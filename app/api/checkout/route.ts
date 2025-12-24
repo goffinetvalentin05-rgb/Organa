@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Authentification
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -22,7 +21,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Récupérer l'email de l'utilisateur
     if (!user.email) {
       return NextResponse.json(
         { error: "Email de l'utilisateur non trouvé" },
@@ -30,10 +28,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Récupérer l'URL de base
     const origin = request.headers.get("origin") || "http://localhost:3000";
 
-    // Créer la session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -45,7 +41,7 @@ export async function POST(request: NextRequest) {
               name: "Plan Pro",
               description: "Abonnement Pro - Accès illimité",
             },
-            unit_amount: 2900, // 29 CHF en centimes
+            unit_amount: 2900,
             recurring: {
               interval: "month",
             },
@@ -66,9 +62,11 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("[API][checkout] Erreur", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création de la session", details: error.message },
+      {
+        error: "Erreur lors de la création de la session",
+        details: error.message,
+      },
       { status: 500 }
     );
   }
 }
-
