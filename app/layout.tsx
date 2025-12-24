@@ -1,4 +1,14 @@
 import "./globals.css";
+import Image from "next/image";
+import { Toaster } from "react-hot-toast";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 export const metadata = {
   title: "Organa",
@@ -11,36 +21,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
-      <body className="bg-black text-white">
-        {/* HEADER */}
-        <header className="w-full border-b border-white/10">
-          <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-            <a href="/" className="text-xl font-bold">
-              Organa
-            </a>
-
-            <nav className="flex items-center gap-4">
-              <a
-                href="/connexion"
-                className="text-sm text-white/80 hover:text-white"
-              >
-                Connexion
-              </a>
-              <a
-                href="/inscription"
-                className="text-sm bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200"
-              >
-                Créer un compte
-              </a>
-            </nav>
-          </div>
-        </header>
-
+    <html lang="fr" className={inter.variable}>
+      <body className="font-body min-h-screen text-white app-bg">
         {/* CONTENU DES PAGES */}
         <main>{children}</main>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#1a1a1f",
+              color: "#fff",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+            },
+            success: {
+              iconTheme: {
+                primary: "#10b981",
+                secondary: "#fff",
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: "#ef4444",
+                secondary: "#fff",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
 }
-
