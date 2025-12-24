@@ -10,9 +10,7 @@ if (!stripeSecretKey) {
   console.error("[WEBHOOK][stripe] STRIPE_SECRET_KEY non configurée");
 }
 
-const stripe = new Stripe(stripeSecretKey || "", {
-  apiVersion: "2025-12-15.clover",
-});
+const stripe = new Stripe(stripeSecretKey || "");
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 

@@ -94,9 +94,7 @@ export async function POST(request: NextRequest) {
     // 2. Initialiser Stripe (stripeSecretKey est garanti non-undefined ici)
     let stripe;
     try {
-      stripe = new Stripe(stripeSecretKey!, {
-        apiVersion: "2025-12-15.clover",
-      });
+      stripe = new Stripe(stripeSecretKey!);
     } catch (stripeInitError: any) {
       console.error("[API][stripe/checkout] Erreur initialisation Stripe:", stripeInitError);
       return NextResponse.json(
