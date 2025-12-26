@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
@@ -12,19 +12,9 @@ import {
 } from "@/lib/mock-data";
 import { Users, FileText, Receipt, AlertCircle, UserPlus, FilePlus } from "@/lib/icons";
 
-export default function TableauDeBordPage() {
+function CheckoutHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [stats, setStats] = useState({
-    totalClients: 0,
-    totalDevis: 0,
-    totalFactures: 0,
-    devisEnAttente: 0,
-    facturesPayees: 0,
-    facturesEnRetard: 0,
-  });
-
-  const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
 
   useEffect(() => {
     // Vérifier si on revient d'un checkout réussi
@@ -35,6 +25,21 @@ export default function TableauDeBordPage() {
       router.replace("/tableau-de-bord");
     }
   }, [searchParams, router]);
+
+  return null;
+}
+
+export default function TableauDeBordPage() {
+  const [stats, setStats] = useState({
+    totalClients: 0,
+    totalDevis: 0,
+    totalFactures: 0,
+    devisEnAttente: 0,
+    facturesPayees: 0,
+    facturesEnRetard: 0,
+  });
+
+  const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
 
   useEffect(() => {
     const clients = clientsAPI.getAll();
@@ -98,6 +103,9 @@ export default function TableauDeBordPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
+      <Suspense fallback={null}>
+        <CheckoutHandler />
+      </Suspense>
       {/* En-tête */}
       <div className="relative">
         <h1 className="font-heading text-2xl md:text-3xl font-bold mb-2 text-primary">
@@ -151,7 +159,9 @@ export default function TableauDeBordPage() {
         <div className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200 hover:shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">En retard</span>
-            <AlertCircle className="w-6 h-6" style={{ color: 'var(--error)' }} />
+            <div style={{ color: 'var(--error)' }}>
+              <AlertCircle className="w-6 h-6" />
+            </div>
           </div>
           <div className="font-heading text-4xl font-bold" style={{ color: 'var(--error)' }}>
             {stats.facturesEnRetard}

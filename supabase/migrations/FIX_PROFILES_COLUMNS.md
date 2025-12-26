@@ -59,3 +59,4 @@ AND column_name IN ('company_name', 'company_email', 'company_phone', 'company_a
 - Les valeurs par défaut sont appliquées uniquement à `primary_color` et `currency`
 
 
+

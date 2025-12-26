@@ -17,3 +17,4 @@ COMMENT ON COLUMN public.profiles.currency IS 'Devise de facturation par défaut
 -- On laisse le check simple car le format hex peut varier (#RGB, #RRGGBB, etc.)
 
 
+

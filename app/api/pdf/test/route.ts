@@ -65,7 +65,7 @@ export async function GET() {
     await browser.close();
 
     // Retourner le PDF avec les en-têtes appropriés
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as any, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

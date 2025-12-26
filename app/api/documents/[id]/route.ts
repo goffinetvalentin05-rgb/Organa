@@ -80,18 +80,6 @@ export async function GET(
       .eq("user_id", user.id)
       .single();
 
-    if (docError || !document) {
-      console.error("[API][documents][GET] Document introuvable:", {
-        id,
-        error: docError?.message,
-        code: docError?.code,
-      });
-      return NextResponse.json(
-        { error: "Document introuvable" },
-        { status: 404 }
-      );
-    }
-
     if (clientError || !client) {
       console.error("[API][documents][GET] Client associé introuvable:", {
         client_id: document.client_id,

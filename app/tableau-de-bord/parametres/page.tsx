@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -32,9 +32,33 @@ async function parseResponseBody(response: Response): Promise<any> {
   }
 }
 
-export default function ParametresPage() {
+function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Vérifier si on revient d'un paiement réussi
+    const sessionId = searchParams?.get("session_id");
+    if (sessionId) {
+      toast.success("Paiement réussi ! Votre compte est maintenant Pro.");
+      onSuccess();
+      // Nettoyer l'URL
+      router.replace("/tableau-de-bord/parametres");
+    }
+
+    // Vérifier si le paiement a été annulé
+    const canceled = searchParams?.get("canceled");
+    if (canceled) {
+      toast.error("Paiement annulé");
+      router.replace("/tableau-de-bord/parametres");
+    }
+  }, [searchParams, router, onSuccess]);
+
+  return null;
+}
+
+export default function ParametresPage() {
+  const router = useRouter();
   const [parametres, setParametres] = useState<Parametres | null>(null);
   const [userPlan, setUserPlan] = useState<"free" | "pro" | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
@@ -172,24 +196,6 @@ export default function ParametresPage() {
     // Récupérer le plan de l'utilisateur
     fetchUserPlan();
   }, [router]);
-
-  useEffect(() => {
-    // Vérifier si on revient d'un paiement réussi
-    const sessionId = searchParams?.get("session_id");
-    if (sessionId) {
-      toast.success("Paiement réussi ! Votre compte est maintenant Pro.");
-      fetchUserPlan();
-      // Nettoyer l'URL
-      router.replace("/tableau-de-bord/parametres");
-    }
-
-    // Vérifier si le paiement a été annulé
-    const canceled = searchParams?.get("canceled");
-    if (canceled) {
-      toast.error("Paiement annulé");
-      router.replace("/tableau-de-bord/parametres");
-    }
-  }, [searchParams, router]);
 
   const fetchUserPlan = async () => {
     try {
@@ -470,6 +476,7 @@ export default function ParametresPage() {
           adresse: normalizedSettings.company_address || "",
           email: normalizedSettings.company_email || "",
           telephone: normalizedSettings.company_phone || "",
+          styleEnTete: "moderne",
           primaryColor: normalizedSettings.primary_color || "#6D5EF8",
           currency: normalizedSettings.currency || "CHF",
           invoiceColor: normalizedSettings.primary_color || "#6D5EF8",
@@ -477,6 +484,9 @@ export default function ParametresPage() {
           emailExpediteur: "",
           nomExpediteur: "",
           resendApiKey: "",
+          iban: "",
+          bankName: "",
+          conditionsPaiement: "",
         });
         if (normalizedSettings.logo_url) {
           setLogoPreview(normalizedSettings.logo_url);
@@ -575,7 +585,11 @@ export default function ParametresPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <>
+      <Suspense fallback={null}>
+        <CheckoutHandler onSuccess={fetchUserPlan} />
+      </Suspense>
+      <div className="max-w-4xl mx-auto space-y-6">
       {/* En-tête */}
       <div>
         <h1 className="text-3xl font-bold">Paramètres</h1>
@@ -1001,6 +1015,7 @@ export default function ParametresPage() {
         </div>
       </form>
     </div>
+    </>
   );
 }
 

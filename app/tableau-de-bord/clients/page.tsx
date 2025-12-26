@@ -2,6 +2,8 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import DeleteClientButton from "./components/DeleteClientButton";
 
+export const dynamic = 'force-dynamic';
+
 interface Client {
   id: string;
   nom: string;
@@ -60,7 +62,7 @@ export default async function ClientsPage() {
     } else {
       const data = await response.json();
       clients = (data.clients || []).filter(
-        (c: Client): c is Client => c.id && typeof c.id === "string"
+        (c: Client): c is Client => typeof c.id === "string" && c.id.length > 0
       );
     }
   } catch (error: any) {

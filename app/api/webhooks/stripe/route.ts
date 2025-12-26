@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       const invoice = event.data.object as Stripe.Invoice;
 
       const customerId = invoice.customer as string;
-      const subscriptionId = invoice.subscription as string;
+      const subscriptionId = typeof (invoice as any).subscription === 'string' ? (invoice as any).subscription : null;
 
       console.log(`[WEBHOOK][stripe] invoice.payment_failed customer=${customerId} subscription=${subscriptionId}`);
 

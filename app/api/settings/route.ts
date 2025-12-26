@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Récupérer les paramètres depuis profiles - UNIQUEMENT les colonnes qui existent
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
-      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency")
+      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           currency: DEFAULT_COMPANY_SETTINGS.currency,
           currency_symbol: defaultCurrencySymbol,
         })
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol")
         .single();
 
       if (createError) {
@@ -370,13 +370,13 @@ export async function PUT(request: NextRequest) {
 
     // Calculer currency_symbol si non défini
     const currency = updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
-    const currency_symbol = updatedProfile?.currency_symbol || getCurrencySymbol(currency);
+    const currency_symbol = (updatedProfile as any)?.currency_symbol || getCurrencySymbol(currency);
 
     // Formater la réponse avec valeurs par défaut robustes
     const rawSettings = {
       primary_color: updatedProfile?.primary_color,
       currency: updatedProfile?.currency,
-      currency_symbol: updatedProfile?.currency_symbol,
+      currency_symbol: (updatedProfile as any)?.currency_symbol,
     };
     
     const companySettings = getCompanySettings(rawSettings);

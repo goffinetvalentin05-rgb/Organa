@@ -102,3 +102,4 @@ COMMENT ON COLUMN public.profiles.currency IS 'Devise de facturation par défaut
 COMMENT ON COLUMN public.profiles.currency_symbol IS 'Symbole de la devise (ex: CHF, €, $). Généré automatiquement depuis currency mais peut être personnalisé.';
 
 
+

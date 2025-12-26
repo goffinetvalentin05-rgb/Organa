@@ -34,7 +34,7 @@ export function getCompanySettings(settings: any): CompanySettings {
   // Valeurs par défaut
   let primary_color = DEFAULT_COMPANY_SETTINGS.primary_color;
   let currency = DEFAULT_COMPANY_SETTINGS.currency;
-  let currency_symbol = DEFAULT_COMPANY_SETTINGS.currency_symbol;
+  let currency_symbol: string = DEFAULT_COMPANY_SETTINGS.currency_symbol;
 
   // Si settings existe et contient primary_color, l'utiliser
   if (settings?.primary_color && typeof settings.primary_color === 'string') {

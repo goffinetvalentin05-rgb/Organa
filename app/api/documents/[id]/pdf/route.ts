@@ -151,7 +151,7 @@ async function getDocumentFromSupabase(id: string, userId: string) {
       phone: "",
       iban: null,
       bankName: null,
-      logoUrl: null,
+      logoUrl: null as string | null,
       conditionsPaiement: null,
     },
     client: {
@@ -278,7 +278,7 @@ export async function GET(
     documentData.company.address = settings.company_address;
     documentData.company.email = settings.company_email;
     documentData.company.phone = settings.company_phone;
-    documentData.company.logoUrl = settings.logo_url || undefined;
+    documentData.company.logoUrl = settings.logo_url ? settings.logo_url : null;
     
     // Utiliser les paramètres depuis les settings (garantis avec valeurs par défaut)
     const companySettings = getCompanySettings(settings);
