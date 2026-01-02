@@ -20,6 +20,7 @@ export interface LigneDocument {
 export interface Devis {
   id: string;
   numero: string;
+  title?: string | null;
   clientId: string;
   client?: Client;
   lignes: LigneDocument[];
@@ -32,6 +33,7 @@ export interface Devis {
 export interface Facture {
   id: string;
   numero: string;
+  title?: string | null;
   clientId: string;
   client?: Client;
   lignes: LigneDocument[];
@@ -266,6 +268,7 @@ export const devisAPI = {
     const facture: Facture = {
       id: Date.now().toString(),
       numero,
+      title: devisItem.title,
       clientId: devisItem.clientId,
       lignes: devisItem.lignes.map(l => ({ ...l })),
       statut: 'brouillon',
@@ -378,6 +381,7 @@ export interface DocumentForPdf {
   };
   document: {
     number: string;
+    title?: string | null;
     date: string;
     dueDate?: string;
     currency: string;
@@ -463,6 +467,7 @@ export function getDocumentForPdf(id: string, type: 'invoice' | 'quote'): Docume
     },
     document: {
       number: document.numero,
+      title: document.title,
       date: document.dateCreation,
       dueDate: document.dateEcheance,
       currency: 'CHF',
