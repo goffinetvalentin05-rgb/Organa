@@ -133,6 +133,7 @@ export async function GET(
       },
       document: {
         number: document.numero,
+        title: document.title || undefined,
         date: document.date_creation,
         dueDate: document.date_echeance || undefined,
         currency: companySettings.currency,
@@ -447,7 +448,7 @@ export async function GET(
           <!-- Document Type and Number -->
           <div class="document-type">${documentTypeLabel}</div>
           <div style="font-size: 12pt; color: #666; margin-bottom: 30px;">
-            N° ${documentData.document.number}
+            ${documentData.document.title ? documentData.document.title : `N° ${documentData.document.number}`}
           </div>
           
           <!-- Client and Document Info -->
@@ -553,8 +554,9 @@ export async function GET(
 
     console.log("[DEBUG PDF] PDF généré avec succès, taille:", pdfBuffer.length, "bytes");
 
-    // Nom du fichier
-    const filename = `organa-${documentData.document.type}-${documentData.document.number}.pdf`;
+    // Nom du fichier (utiliser le title si présent, sinon le numéro)
+    const documentName = documentData.document.title || documentData.document.number;
+    const filename = `organa-${documentData.document.type}-${documentName.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`;
 
     console.log("[DEBUG PDF] Retour du PDF avec headers corrects");
     console.log("[DEBUG PDF] ===== FIN REQUÊTE PDF (SUCCÈS) =====");

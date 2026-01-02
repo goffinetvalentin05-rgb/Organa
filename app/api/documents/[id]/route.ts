@@ -49,6 +49,7 @@ export async function GET(
         date_echeance,
         date_paiement,
         notes,
+        title,
         total_ht,
         total_tva,
         total_ttc,
@@ -110,6 +111,7 @@ export async function GET(
       dateEcheance: document.date_echeance,
       datePaiement: document.date_paiement,
       notes: document.notes,
+      title: document.title,
       totals: {
         totalHT: document.total_ht || 0,
         totalTVA: document.total_tva || 0,

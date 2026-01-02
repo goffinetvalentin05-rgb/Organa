@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, clientId, lignes, statut, dateCreation, dateEcheance, datePaiement, notes } = body;
+    const { type, clientId, lignes, statut, dateCreation, dateEcheance, datePaiement, notes, title } = body;
 
     // Log du payload reçu pour debugging
     console.log("[API][documents][POST] Payload reçu:", {
@@ -192,6 +192,11 @@ export async function POST(request: NextRequest) {
       documentData.notes = notes;
     }
 
+    // Ajouter title uniquement si fourni
+    if (title && title.trim() !== "") {
+      documentData.title = title.trim();
+    }
+
     console.log("[API][documents][POST] Tentative d'insertion dans public.documents:", {
       user_id: user.id,
       client_id: clientId,
@@ -280,7 +285,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes } = body;
+    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes, title } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -341,6 +346,15 @@ export async function PATCH(request: NextRequest) {
         updateData.notes = notes;
       } else {
         updateData.notes = null;
+      }
+    }
+
+    // Ajouter title uniquement si fourni
+    if (title !== undefined) {
+      if (title && title.trim() !== "") {
+        updateData.title = title.trim();
+      } else {
+        updateData.title = null;
       }
     }
 

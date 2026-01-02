@@ -30,6 +30,7 @@ export default function NouveauDevisPage() {
   const [statut, setStatut] = useState<"brouillon" | "envoye" | "accepte" | "refuse">("brouillon");
   const [dateEcheance, setDateEcheance] = useState("");
   const [notes, setNotes] = useState("");
+  const [title, setTitle] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
 
@@ -116,6 +117,7 @@ export default function NouveauDevisPage() {
           dateCreation: new Date().toISOString().split("T")[0],
           ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
           ...(notes && notes.trim() !== "" ? { notes } : {}),
+          ...(title && title.trim() !== "" ? { title } : {}),
         }),
       });
 
@@ -172,6 +174,7 @@ export default function NouveauDevisPage() {
           dateCreation: new Date().toISOString().split("T")[0],
           ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
           ...(notes && notes.trim() !== "" ? { notes } : {}),
+          ...(title && title.trim() !== "" ? { title } : {}),
         }),
         });
 
@@ -200,6 +203,7 @@ export default function NouveauDevisPage() {
             statut,
             ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : { dateEcheance: null }),
             ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
+            ...(title && title.trim() !== "" ? { title } : { title: null }),
           }),
         });
 
@@ -268,6 +272,22 @@ export default function NouveauDevisPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white/90 mb-2">
+              Nom du document (optionnel)
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Devis Valentin"
+              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            />
+            <p className="text-xs text-white/50 mt-1">
+              Si non renseigné, le numéro automatique sera utilisé
+            </p>
           </div>
 
           <div>

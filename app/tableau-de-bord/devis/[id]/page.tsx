@@ -164,7 +164,10 @@ export default function DevisDetailPage() {
           >
             ← Retour aux devis
           </Link>
-          <h1 className="text-3xl font-bold">{devis.numero}</h1>
+          <h1 className="text-3xl font-bold">{devis.title || devis.numero}</h1>
+          {devis.title && (
+            <p className="text-sm text-white/50 mt-1">Numéro: {devis.numero}</p>
+          )}
           <p className="mt-2 text-white/70">
             Client: {devis.client?.nom || "Client inconnu"}
           </p>

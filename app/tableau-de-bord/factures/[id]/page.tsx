@@ -175,7 +175,10 @@ export default function FactureDetailPage() {
           >
             ← Retour aux factures
           </Link>
-          <h1 className="text-3xl font-bold">{facture.numero}</h1>
+          <h1 className="text-3xl font-bold">{facture.title || facture.numero}</h1>
+          {facture.title && (
+            <p className="text-sm text-white/50 mt-1">Numéro: {facture.numero}</p>
+          )}
           <p className="mt-2 text-white/70">
             Client: {facture.client?.nom || "Client inconnu"}
           </p>
