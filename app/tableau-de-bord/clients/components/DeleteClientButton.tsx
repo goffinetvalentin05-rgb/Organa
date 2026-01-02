@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Trash, Loader } from "@/lib/icons";
 
 interface DeleteClientButtonProps {
   clientId: string;
@@ -47,12 +48,21 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
     <button
       onClick={handleDelete}
       disabled={isDeleting}
-      className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+      className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
     >
-      {isDeleting ? "..." : "🗑️ Supprimer"}
+      {isDeleting ? (
+        <Loader className="w-4 h-4 animate-spin" />
+      ) : (
+        <Trash className="w-4 h-4" />
+      )}
+      Supprimer
     </button>
   );
 }
+
+
+
+
 
 
 

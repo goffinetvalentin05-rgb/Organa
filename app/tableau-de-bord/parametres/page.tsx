@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Parametres } from "@/lib/mock-data";
+import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
 
 /**
  * Helper pour lire le body d'une Response une seule fois
@@ -599,8 +600,9 @@ export default function ParametresPage() {
       </div>
 
       {saved && (
-        <div className="rounded-lg bg-green-500/20 border border-green-500/50 p-4 text-green-300">
-          ✅ Paramètres enregistrés avec succès
+        <div className="rounded-lg bg-green-500/20 border border-green-500/50 p-4 text-green-300 flex items-center gap-2">
+          <CheckCircle className="w-5 h-5" />
+          Paramètres enregistrés avec succès
         </div>
       )}
 
@@ -680,15 +682,25 @@ export default function ParametresPage() {
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-white/50 p-4">
-                    <span className="text-4xl mb-2">🏢</span>
+                    <Building2 className="w-12 h-12 mb-2" />
                     <span className="text-xs text-center">Aucun logo</span>
                   </div>
                 )}
               </div>
               <div className="flex-1 space-y-3">
                 <div>
-                  <label className="inline-block px-4 py-2 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all cursor-pointer">
-                    {uploading ? "⏳ Upload en cours..." : "📤 Choisir un logo"}
+                  <label className="inline-block px-4 py-2 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all cursor-pointer flex items-center gap-2">
+                    {uploading ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Upload en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Choisir un logo
+                      </>
+                    )}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/jpg,image/svg+xml"
@@ -706,9 +718,19 @@ export default function ParametresPage() {
                     type="button"
                     onClick={handleLogoDelete}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {deleting ? "⏳ Suppression..." : "🗑️ Supprimer le logo"}
+                    {deleting ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Suppression...
+                      </>
+                    ) : (
+                      <>
+                        <Trash className="w-4 h-4" />
+                        Supprimer le logo
+                      </>
+                    )}
                   </button>
                 )}
               </div>

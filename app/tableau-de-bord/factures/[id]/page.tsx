@@ -13,6 +13,7 @@ import {
   Facture,
 } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils/currency";
+import { Eye, Download, Mail, Trash, FileText } from "@/lib/icons";
 
 export default function FactureDetailPage() {
   const router = useRouter();
@@ -183,9 +184,10 @@ export default function FactureDetailPage() {
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !facture.client?.email}
-            className="px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            {envoiEmail ? "⏳ Envoi..." : "📧 Envoyer par email"}
+            <Mail className="w-4 h-4" />
+            {envoiEmail ? "Envoi..." : "Envoyer par email"}
           </button>
           <button
             onClick={() => {
@@ -198,9 +200,10 @@ export default function FactureDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            👁️ Prévisualiser PDF
+            <Eye className="w-4 h-4" />
+            Prévisualiser PDF
           </button>
           <button
             onClick={() => {
@@ -218,23 +221,26 @@ export default function FactureDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            📥 Télécharger PDF
+            <Download className="w-4 h-4" />
+            Télécharger PDF
           </button>
           {facture.statut !== "paye" && (
             <button
               onClick={handleCreerTacheRelance}
-              className="px-4 py-2 rounded-lg bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 font-medium transition-all"
+              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all flex items-center gap-2 border border-subtle"
             >
-              📋 Créer tâche de relance
+              <FileText className="w-4 h-4" />
+              Créer tâche de relance
             </button>
           )}
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all"
+            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all flex items-center gap-2"
           >
-            🗑️ Supprimer
+            <Trash className="w-4 h-4" />
+            Supprimer
           </button>
         </div>
       </div>

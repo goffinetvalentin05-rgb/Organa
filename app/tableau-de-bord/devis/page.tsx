@@ -9,6 +9,7 @@ import {
   calculerTotalTTC,
   Devis,
 } from "@/lib/mock-data";
+import { Eye, Trash, Plus } from "@/lib/icons";
 
 export default function DevisPage() {
   const router = useRouter();
@@ -68,9 +69,10 @@ export default function DevisPage() {
         </div>
         <Link
           href="/tableau-de-bord/devis/nouveau"
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
         >
-          ➕ Créer un devis
+          <Plus className="w-5 h-5" />
+          Créer un devis
         </Link>
       </div>
 
@@ -144,15 +146,17 @@ export default function DevisPage() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/tableau-de-bord/devis/${devisItem.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center gap-1.5"
                           >
-                            👁️ Voir
+                            <Eye className="w-4 h-4" />
+                            Voir
                           </Link>
                           <button
                             onClick={() => handleDelete(devisItem.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm"
+                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                            title="Supprimer"
                           >
-                            🗑️
+                            <Trash className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -167,6 +171,10 @@ export default function DevisPage() {
     </div>
   );
 }
+
+
+
+
 
 
 

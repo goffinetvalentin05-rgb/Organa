@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import DeleteClientButton from "./components/DeleteClientButton";
+import { Info, Plus } from "@/lib/icons";
 
 export const dynamic = 'force-dynamic';
 
@@ -94,16 +95,18 @@ export default async function ClientsPage() {
         </div>
         <Link
           href="/tableau-de-bord/clients/nouveau"
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
         >
-          ➕ Nouveau client
+          <Plus className="w-5 h-5" />
+          Nouveau client
         </Link>
       </div>
 
       {/* Message informatif */}
       <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4">
-        <p className="text-yellow-300 text-sm">
-          ℹ️ <strong>Modification désactivée :</strong> Pour modifier un client, veuillez le supprimer et le recréer.
+        <p className="text-yellow-300 text-sm flex items-start gap-2">
+          <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span><strong>Modification désactivée :</strong> Pour modifier un client, veuillez le supprimer et le recréer.</span>
         </p>
       </div>
 

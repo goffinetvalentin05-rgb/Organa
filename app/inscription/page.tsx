@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 export default function InscriptionPage() {
   const router = useRouter();
+
   const [nomEntreprise, setNomEntreprise] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,18 +17,17 @@ export default function InscriptionPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!nomEntreprise || nomEntreprise.trim().length === 0) {
+    if (!nomEntreprise.trim()) {
       toast.error("Le nom de l'entreprise est obligatoire");
       return;
     }
 
-    if (!email || !email.includes("@")) {
+    if (!email.includes("@")) {
       toast.error("Veuillez entrer une adresse email valide");
       return;
     }
 
-    if (!password || password.length < 8) {
+    if (password.length < 8) {
       toast.error("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
@@ -42,46 +42,47 @@ export default function InscriptionPage() {
     try {
       const supabase = createClient();
 
-      // Créer l'utilisateur
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // 1️⃣ Créer l'utilisateur
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (authError) {
-        throw authError;
+      if (error) {
+        alert(error.message);
+        setLoading(false);
+        return;
       }
-
-      if (!authData.user) {
-        throw new Error("Erreur lors de la création du compte");
+      
+      if (!data.user) {
+        alert("Utilisateur non créé");
+        setLoading(false);
+        return;
       }
+      
 
-      console.log("[AUTH][Signup] Compte créé avec succès", {
-        id: authData.user.id,
-        email: authData.user.email,
-      });
-
-      // Créer l'organisation pour cet utilisateur
+      // 2️⃣ Créer l'organisation (alignée avec la DB)
       const { error: orgError } = await supabase
         .from("organizations")
         .insert({
-          user_id: authData.user.id,
-          nom_entreprise: nomEntreprise.trim(),
-          email: email,
+          name: nomEntreprise.trim(),
+          email: data.user.email,
+          owner_id: data.user.id,
         });
 
-      if (orgError) {
-        // Si l'organisation n'a pas pu être créée, supprimer l'utilisateur
-        await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {});
-        throw orgError;
-      }
+        if (orgError) {
+          alert(orgError.message);
+          setLoading(false);
+          return;
+        }
+        
 
-      toast.success("Compte créé avec succès !");
+      toast.success("Compte créé avec succès 🎉");
       router.push("/tableau-de-bord");
       router.refresh();
-    } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
-      toast.error(error.message || "Erreur lors de la création du compte");
+    } catch (err: any) {
+      console.error("Erreur inscription:", err);
+      toast.error(err.message || "Erreur lors de la création du compte");
     } finally {
       setLoading(false);
     }
@@ -97,60 +98,46 @@ export default function InscriptionPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Nom de l'entreprise *"
-              value={nomEntreprise}
-              onChange={(e) => setNomEntreprise(e.target.value)}
-              required
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Nom de l'entreprise *"
+            value={nomEntreprise}
+            onChange={(e) => setNomEntreprise(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+          />
 
-          <div>
-            <input
-              type="email"
-              placeholder="Email *"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email *"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+          />
 
-          <div>
-            <input
-              type="password"
-              placeholder="Mot de passe (min. 8 caractères) *"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Mot de passe (min. 8 caractères) *"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+          />
 
-          <div>
-            <input
-              type="password"
-              placeholder="Confirmer le mot de passe *"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Confirmer le mot de passe *"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-white text-black py-2 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-lg bg-white text-black py-2 font-medium hover:bg-white/90 transition disabled:opacity-50"
           >
             {loading ? "Création..." : "Créer mon compte"}
           </button>
@@ -158,7 +145,7 @@ export default function InscriptionPage() {
 
         <p className="mt-6 text-sm text-white/70">
           Déjà un compte ?{" "}
-          <a href="/connexion" className="underline text-white hover:text-white/80">
+          <a href="/connexion" className="underline hover:text-white">
             Se connecter
           </a>
         </p>

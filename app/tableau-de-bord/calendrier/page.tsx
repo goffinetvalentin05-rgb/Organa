@@ -6,6 +6,7 @@ import {
   calendrierAPI,
   EvenementCalendrier,
 } from "@/lib/mock-data";
+import { Plus, Calendar, CheckCircle, Edit, Trash } from "@/lib/icons";
 
 type VueCalendrier = "mois" | "semaine" | "jour";
 type Onglet = "calendrier" | "taches";
@@ -198,9 +199,10 @@ export default function CalendrierPage() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
         >
-          ➕ {ongletActif === "taches" ? "Nouvelle tâche" : "Nouvel événement"}
+          <Plus className="w-5 h-5" />
+          {ongletActif === "taches" ? "Nouvelle tâche" : "Nouvel événement"}
         </button>
       </div>
 
@@ -208,23 +210,25 @@ export default function CalendrierPage() {
       <div className="flex gap-2 border-b border-white/10">
         <button
           onClick={() => setOngletActif("calendrier")}
-          className={`px-6 py-3 font-medium transition-all ${
+          className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "calendrier"
               ? "border-b-2 border-[#7C5CFF] text-white"
               : "text-white/70 hover:text-white"
           }`}
         >
-          📅 Calendrier
+          <Calendar className="w-5 h-5" />
+          Calendrier
         </button>
         <button
           onClick={() => setOngletActif("taches")}
-          className={`px-6 py-3 font-medium transition-all ${
+          className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "taches"
               ? "border-b-2 border-[#7C5CFF] text-white"
               : "text-white/70 hover:text-white"
           }`}
         >
-          ✅ Tâches
+          <CheckCircle className="w-5 h-5" />
+          Tâches
         </button>
       </div>
 
@@ -375,9 +379,13 @@ export default function CalendrierPage() {
                             className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-all"
                           >
                             <div className="flex items-start gap-4 flex-1">
-                              <span className="text-2xl">
-                                {evt.type === "rdv" ? "📅" : "✅"}
-                              </span>
+                              <div className="mt-1">
+                                {evt.type === "rdv" ? (
+                                  <Calendar className="w-5 h-5 text-blue-300" />
+                                ) : (
+                                  <CheckCircle className="w-5 h-5 text-green-300" />
+                                )}
+                              </div>
                               <div className="flex-1">
                                 <div className="font-medium">{evt.titre}</div>
                                 {evt.description && (
@@ -396,15 +404,17 @@ export default function CalendrierPage() {
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleOpenModal(evt)}
-                                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
+                                title="Modifier"
                               >
-                                ✏️
+                                <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(evt.id)}
-                                className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm"
+                                className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                                title="Supprimer"
                               >
-                                🗑️
+                                <Trash className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
@@ -461,15 +471,17 @@ export default function CalendrierPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleOpenModal(tache)}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
+                        title="Modifier"
                       >
-                        ✏️
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(tache.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm"
+                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                        title="Supprimer"
                       >
-                        🗑️
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -502,9 +514,10 @@ export default function CalendrierPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleDelete(tache.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm"
+                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                        title="Supprimer"
                       >
-                        🗑️
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

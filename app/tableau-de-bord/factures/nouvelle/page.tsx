@@ -9,6 +9,7 @@ import {
   calculerTVA,
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
+import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
 
 interface Client {
   id: string;
@@ -325,9 +326,10 @@ export default function NouvelleFacturePage() {
             <button
               type="button"
               onClick={ajouterLigne}
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all text-sm"
+              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all text-sm flex items-center gap-2 border border-subtle"
             >
-              ➕ Ajouter une ligne
+              <Plus className="w-4 h-4" />
+              Ajouter une ligne
             </button>
           </div>
 
@@ -433,9 +435,10 @@ export default function NouvelleFacturePage() {
                       <button
                         type="button"
                         onClick={() => supprimerLigne(ligne.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm"
+                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm flex items-center gap-1.5"
                       >
-                        🗑️ Supprimer
+                        <Trash className="w-4 h-4" />
+                        Supprimer
                       </button>
                     )}
                   </div>
@@ -500,17 +503,37 @@ export default function NouvelleFacturePage() {
             type="button"
             onClick={() => saveAndOpenPdf(false)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            {savingForPdf ? "⏳ Sauvegarde..." : "👁️ Prévisualiser PDF"}
+            {savingForPdf ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4" />
+                Prévisualiser PDF
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={() => saveAndOpenPdf(true)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            {savingForPdf ? "⏳ Sauvegarde..." : "📥 Télécharger PDF"}
+            {savingForPdf ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                Télécharger PDF
+              </>
+            )}
           </button>
           <button
             type="submit"

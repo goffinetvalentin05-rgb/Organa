@@ -13,6 +13,7 @@ import {
   Devis,
 } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils/currency";
+import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
 
 export default function DevisDetailPage() {
   const router = useRouter();
@@ -168,13 +169,14 @@ export default function DevisDetailPage() {
             Client: {devis.client?.nom || "Client inconnu"}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !devis.client?.email}
-            className="px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            {envoiEmail ? "⏳ Envoi..." : "📧 Envoyer par email"}
+            <Mail className="w-4 h-4" />
+            {envoiEmail ? "Envoi..." : "Envoyer par email"}
           </button>
           <button
             onClick={() => {
@@ -187,9 +189,10 @@ export default function DevisDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            👁️ Prévisualiser PDF
+            <Eye className="w-4 h-4" />
+            Prévisualiser PDF
           </button>
           <button
             onClick={() => {
@@ -207,21 +210,24 @@ export default function DevisDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
-            📥 Télécharger PDF
+            <Download className="w-4 h-4" />
+            Télécharger PDF
           </button>
           <button
             onClick={handleTransformerEnFacture}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
           >
-            ➡️ Transformer en facture
+            <ArrowRight className="w-4 h-4" />
+            Transformer en facture
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all"
+            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all flex items-center gap-2"
           >
-            🗑️ Supprimer
+            <Trash className="w-4 h-4" />
+            Supprimer
           </button>
         </div>
       </div>
