@@ -198,3 +198,15 @@ h3 {
 .accent-border {
   border-color: var(--accent-border);
 }
+
+.text-success {
+  color: var(--success);
+}
+
+.text-error {
+  color: var(--error);
+}
+
+.text-warning {
+  color: var(--warning);
+}

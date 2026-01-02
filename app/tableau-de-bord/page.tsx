@@ -290,7 +290,7 @@ export default function TableauDeBordPage() {
         <div className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Trésorerie ce mois</span>
-            <DollarSign className="w-6 h-6" style={{ color: 'var(--success)' }} />
+            <DollarSign className="w-6 h-6 text-success" />
           </div>
           <div className="font-heading text-3xl font-bold" style={{ color: 'var(--success)' }}>
             {formatMontant(stats.montantTresorerieMois)}
@@ -303,7 +303,7 @@ export default function TableauDeBordPage() {
         <div className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200 hover:shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Factures en retard</span>
-            <AlertCircle className="w-6 h-6" style={{ color: 'var(--error)' }} />
+            <AlertCircle className="w-6 h-6 text-error" />
           </div>
           <div className="font-heading text-4xl font-bold" style={{ color: 'var(--error)' }}>
             {stats.facturesEnRetard}
@@ -384,9 +384,9 @@ export default function TableauDeBordPage() {
               >
                 <div className="flex items-center gap-3 flex-1">
                   {item.type === "facture-retard" ? (
-                    <AlertCircle className="w-5 h-5" style={{ color: 'var(--error)' }} />
+                    <AlertCircle className="w-5 h-5 text-error" />
                   ) : item.type === "devis-sans-reponse" ? (
-                    <Clock className="w-5 h-5" style={{ color: 'var(--warning)' }} />
+                    <Clock className="w-5 h-5 text-warning" />
                   ) : (
                     <Mail className="w-5 h-5 text-secondary" />
                   )}
