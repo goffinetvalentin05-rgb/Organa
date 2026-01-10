@@ -55,14 +55,15 @@ export default function Home() {
               </span>
             </div>
             
-            {/* H1 */}
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight tracking-tight">
+            {/* ⚠️ SIGNATURE DE MARQUE - NE JAMAIS MODIFIER, RACCOURCIR OU REFORMULER ⚠️ */}
+            {/* Ce texte est une signature de marque. Il doit rester visible, lisible et central. */}
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight tracking-tight text-center">
               <span className="block text-white mb-3">Moins d'administratif.</span>
               <span className="block text-white">Plus de temps pour ce qui compte vraiment.</span>
             </h1>
             
-            {/* Sous-titre */}
-            <p className="font-body text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed font-normal">
+            {/* Sous-titre - Signature de marque (ne jamais modifier) */}
+            <p className="font-body text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed font-normal text-center">
               Organa automatise la gestion administrative de votre entreprise
               afin que vous puissiez consacrer plus de temps à vos clients,
               à votre activité… et à ce qui compte vraiment pour vous.
@@ -99,59 +100,22 @@ export default function Home() {
 
       {/* 2️⃣ SECTION PROBLÈME */}
       <section className="relative py-20 md:py-28 px-6 z-10 bg-black/10 border-y border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 text-center leading-tight max-w-4xl mx-auto">
-            Vous perdez trop de temps sur des tâches qui ne rapportent rien
-          </h2>
-          
-          <p className="font-body text-lg md:text-xl text-white/80 mb-16 text-center max-w-3xl mx-auto leading-relaxed">
-            Entre les outils éparpillés, les factures à faire manuellement et les relances oubliées, 
-            <strong className="text-white"> l'administratif devient une vraie charge mentale.</strong>
+        <div className="max-w-4xl mx-auto">
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed font-normal">
+            Votre temps est trop précieux pour être perdu dans l'administratif.
+            Pourtant, ce sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Problème 1 */}
-            <div className="bg-black/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-12 h-12 mb-6 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-lg font-bold text-white mb-3">Trop de temps perdu</h3>
-              <p className="font-body text-white/70 text-sm leading-relaxed">
-                Des heures à préparer chaque devis, chaque facture, chaque relance manuellement. 
-                <strong className="text-white/90"> Ce temps, vous pourriez le passer à développer votre activité.</strong>
-              </p>
-            </div>
-            
-            {/* Problème 2 */}
-            <div className="bg-black/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-12 h-12 mb-6 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-lg font-bold text-white mb-3">Outils éparpillés</h3>
-              <p className="font-body text-white/70 text-sm leading-relaxed">
-                Excel pour les clients, Word pour les factures, votre boîte mail pour les relances. 
-                <strong className="text-white/90"> Aucune vision d'ensemble, tout est dispersé.</strong>
-              </p>
-            </div>
-            
-            {/* Problème 3 */}
-            <div className="bg-black/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-12 h-12 mb-6 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-lg font-bold text-white mb-3">Stress administratif</h3>
-              <p className="font-body text-white/70 text-sm leading-relaxed">
-                Factures oubliées, relances manquées, paiements en retard non identifiés. 
-                <strong className="text-white/90"> Vous ne savez jamais vraiment où vous en êtes.</strong>
-              </p>
-            </div>
-          </div>
+          <p className="font-body text-lg md:text-xl text-white/80 mb-8 text-center leading-relaxed">
+            Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux…
+            L'administratif s'accumule, ralentit votre activité et devient une charge mentale permanente.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 text-center leading-relaxed">
+            Ce temps perdu a un coût réel :
+            moins de disponibilité pour vos clients, moins d'énergie pour développer votre entreprise,
+            et moins de temps investi là où il crée réellement de la valeur.
+          </p>
         </div>
       </section>
 
