@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const id = context.params.id;
+  const params = await context.params;
+  const id = params.id;
 
   const { searchParams } = new URL(request.url);
   const typeParam = searchParams.get("type"); // "quote" | "invoice"
