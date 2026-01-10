@@ -142,63 +142,112 @@ export default function Home() {
       {/* 4️⃣ SECTION COMMENT ÇA MARCHE */}
       <section className="relative py-20 md:py-28 px-6 z-10 bg-black/10 border-y border-white/5">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 text-center leading-tight">
-            Comment ça marche
-          </h2>
-          
-          <p className="font-body text-lg text-white/80 mb-16 text-center max-w-2xl mx-auto">
-            Un processus simple, en 3 étapes, pour reprendre le contrôle
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-16 text-center leading-relaxed font-normal">
+            Une gestion claire, structurée et sous contrôle.
           </p>
           
-          <div className="space-y-12 md:space-y-0 md:grid md:grid-cols-3 md:gap-12 max-w-5xl mx-auto">
+          <div className="space-y-8 max-w-5xl mx-auto">
             {/* Étape 1 */}
-            <div className="text-center relative">
-              <div className="relative mb-6 flex justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-2xl flex items-center justify-center relative z-10">
-                  <span className="font-heading text-3xl font-bold text-white">1</span>
+            <div className="bg-black/20 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">1</span>
                 </div>
-                {/* Flèche vers étape 2 - visible uniquement sur desktop */}
-                <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500/40 to-purple-500/40" style={{ width: 'calc(100% + 3rem)', left: '100%' }}>
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Centralisez vos clients</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Vous créez vos clients une seule fois.
+                    Leurs informations sont automatiquement utilisées pour vos devis et factures,
+                    évitant les ressaisies et les erreurs.
+                  </p>
                 </div>
               </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-4">Vous centralisez</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Importez vos clients, ajoutez vos informations d'entreprise, personnalisez vos documents. 
-                <strong className="text-white"> Tout au même endroit.</strong>
-              </p>
             </div>
             
             {/* Étape 2 */}
-            <div className="text-center relative">
-              <div className="relative mb-6 flex justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-2xl flex items-center justify-center relative z-10">
-                  <span className="font-heading text-3xl font-bold text-white">2</span>
+            <div className="bg-black/20 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">2</span>
                 </div>
-                {/* Flèche vers étape 3 - visible uniquement sur desktop */}
-                <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500/40 to-purple-500/40" style={{ width: 'calc(100% + 3rem)', left: '100%' }}>
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Créez, envoyez et suivez vos devis</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    À partir d'un client, vous créez un devis en quelques clics.
+                    Vous l'envoyez directement par e-mail depuis Organa
+                    ou le téléchargez selon vos besoins.
+                    Chaque devis est suivi : brouillon, envoyé, validé.
+                  </p>
                 </div>
               </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-4">Organa automatise</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Création de documents en un clic, transformation devis → facture automatique, 
-                relances programmées. <strong className="text-white"> L'intelligence au service de votre temps.</strong>
-              </p>
             </div>
             
             {/* Étape 3 */}
-            <div className="text-center relative">
-              <div className="relative mb-6 flex justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-2xl flex items-center justify-center">
-                  <span className="font-heading text-3xl font-bold text-white">3</span>
+            <div className="bg-black/20 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">3</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Transformez vos devis en factures</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Une fois le devis accepté, vous le transformez instantanément en facture.
+                    Aucun doublon, aucune perte d'information.
+                  </p>
                 </div>
               </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-4">Vous gagnez du temps</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Moins d'administratif, plus de clarté, plus de sérénité. 
-                <strong className="text-white"> Vous vous concentrez sur ce qui compte vraiment : votre activité.</strong>
-              </p>
+            </div>
+            
+            {/* Étape 4 */}
+            <div className="bg-black/20 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">4</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Personnalisez vos documents à votre image</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Vous configurez vos paramètres : logo, en-tête, coordonnées,
+                    informations bancaires et mentions.
+                    Tous vos documents sont générés automatiquement avec votre identité.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 5 - Dashboard - Point central mis en valeur */}
+            <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-blue-500/40 rounded-xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-purple-500/30 border-2 border-blue-400/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">5</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Pilotez votre activité depuis le dashboard</h3>
+                  <p className="font-body text-white/90 leading-relaxed text-sm md:text-base">
+                    Le dashboard vous offre une vue d'ensemble claire :
+                    documents en cours, factures payées ou en attente,
+                    actions à effectuer, relances à prévoir.
+                    Vous savez immédiatement où vous en êtes.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 6 */}
+            <div className="bg-black/20 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">6</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Suivez vos paiements et vos tâches</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Chaque facture peut être marquée comme payée, en attente ou brouillon.
+                    Des raccourcis vous permettent de relancer et de garder le contrôle.
+                    Un calendrier intégré vous aide à organiser vos tâches et échéances.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
