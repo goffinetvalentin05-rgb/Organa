@@ -70,8 +70,6 @@ export async function GET() {
         client={data.client}
         document={data.document}
         lines={data.lines}
-        totals={data.totals}
-        primaryColor={data.primaryColor}
       />
     );
 
