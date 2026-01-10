@@ -74,7 +74,7 @@ export async function GET() {
     );
 
     // Retourner le PDF pour prévisualisation (inline)
-    return new NextResponse(pdfBuffer, {
+    return new Response(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

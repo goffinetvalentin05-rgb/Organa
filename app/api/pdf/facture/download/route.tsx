@@ -82,7 +82,7 @@ export async function GET() {
     const filename = `facture-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;
 
     // Retourner le PDF pour téléchargement (attachment)
-    return new NextResponse(pdfBuffer, {
+    return new Response(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
