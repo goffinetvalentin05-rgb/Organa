@@ -77,7 +77,7 @@ export async function GET() {
     const filename = `devis-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;
 
     // Retourner le PDF pour téléchargement (attachment)
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

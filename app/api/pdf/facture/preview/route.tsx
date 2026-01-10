@@ -79,7 +79,7 @@ export async function GET() {
     );
 
     // Retourner le PDF pour prévisualisation (inline)
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
