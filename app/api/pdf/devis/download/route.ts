@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { DevisPdf } from "@/lib/pdf/DevisPdf";
-import React from "react";
 
 export const runtime = "nodejs";
 
@@ -60,8 +59,7 @@ export async function GET() {
     const data = getMockDevisData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfDoc = React.createElement(DevisPdf, data);
-    const pdfBuffer = await renderToBuffer(pdfDoc);
+    const pdfBuffer = await renderToBuffer(<DevisPdf {...data} />);
 
     // Nom du fichier avec la date
     const filename = `devis-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;

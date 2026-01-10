@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
-import React from "react";
 
 export const runtime = "nodejs";
 
@@ -65,8 +64,7 @@ export async function GET() {
     const data = getMockFactureData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfDoc = React.createElement(FacturePdf, data);
-    const pdfBuffer = await renderToBuffer(pdfDoc);
+    const pdfBuffer = await renderToBuffer(<FacturePdf {...data} />);
 
     // Retourner le PDF pour prévisualisation (inline)
     return new NextResponse(pdfBuffer, {
