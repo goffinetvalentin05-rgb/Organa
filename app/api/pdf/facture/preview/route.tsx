@@ -70,6 +70,11 @@ export async function GET() {
         client={data.client}
         document={data.document}
         lines={data.lines}
+        totals={{
+          totalHT: 0,
+          totalTVA: 0,
+          totalTTC: 0,
+        }}
       />
     );
 
