@@ -1,0 +1,34 @@
+[33m6836195[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: add default export to devis [id] page
+[33m898b75b[m fix: pdf preview html + pdf download nodejs
+[33m3eb0996[m description claire de la modif
+[33md7e359a[m description claire de la modif
+[33me09afd8[m fix: move pdf route to edge runtime to avoid build execution
+[33m6e2a6dd[m fix: force react 18 for satori compatibility
+[33m6e5860a[m chore: downgrade react to 18 for satori compatibility
+[33m54bdaec[m chore: remove react-pdf DocumentPDF component
+[33me17f04c[m chore: remove remaining react-pdf test route
+[33ma7a8f03[m feat: generate PDF via HTML using satori (no chromium)
+[33mdf67ded[m fix: replace undefined JSX children with null in react-pdf
+[33m7b7a95f[m fix: remove nested Text components in react-pdf
+[33mcfb010d[m description claire de la modif
+[33mdac35e1[m description claire de la modif
+[33m44dc24c[m fix: prevent undefined styles in react-pdf
+[33m457e9af[m fix: guard undefined data in PDF generation
+[33m9c961a6[m fix: correct react-pdf renderToBuffer usage
+[33md6be528[m chore: install react-pdf with legacy peer deps
+[33m3a6b282[m fix: generate PDF without chromium using react-pdf
+[33m9683bf1[m fix: switch to puppeteer + sparticuz chromium for PDF on Vercel
+[33m6cb33bd[m fix: PDF generation with sparticuz chromium on Vercel
+[33m24a5e40[m fix: PDF generation compatible with Vercel
+[33m5bb7a3c[m[33m ([m[1;32mfix--PDF-generation-compatible-with-Vercel[m[33m)[m description claire de la modif
+[33m7e542cd[m description claire de la modif
+[33m7ff41cc[m description claire de la modif
+[33m91dd7a9[m description claire de la modif
+[33m0718881[m UI dashboard: boutons pro sans emojis
+[33m5a563fe[m fix: create organizations table
+[33m7429353[m Projet prêt pour déploiement
+[33m1035bde[m fix: dÃ©sactiver endpoint debug schema pour corriger erreur TypeScript build Vercel
+[33mb5b40a4[m Fix checkout route syntax
+[33mc62328d[m Clean Stripe config
+[33m6f11ae5[m Initial commit
+[33mc585dcc[m Base Organa: landing + auth pages + header + dashboard
