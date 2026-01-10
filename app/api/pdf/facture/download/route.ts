@@ -64,7 +64,16 @@ export async function GET() {
     const data = getMockFactureData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfBuffer = await renderToBuffer(<FacturePdf {...data} />);
+    const pdfBuffer = await renderToBuffer(
+      <FacturePdf
+        company={data.company}
+        client={data.client}
+        document={data.document}
+        lines={data.lines}
+        totals={data.totals}
+        primaryColor={data.primaryColor}
+      />
+    );
 
     // Nom du fichier avec la date
     const filename = `facture-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;

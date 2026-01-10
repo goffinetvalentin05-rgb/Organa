@@ -59,7 +59,16 @@ export async function GET() {
     const data = getMockDevisData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfBuffer = await renderToBuffer(<DevisPdf {...data} />);
+    const pdfBuffer = await renderToBuffer(
+      <DevisPdf
+        company={data.company}
+        client={data.client}
+        document={data.document}
+        lines={data.lines}
+        totals={data.totals}
+        primaryColor={data.primaryColor}
+      />
+    );
 
     // Retourner le PDF pour prévisualisation (inline)
     return new NextResponse(pdfBuffer, {

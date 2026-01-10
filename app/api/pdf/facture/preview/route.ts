@@ -64,7 +64,16 @@ export async function GET() {
     const data = getMockFactureData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfBuffer = await renderToBuffer(<FacturePdf {...data} />);
+    const pdfBuffer = await renderToBuffer(
+      <FacturePdf
+        company={data.company}
+        client={data.client}
+        document={data.document}
+        lines={data.lines}
+        totals={data.totals}
+        primaryColor={data.primaryColor}
+      />
+    );
 
     // Retourner le PDF pour prévisualisation (inline)
     return new NextResponse(pdfBuffer, {

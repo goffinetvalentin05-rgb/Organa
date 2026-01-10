@@ -59,7 +59,16 @@ export async function GET() {
     const data = getMockDevisData();
 
     // Générer le PDF avec @react-pdf/renderer
-    const pdfBuffer = await renderToBuffer(<DevisPdf {...data} />);
+    const pdfBuffer = await renderToBuffer(
+      <DevisPdf
+        company={data.company}
+        client={data.client}
+        document={data.document}
+        lines={data.lines}
+        totals={data.totals}
+        primaryColor={data.primaryColor}
+      />
+    );
 
     // Nom du fichier avec la date
     const filename = `devis-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;
