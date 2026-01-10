@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import DeleteClientButton from "./components/DeleteClientButton";
 import { Info, Plus } from "@/lib/icons";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,59 +15,45 @@ interface Client {
 }
 
 export default async function ClientsPage() {
-  // Construire l'URL de base pour les requêtes internes
-  // En production, utiliser l'URL publique ou VERCEL_URL
-  // En développement, utiliser localhost
-  const getBaseUrl = () => {
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-      return process.env.NEXT_PUBLIC_APP_URL;
-    }
-    if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}`;
-    }
-    return "http://localhost:3000";
-  };
-
-  const baseUrl = getBaseUrl();
   let clients: Client[] = [];
   let errorMessage: string | null = null;
 
   try {
-    // Récupérer les headers pour transmettre les cookies
-    const headersList = await headers();
-    const cookieHeader = headersList.get("cookie") || "";
+    const supabase = await createClient();
 
-    // Appel à l'API route avec les cookies explicitement passés
-    const response = await fetch(`${baseUrl}/api/clients`, {
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader,
-      },
-    });
+    // Authentification
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      errorMessage = errorData.error || "Erreur lors du chargement des clients";
-      
-      // Si erreur 401, c'est un problème d'authentification
-      if (response.status === 401) {
-        return (
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div className="p-12 text-center">
-              <p className="text-red-400">Erreur d'authentification</p>
-            </div>
+    if (!user || !user.id) {
+      return (
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="p-12 text-center">
+            <p className="text-red-400">Erreur d'authentification</p>
           </div>
-        );
-      }
+        </div>
+      );
+    }
+
+    // Charger les clients directement depuis Supabase
+    const { data, error } = await supabase
+      .from("clients")
+      .select("id, nom, email, telephone, adresse, user_id")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[ClientsPage] Erreur Supabase", error);
+      errorMessage = error.message || "Erreur lors du chargement des clients";
     } else {
-      const data = await response.json();
-      clients = (data.clients || []).filter(
-        (c: Client): c is Client => typeof c.id === "string" && c.id.length > 0
+      // Filtrer les clients valides (avec ID)
+      clients = (data || []).filter(
+        (c: Client): c is Client => c.id && typeof c.id === "string" && c.id.length > 0 && c.user_id === user.id
       );
     }
   } catch (error: any) {
-    console.error("[ClientsPage] Erreur lors du fetch", error);
+    console.error("[ClientsPage] Erreur", error);
     errorMessage = error.message || "Erreur lors du chargement des clients";
   }
 
