@@ -49,7 +49,11 @@ export default async function ClientsPage() {
     } else {
       // Filtrer les clients valides (avec ID)
       clients = (data || []).filter(
-        (c: Client): c is Client => c.id && typeof c.id === "string" && c.id.length > 0 && c.user_id === user.id
+        (c: Client): c is Client => 
+          Boolean(c.id) && 
+          typeof c.id === "string" && 
+          c.id.length > 0 && 
+          c.user_id === user.id
       );
     }
   } catch (error: any) {
