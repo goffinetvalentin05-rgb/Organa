@@ -71,9 +71,9 @@ export async function GET() {
         document={data.document}
         lines={data.lines}
         totals={{
-          totalHT: 0,
-          totalTVA: 0,
-          totalTTC: 0,
+          subtotal: 0,
+          vat: 0,
+          total: 0,
         }}
       />
     );
