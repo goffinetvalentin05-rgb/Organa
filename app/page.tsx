@@ -121,90 +121,21 @@ export default function Home() {
 
       {/* 3️⃣ SECTION SOLUTION – ORGANA */}
       <section id="solution" className="relative py-20 md:py-28 px-6 z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight max-w-4xl mx-auto">
-              Organa : votre solution centrale pour l'administratif
-            </h2>
-            
-            <p className="font-body text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed font-normal">
-              Un seul outil qui automatise vos tâches administratives, centralise vos informations 
-              et vous donne une <strong className="text-white font-semibold">vision claire de votre activité.</strong>
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto">
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed font-normal">
+            <strong className="text-white font-bold">Organa</strong> a été conçu pour reprendre le contrôle de votre administratif.
+          </p>
           
-          {/* Bénéfices clés */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Bénéfice 1 */}
-            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-14 h-14 mb-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-3">Factures & devis automatisés</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Créez vos documents en quelques clics. Transformez un devis en facture automatiquement. 
-                <strong className="text-white"> Gagnez des heures chaque semaine.</strong>
-              </p>
-            </div>
-            
-            {/* Bénéfice 2 */}
-            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-14 h-14 mb-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-3">Gestion clients centralisée</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Toutes vos informations clients au même endroit. Historique complet, documents associés. 
-                <strong className="text-white"> Plus de doublons, plus de confusion.</strong>
-              </p>
-            </div>
-            
-            {/* Bénéfice 3 */}
-            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-14 h-14 mb-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-3">Gain de temps réel</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Moins de saisies manuelles, moins d'outils à jongler, moins de stress. 
-                <strong className="text-white"> Réinvestissez ce temps dans votre activité.</strong>
-              </p>
-            </div>
-            
-            {/* Bénéfice 4 */}
-            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all">
-              <div className="w-14 h-14 mb-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-3">Vision claire de l'activité</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Dashboard en temps réel : ce qui est payé, ce qui traîne, ce qui est à relancer. 
-                <strong className="text-white"> Vous savez toujours où vous en êtes.</strong>
-              </p>
-            </div>
-            
-            {/* Bénéfice 5 */}
-            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 rounded-xl p-8 backdrop-blur-sm hover:border-white/20 transition-all md:col-span-2 lg:col-span-1">
-              <div className="w-14 h-14 mb-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-3">Sérénité garantie</h3>
-              <p className="font-body text-white/80 leading-relaxed text-sm">
-                Plus d'oublis, plus de stress. Relances automatiques, alertes personnalisées. 
-                <strong className="text-white"> L'administratif devient simple et maîtrisé.</strong>
-              </p>
-            </div>
-          </div>
+          <p className="font-body text-lg md:text-xl text-white/80 mb-8 text-center leading-relaxed">
+            La plateforme centralise les éléments essentiels de votre gestion :
+            factures, devis, clients et suivi administratif, au même endroit.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 text-center leading-relaxed">
+            En automatisant les tâches chronophages et répétitives,
+            <strong className="text-white font-semibold"> Organa</strong> vous fait gagner du temps au quotidien
+            et vous permet de vous concentrer sur ce qui fait réellement avancer votre entreprise.
+          </p>
         </div>
       </section>
 
