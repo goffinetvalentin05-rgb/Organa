@@ -11,9 +11,9 @@ export default function Home() {
             <Image 
               src="/organa-logo.png" 
               alt="Organa" 
-              width={140} 
-              height={30}
-              className="h-7 w-auto"
+              width={280} 
+              height={60}
+              className="h-12 md:h-14 w-auto"
               priority
             />
           </Link>
@@ -35,6 +35,18 @@ export default function Home() {
       <section className="relative px-6 py-24 md:py-32 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-5xl mx-auto">
+            {/* Logo Organa - Très grand et imposant - Logo premium SaaS */}
+            <div className="mb-12 md:mb-16 flex justify-center">
+              <Image 
+                src="/organa-logo.png" 
+                alt="Organa" 
+                width={800} 
+                height={173}
+                className="h-24 md:h-32 lg:h-40 w-auto max-w-full drop-shadow-2xl"
+                priority
+              />
+            </div>
+            
             {/* Badge de crédibilité */}
             <div className="mb-8 flex justify-center">
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm">
@@ -43,18 +55,17 @@ export default function Home() {
               </span>
             </div>
             
-            {/* Titre principal - très impactant */}
+            {/* H1 */}
             <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight tracking-tight">
-              <span className="block text-white mb-3">Reprenez le contrôle</span>
-              <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-                de votre administratif
-              </span>
+              <span className="block text-white mb-3">Moins d'administratif.</span>
+              <span className="block text-white">Plus de temps pour ce qui compte vraiment.</span>
             </h1>
             
-            {/* Sous-titre - promesse claire */}
+            {/* Sous-titre */}
             <p className="font-body text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed font-normal">
-              Organa automatise vos factures, centralise vos clients et vous fait gagner des heures chaque semaine. 
-              <strong className="text-white font-semibold"> Fini la charge mentale administrative.</strong>
+              Organa automatise la gestion administrative de votre entreprise
+              afin que vous puissiez consacrer plus de temps à vos clients,
+              à votre activité… et à ce qui compte vraiment pour vous.
             </p>
             
             {/* CTAs */}
@@ -63,13 +74,7 @@ export default function Home() {
                 href="/inscription"
                 className="btn-primary px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all duration-200 shadow-xl shadow-purple-900/40 hover:shadow-2xl hover:shadow-purple-900/50 font-semibold text-base"
               >
-                Lancer mon projet
-              </Link>
-              <Link
-                href="#solution"
-                className="btn-secondary px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-lg transition-all duration-200 backdrop-blur-sm hover:border-white/30 font-medium"
-              >
-                En savoir plus
+                Découvrir Organa
               </Link>
             </div>
             
@@ -508,9 +513,9 @@ export default function Home() {
               <Image 
                 src="/organa-logo.png" 
                 alt="Organa" 
-                width={140} 
-                height={30}
-                className="h-7 w-auto mb-4"
+                width={200} 
+                height={43}
+                className="h-9 w-auto mb-4"
               />
               <p className="font-body text-white/70 text-sm leading-relaxed max-w-md">
                 La plateforme de gestion administrative intelligente pour indépendants, PME et artisans. 
