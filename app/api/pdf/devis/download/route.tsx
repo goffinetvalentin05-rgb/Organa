@@ -12,7 +12,7 @@ function getMockDevisData() {
       address: "123 Rue de l'Innovation\n75001 Paris, France",
       email: "contact@organa.fr",
       phone: "+33 1 23 45 67 89",
-      logoUrl: undefined, // Peut être ajouté plus tard
+      logoUrl: undefined,
     },
     client: {
       name: "Client Exemple",
@@ -68,12 +68,15 @@ export async function GET() {
       />
     );
 
-    // Retourner le PDF pour prévisualisation (inline)
+    // Nom du fichier avec la date
+    const filename = `devis-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;
+
+    // Retourner le PDF pour téléchargement (attachment)
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": "inline; filename=devis-preview.pdf",
+        "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
   } catch (error: any) {
@@ -87,4 +90,5 @@ export async function GET() {
     );
   }
 }
+
 
