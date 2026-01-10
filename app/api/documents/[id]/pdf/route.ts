@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
-  const { searchParams } = new URL(req.url);
+  const id = context.params.id;
 
+  const { searchParams } = new URL(request.url);
   const typeParam = searchParams.get("type"); // "quote" | "invoice"
   const downloadParam = searchParams.get("download"); // "true" | null
 
@@ -24,7 +25,5 @@ export async function GET(
     return new Response("Missing parameters", { status: 400 });
   }
 
-  // Rediriger vers la nouvelle route (utiliser NextResponse.redirect() pour les route handlers)
-  return NextResponse.redirect(new URL(`/api/pdf/${type}/${action}?id=${params.id}`, req.url));
+  return redirect(`/api/pdf/${type}/${action}?id=${id}`);
 }
-
