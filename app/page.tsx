@@ -47,19 +47,16 @@ export default function Home() {
         
         {/* Contenu principal - Centré */}
         <div className="max-w-6xl mx-auto w-full relative z-10 pt-32 md:pt-40 text-center">
-          {/* Logo Organa - Mise en avant élégante */}
+          {/* Logo Organa - Intégration naturelle */}
           <div className="flex justify-center mb-10 md:mb-12">
-            <div className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40">
-              <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl"></div>
-              <div className="relative w-full h-full bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-3xl border border-blue-400/30 p-3 md:p-4 backdrop-blur-sm">
-                <Image 
-                  src="/organa-logo.png" 
-                  alt="Organa" 
-                  fill
-                  className="object-contain drop-shadow-2xl"
-                  priority
-                />
-              </div>
+            <div className="relative w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44">
+              <Image 
+                src="/organa-logo.png" 
+                alt="Organa" 
+                fill
+                className="object-contain drop-shadow-2xl"
+                priority
+              />
             </div>
           </div>
 
@@ -143,8 +140,8 @@ export default function Home() {
 
       {/* SECTION 2 — LE PROBLÈME */}
       <section className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background alterné - plus sombre pour contraste */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-black to-slate-950"></div>
+        {/* Background continu avec le hero */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950/40 to-slate-950"></div>
         
         {/* Overlay avec texture */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_50%)]"></div>
