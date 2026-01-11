@@ -24,7 +24,8 @@ export default function RootLayout({
     <html lang="fr" className={inter.variable}>
       <body className="font-body min-h-screen text-white app-bg">
         {/* CONTENU DES PAGES */}
-        <main>{children}</main>
+        {/* Note: Les pages gèrent leur propre structure HTML (balise <main> incluse) */}
+        {children}
         <Toaster
           position="top-right"
           toastOptions={{

@@ -1,3 +1,10 @@
+// Configuration pour forcer le rendu dynamique et éviter le cache statique
+// Cela garantit que les modifications de la landing page sont visibles immédiatement en production
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+// Page d'accueil (landing page) - Route: /
+// Cette page est la landing page principale du site Organa
 export default function Home() {
   return (
     <main className="w-full bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950 text-white overflow-x-hidden">
