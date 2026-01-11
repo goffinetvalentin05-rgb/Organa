@@ -46,7 +46,23 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_center,rgba(37,99,235,0.1),transparent_60%)]"></div>
         
         {/* Contenu principal - Centré */}
-        <div className="max-w-6xl mx-auto w-full relative z-10 pt-24 md:pt-32 text-center">
+        <div className="max-w-6xl mx-auto w-full relative z-10 pt-32 md:pt-40 text-center">
+          {/* Logo Organa - Mise en avant élégante */}
+          <div className="flex justify-center mb-10 md:mb-12">
+            <div className="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl"></div>
+              <div className="relative w-full h-full bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-3xl border border-blue-400/30 p-3 md:p-4 backdrop-blur-sm">
+                <Image 
+                  src="/organa-logo.png" 
+                  alt="Organa" 
+                  fill
+                  className="object-contain drop-shadow-2xl"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Badge premium avec effet glow renforcé */}
           <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500/25 via-blue-600/20 to-blue-500/25 backdrop-blur-2xl border border-blue-400/40 rounded-full px-6 py-3.5 shadow-2xl shadow-blue-500/30 mb-8 md:mb-12">
             <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-400/60"></div>
