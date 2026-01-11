@@ -205,18 +205,11 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* En-tête avec logo Organa */}
+          {/* En-tête */}
           <div className="mb-20 md:mb-32">
-            <div className="flex items-center gap-6 mb-6">
-              <div className="relative w-16 h-16 md:w-20 md:h-20">
-                <Image 
-                  src="/organa-logo.png" 
-                  alt="Organa" 
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <div className="flex-1">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-1 h-16 bg-gradient-to-b from-blue-500 to-transparent rounded-full"></div>
+              <div>
                 <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] tracking-[-0.04em]">
                   <span className="bg-gradient-to-r from-blue-400 via-white to-blue-400 bg-clip-text text-transparent">
                     La solution Organa
@@ -532,8 +525,11 @@ export default function Home() {
                 <div className="mb-6 relative z-10">
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">Plan Gratuit</h2>
                 </div>
+                <div className="mb-4 relative z-10">
+                  <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">Gratuit</p>
+                </div>
                 <p className="text-white/70 mb-8 text-lg md:text-xl relative z-10">Idéal pour démarrer</p>
-                <ul className="space-y-4 relative z-10">
+                <ul className="space-y-4 mb-8 relative z-10">
                   <li className="flex items-start gap-3">
                     <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -553,6 +549,14 @@ export default function Home() {
                     <span className="text-white/90 text-base md:text-lg">Toutes les fonctionnalités de base</span>
                   </li>
                 </ul>
+                <div className="relative z-10">
+                  <a
+                    href="/inscription"
+                    className="inline-flex items-center justify-center w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-base md:text-lg px-6 py-3 rounded-xl transition-all duration-300"
+                  >
+                    Commencer gratuitement
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -565,8 +569,11 @@ export default function Home() {
                 <div className="mb-6 relative z-10">
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">Plan Pro</h2>
                 </div>
+                <div className="mb-4 relative z-10">
+                  <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">29 CHF / mois</p>
+                </div>
                 <p className="text-white/95 mb-8 text-lg md:text-xl font-semibold relative z-10">Accès illimité</p>
-                <ul className="space-y-4 relative z-10">
+                <ul className="space-y-4 mb-8 relative z-10">
                   <li className="flex items-start gap-3">
                     <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -592,6 +599,14 @@ export default function Home() {
                     <span className="text-white text-base md:text-lg font-medium">Toutes les fonctionnalités</span>
                   </li>
                 </ul>
+                <div className="relative z-10">
+                  <a
+                    href="/inscription"
+                    className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 hover:from-blue-400 hover:via-blue-500 hover:to-blue-400 text-white font-bold text-base md:text-lg px-6 py-3 rounded-xl transition-all duration-300 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-105"
+                  >
+                    Essayer le plan Pro
+                  </a>
+                </div>
               </div>
             </div>
           </div>
