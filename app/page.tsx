@@ -289,11 +289,67 @@ export default function Home() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-16 md:mb-20 text-left leading-[1.1] tracking-[-0.02em] opacity-0 animate-fade-in-up">
             Tarifs
           </h2>
-          <div className="max-w-4xl opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            <div className="bg-black/30 border border-white/10 rounded-3xl p-10 md:p-12 backdrop-blur-sm shadow-xl shadow-black/40 hover:border-white/20 hover:shadow-2xl transition-all duration-500 card-glow">
-              <p className="text-white/60 text-base">
-                [TEXTE À FOURNIR - Section tarifs]
-              </p>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            {/* Plan Gratuit */}
+            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 md:p-10 backdrop-blur-sm shadow-xl shadow-black/40">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-white">Plan Gratuit</h2>
+              </div>
+              <p className="text-white/70 mb-6">Idéal pour démarrer</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Maximum 2 clients</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Maximum 3 documents par mois</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Toutes les fonctionnalités de base</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Plan Pro */}
+            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 md:p-10 backdrop-blur-sm shadow-xl shadow-black/40">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-white">Plan Pro</h2>
+              </div>
+              <p className="text-white/70 mb-6">Accès illimité</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Clients illimités</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Documents illimités</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Support prioritaire</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/90">Toutes les fonctionnalités</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
