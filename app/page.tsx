@@ -29,10 +29,6 @@ export default function Home() {
           
           {/* Forme d'accent - bas gauche */}
           <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-blue-600/15 to-transparent rounded-full blur-3xl"></div>
-          
-          {/* Points lumineux pour texture */}
-          <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full shadow-2xl shadow-blue-400/50"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-blue-300 rounded-full shadow-xl shadow-blue-300/50"></div>
         </div>
 
         {/* Grille de fond avec effet de profondeur */}
