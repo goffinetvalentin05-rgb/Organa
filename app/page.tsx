@@ -15,134 +15,104 @@ export default function Home() {
       <LandingNav />
 
       {/* SECTION 1 — HERO */}
-      <section className="relative min-h-screen flex items-center px-6 md:px-8 lg:px-12 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 md:px-8 overflow-hidden">
         {/* Background complexe avec multiples couches */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950/40 to-slate-950"></div>
         
         {/* Overlay sombre pour créer de la profondeur */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/40"></div>
         
-        {/* Formes géométriques lumineuses - composition asymétrique */}
+        {/* Formes géométriques lumineuses - centrées */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Grande forme principale - côté gauche */}
-          <div className="absolute top-0 -left-[20%] w-[800px] h-[800px] bg-gradient-to-br from-blue-500/25 via-blue-600/15 to-transparent rounded-full blur-3xl"></div>
+          {/* Grande forme principale - centre */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-blue-500/25 via-blue-600/15 to-transparent rounded-full blur-3xl"></div>
           
-          {/* Forme secondaire - centre droit */}
-          <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-blue-400/20 via-blue-500/10 to-transparent rounded-full blur-3xl"></div>
+          {/* Forme secondaire - haut droit */}
+          <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-gradient-to-bl from-blue-400/20 via-blue-500/10 to-transparent rounded-full blur-3xl"></div>
           
           {/* Forme d'accent - bas gauche */}
-          <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-blue-600/15 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-blue-600/15 to-transparent rounded-full blur-3xl"></div>
           
           {/* Points lumineux pour texture */}
-          <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-blue-400 rounded-full shadow-2xl shadow-blue-400/50"></div>
+          <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full shadow-2xl shadow-blue-400/50"></div>
           <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-blue-300 rounded-full shadow-xl shadow-blue-300/50"></div>
         </div>
 
         {/* Grille de fond avec effet de profondeur */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:5rem_5rem] opacity-40"></div>
         
-        {/* Rayons de lumière subtils */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.15),transparent_60%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(37,99,235,0.1),transparent_60%)]"></div>
+        {/* Rayons de lumière subtils - centrés */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_center,rgba(37,99,235,0.1),transparent_60%)]"></div>
         
-        {/* Contenu principal - Layout asymétrique */}
-        <div className="max-w-7xl mx-auto w-full relative z-10 pt-24 md:pt-32">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Colonne gauche - Logo et contenu principal */}
-            <div className="space-y-8 md:space-y-12">
-              {/* Logo Organa - Mise en avant majeure */}
-              <div className="flex flex-col items-start gap-6">
-                <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
-                  <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl"></div>
-                  <div className="relative w-full h-full bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-3xl border border-blue-400/30 p-4 backdrop-blur-sm">
-                    <Image 
-                      src="/organa-logo.png" 
-                      alt="Organa" 
-                      fill
-                      className="object-contain drop-shadow-2xl"
-                      priority
-                    />
+        {/* Contenu principal - Centré */}
+        <div className="max-w-6xl mx-auto w-full relative z-10 pt-24 md:pt-32 text-center">
+          {/* Badge premium avec effet glow renforcé */}
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500/25 via-blue-600/20 to-blue-500/25 backdrop-blur-2xl border border-blue-400/40 rounded-full px-6 py-3.5 shadow-2xl shadow-blue-500/30 mb-8 md:mb-12">
+            <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-400/60"></div>
+            <span className="text-sm md:text-base text-white font-bold">Gestion administrative simplifiée</span>
+          </div>
+
+          {/* Titre principal - Centré */}
+          <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] tracking-[-0.04em] mb-8 md:mb-12">
+            <span className="block bg-gradient-to-r from-white via-blue-50 to-white bg-clip-text text-transparent drop-shadow-2xl">
+              Moins d'administratif.
+            </span>
+            <span className="block mt-4 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent drop-shadow-2xl">
+              Plus de temps pour ce qui compte vraiment.
+            </span>
+          </h1>
+
+          {/* Description - Centrée */}
+          <p className="text-lg md:text-xl lg:text-2xl text-white/75 leading-relaxed max-w-3xl mx-auto font-medium mb-12 md:mb-16">
+            Organa automatise la gestion administrative de votre entreprise
+            afin que vous puissiez consacrer plus de temps à vos clients,
+            à votre activité… et à ce qui compte vraiment pour vous.
+          </p>
+
+          {/* CTA principal - Centré */}
+          <div className="flex justify-center mb-16 md:mb-20">
+            <a
+              href="/inscription"
+              className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 hover:from-blue-400 hover:via-blue-500 hover:to-blue-400 text-white font-bold text-base md:text-lg px-8 py-4 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/40 hover:shadow-3xl hover:shadow-blue-500/50 hover:scale-105 overflow-hidden"
+            >
+              <span className="relative z-10">Découvrir Organa</span>
+              <svg className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            </a>
+          </div>
+
+          {/* Élément visuel - Carte flottante centrée */}
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-md">
+              {/* Glow d'arrière-plan */}
+              <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-3xl scale-150"></div>
+              
+              {/* Carte principale */}
+              <div className="relative w-full bg-gradient-to-br from-white/10 via-white/5 to-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-blue-600/20 rounded-xl border border-blue-400/30 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="h-3 bg-white/20 rounded w-3/4 mb-2"></div>
+                      <div className="h-2 bg-white/10 rounded w-1/2"></div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-px w-12 bg-gradient-to-r from-blue-500 to-transparent"></div>
-                  <span className="text-blue-400 font-semibold text-sm md:text-base tracking-wider uppercase">Organa</span>
-                </div>
-              </div>
-
-              {/* Badge premium avec effet glow renforcé */}
-              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500/25 via-blue-600/20 to-blue-500/25 backdrop-blur-2xl border border-blue-400/40 rounded-full px-6 py-3.5 shadow-2xl shadow-blue-500/30">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-400/60"></div>
-                <span className="text-sm md:text-base text-white font-bold">Gestion administrative simplifiée</span>
-              </div>
-
-              {/* Titre principal - Typographie impactante */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] tracking-[-0.04em]">
-                <span className="block bg-gradient-to-r from-white via-blue-50 to-white bg-clip-text text-transparent drop-shadow-2xl">
-                  Moins d'administratif.
-                </span>
-                <span className="block mt-4 bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent drop-shadow-2xl">
-                  Plus de temps pour ce qui compte vraiment.
-                </span>
-              </h1>
-
-              {/* Description */}
-              <p className="text-lg md:text-xl lg:text-2xl text-white/75 leading-relaxed max-w-2xl font-medium">
-                Organa automatise la gestion administrative de votre entreprise
-                afin que vous puissiez consacrer plus de temps à vos clients,
-                à votre activité… et à ce qui compte vraiment pour vous.
-              </p>
-
-              {/* CTA principal */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <a
-                  href="/inscription"
-                  className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 hover:from-blue-400 hover:via-blue-500 hover:to-blue-400 text-white font-bold text-base md:text-lg px-8 py-4 rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-500/40 hover:shadow-3xl hover:shadow-blue-500/50 hover:scale-105 overflow-hidden"
-                >
-                  <span className="relative z-10">Découvrir Organa</span>
-                  <svg className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                </a>
-              </div>
-            </div>
-
-            {/* Colonne droite - Élément visuel de mise en scène */}
-            <div className="hidden lg:block relative">
-              <div className="relative w-full aspect-square">
-                {/* Carte flottante avec effet de profondeur */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-80 h-80">
-                    {/* Glow d'arrière-plan */}
-                    <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-3xl scale-150"></div>
-                    
-                    {/* Carte principale */}
-                    <div className="relative w-full h-full bg-gradient-to-br from-white/10 via-white/5 to-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-                      <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-blue-600/20 rounded-xl border border-blue-400/30 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="h-3 bg-white/20 rounded w-3/4 mb-2"></div>
-                            <div className="h-2 bg-white/10 rounded w-1/2"></div>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="h-2 bg-white/15 rounded"></div>
-                          <div className="h-2 bg-white/15 rounded"></div>
-                          <div className="h-2 bg-white/10 rounded w-5/6"></div>
-                        </div>
-                        <div className="pt-4 border-t border-white/10">
-                          <div className="flex items-center justify-between">
-                            <div className="h-8 bg-blue-500/20 rounded-lg w-24"></div>
-                            <div className="h-8 bg-blue-500/30 rounded-lg w-16"></div>
-                          </div>
-                        </div>
-                      </div>
+                  <div className="space-y-3">
+                    <div className="h-2 bg-white/15 rounded"></div>
+                    <div className="h-2 bg-white/15 rounded"></div>
+                    <div className="h-2 bg-white/10 rounded w-5/6"></div>
+                  </div>
+                  <div className="pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="h-8 bg-blue-500/20 rounded-lg w-24"></div>
+                      <div className="h-8 bg-blue-500/30 rounded-lg w-16"></div>
                     </div>
                   </div>
                 </div>

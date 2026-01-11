@@ -24,8 +24,8 @@ export default function LandingNav() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-5 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 md:w-12 md:h-12 transition-transform duration-300 group-hover:scale-110">
+        <a href="/" className="group">
+          <div className="relative w-14 h-14 md:w-16 md:h-16 transition-transform duration-300 group-hover:scale-110">
             <Image 
               src="/organa-logo.png" 
               alt="Organa" 
@@ -34,9 +34,6 @@ export default function LandingNav() {
               priority
             />
           </div>
-          <span className="text-xl md:text-2xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">
-            Organa
-          </span>
         </a>
         <div className="flex items-center gap-4 md:gap-8">
           <a href="#tarifs" className="text-white/80 hover:text-white text-sm md:text-base font-medium transition-colors duration-300 relative group">
