@@ -98,7 +98,7 @@ export default function Home() {
           </div>
 
           {/* Élément visuel - Carte flottante centrée */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-20 md:mb-32">
             <div className="relative w-full max-w-md">
               {/* Glow d'arrière-plan */}
               <div className="absolute inset-0 bg-blue-500/20 rounded-3xl blur-3xl scale-150"></div>
@@ -133,9 +133,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* Ligne de séparation décorative avec gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
       </section>
 
       {/* SECTION 2 — LE PROBLÈME */}
