@@ -44,6 +44,161 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 2️⃣ SECTION PROBLÈME */}
+      <section className="relative py-20 md:py-28 px-6 bg-gradient-to-b from-slate-950 via-blue-950/20 to-slate-950 border-y border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed font-normal">
+            Votre temps est trop précieux pour être perdu dans l'administratif.
+            Pourtant, ce sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 mb-8 text-center leading-relaxed">
+            Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux…
+            L'administratif s'accumule, ralentit votre activité et devient une charge mentale permanente.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 text-center leading-relaxed">
+            Ce temps perdu a un coût réel :
+            moins de disponibilité pour vos clients, moins d'énergie pour développer votre entreprise,
+            et moins de temps investi là où il crée réellement de la valeur.
+          </p>
+        </div>
+      </section>
+
+      {/* 3️⃣ SECTION SOLUTION – ORGANA */}
+      <section id="solution" className="relative py-20 md:py-28 px-6 bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950">
+        <div className="max-w-4xl mx-auto">
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed font-normal">
+            <strong className="text-white font-bold">Organa</strong> a été conçu pour reprendre le contrôle de votre administratif.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 mb-8 text-center leading-relaxed">
+            La plateforme centralise les éléments essentiels de votre gestion :
+            factures, devis, clients et suivi administratif, au même endroit.
+          </p>
+          
+          <p className="font-body text-lg md:text-xl text-white/80 text-center leading-relaxed">
+            En automatisant les tâches chronophages et répétitives,
+            <strong className="text-white font-semibold"> Organa</strong> vous fait gagner du temps au quotidien
+            et vous permet de vous concentrer sur ce qui fait réellement avancer votre entreprise.
+          </p>
+        </div>
+      </section>
+
+      {/* 4️⃣ SECTION COMMENT ÇA MARCHE */}
+      <section className="relative py-20 md:py-28 px-6 bg-gradient-to-b from-slate-950 via-blue-950/20 to-slate-950 border-y border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <p className="font-body text-xl md:text-2xl text-white/90 mb-16 text-center leading-relaxed font-normal">
+            Une gestion claire, structurée et sous contrôle.
+          </p>
+          
+          <div className="space-y-8 max-w-5xl mx-auto">
+            {/* Étape 1 */}
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">1</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Centralisez vos clients</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Vous créez vos clients une seule fois.
+                    Leurs informations sont automatiquement utilisées pour vos devis et factures,
+                    évitant les ressaisies et les erreurs.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 2 */}
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">2</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Créez, envoyez et suivez vos devis</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    À partir d'un client, vous créez un devis en quelques clics.
+                    Vous l'envoyez directement par e-mail depuis Organa
+                    ou le téléchargez selon vos besoins.
+                    Chaque devis est suivi : brouillon, envoyé, validé.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 3 */}
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">3</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Transformez vos devis en factures</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Une fois le devis accepté, vous le transformez instantanément en facture.
+                    Aucun doublon, aucune perte d'information.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 4 */}
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">4</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Personnalisez vos documents à votre image</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Vous configurez vos paramètres : logo, en-tête, coordonnées,
+                    informations bancaires et mentions.
+                    Tous vos documents sont générés automatiquement avec votre identité.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 5 - Dashboard - Point central mis en valeur */}
+            <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-blue-500/40 rounded-xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-purple-500/30 border-2 border-blue-400/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">5</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Pilotez votre activité depuis le dashboard</h3>
+                  <p className="font-body text-white/90 leading-relaxed text-sm md:text-base">
+                    Le dashboard vous offre une vue d'ensemble claire :
+                    documents en cours, factures payées ou en attente,
+                    actions à effectuer, relances à prévoir.
+                    Vous savez immédiatement où vous en êtes.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Étape 6 */}
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 backdrop-blur-sm">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-2 border-blue-500/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="font-heading text-xl font-bold text-white">6</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg md:text-xl font-bold text-white mb-3">Suivez vos paiements et vos tâches</h3>
+                  <p className="font-body text-white/80 leading-relaxed text-sm md:text-base">
+                    Chaque facture peut être marquée comme payée, en attente ou brouillon.
+                    Des raccourcis vous permettent de relancer et de garder le contrôle.
+                    Un calendrier intégré vous aide à organiser vos tâches et échéances.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section : Pourquoi faire confiance à Organa */}
       <section className="relative py-20 md:py-32 px-6 bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 border-y border-white/5">
         <div className="max-w-6xl mx-auto">
@@ -121,6 +276,20 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Tarifs */}
+      <section id="tarifs" className="relative py-20 md:py-28 px-6 bg-gradient-to-b from-slate-950 via-blue-950/20 to-slate-950 border-y border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-white mb-16 text-center">
+            Tarifs
+          </h2>
+          <div className="max-w-4xl mx-auto">
+            <p className="text-center text-white/60 text-sm mb-8">
+              [TEXTE À FOURNIR - Section tarifs]
+            </p>
           </div>
         </div>
       </section>
