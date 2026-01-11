@@ -10,18 +10,15 @@ export const revalidate = 0
 // Cette page est la landing page principale du site Organa
 export default function Home() {
   return (
-    <main className="w-full bg-slate-950 text-white overflow-x-hidden">
+    <main className="w-full text-white overflow-x-hidden relative">
+      {/* FOND GLOBAL UNIQUE - S'étend sur toute la landing */}
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-blue-950/40 to-slate-950 -z-10"></div>
+      
       {/* NAVIGATION FIXE */}
       <LandingNav />
 
       {/* SECTION 1 — HERO */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 md:px-8 overflow-hidden">
-        {/* Background complexe avec multiples couches */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950/40 to-slate-950"></div>
-        
-        {/* Overlay sombre pour créer de la profondeur */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/40"></div>
-        
         {/* Formes géométriques lumineuses - centrées */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Grande forme principale - centre */}
@@ -137,9 +134,6 @@ export default function Home() {
 
       {/* SECTION 2 — LE PROBLÈME */}
       <section className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background continu avec le hero */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950/40 to-slate-950"></div>
-        
         {/* Overlay avec texture */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(37,99,235,0.06),transparent_50%)]"></div>
@@ -207,9 +201,6 @@ export default function Home() {
 
       {/* SECTION 3 — LA SOLUTION ORGANA */}
       <section className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background alterné - plus clair avec accent bleu */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950/30 to-slate-950"></div>
-        
         {/* Effet de lumière central */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.2),transparent_70%)]"></div>
         
@@ -283,8 +274,7 @@ export default function Home() {
 
       {/* SECTION 4 — COMMENT ÇA MARCHE */}
       <section className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background avec pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/60 to-slate-950"></div>
+        {/* Pattern subtil */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-40"></div>
         
         <div className="max-w-7xl mx-auto relative z-10">
@@ -410,8 +400,7 @@ export default function Home() {
 
       {/* SECTION 5 — POURQUOI FAIRE CONFIANCE À ORGANA */}
       <section className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background alterné */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950/20 to-slate-950"></div>
+        {/* Overlay radial léger */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.12),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(37,99,235,0.08),transparent_50%)]"></div>
         
@@ -520,8 +509,7 @@ export default function Home() {
 
       {/* SECTION 6 — TARIFS */}
       <section id="tarifs" className="relative py-32 md:py-48 px-6 md:px-8 lg:px-12 overflow-hidden">
-        {/* Background avec accent fort */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/80 to-slate-950"></div>
+        {/* Overlay radial léger */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.25),transparent_70%)]"></div>
         
         <div className="max-w-6xl mx-auto relative z-10">
@@ -615,7 +603,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-16 md:py-20 px-6 md:px-8 lg:px-12 bg-gradient-to-b from-slate-950 via-black/70 to-black border-t border-white/10 backdrop-blur-xl">
+      <footer className="relative py-16 md:py-20 px-6 md:px-8 lg:px-12 border-t border-white/10 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
