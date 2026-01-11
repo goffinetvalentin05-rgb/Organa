@@ -17,10 +17,10 @@ export default function LandingNav() {
 
   return (
     <nav 
-      className={`sticky top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`sticky top-0 z-50 bg-slate-900/60 backdrop-blur-md backdrop-saturate-150 border-b border-white/10 transition-all duration-500 ${
         scrolled 
-          ? "bg-slate-950/80 backdrop-blur-xl border-b border-white/20 shadow-2xl shadow-black/50" 
-          : "bg-slate-950/60 backdrop-blur-xl border-b border-white/10"
+          ? "bg-slate-900/80 shadow-2xl shadow-black/50 border-white/20" 
+          : ""
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-5 flex items-center justify-between">
