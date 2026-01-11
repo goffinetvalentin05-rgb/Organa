@@ -198,3 +198,102 @@ h3 {
 .accent-border {
   border-color: var(--accent-border);
 }
+
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Classes avec delays pour les animations */
+.animate-fade-in-up-delay-100 {
+  animation: fade-in-up 0.6s ease-out 0.1s forwards;
+}
+
+.animate-fade-in-up-delay-200 {
+  animation: fade-in-up 0.6s ease-out 0.2s forwards;
+}
+
+.animate-fade-in-up-delay-300 {
+  animation: fade-in-up 0.6s ease-out 0.3s forwards;
+}
+
+.animate-fade-in-up-delay-400 {
+  animation: fade-in-up 0.6s ease-out 0.4s forwards;
+}
+
+.animate-fade-in-up-delay-500 {
+  animation: fade-in-up 0.6s ease-out 0.5s forwards;
+}
+
+.animate-fade-in-up-delay-600 {
+  animation: fade-in-up 0.6s ease-out 0.6s forwards;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Amélioration des effets hover */
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Effets de lumière sur les cartes */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
