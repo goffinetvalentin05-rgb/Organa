@@ -18,7 +18,7 @@ export default function Home() {
       <LandingNav />
 
       {/* SECTION 1 — HERO */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 md:px-8 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 md:px-8 overflow-hidden pt-20 md:pt-24">
         {/* Formes géométriques lumineuses - centrées */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Grande forme principale - centre */}
