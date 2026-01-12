@@ -92,7 +92,11 @@ export default function ParametresPage() {
     const loadSettings = async () => {
       try {
         setLoadingSettings(true);
-        const response = await fetch("/api/settings");
+        console.log("[PARAMETRES] Chargement des paramètres depuis /api/settings");
+        const response = await fetch("/api/settings", {
+          method: "GET",
+          cache: "no-store", // Forcer le rechargement à chaque fois
+        });
         
         // Lire le body UNE SEULE FOIS avec le helper
         const data = await parseResponseBody(response);
@@ -196,7 +200,7 @@ export default function ParametresPage() {
     loadSettings();
     // Récupérer le plan de l'utilisateur
     fetchUserPlan();
-  }, [router]);
+  }, []); // Charger uniquement au montage, pas à chaque changement de router
 
   const fetchUserPlan = async () => {
     try {
