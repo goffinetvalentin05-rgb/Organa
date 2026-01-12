@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Récupérer les paramètres depuis profiles - TOUTES les colonnes nécessaires
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
-      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
+      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           currency: DEFAULT_COMPANY_SETTINGS.currency,
           currency_symbol: defaultCurrencySymbol,
         })
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
         .single();
 
       if (createError) {
@@ -115,9 +115,9 @@ export async function GET(request: NextRequest) {
       currency_symbol: currency_symbol,
       iban: profile?.iban || "",
       bank_name: profile?.bank_name || "",
-      conditions_paiement: profile?.conditions_paiement || "",
-      email_expediteur: profile?.email_expediteur || "",
-      nom_expediteur: profile?.nom_expediteur || "",
+      payment_terms: profile?.payment_terms || "",
+      email_sender_email: profile?.email_sender_email || "",
+      email_sender_name: profile?.email_sender_name || "",
       resend_api_key: profile?.resend_api_key || "",
     };
 
@@ -183,8 +183,8 @@ export async function PUT(request: NextRequest) {
     // Colonnes existantes : user_id, plan, stripe_customer_id, stripe_subscription_id,
     //                      created_at, updated_at, company_name, company_email, company_phone,
     //                      company_address, logo_path, logo_url, primary_color, currency,
-    //                      iban, bank_name, conditions_paiement,
-    //                      email_expediteur, nom_expediteur, resend_api_key
+    //                      iban, bank_name, payment_terms,
+    //                      email_sender_name, email_sender_email, resend_api_key
     const allowedFields = [
       'user_id',
       'plan',
@@ -197,9 +197,9 @@ export async function PUT(request: NextRequest) {
       'logo_url',
       'iban',
       'bank_name',
-      'conditions_paiement',
-      'email_expediteur',
-      'nom_expediteur',
+      'payment_terms',
+      'email_sender_name',
+      'email_sender_email',
       'resend_api_key',
       'updated_at'
     ] as const;
@@ -255,16 +255,16 @@ export async function PUT(request: NextRequest) {
     if (body.bank_name !== undefined) {
       upsertData.bank_name = body.bank_name?.trim() || null;
     }
-    if (body.conditions_paiement !== undefined) {
-      upsertData.conditions_paiement = body.conditions_paiement?.trim() || null;
+    if (body.payment_terms !== undefined) {
+      upsertData.payment_terms = body.payment_terms?.trim() || null;
     }
 
     // Gérer les champs email
-    if (body.email_expediteur !== undefined) {
-      upsertData.email_expediteur = body.email_expediteur?.trim() || null;
+    if (body.email_sender_email !== undefined) {
+      upsertData.email_sender_email = body.email_sender_email?.trim() || null;
     }
-    if (body.nom_expediteur !== undefined) {
-      upsertData.nom_expediteur = body.nom_expediteur?.trim() || null;
+    if (body.email_sender_name !== undefined) {
+      upsertData.email_sender_name = body.email_sender_name?.trim() || null;
     }
     if (body.resend_api_key !== undefined) {
       upsertData.resend_api_key = body.resend_api_key?.trim() || null;
@@ -334,7 +334,7 @@ export async function PUT(request: NextRequest) {
         .from("profiles")
         .update(updateData)
         .eq("user_id", user.id)
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
         .single();
 
       dbError = updateError;
@@ -345,7 +345,7 @@ export async function PUT(request: NextRequest) {
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert(finalUpsertData)
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
         .single();
 
       dbError = createError;
@@ -426,9 +426,9 @@ export async function PUT(request: NextRequest) {
       currency_symbol: currency_symbol,
       iban: updatedProfile?.iban || "",
       bank_name: updatedProfile?.bank_name || "",
-      conditions_paiement: updatedProfile?.conditions_paiement || "",
-      email_expediteur: updatedProfile?.email_expediteur || "",
-      nom_expediteur: updatedProfile?.nom_expediteur || "",
+      payment_terms: updatedProfile?.payment_terms || "",
+      email_sender_email: updatedProfile?.email_sender_email || "",
+      email_sender_name: updatedProfile?.email_sender_name || "",
       resend_api_key: updatedProfile?.resend_api_key || "",
     };
 
