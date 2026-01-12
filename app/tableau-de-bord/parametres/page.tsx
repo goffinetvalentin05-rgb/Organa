@@ -345,14 +345,17 @@ export default function ParametresPage() {
       if (formData.bankName !== undefined) {
         payload.bank_name = formData.bankName.trim();
       }
+      // IMPORTANT: Toujours inclure payment_terms même si vide
       if (formData.conditionsPaiement !== undefined) {
         payload.payment_terms = formData.conditionsPaiement.trim();
       }
 
       // Champs email
+      // IMPORTANT: Toujours inclure email_sender_email même si vide
       if (formData.emailExpediteur !== undefined) {
         payload.email_sender_email = formData.emailExpediteur.trim();
       }
+      // IMPORTANT: Toujours inclure email_sender_name même si vide
       if (formData.nomExpediteur !== undefined) {
         payload.email_sender_name = formData.nomExpediteur.trim();
       }
@@ -360,14 +363,22 @@ export default function ParametresPage() {
         payload.resend_api_key = formData.resendApiKey.trim();
       }
 
-      // Protection finale : supprimer toute clé avec valeur undefined ou null
-      // MAIS garder les chaînes vides car elles peuvent être intentionnelles
+      // Protection finale : garder toutes les valeurs (y compris chaînes vides)
+      // pour permettre la mise à jour des champs même s'ils sont vides
       const cleanPayload: Record<string, string> = {};
       for (const [key, value] of Object.entries(payload)) {
+        // Accepter toutes les valeurs sauf undefined et null explicites
         if (value !== undefined && value !== null) {
           cleanPayload[key] = value;
         }
       }
+      
+      console.log("[PARAMETRES] Payload final avec champs spécifiques:", {
+        payment_terms: cleanPayload.payment_terms,
+        email_sender_email: cleanPayload.email_sender_email,
+        email_sender_name: cleanPayload.email_sender_name,
+        fullPayload: cleanPayload
+      });
 
       console.log("[PARAMETRES] Envoi du payload (champs existants uniquement):", cleanPayload);
 

@@ -255,16 +255,17 @@ export async function PUT(request: NextRequest) {
     if (body.bank_name !== undefined) {
       upsertData.bank_name = body.bank_name?.trim() || null;
     }
+    // Gérer payment_terms - IMPORTANT: Garder les chaînes vides comme strings pour permettre la mise à jour
     if (body.payment_terms !== undefined) {
-      upsertData.payment_terms = body.payment_terms?.trim() || null;
+      upsertData.payment_terms = body.payment_terms !== null ? String(body.payment_terms).trim() : "";
     }
 
-    // Gérer les champs email
+    // Gérer les champs email - IMPORTANT: Garder les chaînes vides comme strings pour permettre la mise à jour
     if (body.email_sender_email !== undefined) {
-      upsertData.email_sender_email = body.email_sender_email?.trim() || null;
+      upsertData.email_sender_email = body.email_sender_email !== null ? String(body.email_sender_email).trim() : "";
     }
     if (body.email_sender_name !== undefined) {
-      upsertData.email_sender_name = body.email_sender_name?.trim() || null;
+      upsertData.email_sender_name = body.email_sender_name !== null ? String(body.email_sender_name).trim() : "";
     }
     if (body.resend_api_key !== undefined) {
       upsertData.resend_api_key = body.resend_api_key?.trim() || null;
@@ -289,6 +290,16 @@ export async function PUT(request: NextRequest) {
     }
 
     console.log("[API][settings] PUT - Données UPDATE (finales, nettoyées):", finalUpsertData);
+    console.log("[API][settings] PUT - Vérification champs spécifiques:", {
+      payment_terms: finalUpsertData.payment_terms,
+      email_sender_email: finalUpsertData.email_sender_email,
+      email_sender_name: finalUpsertData.email_sender_name,
+      inAllowedFields: {
+        payment_terms: allowedFields.includes('payment_terms'),
+        email_sender_email: allowedFields.includes('email_sender_email'),
+        email_sender_name: allowedFields.includes('email_sender_name'),
+      }
+    });
 
     // Vérifier d'abord si le profil existe
     const { data: existingProfile, error: checkError } = await supabase
@@ -326,6 +337,13 @@ export async function PUT(request: NextRequest) {
         updateData[key] = value;
       }
     }
+    
+    console.log("[API][settings] PUT - Données UPDATE (prêtes pour Supabase):", updateData);
+    console.log("[API][settings] PUT - Vérification champs dans updateData:", {
+      payment_terms: updateData.payment_terms,
+      email_sender_email: updateData.email_sender_email,
+      email_sender_name: updateData.email_sender_name,
+    });
 
     if (existingProfile) {
       // Le profil existe, faire une mise à jour
