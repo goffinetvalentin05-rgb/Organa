@@ -204,107 +204,10 @@ export async function PUT(request: NextRequest) {
       'updated_at'
     ] as const;
 
-    // Construire un payload whitelisté explicite depuis le body
-    // Ne jamais accepter created_at, updated_at, id, user_id depuis le body
-    const upsertData: any = {
-      user_id: user.id, // Toujours défini côté serveur
-      plan: "free", // Toujours défini côté serveur
-      updated_at: new Date().toISOString(),
-    };
-
-    // Ajouter uniquement les champs autorisés depuis le body
-    if (body.company_name !== undefined) {
-      upsertData.company_name = body.company_name?.trim() || null;
-    }
-    if (body.company_email !== undefined) {
-      upsertData.company_email = body.company_email?.trim() || null;
-    }
-    if (body.company_phone !== undefined) {
-      upsertData.company_phone = body.company_phone?.trim() || null;
-    }
-    if (body.company_address !== undefined) {
-      upsertData.company_address = body.company_address?.trim() || null;
-    }
-
-    // Gérer primary_color avec validation
-    if (body.primary_color !== undefined && body.primary_color !== null) {
-      const hexColor = String(body.primary_color).trim();
-      if (hexColor && /^#[0-9A-Fa-f]{6}$/.test(hexColor)) {
-        upsertData.primary_color = hexColor;
-      } else {
-        console.warn("[API][settings] PUT - Couleur mal formatée, utilisation de la valeur par défaut:", hexColor);
-        upsertData.primary_color = DEFAULT_COMPANY_SETTINGS.primary_color;
-      }
-    }
-
-    // Gérer currency avec validation
-    if (body.currency !== undefined && body.currency !== null) {
-      const currency = String(body.currency).trim().toUpperCase();
-      if (currency && currency.length === 3) {
-        upsertData.currency = currency;
-      } else {
-        console.warn("[API][settings] PUT - Devise mal formatée, utilisation de la valeur par défaut:", currency);
-        upsertData.currency = DEFAULT_COMPANY_SETTINGS.currency;
-      }
-    }
-
-    // Gérer les champs bancaires
-    if (body.iban !== undefined) {
-      upsertData.iban = body.iban?.trim() || null;
-    }
-    if (body.bank_name !== undefined) {
-      upsertData.bank_name = body.bank_name?.trim() || null;
-    }
-    // Gérer payment_terms - IMPORTANT: Garder les chaînes vides comme strings pour permettre la mise à jour
-    if (body.payment_terms !== undefined) {
-      upsertData.payment_terms = body.payment_terms !== null ? String(body.payment_terms).trim() : "";
-    }
-
-    // Gérer les champs email - IMPORTANT: Garder les chaînes vides comme strings pour permettre la mise à jour
-    if (body.email_sender_email !== undefined) {
-      upsertData.email_sender_email = body.email_sender_email !== null ? String(body.email_sender_email).trim() : "";
-    }
-    if (body.email_sender_name !== undefined) {
-      upsertData.email_sender_name = body.email_sender_name !== null ? String(body.email_sender_name).trim() : "";
-    }
-    if (body.resend_api_key !== undefined) {
-      upsertData.resend_api_key = body.resend_api_key?.trim() || null;
-    }
-
-    // PROTECTION ANTI-COLONNE INVALIDE
-    // Filtrer strictement pour ne garder que les champs autorisés
-    // Accepter les chaînes vides car elles peuvent être intentionnelles
-    // Ne jamais envoyer une colonne si elle n'a pas été validée
-    const finalUpsertData: any = {};
-    for (const [key, value] of Object.entries(upsertData)) {
-      // Vérifier que la clé est autorisée
-      if (allowedFields.includes(key as any)) {
-        // Pour les strings, accepter même si vides (peut être intentionnel)
-        if (typeof value === 'string') {
-          finalUpsertData[key] = value;
-        } else if (value !== undefined && value !== null) {
-          // Pour les autres types (dates, etc.), accepter directement
-          finalUpsertData[key] = value;
-        }
-      }
-    }
-
-    console.log("[API][settings] PUT - Données UPDATE (finales, nettoyées):", finalUpsertData);
-    console.log("[API][settings] PUT - Vérification champs spécifiques:", {
-      payment_terms: finalUpsertData.payment_terms,
-      email_sender_email: finalUpsertData.email_sender_email,
-      email_sender_name: finalUpsertData.email_sender_name,
-      inAllowedFields: {
-        payment_terms: allowedFields.includes('payment_terms'),
-        email_sender_email: allowedFields.includes('email_sender_email'),
-        email_sender_name: allowedFields.includes('email_sender_name'),
-      }
-    });
-
-    // Vérifier d'abord si le profil existe
+    // Récupérer le profil existant avec TOUS les champs nécessaires AVANT de construire le payload
     const { data: existingProfile, error: checkError } = await supabase
       .from("profiles")
-      .select("user_id")
+      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -329,25 +232,109 @@ export async function PUT(request: NextRequest) {
     let updatedProfile: any;
     let dbError: any = null;
 
-    // Préparer les données pour la mise à jour (sans user_id et plan qui ne doivent pas être mis à jour)
-    const updateData: any = {};
-    for (const [key, value] of Object.entries(finalUpsertData)) {
-      // Exclure user_id et plan de la mise à jour (ils ne doivent pas changer)
-      if (key !== 'user_id' && key !== 'plan' && allowedFields.includes(key as any)) {
-        updateData[key] = value;
-      }
-    }
+    // Construire UN SEUL objet avec TOUS les champs du profil
+    // Fusionner les valeurs existantes avec les nouvelles valeurs du body
+    const profilePayload: any = {
+      user_id: user.id,
+      plan: existingProfile?.plan || "free",
+      updated_at: new Date().toISOString(),
+    };
+
+    // Ajouter TOUS les champs : utiliser la valeur du body si fournie, sinon garder la valeur existante
+    profilePayload.company_name = body.company_name !== undefined 
+      ? (body.company_name?.trim() || null)
+      : (existingProfile?.company_name || null);
     
-    console.log("[API][settings] PUT - Données UPDATE (prêtes pour Supabase):", updateData);
-    console.log("[API][settings] PUT - Vérification champs dans updateData:", {
-      payment_terms: updateData.payment_terms,
-      email_sender_email: updateData.email_sender_email,
-      email_sender_name: updateData.email_sender_name,
+    profilePayload.company_email = body.company_email !== undefined
+      ? (body.company_email?.trim() || null)
+      : (existingProfile?.company_email || null);
+    
+    profilePayload.company_phone = body.company_phone !== undefined
+      ? (body.company_phone?.trim() || null)
+      : (existingProfile?.company_phone || null);
+    
+    profilePayload.company_address = body.company_address !== undefined
+      ? (body.company_address?.trim() || null)
+      : (existingProfile?.company_address || null);
+    
+    profilePayload.logo_path = existingProfile?.logo_path || null;
+    profilePayload.logo_url = existingProfile?.logo_url || null;
+    
+    // Gérer primary_color avec validation
+    if (body.primary_color !== undefined && body.primary_color !== null) {
+      const hexColor = String(body.primary_color).trim();
+      if (hexColor && /^#[0-9A-Fa-f]{6}$/.test(hexColor)) {
+        profilePayload.primary_color = hexColor;
+      } else {
+        console.warn("[API][settings] PUT - Couleur mal formatée, utilisation de la valeur par défaut:", hexColor);
+        profilePayload.primary_color = existingProfile?.primary_color || DEFAULT_COMPANY_SETTINGS.primary_color;
+      }
+    } else {
+      profilePayload.primary_color = existingProfile?.primary_color || DEFAULT_COMPANY_SETTINGS.primary_color;
+    }
+
+    // Gérer currency avec validation
+    if (body.currency !== undefined && body.currency !== null) {
+      const currency = String(body.currency).trim().toUpperCase();
+      if (currency && currency.length === 3) {
+        profilePayload.currency = currency;
+      } else {
+        console.warn("[API][settings] PUT - Devise mal formatée, utilisation de la valeur par défaut:", currency);
+        profilePayload.currency = existingProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
+      }
+    } else {
+      profilePayload.currency = existingProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
+    }
+
+    // Calculer currency_symbol
+    profilePayload.currency_symbol = getCurrencySymbol(profilePayload.currency);
+
+    // Gérer les champs bancaires
+    profilePayload.iban = body.iban !== undefined
+      ? (body.iban?.trim() || null)
+      : (existingProfile?.iban || null);
+    
+    profilePayload.bank_name = body.bank_name !== undefined
+      ? (body.bank_name?.trim() || null)
+      : (existingProfile?.bank_name || null);
+    
+    // Gérer payment_terms - IMPORTANT: Garder les chaînes vides comme strings
+    profilePayload.payment_terms = body.payment_terms !== undefined
+      ? (body.payment_terms !== null ? String(body.payment_terms).trim() : "")
+      : (existingProfile?.payment_terms || "");
+
+    // Gérer les champs email - IMPORTANT: Garder les chaînes vides comme strings
+    profilePayload.email_sender_email = body.email_sender_email !== undefined
+      ? (body.email_sender_email !== null ? String(body.email_sender_email).trim() : "")
+      : (existingProfile?.email_sender_email || "");
+    
+    profilePayload.email_sender_name = body.email_sender_name !== undefined
+      ? (body.email_sender_name !== null ? String(body.email_sender_name).trim() : "")
+      : (existingProfile?.email_sender_name || "");
+    
+    profilePayload.resend_api_key = body.resend_api_key !== undefined
+      ? (body.resend_api_key?.trim() || null)
+      : (existingProfile?.resend_api_key || null);
+    
+    console.log("[API][settings] PUT - Payload complet (UN SEUL update):", profilePayload);
+    console.log("[API][settings] PUT - Vérification champs spécifiques:", {
+      payment_terms: profilePayload.payment_terms,
+      email_sender_email: profilePayload.email_sender_email,
+      email_sender_name: profilePayload.email_sender_name,
     });
 
     if (existingProfile) {
-      // Le profil existe, faire une mise à jour
-      console.log("[API][settings] PUT - Mise à jour du profil existant");
+      // Le profil existe, faire UN SEUL UPDATE avec TOUS les champs
+      console.log("[API][settings] PUT - Mise à jour du profil existant avec TOUS les champs");
+      
+      // Exclure user_id et plan de l'update (ils ne doivent pas changer)
+      const updateData: any = {};
+      for (const [key, value] of Object.entries(profilePayload)) {
+        if (key !== 'user_id' && key !== 'plan' && allowedFields.includes(key as any)) {
+          updateData[key] = value;
+        }
+      }
+      
       const { data: profile, error: updateError } = await supabase
         .from("profiles")
         .update(updateData)
@@ -358,11 +345,11 @@ export async function PUT(request: NextRequest) {
       dbError = updateError;
       updatedProfile = profile;
     } else {
-      // Le profil n'existe pas, le créer
-      console.log("[API][settings] PUT - Profil inexistant, création...");
+      // Le profil n'existe pas, le créer avec TOUS les champs
+      console.log("[API][settings] PUT - Profil inexistant, création avec TOUS les champs");
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
-        .insert(finalUpsertData)
+        .insert(profilePayload)
         .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
         .single();
 
@@ -378,7 +365,7 @@ export async function PUT(request: NextRequest) {
         message: dbError.message,
         details: dbError.details,
         hint: dbError.hint,
-        updateData: existingProfile ? updateData : finalUpsertData,
+        profilePayload: profilePayload,
         allowedFields: allowedFields,
         operation: existingProfile ? "UPDATE" : "INSERT",
       });
