@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Parametres } from "@/lib/mock-data";
 import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
+import { createClient } from "@/lib/supabase/client";
 
 /**
  * Helper pour lire le body d'une Response une seule fois
@@ -64,6 +65,7 @@ export default function ParametresPage() {
   const [userPlan, setUserPlan] = useState<"free" | "pro" | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
+  // State initial vide - sera hydraté depuis la DB
   const [formData, setFormData] = useState({
     nomEntreprise: "",
     adresse: "",
@@ -76,9 +78,9 @@ export default function ParametresPage() {
     iban: "",
     bankName: "",
     conditionsPaiement: "",
-    primaryColor: "#6D5EF8",
-    currency: "CHF",
-    invoiceColor: "#6D5EF8",
+    primaryColor: "",
+    currency: "",
+    invoiceColor: "",
     branding: "",
   });
   const [saved, setSaved] = useState(false);
@@ -87,120 +89,136 @@ export default function ParametresPage() {
   const [deleting, setDeleting] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
-  // Charger les paramètres depuis Supabase
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        setLoadingSettings(true);
-        console.log("[PARAMETRES] Chargement des paramètres depuis /api/settings");
-        const response = await fetch("/api/settings", {
-          method: "GET",
-          cache: "no-store", // Forcer le rechargement à chaque fois
-        });
-        
-        // Lire le body UNE SEULE FOIS avec le helper
-        const data = await parseResponseBody(response);
-
-        if (!response.ok) {
-          // Logger les détails de l'erreur pour debugging
-          const status = response.status;
-          const errorMessage = data.error || "Erreur lors du chargement des paramètres";
-          const errorDetails = data.details || "";
-
-          console.error("[PARAMETRES] Erreur chargement settings:", {
-            status,
-            statusText: response.statusText,
-            error: errorMessage,
-            details: errorDetails,
-            url: "/api/settings",
-            fullError: data,
-          });
-
-          // Gérer le cas 401 (non authentifié)
-          if (status === 401) {
-            toast.error("Veuillez vous reconnecter");
-            router.push("/connexion");
-            return;
-          }
-
-          // Afficher un message d'erreur détaillé avec hint si présent
-          const hint = data.hint ? `\n${data.hint}` : "";
-          toast.error(`Erreur (${status}): ${errorMessage}${errorDetails ? ` - ${errorDetails}` : ""}${hint}`);
-          throw new Error(`Erreur ${status}: ${errorMessage}`);
-        }
-        console.log("[PARAMETRES] Settings chargés:", data);
-        
-        // L'API retourne { settings: { company_name, company_email, ... } }
-        const settings = data.settings || data;
-        
-        // Normaliser toutes les valeurs pour éviter undefined/null dans les inputs contrôlés
-        // UNIQUEMENT les champs qui existent dans la table profiles
-        const normalizedSettings = {
-          company_name: String(settings?.company_name ?? ""),
-          company_address: String(settings?.company_address ?? ""),
-          company_email: String(settings?.company_email ?? ""),
-          company_phone: String(settings?.company_phone ?? ""),
-          primary_color: String(settings?.primary_color ?? "#6D5EF8"),
-          currency: String(settings?.currency ?? "CHF"),
-          logo_url: settings?.logo_url || undefined,
-        };
-        
-        // Formater les données pour correspondre à l'interface Parametres
-        const params: Parametres = {
-          nomEntreprise: normalizedSettings.company_name,
-          adresse: normalizedSettings.company_address,
-          email: normalizedSettings.company_email,
-          telephone: normalizedSettings.company_phone,
-          logo: normalizedSettings.logo_url,
-          styleEnTete: "moderne", // Par défaut pour l'instant
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-        };
-
-        setParametres(params);
-        // Normaliser tous les champs pour garantir qu'ils sont toujours des strings (pas undefined)
-        setFormData({
-          nomEntreprise: normalizedSettings.company_name || "",
-          adresse: normalizedSettings.company_address || "",
-          email: normalizedSettings.company_email || "",
-          telephone: normalizedSettings.company_phone || "",
-          styleEnTete: "moderne",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-          primaryColor: normalizedSettings.primary_color || "#6D5EF8",
-          currency: normalizedSettings.currency || "CHF",
-          invoiceColor: normalizedSettings.primary_color || "#6D5EF8",
-          branding: "",
-        });
-
-        // Charger le logo depuis l'API (toujours utiliser logo_url)
-        if (settings.logo_url) {
-          setLogoPreview(settings.logo_url);
-        }
-      } catch (error: any) {
-        console.error("[PARAMETRES] Erreur catch loadSettings:", error);
-        // Ne pas afficher de toast ici car on l'a déjà fait dans le if (!response.ok)
-        // Sauf si c'est une autre erreur (réseau, etc.)
-        if (error.message && !error.message.includes("Erreur")) {
-          toast.error(`Erreur: ${error.message}`);
-        }
-      } finally {
-        setLoadingSettings(false);
+  // Fonction pour charger les paramètres directement depuis Supabase
+  const loadSettingsFromDB = async () => {
+    try {
+      setLoadingSettings(true);
+      console.log("[PARAMETRES] Chargement direct depuis Supabase profiles");
+      
+      const supabase = createClient();
+      
+      // 1. Vérifier l'authentification
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        console.error("[PARAMETRES] Erreur auth:", authError);
+        toast.error("Veuillez vous reconnecter");
+        router.push("/connexion");
+        return;
       }
-    };
 
-    loadSettings();
-    // Récupérer le plan de l'utilisateur
+      console.log("[PARAMETRES] User authentifié:", user.id);
+
+      // 2. Charger le profil depuis la table profiles
+      const { data: profile, error: fetchError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (fetchError) {
+        // Si le profil n'existe pas, ce n'est pas une erreur critique
+        if (fetchError.code === "PGRST116") {
+          console.log("[PARAMETRES] Profil inexistant, utilisation des valeurs par défaut");
+        } else {
+          console.error("[PARAMETRES] Erreur chargement profil:", {
+            code: fetchError.code,
+            message: fetchError.message,
+            details: fetchError.details,
+            hint: fetchError.hint,
+          });
+          toast.error(`Erreur lors du chargement: ${fetchError.message}`);
+          return;
+        }
+      }
+
+      console.log("[PARAMETRES] Profil chargé depuis DB:", profile);
+
+      // 3. Construire l'URL du logo si logo_path existe mais pas logo_url
+      let logoUrl: string | null = null;
+      if (profile?.logo_url) {
+        logoUrl = profile.logo_url;
+      } else if (profile?.logo_path) {
+        const { data: urlData } = supabase.storage
+          .from("Logos")
+          .getPublicUrl(profile.logo_path);
+        logoUrl = urlData.publicUrl;
+      }
+
+      // 4. Hydrater le state avec les données DB (PAS de valeurs par défaut qui écrasent)
+      const normalizedSettings = {
+        company_name: profile?.company_name ?? "",
+        company_address: profile?.company_address ?? "",
+        company_email: profile?.company_email ?? "",
+        company_phone: profile?.company_phone ?? "",
+        primary_color: profile?.primary_color ?? "#6D5EF8",
+        currency: profile?.currency ?? "CHF",
+        logo_url: logoUrl ?? null,
+      };
+
+      // Formater les données pour correspondre à l'interface Parametres
+      const params: Parametres = {
+        nomEntreprise: normalizedSettings.company_name,
+        adresse: normalizedSettings.company_address,
+        email: normalizedSettings.company_email,
+        telephone: normalizedSettings.company_phone,
+        logo: normalizedSettings.logo_url || undefined,
+        styleEnTete: "moderne",
+        emailExpediteur: "",
+        nomExpediteur: "",
+        resendApiKey: "",
+        iban: "",
+        bankName: "",
+        conditionsPaiement: "",
+      };
+
+      setParametres(params);
+      
+      // Hydrater formData avec les données DB (PAS de valeurs par défaut qui écrasent)
+      setFormData({
+        nomEntreprise: normalizedSettings.company_name,
+        adresse: normalizedSettings.company_address,
+        email: normalizedSettings.company_email,
+        telephone: normalizedSettings.company_phone,
+        styleEnTete: "moderne",
+        emailExpediteur: "",
+        nomExpediteur: "",
+        resendApiKey: "",
+        iban: "",
+        bankName: "",
+        conditionsPaiement: "",
+        primaryColor: normalizedSettings.primary_color,
+        currency: normalizedSettings.currency,
+        invoiceColor: normalizedSettings.primary_color,
+        branding: "",
+      });
+
+      // Charger le logo
+      if (normalizedSettings.logo_url) {
+        setLogoPreview(normalizedSettings.logo_url);
+      } else {
+        setLogoPreview(null);
+      }
+
+      console.log("[PARAMETRES] State hydraté avec données DB:", {
+        nomEntreprise: normalizedSettings.company_name,
+        email: normalizedSettings.company_email,
+        primary_color: normalizedSettings.primary_color,
+        currency: normalizedSettings.currency,
+      });
+    } catch (error: any) {
+      console.error("[PARAMETRES] Erreur catch loadSettingsFromDB:", error);
+      toast.error(`Erreur: ${error.message || "Erreur lors du chargement"}`);
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
+
+  // Charger les paramètres au montage et après navigation
+  useEffect(() => {
+    loadSettingsFromDB();
     fetchUserPlan();
-  }, []); // Charger uniquement au montage, pas à chaque changement de router
+  }, []); // Charger uniquement au montage
 
   const fetchUserPlan = async () => {
     try {
@@ -356,56 +374,9 @@ export default function ParametresPage() {
         return; // Ne pas throw pour éviter l'overlay Next.js
       }
       
-      // Mettre à jour les paramètres locaux avec la réponse
-      if (result.settings) {
-        // Normaliser toutes les valeurs pour éviter undefined/null
-        // UNIQUEMENT les champs qui existent dans la table profiles
-        const normalizedSettings = {
-          company_name: String(result.settings.company_name ?? ""),
-          company_address: String(result.settings.company_address ?? ""),
-          company_email: String(result.settings.company_email ?? ""),
-          company_phone: String(result.settings.company_phone ?? ""),
-          primary_color: String(result.settings.primary_color ?? "#6D5EF8"),
-          currency: String(result.settings.currency ?? "CHF"),
-          logo_url: result.settings.logo_url || undefined,
-        };
-        
-        const params: Parametres = {
-          nomEntreprise: normalizedSettings.company_name,
-          adresse: normalizedSettings.company_address,
-          email: normalizedSettings.company_email,
-          telephone: normalizedSettings.company_phone,
-          logo: normalizedSettings.logo_url,
-          styleEnTete: "moderne",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-        };
-        setParametres(params);
-        // Mettre à jour uniquement les champs modifiés, en préservant les autres avec valeurs par défaut
-        setFormData({
-          ...formData,
-          nomEntreprise: normalizedSettings.company_name || "",
-          adresse: normalizedSettings.company_address || "",
-          email: normalizedSettings.company_email || "",
-          telephone: normalizedSettings.company_phone || "",
-          primaryColor: normalizedSettings.primary_color || "#6D5EF8",
-          currency: normalizedSettings.currency || "CHF",
-          invoiceColor: normalizedSettings.primary_color || "#6D5EF8",
-          branding: "",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-        });
-        
-        // Mettre à jour le logo si présent
-        if (normalizedSettings.logo_url) {
-          setLogoPreview(normalizedSettings.logo_url);
-        }
-      }
+      // IMPORTANT : Recharger depuis la DB après UPDATE pour garantir la synchronisation
+      console.log("[PARAMETRES] UPDATE réussi, rechargement depuis DB...");
+      await loadSettingsFromDB();
 
       setSaved(true);
       toast.success("Paramètres enregistrés avec succès");
@@ -437,66 +408,9 @@ export default function ParametresPage() {
         throw new Error(data.error || "Erreur lors de l'upload");
       }
 
-      // Mettre à jour l'aperçu avec l'URL du logo
-      if (data.logoUrl) {
-        setLogoPreview(data.logoUrl);
-      }
-      
-      // Recharger les paramètres depuis l'API
-      const settingsResponse = await fetch("/api/settings");
-      if (settingsResponse.ok) {
-        const responseData = await parseResponseBody(settingsResponse);
-        const settings = responseData.settings || responseData;
-        
-        // Normaliser toutes les valeurs pour éviter undefined/null
-        // UNIQUEMENT les champs qui existent dans la table profiles
-        const normalizedSettings = {
-          company_name: String(settings?.company_name ?? ""),
-          company_address: String(settings?.company_address ?? ""),
-          company_email: String(settings?.company_email ?? ""),
-          company_phone: String(settings?.company_phone ?? ""),
-          primary_color: String(settings?.primary_color ?? "#6D5EF8"),
-          currency: String(settings?.currency ?? "CHF"),
-          logo_url: settings?.logo_url || undefined,
-        };
-        
-        const params: Parametres = {
-          nomEntreprise: normalizedSettings.company_name,
-          adresse: normalizedSettings.company_address,
-          email: normalizedSettings.company_email,
-          telephone: normalizedSettings.company_phone,
-          logo: normalizedSettings.logo_url,
-          styleEnTete: "moderne",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-        };
-        setParametres(params);
-        setFormData({
-          ...formData,
-          nomEntreprise: normalizedSettings.company_name || "",
-          adresse: normalizedSettings.company_address || "",
-          email: normalizedSettings.company_email || "",
-          telephone: normalizedSettings.company_phone || "",
-          styleEnTete: "moderne",
-          primaryColor: normalizedSettings.primary_color || "#6D5EF8",
-          currency: normalizedSettings.currency || "CHF",
-          invoiceColor: normalizedSettings.primary_color || "#6D5EF8",
-          branding: "",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-        });
-        if (normalizedSettings.logo_url) {
-          setLogoPreview(normalizedSettings.logo_url);
-        }
-      }
+      // Recharger depuis la DB pour synchroniser le state
+      console.log("[PARAMETRES] Logo uploadé, rechargement depuis DB...");
+      await loadSettingsFromDB();
       
       toast.success("Logo uploadé avec succès !");
     } catch (error: any) {
@@ -526,52 +440,9 @@ export default function ParametresPage() {
         throw new Error(data.error || "Erreur lors de la suppression");
       }
 
-      // Mettre à jour l'aperçu
-      setLogoPreview(null);
-      
-      // Recharger les paramètres depuis l'API
-      const settingsResponse = await fetch("/api/settings");
-      if (settingsResponse.ok) {
-        const responseData = await parseResponseBody(settingsResponse);
-        const settings = responseData.settings || responseData;
-        
-        // Normaliser toutes les valeurs pour éviter undefined/null
-        const normalizedSettings = {
-          company_name: String(settings?.company_name ?? ""),
-          company_address: String(settings?.company_address ?? ""),
-          company_email: String(settings?.company_email ?? ""),
-          company_phone: String(settings?.company_phone ?? ""),
-          primary_color: String(settings?.primary_color ?? "#6D5EF8"),
-          currency: String(settings?.currency ?? "CHF"),
-          logo_url: settings?.logo_url || undefined,
-        };
-        
-        const params: Parametres = {
-          nomEntreprise: normalizedSettings.company_name,
-          adresse: normalizedSettings.company_address,
-          email: normalizedSettings.company_email,
-          telephone: normalizedSettings.company_phone,
-          logo: normalizedSettings.logo_url,
-          styleEnTete: "moderne",
-          emailExpediteur: "",
-          nomExpediteur: "",
-          resendApiKey: "",
-          iban: "",
-          bankName: "",
-          conditionsPaiement: "",
-        };
-        setParametres(params);
-        // Mettre à jour formData avec les valeurs normalisées
-        setFormData({
-          ...formData,
-          nomEntreprise: normalizedSettings.company_name,
-          adresse: normalizedSettings.company_address,
-          email: normalizedSettings.company_email,
-          telephone: normalizedSettings.company_phone,
-          primaryColor: normalizedSettings.primary_color,
-          currency: normalizedSettings.currency,
-        });
-      }
+      // Recharger depuis la DB pour synchroniser le state
+      console.log("[PARAMETRES] Logo supprimé, rechargement depuis DB...");
+      await loadSettingsFromDB();
       
       toast.success("Logo supprimé avec succès");
     } catch (error: any) {
