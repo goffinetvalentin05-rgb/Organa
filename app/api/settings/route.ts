@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
 
     console.log("[API][settings] GET - User authentifié:", user.id);
 
-    // Récupérer les paramètres depuis profiles - UNIQUEMENT les colonnes qui existent
+    // Récupérer les paramètres depuis profiles - TOUTES les colonnes nécessaires
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
-      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol")
+      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -113,6 +113,12 @@ export async function GET(request: NextRequest) {
       primary_color: companySettings.primary_color,
       currency: companySettings.currency,
       currency_symbol: currency_symbol,
+      iban: profile?.iban || "",
+      bank_name: profile?.bank_name || "",
+      conditions_paiement: profile?.conditions_paiement || "",
+      email_expediteur: profile?.email_expediteur || "",
+      nom_expediteur: profile?.nom_expediteur || "",
+      resend_api_key: profile?.resend_api_key || "",
     };
 
     console.log("[API][settings] GET - Settings récupérés avec succès");
@@ -176,7 +182,9 @@ export async function PUT(request: NextRequest) {
     // Définir les champs autorisés - UNIQUEMENT ceux qui existent dans la table profiles
     // Colonnes existantes : user_id, plan, stripe_customer_id, stripe_subscription_id,
     //                      created_at, updated_at, company_name, company_email, company_phone,
-    //                      company_address, logo_path, logo_url, primary_color, currency
+    //                      company_address, logo_path, logo_url, primary_color, currency,
+    //                      iban, bank_name, conditions_paiement,
+    //                      email_expediteur, nom_expediteur, resend_api_key
     const allowedFields = [
       'user_id',
       'plan',
@@ -187,6 +195,12 @@ export async function PUT(request: NextRequest) {
       'primary_color',
       'currency',
       'logo_url',
+      'iban',
+      'bank_name',
+      'conditions_paiement',
+      'email_expediteur',
+      'nom_expediteur',
+      'resend_api_key',
       'updated_at'
     ] as const;
 
@@ -234,21 +248,40 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Gérer les champs bancaires
+    if (body.iban !== undefined) {
+      upsertData.iban = body.iban?.trim() || null;
+    }
+    if (body.bank_name !== undefined) {
+      upsertData.bank_name = body.bank_name?.trim() || null;
+    }
+    if (body.conditions_paiement !== undefined) {
+      upsertData.conditions_paiement = body.conditions_paiement?.trim() || null;
+    }
+
+    // Gérer les champs email
+    if (body.email_expediteur !== undefined) {
+      upsertData.email_expediteur = body.email_expediteur?.trim() || null;
+    }
+    if (body.nom_expediteur !== undefined) {
+      upsertData.nom_expediteur = body.nom_expediteur?.trim() || null;
+    }
+    if (body.resend_api_key !== undefined) {
+      upsertData.resend_api_key = body.resend_api_key?.trim() || null;
+    }
+
     // PROTECTION ANTI-COLONNE INVALIDE
     // Filtrer strictement pour ne garder que les champs autorisés
-    // Supprimer toute clé dont la valeur est undefined ou null
+    // Accepter les chaînes vides car elles peuvent être intentionnelles
     // Ne jamais envoyer une colonne si elle n'a pas été validée
     const finalUpsertData: any = {};
     for (const [key, value] of Object.entries(upsertData)) {
-      // Vérifier que la clé est autorisée ET que la valeur est valide (pas undefined, pas null)
-      if (allowedFields.includes(key as any) && value !== undefined && value !== null) {
-        // Pour les strings, vérifier qu'elles ne sont pas vides après trim
+      // Vérifier que la clé est autorisée
+      if (allowedFields.includes(key as any)) {
+        // Pour les strings, accepter même si vides (peut être intentionnel)
         if (typeof value === 'string') {
-          const trimmed = value.trim();
-          if (trimmed !== '') {
-            finalUpsertData[key] = trimmed;
-          }
-        } else {
+          finalUpsertData[key] = value;
+        } else if (value !== undefined && value !== null) {
           // Pour les autres types (dates, etc.), accepter directement
           finalUpsertData[key] = value;
         }
@@ -391,6 +424,12 @@ export async function PUT(request: NextRequest) {
       primary_color: companySettings.primary_color,
       currency: companySettings.currency,
       currency_symbol: currency_symbol,
+      iban: updatedProfile?.iban || "",
+      bank_name: updatedProfile?.bank_name || "",
+      conditions_paiement: updatedProfile?.conditions_paiement || "",
+      email_expediteur: updatedProfile?.email_expediteur || "",
+      nom_expediteur: updatedProfile?.nom_expediteur || "",
+      resend_api_key: updatedProfile?.resend_api_key || "",
     };
 
     console.log("[API][settings] PUT - Settings sauvegardés avec succès");

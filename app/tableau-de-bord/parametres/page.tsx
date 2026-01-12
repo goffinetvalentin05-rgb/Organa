@@ -154,6 +154,14 @@ export default function ParametresPage() {
         primary_color: profile?.primary_color ?? "#6D5EF8",
         currency: profile?.currency ?? "CHF",
         logo_url: logoUrl ?? null,
+        // Champs bancaires
+        iban: profile?.iban ?? "",
+        bank_name: profile?.bank_name ?? "",
+        conditions_paiement: profile?.conditions_paiement ?? "",
+        // Champs email
+        email_expediteur: profile?.email_expediteur ?? "",
+        nom_expediteur: profile?.nom_expediteur ?? "",
+        resend_api_key: profile?.resend_api_key ?? "",
       };
 
       // Formater les données pour correspondre à l'interface Parametres
@@ -164,12 +172,12 @@ export default function ParametresPage() {
         telephone: normalizedSettings.company_phone,
         logo: normalizedSettings.logo_url || undefined,
         styleEnTete: "moderne",
-        emailExpediteur: "",
-        nomExpediteur: "",
-        resendApiKey: "",
-        iban: "",
-        bankName: "",
-        conditionsPaiement: "",
+        emailExpediteur: normalizedSettings.email_expediteur,
+        nomExpediteur: normalizedSettings.nom_expediteur,
+        resendApiKey: normalizedSettings.resend_api_key,
+        iban: normalizedSettings.iban,
+        bankName: normalizedSettings.bank_name,
+        conditionsPaiement: normalizedSettings.conditions_paiement,
       };
 
       setParametres(params);
@@ -181,12 +189,12 @@ export default function ParametresPage() {
         email: normalizedSettings.company_email,
         telephone: normalizedSettings.company_phone,
         styleEnTete: "moderne",
-        emailExpediteur: "",
-        nomExpediteur: "",
-        resendApiKey: "",
-        iban: "",
-        bankName: "",
-        conditionsPaiement: "",
+        emailExpediteur: normalizedSettings.email_expediteur,
+        nomExpediteur: normalizedSettings.nom_expediteur,
+        resendApiKey: normalizedSettings.resend_api_key,
+        iban: normalizedSettings.iban,
+        bankName: normalizedSettings.bank_name,
+        conditionsPaiement: normalizedSettings.conditions_paiement,
         primaryColor: normalizedSettings.primary_color,
         currency: normalizedSettings.currency,
         invoiceColor: normalizedSettings.primary_color,
@@ -284,11 +292,12 @@ export default function ParametresPage() {
     }
 
     try {
-      // PAYLOAD MANUEL - UNIQUEMENT LES CHAMPS QUI EXISTENT DANS LA TABLE PROFILES
+      // PAYLOAD MANUEL - TOUS LES CHAMPS QUI EXISTENT DANS LA TABLE PROFILES
       // Colonnes existantes : company_name, company_email, company_phone, company_address,
-      //                      logo_path, logo_url, primary_color, currency
+      //                      logo_path, logo_url, primary_color, currency,
+      //                      iban, bank_name, conditions_paiement,
+      //                      email_expediteur, nom_expediteur, resend_api_key
       // Ne JAMAIS envoyer : created_at, updated_at, id, user_id, undefined, null
-      // Ne JAMAIS envoyer : email_sender_name, email_sender_address, resend_api_key, invoice_color, branding
       
       const payload: Record<string, string> = {};
 
@@ -329,10 +338,33 @@ export default function ParametresPage() {
         }
       }
 
+      // Champs bancaires
+      if (formData.iban !== undefined) {
+        payload.iban = formData.iban.trim();
+      }
+      if (formData.bankName !== undefined) {
+        payload.bank_name = formData.bankName.trim();
+      }
+      if (formData.conditionsPaiement !== undefined) {
+        payload.conditions_paiement = formData.conditionsPaiement.trim();
+      }
+
+      // Champs email
+      if (formData.emailExpediteur !== undefined) {
+        payload.email_expediteur = formData.emailExpediteur.trim();
+      }
+      if (formData.nomExpediteur !== undefined) {
+        payload.nom_expediteur = formData.nomExpediteur.trim();
+      }
+      if (formData.resendApiKey !== undefined) {
+        payload.resend_api_key = formData.resendApiKey.trim();
+      }
+
       // Protection finale : supprimer toute clé avec valeur undefined ou null
+      // MAIS garder les chaînes vides car elles peuvent être intentionnelles
       const cleanPayload: Record<string, string> = {};
       for (const [key, value] of Object.entries(payload)) {
-        if (value !== undefined && value !== null && value !== "") {
+        if (value !== undefined && value !== null) {
           cleanPayload[key] = value;
         }
       }
