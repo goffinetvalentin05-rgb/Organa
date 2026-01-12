@@ -334,7 +334,7 @@ export async function PUT(request: NextRequest) {
         .from("profiles")
         .update(updateData)
         .eq("user_id", user.id)
-        .select()
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
         .single();
 
       dbError = updateError;
@@ -345,7 +345,7 @@ export async function PUT(request: NextRequest) {
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert(finalUpsertData)
-        .select()
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
         .single();
 
       dbError = createError;

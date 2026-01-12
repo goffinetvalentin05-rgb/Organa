@@ -109,10 +109,10 @@ export default function ParametresPage() {
 
       console.log("[PARAMETRES] User authentifié:", user.id);
 
-      // 2. Charger le profil depuis la table profiles
+      // 2. Charger le profil depuis la table profiles - SELECT EXPLICITE pour garantir tous les champs
       const { data: profile, error: fetchError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
         .eq("user_id", user.id)
         .single();
 
