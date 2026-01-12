@@ -8,12 +8,12 @@ import {
 } from "@/lib/mock-data";
 import { Plus, Calendar, CheckCircle, Edit, Trash } from "@/lib/icons";
 
-type VueCalendrier = "mois" | "semaine" | "jour";
+type VueCalendrier = "calendrier" | "liste";
 type Onglet = "calendrier" | "taches";
 
 export default function CalendrierPage() {
   const [ongletActif, setOngletActif] = useState<Onglet>("calendrier");
-  const [vueCalendrier, setVueCalendrier] = useState<VueCalendrier>("mois");
+  const [vueCalendrier, setVueCalendrier] = useState<VueCalendrier>("calendrier");
   const [dateCourante, setDateCourante] = useState(new Date());
   const [evenements, setEvenements] = useState<EvenementCalendrier[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -262,40 +262,30 @@ export default function CalendrierPage() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setVueCalendrier("mois")}
+                onClick={() => setVueCalendrier("calendrier")}
                 className={`px-4 py-2 rounded-lg transition-all ${
-                  vueCalendrier === "mois"
+                  vueCalendrier === "calendrier"
                     ? "bg-[#7C5CFF]/20 text-white"
                     : "bg-white/10 text-white/70 hover:text-white"
                 }`}
               >
-                Mois
+                Calendrier
               </button>
               <button
-                onClick={() => setVueCalendrier("semaine")}
+                onClick={() => setVueCalendrier("liste")}
                 className={`px-4 py-2 rounded-lg transition-all ${
-                  vueCalendrier === "semaine"
+                  vueCalendrier === "liste"
                     ? "bg-[#7C5CFF]/20 text-white"
                     : "bg-white/10 text-white/70 hover:text-white"
                 }`}
               >
-                Semaine
-              </button>
-              <button
-                onClick={() => setVueCalendrier("jour")}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  vueCalendrier === "jour"
-                    ? "bg-[#7C5CFF]/20 text-white"
-                    : "bg-white/10 text-white/70 hover:text-white"
-                }`}
-              >
-                Jour
+                Liste
               </button>
             </div>
           </div>
 
-          {/* Vue Mois */}
-          {vueCalendrier === "mois" && (
+          {/* Vue Calendrier */}
+          {vueCalendrier === "calendrier" && (
             <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
               <div className="grid grid-cols-7 gap-px bg-white/10">
                 {nomsJours.map((jour) => (
@@ -345,63 +335,121 @@ export default function CalendrierPage() {
             </div>
           )}
 
-          {/* Vue Semaine/Jour - Liste simplifiée */}
-          {(vueCalendrier === "semaine" || vueCalendrier === "jour") && (
+          {/* Vue Liste - Événements à venir */}
+          {vueCalendrier === "liste" && (
             <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-              <div className="divide-y divide-white/10">
-                {Object.keys(evenementsParDate)
-                  .sort()
-                  .filter((date) => {
-                    const dateEvt = new Date(date);
-                    if (vueCalendrier === "jour") {
-                      return estAujourdhui(dateEvt);
-                    }
-                    // Semaine: afficher les 7 prochains jours
-                    const aujourdhui = new Date();
-                    const dans7Jours = new Date(aujourdhui);
-                    dans7Jours.setDate(dans7Jours.getDate() + 7);
-                    return dateEvt >= aujourdhui && dateEvt <= dans7Jours;
-                  })
-                  .map((date) => (
-                    <div key={date} className="p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-white/90">
-                        {new Date(date).toLocaleDateString("fr-FR", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </h3>
-                      <div className="space-y-3">
-                        {evenementsParDate[date].map((evt) => (
-                          <div
-                            key={evt.id}
-                            className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-all"
-                          >
+              {evenements.length === 0 ? (
+                <div className="p-12 text-center">
+                  <p className="text-white/70 text-lg">Aucun événement à venir</p>
+                  <button
+                    onClick={() => handleOpenModal()}
+                    className="mt-4 px-6 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                  >
+                    Créer un événement
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/10">
+                  {evenements
+                    .filter((evt) => {
+                      const dateEvt = new Date(evt.date);
+                      const aujourdhui = new Date();
+                      aujourdhui.setHours(0, 0, 0, 0);
+                      return dateEvt >= aujourdhui;
+                    })
+                    .sort((a, b) => {
+                      const dateA = new Date(a.date + (a.heure ? `T${a.heure}` : "T00:00"));
+                      const dateB = new Date(b.date + (b.heure ? `T${b.heure}` : "T00:00"));
+                      return dateA.getTime() - dateB.getTime();
+                    })
+                    .map((evt) => {
+                      const dateEvt = new Date(evt.date);
+                      const estAujourdhuiDate = estAujourdhui(dateEvt);
+                      const estDemain = (() => {
+                        const demain = new Date();
+                        demain.setDate(demain.getDate() + 1);
+                        return (
+                          dateEvt.getDate() === demain.getDate() &&
+                          dateEvt.getMonth() === demain.getMonth() &&
+                          dateEvt.getFullYear() === demain.getFullYear()
+                        );
+                      })();
+
+                      return (
+                        <div
+                          key={evt.id}
+                          className="p-6 hover:bg-black/20 transition-all"
+                        >
+                          <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-4 flex-1">
                               <div className="mt-1">
                                 {evt.type === "rdv" ? (
                                   <Calendar className="w-5 h-5 text-blue-300" />
                                 ) : (
-                                  <CheckCircle className="w-5 h-5 text-green-300" />
+                                  <CheckCircle className={`w-5 h-5 ${evt.statut === "fait" ? "text-green-300" : "text-yellow-300"}`} />
                                 )}
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium">{evt.titre}</div>
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div className="font-medium text-lg">{evt.titre}</div>
+                                  {evt.type === "tache" && evt.statut && (
+                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                      evt.statut === "fait"
+                                        ? "bg-green-500/20 text-green-300"
+                                        : "bg-yellow-500/20 text-yellow-300"
+                                    }`}>
+                                      {evt.statut === "fait" ? "Terminé" : "À faire"}
+                                    </span>
+                                  )}
+                                </div>
                                 {evt.description && (
-                                  <div className="text-sm text-white/70 mt-1">
+                                  <div className="text-sm text-white/70 mt-1 mb-3">
                                     {evt.description}
                                   </div>
                                 )}
-                                <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
-                                  {evt.heure && <span>à {evt.heure}</span>}
-                                  <span className="px-2 py-0.5 rounded bg-white/10 text-xs">
+                                <div className="flex items-center gap-4 text-sm text-white/60">
+                                  <span className="font-medium text-white/80">
+                                    {estAujourdhuiDate
+                                      ? "Aujourd'hui"
+                                      : estDemain
+                                      ? "Demain"
+                                      : dateEvt.toLocaleDateString("fr-FR", {
+                                          weekday: "long",
+                                          day: "numeric",
+                                          month: "long",
+                                          year: "numeric",
+                                        })}
+                                  </span>
+                                  {evt.heure && (
+                                    <span className="px-2 py-1 rounded bg-white/10">
+                                      {evt.heure}
+                                    </span>
+                                  )}
+                                  <span className="px-2 py-1 rounded bg-white/10 text-xs">
                                     {evt.type === "rdv" ? "Rendez-vous" : "Tâche"}
                                   </span>
+                                  {evt.type === "tache" && evt.dateEcheance && (
+                                    <span className="text-xs text-white/50">
+                                      Échéance: {new Date(evt.dateEcheance).toLocaleDateString("fr-FR")}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
+                              {evt.type === "tache" && (
+                                <button
+                                  onClick={() => handleToggleStatut(evt.id, evt.statut || "a-faire")}
+                                  className={`px-3 py-1.5 rounded-lg transition-all text-sm flex items-center justify-center ${
+                                    evt.statut === "fait"
+                                      ? "bg-green-500/20 hover:bg-green-500/30 text-green-300"
+                                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                                  }`}
+                                  title={evt.statut === "fait" ? "Marquer comme à faire" : "Marquer comme terminé"}
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleOpenModal(evt)}
                                 className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
@@ -418,11 +466,11 @@ export default function CalendrierPage() {
                               </button>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-              </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -433,95 +481,180 @@ export default function CalendrierPage() {
         <div className="space-y-6">
           {/* Tâches à faire */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold mb-4">À faire ({tachesAFaire.length})</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-yellow-300" />
+              À faire ({tachesAFaire.length})
+            </h2>
             {tachesAFaire.length === 0 ? (
-              <p className="text-white/70">Aucune tâche à faire</p>
+              <div className="text-center py-8">
+                <p className="text-white/70 mb-4">Aucune tâche à faire</p>
+                <button
+                  onClick={() => handleOpenModal()}
+                  className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                >
+                  Créer une tâche
+                </button>
+              </div>
             ) : (
               <div className="space-y-3">
-                {tachesAFaire.map((tache) => (
-                  <div
-                    key={tache.id}
-                    className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-all"
-                  >
-                    <div className="flex items-start gap-4 flex-1">
-                      <button
-                        onClick={() => handleToggleStatut(tache.id, tache.statut || "a-faire")}
-                        className="w-5 h-5 rounded border-2 border-white/30 hover:border-[#7C5CFF] transition-all mt-0.5"
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium">{tache.titre}</div>
-                        {tache.description && (
-                          <div className="text-sm text-white/70 mt-1">{tache.description}</div>
-                        )}
-                        <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
-                          {tache.dateEcheance && (
-                            <span>Échéance: {tache.dateEcheance}</span>
-                          )}
-                          {tache.typeTache && (
-                            <span className="px-2 py-0.5 rounded bg-white/10 text-xs">
-                              {tache.typeTache === "relance" && "Relance"}
-                              {tache.typeTache === "rdv" && "Rendez-vous"}
-                              {tache.typeTache === "admin" && "Admin"}
-                              {tache.typeTache === "autre" && "Autre"}
-                            </span>
-                          )}
+                {tachesAFaire
+                  .sort((a, b) => {
+                    // Trier par date d'échéance si disponible, sinon par date
+                    const dateA = a.dateEcheance ? new Date(a.dateEcheance) : new Date(a.date);
+                    const dateB = b.dateEcheance ? new Date(b.dateEcheance) : new Date(b.date);
+                    return dateA.getTime() - dateB.getTime();
+                  })
+                  .map((tache) => {
+                    const dateEcheance = tache.dateEcheance ? new Date(tache.dateEcheance) : null;
+                    const dateTache = new Date(tache.date);
+                    const aujourdhui = new Date();
+                    aujourdhui.setHours(0, 0, 0, 0);
+                    const estEnRetard = dateEcheance && dateEcheance < aujourdhui;
+                    const estAujourdhuiDate = dateEcheance && estAujourdhui(dateEcheance);
+
+                    return (
+                      <div
+                        key={tache.id}
+                        className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-all"
+                      >
+                        <div className="flex items-start gap-4 flex-1">
+                          <button
+                            onClick={() => handleToggleStatut(tache.id, tache.statut || "a-faire")}
+                            className="w-5 h-5 rounded border-2 border-white/30 hover:border-[#7C5CFF] transition-all mt-0.5 flex-shrink-0"
+                            title="Marquer comme terminé"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-lg mb-1">{tache.titre}</div>
+                            {tache.description && (
+                              <div className="text-sm text-white/70 mt-1 mb-3">{tache.description}</div>
+                            )}
+                            <div className="flex items-center gap-4 flex-wrap">
+                              {dateEcheance && (
+                                <span
+                                  className={`text-sm font-medium ${
+                                    estEnRetard
+                                      ? "text-red-300"
+                                      : estAujourdhuiDate
+                                      ? "text-yellow-300"
+                                      : "text-white/60"
+                                  }`}
+                                >
+                                  {estEnRetard
+                                    ? "⚠️ En retard"
+                                    : estAujourdhuiDate
+                                    ? "📅 Aujourd'hui"
+                                    : `📅 ${dateEcheance.toLocaleDateString("fr-FR", {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                      })}`}
+                                </span>
+                              )}
+                              {!dateEcheance && (
+                                <span className="text-sm text-white/60">
+                                  {dateTache.toLocaleDateString("fr-FR", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              )}
+                              {tache.typeTache && (
+                                <span className="px-2 py-1 rounded bg-white/10 text-xs font-medium">
+                                  {tache.typeTache === "relance" && "🔔 Relance"}
+                                  {tache.typeTache === "rdv" && "📅 Rendez-vous"}
+                                  {tache.typeTache === "admin" && "⚙️ Admin"}
+                                  {tache.typeTache === "autre" && "📋 Autre"}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => handleOpenModal(tache)}
+                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
+                            title="Modifier"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(tache.id)}
+                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                            title="Supprimer"
+                          >
+                            <Trash className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleOpenModal(tache)}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
-                        title="Modifier"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(tache.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
-                        title="Supprimer"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
             )}
           </div>
 
           {/* Tâches faites */}
           {tachesFaites.length > 0 && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm opacity-60">
-              <h2 className="text-xl font-semibold mb-4">Faites ({tachesFaites.length})</h2>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm opacity-70">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-300" />
+                Terminées ({tachesFaites.length})
+              </h2>
               <div className="space-y-3">
-                {tachesFaites.map((tache) => (
-                  <div
-                    key={tache.id}
-                    className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20"
-                  >
-                    <div className="flex items-start gap-4 flex-1">
-                      <button
-                        onClick={() => handleToggleStatut(tache.id, "fait")}
-                        className="w-5 h-5 rounded bg-green-500 border-2 border-green-500 flex items-center justify-center mt-0.5"
-                      >
-                        ✓
-                      </button>
-                      <div className="flex-1">
-                        <div className="font-medium line-through text-white/50">{tache.titre}</div>
+                {tachesFaites
+                  .sort((a, b) => {
+                    // Trier par date (plus récentes en premier)
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateB.getTime() - dateA.getTime();
+                  })
+                  .map((tache) => (
+                    <div
+                      key={tache.id}
+                      className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20"
+                    >
+                      <div className="flex items-start gap-4 flex-1">
+                        <button
+                          onClick={() => handleToggleStatut(tache.id, "fait")}
+                          className="w-5 h-5 rounded bg-green-500 border-2 border-green-500 flex items-center justify-center mt-0.5 flex-shrink-0"
+                          title="Marquer comme à faire"
+                        >
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium line-through text-white/50 text-lg mb-1">
+                            {tache.titre}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-white/40">
+                            <span>
+                              {new Date(tache.date).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </span>
+                            {tache.typeTache && (
+                              <span className="px-2 py-0.5 rounded bg-white/5 text-xs">
+                                {tache.typeTache === "relance" && "Relance"}
+                                {tache.typeTache === "rdv" && "Rendez-vous"}
+                                {tache.typeTache === "admin" && "Admin"}
+                                {tache.typeTache === "autre" && "Autre"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleDelete(tache.id)}
+                          className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                          title="Supprimer"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleDelete(tache.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
-                        title="Supprimer"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
