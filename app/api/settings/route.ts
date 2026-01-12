@@ -207,7 +207,7 @@ export async function PUT(request: NextRequest) {
     // Récupérer le profil existant avec TOUS les champs nécessaires AVANT de construire le payload
     const { data: existingProfile, error: checkError } = await supabase
       .from("profiles")
-      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+      .select("user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
       .eq("user_id", user.id)
       .maybeSingle();
 
