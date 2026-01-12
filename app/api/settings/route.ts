@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           currency: DEFAULT_COMPANY_SETTINGS.currency,
           currency_symbol: defaultCurrencySymbol,
         })
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol")
+        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, conditions_paiement, email_expediteur, nom_expediteur, resend_api_key")
         .single();
 
       if (createError) {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         // En cas d'erreur de création, retourner les valeurs par défaut plutôt que de planter
         profile = null;
       } else {
-        profile = newProfile;
+        profile = newProfile as any;
       }
     } else if (fetchError) {
       console.error("[API][settings] GET - Erreur récupération profil:", {
