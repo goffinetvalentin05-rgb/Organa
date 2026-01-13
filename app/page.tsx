@@ -87,7 +87,7 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                Simplifiez votre
+                Moins d'administratif.
               </motion.span>
               <motion.span 
                 className="block text-white mt-2 md:mt-4 relative"
@@ -95,7 +95,7 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >
-                gestion administrative
+                Plus de temps pour ce qui compte vraiment.
               </motion.span>
             </motion.h1>
           </ScrollReveal>
@@ -113,7 +113,7 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1.5, delay: 1.1 }}
               >
-                Organa offre une expérience fluide et sécurisée pour gérer votre activité administrative. Factures, devis, clients et suivi, au même endroit.
+                Organa simplifie la gestion administrative de votre entreprise afin que vous puissiez consacrer plus de temps à vos clients, à votre activité… et à ce qui compte vraiment pour vous.
               </motion.span>
             </motion.p>
           </ScrollReveal>
@@ -177,6 +177,118 @@ export default function Home() {
                   </motion.svg>
                 </motion.div>
               </Link>
+            </motion.div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION PRISE DE CONSCIENCE — LE TEMPS */}
+      <section className="relative py-20 md:py-32 px-6">
+        <div className="max-w-4xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <motion.h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              PRISE DE CONSCIENCE — LE TEMPS
+            </motion.h2>
+            <motion.div 
+              className="space-y-6 text-white/80 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="text-lg md:text-xl font-light">
+                Vos journées sont déjà bien remplies.
+                Pourtant, une part importante de votre temps est absorbée par l'administratif.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                Créer des devis, gérer des factures, suivre des clients, retrouver des documents…
+                Pris séparément, ces tâches paraissent simples.
+                Additionnées, elles finissent par prendre une place disproportionnée dans votre quotidien.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                Ce temps passé sur l'administratif n'est pas neutre.
+                C'est du temps en moins pour vos clients, pour développer votre activité, ou simplement pour avancer sur ce qui crée réellement de la valeur.
+              </p>
+            </motion.div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION POURQUOI ÇA SE COMPLIQUE */}
+      <section className="relative py-20 md:py-32 px-6">
+        <div className="max-w-4xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <motion.h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              POURQUOI ÇA SE COMPLIQUE
+            </motion.h2>
+            <motion.div 
+              className="space-y-6 text-white/80 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="text-lg md:text-xl font-light">
+                Si l'administratif prend autant de place, ce n'est pas par manque de volonté.
+                C'est souvent une question d'organisation.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                Les informations sont dispersées.
+                Les outils ne communiquent pas entre eux.
+                Certaines données doivent être ressaisies plusieurs fois.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                Résultat :
+                on perd du temps à gérer, à vérifier, à chercher…
+                et l'administratif devient une charge permanente, difficile à maîtriser.
+              </p>
+            </motion.div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION ORGANA, CONCRÈTEMENT */}
+      <section className="relative py-20 md:py-32 px-6">
+        <div className="max-w-4xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <motion.h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              ORGANA, CONCRÈTEMENT
+            </motion.h2>
+            <motion.div 
+              className="space-y-6 text-white/80 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="text-lg md:text-xl font-light">
+                Organa a été conçu pour remettre de la clarté dans votre gestion administrative.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                La plateforme centralise l'essentiel de votre activité au même endroit :
+                clients, devis, factures et suivi administratif.
+              </p>
+              <p className="text-lg md:text-xl font-light">
+                En structurant simplement vos tâches du quotidien, Organa vous aide à mieux vous organiser, à réduire le temps passé sur l'administratif et à vous concentrer sur ce qui fait avancer votre entreprise.
+              </p>
             </motion.div>
           </ScrollReveal>
         </div>
@@ -365,7 +477,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.3 }}
               />
-              Comment ça se passe
+              COMMENT ÇA SE PASSE AU QUOTIDIEN
             </motion.h2>
             <motion.p 
               className="text-lg md:text-xl text-center text-white/70 mb-16 max-w-2xl mx-auto font-light"
@@ -374,7 +486,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
-              Une prise en main simple, au rythme de votre activité.
+              Un fonctionnement simple, pensé pour votre gestion quotidienne.
             </motion.p>
           </ScrollReveal>
 
@@ -382,7 +494,7 @@ export default function Home() {
             {[
               { 
                 title: "Créez vos clients", 
-                text: "Les informations sont enregistrées une seule fois et réutilisées automatiquement.",
+                text: "Vous enregistrez les informations une seule fois. Elles sont automatiquement réutilisées pour vos devis et factures.",
                 icon: (
                   <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -391,7 +503,7 @@ export default function Home() {
               },
               { 
                 title: "Créez et envoyez vos devis", 
-                text: "En quelques clics, depuis une interface claire.",
+                text: "À partir d'un client, vous créez un devis en quelques clics. Vous pouvez l'envoyer par e-mail ou le télécharger.",
                 icon: (
                   <div className="relative">
                     <svg className="w-6 h-6 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -402,7 +514,7 @@ export default function Home() {
               },
               { 
                 title: "Transformez vos devis en factures", 
-                text: "Sans ressaisie, sans perte d'information.",
+                text: "Une fois le devis validé, vous le transformez instantanément en facture, sans ressaisie ni perte d'information.",
                 icon: (
                   <div className="relative">
                     <svg className="w-6 h-6 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -413,7 +525,7 @@ export default function Home() {
               },
               { 
                 title: "Personnalisez vos documents", 
-                text: "Logo, coordonnées, informations bancaires : tout est prêt, partout.",
+                text: "Logo, en-tête, coordonnées, informations bancaires : vos documents reflètent automatiquement votre identité.",
                 icon: (
                   <div className="relative">
                     <svg className="w-6 h-6 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -424,8 +536,8 @@ export default function Home() {
                 )
               },
               { 
-                title: "Gardez une vue d'ensemble", 
-                text: "Un dashboard clair pour suivre vos documents et votre activité.",
+                title: "Pilotez votre activité depuis le dashboard", 
+                text: "Vous disposez d'une vue claire sur votre activité : documents en cours, factures payées ou en attente, actions à effectuer.",
                 icon: (
                   <div className="relative">
                     <svg className="w-6 h-6 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -435,8 +547,8 @@ export default function Home() {
                 )
               },
               { 
-                title: "Suivez paiements et tâches", 
-                text: "Statuts, échéances et organisation, au même endroit.",
+                title: "Suivez vos paiements et vos tâches", 
+                text: "Vous suivez l'état de vos documents (brouillon, envoyé, validé, payé) et organisez vos tâches grâce au calendrier intégré.",
                 icon: (
                   <div className="relative">
                     <svg className="w-6 h-6 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -499,6 +611,66 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SECTION POURQUOI FAIRE CONFIANCE À ORGANA */}
+      <section className="relative py-20 md:py-32 px-6">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <motion.h2 
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight relative"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Ligne décorative */}
+              <motion.div 
+                className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.3 }}
+              />
+              POURQUOI FAIRE CONFIANCE À ORGANA
+            </motion.h2>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                title: "Sécurité et confidentialité des données",
+                text: "Vos données sont hébergées sur une infrastructure cloud sécurisée, avec des mécanismes d'accès stricts.",
+              },
+              {
+                title: "Une plateforme disponible quand vous en avez besoin",
+                text: "Organa repose sur une infrastructure robuste, conçue pour être stable et accessible au quotidien.",
+              },
+              {
+                title: "Conçu pour les indépendants et les PME",
+                text: "Une interface claire, des actions simples, sans complexité inutile.",
+              },
+            ].map((item, index) => (
+              <ScrollReveal key={index} delay={index * 100}>
+                <motion.div
+                  className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/40 hover:bg-white/[0.04] transition-all duration-700 group relative overflow-hidden h-full"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-1000"></div>
+                  <h3 className="text-xl font-semibold mb-3 text-white relative z-10">{item.title}</h3>
+                  <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
+                    {item.text}
+                  </p>
+                </motion.div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* SECTION TARIFS */}
       <section id="tarifs" className="relative py-20 md:py-32 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
@@ -544,8 +716,7 @@ export default function Home() {
                   className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100"
                   transition={{ duration: 0.6 }}
                 />
-                <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Gratuit</h3>
-                <p className="text-gray-400 mb-8 relative z-10 font-light text-sm">pour démarrer</p>
+                <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Plan Gratuit — Idéal pour démarrer</h3>
                 <div className="mb-8 relative z-10">
                   <span className="text-6xl font-bold text-white">0</span>
                   <span className="text-gray-400 ml-2 text-xl font-light">CHF</span>
@@ -624,8 +795,7 @@ export default function Home() {
                   Populaire
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Pro</h3>
-                <p className="text-gray-300 mb-8 relative z-10 font-light text-sm">pour aller plus loin</p>
+                <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Plan Pro — Accès illimité</h3>
                 <div className="mb-8 relative z-10">
                   <span className="text-6xl font-bold text-white">29</span>
                   <span className="text-gray-400 ml-2 text-xl font-light">CHF</span>
