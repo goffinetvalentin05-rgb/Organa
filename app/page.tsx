@@ -197,113 +197,250 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION PRISE DE CONSCIENCE — LE TEMPS */}
+      {/* SECTION LE TEMPS PERDU */}
       <section className="relative py-20 md:py-32 px-6">
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
             <motion.h2 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              PRISE DE CONSCIENCE — LE TEMPS
+              Votre temps vaut mieux que ça
             </motion.h2>
-            <motion.div 
-              className="space-y-6 text-white/80 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <p className="text-lg md:text-xl font-light">
-                Vos journées sont déjà bien remplies.
-                Pourtant, une part importante de votre temps est absorbée par l'administratif.
-              </p>
-              <p className="text-lg md:text-xl font-light">
-                Créer des devis, gérer des factures, suivre des clients, retrouver des documents…
-                Pris séparément, ces tâches paraissent simples.
-                Additionnées, elles finissent par prendre une place disproportionnée dans votre quotidien.
-              </p>
-              <p className="text-lg md:text-xl font-light">
-                Ce temps passé sur l'administratif n'est pas neutre.
-                C'est du temps en moins pour vos clients, pour développer votre activité, ou simplement pour avancer sur ce qui crée réellement de la valeur.
-              </p>
-            </motion.div>
           </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <ScrollReveal delay={0}>
+              <motion.div
+                className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden h-full"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="text-4xl font-bold text-blue-400 mb-4 relative z-10">24h</div>
+                <p className="text-white/80 text-base leading-relaxed relative z-10">
+                  Vos journées sont déjà bien remplies.
+                  <br /><br />
+                  Pourtant, une part importante de votre temps est absorbée par l'administratif.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <motion.div
+                className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden h-full"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="flex flex-wrap gap-2 mb-4 relative z-10">
+                  {["Devis", "Factures", "Clients", "Documents"].map((item, i) => (
+                    <span key={i} className="px-3 py-1 rounded-lg bg-white/5 text-white/70 text-sm border border-white/10">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-white/80 text-base leading-relaxed relative z-10">
+                  Créer des devis, gérer des factures, suivre des clients, retrouver des documents…
+                  <br /><br />
+                  Pris séparément, ces tâches paraissent simples.
+                  Additionnées, elles finissent par prendre une place disproportionnée dans votre quotidien.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <motion.div
+                className="p-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/40 transition-all duration-500 group relative overflow-hidden h-full"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5, scale: 1.02 }}
+              >
+                <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
+                <div className="text-2xl font-bold text-white mb-4 relative z-10">Le coût réel</div>
+                <p className="text-white/90 text-base leading-relaxed relative z-10">
+                  Ce temps passé sur l'administratif n'est pas neutre.
+                  <br /><br />
+                  C'est du temps en moins pour vos clients, pour développer votre activité, ou simplement pour avancer sur ce qui crée réellement de la valeur.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
-      {/* SECTION POURQUOI ÇA SE COMPLIQUE */}
+      {/* SECTION LE PROBLÈME */}
       <section className="relative py-20 md:py-32 px-6">
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
-            <motion.h2 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              POURQUOI ÇA SE COMPLIQUE
-            </motion.h2>
-            <motion.div 
-              className="space-y-6 text-white/80 leading-relaxed"
+            <motion.div
+              className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <p className="text-lg md:text-xl font-light">
+              <p className="text-xl md:text-2xl text-white/70 mb-4 font-light">
                 Si l'administratif prend autant de place, ce n'est pas par manque de volonté.
+              </p>
+              <p className="text-2xl md:text-3xl font-bold text-white">
                 C'est souvent une question d'organisation.
               </p>
-              <p className="text-lg md:text-xl font-light">
-                Les informations sont dispersées.
-                Les outils ne communiquent pas entre eux.
-                Certaines données doivent être ressaisies plusieurs fois.
-              </p>
-              <p className="text-lg md:text-xl font-light">
-                Résultat :
-                on perd du temps à gérer, à vérifier, à chercher…
-                et l'administratif devient une charge permanente, difficile à maîtriser.
-              </p>
+            </motion.div>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+            {[
+              {
+                title: "Informations dispersées",
+                text: "Les informations sont dispersées.",
+                icon: (
+                  <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                )
+              },
+              {
+                title: "Outils isolés",
+                text: "Les outils ne communiquent pas entre eux.",
+                icon: (
+                  <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.645-5.963-1.74A10.07 10.07 0 017.228 15.5m12.01 0a10.07 10.07 0 00-1.74-3.962M15.75 15.5a10.07 10.07 0 01-3.962 1.74M15.75 15.5l-3-3m3 3l3-3M9.75 9.75l3 3m-3-3l-3 3" />
+                  </svg>
+                )
+              },
+              {
+                title: "Ressaisies multiples",
+                text: "Certaines données doivent être ressaisies plusieurs fois.",
+                icon: (
+                  <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                )
+              },
+            ].map((item, index) => (
+              <ScrollReveal key={index} delay={index * 100}>
+                <motion.div
+                  className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -5 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="mb-4 relative z-10">{item.icon}</div>
+                  <h3 className="text-lg font-semibold text-white mb-3 relative z-10">{item.title}</h3>
+                  <p className="text-white/70 text-sm leading-relaxed relative z-10">{item.text}</p>
+                </motion.div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal delay={300}>
+            <motion.div
+              className="max-w-3xl mx-auto p-8 rounded-2xl bg-gradient-to-br from-red-500/10 to-transparent border border-red-500/20 relative overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
+              <div className="text-center relative z-10">
+                <div className="text-2xl font-bold text-white mb-4">Résultat :</div>
+                <p className="text-lg text-white/80 leading-relaxed">
+                  on perd du temps à gérer, à vérifier, à chercher…
+                  <br />
+                  et l'administratif devient une charge permanente, difficile à maîtriser.
+                </p>
+              </div>
             </motion.div>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* SECTION ORGANA, CONCRÈTEMENT */}
+      {/* SECTION LA SOLUTION */}
       <section className="relative py-20 md:py-32 px-6">
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
             <motion.h2 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 text-white tracking-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              ORGANA, CONCRÈTEMENT
+              Tout au même endroit, enfin
             </motion.h2>
-            <motion.div 
-              className="space-y-6 text-white/80 leading-relaxed"
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <ScrollReveal delay={0}>
+              <motion.div
+                className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/40 transition-all duration-500 group relative overflow-hidden"
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5, scale: 1.02 }}
+              >
+                <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
+                <div className="text-3xl font-bold text-white mb-4 relative z-10">Organa</div>
+                <p className="text-white/80 text-lg leading-relaxed relative z-10">
+                  Organa a été conçu pour remettre de la clarté dans votre gestion administrative.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <motion.div
+                className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5, scale: 1.02 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="text-xl font-semibold text-white mb-4 relative z-10">Centralisation</div>
+                <p className="text-white/80 text-base leading-relaxed mb-4 relative z-10">
+                  La plateforme centralise l'essentiel de votre activité au même endroit :
+                </p>
+                <div className="flex flex-wrap gap-2 relative z-10">
+                  {["Clients", "Devis", "Factures", "Suivi"].map((item, i) => (
+                    <span key={i} className="px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm font-medium">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal delay={200}>
+            <motion.div
+              className="max-w-4xl mx-auto mt-12 p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 relative overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
-              <p className="text-lg md:text-xl font-light">
-                Organa a été conçu pour remettre de la clarté dans votre gestion administrative.
-              </p>
-              <p className="text-lg md:text-xl font-light">
-                La plateforme centralise l'essentiel de votre activité au même endroit :
-                clients, devis, factures et suivi administratif.
-              </p>
-              <p className="text-lg md:text-xl font-light">
-                En structurant simplement vos tâches du quotidien, Organa vous aide à mieux vous organiser, à réduire le temps passé sur l'administratif et à vous concentrer sur ce qui fait avancer votre entreprise.
-              </p>
+              <div className="text-center">
+                <p className="text-xl text-white/90 leading-relaxed">
+                  En structurant simplement vos tâches du quotidien, Organa vous aide à mieux vous organiser, à réduire le temps passé sur l'administratif et à vous concentrer sur ce qui fait avancer votre entreprise.
+                </p>
+              </div>
             </motion.div>
           </ScrollReveal>
         </div>
@@ -626,56 +763,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION POURQUOI FAIRE CONFIANCE À ORGANA */}
+      {/* SECTION CONFIANCE */}
       <section className="relative py-20 md:py-32 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
             <motion.h2 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight relative"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              {/* Ligne décorative */}
-              <motion.div 
-                className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.3 }}
-              />
-              POURQUOI FAIRE CONFIANCE À ORGANA
+              Fiable, sécurisé, pensé pour vous
             </motion.h2>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
               {
-                title: "Sécurité et confidentialité des données",
+                title: "Sécurité et confidentialité",
+                highlight: "Infrastructure cloud sécurisée",
                 text: "Vos données sont hébergées sur une infrastructure cloud sécurisée, avec des mécanismes d'accès stricts.",
+                icon: (
+                  <svg className="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-2.952M13 10.5h3.75m-3.75 3h3.75m-3.75 3h3.75M9.75 9.75h3.75m-3.75 3h3.75m-3.75 3h3.75M9.75 9.75V6.75m0 3h3.75m-3.75 3v3m0 0h3.75m-3.75 0h3.75" />
+                  </svg>
+                )
               },
               {
-                title: "Une plateforme disponible quand vous en avez besoin",
+                title: "Disponibilité",
+                highlight: "Accessible au quotidien",
                 text: "Organa repose sur une infrastructure robuste, conçue pour être stable et accessible au quotidien.",
+                icon: (
+                  <svg className="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                  </svg>
+                )
               },
               {
-                title: "Conçu pour les indépendants et les PME",
+                title: "Simplicité",
+                highlight: "Interface claire",
                 text: "Une interface claire, des actions simples, sans complexité inutile.",
+                icon: (
+                  <svg className="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                  </svg>
+                )
               },
             ].map((item, index) => (
               <ScrollReveal key={index} delay={index * 100}>
                 <motion.div
-                  className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/40 hover:bg-white/[0.04] transition-all duration-700 group relative overflow-hidden h-full"
+                  className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/40 hover:bg-white/[0.04] transition-all duration-700 group relative overflow-hidden h-full"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={{ y: -5, scale: 1.02 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-1000"></div>
-                  <h3 className="text-xl font-semibold mb-3 text-white relative z-10">{item.title}</h3>
+                  <div className="mb-6 relative z-10">{item.icon}</div>
+                  <h3 className="text-xl font-semibold mb-2 text-white relative z-10">{item.title}</h3>
+                  <div className="text-blue-400 text-sm font-medium mb-4 relative z-10">{item.highlight}</div>
                   <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
                     {item.text}
                   </p>
