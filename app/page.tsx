@@ -114,8 +114,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              <span className="block text-white">Simplifiez votre</span>
-              <span className="block text-white mt-2 md:mt-4">gestion administrative.</span>
+              <span className="block text-white">Moins d'administratif.</span>
+              <span className="block text-white mt-2 md:mt-4">Plus de temps pour ce qui compte vraiment.</span>
             </motion.h1>
           </ScrollReveal>
           
@@ -127,7 +127,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             >
-              Organa automatise vos tâches administratives pour que vous puissiez vous concentrer sur ce qui compte vraiment : développer votre activité.
+              Organa simplifie la gestion administrative de votre entreprise afin que vous puissiez consacrer votre temps à vos clients, à votre activité et à ce qui compte vraiment.
             </motion.p>
           </ScrollReveal>
 
@@ -156,6 +156,120 @@ export default function Home() {
               </Link>
             </motion.div>
           </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION 1 — LE TEMPS */}
+      <section id="temps" className="relative py-20 md:py-32 px-6">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight">
+              Le temps
+            </h2>
+          </ScrollReveal>
+
+          <div className="max-w-4xl mx-auto space-y-8">
+            <ScrollReveal delay={0}>
+              <motion.p 
+                className="text-2xl md:text-3xl text-center text-white leading-relaxed font-light"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                Votre temps est précieux.
+              </motion.p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <motion.p 
+                className="text-lg md:text-xl text-center text-white/80 leading-relaxed font-light"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                Pourtant, une grande partie de vos journées est absorbée par des tâches administratives.
+              </motion.p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <motion.div 
+                className="p-10 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <p className="text-center text-white/70 leading-relaxed font-light mb-4">
+                  Créer des devis, gérer des factures, suivre des documents…
+                </p>
+                <p className="text-center text-white/70 leading-relaxed font-light">
+                  Ces actions sont nécessaires, mais elles prennent du temps au quotidien.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <motion.p 
+                className="text-lg md:text-xl text-center text-white/80 leading-relaxed font-light max-w-3xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                En simplifiant la gestion administrative, Organa vous permet de réduire le temps consacré à l'administratif et de le réinvestir là où il compte vraiment : votre activité, vos clients et votre vie personnelle ou familiale.
+              </motion.p>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2 */}
+      <section id="solution" className="relative py-20 md:py-32 px-6">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <ScrollReveal delay={0}>
+              <motion.p 
+                className="text-2xl md:text-3xl text-center text-white leading-relaxed font-light"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                Organa a été conçu pour simplifier votre gestion administrative.
+              </motion.p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <motion.div 
+                className="p-10 rounded-2xl bg-gradient-to-br from-violet-600/15 via-purple-500/10 to-transparent backdrop-blur-xl border border-violet-500/20"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <p className="text-center text-white/90 leading-relaxed font-light mb-4">
+                  Tous les éléments essentiels sont centralisés au même endroit :
+                </p>
+                <p className="text-center text-white/70 leading-relaxed font-light">
+                  clients, devis, factures et suivi administratif.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <motion.p 
+                className="text-lg md:text-xl text-center text-white/80 leading-relaxed font-light"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Une interface claire, des actions simples, et une organisation pensée pour vous faire gagner du temps, chaque jour.
+              </motion.p>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
@@ -268,39 +382,56 @@ export default function Home() {
       <section id="comment-ca-marche" className="relative py-20 md:py-32 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight">
-              Comment ça marche
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 text-white tracking-tight">
+              Comment ça se passe
             </h2>
+            <p className="text-lg md:text-xl text-center text-white/70 mb-16 max-w-2xl mx-auto font-light">
+              Une prise en main simple, au rythme de votre activité.
+            </p>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="space-y-6 max-w-5xl mx-auto">
             {[
               { 
                 title: "Créez vos clients", 
-                text: "Ajoutez vos clients en quelques clics. Leurs informations sont automatiquement réutilisées pour tous vos documents." 
+                text: "Les informations sont enregistrées une seule fois et réutilisées automatiquement." 
               },
               { 
-                title: "Générez vos documents", 
-                text: "Créez devis et factures en quelques secondes. Personnalisez-les avec votre logo et vos informations." 
+                title: "Créez et envoyez vos devis", 
+                text: "En quelques clics, depuis une interface claire." 
               },
               { 
-                title: "Pilotez votre activité", 
-                text: "Suivez vos paiements, organisez vos tâches et gardez une vue d'ensemble sur votre activité depuis un seul endroit." 
+                title: "Transformez vos devis en factures", 
+                text: "Sans ressaisie, sans perte d'information." 
+              },
+              { 
+                title: "Personnalisez vos documents", 
+                text: "Logo, coordonnées, informations bancaires : tout est prêt, partout." 
+              },
+              { 
+                title: "Gardez une vue d'ensemble", 
+                text: "Un dashboard clair pour suivre vos documents et votre activité." 
+              },
+              { 
+                title: "Suivez paiements et tâches", 
+                text: "Statuts, échéances et organisation, au même endroit." 
               },
             ].map((step, index) => (
-              <ScrollReveal key={index} delay={index * 100}>
+              <ScrollReveal key={index} delay={index * 80}>
                 <motion.div 
-                  className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                  className="flex flex-col md:flex-row items-start gap-6 p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
                   whileHover={{ y: -5 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white mb-6 relative z-10">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white relative z-10">
                     {index + 1}
                   </div>
-                  <h3 className="text-xl font-semibold mb-4 text-white relative z-10">{step.title}</h3>
-                  <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
-                    {step.text}
-                  </p>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-3 text-white relative z-10">{step.title}</h3>
+                    <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
+                      {step.text}
+                    </p>
+                  </div>
                 </motion.div>
               </ScrollReveal>
             ))}
@@ -313,7 +444,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight">
-              Tarifs simples et transparents
+              Tarifs
             </h2>
           </ScrollReveal>
 
@@ -326,7 +457,7 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Gratuit</h3>
-                <p className="text-gray-400 mb-8 relative z-10 font-light text-sm">Pour démarrer</p>
+                <p className="text-gray-400 mb-8 relative z-10 font-light text-sm">pour démarrer</p>
                 <div className="mb-8 relative z-10">
                   <span className="text-6xl font-bold text-white">0</span>
                   <span className="text-gray-400 ml-2 text-xl font-light">CHF</span>
@@ -334,15 +465,15 @@ export default function Home() {
                 <ul className="space-y-3 mb-8 text-gray-300 relative z-10 text-sm">
                   <li className="flex items-start">
                     <span className="mr-2 text-violet-400">•</span>
-                    <span>Maximum 2 clients</span>
+                    <span>Jusqu'à 2 clients</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2 text-violet-400">•</span>
-                    <span>3 documents par mois</span>
+                    <span>Jusqu'à 3 documents par mois</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2 text-violet-400">•</span>
-                    <span>Fonctionnalités de base</span>
+                    <span>Fonctionnalités essentielles</span>
                   </li>
                 </ul>
                 <Link href="/inscription">
@@ -378,7 +509,7 @@ export default function Home() {
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <h3 className="text-2xl font-bold mb-2 text-white relative z-10">Pro</h3>
-                <p className="text-gray-300 mb-8 relative z-10 font-light text-sm">Pour les professionnels</p>
+                <p className="text-gray-300 mb-8 relative z-10 font-light text-sm">pour aller plus loin</p>
                 <div className="mb-8 relative z-10">
                   <span className="text-6xl font-bold text-white">29</span>
                   <span className="text-gray-400 ml-2 text-xl font-light">CHF</span>
@@ -417,34 +548,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION TRUSTED BY */}
-      <section className="relative py-20 md:py-32 px-6">
+      {/* SECTION 4 — FIABILITÉ */}
+      <section id="fiabilite" className="relative py-20 md:py-32 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
           <ScrollReveal delay={0}>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white/90 tracking-tight">
-              Utilisé par des entreprises suisses
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 text-white tracking-tight">
+              Fiabilité
             </h2>
           </ScrollReveal>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {["Consultants", "Agences", "Freelances", "PME", "Startups", "Indépendants", "Créateurs", "Entrepreneurs"].map((name, index) => (
-              <ScrollReveal key={index} delay={index * 50}>
-                <motion.div 
-                  className="p-6 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 hover:bg-white/10 transition-all duration-300 text-center"
-                  whileHover={{ y: -3 }}
-                >
-                  <span className="text-white/70 font-medium text-sm">{name}</span>
-                </motion.div>
-              </ScrollReveal>
-            ))}
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <ScrollReveal delay={0}>
+              <motion.div 
+                className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                whileHover={{ y: -5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <h3 className="text-xl font-semibold mb-4 text-white relative z-10">Vos données, en sécurité</h3>
+                <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
+                  Infrastructure cloud sécurisée, accès contrôlés et bonnes pratiques techniques.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={150}>
+              <motion.div 
+                className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                whileHover={{ y: -5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <h3 className="text-xl font-semibold mb-4 text-white relative z-10">Disponible quand vous en avez besoin</h3>
+                <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
+                  Vos outils restent accessibles à tout moment, où que vous soyez.
+                </p>
+              </motion.div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <motion.div 
+                className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
+                whileHover={{ y: -5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <h3 className="text-xl font-semibold mb-4 text-white relative z-10">Pensé pour les indépendants et les PME</h3>
+                <p className="text-gray-300 leading-relaxed text-sm font-light relative z-10">
+                  Pas de complexité inutile. Juste ce dont vous avez besoin.
+                </p>
+              </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="relative py-12 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto text-center text-gray-500">
-          <p className="font-light text-sm">© 2026 Organa. Développé en Suisse.</p>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center text-gray-500 mb-6">
+            <p className="font-light text-sm">© 2026 Organa — Développé en Suisse</p>
+          </div>
+          <div className="flex justify-center gap-6">
+            <Link href="/connexion" className="text-sm text-white/60 hover:text-white transition-colors">
+              Connexion
+            </Link>
+            <Link href="/inscription" className="text-sm text-white/60 hover:text-white transition-colors">
+              Inscription
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
