@@ -10,38 +10,18 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 export default function Home() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* FOND CONTINU - DÉGRADÉ PREMIUM BLEU NOIR */}
+      {/* FOND - IMAGE BACKGROUND.PNG */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Dégradé premium : bleu nuit vers noir */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] via-[#0a0e1a] to-[#000000]"></div>
+        {/* Image background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/background.png')",
+          }}
+        ></div>
         
-        {/* Glow néon très discret - bleu électrique */}
-        <motion.div 
-          className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-blue-500/3 rounded-full blur-3xl"
-          animate={{
-            opacity: [0.2, 0.4, 0.2],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        ></motion.div>
-        
-        {/* Glow néon très discret - cyan */}
-        <motion.div 
-          className="absolute bottom-0 right-1/4 w-[900px] h-[900px] bg-cyan-500/2 rounded-full blur-3xl"
-          animate={{
-            opacity: [0.15, 0.3, 0.15],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        ></motion.div>
+        {/* Overlay léger pour la lisibilité du texte */}
+        <div className="absolute inset-0 bg-black/40"></div>
       </div>
 
       <LandingNav />
@@ -49,8 +29,31 @@ export default function Home() {
       {/* HERO SECTION */}
       <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Titre principal */}
+          {/* Logo Organa - au-dessus du titre */}
           <ScrollReveal delay={0}>
+            <motion.div 
+              className="flex justify-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div className="relative group">
+                <div className="relative w-32 h-32 md:w-40 md:h-40">
+                  <Image
+                    src="/organa-logo.png"
+                    alt="Organa Logo"
+                    width={160}
+                    height={160}
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </ScrollReveal>
+          
+          {/* Titre principal */}
+          <ScrollReveal delay={100}>
             <motion.h1 
               className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center mb-6 leading-[1.1] tracking-tight"
               initial={{ opacity: 0, y: 30 }}
