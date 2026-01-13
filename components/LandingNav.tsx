@@ -9,7 +9,7 @@ export default function LandingNav() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo à gauche */}
         <Link href="/" className="group flex items-center gap-3">
-          <div className="relative w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:scale-105">
+          <div className="relative w-12 h-12 md:w-14 md:h-14 transition-transform group-hover:scale-105">
             <Image
               src="/organa-logo.png"
               alt="Organa Logo"
@@ -18,7 +18,6 @@ export default function LandingNav() {
               priority
             />
           </div>
-          <span className="text-white font-semibold text-lg hidden sm:block">Organa</span>
         </Link>
         
         {/* Liens au centre */}
