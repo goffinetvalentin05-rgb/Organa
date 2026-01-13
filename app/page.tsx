@@ -1,376 +1,434 @@
+"use client";
+
+import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
-// Configuration pour forcer le rendu dynamique et éviter le cache statique
-// Cela garantit que les modifications de la landing page sont visibles immédiatement en production
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
-// Page d'accueil (landing page) - Route: /
-// Cette page est la landing page principale du site Organa
 export default function Home() {
   return (
-    <main className="w-full bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950 text-white overflow-x-hidden">
-      {/* NAVIGATION FIXE */}
+    <div className="min-h-screen bg-gradient-to-b from-[#03062A] via-[#050A3A] to-[#0A1A5E]">
       <LandingNav />
-
-      {/* SECTION 1 — HERO */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 py-40 md:py-56 mb-0 overflow-hidden">
-        {/* Effet de particules/gradient animé en arrière-plan */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-12 md:mb-16 leading-[1.05] tracking-[-0.03em] text-white">
-            Moins d'administratif.
-            <br />
-            Plus de temps pour ce qui compte vraiment.
-          </h1>
-
-          <p className="mt-8 mb-12 md:mb-16 max-w-3xl mx-auto text-xl md:text-2xl lg:text-3xl text-white/80 leading-relaxed font-normal">
-            Organa automatise la gestion administrative de votre entreprise
-            afin que vous puissiez consacrer plus de temps à vos clients,
-            à votre activité… et à ce qui compte vraiment pour vous.
-          </p>
-
-          <a
-            href="/inscription"
-            className="inline-flex items-center gap-3 rounded-2xl bg-blue-500 hover:bg-blue-600 px-12 py-5 md:px-16 md:py-6 text-white font-semibold text-lg md:text-xl transition-all duration-300 shadow-2xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02]"
-          >
-            Découvrir Organa
-            <svg className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </a>
-        </div>
-      </section>
-
-      {/* SECTION 2 — LE PROBLÈME */}
-      <section className="relative py-32 md:py-48 px-6 bg-gradient-to-b from-slate-950/95 via-slate-900/30 to-slate-950/95 mt-0">
+      
+      {/* HERO SECTION */}
+      <section className="pt-32 pb-20 md:pt-40 md:pb-32 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-20 md:mb-28 text-left leading-[1.05] tracking-[-0.03em]">
-            Le problème
-          </h2>
+          <ScrollReveal delay={0}>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-center mb-6 leading-tight">
+              <span className="block text-white">Organa</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 mt-4">
+                La gestion simple pour les indépendants
+              </span>
+            </h1>
+          </ScrollReveal>
           
-          <div className="space-y-8 md:space-y-10">
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-black/50 hover:border-white/25 transition-all duration-300">
-              <p className="text-2xl md:text-3xl text-white leading-relaxed font-normal">
-                Votre temps est trop précieux pour être perdu dans l'administratif.
-                Pourtant, ce sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.
-              </p>
-            </div>
-
-            <div className="bg-black/30 border border-white/10 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-xl shadow-black/40 hover:border-white/20 transition-all duration-300">
-              <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
-                Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux…
-                L'administratif s'accumule, ralentit votre activité et devient une charge mentale permanente.
-              </p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-blue-950/50 via-purple-950/40 to-blue-950/50 border border-blue-500/30 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-blue-950/40 hover:border-blue-500/50 transition-all duration-300">
-              <p className="text-xl md:text-2xl text-white leading-relaxed font-semibold">
-                Ce temps perdu a un coût réel :
-                moins de disponibilité pour vos clients,
-                moins d'énergie pour développer votre entreprise,
-                et moins de temps investi là où il crée réellement de la valeur.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3 — LA SOLUTION ORGANA */}
-      <section className="relative py-32 md:py-48 px-6 bg-gradient-to-b from-slate-950/95 via-slate-900/30 to-slate-950/95 mt-0">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-20 md:mb-28 text-left leading-[1.05] tracking-[-0.03em]">
-            La solution Organa
-          </h2>
-          
-          <div className="bg-gradient-to-br from-black/50 to-blue-950/40 border border-white/20 rounded-3xl p-14 md:p-20 backdrop-blur-sm mb-12 md:mb-16 shadow-2xl shadow-black/60 hover:border-blue-500/40 transition-all duration-300">
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-semibold leading-relaxed">
-              Organa a été conçu pour reprendre le contrôle de votre administratif.
+          <ScrollReveal delay={100}>
+            <p className="mt-8 max-w-3xl mx-auto text-center text-lg md:text-xl text-gray-300 leading-relaxed">
+              Créez des devis et factures professionnels, transformez vos devis en factures,
+              gérez vos clients, planifiez vos rendez-vous et modifiez tout manuellement,
+              sans dépendre d'une IA.
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-black/50 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-950/40 transition-all duration-300">
-              <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
-                La plateforme centralise les éléments essentiels de votre gestion :
-                factures, devis, clients et suivi administratif, au même endroit.
-              </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={200}>
+            <div className="mt-12 flex flex-wrap justify-center gap-4 text-gray-300">
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span>📄</span>
+                <span>Devis → Factures en 1 clic</span>
+              </div>
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span>🧾</span>
+                <span>Documents A4 professionnels (PDF)</span>
+              </div>
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span>✏️</span>
+                <span>Modification totale par l'entreprise</span>
+              </div>
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span>📅</span>
+                <span>Calendrier intégré</span>
+              </div>
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <span>💳</span>
+                <span>Abonnements mensuel & annuel</span>
+              </div>
             </div>
-            
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-black/50 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-950/40 transition-all duration-300">
-              <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
-                En simplifiant et en structurant vos tâches administratives,
-                Organa vous permet de gérer plus efficacement votre activité
-                et de vous concentrer sur ce qui fait réellement avancer votre entreprise.
-              </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={300}>
+            <div className="mt-12 text-center">
+              <Link
+                href="/inscription"
+                className="inline-block px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 transform"
+              >
+                Découvrir Organa
+              </Link>
             </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION LE PROBLÈME */}
+      <section id="probleme" className="py-20 md:py-32 px-6 bg-gradient-to-b from-[#0A1A5E] via-[#050A3A] to-[#03062A]">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">
+              Le Problème
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <ScrollReveal delay={0}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10">
+                <div className="text-4xl mb-4">📊</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Gestion dispersée</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Vos outils de gestion sont éparpillés entre plusieurs plateformes. 
+                  Vous perdez du temps à jongler entre différents logiciels pour gérer 
+                  vos clients, vos devis, vos factures et votre calendrier.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10">
+                <div className="text-4xl mb-4">⏱️</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Perte de temps</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  La création manuelle de devis et factures prend beaucoup de temps. 
+                  Chaque document doit être créé depuis zéro, avec un risque d'erreur 
+                  et une charge mentale importante.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10">
+                <div className="text-4xl mb-4">🔀</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Manque de fluidité</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Transformer un devis en facture est un processus fastidieux qui nécessite 
+                  de recopier toutes les informations. Cette étape répétitive augmente 
+                  les risques d'erreurs et la frustration.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10">
+                <div className="text-4xl mb-4">🎯</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Manque de contrôle</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Beaucoup d'outils imposent leurs formats et leurs processus. Vous n'avez 
+                  pas la liberté de personnaliser vos documents selon vos besoins spécifiques 
+                  et votre identité visuelle.
+                </p>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* SECTION 4 — COMMENT ÇA MARCHE */}
-      <section className="relative py-32 md:py-48 px-6 bg-gradient-to-b from-slate-950/95 via-slate-900/30 to-slate-950/95 mt-0">
+      {/* SECTION LA SOLUTION ORGANA */}
+      <section id="solution" className="py-20 md:py-32 px-6 bg-gradient-to-b from-[#03062A] via-[#050A3A] to-[#0A1A5E]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 md:mb-12 text-left leading-[1.05] tracking-[-0.03em]">
-            Comment ça marche
-          </h2>
-          
-          <p className="text-2xl md:text-3xl text-white/80 mb-20 md:mb-28 leading-relaxed font-normal max-w-4xl">
-            Un fonctionnement simple, pensé pour votre gestion quotidienne.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-            {/* Étape 1 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">1</span>
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-8 text-white">
+              La Solution Organa
+            </h2>
+          </ScrollReveal>
+
+          <ScrollReveal delay={100}>
+            <p className="text-xl md:text-2xl text-center text-gray-300 mb-16 max-w-3xl mx-auto leading-relaxed">
+              Une plateforme centralisée qui vous donne le contrôle total sur votre gestion, 
+              avec des outils simples et puissants conçus pour les indépendants.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <ScrollReveal delay={0}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent backdrop-blur-sm border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20">
+                <div className="text-4xl mb-4">🎯</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Centralisation</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Tous vos outils en un seul endroit : clients, devis, factures, calendrier. 
+                  Plus besoin de jongler entre plusieurs applications.
+                </p>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Créez vos clients</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                Vous commencez par créer vos clients dans Organa.
-                Leurs informations sont automatiquement réutilisées pour vos devis et factures.
-              </p>
-            </div>
-            
-            {/* Étape 2 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">2</span>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent backdrop-blur-sm border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20">
+                <div className="text-4xl mb-4">⚡</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Efficacité</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Transformez vos devis en factures en un clic. Créez des documents 
+                  professionnels en quelques secondes, sans recopier d'informations.
+                </p>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Créez et envoyez vos devis</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                À partir d'un client, vous créez un devis en quelques clics.
-                Vous pouvez l'envoyer par e-mail depuis Organa ou le télécharger.
-              </p>
-            </div>
-            
-            {/* Étape 3 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">3</span>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent backdrop-blur-sm border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20">
+                <div className="text-4xl mb-4">✏️</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Contrôle total</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Modifiez tout manuellement selon vos besoins. Personnalisez vos documents, 
+                  adaptez vos processus, sans dépendre d'une IA ou de formats imposés.
+                </p>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Transformez vos devis en factures</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                Une fois le devis validé, vous le transformez instantanément en facture,
-                sans ressaisie ni perte d'information.
-              </p>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal delay={300}>
+            <div className="mt-16 text-center">
+              <Link
+                href="/inscription"
+                className="inline-block px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 transform"
+              >
+                Découvrir Organa
+              </Link>
             </div>
-            
-            {/* Étape 4 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">4</span>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* SECTION COMMENT ÇA MARCHE */}
+      <section id="comment-ca-marche" className="py-20 md:py-32 px-6 bg-gradient-to-b from-[#0A1A5E] via-[#050A3A] to-[#03062A]">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">
+              Comment ça marche
+            </h2>
+          </ScrollReveal>
+
+          <div className="space-y-12">
+            <ScrollReveal delay={0}>
+              <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01]">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  1
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-3 text-white">Créez votre compte</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Inscrivez-vous en quelques secondes. Aucune carte bancaire requise pour commencer. 
+                    Vous avez accès immédiatement à toutes les fonctionnalités de base.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Personnalisez vos documents</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                Vous configurez vos paramètres :
-                logo, en-tête, coordonnées, informations bancaires.
-                Tous vos documents reflètent automatiquement votre identité.
-              </p>
-            </div>
-            
-            {/* Étape 5 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">5</span>
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01]">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  2
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-3 text-white">Ajoutez vos clients</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Importez ou créez manuellement votre base de clients. Organisez toutes 
+                    vos informations de contact en un seul endroit sécurisé.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Pilotez votre activité depuis le dashboard</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                Le dashboard vous offre une vue claire sur votre activité :
-                documents en cours, factures payées ou en attente, actions à effectuer.
-              </p>
-            </div>
-            
-            {/* Étape 6 */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500/40 to-purple-500/30 border border-blue-500/50 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
-                <span className="text-3xl md:text-4xl font-bold text-white">6</span>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01]">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  3
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-3 text-white">Créez vos devis</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Générez des devis professionnels en quelques clics. Personnalisez chaque 
+                    détail selon vos besoins. Exportez en PDF prêt à envoyer à vos clients.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">Suivez vos paiements et vos tâches</h3>
-              <p className="text-white/80 leading-relaxed text-lg md:text-xl">
-                Vous suivez l'état de vos documents (brouillon, envoyé, validé, payé)
-                et organisez vos tâches grâce au calendrier intégré.
-              </p>
-            </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01]">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  4
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-3 text-white">Transformez en factures</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Une fois le devis accepté, transformez-le en facture en un seul clic. 
+                    Toutes les informations sont automatiquement transférées. Plus besoin de recopier.
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={400}>
+              <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01]">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  5
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-3 text-white">Gérez votre calendrier</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Planifiez vos rendez-vous directement dans Organa. Synchronisez avec vos clients 
+                    et gardez une vue d'ensemble de votre activité.
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* SECTION 5 — POURQUOI FAIRE CONFIANCE À ORGANA */}
-      <section className="relative py-32 md:py-48 px-6 bg-gradient-to-b from-slate-950/95 via-slate-900/30 to-slate-950/95 mt-0">
+      {/* SECTION POURQUOI FAIRE CONFIANCE */}
+      <section id="confiance" className="py-20 md:py-32 px-6 bg-gradient-to-b from-[#03062A] via-[#050A3A] to-[#0A1A5E]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-20 md:mb-28 text-left leading-[1.05] tracking-[-0.03em]">
-            Pourquoi faire confiance à Organa
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            {/* BLOC 1 — Sécurité et confidentialité des données */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 mb-8 bg-gradient-to-br from-blue-500/40 to-blue-600/30 border border-blue-500/50 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30">
-                <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-tight">Sécurité et confidentialité des données</h3>
-              <div className="space-y-6">
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Vos données sont hébergées sur une infrastructure cloud sécurisée
-                  et protégées par des mécanismes d'accès stricts.
-                </p>
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Organa met en œuvre les bonnes pratiques techniques
-                  pour garantir la confidentialité et l'intégrité de vos informations,
-                  tout en s'appuyant sur des solutions reconnues et fiables.
-                </p>
-                <p className="text-white font-semibold leading-relaxed text-lg pt-6 border-t border-white/15">
-                  Votre administratif est stocké dans un environnement sécurisé.
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">
+              Pourquoi faire confiance à Organa
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <ScrollReveal delay={0}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10">
+                <div className="text-4xl mb-4">🔒</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Sécurité</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Vos données sont protégées avec les meilleures pratiques de sécurité. 
+                  Chiffrement, sauvegardes régulières et conformité RGPD.
                 </p>
               </div>
-            </div>
-            
-            {/* BLOC 2 — Une plateforme fiable, accessible quand vous en avez besoin */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 mb-8 bg-gradient-to-br from-purple-500/40 to-purple-600/30 border border-purple-500/50 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/30">
-                <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-tight">Une plateforme fiable, accessible quand vous en avez besoin</h3>
-              <div className="space-y-6">
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Organa repose sur une infrastructure robuste, conçue pour être stable
-                  et disponible au quotidien.
-                </p>
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Vos outils restent accessibles à tout moment, où que vous soyez,
-                  afin que votre gestion ne soit jamais interrompue.
-                </p>
-                <p className="text-white font-semibold leading-relaxed text-lg pt-6 border-t border-white/15">
-                  Vous travaillez sereinement, sans dépendre d'imprévus techniques.
+            </ScrollReveal>
+
+            <ScrollReveal delay={100}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10">
+                <div className="text-4xl mb-4">🚀</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Simplicité</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Interface intuitive conçue pour les indépendants. Pas besoin de formation 
+                  ou de connaissances techniques. Vous êtes opérationnel en quelques minutes.
                 </p>
               </div>
-            </div>
-            
-            {/* BLOC 3 — Conçu pour les indépendants et les PME */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-10 md:p-12 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 shadow-2xl shadow-black/50">
-              <div className="w-20 h-20 mb-8 bg-gradient-to-br from-blue-500/40 to-blue-600/30 border border-blue-500/50 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30">
-                <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-tight">Conçu pour les indépendants et les PME</h3>
-              <div className="space-y-6">
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Organa a été pensé pour répondre aux besoins concrets
-                  des petites entreprises et des indépendants.
-                </p>
-                <p className="text-white/80 leading-relaxed text-lg">
-                  Une interface claire, des actions simples,
-                  sans complexité inutile ni fonctionnalités superflues.
-                </p>
-                <p className="text-white font-semibold leading-relaxed text-lg pt-6 border-t border-white/15">
-                  Un outil pensé pour le terrain, pas pour compliquer votre quotidien.
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10">
+                <div className="text-4xl mb-4">💪</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">Fiabilité</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Une plateforme stable et performante, disponible 24/7. Support réactif 
+                  et mises à jour régulières pour toujours améliorer votre expérience.
                 </p>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* SECTION 6 — TARIFS */}
-      <section id="tarifs" className="relative py-32 md:py-48 px-6 bg-gradient-to-b from-slate-950/95 via-slate-900/30 to-slate-950/95 mt-0">
+      {/* SECTION TARIFS */}
+      <section id="tarifs" className="py-20 md:py-32 px-6 bg-gradient-to-b from-[#0A1A5E] via-[#050A3A] to-[#03062A]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-20 md:mb-28 text-left leading-[1.05] tracking-[-0.03em]">
-            Tarifs
-          </h2>
-          <div className="grid md:grid-cols-2 gap-10 max-w-5xl">
+          <ScrollReveal delay={0}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-8 text-white">
+              Tarifs
+            </h2>
+          </ScrollReveal>
+
+          <ScrollReveal delay={100}>
+            <p className="text-xl text-center text-gray-300 mb-16 max-w-2xl mx-auto">
+              Choisissez le plan qui correspond à vos besoins. Commencez gratuitement, 
+              passez au niveau supérieur quand vous êtes prêt.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Plan Gratuit */}
-            <div className="bg-black/40 border border-white/15 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-black/50 hover:border-white/25 transition-all duration-300">
-              <div className="mb-6">
-                <h2 className="text-3xl md:text-4xl font-bold text-white">Plan Gratuit</h2>
+            <ScrollReveal delay={0}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02]">
+                <h3 className="text-2xl font-bold mb-2 text-white">Gratuit</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white">0€</span>
+                  <span className="text-gray-400">/mois</span>
+                </div>
+                <ul className="space-y-3 mb-8 text-gray-300">
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Jusqu'à 5 clients</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>10 devis par mois</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>10 factures par mois</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Calendrier de base</span>
+                  </li>
+                </ul>
+                <Link
+                  href="/inscription"
+                  className="block w-full text-center px-6 py-3 rounded-lg bg-white/10 text-white font-semibold hover:bg-white/20 transition-all duration-300 hover:scale-105"
+                >
+                  Découvrir le plan gratuit
+                </Link>
               </div>
-              <p className="text-white/80 mb-8 text-xl">Idéal pour démarrer</p>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white/90 text-lg">Maximum 2 clients</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white/90 text-lg">Maximum 3 documents par mois</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white/90 text-lg">Toutes les fonctionnalités de base</span>
-                </li>
-              </ul>
-            </div>
+            </ScrollReveal>
 
             {/* Plan Pro */}
-            <div className="bg-gradient-to-br from-blue-950/50 via-purple-950/40 to-blue-950/50 border border-blue-500/40 rounded-3xl p-12 md:p-16 backdrop-blur-sm shadow-2xl shadow-blue-950/50 hover:border-blue-500/60 transition-all duration-300">
-              <div className="mb-6">
-                <h2 className="text-3xl md:text-4xl font-bold text-white">Plan Pro</h2>
+            <ScrollReveal delay={100}>
+              <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-transparent backdrop-blur-sm border-2 border-blue-500/40 hover:border-blue-500/60 transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl hover:shadow-blue-500/30 relative overflow-hidden">
+                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold">
+                  POPULAIRE
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-white">Pro</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white">29€</span>
+                  <span className="text-gray-400">/mois</span>
+                </div>
+                <ul className="space-y-3 mb-8 text-gray-300">
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Clients illimités</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Devis illimités</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Factures illimitées</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Calendrier avancé</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✓</span>
+                    <span>Support prioritaire</span>
+                  </li>
+                </ul>
+                <Link
+                  href="/inscription"
+                  className="block w-full text-center px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/50"
+                >
+                  Passer au plan Pro
+                </Link>
               </div>
-              <p className="text-white/90 mb-8 text-xl font-medium">Accès illimité</p>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white text-lg">Clients illimités</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white text-lg">Documents illimités</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white text-lg">Support prioritaire</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white text-lg">Toutes les fonctionnalités</span>
-                </li>
-              </ul>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative py-16 md:py-20 px-6 bg-black/40 border-t border-white/10 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto opacity-0 animate-fade-in-up">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-white/50 text-sm text-center md:text-left">
-              © {new Date().getFullYear()} Organa. Développé en Suisse.
-            </p>
-            <div className="flex items-center gap-6">
-              <a href="/connexion" className="text-white/50 hover:text-white/80 text-sm transition-colors duration-200">
-                Connexion
-              </a>
-              <a href="/inscription" className="text-white/50 hover:text-white/80 text-sm transition-colors duration-200">
-                Inscription
-              </a>
-            </div>
-          </div>
+      {/* FOOTER */}
+      <footer className="py-12 px-6 border-t border-white/10 bg-gradient-to-b from-[#03062A] to-black">
+        <div className="max-w-6xl mx-auto text-center text-gray-400">
+          <p>&copy; 2024 Organa. Tous droits réservés.</p>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }
