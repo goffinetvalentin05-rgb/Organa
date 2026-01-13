@@ -3,88 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import LandingNav from "@/components/LandingNav";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function Home() {
-  const { scrollYProgress } = useScroll();
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-
   return (
-    <div className="min-h-screen bg-[#0a0e1a] relative overflow-hidden">
-      {/* FOND CONTINU - BLEU FONCÉ/NOIR */}
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* FOND CONTINU - DÉGRADÉ BLEU FONCÉ VERS NOIR */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Fond de base - bleu foncé/noir */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1419] to-[#151a20]"></div>
-        
-        {/* GLOW BLEU DIFFUS DEPUIS LE BAS CENTRE */}
-        <motion.div 
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[1400px] h-[900px] bg-gradient-to-t from-blue-600/20 via-blue-500/15 to-transparent rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.4, 0.6, 0.4],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        ></motion.div>
-
-        {/* Mesh gradient bleu subtil */}
-        <motion.div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            background: `
-              radial-gradient(at 20% 30%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
-              radial-gradient(at 80% 70%, rgba(59, 130, 246, 0.10) 0%, transparent 50%),
-              radial-gradient(at 50% 50%, rgba(96, 165, 250, 0.08) 0%, transparent 50%)
-            `,
-            y: backgroundY,
-          }}
-        ></motion.div>
-
-        {/* Light rays subtils bleu */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-[20%] w-px h-full bg-gradient-to-b from-transparent via-blue-500/6 to-transparent"></div>
-          <div className="absolute top-0 right-[30%] w-px h-full bg-gradient-to-b from-transparent via-blue-400/5 to-transparent"></div>
-          <div className="absolute top-0 left-[60%] w-px h-full bg-gradient-to-b from-transparent via-cyan-500/4 to-transparent"></div>
-        </div>
-
-        {/* Glow orbs animés bleu */}
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-blue-500/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.3, 0.15],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        ></motion.div>
-        <motion.div 
-          className="absolute bottom-1/3 right-1/3 w-[800px] h-[800px] bg-cyan-500/4 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        ></motion.div>
-
-        {/* Noise texture subtile */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          }}
-        ></div>
+        {/* Dégradé simple : bleu foncé (haut gauche) vers noir (bas droite) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#000000]"></div>
       </div>
 
       <LandingNav />
