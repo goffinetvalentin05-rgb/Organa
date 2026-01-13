@@ -21,10 +21,25 @@ export default function Home() {
       {/* Overlay très léger pour la lisibilité du texte */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-black/20"></div>
 
-      <LandingNav />
-      
-      {/* HERO SECTION */}
-      <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 px-6">
+      {/* Grille subtile en arrière-plan */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      <div className="flex min-h-screen relative">
+        {/* COLONNE PRINCIPALE - GAUCHE */}
+        <div className="flex-1 relative z-10">
+          <LandingNav />
+          
+          {/* HERO SECTION */}
+          <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Logo Organa - au-dessus du titre */}
           <ScrollReveal delay={0}>
@@ -845,22 +860,183 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="relative py-12 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center text-gray-500 mb-6">
-            <p className="font-light text-sm">© 2026 Organa — Développé en Suisse</p>
+          {/* FOOTER */}
+          <footer className="relative py-12 px-6 border-t border-white/5">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center text-gray-500 mb-6">
+                <p className="font-light text-sm">© 2026 Organa — Développé en Suisse</p>
+              </div>
+              <div className="flex justify-center gap-6">
+                <Link href="/connexion" className="text-sm text-white/60 hover:text-white transition-colors">
+                  Connexion
+                </Link>
+                <Link href="/inscription" className="text-sm text-white/60 hover:text-white transition-colors">
+                  Inscription
+                </Link>
+              </div>
+            </div>
+          </footer>
+        </div>
+
+        {/* SIDEBAR - DROITE */}
+        <div className="hidden lg:block w-96 xl:w-[420px] fixed right-0 top-0 h-screen overflow-y-auto z-20 border-l border-white/5 bg-black/30 backdrop-blur-2xl">
+          {/* Top Bar Sidebar */}
+          <div className="sticky top-0 z-30 bg-black/40 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="relative w-8 h-8">
+                <Image
+                  src="/organa-logo.png"
+                  alt="Organa"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <Link
+              href="/inscription"
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all duration-300"
+            >
+              S'inscrire
+            </Link>
           </div>
-          <div className="flex justify-center gap-6">
-            <Link href="/connexion" className="text-sm text-white/60 hover:text-white transition-colors">
-              Connexion
-            </Link>
-            <Link href="/inscription" className="text-sm text-white/60 hover:text-white transition-colors">
-              Inscription
-            </Link>
+
+          <div className="px-6 py-8 space-y-8">
+            {/* Hero Section Sidebar */}
+            <ScrollReveal delay={0}>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="mb-4">
+                  <span className="text-xs text-blue-400 font-medium">✨ BIENVENUE SUR ORGANA</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                  Simplifiez votre gestion administrative en quelques minutes
+                </h2>
+                <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                  Organa centralise l'essentiel de votre activité au même endroit : clients, devis, factures et suivi administratif.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <Link href="/inscription">
+                    <motion.div
+                      className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-sm text-center relative group overflow-hidden"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <motion.div 
+                        className="absolute inset-0 bg-blue-400/30 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"
+                      />
+                      <span className="relative z-10">Commencer gratuitement</span>
+                    </motion.div>
+                  </Link>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* Dashboard Preview Sidebar */}
+            <ScrollReveal delay={100}>
+              <motion.div
+                className="rounded-xl bg-[#0f1419]/90 backdrop-blur-xl border border-white/10 overflow-hidden group hover:border-blue-500/30 transition-all duration-500"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="p-4 bg-[#151a20]/50 border-b border-white/5">
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-4 h-4">
+                      <Image
+                        src="/organa-logo.png"
+                        alt="Organa"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="text-white font-semibold text-xs">Dashboard</span>
+                  </div>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="text-white/50 text-xs mb-1">Clients</div>
+                      <div className="text-lg font-bold text-white">24</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="text-white/50 text-xs mb-1">Factures</div>
+                      <div className="text-lg font-bold text-white">48</div>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div className="text-white/50 text-xs mb-2">Revenus</div>
+                    <div className="text-2xl font-bold text-white">12.5k</div>
+                    <div className="text-blue-400 text-xs mt-1">CHF</div>
+                  </div>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* Témoignage Sidebar */}
+            <ScrollReveal delay={200}>
+              <motion.div
+                className="rounded-xl bg-white/[0.02] backdrop-blur-xl border border-white/5 p-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                <div className="mb-3">
+                  <span className="text-xs text-blue-400 font-medium">TÉMOIGNAGE CLIENT</span>
+                </div>
+                <p className="text-white/80 text-sm leading-relaxed mb-4 italic">
+                  "Organa a transformé ma gestion administrative. Je gagne plusieurs heures par semaine et je peux me concentrer sur ce qui compte vraiment pour mon activité."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                    JD
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold text-sm">Jean Dupont</div>
+                    <div className="text-white/50 text-xs">Indépendant</div>
+                  </div>
+                </div>
+              </motion.div>
+            </ScrollReveal>
+
+            {/* CTA Card Sidebar */}
+            <ScrollReveal delay={300}>
+              <motion.div
+                className="rounded-xl bg-gradient-to-br from-blue-600/30 via-blue-500/20 to-transparent backdrop-blur-xl border border-blue-500/30 p-6 relative overflow-hidden group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <motion.div 
+                  className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500"
+                />
+                <h3 className="text-lg font-bold text-white mb-2 relative z-10">
+                  Maximisez votre productivité
+                </h3>
+                <p className="text-white/70 text-sm mb-4 leading-relaxed relative z-10">
+                  Réduisez le temps passé sur l'administratif et concentrez-vous sur ce qui fait avancer votre entreprise.
+                </p>
+                <Link href="/inscription">
+                  <motion.div
+                    className="w-full px-4 py-2.5 rounded-lg bg-white text-black font-semibold text-sm text-center relative z-10"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Essayer gratuitement
+                  </motion.div>
+                </Link>
+              </motion.div>
+            </ScrollReveal>
           </div>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
