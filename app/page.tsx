@@ -9,20 +9,17 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* FOND - IMAGE BACKGROUND.PNG */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Image background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/background.png')",
-          }}
-        ></div>
-        
-        {/* Overlay léger pour la lisibilité du texte */}
-        <div className="absolute inset-0 bg-black/40"></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* FOND - DÉGRADÉ BLEU NOIR */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: "linear-gradient(180deg, #0a0e2e 0%, #080b1f 40%, #050616 70%, #000000 100%)",
+        }}
+      ></div>
+      
+      {/* Overlay très léger pour la lisibilité du texte */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-black/20"></div>
 
       <LandingNav />
       
