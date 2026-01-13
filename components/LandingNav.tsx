@@ -5,10 +5,11 @@ import Image from "next/image";
 
 export default function LandingNav() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050B1E]/80 backdrop-blur-xl border-b border-white/5">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-        <Link href="/" className="group">
-          <div className="relative w-12 h-12 md:w-14 md:h-14 transition-transform group-hover:scale-105">
+        {/* Logo + Texte à gauche */}
+        <Link href="/" className="group flex items-center gap-3">
+          <div className="relative w-10 h-10 md:w-12 md:h-12 transition-transform group-hover:scale-105">
             <Image
               src="/organa-logo.png"
               alt="Organa Logo"
@@ -17,26 +18,50 @@ export default function LandingNav() {
               priority
             />
           </div>
+          <span className="text-white font-semibold text-lg hidden sm:block">Organa</span>
         </Link>
         
-        <div className="flex items-center space-x-6">
+        {/* Liens au centre */}
+        <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+          <Link
+            href="/#probleme"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
+          >
+            Le problème
+          </Link>
+          <Link
+            href="/#solution"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
+          >
+            La solution
+          </Link>
+          <Link
+            href="/#comment-ca-marche"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
+          >
+            Comment ça marche
+          </Link>
           <Link
             href="/#tarifs"
-            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 hidden md:block"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
           >
             Tarifs
           </Link>
+        </div>
+        
+        {/* CTA à droite */}
+        <div className="flex items-center space-x-4">
           <Link
             href="/connexion"
-            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/5"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 hidden md:block"
           >
             Connexion
           </Link>
           <Link
             href="/inscription"
-            className="px-6 py-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-sm hover:bg-white/20 hover:border-white/30 transition-all duration-200"
+            className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold text-sm hover:from-violet-500 hover:to-purple-500 transition-all duration-200 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50"
           >
-            Inscription
+            Démarrer
           </Link>
         </div>
       </div>
