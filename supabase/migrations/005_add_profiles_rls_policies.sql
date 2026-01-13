@@ -55,3 +55,5 @@ COMMENT ON POLICY "Users can update their own profile" ON public.profiles IS
 COMMENT ON POLICY "Users can delete their own profile" ON public.profiles IS 
   'Permet aux utilisateurs de supprimer uniquement leur propre profil (user_id = auth.uid())';
 
+
+
