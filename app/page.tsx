@@ -8,6 +8,8 @@ import LandingNav from "@/components/LandingNav";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 export default function Home() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* FOND - DÉGRADÉ BLEU NOIR */}
@@ -763,6 +765,96 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SECTION TÉMOIGNAGES CLIENTS */}
+      <section className="relative py-20 md:py-32 px-6">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal delay={0}>
+            <motion.h2 
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Ils nous font confiance
+            </motion.h2>
+            <motion.p 
+              className="text-lg md:text-xl text-center text-white/70 mb-16 max-w-2xl mx-auto font-light"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Découvrez comment Organa transforme la gestion administrative de nos utilisateurs.
+            </motion.p>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {[
+              {
+                quote: "Organa a transformé ma gestion administrative. Je gagne plusieurs heures par semaine et je peux me concentrer sur ce qui compte vraiment pour mon activité.",
+                name: "Sophie Martin",
+                role: "Consultante indépendante",
+                initials: "SM"
+              },
+              {
+                quote: "La centralisation de tous mes documents au même endroit a changé ma façon de travailler. Plus besoin de chercher, tout est organisé et accessible en quelques clics.",
+                name: "Thomas Dubois",
+                role: "Graphiste freelance",
+                initials: "TD"
+              },
+              {
+                quote: "L'interface est claire et intuitive. En quelques minutes, j'ai créé mes premiers devis. La transformation en facture est instantanée, c'est un gain de temps énorme.",
+                name: "Marie Lefebvre",
+                role: "Architecte d'intérieur",
+                initials: "ML"
+              },
+              {
+                quote: "En tant que petite entreprise, nous avions besoin d'une solution simple et efficace. Organa répond parfaitement à nos besoins sans complexité inutile.",
+                name: "Pierre Moreau",
+                role: "Fondateur, TechStart",
+                initials: "PM"
+              },
+            ].map((testimonial, index) => (
+              <ScrollReveal key={index} delay={index * 100}>
+                <motion.div
+                  className="p-6 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/40 hover:bg-white/[0.04] transition-all duration-700 group relative overflow-hidden h-full"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-1000"></div>
+                  
+                  {/* Quote icon */}
+                  <div className="mb-4 relative z-10">
+                    <svg className="w-8 h-8 text-blue-400/50" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                    </svg>
+                  </div>
+
+                  <p className="text-white/80 text-base leading-relaxed mb-6 relative z-10 italic">
+                    "{testimonial.quote}"
+                  </p>
+
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {testimonial.initials}
+                    </div>
+                    <div>
+                      <div className="text-white font-semibold text-sm">{testimonial.name}</div>
+                      <div className="text-white/50 text-xs">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </motion.div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* SECTION CONFIANCE */}
       <section className="relative py-20 md:py-32 px-6">
         <div className="max-w-7xl mx-auto relative z-10">
@@ -1027,27 +1119,56 @@ export default function Home() {
           </footer>
         </div>
 
+        {/* Overlay pour fermer le sidebar */}
+        {sidebarOpen && (
+          <motion.div
+            className="hidden lg:block fixed inset-0 bg-black/40 backdrop-blur-sm z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* SIDEBAR - DROITE */}
-        <div className="hidden lg:block w-96 xl:w-[420px] fixed right-0 top-0 h-screen overflow-y-auto z-20 border-l border-white/5 bg-black/30 backdrop-blur-2xl">
-          {/* Top Bar Sidebar */}
-          <div className="sticky top-0 z-30 bg-black/40 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/organa-logo.png"
-                  alt="Organa"
-                  fill
-                  className="object-contain"
-                />
+        {sidebarOpen && (
+          <motion.div
+            className="hidden lg:block w-96 xl:w-[420px] fixed right-0 top-0 h-screen overflow-y-auto z-20 border-l border-white/5 bg-black/30 backdrop-blur-2xl"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Top Bar Sidebar */}
+            <div className="sticky top-0 z-30 bg-black/40 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative w-8 h-8">
+                  <Image
+                    src="/organa-logo.png"
+                    alt="Organa"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/inscription"
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all duration-300"
+                >
+                  S'inscrire
+                </Link>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors duration-200 text-white/70 hover:text-white"
+                  aria-label="Fermer le panneau"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
             </div>
-            <Link
-              href="/inscription"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all duration-300"
-            >
-              S'inscrire
-            </Link>
-          </div>
 
           <div className="px-6 py-8 space-y-8">
             {/* Hero Section Sidebar */}
@@ -1184,7 +1305,8 @@ export default function Home() {
               </motion.div>
             </ScrollReveal>
           </div>
-        </div>
+        </motion.div>
+        )}
       </div>
     </div>
   );
