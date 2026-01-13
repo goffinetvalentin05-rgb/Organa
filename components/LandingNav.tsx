@@ -39,7 +39,7 @@ export default function LandingNav() {
             href="/inscription"
             className="px-4 py-2 rounded-lg bg-white text-black font-semibold text-sm hover:bg-gray-100 transition-all hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Découvrir Organa
+            Inscription
           </Link>
         </div>
       </div>
