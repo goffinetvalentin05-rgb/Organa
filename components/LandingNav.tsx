@@ -8,7 +8,7 @@ export default function LandingNav() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo à gauche */}
-        <Link href="/" className="group flex items-center gap-2">
+        <Link href="/" className="group flex items-center gap-3">
           <div className="relative w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:scale-105">
             <Image
               src="/organa-logo.png"
@@ -18,6 +18,7 @@ export default function LandingNav() {
               priority
             />
           </div>
+          <span className="text-white font-semibold text-lg hidden sm:block">Organa</span>
         </Link>
         
         {/* Liens au centre */}
@@ -43,12 +44,18 @@ export default function LandingNav() {
         </div>
         
         {/* CTA à droite */}
-        <div className="flex items-center">
+        <div className="flex items-center space-x-4">
+          <Link
+            href="/connexion"
+            className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
+          >
+            Connexion
+          </Link>
           <Link
             href="/inscription"
-            className="px-5 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold text-sm hover:from-violet-500 hover:to-purple-500 transition-all duration-200 shadow-lg shadow-violet-500/30"
+            className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 transition-all duration-200 border border-blue-500/30"
           >
-            Commencer
+            Créer un compte
           </Link>
         </div>
       </div>
