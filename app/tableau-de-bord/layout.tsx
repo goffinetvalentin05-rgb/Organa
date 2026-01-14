@@ -77,6 +77,7 @@ export default function DashboardLayout({
     { name: "Clients", href: "/tableau-de-bord/clients", icon: Users },
     { name: "Devis", href: "/tableau-de-bord/devis", icon: FileText },
     { name: "Factures", href: "/tableau-de-bord/factures", icon: Receipt },
+    { name: "Dépenses", href: "/tableau-de-bord/depenses", icon: Receipt },
     { name: "Calendrier", href: "/tableau-de-bord/calendrier", icon: Calendar },
     { name: "Paramètres", href: "/tableau-de-bord/parametres", icon: Settings },
   ];
