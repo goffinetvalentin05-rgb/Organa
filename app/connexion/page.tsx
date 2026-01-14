@@ -66,8 +66,31 @@ export default function ConnexionPage() {
   };
 
   return (
-    <main className="min-h-screen text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
+    <main className="min-h-screen text-white flex items-center justify-center px-6 relative overflow-hidden">
+      {/* FOND - DÉGRADÉ BLEU NOIR */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: "linear-gradient(180deg, #0a0e2e 0%, #080b1f 40%, #050616 70%, #000000 100%)",
+        }}
+      ></div>
+      
+      {/* Overlay très léger pour la lisibilité du texte */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-black/20"></div>
+
+      {/* Grille subtile en arrière-plan */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm relative z-10">
         <h1 className="text-3xl font-bold">Connexion</h1>
 
         <p className="mt-2 text-sm text-white/70">
