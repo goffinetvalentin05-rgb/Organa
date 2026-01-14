@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export default function LandingNav() {
   return (
     <motion.nav 
-      className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5"
+      className="fixed top-0 left-0 right-0 z-50 bg-black/60 border-b border-white/5"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -47,14 +47,9 @@ export default function LandingNav() {
             >
               <Link
                 href={link.href}
-                className="text-sm font-medium text-white/70 hover:text-white transition-all duration-500 relative group/link"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-300 relative"
               >
-                <span className="relative z-10">{link.label}</span>
-                {/* Ligne de soulignement au hover */}
-                <motion.div 
-                  className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent opacity-0 group-hover/link:opacity-100"
-                  transition={{ duration: 0.4 }}
-                />
+                {link.label}
               </Link>
             </motion.div>
           ))}
@@ -69,13 +64,9 @@ export default function LandingNav() {
           >
             <Link
               href="/connexion"
-              className="text-sm font-medium text-white/70 hover:text-white transition-all duration-500 relative group/link"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-300"
             >
-              <span className="relative z-10">Connexion</span>
-              <motion.div 
-                className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent opacity-0 group-hover/link:opacity-100"
-                transition={{ duration: 0.4 }}
-              />
+              Connexion
             </Link>
           </motion.div>
           <motion.div

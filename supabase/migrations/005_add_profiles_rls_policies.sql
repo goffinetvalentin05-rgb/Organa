@@ -57,3 +57,4 @@ COMMENT ON POLICY "Users can delete their own profile" ON public.profiles IS
 
 
 
+
