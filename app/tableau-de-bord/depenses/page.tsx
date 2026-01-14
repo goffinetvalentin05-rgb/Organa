@@ -12,6 +12,11 @@ type Depense = {
   dateEcheance: string;
   statut: DepenseStatut;
   note?: string;
+  pieceJointe?: {
+    name: string;
+    url: string;
+    type: string;
+  };
 };
 
 const depensesInitiales: Depense[] = [
@@ -96,6 +101,7 @@ export default function DepensesPage() {
     dateEcheance: "",
     statut: "a_payer" as DepenseStatut,
     note: "",
+    pieceJointe: null as File | null,
   });
 
   const depensesTriees = useMemo(() => {
@@ -111,6 +117,7 @@ export default function DepensesPage() {
       dateEcheance: "",
       statut: "a_payer",
       note: "",
+      pieceJointe: null,
     });
   };
 
@@ -121,6 +128,14 @@ export default function DepensesPage() {
       return;
     }
 
+    const pieceJointe = formData.pieceJointe
+      ? {
+          name: formData.pieceJointe.name,
+          url: URL.createObjectURL(formData.pieceJointe),
+          type: formData.pieceJointe.type,
+        }
+      : undefined;
+
     const nouvelleDepense: Depense = {
       id: globalThis.crypto?.randomUUID?.() ?? `dep-${Date.now()}`,
       fournisseur: formData.fournisseur.trim(),
@@ -128,6 +143,7 @@ export default function DepensesPage() {
       dateEcheance: formData.dateEcheance,
       statut: formData.statut,
       note: formData.note.trim() || undefined,
+      pieceJointe,
     };
 
     setDepenses((current) => [nouvelleDepense, ...current]);
@@ -143,10 +159,13 @@ export default function DepensesPage() {
   const handleVoir = (depense: Depense) => {
     const statutAffiche = getStatutLabel(getStatutAffiche(depense));
     const note = depense.note ? `\nNote : ${depense.note}` : "";
+    const pieceJointe = depense.pieceJointe
+      ? `\nPièce jointe : ${depense.pieceJointe.name}`
+      : "";
     alert(
       `Fournisseur : ${depense.fournisseur}\nMontant : ${formatMontant(
         depense.montant
-      )}\nÉchéance : ${formatDate(depense.dateEcheance)}\nStatut : ${statutAffiche}${note}`
+      )}\nÉchéance : ${formatDate(depense.dateEcheance)}\nStatut : ${statutAffiche}${note}${pieceJointe}`
     );
   };
 
@@ -250,6 +269,25 @@ export default function DepensesPage() {
               className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-white/90 mb-2">
+              Ajouter une pièce jointe
+            </label>
+            <input
+              type="file"
+              accept=".pdf,image/jpeg,image/png"
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  pieceJointe: event.target.files?.[0] ?? null,
+                })
+              }
+              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-white/20"
+            />
+            <p className="mt-2 text-xs text-white/50">
+              Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
+            </p>
+          </div>
           <div className="flex gap-3">
             <button
               type="button"
@@ -301,6 +339,9 @@ export default function DepensesPage() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
                     Statut
                   </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                    Pièce jointe
+                  </th>
                   <th className="px-6 py-4 text-right text-sm font-semibold text-white/90">
                     Actions
                   </th>
@@ -331,6 +372,20 @@ export default function DepensesPage() {
                         >
                           {getStatutLabel(statutAffiche)}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 text-white/70">
+                        {depense.pieceJointe ? (
+                          <a
+                            href={depense.pieceJointe.url}
+                            download={depense.pieceJointe.name}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Voir le document
+                          </a>
+                        ) : (
+                          "-"
+                        )}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
