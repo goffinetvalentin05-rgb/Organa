@@ -11,7 +11,7 @@ import {
   depensesAPI,
   calculerTotalTTC,
 } from "@/lib/mock-data";
-import { Users, FileText, Receipt, AlertCircle, UserPlus, FilePlus } from "@/lib/icons";
+import { Users, FileText, Receipt, UserPlus, FilePlus } from "@/lib/icons";
 
 function CheckoutHandler() {
   const router = useRouter();
@@ -33,15 +33,12 @@ function CheckoutHandler() {
 export default function TableauDeBordPage() {
   const [stats, setStats] = useState({
     totalClients: 0,
-    totalDevis: 0,
     totalFactures: 0,
-    devisEnAttente: 0,
-    facturesNonPayees: 0,
-    elementsEnRetard: 0,
+    montantFactureMois: 0,
+    montantDepensesMois: 0,
   });
 
   const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
-  const [aTraiterMaintenant, setATraiterMaintenant] = useState<any[]>([]);
 
   useEffect(() => {
     const clients = clientsAPI.getAll();
@@ -49,28 +46,24 @@ export default function TableauDeBordPage() {
     const factures = facturesAPI.getAll();
     const depenses = depensesAPI.getAll();
 
-    const devisEnAttente = devis.filter(
-      (d) => d.statut === "envoye" || d.statut === "brouillon"
-    ).length;
-    const facturesNonPayees = factures.filter(
-      (f) => f.statut === "envoye" || f.statut === "en-retard"
-    ).length;
-    const depensesEnRetard = depenses.filter(
-      (d) => d.statut === "a_payer" && isDatePassee(d.dateEcheance)
+    const facturesMois = factures.filter((facture) =>
+      isSameMonth(facture.dateCreation)
     );
-    const facturesEnRetard = factures.filter(
-      (f) =>
-        (f.statut === "envoye" || f.statut === "en-retard") &&
-        isDatePassee(f.dateEcheance)
+    const depensesMois = depenses.filter((depense) =>
+      isSameMonth(depense.dateEcheance)
     );
 
     setStats({
       totalClients: clients.length,
-      totalDevis: devis.length,
       totalFactures: factures.length,
-      devisEnAttente,
-      facturesNonPayees,
-      elementsEnRetard: depensesEnRetard.length + facturesEnRetard.length,
+      montantFactureMois: facturesMois.reduce(
+        (total, facture) => total + calculerTotalTTC(facture.lignes),
+        0
+      ),
+      montantDepensesMois: depensesMois.reduce(
+        (total, depense) => total + depense.montant,
+        0
+      ),
     });
 
     // Derniers documents (devis + factures)
@@ -90,50 +83,6 @@ export default function TableauDeBordPage() {
       .slice(0, 5);
 
     setDerniersDocuments(tousDocuments);
-
-    const depensesUrgentes = depensesEnRetard
-      .sort((a, b) => a.dateEcheance.localeCompare(b.dateEcheance))
-      .map((depense) => ({
-        id: `depense-${depense.id}`,
-        type: "Dépense",
-        nom: depense.fournisseur,
-        montant: depense.montant,
-        date: depense.dateEcheance,
-        href: "/tableau-de-bord/depenses",
-      }));
-
-    const facturesUrgentes = factures
-      .filter((facture) => facture.statut === "envoye" || facture.statut === "en-retard")
-      .sort((a, b) =>
-        (a.dateEcheance || a.dateCreation).localeCompare(b.dateEcheance || b.dateCreation)
-      )
-      .map((facture) => ({
-        id: `facture-${facture.id}`,
-        type: "Facture",
-        nom: facture.client?.nom || "Client inconnu",
-        montant: calculerTotalTTC(facture.lignes),
-        date: facture.dateEcheance || facture.dateCreation,
-        href: `/tableau-de-bord/factures/${facture.id}`,
-      }));
-
-    const devisSansReponse = devis
-      .filter(
-        (devisItem) =>
-          devisItem.statut === "envoye" && isDateAncienne(devisItem.dateCreation, 7)
-      )
-      .sort((a, b) => a.dateCreation.localeCompare(b.dateCreation))
-      .map((devisItem) => ({
-        id: `devis-${devisItem.id}`,
-        type: "Devis",
-        nom: devisItem.client?.nom || "Client inconnu",
-        montant: calculerTotalTTC(devisItem.lignes),
-        date: devisItem.dateEcheance || devisItem.dateCreation,
-        href: `/tableau-de-bord/devis/${devisItem.id}`,
-      }));
-
-    setATraiterMaintenant(
-      [...depensesUrgentes, ...facturesUrgentes, ...devisSansReponse].slice(0, 5)
-    );
   }, []);
 
   const formatMontant = (montant: number) => {
@@ -143,30 +92,15 @@ export default function TableauDeBordPage() {
     }).format(montant);
   };
 
-  const formatDate = (value: string) => {
-    if (!value) return "-";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString("fr-FR");
-  };
-
-  const isDatePassee = (value?: string) => {
-    if (!value) return false;
-    const date = new Date(`${value}T00:00:00`);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date.getTime() < today.getTime();
-  };
-
-  const isDateAncienne = (value?: string, days = 7) => {
+  const isSameMonth = (value?: string) => {
     if (!value) return false;
     const date = new Date(`${value}T00:00:00`);
     if (Number.isNaN(date.getTime())) return false;
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const limit = new Date(today);
-    limit.setDate(today.getDate() - days);
-    return date.getTime() <= limit.getTime();
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth()
+    );
   };
 
   const getStatutColor = (statut: string) => {
@@ -196,12 +130,9 @@ export default function TableauDeBordPage() {
         </p>
       </div>
 
-      {/* KPIs */}
+      {/* Indicateurs clés */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link
-          href="/tableau-de-bord/clients"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
-        >
+        <div className="group relative rounded-xl border border-subtle bg-surface p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Clients</span>
             <Users className="w-6 h-6 text-secondary" />
@@ -209,121 +140,88 @@ export default function TableauDeBordPage() {
           <div className="font-heading text-4xl font-bold text-primary">
             {stats.totalClients}
           </div>
-          {stats.totalClients === 0 && (
-            <div className="mt-3 font-body text-sm text-secondary">
-              Tout est prêt pour démarrer
-            </div>
-          )}
-        </Link>
+        </div>
 
-        <Link
-          href="/tableau-de-bord/devis?statut=en-attente"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
-        >
+        <div className="group relative rounded-xl border border-subtle bg-surface p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">Devis</span>
-            <FileText className="w-6 h-6 text-secondary" />
-          </div>
-          <div className="font-heading text-4xl font-bold text-primary">
-            {stats.totalDevis}
-          </div>
-          {stats.devisEnAttente > 0 && (
-            <div className="mt-3 font-body text-sm accent font-medium">
-              {stats.devisEnAttente} en attente
-            </div>
-          )}
-          {stats.devisEnAttente === 0 && (
-            <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
-            </div>
-          )}
-        </Link>
-
-        <Link
-          href="/tableau-de-bord/factures?statut=non-payees"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">Factures</span>
+            <span className="font-body text-secondary text-sm font-medium">
+              Factures émises
+            </span>
             <Receipt className="w-6 h-6 text-secondary" />
           </div>
           <div className="font-heading text-4xl font-bold text-primary">
             {stats.totalFactures}
           </div>
-          {stats.facturesNonPayees > 0 ? (
-            <div className="mt-3 font-body text-sm" style={{ color: "var(--error)" }}>
-              {stats.facturesNonPayees} non payées
-            </div>
-          ) : (
-            <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
-            </div>
-          )}
-        </Link>
+        </div>
 
-        <Link
-          href="/tableau-de-bord/a-ne-pas-oublier"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200 hover:shadow-lg"
-        >
+        <div className="group relative rounded-xl border border-subtle bg-surface p-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">En retard</span>
-            <div style={{ color: 'var(--error)' }}>
-              <AlertCircle className="w-6 h-6" />
-            </div>
+            <span className="font-body text-secondary text-sm font-medium">
+              Facturé ce mois
+            </span>
+            <FileText className="w-6 h-6 text-secondary" />
           </div>
-          <div className="font-heading text-4xl font-bold" style={{ color: 'var(--error)' }}>
-            {stats.elementsEnRetard}
+          <div className="font-heading text-3xl font-bold text-primary">
+            {formatMontant(stats.montantFactureMois)}
           </div>
-          {stats.elementsEnRetard === 0 && (
-            <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
-            </div>
-          )}
-        </Link>
+          <div className="mt-2 font-body text-xs text-tertiary">
+            Total des factures du mois en cours
+          </div>
+        </div>
+
+        <div className="group relative rounded-xl border border-subtle bg-surface p-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-body text-secondary text-sm font-medium">
+              Dépenses ce mois
+            </span>
+            <Receipt className="w-6 h-6 text-secondary" />
+          </div>
+          <div className="font-heading text-3xl font-bold text-primary">
+            {formatMontant(stats.montantDepensesMois)}
+          </div>
+          <div className="mt-2 font-body text-xs text-tertiary">
+            Total des dépenses du mois en cours
+          </div>
+        </div>
       </div>
 
-      {/* À traiter maintenant */}
-      <div className="rounded-xl border border-subtle bg-surface p-8">
-        <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
-          À traiter maintenant
-        </h2>
-        {aTraiterMaintenant.length === 0 ? (
-          <p className="font-body text-secondary text-lg font-normal">
-            Rien d&apos;urgent pour le moment
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {aTraiterMaintenant.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="flex items-center justify-between p-5 rounded-lg border border-subtle bg-surface-hover hover:border-accent-border transition-all duration-200 group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="font-body text-xs uppercase tracking-wide text-secondary">
-                    {item.type}
-                  </div>
-                  <div>
-                    <div className="font-body font-semibold text-lg text-primary">
-                      {item.nom}
-                    </div>
-                    <div className="font-body text-sm text-secondary">
-                      Échéance : {formatDate(item.date)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  {typeof item.montant === "number" && (
-                    <div className="font-body font-bold text-lg text-primary">
-                      {formatMontant(item.montant)}
-                    </div>
-                  )}
-                  <div className="font-body text-xs text-tertiary">Voir le détail</div>
-                </div>
-              </Link>
-            ))}
+      {/* Comparaison simple */}
+      <div className="rounded-xl border border-subtle bg-surface p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-heading text-lg font-semibold text-primary">
+            Comparaison du mois
+          </h2>
+          <span className="font-body text-xs text-tertiary">Facturé vs dépensé</span>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-secondary">Facturé</span>
+            <span className="text-primary font-semibold">
+              {formatMontant(stats.montantFactureMois)}
+            </span>
           </div>
-        )}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-secondary">Dépensé</span>
+            <span className="text-primary font-semibold">
+              {formatMontant(stats.montantDepensesMois)}
+            </span>
+          </div>
+          <div className="h-2 w-full rounded-full bg-surface-hover overflow-hidden">
+            {(() => {
+              const total = stats.montantFactureMois + stats.montantDepensesMois;
+              const facturePart = total > 0 ? (stats.montantFactureMois / total) * 100 : 50;
+              return (
+                <div className="flex h-full">
+                  <div
+                    className="bg-accent"
+                    style={{ width: `${facturePart}%` }}
+                  ></div>
+                  <div className="flex-1 bg-accent-light"></div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       </div>
 
       {/* Actions rapides */}
