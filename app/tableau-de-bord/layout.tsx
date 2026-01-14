@@ -194,14 +194,6 @@ export default function DashboardLayout({
               )}
             </div>
             <div className="flex items-center gap-4">
-              {!loadingUser && userEmail && (
-                <span
-                  className="font-body text-xs text-tertiary max-w-[220px] truncate"
-                  title={userEmail}
-                >
-                  {userEmail}
-                </span>
-              )}
               <button
                 onClick={handleLogout}
                 className="btn-secondary px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all duration-200 border border-subtle hover:border-subtle-hover"
