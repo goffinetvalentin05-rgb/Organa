@@ -89,7 +89,30 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen text-primary relative">
+    <div className="min-h-screen text-primary relative overflow-hidden">
+      {/* FOND - DÉGRADÉ BLEU NOIR */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: "linear-gradient(180deg, #0a0e2e 0%, #080b1f 40%, #050616 70%, #000000 100%)",
+        }}
+      ></div>
+      
+      {/* Overlay très léger pour la lisibilité du texte */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-black/20"></div>
+
+      {/* Grille subtile en arrière-plan */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-screen w-64 bg-surface border-r border-subtle z-40">
         <div className="flex flex-col h-full">
@@ -153,7 +176,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="ml-64 relative z-10">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-surface border-b border-subtle backdrop-blur-sm">
+        <header className="sticky top-0 z-30 bg-surface/80 border-b border-subtle backdrop-blur-sm">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
               {companyLogo ? (
