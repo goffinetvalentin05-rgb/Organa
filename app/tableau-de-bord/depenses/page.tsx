@@ -1,49 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Eye, Plus, Trash } from "@/lib/icons";
+import { depensesAPI, Depense } from "@/lib/mock-data";
 
 type DepenseStatut = "a_payer" | "paye";
-
-type Depense = {
-  id: string;
-  fournisseur: string;
-  montant: number;
-  dateEcheance: string;
-  statut: DepenseStatut;
-  note?: string;
-  pieceJointe?: {
-    name: string;
-    url: string;
-    type: string;
-  };
-};
-
-const depensesInitiales: Depense[] = [
-  {
-    id: "dep-1",
-    fournisseur: "Orange",
-    montant: 89.9,
-    dateEcheance: "2025-12-10",
-    statut: "paye",
-    note: "Abonnement mobile",
-  },
-  {
-    id: "dep-2",
-    fournisseur: "Adobe",
-    montant: 62,
-    dateEcheance: "2025-12-05",
-    statut: "a_payer",
-    note: "Creative Cloud",
-  },
-  {
-    id: "dep-3",
-    fournisseur: "OVH",
-    montant: 129,
-    dateEcheance: "2025-12-20",
-    statut: "a_payer",
-  },
-];
 
 const formatMontant = (montant: number) => {
   return new Intl.NumberFormat("fr-FR", {
@@ -93,7 +54,7 @@ const getStatutColor = (statut: string) => {
 };
 
 export default function DepensesPage() {
-  const [depenses, setDepenses] = useState<Depense[]>(depensesInitiales);
+  const [depenses, setDepenses] = useState<Depense[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fournisseur: "",
@@ -103,6 +64,10 @@ export default function DepensesPage() {
     note: "",
     pieceJointe: null as File | null,
   });
+
+  useEffect(() => {
+    setDepenses(depensesAPI.getAll());
+  }, []);
 
   const depensesTriees = useMemo(() => {
     return [...depenses].sort((a, b) => {
@@ -136,8 +101,7 @@ export default function DepensesPage() {
         }
       : undefined;
 
-    const nouvelleDepense: Depense = {
-      id: globalThis.crypto?.randomUUID?.() ?? `dep-${Date.now()}`,
+    const nouvelleDepense: Omit<Depense, "id"> = {
       fournisseur: formData.fournisseur.trim(),
       montant,
       dateEcheance: formData.dateEcheance,
@@ -146,14 +110,16 @@ export default function DepensesPage() {
       pieceJointe,
     };
 
-    setDepenses((current) => [nouvelleDepense, ...current]);
+    depensesAPI.create(nouvelleDepense);
+    setDepenses(depensesAPI.getAll());
     resetForm();
     setShowForm(false);
   };
 
   const handleDelete = (id: string) => {
     if (!confirm("Supprimer cette dépense ?")) return;
-    setDepenses((current) => current.filter((depense) => depense.id !== id));
+    depensesAPI.delete(id);
+    setDepenses(depensesAPI.getAll());
   };
 
   const handleVoir = (depense: Depense) => {

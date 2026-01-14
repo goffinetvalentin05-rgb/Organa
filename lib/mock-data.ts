@@ -42,6 +42,20 @@ export interface Facture {
   notes?: string;
 }
 
+export interface Depense {
+  id: string;
+  fournisseur: string;
+  montant: number;
+  dateEcheance: string;
+  statut: 'a_payer' | 'paye';
+  note?: string;
+  pieceJointe?: {
+    name: string;
+    url: string;
+    type: string;
+  };
+}
+
 export interface EvenementCalendrier {
   id: string;
   titre: string;
@@ -127,6 +141,32 @@ let factures: Facture[] = [
     dateCreation: '2024-01-10',
     dateEcheance: '2024-02-10',
     datePaiement: '2024-01-25',
+  },
+];
+
+let depenses: Depense[] = [
+  {
+    id: 'dep-1',
+    fournisseur: 'Orange',
+    montant: 89.9,
+    dateEcheance: '2025-12-10',
+    statut: 'paye',
+    note: 'Abonnement mobile',
+  },
+  {
+    id: 'dep-2',
+    fournisseur: 'Adobe',
+    montant: 62,
+    dateEcheance: '2025-12-05',
+    statut: 'a_payer',
+    note: 'Creative Cloud',
+  },
+  {
+    id: 'dep-3',
+    fournisseur: 'OVH',
+    montant: 129,
+    dateEcheance: '2025-12-20',
+    statut: 'a_payer',
   },
 ];
 
@@ -314,6 +354,33 @@ export const facturesAPI = {
     const index = factures.findIndex(f => f.id === id);
     if (index === -1) return false;
     factures.splice(index, 1);
+    return true;
+  },
+};
+
+// API mock pour les dépenses
+export const depensesAPI = {
+  getAll: (): Depense[] => {
+    return depenses.map(d => ({ ...d, pieceJointe: d.pieceJointe ? { ...d.pieceJointe } : undefined }));
+  },
+  create: (depenseData: Omit<Depense, 'id'>): Depense => {
+    const newDepense: Depense = {
+      ...depenseData,
+      id: Date.now().toString(),
+    };
+    depenses.unshift(newDepense);
+    return newDepense;
+  },
+  update: (id: string, updates: Partial<Omit<Depense, 'id'>>): Depense | undefined => {
+    const index = depenses.findIndex(d => d.id === id);
+    if (index === -1) return undefined;
+    depenses[index] = { ...depenses[index], ...updates };
+    return depenses[index];
+  },
+  delete: (id: string): boolean => {
+    const index = depenses.findIndex(d => d.id === id);
+    if (index === -1) return false;
+    depenses.splice(index, 1);
     return true;
   },
 };

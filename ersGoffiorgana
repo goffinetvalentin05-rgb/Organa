@@ -1,0 +1,106 @@
+[33m17bc809[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m description claire de la modif
+[33m4d9b309[m description claire de la modif
+[33ma0b1b5f[m description claire de la modif
+[33m5a972b6[m description claire de la modif
+[33m5b11ce3[m description claire de la modif
+[33m7dcde01[m description claire de la modif
+[33m95f0e1c[m description claire de la modif
+[33m00054df[m description claire de la modif
+[33m0fb9e9a[m description claire de la modif
+[33mdbebe42[m LANDING – version stable sauvegardée
+[33mb538e65[m description claire de la modif
+[33mb0a59b2[m description claire de la modif
+[33m3752a76[m description claire de la modif
+[33m3881917[m description claire de la modif
+[33mc9500ff[m description claire de la modif
+[33m5713493[m description claire de la modif
+[33m1c33512[m description claire de la modif
+[33mc2da486[m description claire de la modif
+[33mea6cde5[m description claire de la modif
+[33m4db3398[m test
+[33med2da72[m description claire de la modif
+[33mfc598eb[m description claire de la modif
+[33mda498ee[m description claire de la modif
+[33mb63371e[m description claire de la modif
+[33m0fa945a[m description claire de la modif
+[33mfb255f0[m description claire de la modif
+[33m344cbf5[m description claire de la modif
+[33mff6777b[m description claire de la modif
+[33mb57704b[m description claire de la modif
+[33m4a48a7e[m description claire de la modif
+[33m6373df3[m description claire de la modif
+[33mc1c0d85[m description claire de la modif
+[33mf5754f9[m description claire de la modif
+[33mcdef720[m merge landing-prod-stable into main
+[33m7af65fd[m[33m ([m[1;31morigin/landing-prod-stable[m[33m, [m[1;32mlanding-prod-stable[m[33m)[m description claire de la modif
+[33m6b949d6[m sync with production landing (stable)
+[33m692be3a[m[33m ([m[1;32mbackup-bordel-actuel[m[33m)[m description claire de la modif
+[33m2fd54f1[m description claire de la modif
+[33ma94fd8c[m description claire de la modif
+[33mc2d61e2[m description claire de la modif
+[33mc9f5d32[m description claire de la modif
+[33mff97d46[m description claire de la modif
+[33m30eef09[m description claire de la modif
+[33m097cac2[m fix: typescript build error in settings route
+[33m4e7e163[m description claire de la modif
+[33md43c8a6[m description claire de la modif
+[33m6d440a6[m description claire de la modif
+[33m4257782[m description claire de la modif
+[33m56a727c[m description claire de la modif
+[33mc16019c[m description claire de la modif
+[33m2a010ac[m description claire de la modif
+[33m6f6c586[m description claire de la modif
+[33me38cd87[m description claire de la modif
+[33mebe13f0[m description claire de la modif
+[33m5330db1[m description claire de la modif
+[33m805760f[m description claire de la modif
+[33mec7d903[m chore: force vercel deploy
+[33m2699ec0[m description claire de la modif
+[33me203896[m description claire de la modif
+[33mcee510c[m description claire de la modif
+[33macc5f7b[m description claire de la modif
+[33ma8a9c3e[m description claire de la modif
+[33m9e7ab8e[m AmÃ©lioration visuelle landing page: espacements, hiÃ©rarchie typographique et CTA renforcÃ©s pour un rendu SaaS B2B premium
+[33m79523fa[m description claire de la modif
+[33mce97b78[m description claire de la modif
+[33m42da64f[m description claire de la modif
+[33mc76849e[m chore: force vercel deploy
+[33m0cbc8e3[m description claire de la modif
+[33m6fe66de[m description claire de la modif
+[33m813cba6[m description claire de la modif
+[33mee9632a[m description claire de la modif
+[33ma83f07f[m description claire de la modif
+[33m6ba7b68[m description claire de la modif
+[33m47e4fa1[m description claire de la modif
+[33mc807b44[m description claire de la modif
+[33m6c9f269[m[33m ([m[1;31morigin/rollback-landing[m[33m, [m[1;32mclean-landing[m[33m)[m description claire de la modif
+[33m70c5174[m description claire de la modif
+[33mf174eb8[m description claire de la modif
+[33m275aa5d[m description claire de la modif
+[33m68e3b02[m description claire de la modif
+[33m7d9181a[m description claire de la modif
+[33me096437[m description claire de la modif
+[33m9f992af[m description claire de la modif
+[33ma26f385[m fix(api): correct route handler signature for Next.js App Router
+[33mb6cc98f[m fix(api): add bridge route for legacy document pdf endpoints
+[33m2fcff36[m fix(pdf): convert Buffer to Uint8Array for Response body
+[33m041b662[m fix(pdf): use Response instead of NextResponse for Buffer body
+[33mccc8033[m fix(pdf): align totals object with expected type
+[33mc10a174[m fix(pdf): add required totals prop to PDF routes
+[33mf766763[m fix(pdf): rename route.ts to route.tsx for JSX support
+[33m9a34d78[m fix(pdf): close JSX components correctly (final)
+[33m95428cd[m chore: trigger vercel redeploy
+[33m53e115b[m fix(pdf): correct JSX props for react-pdf components
+[33ma4ed28d[m fix(pdf): replace React.createElement with JSX for react-pdf
+[33mef52c01[m remove legacy documents pdf route using playwright
+[33m726a1d1[m remove legacy documents pdf route using playwright
+[33maed1302[m fix(pdf): force nodejs runtime for react-pdf routes
+[33m3e1b96c[m fix: force redeploy vercel
+[33m0718881[m UI dashboard: boutons pro sans emojis
+[33m5a563fe[m fix: create organizations table
+[33m7429353[m Projet prêt pour déploiement
+[33m1035bde[m fix: dÃ©sactiver endpoint debug schema pour corriger erreur TypeScript build Vercel
+[33mb5b40a4[m Fix checkout route syntax
+[33mc62328d[m Clean Stripe config
+[33m6f11ae5[m Initial commit
+[33mc585dcc[m Base Organa: landing + auth pages + header + dashboard

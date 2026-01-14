@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, Users, FileText, Receipt, Calendar, Settings, Home } from "@/lib/icons";
+import { LayoutDashboard, Users, FileText, Receipt, Calendar, Settings, Home, AlertTriangle } from "@/lib/icons";
 
 export default function DashboardLayout({
   children,
@@ -78,6 +78,7 @@ export default function DashboardLayout({
     { name: "Devis", href: "/tableau-de-bord/devis", icon: FileText },
     { name: "Factures", href: "/tableau-de-bord/factures", icon: Receipt },
     { name: "Dépenses", href: "/tableau-de-bord/depenses", icon: Receipt },
+    { name: "À ne pas oublier", href: "/tableau-de-bord/a-ne-pas-oublier", icon: AlertTriangle },
     { name: "Calendrier", href: "/tableau-de-bord/calendrier", icon: Calendar },
     { name: "Paramètres", href: "/tableau-de-bord/parametres", icon: Settings },
   ];
