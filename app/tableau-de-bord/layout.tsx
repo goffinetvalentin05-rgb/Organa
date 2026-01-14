@@ -188,12 +188,21 @@ export default function DashboardLayout({
                   className="h-8 w-auto object-contain"
                 />
               ) : (
-                <h1 className="font-heading text-lg font-semibold text-primary">
-                  {companyName}
-                </h1>
+                <Image
+                  src="/organa-logo.png"
+                  alt="Organa"
+                  width={120}
+                  height={28}
+                  className="h-8 w-auto object-contain"
+                />
               )}
             </div>
             <div className="flex items-center gap-4">
+              {!loadingUser && companyName && companyName !== "Organa" && (
+                <span className="text-xs text-white/40 font-normal">
+                  {companyName}
+                </span>
+              )}
               <button
                 onClick={handleLogout}
                 className="btn-secondary px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all duration-200 border border-subtle hover:border-subtle-hover"
