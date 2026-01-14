@@ -215,51 +215,40 @@ export default function Home() {
             </motion.h2>
           </ScrollReveal>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8">
-              <ScrollReveal delay={0}>
-                <motion.div
-                  className="p-8 rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={{ y: -5 }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <p className="text-white/80 text-base leading-relaxed relative z-10">
-                    Vos journées sont déjà bien remplies.
-                    <br /><br />
-                    Pourtant, une part importante de votre temps est absorbée par l'administratif.
-                    <br /><br />
-                    Créer des devis, gérer des factures, suivre des clients, retrouver des documents…
-                    <br /><br />
-                    Pris séparément, ces tâches paraissent simples.
-                    Additionnées, elles finissent par prendre une place disproportionnée dans votre quotidien.
-                  </p>
-                </motion.div>
-              </ScrollReveal>
-
-              <ScrollReveal delay={100}>
-                <motion.div
-                  className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/40 transition-all duration-500 group relative overflow-hidden"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                >
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
-                  <div className="text-2xl font-bold text-white mb-4 relative z-10">Le coût réel</div>
-                  <p className="text-white/90 text-base leading-relaxed relative z-10">
+          <ScrollReveal delay={100}>
+            <motion.div
+              className="max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="space-y-6 text-center">
+                <p className="text-lg md:text-xl text-white/80 leading-relaxed font-light">
+                  Vos journées sont déjà bien remplies.
+                </p>
+                <p className="text-lg md:text-xl text-white/80 leading-relaxed font-light">
+                  Pourtant, une part importante de votre temps est absorbée par l'administratif.
+                </p>
+                <p className="text-lg md:text-xl text-white/80 leading-relaxed font-light">
+                  Créer des devis, gérer des factures, suivre des clients, retrouver des documents…
+                </p>
+                <p className="text-lg md:text-xl text-white/80 leading-relaxed font-light">
+                  Pris séparément, ces tâches paraissent simples.
+                  Additionnées, elles finissent par prendre une place disproportionnée dans votre quotidien.
+                </p>
+                <div className="pt-6 mt-6 border-t border-white/10">
+                  <p className="text-xl md:text-2xl font-semibold text-white mb-4">Le coût réel</p>
+                  <p className="text-lg md:text-xl text-white/90 leading-relaxed font-light">
                     Ce temps passé sur l'administratif n'est pas neutre.
-                    <br /><br />
+                  </p>
+                  <p className="text-lg md:text-xl text-white/90 leading-relaxed font-light mt-4">
                     C'est du temps en moins pour vos clients, pour développer votre activité, ou simplement pour avancer sur ce qui crée réellement de la valeur.
                   </p>
-                </motion.div>
-              </ScrollReveal>
-            </div>
-          </div>
+                </div>
+              </div>
+            </motion.div>
+          </ScrollReveal>
         </div>
       </section>
 
