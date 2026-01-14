@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export default function LandingNav() {
   return (
     <motion.nav 
-      className="fixed top-0 left-0 right-0 z-50 bg-black/60 border-b border-white/5"
+      className="fixed top-0 left-0 right-0 z-50 bg-black/90 border-b border-white/5"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -47,7 +47,7 @@ export default function LandingNav() {
             >
               <Link
                 href={link.href}
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-300 relative"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
               >
                 {link.label}
               </Link>
@@ -64,7 +64,7 @@ export default function LandingNav() {
           >
             <Link
               href="/connexion"
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-300"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200"
             >
               Connexion
             </Link>
