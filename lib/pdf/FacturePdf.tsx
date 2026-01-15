@@ -45,6 +45,11 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 1.5,
   },
+  wrapText: {
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "normal",
+  },
   documentType: {
     fontSize: 24,
     fontWeight: "bold",
@@ -100,12 +105,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
+    alignItems: "flex-start",
   },
   tableCell: {
     fontSize: 9,
   },
   colDesignation: {
     width: "50%",
+    flexShrink: 1,
   },
   colQty: {
     width: "12%",
@@ -263,7 +270,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
             <Text style={[styles.companyName, dynamicStyles.companyName]}>
               {company.name}
             </Text>
-            <Text style={styles.companyDetails}>
+            <Text style={[styles.companyDetails, styles.wrapText]}>
               {company.address && `${company.address}\n`}
               {company.email && `${company.email}\n`}
               {company.phone}
@@ -285,10 +292,14 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
               {client.name}
             </Text>
             {client.address && (
-              <Text style={styles.infoBlockText}>{client.address}</Text>
+              <Text style={[styles.infoBlockText, styles.wrapText]}>
+                {client.address}
+              </Text>
             )}
             {client.email && (
-              <Text style={styles.infoBlockText}>{client.email}</Text>
+              <Text style={[styles.infoBlockText, styles.wrapText]}>
+                {client.email}
+              </Text>
             )}
           </View>
           <View style={styles.infoBlock}>
@@ -326,13 +337,20 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
             <View key={index}>
               <View style={styles.tableRow}>
                 <View style={styles.colDesignation}>
-                  <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.wrapText,
+                      { fontWeight: "bold" },
+                    ]}
+                  >
                     {line.label}
                   </Text>
                   {line.description && (
                     <Text
                       style={[
                         styles.tableCell,
+                        styles.wrapText,
                         { fontSize: 8, color: "#666", marginTop: 4 },
                       ]}
                     >
@@ -382,7 +400,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
         {document.notes && (
           <View style={styles.notes}>
             <Text style={styles.notesTitle}>Notes</Text>
-            <Text>{document.notes}</Text>
+            <Text style={styles.wrapText}>{document.notes}</Text>
           </View>
         )}
       </Page>
