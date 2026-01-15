@@ -216,6 +216,21 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const wrapText = (text: string, maxLength: number = 40) => {
+  if (!text) return "";
+  return (
+    text.match(new RegExp(`.{1,${maxLength}}`, "g"))?.join("\n") ?? text
+  );
+};
+
+const wrapTextBlock = (text: string, maxLength: number = 40) => {
+  if (!text) return "";
+  return text
+    .split("\n")
+    .map((line) => wrapText(line, maxLength))
+    .join("\n");
+};
+
 export const DevisPdf: React.FC<DevisPdfProps> = ({
   company,
   client,
@@ -245,6 +260,9 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   });
 
   const currencySymbol = document.currencySymbol || "€";
+  const companyDetails = wrapTextBlock(
+    [company.address, company.email, company.phone].filter(Boolean).join("\n")
+  );
 
   return (
     <Document>
@@ -258,12 +276,10 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
           </View>
           <View style={styles.companyInfo}>
             <Text style={[styles.companyName, dynamicStyles.companyName]}>
-              {company.name}
+              {wrapText(company.name)}
             </Text>
             <Text style={styles.companyDetails}>
-              {company.address && `${company.address}\n`}
-              {company.email && `${company.email}\n`}
-              {company.phone}
+              {companyDetails}
             </Text>
           </View>
         </View>
@@ -279,13 +295,15 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
           <View style={styles.infoBlock}>
             <Text style={styles.infoBlockTitle}>Facturer à</Text>
             <Text style={[styles.infoBlockText, { fontWeight: "bold" }]}>
-              {client.name}
+              {wrapText(client.name)}
             </Text>
             {client.address && (
-              <Text style={styles.infoBlockText}>{client.address}</Text>
+              <Text style={styles.infoBlockText}>
+                {wrapText(client.address)}
+              </Text>
             )}
             {client.email && (
-              <Text style={styles.infoBlockText}>{client.email}</Text>
+              <Text style={styles.infoBlockText}>{wrapText(client.email)}</Text>
             )}
           </View>
           <View style={styles.infoBlock}>
@@ -318,7 +336,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
               <View style={styles.tableRow}>
                 <View style={styles.colDesignation}>
                   <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
-                    {line.label}
+                    {wrapText(line.label)}
                   </Text>
                   {line.description && (
                     <Text
@@ -327,7 +345,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
                         { fontSize: 8, color: "#666", marginTop: 4 },
                       ]}
                     >
-                      {line.description}
+                      {wrapText(line.description)}
                     </Text>
                   )}
                 </View>
@@ -367,7 +385,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
         {document.notes && (
           <View style={styles.notes}>
             <Text style={styles.notesTitle}>Notes</Text>
-            <Text>{document.notes}</Text>
+            <Text>{wrapText(document.notes)}</Text>
           </View>
         )}
       </Page>

@@ -226,6 +226,21 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const wrapText = (text: string, maxLength: number = 40) => {
+  if (!text) return "";
+  return (
+    text.match(new RegExp(`.{1,${maxLength}}`, "g"))?.join("\n") ?? text
+  );
+};
+
+const wrapTextBlock = (text: string, maxLength: number = 40) => {
+  if (!text) return "";
+  return text
+    .split("\n")
+    .map((line) => wrapText(line, maxLength))
+    .join("\n");
+};
+
 export const FacturePdf: React.FC<FacturePdfProps> = ({
   company,
   client,
@@ -255,6 +270,9 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
   });
 
   const currencySymbol = document.currencySymbol || "€";
+  const companyDetails = wrapTextBlock(
+    [company.address, company.email, company.phone].filter(Boolean).join("\n")
+  );
 
   return (
     <Document>
@@ -268,12 +286,10 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
           </View>
           <View style={styles.companyInfo}>
             <Text style={[styles.companyName, dynamicStyles.companyName]}>
-              {company.name}
+              {wrapText(company.name)}
             </Text>
             <Text style={[styles.companyDetails, styles.wrapText]}>
-              {company.address && `${company.address}\n`}
-              {company.email && `${company.email}\n`}
-              {company.phone}
+              {companyDetails}
             </Text>
           </View>
         </View>
@@ -289,16 +305,16 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
           <View style={styles.infoBlock}>
             <Text style={styles.infoBlockTitle}>Facturer à</Text>
             <Text style={[styles.infoBlockText, { fontWeight: "bold" }]}>
-              {client.name}
+              {wrapText(client.name)}
             </Text>
             {client.address && (
               <Text style={[styles.infoBlockText, styles.wrapText]}>
-                {client.address}
+                {wrapText(client.address)}
               </Text>
             )}
             {client.email && (
               <Text style={[styles.infoBlockText, styles.wrapText]}>
-                {client.email}
+                {wrapText(client.email)}
               </Text>
             )}
           </View>
@@ -344,7 +360,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
                       { fontWeight: "bold" },
                     ]}
                   >
-                    {line.label}
+                    {wrapText(line.label)}
                   </Text>
                   {line.description && (
                     <Text
@@ -354,7 +370,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
                         { fontSize: 8, color: "#666", marginTop: 4 },
                       ]}
                     >
-                      {line.description}
+                      {wrapText(line.description)}
                     </Text>
                   )}
                 </View>
@@ -400,7 +416,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
         {document.notes && (
           <View style={styles.notes}>
             <Text style={styles.notesTitle}>Notes</Text>
-            <Text style={styles.wrapText}>{document.notes}</Text>
+            <Text style={styles.wrapText}>{wrapText(document.notes)}</Text>
           </View>
         )}
       </Page>
