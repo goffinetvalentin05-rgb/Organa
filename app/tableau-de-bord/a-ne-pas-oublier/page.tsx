@@ -141,7 +141,7 @@ export default function ANePasOublierPage() {
       .filter(
         (facture) =>
           (facture.statut === "envoye" || facture.statut === "en-retard") &&
-          isPast(facture.dateEcheance)
+          facture.dateEcheance && isPast(facture.dateEcheance)
       )
       .map((facture) => ({
         id: `facture-${facture.id}`,
