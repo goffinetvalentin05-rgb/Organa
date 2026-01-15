@@ -110,6 +110,12 @@ const styles = StyleSheet.create({
   tableCell: {
     fontSize: 9,
   },
+  textBlock: {
+    width: "100%",
+    maxWidth: "100%",
+    flexWrap: "wrap",
+    wordBreak: "break-word",
+  },
   colDesignation: {
     width: "50%",
     flexShrink: 1,
@@ -226,21 +232,6 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const wrapText = (text: string, maxLength: number = 40) => {
-  if (!text) return "";
-  return (
-    text.match(new RegExp(`.{1,${maxLength}}`, "g"))?.join("\n") ?? text
-  );
-};
-
-const wrapTextBlock = (text: string, maxLength: number = 40) => {
-  if (!text) return "";
-  return text
-    .split("\n")
-    .map((line) => wrapText(line, maxLength))
-    .join("\n");
-};
-
 export const FacturePdf: React.FC<FacturePdfProps> = ({
   company,
   client,
@@ -270,9 +261,6 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
   });
 
   const currencySymbol = document.currencySymbol || "€";
-  const companyDetails = wrapTextBlock(
-    [company.address, company.email, company.phone].filter(Boolean).join("\n")
-  );
 
   return (
     <Document>
@@ -285,11 +273,21 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
             )}
           </View>
           <View style={styles.companyInfo}>
-            <Text style={[styles.companyName, dynamicStyles.companyName]}>
-              {wrapText(company.name)}
+            <Text
+              style={[
+                styles.companyName,
+                dynamicStyles.companyName,
+                styles.textBlock,
+              ]}
+            >
+              {company.name}
             </Text>
-            <Text style={[styles.companyDetails, styles.wrapText]}>
-              {companyDetails}
+            <Text
+              style={[styles.companyDetails, styles.wrapText, styles.textBlock]}
+            >
+              {company.address && `${company.address}\n`}
+              {company.email && `${company.email}\n`}
+              {company.phone}
             </Text>
           </View>
         </View>
@@ -304,17 +302,27 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
         <View style={styles.documentInfo}>
           <View style={styles.infoBlock}>
             <Text style={styles.infoBlockTitle}>Facturer à</Text>
-            <Text style={[styles.infoBlockText, { fontWeight: "bold" }]}>
-              {wrapText(client.name)}
+            <Text
+              style={[
+                styles.infoBlockText,
+                { fontWeight: "bold" },
+                styles.textBlock,
+              ]}
+            >
+              {client.name}
             </Text>
             {client.address && (
-              <Text style={[styles.infoBlockText, styles.wrapText]}>
-                {wrapText(client.address)}
+              <Text
+                style={[styles.infoBlockText, styles.wrapText, styles.textBlock]}
+              >
+                {client.address}
               </Text>
             )}
             {client.email && (
-              <Text style={[styles.infoBlockText, styles.wrapText]}>
-                {wrapText(client.email)}
+              <Text
+                style={[styles.infoBlockText, styles.wrapText, styles.textBlock]}
+              >
+                {client.email}
               </Text>
             )}
           </View>
@@ -357,20 +365,22 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
                     style={[
                       styles.tableCell,
                       styles.wrapText,
+                      styles.textBlock,
                       { fontWeight: "bold" },
                     ]}
                   >
-                    {wrapText(line.label)}
+                    {line.label}
                   </Text>
                   {line.description && (
                     <Text
                       style={[
                         styles.tableCell,
                         styles.wrapText,
+                        styles.textBlock,
                         { fontSize: 8, color: "#666", marginTop: 4 },
                       ]}
                     >
-                      {wrapText(line.description)}
+                      {line.description}
                     </Text>
                   )}
                 </View>
@@ -416,7 +426,9 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
         {document.notes && (
           <View style={styles.notes}>
             <Text style={styles.notesTitle}>Notes</Text>
-            <Text style={styles.wrapText}>{wrapText(document.notes)}</Text>
+            <Text style={[styles.wrapText, styles.textBlock]}>
+              {document.notes}
+            </Text>
           </View>
         )}
       </Page>
