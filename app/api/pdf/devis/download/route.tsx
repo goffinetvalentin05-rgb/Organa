@@ -1,62 +1,23 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { DevisPdf } from "@/lib/pdf/DevisPdf";
+import { getDocumentPdfData } from "@/lib/utils/pdf-data";
 
 export const runtime = "nodejs";
 
-// Données mockées pour le devis (structure simple)
-function getMockDevisData() {
-  return {
-    company: {
-      name: "Organa",
-      address: "123 Rue de l'Innovation\n75001 Paris, France",
-      email: "contact@organa.fr",
-      phone: "+33 1 23 45 67 89",
-      logoUrl: undefined,
-    },
-    client: {
-      name: "Client Exemple",
-      address: "456 Avenue des Clients\n69000 Lyon, France",
-      email: "client@exemple.fr",
-    },
-    document: {
-      number: "DEV-2024-001",
-      date: new Date().toISOString(),
-      currency: "EUR",
-      currencySymbol: "€",
-      vatRate: 20,
-      notes: "Devis valable 30 jours",
-    },
-    lines: [
-      {
-        label: "Prestation 1",
-        description: "Description détaillée de la prestation 1",
-        qty: 2,
-        unitPrice: 100.0,
-        total: 200.0,
-        vat: 20,
-      },
-      {
-        label: "Prestation 2",
-        description: "Description de la prestation 2",
-        qty: 1,
-        unitPrice: 150.0,
-        total: 150.0,
-        vat: 20,
-      },
-    ],
-    totals: {
-      subtotal: 350.0,
-      vat: 70.0,
-      total: 420.0,
-    },
-    primaryColor: "#3B82F6",
-  };
-}
-
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const data = getMockDevisData();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID du devis manquant" },
+        { status: 400 }
+      );
+    }
+
+    const data = await getDocumentPdfData(id, "quote");
 
     // Générer le PDF avec @react-pdf/renderer
     const pdfBuffer = await renderToBuffer(
@@ -65,16 +26,13 @@ export async function GET() {
         client={data.client}
         document={data.document}
         lines={data.lines}
-        totals={{
-          subtotal: 0,
-          vat: 0,
-          total: 0,
-        }}
+        totals={data.totals}
+        primaryColor={data.primaryColor}
       />
     );
 
     // Nom du fichier avec la date
-    const filename = `devis-${data.document.number}-${new Date().toISOString().split("T")[0]}.pdf`;
+    const filename = `devis-${data.document.number || id}-${new Date().toISOString().split("T")[0]}.pdf`;
 
     // Retourner le PDF pour téléchargement (attachment)
     return new Response(new Uint8Array(pdfBuffer), {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { parametresAPI, devisAPI, facturesAPI, calculerTotalTTC } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { calculerTotalTTC } from "@/lib/utils/calculations";
 
 /**
  * API Email - Envoi de devis et factures par email
@@ -18,11 +19,44 @@ import { parametresAPI, devisAPI, facturesAPI, calculerTotalTTC } from "@/lib/mo
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user || !user.id) {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { type, documentId } = body; // type: 'devis' | 'facture', documentId: string
 
-    // Récupérer les paramètres email
-    const parametres = parametresAPI.get();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select(
+        "company_name, company_email, company_phone, company_address, email_sender_name, email_sender_email, resend_api_key"
+      )
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("[API][email] Erreur profil:", profileError);
+      return NextResponse.json(
+        { error: "Erreur lors du chargement des paramètres" },
+        { status: 500 }
+      );
+    }
+    
+    const parametres = {
+      nomEntreprise: profile?.company_name || "",
+      email: profile?.company_email || "",
+      telephone: profile?.company_phone || "",
+      adresse: profile?.company_address || "",
+      nomExpediteur: profile?.email_sender_name || "",
+      emailExpediteur: profile?.email_sender_email || "",
+      resendApiKey: profile?.resend_api_key || "",
+    };
     
     if (!parametres.resendApiKey) {
       return NextResponse.json(
@@ -40,29 +74,52 @@ export async function POST(request: NextRequest) {
     let montant: number;
     let sujet: string;
     let typeDoc: string;
+    let expectedType: "quote" | "invoice";
 
     if (type === "devis") {
-      document = devisAPI.getById(documentId);
+      expectedType = "quote";
       typeDoc = "devis";
-      sujet = `Votre devis Organa n°${document?.numero || ""}`;
     } else if (type === "facture") {
-      document = facturesAPI.getById(documentId);
+      expectedType = "invoice";
       typeDoc = "facture";
-      sujet = `Votre facture Organa n°${document?.numero || ""}`;
     } else {
       return NextResponse.json({ error: "Type de document invalide" }, { status: 400 });
     }
 
-    if (!document || !document.client) {
+    const { data: documentData, error: documentError } = await supabase
+      .from("documents")
+      .select(
+        "id, numero, type, items, notes, total_ttc, client:clients(id, nom, email, adresse)"
+      )
+      .eq("id", documentId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (documentError || !documentData || documentData.type !== expectedType) {
+      console.error("[API][email] Document introuvable:", documentError);
       return NextResponse.json({ error: "Document ou client introuvable" }, { status: 404 });
     }
 
-    clientEmail = document.client.email;
-    numero = document.numero;
-    montant = calculerTotalTTC(document.lignes);
+    document = documentData;
+    sujet = `Votre ${typeDoc} Organa n°${document.numero || ""}`;
+
+    const client = Array.isArray(document.client)
+      ? document.client[0]
+      : document.client;
+
+    if (!client?.email) {
+      return NextResponse.json({ error: "Email du client introuvable" }, { status: 404 });
+    }
+
+    clientEmail = client.email;
+    numero = document.numero || "";
+    montant =
+      typeof document.total_ttc === "number"
+        ? document.total_ttc
+        : Number(document.total_ttc) || calculerTotalTTC(document.items);
 
     // Construire le corps de l'email
-    const lignesHtml = document.lignes
+    const lignesHtml = (Array.isArray(document.items) ? document.items : [])
       .map(
         (ligne: any) => {
           const sousTotal = (ligne.quantite || 0) * (ligne.prixUnitaire || 0);

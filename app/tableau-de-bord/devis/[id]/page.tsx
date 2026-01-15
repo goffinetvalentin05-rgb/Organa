@@ -5,15 +5,25 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
-  devisAPI,
-  facturesAPI,
   calculerTotalHT,
   calculerTVA,
   calculerTotalTTC,
-  Devis,
-} from "@/lib/mock-data";
+} from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
+
+interface Devis {
+  id: string;
+  numero: string;
+  clientId?: string | null;
+  client?: { nom?: string; email?: string };
+  lignes: any[];
+  statut: "brouillon" | "envoye" | "accepte" | "refuse";
+  dateCreation: string;
+  dateEcheance?: string | null;
+  notes?: string | null;
+  type?: string;
+}
 
 export default function DevisDetailPage() {
   const router = useRouter();
@@ -28,46 +38,113 @@ export default function DevisDetailPage() {
       router.push("/tableau-de-bord/devis");
       return;
     }
-    const devisItem = devisAPI.getById(id);
-    if (!devisItem) {
-      router.push("/tableau-de-bord/devis");
-      return;
-    }
-    setDevis(devisItem);
-    
-    // Charger la devise depuis les settings
-    fetch("/api/settings")
-      .then((res) => res.json())
-      .then((data) => {
+
+    const loadDevis = async () => {
+      try {
+        const response = await fetch(`/api/documents?id=${id}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          router.push("/tableau-de-bord/devis");
+          return;
+        }
+        const data = await response.json();
+        if (!data.document || data.document.type !== "quote") {
+          router.push("/tableau-de-bord/devis");
+          return;
+        }
+        setDevis(data.document);
+      } catch (error) {
+        console.error("[Devis] Erreur chargement:", error);
+        router.push("/tableau-de-bord/devis");
+      }
+    };
+
+    const loadCurrency = async () => {
+      try {
+        const res = await fetch("/api/settings", { cache: "no-store" });
+        const data = await res.json();
         if (data.settings?.currency) {
           setCurrency(data.settings.currency);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Erreur lors du chargement de la devise:", err);
-      });
+      }
+    };
+
+    void loadDevis();
+    void loadCurrency();
   }, [id, router]);
 
-  const handleDelete = () => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce devis ?")) {
-      devisAPI.delete(id);
-      router.push("/tableau-de-bord/devis");
-    }
-  };
-
-  const handleTransformerEnFacture = () => {
-    if (confirm("Transformer ce devis en facture ?")) {
-      const facture = devisAPI.transformerEnFacture(id);
-      if (facture) {
-        router.push(`/tableau-de-bord/factures/${facture.id}`);
+  const handleDelete = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce devis ?")) return;
+    try {
+      const response = await fetch(`/api/documents?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression du devis");
       }
+      router.push("/tableau-de-bord/devis");
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de la suppression");
     }
   };
 
-  const handleChangerStatut = (nouveauStatut: Devis["statut"]) => {
-    if (devis) {
-      devisAPI.update(id, { statut: nouveauStatut });
+  const handleTransformerEnFacture = async () => {
+    if (!devis) return;
+    if (!confirm("Transformer ce devis en facture ?")) return;
+    if (!devis.clientId) {
+      toast.error("Client manquant pour ce devis");
+      return;
+    }
+    try {
+      const response = await fetch("/api/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "invoice",
+          clientId: devis.clientId,
+          lignes: devis.lignes,
+          statut: "brouillon",
+          dateCreation: new Date().toISOString().split("T")[0],
+          ...(devis.dateEcheance ? { dateEcheance: devis.dateEcheance } : {}),
+          ...(devis.notes ? { notes: devis.notes } : {}),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.error || "Erreur lors de la création de la facture");
+      }
+
+      const data = await response.json();
+      router.push(`/tableau-de-bord/factures/${data.id}`);
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de la transformation");
+    }
+  };
+
+  const handleChangerStatut = async (nouveauStatut: Devis["statut"]) => {
+    if (!devis) return;
+    try {
+      const response = await fetch("/api/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          type: "quote",
+          statut: nouveauStatut,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour du statut");
+      }
+
       setDevis({ ...devis, statut: nouveauStatut });
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de la mise à jour du statut");
     }
   };
 

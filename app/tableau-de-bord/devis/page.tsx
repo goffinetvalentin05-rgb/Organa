@@ -2,31 +2,59 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  devisAPI,
-  clientsAPI,
-  calculerTotalTTC,
-  Devis,
-} from "@/lib/mock-data";
+import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { Eye, Trash, Plus } from "@/lib/icons";
 
+interface Devis {
+  id: string;
+  numero: string;
+  client?: { nom?: string };
+  lignes: any[];
+  statut: string;
+  dateCreation: string;
+}
+
 export default function DevisPage() {
-  const router = useRouter();
   const [devis, setDevis] = useState<Devis[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    loadDevis();
+    void loadDevis();
   }, []);
 
-  const loadDevis = () => {
-    setDevis(devisAPI.getAll());
+  const loadDevis = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const response = await fetch("/api/documents?type=quote", {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des devis");
+      }
+      const data = await response.json();
+      setDevis(data.documents || []);
+    } catch (error: any) {
+      setErrorMessage(error?.message || "Erreur lors du chargement des devis");
+      setDevis([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce devis ?")) {
-      devisAPI.delete(id);
-      loadDevis();
+  const handleDelete = async (id: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce devis ?")) return;
+    try {
+      const response = await fetch(`/api/documents?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression du devis");
+      }
+      await loadDevis();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -78,7 +106,16 @@ export default function DevisPage() {
 
       {/* Liste */}
       <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-        {devis.length === 0 ? (
+        {loading ? (
+          <div className="p-12 text-center">
+            <p className="text-white/70">Chargement...</p>
+          </div>
+        ) : errorMessage ? (
+          <div className="p-12 text-center">
+            <p className="text-red-400 mb-2">Erreur lors du chargement</p>
+            <p className="text-white/70 text-sm">{errorMessage}</p>
+          </div>
+        ) : devis.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-white/70 mb-4">Aucun devis pour le moment</p>
             <Link

@@ -87,105 +87,15 @@ export interface Parametres {
 }
 
 // Données mock en mémoire
-let clients: Client[] = [
-  {
-    id: '1',
-    nom: 'Entreprise ABC',
-    email: 'contact@abc.fr',
-    telephone: '+33 1 23 45 67 89',
-    adresse: '123 Rue Example, 75001 Paris',
-  },
-  {
-    id: '2',
-    nom: 'SARL XYZ',
-    email: 'info@xyz.fr',
-    telephone: '+33 1 98 76 54 32',
-    adresse: '456 Avenue Test, 69000 Lyon',
-  },
-];
+let clients: Client[] = [];
 
-let devis: Devis[] = [
-  {
-    id: '1',
-    numero: 'DEV-2024-001',
-    clientId: '1',
-    lignes: [
-      { id: '1', designation: 'Prestation conseil', quantite: 10, prixUnitaire: 150, tva: 7.7 },
-      { id: '2', designation: 'Formation', quantite: 2, prixUnitaire: 500, tva: 7.7 },
-    ],
-    statut: 'envoye',
-    dateCreation: '2024-01-15',
-    dateEcheance: '2024-02-15',
-  },
-  {
-    id: '2',
-    numero: 'DEV-2024-002',
-    clientId: '2',
-    lignes: [
-      { id: '1', designation: 'Développement web', quantite: 40, prixUnitaire: 80, tva: 7.7 },
-    ],
-    statut: 'brouillon',
-    dateCreation: '2024-01-20',
-  },
-];
+let devis: Devis[] = [];
 
-let factures: Facture[] = [
-  {
-    id: '1',
-    numero: 'FAC-2024-001',
-    clientId: '1',
-    lignes: [
-      { id: '1', designation: 'Prestation conseil', quantite: 10, prixUnitaire: 150, tva: 7.7 },
-    ],
-    statut: 'paye',
-    dateCreation: '2024-01-10',
-    dateEcheance: '2024-02-10',
-    datePaiement: '2024-01-25',
-  },
-];
+let factures: Facture[] = [];
 
-let depenses: Depense[] = [
-  {
-    id: 'dep-1',
-    fournisseur: 'Orange',
-    montant: 89.9,
-    dateEcheance: '2025-12-10',
-    statut: 'paye',
-    note: 'Abonnement mobile',
-  },
-  {
-    id: 'dep-2',
-    fournisseur: 'Adobe',
-    montant: 62,
-    dateEcheance: '2025-12-05',
-    statut: 'a_payer',
-    note: 'Creative Cloud',
-  },
-  {
-    id: 'dep-3',
-    fournisseur: 'OVH',
-    montant: 129,
-    dateEcheance: '2025-12-20',
-    statut: 'a_payer',
-  },
-];
+let depenses: Depense[] = [];
 
-let evenements: EvenementCalendrier[] = [
-  {
-    id: '1',
-    titre: 'Réunion client ABC',
-    description: 'Présentation du projet',
-    date: '2024-02-01',
-    heure: '14:00',
-    type: 'rdv',
-  },
-  {
-    id: '2',
-    titre: 'Relancer facture FAC-2024-001',
-    date: '2024-02-05',
-    type: 'tache',
-  },
-];
+let evenements: EvenementCalendrier[] = [];
 
 let parametres: Parametres = {
   nomEntreprise: 'Mon Entreprise',

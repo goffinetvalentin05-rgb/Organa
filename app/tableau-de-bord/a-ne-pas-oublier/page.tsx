@@ -2,8 +2,30 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { calculerTotalTTC, depensesAPI, devisAPI, facturesAPI, Depense, Devis, Facture } from "@/lib/mock-data";
+import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { Eye } from "@/lib/icons";
+
+interface Depense {
+  id: string;
+  fournisseur: string;
+  montant: number;
+  dateEcheance: string;
+  statut: "a_payer" | "paye";
+}
+
+interface DocumentClient {
+  nom?: string;
+}
+
+interface DocumentBase {
+  id: string;
+  numero: string;
+  client?: DocumentClient;
+  lignes: any[];
+  statut: string;
+  dateCreation: string;
+  dateEcheance?: string | null;
+}
 
 type RappelItem = {
   id: string;
@@ -66,13 +88,41 @@ const isOlderThanDays = (value?: string, days = 7) => {
 
 export default function ANePasOublierPage() {
   const [depenses, setDepenses] = useState<Depense[]>([]);
-  const [factures, setFactures] = useState<Facture[]>([]);
-  const [devis, setDevis] = useState<Devis[]>([]);
+  const [factures, setFactures] = useState<DocumentBase[]>([]);
+  const [devis, setDevis] = useState<DocumentBase[]>([]);
 
   useEffect(() => {
-    setDepenses(depensesAPI.getAll());
-    setFactures(facturesAPI.getAll());
-    setDevis(devisAPI.getAll());
+    const loadAll = async () => {
+      try {
+        const [depensesRes, facturesRes, devisRes] = await Promise.all([
+          fetch("/api/depenses", { cache: "no-store" }),
+          fetch("/api/documents?type=invoice", { cache: "no-store" }),
+          fetch("/api/documents?type=quote", { cache: "no-store" }),
+        ]);
+
+        if (depensesRes.ok) {
+          const depensesData = await depensesRes.json();
+          setDepenses(depensesData.depenses || []);
+        }
+
+        if (facturesRes.ok) {
+          const facturesData = await facturesRes.json();
+          setFactures(facturesData.documents || []);
+        }
+
+        if (devisRes.ok) {
+          const devisData = await devisRes.json();
+          setDevis(devisData.documents || []);
+        }
+      } catch (error) {
+        console.error("[A-ne-pas-oublier] Erreur chargement:", error);
+        setDepenses([]);
+        setFactures([]);
+        setDevis([]);
+      }
+    };
+
+    void loadAll();
   }, []);
 
   const enRetard = useMemo<RappelItem[]>(() => {

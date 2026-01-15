@@ -4,16 +4,24 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {
-  facturesAPI,
-  calendrierAPI,
-  calculerTotalHT,
-  calculerTVA,
-  calculerTotalTTC,
-  Facture,
-} from "@/lib/mock-data";
+import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
+import { calendrierAPI } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, FileText } from "@/lib/icons";
+
+interface Facture {
+  id: string;
+  numero: string;
+  clientId?: string | null;
+  client?: { nom?: string; email?: string };
+  lignes: any[];
+  statut: "brouillon" | "envoye" | "paye" | "en-retard";
+  dateCreation: string;
+  dateEcheance?: string | null;
+  datePaiement?: string | null;
+  notes?: string | null;
+  type?: string;
+}
 
 export default function FactureDetailPage() {
   const router = useRouter();
@@ -28,30 +36,56 @@ export default function FactureDetailPage() {
       router.push("/tableau-de-bord/factures");
       return;
     }
-    const factureItem = facturesAPI.getById(id);
-    if (!factureItem) {
-      router.push("/tableau-de-bord/factures");
-      return;
-    }
-    setFacture(factureItem);
-    
-    // Charger la devise depuis les settings
-    fetch("/api/settings")
-      .then((res) => res.json())
-      .then((data) => {
+
+    const loadFacture = async () => {
+      try {
+        const response = await fetch(`/api/documents?id=${id}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          router.push("/tableau-de-bord/factures");
+          return;
+        }
+        const data = await response.json();
+        if (!data.document || data.document.type !== "invoice") {
+          router.push("/tableau-de-bord/factures");
+          return;
+        }
+        setFacture(data.document);
+      } catch (error) {
+        console.error("[Facture] Erreur chargement:", error);
+        router.push("/tableau-de-bord/factures");
+      }
+    };
+
+    const loadCurrency = async () => {
+      try {
+        const res = await fetch("/api/settings", { cache: "no-store" });
+        const data = await res.json();
         if (data.settings?.currency) {
           setCurrency(data.settings.currency);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Erreur lors du chargement de la devise:", err);
-      });
+      }
+    };
+
+    void loadFacture();
+    void loadCurrency();
   }, [id, router]);
 
-  const handleDelete = () => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) {
-      facturesAPI.delete(id);
+  const handleDelete = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) return;
+    try {
+      const response = await fetch(`/api/documents?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression de la facture");
+      }
       router.push("/tableau-de-bord/factures");
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de la suppression");
     }
   };
 
@@ -103,10 +137,26 @@ export default function FactureDetailPage() {
     window.print();
   };
 
-  const handleChangerStatut = (nouveauStatut: Facture["statut"]) => {
-    if (facture) {
-      facturesAPI.update(id, { statut: nouveauStatut });
+  const handleChangerStatut = async (nouveauStatut: Facture["statut"]) => {
+    if (!facture) return;
+    try {
+      const response = await fetch("/api/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          type: "invoice",
+          statut: nouveauStatut,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour du statut");
+      }
+
       setFacture({ ...facture, statut: nouveauStatut });
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de la mise à jour du statut");
     }
   };
 

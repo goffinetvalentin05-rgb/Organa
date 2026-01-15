@@ -2,9 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Eye, Plus, Trash } from "@/lib/icons";
-import { depensesAPI, Depense } from "@/lib/mock-data";
 
 type DepenseStatut = "a_payer" | "paye";
+
+interface Depense {
+  id: string;
+  fournisseur: string;
+  montant: number;
+  dateEcheance: string;
+  statut: DepenseStatut;
+  note?: string;
+  pieceJointe?: {
+    name: string;
+    url?: string;
+    type: string;
+  };
+}
 
 const formatMontant = (montant: number) => {
   return new Intl.NumberFormat("fr-FR", {
@@ -55,6 +68,8 @@ const getStatutColor = (statut: string) => {
 
 export default function DepensesPage() {
   const [depenses, setDepenses] = useState<Depense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fournisseur: "",
@@ -66,8 +81,26 @@ export default function DepensesPage() {
   });
 
   useEffect(() => {
-    setDepenses(depensesAPI.getAll());
+    void loadDepenses();
   }, []);
+
+  const loadDepenses = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const response = await fetch("/api/depenses", { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des dépenses");
+      }
+      const data = await response.json();
+      setDepenses(data.depenses || []);
+    } catch (error: any) {
+      setErrorMessage(error?.message || "Erreur lors du chargement des dépenses");
+      setDepenses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const depensesTriees = useMemo(() => {
     return [...depenses].sort((a, b) => {
@@ -86,7 +119,7 @@ export default function DepensesPage() {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const montant = Number.parseFloat(formData.montant);
     if (!formData.fournisseur || !formData.dateEcheance || Number.isNaN(montant)) {
@@ -96,7 +129,6 @@ export default function DepensesPage() {
     const pieceJointe = formData.pieceJointe
       ? {
           name: formData.pieceJointe.name,
-          url: URL.createObjectURL(formData.pieceJointe),
           type: formData.pieceJointe.type,
         }
       : undefined;
@@ -110,16 +142,38 @@ export default function DepensesPage() {
       pieceJointe,
     };
 
-    depensesAPI.create(nouvelleDepense);
-    setDepenses(depensesAPI.getAll());
-    resetForm();
-    setShowForm(false);
+    try {
+      const response = await fetch("/api/depenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nouvelleDepense),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la création de la dépense");
+      }
+
+      await loadDepenses();
+      resetForm();
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Supprimer cette dépense ?")) return;
-    depensesAPI.delete(id);
-    setDepenses(depensesAPI.getAll());
+    try {
+      const response = await fetch(`/api/depenses?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression de la dépense");
+      }
+      await loadDepenses();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleVoir = (depense: Depense) => {
@@ -276,7 +330,16 @@ export default function DepensesPage() {
       )}
 
       <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-        {depensesTriees.length === 0 ? (
+        {loading ? (
+          <div className="p-12 text-center">
+            <p className="text-white/70">Chargement...</p>
+          </div>
+        ) : errorMessage ? (
+          <div className="p-12 text-center">
+            <p className="text-red-400 mb-2">Erreur lors du chargement</p>
+            <p className="text-white/70 text-sm">{errorMessage}</p>
+          </div>
+        ) : depensesTriees.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-white/70 mb-4">
               Aucune dépense enregistrée pour le moment
@@ -340,7 +403,7 @@ export default function DepensesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-white/70">
-                        {depense.pieceJointe ? (
+                        {depense.pieceJointe?.url ? (
                           <a
                             href={depense.pieceJointe.url}
                             download={depense.pieceJointe.name}

@@ -1,9 +1,81 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
+
+// GET /api/documents - Lister ou récupérer un document
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user || !user.id) {
+      console.error("[API][documents][GET] Erreur auth:", authError);
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+
+    const { searchParams } = request.nextUrl;
+    const type = searchParams.get("type");
+    const id = searchParams.get("id");
+
+    let query = supabase
+      .from("documents")
+      .select(
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, client:clients(id, nom, email, telephone, adresse)"
+      )
+      .eq("user_id", user.id);
+
+    if (type) {
+      query = query.eq("type", type);
+    }
+
+    if (id) {
+      const { data, error } = await query.eq("id", id).single();
+      if (error || !data) {
+        console.error("[API][documents][GET] Document introuvable:", error);
+        return NextResponse.json(
+          { error: "Document introuvable" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        { document: formatDocument(data) },
+        { status: 200 }
+      );
+    }
+
+    const { data, error } = await query.order("created_at", {
+      ascending: false,
+    });
+
+    if (error) {
+      console.error("[API][documents][GET] Erreur Supabase:", error);
+      return NextResponse.json(
+        { error: "Erreur lors du chargement des documents" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { documents: (data || []).map(formatDocument) },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("[API][documents][GET] Erreur inattendue:", error);
+    return NextResponse.json(
+      { error: "Erreur lors du chargement des documents", details: error.message },
+      { status: 500 }
+    );
+  }
+}
 
 // POST /api/documents - Créer un nouveau document
 export async function POST(request: NextRequest) {
@@ -260,6 +332,90 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// DELETE /api/documents - Supprimer un document
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user || !user.id) {
+      console.error("[API][documents][DELETE] Erreur auth:", authError);
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+
+    const { searchParams } = request.nextUrl;
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID du document requis" },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase
+      .from("documents")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("[API][documents][DELETE] Erreur Supabase:", error);
+      return NextResponse.json(
+        { error: "Erreur lors de la suppression du document" },
+        { status: 500 }
+      );
+    }
+
+    revalidatePath("/tableau-de-bord");
+    revalidatePath("/tableau-de-bord/devis");
+    revalidatePath("/tableau-de-bord/factures");
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error: any) {
+    console.error("[API][documents][DELETE] Erreur inattendue:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+function formatDocument(doc: any) {
+  const toNumber = (value: any) =>
+    typeof value === "number" ? value : Number(value) || 0;
+
+  const client = Array.isArray(doc.client) ? doc.client[0] : doc.client;
+
+  return {
+    id: doc.id,
+    numero: doc.numero || "",
+    type: doc.type,
+    statut: doc.status || "brouillon",
+    dateCreation: doc.date_creation || "",
+    dateEcheance: doc.date_echeance || null,
+    datePaiement: doc.date_paiement || null,
+    lignes: Array.isArray(doc.items) ? doc.items : [],
+    totalHT: toNumber(doc.total_ht),
+    totalTVA: toNumber(doc.total_tva),
+    totalTTC: toNumber(doc.total_ttc),
+    notes: doc.notes || "",
+    clientId: doc.client_id || null,
+    client: client
+      ? {
+          id: client.id,
+          nom: client.nom,
+          email: client.email,
+          telephone: client.telephone,
+          adresse: client.adresse,
+        }
+      : null,
+  };
+}
 // PATCH /api/documents - Mettre à jour un document existant
 export async function PATCH(request: NextRequest) {
   try {
