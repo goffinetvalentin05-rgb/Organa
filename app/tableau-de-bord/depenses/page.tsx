@@ -232,7 +232,7 @@ export default function DepensesPage() {
   };
 
   const onUpdateExpense = async () => {
-    console.log("update expense clicked");
+    console.log("CLICK ENREGISTRER OK");
     if (!selectedDepense) return;
     const amount = Number.parseFloat(editFormData.amount);
     if (!editFormData.label || !editFormData.date || Number.isNaN(amount)) {
@@ -754,7 +754,10 @@ export default function DepensesPage() {
                   Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div
+                className="flex gap-3"
+                style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+              >
                 <button
                   type="button"
                   onClick={() => {
@@ -769,6 +772,7 @@ export default function DepensesPage() {
                 <button
                   type="button"
                   onClick={onUpdateExpense}
+                  style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
                   className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
                 >
                   Enregistrer
