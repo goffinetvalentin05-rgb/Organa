@@ -182,8 +182,15 @@ export default function DepensesPage() {
     return publicUrlData.publicUrl;
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  // Cause du bug: les boutons dépendaient du submit HTML et étaient recouverts par un overlay,
+  // ce qui empêchait le clic de remonter. On force un handler explicite + z-index/pointer-events.
+  const openCreateForm = () => {
+    console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
+    setShowForm(true);
+  };
+
+  const onCreateExpense = async () => {
+    console.log("CLICK AJOUTER DEPENSE OK");
     const amount = Number.parseFloat(formData.amount);
     if (!formData.label || !formData.date || Number.isNaN(amount)) {
       return;
@@ -337,8 +344,12 @@ export default function DepensesPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowForm((value) => !value)}
+          onClick={() => {
+            console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
+            setShowForm((value) => !value);
+          }}
           className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
+          style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
         >
           <Plus className="w-5 h-5" />
           Nouvelle dépense
@@ -346,10 +357,7 @@ export default function DepensesPage() {
       </div>
 
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4"
-        >
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">
@@ -446,7 +454,10 @@ export default function DepensesPage() {
               Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div
+            className="flex gap-3"
+            style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+          >
             <button
               type="button"
               onClick={() => {
@@ -458,13 +469,15 @@ export default function DepensesPage() {
               Annuler
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={onCreateExpense}
               className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+              style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter la dépense
             </button>
           </div>
-        </form>
+        </div>
       )}
 
       <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
@@ -483,8 +496,10 @@ export default function DepensesPage() {
               Aucune dépense enregistrée pour le moment
             </p>
             <button
-              onClick={() => setShowForm(true)}
+              type="button"
+              onClick={openCreateForm}
               className="inline-block px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+              style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter votre première dépense
             </button>
