@@ -232,6 +232,7 @@ export default function DepensesPage() {
 
   const handleUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
+    console.log("submit update expense");
     if (!selectedDepense) return;
     const amount = Number.parseFloat(editFormData.amount);
     if (!editFormData.label || !editFormData.date || Number.isNaN(amount)) {
