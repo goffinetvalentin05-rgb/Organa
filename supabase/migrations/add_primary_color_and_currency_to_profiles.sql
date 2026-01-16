@@ -31,3 +31,4 @@ COMMENT ON COLUMN public.profiles.currency IS 'Devise de facturation par défaut
 
 
 
+

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Eye, Plus, Trash } from "@/lib/icons";
+import { createClient } from "@/lib/supabase/client";
 
 type DepenseStatut = "a_payer" | "paye";
 
@@ -88,12 +89,30 @@ export default function DepensesPage() {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const response = await fetch("/api/depenses", { cache: "no-store" });
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement des dépenses");
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("expenses")
+        .select("*")
+        .order("date", { ascending: false });
+
+      if (error) {
+        throw new Error(error.message || "Erreur lors du chargement des dépenses");
       }
-      const data = await response.json();
-      setDepenses(data.depenses || []);
+
+      const depensesChargees = (data ?? []).map((depense: any) => ({
+        id: depense.id,
+        fournisseur: depense.label || "",
+        montant:
+          typeof depense.amount === "number"
+            ? depense.amount
+            : Number(depense.amount) || 0,
+        dateEcheance: depense.date || "",
+        statut: "a_payer" as DepenseStatut,
+        note: undefined,
+        pieceJointe: undefined,
+      }));
+
+      setDepenses(depensesChargees);
     } catch (error: any) {
       setErrorMessage(error?.message || "Erreur lors du chargement des dépenses");
       setDepenses([]);
@@ -104,7 +123,7 @@ export default function DepensesPage() {
 
   const depensesTriees = useMemo(() => {
     return [...depenses].sort((a, b) => {
-      return a.dateEcheance.localeCompare(b.dateEcheance);
+      return b.dateEcheance.localeCompare(a.dateEcheance);
     });
   }, [depenses]);
 
@@ -143,13 +162,24 @@ export default function DepensesPage() {
     };
 
     try {
-      const response = await fetch("/api/depenses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nouvelleDepense),
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Erreur lors de la création de la dépense");
+      }
+
+      const { error } = await supabase.from("expenses").insert({
+        label: nouvelleDepense.fournisseur,
+        amount: nouvelleDepense.montant,
+        date: nouvelleDepense.dateEcheance,
+        user_id: user.id,
       });
 
-      if (!response.ok) {
+      if (error) {
         throw new Error("Erreur lors de la création de la dépense");
       }
 
@@ -164,10 +194,10 @@ export default function DepensesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Supprimer cette dépense ?")) return;
     try {
-      const response = await fetch(`/api/depenses?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
+      const supabase = createClient();
+      const { error } = await supabase.from("expenses").delete().eq("id", id);
+
+      if (error) {
         throw new Error("Erreur lors de la suppression de la dépense");
       }
       await loadDepenses();
