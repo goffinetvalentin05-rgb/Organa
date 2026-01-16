@@ -71,6 +71,7 @@ export default function DepensesPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDepense, setSelectedDepense] = useState<Depense | null>(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [formData, setFormData] = useState({
     label: "",
     amount: "",
@@ -230,9 +231,8 @@ export default function DepensesPage() {
     }
   };
 
-  const handleUpdate = async (event: React.FormEvent) => {
-    event.preventDefault();
-    console.log("submit update expense");
+  const onUpdateExpense = async () => {
+    console.log("update expense clicked");
     if (!selectedDepense) return;
     const amount = Number.parseFloat(editFormData.amount);
     if (!editFormData.label || !editFormData.date || Number.isNaN(amount)) {
@@ -240,6 +240,8 @@ export default function DepensesPage() {
     }
 
     try {
+      if (updateLoading) return;
+      setUpdateLoading(true);
       const supabase = createClient();
       const {
         data: { user },
@@ -279,8 +281,10 @@ export default function DepensesPage() {
       resetEditForm();
       setShowEditModal(false);
       setSelectedDepense(null);
+      setUpdateLoading(false);
     } catch (error) {
       console.error(error);
+      setUpdateLoading(false);
     }
   };
 
@@ -653,7 +657,7 @@ export default function DepensesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleUpdate} className="space-y-4">
+            <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-white/90 mb-2">
@@ -763,13 +767,14 @@ export default function DepensesPage() {
                   Annuler
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={onUpdateExpense}
                   className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
                 >
                   Enregistrer
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
