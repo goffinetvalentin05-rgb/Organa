@@ -7,38 +7,38 @@ export default function Home() {
       <LandingNav />
       <main className="pt-24">
         <section className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl rounded-[48px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 md:p-12 shadow-[0_22px_70px_rgba(15,23,42,0.06)]">
+          <div className="mx-auto max-w-6xl rounded-[52px] border border-cyan-100 bg-gradient-to-br from-cyan-500/90 via-cyan-500 to-teal-400/90 p-8 md:p-12 shadow-[0_28px_80px_rgba(14,116,144,0.25)]">
             <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] items-center">
-              <div className="text-left">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-slate-900">
+              <div className="text-left text-white">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight">
                   Moins d'administratif.
                   <br />
                   Plus de temps pour ce qui compte vraiment.
                 </h1>
-                <p className="mt-6 text-lg text-slate-600 leading-relaxed">
+                <p className="mt-6 text-lg text-white/90 leading-relaxed">
                   Organa automatise votre administratif pour libérer du temps client, garder une
                   vision claire de vos documents et piloter l’activité sans friction.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
                     href="/inscription"
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-3 text-sm font-semibold text-white shadow-sm ring-1 ring-slate-900/10 hover:bg-slate-800 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-cyan-900 shadow-sm hover:bg-cyan-50 transition-colors"
                   >
                     Découvrir Organa
                   </Link>
                   <Link
                     href="#tarifs"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white/70 px-7 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/15 px-7 py-3 text-sm font-semibold text-white hover:bg-white/20 transition-colors"
                   >
                     Tarifs
                   </Link>
                 </div>
               </div>
               <div className="relative">
-                <div className="rounded-[40px] border border-slate-200 bg-white/90 p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-                  <div className="relative h-80 rounded-[32px] bg-gradient-to-br from-indigo-100/80 via-white to-fuchsia-100/80">
-                    <div className="absolute -top-8 right-8 h-28 w-28 rounded-full bg-indigo-200/70 blur-2xl" />
-                    <div className="absolute bottom-6 left-6 h-32 w-32 rounded-full bg-fuchsia-200/70 blur-2xl" />
+                <div className="rounded-[40px] border border-white/40 bg-white/95 p-8 shadow-[0_22px_50px_rgba(15,23,42,0.12)]">
+                  <div className="relative h-80 rounded-[32px] bg-gradient-to-br from-cyan-50 via-white to-teal-50">
+                    <div className="absolute -top-8 right-8 h-28 w-28 rounded-full bg-cyan-200/70 blur-2xl" />
+                    <div className="absolute bottom-6 left-6 h-32 w-32 rounded-full bg-teal-200/70 blur-2xl" />
 
                     <div className="absolute left-6 top-6 w-64 rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
                       <div className="flex items-center justify-between">
@@ -152,49 +152,43 @@ export default function Home() {
         </section>
 
         <section className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-start">
-            <div className="grid gap-6 md:grid-cols-2">
+          <div className="mx-auto max-w-6xl rounded-[52px] border border-cyan-100 bg-gradient-to-br from-cyan-500/90 via-cyan-500 to-teal-400/90 p-8 md:p-12 shadow-[0_28px_80px_rgba(14,116,144,0.22)]">
+            <div className="text-white">
+              <p className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                Valeur
+              </p>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold">
+                Une base claire pour piloter l’activité.
+              </h2>
+              <p className="mt-4 text-lg text-white/90">
+                Organa centralise les documents, fluidifie les tâches et donne une lecture nette de
+                votre activité.
+              </p>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Reprendre le contrôle",
-                  description: "Une base claire pour tout votre administratif.",
-                },
-                {
-                  title: "Centraliser l’essentiel",
+                  title: "Centralisation",
                   description: "Factures, devis, clients et suivi au même endroit.",
                 },
                 {
-                  title: "Structurer les tâches",
-                  description: "Moins de ressaisies, plus de fluidité au quotidien.",
+                  title: "Automatisation",
+                  description: "Moins de ressaisies, plus de continuité.",
+                },
+                {
+                  title: "Pilotage",
+                  description: "Encours visibles et actions à jour.",
                 },
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-[32px] border border-slate-200 bg-white p-7 shadow-[0_16px_36px_rgba(15,23,42,0.06)]"
+                  className="rounded-[28px] border border-white/40 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)]"
                 >
-                  <div className="mb-4 h-10 w-10 rounded-full bg-slate-100 ring-1 ring-slate-200" />
+                  <div className="mb-4 h-10 w-10 rounded-full bg-cyan-100 ring-1 ring-cyan-200" />
                   <p className="text-sm font-semibold text-slate-900">{item.title}</p>
                   <p className="mt-2 text-sm text-slate-600">{item.description}</p>
                 </div>
               ))}
-            </div>
-            <div className="rounded-[44px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-              <div className="space-y-4">
-                {[
-                  { label: "Factures", value: "Automatisées" },
-                  { label: "Devis", value: "Rapides" },
-                  { label: "Clients", value: "Centralisés" },
-                  { label: "Suivi", value: "Visible" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between rounded-[22px] border border-slate-200 bg-white px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-fuchsia-100 ring-1 ring-fuchsia-200" />
-                      <p className="text-sm font-semibold text-slate-900">{item.label}</p>
-                    </div>
-                    <span className="text-xs font-semibold text-slate-500">{item.value}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </section>
@@ -260,7 +254,7 @@ export default function Home() {
         </section>
 
         <section className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl rounded-[48px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 md:p-12 shadow-[0_22px_70px_rgba(15,23,42,0.06)]">
+          <div className="mx-auto max-w-6xl rounded-[52px] border border-cyan-100 bg-gradient-to-br from-cyan-500/90 via-cyan-500 to-teal-400/90 p-8 md:p-12 shadow-[0_28px_80px_rgba(14,116,144,0.22)]">
             <h2 className="text-3xl md:text-4xl font-semibold text-slate-900">
               Pourquoi les entreprises font confiance à Organa
             </h2>
@@ -320,14 +314,14 @@ export default function Home() {
         </section>
 
         <section className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl rounded-[48px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 px-8 py-12 text-center shadow-[0_22px_70px_rgba(15,23,42,0.06)] md:px-12">
-            <h2 className="text-3xl md:text-4xl font-semibold text-slate-900">
+          <div className="mx-auto max-w-6xl rounded-[52px] border border-cyan-100 bg-gradient-to-br from-cyan-500/90 via-cyan-500 to-teal-400/90 px-8 py-12 text-center shadow-[0_28px_80px_rgba(14,116,144,0.22)] md:px-12">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white">
               Prêt à simplifier votre gestion administrative ?
             </h2>
             <div className="mt-6">
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-3 text-sm font-semibold text-white shadow-sm ring-1 ring-slate-900/10 hover:bg-slate-800 transition-colors"
+                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-cyan-900 shadow-sm hover:bg-cyan-50 transition-colors"
               >
                 Découvrir Organa
               </Link>
