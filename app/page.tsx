@@ -116,13 +116,52 @@ export default function Home() {
               </div>
               <div className="mt-10 grid gap-6 md:grid-cols-4">
                 {[
-                  { title: "Devis rapides", text: "Créer, envoyer et valider en quelques clics." },
-                  { title: "Factures propres", text: "Documents cohérents, prêts à l’envoi." },
-                  { title: "Clients centralisés", text: "Coordonnées et historique au même endroit." },
-                  { title: "Suivi clair", text: "Statuts visibles et actions à jour." },
+                  {
+                    title: "Devis rapides",
+                    text: "Créer un devis, l’envoyer, puis le convertir en facture.",
+                    icon: (
+                      <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6M9 17h6" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: "Factures propres",
+                    text: "Générer des factures PDF et suivre les paiements.",
+                    icon: (
+                      <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5h6M9 9h6M6 3h12v18l-2-1-2 1-2-1-2 1-2-1-2 1V3z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: "Clients centralisés",
+                    text: "Fiches clients uniques avec historique des documents.",
+                    icon: (
+                      <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 20v-2a4 4 0 0 0-3-3.87" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: "Suivi clair",
+                    text: "Voir payé, en attente ou en retard d’un coup d’œil.",
+                    icon: (
+                      <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 15l4-4 3 3 5-6" />
+                      </svg>
+                    ),
+                  },
                 ].map((card) => (
                   <div key={card.title} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
-                    <div className="mb-4 h-10 w-10 rounded-full bg-cyan-100 ring-1 ring-cyan-200" />
+                    <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 ring-1 ring-cyan-200">
+                      {card.icon}
+                    </div>
                     <p className="text-sm font-semibold text-slate-900">{card.title}</p>
                     <p className="mt-2 text-sm text-slate-600">{card.text}</p>
                   </div>
@@ -130,12 +169,41 @@ export default function Home() {
               </div>
               <div className="mt-8 grid gap-6 md:grid-cols-3">
                 {[
-                  { title: "Relances automatiques", text: "Rappels intégrés pour vos paiements." },
-                  { title: "Documents personnalisés", text: "Logo, entête et coordonnées intégrés." },
-                  { title: "Calendrier intégré", text: "Tâches et échéances visibles." },
+                  {
+                    title: "Relances automatiques",
+                    text: "Rappels intégrés pour factures en attente.",
+                    icon: (
+                      <svg className="h-5 w-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a2.5 2.5 0 0 0 2.5-2.5h-5A2.5 2.5 0 0 0 12 22z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 8a6 6 0 1 0-12 0v4l-2 2h16l-2-2V8z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: "Documents personnalisés",
+                    text: "Logo, entête, coordonnées et IBAN intégrés.",
+                    icon: (
+                      <svg className="h-5 w-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h10l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: "Calendrier intégré",
+                    text: "Tâches, échéances et relances au même endroit.",
+                    icon: (
+                      <svg className="h-5 w-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 2v4M8 2v4M3 10h18" />
+                      </svg>
+                    ),
+                  },
                 ].map((card) => (
                   <div key={card.title} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
-                    <div className="mb-4 h-10 w-10 rounded-full bg-indigo-100 ring-1 ring-indigo-200" />
+                    <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 ring-1 ring-indigo-200">
+                      {card.icon}
+                    </div>
                     <p className="text-sm font-semibold text-slate-900">{card.title}</p>
                     <p className="mt-2 text-sm text-slate-600">{card.text}</p>
                   </div>
@@ -158,12 +226,12 @@ export default function Home() {
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               {[
-                { title: "Clients", text: "Saisissez une fois, réutilisez partout." },
-                { title: "Devis", text: "Création rapide et envoi direct." },
-                { title: "Factures", text: "Conversion immédiate sans ressaisie." },
-                { title: "Identité", text: "Documents homogènes et professionnels." },
-                { title: "Dashboard", text: "Encours visibles et actions claires." },
-                { title: "Suivi", text: "Paiements et tâches au même endroit." },
+                { title: "Clients", text: "Fiche client unique, réutilisée sur chaque document." },
+                { title: "Devis", text: "Créer, envoyer, puis valider sans double saisie." },
+                { title: "Factures", text: "Générer la facture et suivre le paiement." },
+                { title: "Identité", text: "Logo, entête et coordonnées intégrés." },
+                { title: "Dashboard", text: "Voir immédiatement payé, en attente ou en retard." },
+                { title: "Suivi", text: "Tâches, relances et échéances centralisées." },
               ].map((card, index) => (
                 <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
                   <div className="flex items-start gap-4">
@@ -175,6 +243,79 @@ export default function Home() {
                       <p className="mt-2 text-sm text-slate-600">{card.text}</p>
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 pb-16 md:pb-24">
+          <div className="mx-auto max-w-6xl rounded-[44px] border border-slate-200 bg-white p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)] md:p-10">
+            <div className="text-center">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Bénéfices</p>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold text-slate-900">
+                Des gains concrets, visibles dès la première semaine.
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  title: "Temps gagné",
+                  text: "Moins de ressaisies et de relances manuelles.",
+                },
+                {
+                  title: "Suivi fiable",
+                  text: "Encours, paiements et retards visibles immédiatement.",
+                },
+                {
+                  title: "Documents cohérents",
+                  text: "Même structure, même identité, à chaque envoi.",
+                },
+              ].map((card) => (
+                <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 ring-1 ring-cyan-200">
+                    <svg className="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-900">{card.title}</p>
+                  <p className="mt-2 text-sm text-slate-600">{card.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 pb-16 md:pb-24">
+          <div className="mx-auto max-w-6xl rounded-[44px] border border-slate-200 bg-white p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)] md:p-10">
+            <div className="text-center">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">FAQ</p>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold text-slate-900">
+                Réponses rapides aux questions clés.
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {[
+                {
+                  question: "À qui s’adresse Organa ?",
+                  answer: "Aux indépendants et PME qui veulent structurer leur administratif.",
+                },
+                {
+                  question: "Puis-je commencer gratuitement ?",
+                  answer: "Oui, un plan gratuit permet de tester les bases du produit.",
+                },
+                {
+                  question: "Mes données sont-elles sécurisées ?",
+                  answer: "Oui, elles sont hébergées sur une infrastructure cloud sécurisée.",
+                },
+                {
+                  question: "Est-ce adapté aux PME ?",
+                  answer: "Oui, Organa est conçu pour des équipes petites à moyennes.",
+                },
+              ].map((item) => (
+                <div key={item.question} className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
+                  <p className="text-sm font-semibold text-slate-900">{item.question}</p>
+                  <p className="mt-2 text-sm text-slate-600">{item.answer}</p>
                 </div>
               ))}
             </div>
