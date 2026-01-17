@@ -65,14 +65,8 @@ export default function LandingNav() {
           >
             <Link
               href="/connexion"
-              className="px-5 py-2 rounded-lg bg-white/5 text-white font-semibold text-sm border border-white/15 hover:bg-white/10 hover:border-blue-400/40 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500 relative group overflow-hidden"
+              className="px-5 py-2 rounded-lg bg-white/5 text-white font-semibold text-sm border border-white/15 hover:bg-white/10 hover:border-blue-400/40 transition-all duration-500"
             >
-              <motion.div 
-                className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-              />
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-              />
               Connexion
             </Link>
           </motion.div>
