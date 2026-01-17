@@ -43,52 +43,44 @@ export default function Home() {
 
                     <div className="absolute left-6 top-6 w-64 rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold text-slate-500">Tableau de bord</p>
-                        <span className="text-xs text-slate-400">30 jours</span>
+                        <div className="h-8 w-8 rounded-full bg-indigo-100 ring-1 ring-indigo-200" />
+                        <div className="h-2 w-16 rounded-full bg-slate-100" />
                       </div>
-                      <div className="mt-3 grid grid-cols-2 gap-3">
-                        {[
-                          { label: "Clients", value: "24" },
-                          { label: "Devis", value: "32" },
-                          { label: "Factures", value: "48" },
-                          { label: "Encours", value: "12.5k CHF" },
-                        ].map((stat) => (
-                          <div key={stat.label} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                            <p className="text-[11px] text-slate-500">{stat.label}</p>
-                            <p className="text-sm font-semibold text-slate-900">{stat.value}</p>
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        {Array.from({ length: 4 }).map((_, index) => (
+                          <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+                            <div className="h-2 w-12 rounded-full bg-slate-200" />
+                            <div className="mt-2 h-3 w-16 rounded-full bg-slate-300" />
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="absolute right-8 top-16 w-52 rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
-                      <p className="text-xs font-semibold text-slate-500">Facture #1284</p>
-                      <p className="mt-2 text-sm font-semibold text-slate-900">Envoyée</p>
-                      <div className="mt-3 space-y-2 text-xs text-slate-600">
-                        <div className="flex items-center justify-between">
-                          <span>Client</span>
-                          <span className="font-medium text-slate-700">Studio Atlas</span>
+                    <div className="absolute right-8 top-14 w-52 rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-fuchsia-100 ring-1 ring-fuchsia-200" />
+                        <div className="space-y-2">
+                          <div className="h-2 w-20 rounded-full bg-slate-200" />
+                          <div className="h-2 w-14 rounded-full bg-slate-100" />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span>Montant</span>
-                          <span className="font-medium text-slate-700">2 450 CHF</span>
-                        </div>
+                      </div>
+                      <div className="mt-4 space-y-3">
+                        <div className="h-2 w-full rounded-full bg-slate-100" />
+                        <div className="h-2 w-5/6 rounded-full bg-slate-100" />
+                        <div className="h-2 w-2/3 rounded-full bg-slate-100" />
                       </div>
                     </div>
 
                     <div className="absolute bottom-8 right-10 w-60 rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
-                      <p className="text-xs font-semibold text-slate-500">Clients récents</p>
-                      <div className="mt-3 space-y-3 text-xs text-slate-600">
-                        {[
-                          { name: "Maison Rivage", status: "Actif" },
-                          { name: "Nordline", status: "Devis envoyé" },
-                          { name: "Atelier Hugo", status: "En suivi" },
-                        ].map((client) => (
-                          <div key={client.name} className="flex items-center justify-between">
-                            <span className="font-medium text-slate-700">{client.name}</span>
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">
-                              {client.status}
-                            </span>
+                      <div className="flex items-center justify-between">
+                        <div className="h-3 w-24 rounded-full bg-slate-200" />
+                        <div className="h-6 w-6 rounded-full bg-indigo-100 ring-1 ring-indigo-200" />
+                      </div>
+                      <div className="mt-4 space-y-3">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <div className="h-2 w-24 rounded-full bg-slate-100" />
+                            <div className="h-2 w-12 rounded-full bg-slate-200" />
                           </div>
                         ))}
                       </div>
@@ -118,40 +110,34 @@ export default function Home() {
                 réellement de la valeur.
               </p>
             </div>
-            <div className="grid gap-5">
-              {[
-                "Votre temps est trop précieux pour être perdu dans l'administratif. Pourtant, ce sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.",
-                "Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux… L'administratif s'accumule, ralentit votre activité et devient une charge mentale permanente.",
-                "Ce temps perdu a un coût réel : moins de disponibilité pour vos clients, moins d'énergie pour développer votre entreprise, et moins de temps investi là où il crée réellement de la valeur.",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]"
-                >
-                  <p className="text-sm leading-relaxed text-slate-700">{item}</p>
-                </div>
-              ))}
+            <div className="rounded-[36px] border border-slate-200 bg-slate-50 p-8 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+              <div className="grid gap-4">
+                {[
+                  "Factures",
+                  "Devis",
+                  "Clients",
+                  "Documents",
+                  "Calendrier",
+                  "Suivi",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-center justify-between rounded-[22px] border border-slate-200 bg-white px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-indigo-100 ring-1 ring-indigo-200" />
+                      <div className="h-2 w-24 rounded-full bg-slate-200" />
+                    </div>
+                    <div className="h-2 w-12 rounded-full bg-slate-100" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="px-6 py-16 md:py-24">
           <div className="mx-auto max-w-6xl grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-start">
-            <div className="rounded-[44px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-              <p className="text-lg text-slate-700 leading-relaxed">
-                Organa a été conçu pour reprendre le contrôle de votre administratif.
-              </p>
-              <div className="mt-6 grid gap-4">
-                {[
-                  "La plateforme centralise les éléments essentiels de votre gestion : factures, devis, clients et suivi administratif, au même endroit.",
-                  "En simplifiant et en structurant vos tâches administratives, Organa vous permet de gérer plus efficacement votre activité et de vous concentrer sur ce qui fait réellement avancer votre entreprise.",
-                ].map((item) => (
-                  <div key={item} className="rounded-[28px] border border-slate-200 bg-white p-5">
-                    <p className="text-sm leading-relaxed text-slate-700">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
             <div className="grid gap-6 md:grid-cols-2">
               {[
                 "Organa a été conçu pour reprendre le contrôle de votre administratif.",
@@ -167,6 +153,24 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <div className="rounded-[44px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+              <div className="space-y-4">
+                {[
+                  "Factures",
+                  "Devis",
+                  "Clients",
+                  "Suivi",
+                ].map((item) => (
+                  <div key={item} className="flex items-center justify-between rounded-[22px] border border-slate-200 bg-white px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-fuchsia-100 ring-1 ring-fuchsia-200" />
+                      <div className="h-2 w-20 rounded-full bg-slate-200" />
+                    </div>
+                    <div className="h-2 w-10 rounded-full bg-slate-100" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -180,22 +184,49 @@ export default function Home() {
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               {[
-                "Créez vos clients",
-                "Créez et envoyez vos devis",
-                "Transformez vos devis en factures",
-                "Personnalisez vos documents",
-                "Pilotez votre activité depuis le dashboard",
-                "Suivez vos paiements et vos tâches",
+                {
+                  title: "Créez vos clients",
+                  description:
+                    "Vous commencez par créer vos clients dans Organa. Leurs informations sont automatiquement réutilisées pour vos devis et factures.",
+                },
+                {
+                  title: "Créez et envoyez vos devis",
+                  description:
+                    "À partir d'un client, vous créez un devis en quelques clics. Vous pouvez l'envoyer par e-mail depuis Organa ou le télécharger.",
+                },
+                {
+                  title: "Transformez vos devis en factures",
+                  description:
+                    "Une fois le devis validé, vous le transformez instantanément en facture, sans ressaisie ni perte d'information.",
+                },
+                {
+                  title: "Personnalisez vos documents",
+                  description:
+                    "Vous configurez vos paramètres : logo, en-tête, coordonnées, informations bancaires. Tous vos documents reflètent automatiquement votre identité.",
+                },
+                {
+                  title: "Pilotez votre activité depuis le dashboard",
+                  description:
+                    "Le dashboard vous offre une vue claire sur votre activité : documents en cours, factures payées ou en attente, actions à effectuer.",
+                },
+                {
+                  title: "Suivez vos paiements et vos tâches",
+                  description:
+                    "Vous suivez l'état de vos documents et organisez vos tâches grâce au calendrier intégré.",
+                },
               ].map((item, index) => (
                 <div
-                  key={item}
+                  key={item.title}
                   className="rounded-[32px] border border-slate-200 bg-slate-50 p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]"
                 >
                   <div className="flex items-start gap-4">
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
                       {index + 1}
                     </span>
-                    <p className="text-sm font-semibold text-slate-900">{item}</p>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -210,13 +241,26 @@ export default function Home() {
             </h2>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {[
-                "Sécurité et confidentialité des données",
-                "Une plateforme fiable, accessible quand vous en avez besoin",
-                "Conçu pour les indépendants et les PME",
+                {
+                  title: "Sécurité et confidentialité des données",
+                  description:
+                    "Vos données sont hébergées sur une infrastructure cloud sécurisée et protégées par des mécanismes d'accès stricts.",
+                },
+                {
+                  title: "Une plateforme fiable, accessible quand vous en avez besoin",
+                  description:
+                    "Organa repose sur une infrastructure robuste, conçue pour être stable et disponible au quotidien.",
+                },
+                {
+                  title: "Conçu pour les indépendants et les PME",
+                  description:
+                    "Organa a été pensé pour répondre aux besoins concrets des petites entreprises et des indépendants. Une interface claire, des actions simples, sans complexité inutile ni fonctionnalités superflues. Un outil pensé pour le terrain, pas pour compliquer votre quotidien.",
+                },
               ].map((item) => (
-                <div key={item} className="rounded-[28px] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+                <div key={item.title} className="rounded-[28px] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
                   <div className="mb-4 h-10 w-10 rounded-full bg-slate-100 ring-1 ring-slate-200" />
-                  <p className="text-sm text-slate-700">{item}</p>
+                  <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.description}</p>
                 </div>
               ))}
             </div>
