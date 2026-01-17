@@ -498,7 +498,7 @@ export default function ParametresPage() {
   if (loadingSettings || !parametres) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-white/70">Chargement des paramètres...</p>
+        <p className="text-secondary">Chargement des paramètres...</p>
       </div>
     );
   }
@@ -512,7 +512,7 @@ export default function ParametresPage() {
       {/* En-tête */}
       <div>
         <h1 className="text-3xl font-bold">Paramètres</h1>
-        <p className="mt-2 text-white/70">
+        <p className="mt-2 text-secondary">
           Configurez votre entreprise et votre marque
         </p>
       </div>
@@ -525,25 +525,25 @@ export default function ParametresPage() {
       )}
 
       {/* Section Abonnement */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <h2 className="text-xl font-semibold mb-4">Abonnement</h2>
         
         {loadingPlan ? (
-          <p className="text-white/70">Chargement...</p>
+          <p className="text-secondary">Chargement...</p>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg font-medium">
-                  Plan actuel : <span className="text-[#7C5CFF]">{userPlan === "pro" ? "Pro" : "Gratuit"}</span>
+                  Plan actuel : <span className="accent">{userPlan === "pro" ? "Pro" : "Gratuit"}</span>
                 </p>
                 {userPlan === "free" && (
-                  <p className="text-sm text-white/70 mt-1">
+                  <p className="text-sm text-secondary mt-1">
                     Limite : 2 clients, 3 documents par mois
                   </p>
                 )}
                 {userPlan === "pro" && (
-                  <p className="text-sm text-white/70 mt-1">
+                  <p className="text-sm text-secondary mt-1">
                     Accès illimité à toutes les fonctionnalités
                   </p>
                 )}
@@ -553,7 +553,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={handleUpgradeToPro}
                   disabled={loadingCheckout}
-                  className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingCheckout ? "Chargement..." : "🚀 Passer à Pro"}
                 </button>
@@ -565,9 +565,9 @@ export default function ParametresPage() {
               )}
             </div>
             {userPlan === "free" && (
-              <div className="mt-4 p-4 bg-[#7C5CFF]/10 border border-[#7C5CFF]/30 rounded-lg">
-                <p className="text-sm text-white/90 font-medium mb-2">Plan Pro - 29 CHF / mois</p>
-                <ul className="text-sm text-white/70 space-y-1 list-disc list-inside">
+              <div className="mt-4 p-4 accent-bg-light accent-border rounded-lg border">
+                <p className="text-sm text-primary font-medium mb-2">Plan Pro - 29 CHF / mois</p>
+                <ul className="text-sm text-secondary space-y-1 list-disc list-inside">
                   <li>Clients illimités</li>
                   <li>Documents illimités</li>
                   <li>Toutes les fonctionnalités</li>
@@ -580,15 +580,15 @@ export default function ParametresPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section Marque */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <h2 className="text-xl font-semibold mb-4">Marque</h2>
           
           <div className="mb-6">
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Logo de l'entreprise
             </label>
             <div className="flex items-start gap-6">
-              <div className="w-32 h-32 rounded-xl border border-white/20 bg-black/40 flex items-center justify-center overflow-hidden relative group">
+              <div className="w-32 h-32 rounded-xl border border-subtle-hover bg-surface flex items-center justify-center overflow-hidden relative group">
                 {logoPreview ? (
                   <Image
                     src={logoPreview}
@@ -599,7 +599,7 @@ export default function ParametresPage() {
                     unoptimized={logoPreview.includes("supabase.co")}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-white/50 p-4">
+                  <div className="flex flex-col items-center justify-center text-tertiary p-4">
                     <Building2 className="w-12 h-12 mb-2" />
                     <span className="text-xs text-center">Aucun logo</span>
                   </div>
@@ -607,7 +607,7 @@ export default function ParametresPage() {
               </div>
               <div className="flex-1 space-y-3">
                 <div>
-                  <label className="inline-block px-4 py-2 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all cursor-pointer flex items-center gap-2">
+                  <label className="inline-block px-4 py-2 accent-bg text-white font-medium rounded-lg transition-all cursor-pointer flex items-center gap-2">
                     {uploading ? (
                       <>
                         <Loader className="w-4 h-4 animate-spin" />
@@ -627,7 +627,7 @@ export default function ParametresPage() {
                       className="hidden"
                     />
                   </label>
-                  <p className="text-xs text-white/50 mt-2">
+                  <p className="text-xs text-tertiary mt-2">
                     Formats acceptés : PNG, JPG, SVG (max 5MB)
                   </p>
                 </div>
@@ -656,7 +656,7 @@ export default function ParametresPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Style d'en-tête
             </label>
             <select
@@ -667,19 +667,19 @@ export default function ParametresPage() {
                   styleEnTete: e.target.value as "simple" | "moderne" | "classique",
                 })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
               <option value="simple">Simple</option>
               <option value="moderne">Moderne</option>
               <option value="classique">Classique</option>
             </select>
-            <p className="text-xs text-white/50 mt-2">
+            <p className="text-xs text-tertiary mt-2">
               Style utilisé pour l'affichage des documents (devis, factures)
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Couleur principale
             </label>
             <div className="flex items-center gap-4">
@@ -689,7 +689,7 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, primaryColor: e.target.value })
                 }
-                className="h-12 w-20 rounded-lg border border-white/20 bg-black/40 cursor-pointer"
+                className="h-12 w-20 rounded-lg border border-subtle-hover bg-surface cursor-pointer"
               />
               <input
                 type="text"
@@ -701,16 +701,16 @@ export default function ParametresPage() {
                   }
                 }}
                 placeholder="#6D5EF8"
-                className="flex-1 rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] font-mono"
+                className="flex-1 rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] font-mono"
               />
             </div>
-            <p className="text-xs text-white/50 mt-2">
+            <p className="text-xs text-tertiary mt-2">
               Couleur utilisée pour le nom de l'entreprise et les éléments visuels sur les factures PDF
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Devise de facturation
             </label>
             <select
@@ -718,7 +718,7 @@ export default function ParametresPage() {
               onChange={(e) =>
                 setFormData({ ...formData, currency: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
               <option value="CHF">CHF - Franc suisse</option>
               <option value="EUR">EUR - Euro</option>
@@ -728,19 +728,19 @@ export default function ParametresPage() {
               <option value="AUD">AUD - Dollar australien</option>
               <option value="JPY">JPY - Yen japonais</option>
             </select>
-            <p className="text-xs text-white/50 mt-2">
+            <p className="text-xs text-tertiary mt-2">
               Devise par défaut utilisée sur les devis et factures
             </p>
           </div>
         </div>
 
         {/* Section Informations entreprise */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <h2 className="text-xl font-semibold mb-4">Informations entreprise</h2>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Nom de l'entreprise *
               </label>
               <input
@@ -750,12 +750,12 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, nomEntreprise: e.target.value })
                 }
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Adresse *
               </label>
               <textarea
@@ -765,13 +765,13 @@ export default function ParametresPage() {
                   setFormData({ ...formData, adresse: e.target.value })
                 }
                 rows={3}
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Email *
                 </label>
                 <input
@@ -781,12 +781,12 @@ export default function ParametresPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Téléphone *
                 </label>
                 <input
@@ -796,7 +796,7 @@ export default function ParametresPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, telephone: e.target.value })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
             </div>
@@ -804,15 +804,15 @@ export default function ParametresPage() {
         </div>
 
         {/* Section Informations bancaires */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <h2 className="text-xl font-semibold mb-4">Informations bancaires</h2>
-          <p className="text-sm text-white/70 mb-4">
+          <p className="text-sm text-secondary mb-4">
             Ces informations seront affichées sur les factures et devis PDF.
           </p>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 IBAN
               </label>
               <input
@@ -822,12 +822,12 @@ export default function ParametresPage() {
                   setFormData({ ...formData, iban: e.target.value })
                 }
                 placeholder="CH93 0076 2011 6238 5295 7"
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Nom de la banque
               </label>
               <input
@@ -837,12 +837,12 @@ export default function ParametresPage() {
                   setFormData({ ...formData, bankName: e.target.value })
                 }
                 placeholder="Banque Suisse"
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Conditions de paiement
               </label>
               <textarea
@@ -852,9 +852,9 @@ export default function ParametresPage() {
                 }
                 placeholder="Paiement à réception, délai de paiement : 30 jours"
                 rows={3}
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-tertiary mt-1">
                 Conditions affichées dans le footer des PDF
               </p>
             </div>
@@ -862,15 +862,15 @@ export default function ParametresPage() {
         </div>
 
         {/* Section Email */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <h2 className="text-xl font-semibold mb-4">Configuration Email</h2>
-          <p className="text-sm text-white/70 mb-4">
+          <p className="text-sm text-secondary mb-4">
             Configurez l'envoi d'emails pour les devis et factures. Utilisez{" "}
             <a
               href="https://resend.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#7C5CFF] hover:underline"
+              className="accent hover:underline"
             >
               Resend
             </a>{" "}
@@ -879,7 +879,7 @@ export default function ParametresPage() {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Nom de l'expéditeur
               </label>
               <input
@@ -889,15 +889,15 @@ export default function ParametresPage() {
                   setFormData({ ...formData, nomExpediteur: e.target.value })
                 }
                 placeholder="Organa"
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-tertiary mt-1">
                 Nom affiché dans les emails envoyés
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Email de l'expéditeur *
               </label>
               <input
@@ -908,15 +908,15 @@ export default function ParametresPage() {
                   setFormData({ ...formData, emailExpediteur: e.target.value })
                 }
                 placeholder="noreply@votredomaine.com"
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-tertiary mt-1">
                 Doit être un domaine vérifié dans Resend
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Clé API Resend *
               </label>
               <input
@@ -927,15 +927,15 @@ export default function ParametresPage() {
                   setFormData({ ...formData, resendApiKey: e.target.value })
                 }
                 placeholder="re_xxxxxxxxxxxxx"
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-tertiary mt-1">
                 Obtenez votre clé API sur{" "}
                 <a
                   href="https://resend.com/api-keys"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#7C5CFF] hover:underline"
+                  className="accent hover:underline"
                 >
                   resend.com/api-keys
                 </a>
@@ -948,7 +948,7 @@ export default function ParametresPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
           >
             💾 Enregistrer les paramètres
           </button>
@@ -958,4 +958,8 @@ export default function ParametresPage() {
     </>
   );
 }
+
+
+
+
 

@@ -76,7 +76,7 @@ export default function EditClientForm({
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Modifier le client</h1>
-        <p className="mt-2 text-white/70">Modifier les informations du client</p>
+        <p className="mt-2 text-secondary">Modifier les informations du client</p>
       </div>
 
       {error && (
@@ -86,9 +86,9 @@ export default function EditClientForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Nom *
             </label>
             <input
@@ -98,11 +98,11 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Email
             </label>
             <input
@@ -111,11 +111,11 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Téléphone
             </label>
             <input
@@ -124,11 +124,11 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, telephone: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Adresse
             </label>
             <textarea
@@ -137,7 +137,7 @@ export default function EditClientForm({
                 setFormData({ ...formData, adresse: e.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
         </div>
@@ -145,14 +145,14 @@ export default function EditClientForm({
         <div className="flex gap-3">
           <Link
             href="/tableau-de-bord/clients"
-            className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all text-center"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all text-center"
           >
             Annuler
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? "Enregistrement..." : "Enregistrer les modifications"}
           </button>
@@ -161,6 +161,9 @@ export default function EditClientForm({
     </div>
   );
 }
+
+
+
 
 
 

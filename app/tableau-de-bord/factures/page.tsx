@@ -91,13 +91,13 @@ export default function FacturesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Factures</h1>
-          <p className="mt-2 text-white/70">
+          <p className="mt-2 text-secondary">
             Gérez vos factures et suivez les paiements
           </p>
         </div>
         <Link
           href="/tableau-de-bord/factures/nouvelle"
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
+          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           Créer une facture
@@ -105,22 +105,22 @@ export default function FacturesPage() {
       </div>
 
       {/* Liste */}
-      <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-white/70">Chargement...</p>
+            <p className="text-secondary">Chargement...</p>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
             <p className="text-red-400 mb-2">Erreur lors du chargement</p>
-            <p className="text-white/70 text-sm">{errorMessage}</p>
+            <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : factures.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-white/70 mb-4">Aucune facture pour le moment</p>
+            <p className="text-secondary mb-4">Aucune facture pour le moment</p>
             <Link
               href="/tableau-de-bord/factures/nouvelle"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
             >
               Créer votre première facture
             </Link>
@@ -128,24 +128,24 @@ export default function FacturesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/10">
+              <thead className="bg-surface border-b border-subtle">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Numéro
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Client
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Montant
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Statut
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
                     Actions
                   </th>
                 </tr>
@@ -156,12 +156,12 @@ export default function FacturesPage() {
                   return (
                     <tr
                       key={facture.id}
-                      className="hover:bg-white/5 transition-colors"
+                      className="hover:bg-surface transition-colors"
                     >
                       <td className="px-6 py-4 font-medium">
                         {facture.numero}
                       </td>
-                      <td className="px-6 py-4 text-white/70">
+                      <td className="px-6 py-4 text-secondary">
                         {facture.client?.nom || "Client inconnu"}
                       </td>
                       <td className="px-6 py-4 font-semibold">
@@ -176,14 +176,14 @@ export default function FacturesPage() {
                           {getStatutLabel(facture.statut)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-white/70">
+                      <td className="px-6 py-4 text-secondary">
                         {facture.dateCreation}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/tableau-de-bord/factures/${facture.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-1.5"
                           >
                             <Eye className="w-4 h-4" />
                             Voir
@@ -208,6 +208,10 @@ export default function FacturesPage() {
     </div>
   );
 }
+
+
+
+
 
 
 

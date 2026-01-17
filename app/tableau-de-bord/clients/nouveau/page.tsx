@@ -67,7 +67,7 @@ export default function NouveauClientPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Nouveau client</h1>
-        <p className="mt-2 text-white/70">Ajouter un nouveau client</p>
+        <p className="mt-2 text-secondary">Ajouter un nouveau client</p>
       </div>
 
       {/* Message d'erreur pour limite atteinte */}
@@ -77,15 +77,15 @@ export default function NouveauClientPage() {
 
       {/* Message d'erreur générique */}
       {error?.type === "OTHER" && (
-        <div className="rounded-xl border border-red-500/50 bg-red-500/10 p-4 backdrop-blur-sm">
+        <div className="rounded-xl border border-red-500/50 bg-red-500/10 p-4">
           <p className="text-red-400">{error.message}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Nom *
             </label>
             <input
@@ -95,11 +95,11 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Email *
             </label>
             <input
@@ -109,11 +109,11 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Téléphone
             </label>
             <input
@@ -122,11 +122,11 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, telephone: e.target.value })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Adresse
             </label>
             <textarea
@@ -135,7 +135,7 @@ export default function NouveauClientPage() {
                 setFormData({ ...formData, adresse: e.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
         </div>
@@ -144,14 +144,14 @@ export default function NouveauClientPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
           >
             Annuler
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Création..." : "Créer le client"}
           </button>
@@ -160,6 +160,10 @@ export default function NouveauClientPage() {
     </div>
   );
 }
+
+
+
+
 
 
 

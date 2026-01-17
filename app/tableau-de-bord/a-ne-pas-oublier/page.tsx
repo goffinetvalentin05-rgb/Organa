@@ -188,7 +188,7 @@ export default function ANePasOublierPage() {
   const afficherTableau = (items: RappelItem[]) => {
     if (items.length === 0) {
       return (
-        <div className="p-6 text-sm text-white/60">
+        <div className="p-6 text-sm text-secondary">
           Aucun élément à afficher pour le moment.
         </div>
       );
@@ -197,30 +197,30 @@ export default function ANePasOublierPage() {
     return (
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-white/5 border-b border-white/10">
+          <thead className="bg-surface border-b border-subtle">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                 Type
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                 Nom
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                 Montant
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                 Date d&apos;échéance
               </th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-white/90">
+              <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
                 Lien
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-white/5 transition-colors">
+              <tr key={item.id} className="hover:bg-surface transition-colors">
                 <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/80">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-hover text-secondary">
                     {item.type}
                   </span>
                 </td>
@@ -228,13 +228,13 @@ export default function ANePasOublierPage() {
                 <td className="px-6 py-4 font-semibold">
                   {formatMontant(item.montant)}
                 </td>
-                <td className="px-6 py-4 text-white/70">
+                <td className="px-6 py-4 text-secondary">
                   {formatDate(item.dateEcheance)}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <Link
                     href={item.href}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
                   >
                     <Eye className="w-4 h-4" />
                     Voir
@@ -254,36 +254,36 @@ export default function ANePasOublierPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">À ne pas oublier</h1>
-        <p className="mt-2 text-white/70">
+        <p className="mt-2 text-secondary">
           Une vue claire et priorisée de ce qui nécessite votre attention.
         </p>
       </div>
 
       {rienAAfficher && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm text-white/70">
+        <div className="rounded-xl border border-subtle bg-surface p-6 text-secondary">
           Tout est à jour. Rien d&apos;urgent pour le moment.
         </div>
       )}
 
       <div className="space-y-6">
-        <section className="rounded-xl border border-red-500/30 bg-red-500/10 backdrop-blur-sm overflow-hidden">
+        <section className="rounded-xl border border-red-500/30 bg-red-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-red-500/20">
             <h2 className="text-lg font-semibold text-white">
               🔴 Priorité — En retard
             </h2>
-            <p className="text-sm text-white/70 mt-1">
+            <p className="text-sm text-secondary mt-1">
               Éléments dont la date d&apos;échéance est dépassée.
             </p>
           </div>
           {afficherTableau(enRetard)}
         </section>
 
-        <section className="rounded-xl border border-orange-500/30 bg-orange-500/10 backdrop-blur-sm overflow-hidden">
+        <section className="rounded-xl border border-orange-500/30 bg-orange-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-orange-500/20">
             <h2 className="text-lg font-semibold text-white">
               🟠 À venir prochainement
             </h2>
-            <p className="text-sm text-white/70 mt-1">
+            <p className="text-sm text-secondary mt-1">
               Dépenses à payer bientôt et devis envoyés sans réponse.
             </p>
           </div>
@@ -293,4 +293,8 @@ export default function ANePasOublierPage() {
     </div>
   );
 }
+
+
+
+
 

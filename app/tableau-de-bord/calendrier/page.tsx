@@ -193,13 +193,13 @@ export default function CalendrierPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Calendrier & Tâches</h1>
-          <p className="mt-2 text-white/70">
+          <p className="mt-2 text-secondary">
             Gérez vos rendez-vous et tâches
           </p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
+          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           {ongletActif === "taches" ? "Nouvelle tâche" : "Nouvel événement"}
@@ -207,13 +207,13 @@ export default function CalendrierPage() {
       </div>
 
       {/* Onglets */}
-      <div className="flex gap-2 border-b border-white/10">
+      <div className="flex gap-2 border-b border-subtle">
         <button
           onClick={() => setOngletActif("calendrier")}
           className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "calendrier"
-              ? "border-b-2 border-[#7C5CFF] text-white"
-              : "text-white/70 hover:text-white"
+              ? "border-b-2 accent-border-strong text-white"
+              : "text-secondary hover:text-white"
           }`}
         >
           <Calendar className="w-5 h-5" />
@@ -223,8 +223,8 @@ export default function CalendrierPage() {
           onClick={() => setOngletActif("taches")}
           className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "taches"
-              ? "border-b-2 border-[#7C5CFF] text-white"
-              : "text-white/70 hover:text-white"
+              ? "border-b-2 accent-border-strong text-white"
+              : "text-secondary hover:text-white"
           }`}
         >
           <CheckCircle className="w-5 h-5" />
@@ -240,19 +240,19 @@ export default function CalendrierPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={moisPrecedent}
-                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
               >
                 ←
               </button>
               <button
                 onClick={allerAujourdhui}
-                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
               >
                 Aujourd'hui
               </button>
               <button
                 onClick={moisSuivant}
-                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
               >
                 →
               </button>
@@ -265,8 +265,8 @@ export default function CalendrierPage() {
                 onClick={() => setVueCalendrier("calendrier")}
                 className={`px-4 py-2 rounded-lg transition-all ${
                   vueCalendrier === "calendrier"
-                    ? "bg-[#7C5CFF]/20 text-white"
-                    : "bg-white/10 text-white/70 hover:text-white"
+                    ? "accent-bg-light text-primary"
+                    : "bg-surface-hover text-secondary hover:text-white"
                 }`}
               >
                 Calendrier
@@ -275,8 +275,8 @@ export default function CalendrierPage() {
                 onClick={() => setVueCalendrier("liste")}
                 className={`px-4 py-2 rounded-lg transition-all ${
                   vueCalendrier === "liste"
-                    ? "bg-[#7C5CFF]/20 text-white"
-                    : "bg-white/10 text-white/70 hover:text-white"
+                    ? "accent-bg-light text-primary"
+                    : "bg-surface-hover text-secondary hover:text-white"
                 }`}
               >
                 Liste
@@ -286,10 +286,10 @@ export default function CalendrierPage() {
 
           {/* Vue Calendrier */}
           {vueCalendrier === "calendrier" && (
-            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-              <div className="grid grid-cols-7 gap-px bg-white/10">
+            <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
+              <div className="grid grid-cols-7 gap-px bg-surface-hover">
                 {nomsJours.map((jour) => (
-                  <div key={jour} className="bg-white/5 p-2 text-center text-sm font-semibold text-white/90">
+                  <div key={jour} className="bg-surface p-2 text-center text-sm font-semibold text-primary">
                     {jour}
                   </div>
                 ))}
@@ -301,11 +301,11 @@ export default function CalendrierPage() {
                   return (
                     <div
                       key={index}
-                      className={`min-h-[100px] p-2 bg-[#0B0B0F] ${
+                      className={`min-h-[100px] p-2 bg-surface ${
                         !estMoisActuel ? "opacity-30" : ""
-                      } ${estAujourdhuiDate ? "ring-2 ring-[#7C5CFF]" : ""}`}
+                      } ${estAujourdhuiDate ? "border border-accent-border" : ""}`}
                     >
-                      <div className={`text-sm mb-1 ${estAujourdhuiDate ? "font-bold text-[#7C5CFF]" : "text-white/70"}`}>
+                      <div className={`text-sm mb-1 ${estAujourdhuiDate ? "font-bold accent" : "text-secondary"}`}>
                         {date.getDate()}
                       </div>
                       <div className="space-y-1">
@@ -323,7 +323,7 @@ export default function CalendrierPage() {
                           </div>
                         ))}
                         {evenementsJour.length > 2 && (
-                          <div className="text-xs text-white/50">
+                          <div className="text-xs text-tertiary">
                             +{evenementsJour.length - 2} autre(s)
                           </div>
                         )}
@@ -337,13 +337,13 @@ export default function CalendrierPage() {
 
           {/* Vue Liste - Événements à venir */}
           {vueCalendrier === "liste" && (
-            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
+            <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
               {evenements.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-white/70 text-lg">Aucun événement à venir</p>
+                  <p className="text-secondary text-lg">Aucun événement à venir</p>
                   <button
                     onClick={() => handleOpenModal()}
-                    className="mt-4 px-6 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                    className="mt-4 px-6 py-2 rounded-lg accent-bg text-white font-medium transition-all"
                   >
                     Créer un événement
                   </button>
@@ -403,12 +403,12 @@ export default function CalendrierPage() {
                                   )}
                                 </div>
                                 {evt.description && (
-                                  <div className="text-sm text-white/70 mt-1 mb-3">
+                                  <div className="text-sm text-secondary mt-1 mb-3">
                                     {evt.description}
                                   </div>
                                 )}
-                                <div className="flex items-center gap-4 text-sm text-white/60">
-                                  <span className="font-medium text-white/80">
+                                <div className="flex items-center gap-4 text-sm text-secondary">
+                                  <span className="font-medium text-secondary">
                                     {estAujourdhuiDate
                                       ? "Aujourd'hui"
                                       : estDemain
@@ -421,15 +421,15 @@ export default function CalendrierPage() {
                                         })}
                                   </span>
                                   {evt.heure && (
-                                    <span className="px-2 py-1 rounded bg-white/10">
+                                    <span className="px-2 py-1 rounded bg-surface-hover">
                                       {evt.heure}
                                     </span>
                                   )}
-                                  <span className="px-2 py-1 rounded bg-white/10 text-xs">
+                                  <span className="px-2 py-1 rounded bg-surface-hover text-xs">
                                     {evt.type === "rdv" ? "Rendez-vous" : "Tâche"}
                                   </span>
                                   {evt.type === "tache" && evt.dateEcheance && (
-                                    <span className="text-xs text-white/50">
+                                    <span className="text-xs text-tertiary">
                                       Échéance: {new Date(evt.dateEcheance).toLocaleDateString("fr-FR")}
                                     </span>
                                   )}
@@ -443,7 +443,7 @@ export default function CalendrierPage() {
                                   className={`px-3 py-1.5 rounded-lg transition-all text-sm flex items-center justify-center ${
                                     evt.statut === "fait"
                                       ? "bg-green-500/20 hover:bg-green-500/30 text-green-300"
-                                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                                      : "bg-surface-hover hover:bg-surface text-secondary hover:text-white"
                                   }`}
                                   title={evt.statut === "fait" ? "Marquer comme à faire" : "Marquer comme terminé"}
                                 >
@@ -452,7 +452,7 @@ export default function CalendrierPage() {
                               )}
                               <button
                                 onClick={() => handleOpenModal(evt)}
-                                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
+                                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center justify-center"
                                 title="Modifier"
                               >
                                 <Edit className="w-4 h-4" />
@@ -480,17 +480,17 @@ export default function CalendrierPage() {
       {ongletActif === "taches" && (
         <div className="space-y-6">
           {/* Tâches à faire */}
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="rounded-xl border border-subtle bg-surface p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-yellow-300" />
               À faire ({tachesAFaire.length})
             </h2>
             {tachesAFaire.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-white/70 mb-4">Aucune tâche à faire</p>
+                <p className="text-secondary mb-4">Aucune tâche à faire</p>
                 <button
                   onClick={() => handleOpenModal()}
-                  className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                  className="px-6 py-2 rounded-lg accent-bg text-white font-medium transition-all"
                 >
                   Créer une tâche
                 </button>
@@ -515,18 +515,18 @@ export default function CalendrierPage() {
                     return (
                       <div
                         key={tache.id}
-                        className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20 hover:bg-black/30 transition-all"
+                        className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-black/20 hover:bg-black/30 transition-all"
                       >
                         <div className="flex items-start gap-4 flex-1">
                           <button
                             onClick={() => handleToggleStatut(tache.id, tache.statut || "a-faire")}
-                            className="w-5 h-5 rounded border-2 border-white/30 hover:border-[#7C5CFF] transition-all mt-0.5 flex-shrink-0"
+                            className="w-5 h-5 rounded border-2 border-subtle-hover hover:border-subtle transition-all mt-0.5 flex-shrink-0"
                             title="Marquer comme terminé"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-lg mb-1">{tache.titre}</div>
                             {tache.description && (
-                              <div className="text-sm text-white/70 mt-1 mb-3">{tache.description}</div>
+                              <div className="text-sm text-secondary mt-1 mb-3">{tache.description}</div>
                             )}
                             <div className="flex items-center gap-4 flex-wrap">
                               {dateEcheance && (
@@ -536,7 +536,7 @@ export default function CalendrierPage() {
                                       ? "text-red-300"
                                       : estAujourdhuiDate
                                       ? "text-yellow-300"
-                                      : "text-white/60"
+                                      : "text-secondary"
                                   }`}
                                 >
                                   {estEnRetard
@@ -551,7 +551,7 @@ export default function CalendrierPage() {
                                 </span>
                               )}
                               {!dateEcheance && (
-                                <span className="text-sm text-white/60">
+                                <span className="text-sm text-secondary">
                                   {dateTache.toLocaleDateString("fr-FR", {
                                     day: "numeric",
                                     month: "short",
@@ -560,7 +560,7 @@ export default function CalendrierPage() {
                                 </span>
                               )}
                               {tache.typeTache && (
-                                <span className="px-2 py-1 rounded bg-white/10 text-xs font-medium">
+                                <span className="px-2 py-1 rounded bg-surface-hover text-xs font-medium">
                                   {tache.typeTache === "relance" && "🔔 Relance"}
                                   {tache.typeTache === "rdv" && "📅 Rendez-vous"}
                                   {tache.typeTache === "admin" && "⚙️ Admin"}
@@ -573,7 +573,7 @@ export default function CalendrierPage() {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleOpenModal(tache)}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center justify-center"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center justify-center"
                             title="Modifier"
                           >
                             <Edit className="w-4 h-4" />
@@ -595,7 +595,7 @@ export default function CalendrierPage() {
 
           {/* Tâches faites */}
           {tachesFaites.length > 0 && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm opacity-70">
+            <div className="rounded-xl border border-subtle bg-surface p-6 opacity-70">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-300" />
                 Terminées ({tachesFaites.length})
@@ -611,7 +611,7 @@ export default function CalendrierPage() {
                   .map((tache) => (
                     <div
                       key={tache.id}
-                      className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-black/20"
+                      className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-black/20"
                     >
                       <div className="flex items-start gap-4 flex-1">
                         <button
@@ -622,10 +622,10 @@ export default function CalendrierPage() {
                           <CheckCircle className="w-3 h-3 text-white" />
                         </button>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium line-through text-white/50 text-lg mb-1">
+                          <div className="font-medium line-through text-tertiary text-lg mb-1">
                             {tache.titre}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-white/40">
+                        <div className="flex items-center gap-4 text-sm text-tertiary">
                             <span>
                               {new Date(tache.date).toLocaleDateString("fr-FR", {
                                 day: "numeric",
@@ -634,7 +634,7 @@ export default function CalendrierPage() {
                               })}
                             </span>
                             {tache.typeTache && (
-                              <span className="px-2 py-0.5 rounded bg-white/5 text-xs">
+                              <span className="px-2 py-0.5 rounded bg-surface text-xs">
                                 {tache.typeTache === "relance" && "Relance"}
                                 {tache.typeTache === "rdv" && "Rendez-vous"}
                                 {tache.typeTache === "admin" && "Admin"}
@@ -663,14 +663,14 @@ export default function CalendrierPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0B0B0F] border border-white/10 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-surface border border-subtle rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4">
               {editingEvenement ? "Modifier" : ongletActif === "taches" ? "Nouvelle tâche" : "Nouvel événement"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Type
                 </label>
                 <select
@@ -681,7 +681,7 @@ export default function CalendrierPage() {
                       type: e.target.value as "rdv" | "tache",
                     })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 >
                   <option value="rdv">Rendez-vous</option>
                   <option value="tache">Tâche</option>
@@ -690,7 +690,7 @@ export default function CalendrierPage() {
               {formData.type === "tache" && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Type de tâche
                     </label>
                     <select
@@ -701,7 +701,7 @@ export default function CalendrierPage() {
                           typeTache: e.target.value as "relance" | "rdv" | "admin" | "autre",
                         })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     >
                       <option value="relance">Relance</option>
                       <option value="rdv">Rendez-vous</option>
@@ -710,7 +710,7 @@ export default function CalendrierPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Statut
                     </label>
                     <select
@@ -721,14 +721,14 @@ export default function CalendrierPage() {
                           statut: e.target.value as "a-faire" | "fait",
                         })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     >
                       <option value="a-faire">À faire</option>
                       <option value="fait">Fait</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Date d'échéance
                     </label>
                     <input
@@ -737,13 +737,13 @@ export default function CalendrierPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, dateEcheance: e.target.value })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                 </>
               )}
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Titre *
                 </label>
                 <input
@@ -753,11 +753,11 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, titre: e.target.value })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Description
                 </label>
                 <textarea
@@ -766,11 +766,11 @@ export default function CalendrierPage() {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   rows={3}
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Date *
                 </label>
                 <input
@@ -780,11 +780,11 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Heure (optionnel)
                 </label>
                 <input
@@ -793,20 +793,20 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, heure: e.target.value })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg accent-bg text-white font-medium transition-all"
                 >
                   {editingEvenement ? "Enregistrer" : "Créer"}
                 </button>
@@ -818,3 +818,7 @@ export default function CalendrierPage() {
     </div>
   );
 }
+
+
+
+

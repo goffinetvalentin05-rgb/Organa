@@ -15,16 +15,16 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
             <AlertTriangle className="w-5 h-5" />
             Modification désactivée
           </p>
-          <p className="text-white/70 text-sm">
+          <p className="text-secondary text-sm">
             La modification des clients n'est plus disponible.
           </p>
         </div>
-        <p className="text-white/90 mb-6">
+        <p className="text-primary mb-6">
           Pour modifier un client, veuillez le supprimer et le recréer.
         </p>
         <Link
           href="/tableau-de-bord/clients"
-          className="inline-block px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+          className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
         >
           Retour à la liste des clients
         </Link>
@@ -32,3 +32,6 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
     </div>
   );
 }
+
+
+

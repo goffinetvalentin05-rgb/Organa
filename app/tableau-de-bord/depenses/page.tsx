@@ -339,7 +339,7 @@ export default function DepensesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dépenses</h1>
-          <p className="mt-2 text-white/70">
+          <p className="mt-2 text-secondary">
             Suivez vos factures reçues et vos paiements à venir
           </p>
         </div>
@@ -348,7 +348,7 @@ export default function DepensesPage() {
             console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
             setShowForm((value) => !value);
           }}
-          className="px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
+          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
           style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
         >
           <Plus className="w-5 h-5" />
@@ -357,10 +357,10 @@ export default function DepensesPage() {
       </div>
 
       {showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Fournisseur
               </label>
               <input
@@ -370,11 +370,11 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, label: event.target.value })
                 }
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Montant
               </label>
               <input
@@ -386,11 +386,11 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, amount: event.target.value })
                 }
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Date d&apos;échéance
               </label>
               <input
@@ -400,11 +400,11 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, date: event.target.value })
                 }
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Statut
               </label>
               <select
@@ -415,7 +415,7 @@ export default function DepensesPage() {
                     status: event.target.value as DepenseStatut,
                   })
                 }
-                className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               >
                 <option value="a_payer">À payer</option>
                 <option value="paye">Payé</option>
@@ -423,7 +423,7 @@ export default function DepensesPage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Note (optionnel)
             </label>
             <textarea
@@ -432,11 +432,11 @@ export default function DepensesPage() {
                 setFormData({ ...formData, notes: event.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Ajouter une pièce jointe
             </label>
             <input
@@ -448,9 +448,9 @@ export default function DepensesPage() {
                   pieceJointe: event.target.files?.[0] ?? null,
                 })
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-white/20"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-surface"
             />
-            <p className="mt-2 text-xs text-white/50">
+            <p className="mt-2 text-xs text-tertiary">
               Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
             </p>
           </div>
@@ -464,14 +464,14 @@ export default function DepensesPage() {
                 resetForm();
                 setShowForm(false);
               }}
-              className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+              className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
             >
               Annuler
             </button>
             <button
               type="button"
               onClick={onCreateExpense}
-              className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+              className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter la dépense
@@ -480,25 +480,25 @@ export default function DepensesPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-white/70">Chargement...</p>
+            <p className="text-secondary">Chargement...</p>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
             <p className="text-red-400 mb-2">Erreur lors du chargement</p>
-            <p className="text-white/70 text-sm">{errorMessage}</p>
+            <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : depensesTriees.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-white/70 mb-4">
+            <p className="text-secondary mb-4">
               Aucune dépense enregistrée pour le moment
             </p>
             <button
               type="button"
               onClick={openCreateForm}
-              className="inline-block px-6 py-3 bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium rounded-lg hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter votre première dépense
@@ -507,24 +507,24 @@ export default function DepensesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/10">
+              <thead className="bg-surface border-b border-subtle">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Fournisseur
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Montant
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Date d&apos;échéance
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Statut
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
                     Pièce jointe
                   </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-white/90">
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
                     Actions
                   </th>
                 </tr>
@@ -535,7 +535,7 @@ export default function DepensesPage() {
                   return (
                     <tr
                       key={depense.id}
-                      className="hover:bg-white/5 transition-colors"
+                      className="hover:bg-surface transition-colors"
                     >
                       <td className="px-6 py-4 font-medium">
                         {depense.label}
@@ -543,7 +543,7 @@ export default function DepensesPage() {
                       <td className="px-6 py-4 font-semibold">
                         {formatMontant(depense.amount)}
                       </td>
-                      <td className="px-6 py-4 text-white/70">
+                      <td className="px-6 py-4 text-secondary">
                         {formatDate(depense.date)}
                       </td>
                       <td className="px-6 py-4">
@@ -555,21 +555,21 @@ export default function DepensesPage() {
                           {getStatutLabel(statutAffiche)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-white/70">
+                      <td className="px-6 py-4 text-secondary">
                         {depense.attachmentUrl ? "📎" : "-"}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleVoir(depense)}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-1.5"
                           >
                             <Eye className="w-4 h-4" />
                             Voir
                           </button>
                           <button
                             onClick={() => handleModifier(depense)}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
                           >
                             Modifier
                           </button>
@@ -593,7 +593,7 @@ export default function DepensesPage() {
 
       {showViewModal && selectedDepense && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-2xl rounded-xl border border-white/10 bg-[#0F0F14] p-6 space-y-6">
+          <div className="w-full max-w-2xl rounded-xl border border-subtle bg-surface p-6 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">Dépense</h2>
               <button
@@ -601,40 +601,40 @@ export default function DepensesPage() {
                   setShowViewModal(false);
                   setSelectedDepense(null);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
               >
                 Fermer
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="rounded-lg bg-white/5 p-4">
-                <p className="text-xs uppercase text-white/50">Fournisseur</p>
+              <div className="rounded-lg bg-surface p-4">
+                <p className="text-xs uppercase text-tertiary">Fournisseur</p>
                 <p className="mt-2 font-medium break-words">
                   {selectedDepense.label}
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-4">
-                <p className="text-xs uppercase text-white/50">Montant</p>
+              <div className="rounded-lg bg-surface p-4">
+                <p className="text-xs uppercase text-tertiary">Montant</p>
                 <p className="mt-2 font-semibold">
                   {formatMontant(selectedDepense.amount)}
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-4">
-                <p className="text-xs uppercase text-white/50">Date d&apos;échéance</p>
+              <div className="rounded-lg bg-surface p-4">
+                <p className="text-xs uppercase text-tertiary">Date d&apos;échéance</p>
                 <p className="mt-2">{formatDate(selectedDepense.date)}</p>
               </div>
-              <div className="rounded-lg bg-white/5 p-4">
-                <p className="text-xs uppercase text-white/50">Statut</p>
+              <div className="rounded-lg bg-surface p-4">
+                <p className="text-xs uppercase text-tertiary">Statut</p>
                 <p className="mt-2">
                   {getStatutLabel(getStatutAffiche(selectedDepense))}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-lg bg-white/5 p-4">
-              <p className="text-xs uppercase text-white/50">Notes</p>
-              <p className="mt-2 whitespace-pre-wrap break-words text-white/80">
+            <div className="rounded-lg bg-surface p-4">
+              <p className="text-xs uppercase text-tertiary">Notes</p>
+              <p className="mt-2 whitespace-pre-wrap break-words text-secondary">
                 {selectedDepense.notes || "-"}
               </p>
             </div>
@@ -645,7 +645,7 @@ export default function DepensesPage() {
                   href={selectedDepense.attachmentUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                  className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
                 >
                   Télécharger la pièce jointe
                 </a>
@@ -657,7 +657,7 @@ export default function DepensesPage() {
 
       {showEditModal && selectedDepense && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-2xl rounded-xl border border-white/10 bg-[#0F0F14] p-6 space-y-6">
+          <div className="w-full max-w-2xl rounded-xl border border-subtle bg-surface p-6 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">Modifier la dépense</h2>
               <button
@@ -666,7 +666,7 @@ export default function DepensesPage() {
                   setSelectedDepense(null);
                   resetEditForm();
                 }}
-                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all text-sm"
+                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
               >
                 Fermer
               </button>
@@ -675,7 +675,7 @@ export default function DepensesPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/90 mb-2">
+                  <label className="block text-sm font-medium text-primary mb-2">
                     Fournisseur
                   </label>
                   <input
@@ -685,11 +685,11 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, label: event.target.value })
                     }
-                    className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/90 mb-2">
+                  <label className="block text-sm font-medium text-primary mb-2">
                     Montant
                   </label>
                   <input
@@ -701,11 +701,11 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, amount: event.target.value })
                     }
-                    className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/90 mb-2">
+                  <label className="block text-sm font-medium text-primary mb-2">
                     Date d&apos;échéance
                   </label>
                   <input
@@ -715,11 +715,11 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, date: event.target.value })
                     }
-                    className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/90 mb-2">
+                  <label className="block text-sm font-medium text-primary mb-2">
                     Statut
                   </label>
                   <select
@@ -730,7 +730,7 @@ export default function DepensesPage() {
                         status: event.target.value as DepenseStatut,
                       })
                     }
-                    className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   >
                     <option value="a_payer">À payer</option>
                     <option value="paye">Payé</option>
@@ -738,7 +738,7 @@ export default function DepensesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Notes (optionnel)
                 </label>
                 <textarea
@@ -747,11 +747,11 @@ export default function DepensesPage() {
                     setEditFormData({ ...editFormData, notes: event.target.value })
                   }
                   rows={4}
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Remplacer la pièce jointe
                 </label>
                 <input
@@ -763,9 +763,9 @@ export default function DepensesPage() {
                       pieceJointe: event.target.files?.[0] ?? null,
                     })
                   }
-                  className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-white/20"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-surface"
                 />
-                <p className="mt-2 text-xs text-white/50">
+                <p className="mt-2 text-xs text-tertiary">
                   Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
                 </p>
               </div>
@@ -780,7 +780,7 @@ export default function DepensesPage() {
                     setSelectedDepense(null);
                     resetEditForm();
                   }}
-                  className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                  className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
                 >
                   Annuler
                 </button>
@@ -788,7 +788,7 @@ export default function DepensesPage() {
                   type="button"
                   onClick={onUpdateExpense}
                   style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-                  className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+                  className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
                 >
                   Enregistrer
                 </button>
@@ -800,4 +800,8 @@ export default function DepensesPage() {
     </div>
   );
 }
+
+
+
+
 

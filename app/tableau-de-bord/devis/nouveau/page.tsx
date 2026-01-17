@@ -243,13 +243,13 @@ export default function NouveauDevisPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Nouveau devis</h1>
-        <p className="mt-2 text-white/70">Créer un nouveau devis</p>
+        <p className="mt-2 text-secondary">Créer un nouveau devis</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Client *
             </label>
             <select
@@ -257,7 +257,7 @@ export default function NouveauDevisPage() {
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
               disabled={loadingClients}
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">
                 {loadingClients ? "Chargement des clients..." : "Sélectionner un client"}
@@ -271,7 +271,7 @@ export default function NouveauDevisPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Statut
             </label>
             <select
@@ -281,7 +281,7 @@ export default function NouveauDevisPage() {
                   e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
                 )
               }
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
               <option value="brouillon">Brouillon</option>
               <option value="envoye">Envoyé</option>
@@ -291,25 +291,25 @@ export default function NouveauDevisPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2">
               Date d'échéance
             </label>
             <input
               type="date"
               value={dateEcheance}
               onChange={(e) => setDateEcheance(e.target.value)}
-              className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Lignes</h2>
             <button
               type="button"
               onClick={ajouterLigne}
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all text-sm flex items-center gap-2 border border-subtle"
+              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all text-sm flex items-center gap-2 border border-subtle"
             >
               <Plus className="w-4 h-4" />
               Ajouter une ligne
@@ -320,11 +320,11 @@ export default function NouveauDevisPage() {
             {lignes.map((ligne, index) => (
               <div
                 key={ligne.id}
-                className="p-4 rounded-lg border border-white/10 bg-black/20 space-y-3"
+                className="p-4 rounded-lg border border-subtle bg-black/20 space-y-3"
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Titre de la prestation *
                     </label>
                     <input
@@ -336,11 +336,11 @@ export default function NouveauDevisPage() {
                         })
                       }
                       placeholder="Description de la prestation"
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Description (optionnelle)
                     </label>
                     <textarea
@@ -352,11 +352,11 @@ export default function NouveauDevisPage() {
                       }
                       placeholder="Détails supplémentaires de la prestation..."
                       rows={3}
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] resize-y"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] resize-y"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Quantité
                     </label>
                     <input
@@ -369,11 +369,11 @@ export default function NouveauDevisPage() {
                           quantite: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       Prix unitaire (CHF)
                     </label>
                     <input
@@ -386,11 +386,11 @@ export default function NouveauDevisPage() {
                           prixUnitaire: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-2">
+                    <label className="block text-sm font-medium text-primary mb-2">
                       TVA (%)
                     </label>
                     <input
@@ -403,11 +403,11 @@ export default function NouveauDevisPage() {
                           tva: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div className="col-span-2 flex items-center justify-between">
-                    <div className="text-sm text-white/70">
+                    <div className="text-sm text-secondary">
                       Sous-total:{" "}
                       {new Intl.NumberFormat("fr-FR", {
                         style: "currency",
@@ -431,20 +431,20 @@ export default function NouveauDevisPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <h2 className="text-xl font-semibold mb-4">Notes</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
             placeholder="Notes additionnelles..."
-            className="w-full rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           />
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <div className="rounded-xl border border-subtle bg-surface p-6">
           <div className="space-y-2 text-right">
-            <div className="flex justify-between text-white/70">
+            <div className="flex justify-between text-secondary">
               <span>Total HT:</span>
               <span>
                 {new Intl.NumberFormat("fr-FR", {
@@ -453,7 +453,7 @@ export default function NouveauDevisPage() {
                 }).format(totalHT)}
               </span>
             </div>
-            <div className="flex justify-between text-white/70">
+            <div className="flex justify-between text-secondary">
               <span>TVA:</span>
               <span>
                 {new Intl.NumberFormat("fr-FR", {
@@ -462,7 +462,7 @@ export default function NouveauDevisPage() {
                 }).format(totalTVA)}
               </span>
             </div>
-            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-white/10">
+            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-subtle">
               <span>Total TTC:</span>
               <span>
                 {new Intl.NumberFormat("fr-FR", {
@@ -478,7 +478,7 @@ export default function NouveauDevisPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
           >
             Annuler
           </button>
@@ -486,7 +486,7 @@ export default function NouveauDevisPage() {
             type="button"
             onClick={() => saveAndOpenPdf(false)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
               <>
@@ -504,7 +504,7 @@ export default function NouveauDevisPage() {
             type="button"
             onClick={() => saveAndOpenPdf(true)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
               <>
@@ -520,7 +520,7 @@ export default function NouveauDevisPage() {
           </button>
           <button
             type="submit"
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
           >
             Créer le devis
           </button>
@@ -529,6 +529,10 @@ export default function NouveauDevisPage() {
     </div>
   );
 }
+
+
+
+
 
 
 

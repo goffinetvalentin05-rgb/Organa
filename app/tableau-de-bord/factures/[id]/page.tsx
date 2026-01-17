@@ -187,7 +187,7 @@ export default function FactureDetailPage() {
   if (!facture) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-white/70">Chargement...</p>
+        <p className="text-secondary">Chargement...</p>
       </div>
     );
   }
@@ -195,10 +195,10 @@ export default function FactureDetailPage() {
   if (!facture.lignes || !Array.isArray(facture.lignes)) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-white/70">Erreur : données de facture invalides</p>
+        <p className="text-secondary">Erreur : données de facture invalides</p>
         <Link
           href="/tableau-de-bord/factures"
-          className="text-white/70 hover:text-white mt-4 inline-block"
+          className="text-secondary hover:text-white mt-4 inline-block"
         >
           ← Retour aux factures
         </Link>
@@ -221,12 +221,12 @@ export default function FactureDetailPage() {
         <div>
           <Link
             href="/tableau-de-bord/factures"
-            className="text-white/70 hover:text-white mb-2 inline-block"
+            className="text-secondary hover:text-white mb-2 inline-block"
           >
             ← Retour aux factures
           </Link>
           <h1 className="text-3xl font-bold">{facture.numero}</h1>
-          <p className="mt-2 text-white/70">
+          <p className="mt-2 text-secondary">
             Client: {facture.client?.nom || "Client inconnu"}
           </p>
         </div>
@@ -234,7 +234,7 @@ export default function FactureDetailPage() {
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !facture.client?.email}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Mail className="w-4 h-4" />
             {envoiEmail ? "Envoi..." : "Envoyer par email"}
@@ -250,7 +250,7 @@ export default function FactureDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Eye className="w-4 h-4" />
             Prévisualiser PDF
@@ -271,7 +271,7 @@ export default function FactureDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Download className="w-4 h-4" />
             Télécharger PDF
@@ -279,7 +279,7 @@ export default function FactureDetailPage() {
           {facture.statut !== "paye" && (
             <button
               onClick={handleCreerTacheRelance}
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all flex items-center gap-2 border border-subtle"
+              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all flex items-center gap-2 border border-subtle"
             >
               <FileText className="w-4 h-4" />
               Créer tâche de relance
@@ -296,27 +296,27 @@ export default function FactureDetailPage() {
       </div>
 
       {/* Informations */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="text-sm text-white/70">Date de création</label>
+            <label className="text-sm text-secondary">Date de création</label>
             <p className="font-medium">{facture.dateCreation}</p>
           </div>
           {facture.dateEcheance && (
             <div>
-              <label className="text-sm text-white/70">Date d'échéance</label>
+              <label className="text-sm text-secondary">Date d'échéance</label>
               <p className="font-medium">{facture.dateEcheance}</p>
             </div>
           )}
           {facture.datePaiement && (
             <div>
-              <label className="text-sm text-white/70">Date de paiement</label>
+              <label className="text-sm text-secondary">Date de paiement</label>
               <p className="font-medium">{facture.datePaiement}</p>
             </div>
           )}
         </div>
         <div className="mb-4">
-          <label className="text-sm text-white/70 mb-2 block">Statut</label>
+          <label className="text-sm text-secondary mb-2 block">Statut</label>
           <select
             value={facture.statut}
             onChange={(e) =>
@@ -324,7 +324,7 @@ export default function FactureDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "paye" | "en-retard"
               )
             }
-            className="rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           >
             <option value="brouillon">Brouillon</option>
             <option value="envoye">Envoyée</option>
@@ -334,32 +334,32 @@ export default function FactureDetailPage() {
         </div>
         {facture.notes && (
           <div>
-            <label className="text-sm text-white/70 mb-2 block">Notes</label>
-            <p className="text-white/90">{facture.notes}</p>
+            <label className="text-sm text-secondary mb-2 block">Notes</label>
+            <p className="text-primary">{facture.notes}</p>
           </div>
         )}
       </div>
 
       {/* Lignes */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <h2 className="text-xl font-semibold mb-4">Lignes</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/5 border-b border-white/10">
+            <thead className="bg-surface border-b border-subtle">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-primary">
                   Désignation
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Quantité
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Prix unitaire
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   TVA
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Total
                 </th>
               </tr>
@@ -374,7 +374,7 @@ export default function FactureDetailPage() {
                       <td className="px-4 py-3">
                         <div className="font-medium">{ligne.designation || ""}</div>
                         {ligne.description && (
-                          <div className="text-sm text-white/60 mt-1 whitespace-pre-line">
+                          <div className="text-sm text-secondary mt-1 whitespace-pre-line">
                             {ligne.description}
                           </div>
                         )}
@@ -394,7 +394,7 @@ export default function FactureDetailPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-3 text-center text-white/70">
+                  <td colSpan={5} className="px-4 py-3 text-center text-secondary">
                     Aucune ligne
                   </td>
                 </tr>
@@ -404,12 +404,12 @@ export default function FactureDetailPage() {
         </div>
 
         {/* Totaux */}
-        <div className="mt-6 pt-6 border-t border-white/10 space-y-2 text-right">
-          <div className="flex justify-between text-white/70">
+        <div className="mt-6 pt-6 border-t border-subtle space-y-2 text-right">
+          <div className="flex justify-between text-secondary">
             <span>Total HT:</span>
             <span>{formatMontant(totalHT)}</span>
           </div>
-          <div className="flex justify-between text-white/70">
+          <div className="flex justify-between text-secondary">
             <span>TVA:</span>
             <span>{formatMontant(totalTVA)}</span>
           </div>
@@ -422,4 +422,7 @@ export default function FactureDetailPage() {
     </div>
   );
 }
+
+
+
 

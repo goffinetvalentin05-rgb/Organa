@@ -194,7 +194,7 @@ export default function DevisDetailPage() {
   if (!devis) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-white/70">Chargement...</p>
+        <p className="text-secondary">Chargement...</p>
       </div>
     );
   }
@@ -202,10 +202,10 @@ export default function DevisDetailPage() {
   if (!devis.lignes || !Array.isArray(devis.lignes)) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-white/70">Erreur : données de devis invalides</p>
+        <p className="text-secondary">Erreur : données de devis invalides</p>
         <Link
           href="/tableau-de-bord/devis"
-          className="text-white/70 hover:text-white mt-4 inline-block"
+          className="text-secondary hover:text-white mt-4 inline-block"
         >
           ← Retour aux devis
         </Link>
@@ -237,12 +237,12 @@ export default function DevisDetailPage() {
         <div>
           <Link
             href="/tableau-de-bord/devis"
-            className="text-white/70 hover:text-white mb-2 inline-block"
+            className="text-secondary hover:text-white mb-2 inline-block"
           >
             ← Retour aux devis
           </Link>
           <h1 className="text-3xl font-bold">{devis.numero}</h1>
-          <p className="mt-2 text-white/70">
+          <p className="mt-2 text-secondary">
             Client: {devis.client?.nom || "Client inconnu"}
           </p>
         </div>
@@ -250,7 +250,7 @@ export default function DevisDetailPage() {
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !devis.client?.email}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Mail className="w-4 h-4" />
             {envoiEmail ? "Envoi..." : "Envoyer par email"}
@@ -266,7 +266,7 @@ export default function DevisDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Eye className="w-4 h-4" />
             Prévisualiser PDF
@@ -287,14 +287,14 @@ export default function DevisDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Download className="w-4 h-4" />
             Télécharger PDF
           </button>
           <button
             onClick={handleTransformerEnFacture}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-lg accent-bg text-white font-medium transition-all flex items-center gap-2"
           >
             <ArrowRight className="w-4 h-4" />
             Transformer en facture
@@ -309,21 +309,21 @@ export default function DevisDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="text-sm text-white/70">Date de création</label>
+            <label className="text-sm text-secondary">Date de création</label>
             <p className="font-medium">{devis.dateCreation}</p>
           </div>
           {devis.dateEcheance && (
             <div>
-              <label className="text-sm text-white/70">Date d'échéance</label>
+              <label className="text-sm text-secondary">Date d'échéance</label>
               <p className="font-medium">{devis.dateEcheance}</p>
             </div>
           )}
         </div>
         <div className="mb-4">
-          <label className="text-sm text-white/70 mb-2 block">Statut</label>
+          <label className="text-sm text-secondary mb-2 block">Statut</label>
           <select
             value={devis.statut}
             onChange={(e) =>
@@ -331,7 +331,7 @@ export default function DevisDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
               )
             }
-            className="rounded-lg bg-black/40 border border-white/20 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           >
             <option value="brouillon">Brouillon</option>
             <option value="envoye">Envoyé</option>
@@ -341,31 +341,31 @@ export default function DevisDetailPage() {
         </div>
         {devis.notes && (
           <div>
-            <label className="text-sm text-white/70 mb-2 block">Notes</label>
-            <p className="text-white/90">{devis.notes}</p>
+            <label className="text-sm text-secondary mb-2 block">Notes</label>
+            <p className="text-primary">{devis.notes}</p>
           </div>
         )}
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <h2 className="text-xl font-semibold mb-4">Lignes</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/5 border-b border-white/10">
+            <thead className="bg-surface border-b border-subtle">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-primary">
                   Désignation
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Quantité
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Prix unitaire
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   TVA
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-white/90">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
                   Total
                 </th>
               </tr>
@@ -380,7 +380,7 @@ export default function DevisDetailPage() {
                       <td className="px-4 py-3">
                         <div className="font-medium">{ligne.designation || ""}</div>
                         {ligne.description && (
-                          <div className="text-sm text-white/60 mt-1 whitespace-pre-line">
+                          <div className="text-sm text-secondary mt-1 whitespace-pre-line">
                             {ligne.description}
                           </div>
                         )}
@@ -400,7 +400,7 @@ export default function DevisDetailPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-3 text-center text-white/70">
+                  <td colSpan={5} className="px-4 py-3 text-center text-secondary">
                     Aucune ligne
                   </td>
                 </tr>
@@ -409,12 +409,12 @@ export default function DevisDetailPage() {
           </table>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-white/10 space-y-2 text-right">
-          <div className="flex justify-between text-white/70">
+        <div className="mt-6 pt-6 border-t border-subtle space-y-2 text-right">
+          <div className="flex justify-between text-secondary">
             <span>Total HT:</span>
             <span>{formatMontant(totalHT)}</span>
           </div>
-          <div className="flex justify-between text-white/70">
+          <div className="flex justify-between text-secondary">
             <span>TVA:</span>
             <span>{formatMontant(totalTVA)}</span>
           </div>
@@ -427,3 +427,6 @@ export default function DevisDetailPage() {
     </div>
   );
 }
+
+
+

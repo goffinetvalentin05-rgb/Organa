@@ -314,7 +314,7 @@ export default function TableauDeBordPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link
           href="/tableau-de-bord/clients"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
+          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Clients</span>
@@ -332,7 +332,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/devis?statut=en-attente"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
+          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Devis</span>
@@ -355,7 +355,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/factures?statut=non-payees"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200 hover:shadow-lg"
+          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Factures</span>
@@ -377,7 +377,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/a-ne-pas-oublier"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200 hover:shadow-lg"
+          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">En retard</span>
@@ -448,21 +448,21 @@ export default function TableauDeBordPage() {
         <div className="flex flex-wrap gap-4">
           <Link
             href="/tableau-de-bord/devis/nouveau"
-            className="btn-primary px-6 py-3 accent-bg hover:bg-accent-hover text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
           >
             <FilePlus className="w-4 h-4" />
             Nouveau devis
           </Link>
           <Link
             href="/tableau-de-bord/factures/nouvelle"
-            className="btn-primary px-6 py-3 accent-bg hover:bg-accent-hover text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
           >
             <FilePlus className="w-4 h-4" />
             Nouvelle facture
           </Link>
           <Link
             href="/tableau-de-bord/clients/nouveau"
-            className="btn-primary px-6 py-3 accent-bg hover:bg-accent-hover text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
           >
             <UserPlus className="w-4 h-4" />
             Nouveau client
@@ -519,3 +519,7 @@ export default function TableauDeBordPage() {
     </div>
   );
 }
+
+
+
+

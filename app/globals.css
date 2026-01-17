@@ -17,9 +17,9 @@
   --blue-violet-glow: rgba(99, 102, 241, 0.3);
   
   /* Colors - Dashboard (neutre pro) */
-  --bg-dashboard: #0B1020;
-  --bg-surface: #111A33;
-  --bg-surface-hover: #152040;
+  --bg-dashboard: #0B111E;
+  --bg-surface: #111827;
+  --bg-surface-hover: #172036;
   --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.12);
   --text-primary: #FFFFFF;
@@ -84,6 +84,11 @@ body.app-bg {
 
 /* Landing page - pas de background image, utilise les gradients */
 body.app-bg:has(> div > nav) {
+  background-image: none !important;
+}
+
+/* Pages SaaS - fond sobre */
+body.app-bg:has(.dashboard-shell) {
   background-image: none !important;
 }
 
@@ -165,13 +170,38 @@ h3 {
 }
 
 .bg-surface {
-  background: rgba(17, 26, 51, 0.85);
-  backdrop-filter: blur(8px);
+  background: var(--bg-surface);
 }
 
 .bg-surface-hover {
-  background: rgba(21, 32, 64, 0.85);
-  backdrop-filter: blur(8px);
+  background: var(--bg-surface-hover);
+}
+
+/* Typographie plus dense pour le SaaS */
+.dashboard-shell h1 {
+  font-size: 2rem !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-shell h2 {
+  font-size: 1.5rem !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-shell h3 {
+  font-size: 1.25rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-shell .accent-bg:hover {
+  background: var(--accent-hover);
+}
+
+.dashboard-shell .accent-bg {
+  border: 1px solid var(--accent-border);
 }
 
 .border-subtle {
@@ -208,6 +238,10 @@ h3 {
 
 .accent-border {
   border-color: var(--accent-border);
+}
+
+.accent-border-strong {
+  border-color: var(--accent);
 }
 
 /* Animations */
