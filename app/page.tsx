@@ -36,12 +36,63 @@ export default function Home() {
                 </div>
               </div>
               <div className="relative">
-                <div className="rounded-[40px] border border-slate-200 bg-white p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-                  <div className="relative h-72 rounded-[32px] bg-gradient-to-br from-indigo-100/80 via-white to-fuchsia-100/80">
-                    <div className="absolute -top-6 right-6 h-24 w-24 rounded-full bg-indigo-200/70 blur-xl" />
-                    <div className="absolute bottom-6 left-8 h-28 w-28 rounded-full bg-fuchsia-200/70 blur-xl" />
-                    <div className="absolute top-10 left-10 h-16 w-40 rounded-full bg-white/70 ring-1 ring-slate-200" />
-                    <div className="absolute bottom-10 right-10 h-20 w-20 rounded-[24px] bg-white/70 ring-1 ring-slate-200" />
+                <div className="rounded-[40px] border border-slate-200 bg-white/90 p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+                  <div className="relative h-80 rounded-[32px] bg-gradient-to-br from-indigo-100/80 via-white to-fuchsia-100/80">
+                    <div className="absolute -top-8 right-8 h-28 w-28 rounded-full bg-indigo-200/70 blur-2xl" />
+                    <div className="absolute bottom-6 left-6 h-32 w-32 rounded-full bg-fuchsia-200/70 blur-2xl" />
+
+                    <div className="absolute left-6 top-6 w-64 rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-semibold text-slate-500">Tableau de bord</p>
+                        <span className="text-xs text-slate-400">30 jours</span>
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        {[
+                          { label: "Clients", value: "24" },
+                          { label: "Devis", value: "32" },
+                          { label: "Factures", value: "48" },
+                          { label: "Encours", value: "12.5k CHF" },
+                        ].map((stat) => (
+                          <div key={stat.label} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                            <p className="text-[11px] text-slate-500">{stat.label}</p>
+                            <p className="text-sm font-semibold text-slate-900">{stat.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="absolute right-8 top-16 w-52 rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+                      <p className="text-xs font-semibold text-slate-500">Facture #1284</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-900">Envoyée</p>
+                      <div className="mt-3 space-y-2 text-xs text-slate-600">
+                        <div className="flex items-center justify-between">
+                          <span>Client</span>
+                          <span className="font-medium text-slate-700">Studio Atlas</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Montant</span>
+                          <span className="font-medium text-slate-700">2 450 CHF</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="absolute bottom-8 right-10 w-60 rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+                      <p className="text-xs font-semibold text-slate-500">Clients récents</p>
+                      <div className="mt-3 space-y-3 text-xs text-slate-600">
+                        {[
+                          { name: "Maison Rivage", status: "Actif" },
+                          { name: "Nordline", status: "Devis envoyé" },
+                          { name: "Atelier Hugo", status: "En suivi" },
+                        ].map((client) => (
+                          <div key={client.name} className="flex items-center justify-between">
+                            <span className="font-medium text-slate-700">{client.name}</span>
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">
+                              {client.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
