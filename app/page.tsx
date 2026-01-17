@@ -101,27 +101,58 @@ export default function Home() {
         </section>
 
         <section className="bg-white px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-5xl text-left space-y-6 text-slate-700">
-            <p className="text-lg leading-relaxed">
-              Votre temps est trop précieux pour être perdu dans l'administratif. Pourtant, ce
-              sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.
-            </p>
-            <p className="text-lg leading-relaxed">
-              Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent
-              pas entre eux… L'administratif s'accumule, ralentit votre activité et devient une
-              charge mentale permanente.
-            </p>
-            <p className="text-lg leading-relaxed">
-              Ce temps perdu a un coût réel : moins de disponibilité pour vos clients, moins
-              d'énergie pour développer votre entreprise, et moins de temps investi là où il crée
-              réellement de la valeur.
-            </p>
+          <div className="mx-auto max-w-6xl grid gap-10 lg:grid-cols-[1.05fr_0.95fr] items-start">
+            <div className="space-y-6 text-slate-700">
+              <p className="text-lg leading-relaxed">
+                Votre temps est trop précieux pour être perdu dans l'administratif. Pourtant, ce
+                sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.
+              </p>
+              <p className="text-lg leading-relaxed">
+                Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent
+                pas entre eux… L'administratif s'accumule, ralentit votre activité et devient une
+                charge mentale permanente.
+              </p>
+              <p className="text-lg leading-relaxed">
+                Ce temps perdu a un coût réel : moins de disponibilité pour vos clients, moins
+                d'énergie pour développer votre entreprise, et moins de temps investi là où il crée
+                réellement de la valeur.
+              </p>
+            </div>
+            <div className="grid gap-5">
+              {[
+                "Votre temps est trop précieux pour être perdu dans l'administratif. Pourtant, ce sont encore ces tâches qui occupent une place disproportionnée dans votre quotidien.",
+                "Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux… L'administratif s'accumule, ralentit votre activité et devient une charge mentale permanente.",
+                "Ce temps perdu a un coût réel : moins de disponibilité pour vos clients, moins d'énergie pour développer votre entreprise, et moins de temps investi là où il crée réellement de la valeur.",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]"
+                >
+                  <p className="text-sm leading-relaxed text-slate-700">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         <section className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl rounded-[44px] border border-slate-200 bg-slate-50 p-8 md:p-10">
-            <div className="grid gap-6 md:grid-cols-3">
+          <div className="mx-auto max-w-6xl grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-start">
+            <div className="rounded-[44px] border border-slate-200 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+              <p className="text-lg text-slate-700 leading-relaxed">
+                Organa a été conçu pour reprendre le contrôle de votre administratif.
+              </p>
+              <div className="mt-6 grid gap-4">
+                {[
+                  "La plateforme centralise les éléments essentiels de votre gestion : factures, devis, clients et suivi administratif, au même endroit.",
+                  "En simplifiant et en structurant vos tâches administratives, Organa vous permet de gérer plus efficacement votre activité et de vous concentrer sur ce qui fait réellement avancer votre entreprise.",
+                ].map((item) => (
+                  <div key={item} className="rounded-[28px] border border-slate-200 bg-white p-5">
+                    <p className="text-sm leading-relaxed text-slate-700">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
               {[
                 "Organa a été conçu pour reprendre le contrôle de votre administratif.",
                 "La plateforme centralise les éléments essentiels de votre gestion : factures, devis, clients et suivi administratif, au même endroit.",
@@ -140,14 +171,14 @@ export default function Home() {
         </section>
 
         <section id="comment-ca-marche" className="px-6 py-16 md:py-24">
-          <div className="mx-auto max-w-6xl rounded-[44px] border border-slate-200 bg-white p-8 md:p-10">
-            <div className="max-w-2xl">
+          <div className="mx-auto max-w-6xl grid gap-10 lg:grid-cols-[1fr_1.1fr] items-start">
+            <div className="rounded-[44px] border border-slate-200 bg-white p-8 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
               <h2 className="text-3xl md:text-4xl font-semibold text-slate-900">Comment ça marche</h2>
               <p className="mt-4 text-lg text-slate-600">
                 Un fonctionnement simple, pensé pour votre gestion quotidienne.
               </p>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {[
                 "Créez vos clients",
                 "Créez et envoyez vos devis",
