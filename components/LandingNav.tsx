@@ -65,7 +65,7 @@ export default function LandingNav() {
           >
             <Link
               href="/connexion"
-              className="px-5 py-2 rounded-lg bg-white/5 text-white font-semibold text-sm border border-white/15 hover:bg-white/10 hover:border-blue-400/40 transition-all duration-500"
+              className="px-5 py-2 rounded-lg bg-white/5 text-white font-semibold text-sm border border-white/15 hover:bg-white/10 hover:border-blue-400/40 transition-all duration-300"
             >
               Connexion
             </Link>
@@ -77,16 +77,8 @@ export default function LandingNav() {
           >
             <Link
               href="/inscription"
-              className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 transition-all duration-500 border border-blue-500/30 hover:border-blue-400/60 hover:shadow-xl hover:shadow-blue-500/40 relative group overflow-hidden"
+              className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 transition-all duration-300 border border-blue-500/30 hover:border-blue-400/60"
             >
-              {/* Glow au hover */}
-              <motion.div 
-                className="absolute inset-0 bg-blue-400/30 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-              />
-              {/* Shine effect */}
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-              />
               <span className="relative z-10">Créer un compte</span>
             </Link>
           </motion.div>
