@@ -213,6 +213,229 @@
     "title": "Bereit, Ihre administrative Last zu reduzieren?",
     "paragraph": "Entdecken Sie Organa und konzentrieren Sie sich auf das, was wirklich zählt.",
     "cta": "Organa entdecken"
+  },
+  "dashboard": {
+    "brandLabel": "Dashboard",
+    "navigation": {
+      "primary": "Navigation",
+      "secondary": "Überblick",
+      "backHome": "Zur Startseite"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "clients": "Kunden",
+      "quotes": "Angebote",
+      "invoices": "Rechnungen",
+      "expenses": "Ausgaben",
+      "reminders": "Nicht vergessen",
+      "calendar": "Kalender",
+      "settings": "Einstellungen"
+    },
+    "pageTitles": {
+      "dashboard": "Dashboard",
+      "newClient": "Neuer Kunde",
+      "editClient": "Kunden bearbeiten",
+      "clients": "Kunden",
+      "quotes": "Angebote",
+      "invoices": "Rechnungen",
+      "expenses": "Ausgaben",
+      "calendar": "Kalender",
+      "settings": "Einstellungen",
+      "reminders": "Nicht vergessen"
+    },
+    "topbar": {
+      "upToDate": "Alles aktuell",
+      "connectedAs": "Angemeldet:",
+      "userFallback": "Benutzer",
+      "logout": "Abmelden"
+    },
+    "common": {
+      "loading": "Laden...",
+      "loadFailed": "Fehler beim Laden",
+      "number": "Nummer",
+      "client": "Kunde",
+      "amount": "Betrag",
+      "status": "Status",
+      "date": "Datum",
+      "actions": "Aktionen",
+      "view": "Ansehen",
+      "delete": "Löschen",
+      "unknownClient": "Unbekannter Kunde",
+      "cancel": "Abbrechen",
+      "saving": "Wird gespeichert...",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+      "unknownError": "Unbekannter Fehler"
+    },
+    "limits": {
+      "title": "Limit des Gratisplans erreicht",
+      "cta": "Pläne ansehen"
+    },
+    "clients": {
+      "authError": "Authentifizierungsfehler",
+      "loadError": "Fehler beim Laden der Kunden",
+      "title": "Kunden",
+      "subtitle": "Ein klarer Überblick über Ihre Kontakte und wichtige Informationen.",
+      "newClient": "Neuer Kunde",
+      "editDisabledTitle": "Bearbeitung vorübergehend deaktiviert",
+      "editDisabledText": "Um einen Kunden zu ändern, löschen Sie ihn und legen Sie ihn neu an. So bleiben die Daten zuverlässig.",
+      "emptyState": "Noch keine Kunden.",
+      "emptyCta": "Ersten Kunden anlegen",
+      "cardLabel": "Kunde",
+      "noName": "Ohne Namen",
+      "emailLabel": "E-Mail:",
+      "phoneLabel": "Telefon:",
+      "addressLabel": "Adresse:",
+      "notProvided": "Nicht angegeben",
+      "addressNotProvided": "Nicht angegeben",
+      "deleteConfirm": "Möchten Sie diesen Kunden wirklich löschen?",
+      "deleteError": "Fehler beim Löschen",
+      "deleteErrorDetail": "Fehler beim Löschen des Kunden",
+      "deleteAction": "Löschen",
+      "limitReached": "Limit des Gratisplans erreicht.",
+      "createError": "Fehler beim Erstellen des Kunden",
+      "newTitle": "Neuer Kunde",
+      "newSubtitle": "Neuen Kunden hinzufügen",
+      "creating": "Wird erstellt...",
+      "createAction": "Kunden erstellen",
+      "editDisabledDetail": "Die Bearbeitung von Kunden ist nicht mehr verfügbar.",
+      "editDisabledInstruction": "Um einen Kunden zu ändern, löschen Sie ihn und legen Sie ihn neu an.",
+      "backToList": "Zur Kundenliste",
+      "editTitle": "Kunden bearbeiten",
+      "editSubtitle": "Kundendaten bearbeiten",
+      "saveChanges": "Änderungen speichern",
+      "fields": {
+        "name": "Name *",
+        "email": "E-Mail *",
+        "emailOptional": "E-Mail",
+        "phone": "Telefon",
+        "address": "Adresse"
+      },
+      "errors": {
+        "missingId": "Kunden-ID fehlt",
+        "nameRequired": "Name ist erforderlich",
+        "updateError": "Fehler beim Aktualisieren des Kunden"
+      }
+    },
+    "quotes": {
+      "title": "Angebote",
+      "subtitle": "Angebote und Offerten verwalten",
+      "newAction": "Angebot erstellen",
+      "newTitle": "Neues Angebot",
+      "newSubtitle": "Neues Angebot erstellen",
+      "loadError": "Fehler beim Laden der Angebote",
+      "clientsLoadError": "Fehler beim Laden der Kunden",
+      "selectClientError": "Bitte wählen Sie einen Kunden aus",
+      "lineRequiredError": "Bitte fügen Sie mindestens eine Position mit einer Bezeichnung hinzu",
+      "createError": "Fehler beim Erstellen des Angebots",
+      "createDocumentError": "Fehler beim Erstellen des Dokuments",
+      "updateDocumentError": "Fehler beim Aktualisieren des Dokuments",
+      "saveForPdfError": "Dokument konnte nicht gespeichert werden",
+      "deleteConfirm": "Möchten Sie dieses Angebot wirklich löschen?",
+      "deleteError": "Fehler beim Löschen des Angebots",
+      "emptyState": "Noch keine Angebote",
+      "emptyCta": "Erstes Angebot erstellen",
+      "selectClient": "Kunden auswählen",
+      "loadingClients": "Kunden werden geladen...",
+      "createAction": "Angebot erstellen",
+      "saving": "Wird gespeichert...",
+      "previewPdf": "PDF-Vorschau",
+      "downloadPdf": "PDF herunterladen",
+      "fields": {
+        "client": "Kunde *",
+        "dueDate": "Fälligkeitsdatum",
+        "notes": "Notizen",
+        "notesPlaceholder": "Zusätzliche Notizen..."
+      },
+      "lines": {
+        "title": "Positionen",
+        "add": "Position hinzufügen",
+        "titleLabel": "Leistungstitel *",
+        "titlePlaceholder": "Leistungsbeschreibung",
+        "descriptionLabel": "Beschreibung (optional)",
+        "descriptionPlaceholder": "Zusätzliche Leistungsdetails...",
+        "quantity": "Menge",
+        "unitPrice": "Stückpreis (CHF)",
+        "vat": "MwSt. (%)",
+        "subtotal": "Zwischensumme:"
+      },
+      "summary": {
+        "totalHT": "Total exkl. MwSt.:",
+        "vat": "MwSt.:",
+        "totalTTC": "Total inkl. MwSt.:"
+      }
+    },
+    "invoices": {
+      "title": "Rechnungen",
+      "subtitle": "Rechnungen verwalten und Zahlungen verfolgen",
+      "newAction": "Rechnung erstellen",
+      "loadError": "Fehler beim Laden der Rechnungen",
+      "deleteConfirm": "Möchten Sie diese Rechnung wirklich löschen?",
+      "deleteError": "Fehler beim Löschen der Rechnung",
+      "emptyState": "Noch keine Rechnungen",
+      "emptyCta": "Erste Rechnung erstellen"
+    },
+    "status": {
+      "quote": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "accepted": "Akzeptiert",
+        "refused": "Abgelehnt"
+      },
+      "invoice": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "paid": "Bezahlt",
+        "overdue": "Überfällig"
+      }
+    },
+    "reminders": {
+      "title": "Nicht vergessen",
+      "subtitle": "Ein klarer, priorisierter Überblick über das, was Ihre Aufmerksamkeit braucht.",
+      "allClear": "Alles aktuell. Zurzeit nichts Dringendes.",
+      "emptySection": "Derzeit nichts anzuzeigen.",
+      "table": {
+        "type": "Typ",
+        "name": "Name",
+        "amount": "Betrag",
+        "dueDate": "Fälligkeitsdatum",
+        "link": "Link"
+      },
+      "types": {
+        "expense": "Ausgabe",
+        "invoice": "Rechnung",
+        "quote": "Angebot"
+      },
+      "overdueTitle": "🔴 Priorität — Überfällig",
+      "overdueSubtitle": "Positionen mit überschrittenem Fälligkeitsdatum.",
+      "upcomingTitle": "🟠 Demnächst fällig",
+      "upcomingSubtitle": "Bald fällige Ausgaben und versendete Angebote ohne Rückmeldung."
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "subtitle": "Abonnement und Limits verwalten",
+      "current": "Aktuell",
+      "free": {
+        "title": "Gratis-Plan",
+        "subtitle": "Ideal für den Einstieg",
+        "features": {
+          "clients": "Maximal 2 Kunden",
+          "documents": "Maximal 3 Dokumente pro Monat",
+          "core": "Alle Basisfunktionen"
+        }
+      },
+      "pro": {
+        "title": "Pro-Plan",
+        "subtitle": "Unbegrenzter Zugriff",
+        "features": {
+          "clients": "Unbegrenzte Kunden",
+          "documents": "Unbegrenzte Dokumente",
+          "support": "Priorisierter Support",
+          "all": "Alle Funktionen"
+        },
+        "notice": "Zahlungen sind bald verfügbar. Bis dahin nutzen Sie den Gratis-Plan!",
+        "cta": "Zurück zu den Einstellungen"
+      }
+    }
   }
 }
 

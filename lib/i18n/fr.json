@@ -213,6 +213,229 @@
     "title": "Prêt à réduire votre charge administrative ?",
     "paragraph": "Découvrez Organa et concentrez-vous sur ce qui compte vraiment.",
     "cta": "Découvrir Organa"
+  },
+  "dashboard": {
+    "brandLabel": "Dashboard",
+    "navigation": {
+      "primary": "Navigation",
+      "secondary": "Suivi",
+      "backHome": "Retour à l'accueil"
+    },
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "clients": "Clients",
+      "quotes": "Devis",
+      "invoices": "Factures",
+      "expenses": "Dépenses",
+      "reminders": "À ne pas oublier",
+      "calendar": "Calendrier",
+      "settings": "Paramètres"
+    },
+    "pageTitles": {
+      "dashboard": "Tableau de bord",
+      "newClient": "Nouveau client",
+      "editClient": "Modifier client",
+      "clients": "Clients",
+      "quotes": "Devis",
+      "invoices": "Factures",
+      "expenses": "Dépenses",
+      "calendar": "Calendrier",
+      "settings": "Paramètres",
+      "reminders": "À ne pas oublier"
+    },
+    "topbar": {
+      "upToDate": "Tout est à jour",
+      "connectedAs": "Connecté :",
+      "userFallback": "Utilisateur",
+      "logout": "Se déconnecter"
+    },
+    "common": {
+      "loading": "Chargement...",
+      "loadFailed": "Erreur lors du chargement",
+      "number": "Numéro",
+      "client": "Client",
+      "amount": "Montant",
+      "status": "Statut",
+      "date": "Date",
+      "actions": "Actions",
+      "view": "Voir",
+      "delete": "Supprimer",
+      "unknownClient": "Client inconnu",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "unexpectedError": "Une erreur inattendue s'est produite",
+      "unknownError": "Erreur inconnue"
+    },
+    "limits": {
+      "title": "Limite du plan gratuit atteinte",
+      "cta": "Voir les offres"
+    },
+    "clients": {
+      "authError": "Erreur d'authentification",
+      "loadError": "Erreur lors du chargement des clients",
+      "title": "Clients",
+      "subtitle": "Une vue claire pour gérer vos contacts et leurs informations clés.",
+      "newClient": "Nouveau client",
+      "editDisabledTitle": "Modification temporairement désactivée",
+      "editDisabledText": "Pour modifier un client, supprimez-le puis recréez-le. Cela garantit des données propres et une base toujours fiable.",
+      "emptyState": "Aucun client pour le moment.",
+      "emptyCta": "Créer votre premier client",
+      "cardLabel": "Client",
+      "noName": "Sans nom",
+      "emailLabel": "Email :",
+      "phoneLabel": "Téléphone :",
+      "addressLabel": "Adresse :",
+      "notProvided": "Non renseigné",
+      "addressNotProvided": "Non renseignée",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce client ?",
+      "deleteError": "Erreur lors de la suppression",
+      "deleteErrorDetail": "Erreur lors de la suppression du client",
+      "deleteAction": "Supprimer",
+      "limitReached": "Limite du plan gratuit atteinte.",
+      "createError": "Erreur lors de la création du client",
+      "newTitle": "Nouveau client",
+      "newSubtitle": "Ajouter un nouveau client",
+      "creating": "Création...",
+      "createAction": "Créer le client",
+      "editDisabledDetail": "La modification des clients n'est plus disponible.",
+      "editDisabledInstruction": "Pour modifier un client, veuillez le supprimer et le recréer.",
+      "backToList": "Retour à la liste des clients",
+      "editTitle": "Modifier le client",
+      "editSubtitle": "Modifier les informations du client",
+      "saveChanges": "Enregistrer les modifications",
+      "fields": {
+        "name": "Nom *",
+        "email": "Email *",
+        "emailOptional": "Email",
+        "phone": "Téléphone",
+        "address": "Adresse"
+      },
+      "errors": {
+        "missingId": "ID du client manquant",
+        "nameRequired": "Le nom est obligatoire",
+        "updateError": "Erreur lors de la mise à jour du client"
+      }
+    },
+    "quotes": {
+      "title": "Devis",
+      "subtitle": "Gérez vos devis et propositions commerciales",
+      "newAction": "Créer un devis",
+      "newTitle": "Nouveau devis",
+      "newSubtitle": "Créer un nouveau devis",
+      "loadError": "Erreur lors du chargement des devis",
+      "clientsLoadError": "Erreur lors du chargement des clients",
+      "selectClientError": "Veuillez sélectionner un client",
+      "lineRequiredError": "Veuillez ajouter au moins une ligne avec une désignation",
+      "createError": "Erreur lors de la création du devis",
+      "createDocumentError": "Erreur lors de la création du document",
+      "updateDocumentError": "Erreur lors de la mise à jour du document",
+      "saveForPdfError": "Impossible de sauvegarder le document",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce devis ?",
+      "deleteError": "Erreur lors de la suppression du devis",
+      "emptyState": "Aucun devis pour le moment",
+      "emptyCta": "Créer votre premier devis",
+      "selectClient": "Sélectionner un client",
+      "loadingClients": "Chargement des clients...",
+      "createAction": "Créer le devis",
+      "saving": "Sauvegarde...",
+      "previewPdf": "Prévisualiser PDF",
+      "downloadPdf": "Télécharger PDF",
+      "fields": {
+        "client": "Client *",
+        "dueDate": "Date d'échéance",
+        "notes": "Notes",
+        "notesPlaceholder": "Notes additionnelles..."
+      },
+      "lines": {
+        "title": "Lignes",
+        "add": "Ajouter une ligne",
+        "titleLabel": "Titre de la prestation *",
+        "titlePlaceholder": "Description de la prestation",
+        "descriptionLabel": "Description (optionnelle)",
+        "descriptionPlaceholder": "Détails supplémentaires de la prestation...",
+        "quantity": "Quantité",
+        "unitPrice": "Prix unitaire (CHF)",
+        "vat": "TVA (%)",
+        "subtotal": "Sous-total:"
+      },
+      "summary": {
+        "totalHT": "Total HT:",
+        "vat": "TVA:",
+        "totalTTC": "Total TTC:"
+      }
+    },
+    "invoices": {
+      "title": "Factures",
+      "subtitle": "Gérez vos factures et suivez les paiements",
+      "newAction": "Créer une facture",
+      "loadError": "Erreur lors du chargement des factures",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette facture ?",
+      "deleteError": "Erreur lors de la suppression de la facture",
+      "emptyState": "Aucune facture pour le moment",
+      "emptyCta": "Créer votre première facture"
+    },
+    "status": {
+      "quote": {
+        "draft": "Brouillon",
+        "sent": "Envoyé",
+        "accepted": "Accepté",
+        "refused": "Refusé"
+      },
+      "invoice": {
+        "draft": "Brouillon",
+        "sent": "Envoyée",
+        "paid": "Payée",
+        "overdue": "En retard"
+      }
+    },
+    "reminders": {
+      "title": "À ne pas oublier",
+      "subtitle": "Une vue claire et priorisée de ce qui nécessite votre attention.",
+      "allClear": "Tout est à jour. Rien d'urgent pour le moment.",
+      "emptySection": "Aucun élément à afficher pour le moment.",
+      "table": {
+        "type": "Type",
+        "name": "Nom",
+        "amount": "Montant",
+        "dueDate": "Date d'échéance",
+        "link": "Lien"
+      },
+      "types": {
+        "expense": "Dépense",
+        "invoice": "Facture",
+        "quote": "Devis"
+      },
+      "overdueTitle": "🔴 Priorité — En retard",
+      "overdueSubtitle": "Éléments dont la date d'échéance est dépassée.",
+      "upcomingTitle": "🟠 À venir prochainement",
+      "upcomingSubtitle": "Dépenses à payer bientôt et devis envoyés sans réponse."
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "subtitle": "Gérez votre abonnement et vos limites",
+      "current": "Actuel",
+      "free": {
+        "title": "Plan Gratuit",
+        "subtitle": "Idéal pour démarrer",
+        "features": {
+          "clients": "Maximum 2 clients",
+          "documents": "Maximum 3 documents par mois",
+          "core": "Toutes les fonctionnalités de base"
+        }
+      },
+      "pro": {
+        "title": "Plan Pro",
+        "subtitle": "Accès illimité",
+        "features": {
+          "clients": "Clients illimités",
+          "documents": "Documents illimités",
+          "support": "Support prioritaire",
+          "all": "Toutes les fonctionnalités"
+        },
+        "notice": "Le paiement sera bientôt disponible. Pour le moment, profitez du plan gratuit !",
+        "cta": "Retour aux paramètres"
+      }
+    }
   }
 }
 

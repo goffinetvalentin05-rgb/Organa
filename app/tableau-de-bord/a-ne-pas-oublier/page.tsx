@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { Eye } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 interface Depense {
   id: string;
@@ -29,25 +31,11 @@ interface DocumentBase {
 
 type RappelItem = {
   id: string;
-  type: "Dépense" | "Facture" | "Devis";
+  type: "expense" | "invoice" | "quote";
   nom: string;
   montant: number;
   dateEcheance: string;
   href: string;
-};
-
-const formatMontant = (montant: number) => {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "CHF",
-  }).format(montant);
-};
-
-const formatDate = (value: string) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("fr-FR");
 };
 
 const startOfDay = (value: Date) => {
@@ -87,6 +75,7 @@ const isOlderThanDays = (value?: string, days = 7) => {
 };
 
 export default function ANePasOublierPage() {
+  const { t, locale } = useI18n();
   const [depenses, setDepenses] = useState<Depense[]>([]);
   const [factures, setFactures] = useState<DocumentBase[]>([]);
   const [devis, setDevis] = useState<DocumentBase[]>([]);
@@ -130,7 +119,7 @@ export default function ANePasOublierPage() {
       .filter((depense) => depense.statut === "a_payer" && isPast(depense.dateEcheance))
       .map((depense) => ({
         id: `depense-${depense.id}`,
-        type: "Dépense" as const,
+        type: "expense" as const,
         nom: depense.fournisseur,
         montant: depense.montant,
         dateEcheance: depense.dateEcheance,
@@ -145,8 +134,8 @@ export default function ANePasOublierPage() {
       )
       .map((facture) => ({
         id: `facture-${facture.id}`,
-        type: "Facture" as const,
-        nom: facture.client?.nom || "Client inconnu",
+        type: "invoice" as const,
+        nom: facture.client?.nom || t("dashboard.common.unknownClient"),
         montant: calculerTotalTTC(facture.lignes),
         dateEcheance: facture.dateEcheance || facture.dateCreation,
         href: `/tableau-de-bord/factures/${facture.id}`,
@@ -162,7 +151,7 @@ export default function ANePasOublierPage() {
       .filter((depense) => depense.statut === "a_payer" && isWithinDays(depense.dateEcheance, 7))
       .map((depense) => ({
         id: `depense-${depense.id}`,
-        type: "Dépense" as const,
+        type: "expense" as const,
         nom: depense.fournisseur,
         montant: depense.montant,
         dateEcheance: depense.dateEcheance,
@@ -173,8 +162,8 @@ export default function ANePasOublierPage() {
       .filter((devisItem) => devisItem.statut === "envoye" && isOlderThanDays(devisItem.dateCreation, 7))
       .map((devisItem) => ({
         id: `devis-${devisItem.id}`,
-        type: "Devis" as const,
-        nom: devisItem.client?.nom || "Client inconnu",
+        type: "quote" as const,
+        nom: devisItem.client?.nom || t("dashboard.common.unknownClient"),
         montant: calculerTotalTTC(devisItem.lignes),
         dateEcheance: devisItem.dateEcheance || devisItem.dateCreation,
         href: `/tableau-de-bord/devis/${devisItem.id}`,
@@ -189,7 +178,7 @@ export default function ANePasOublierPage() {
     if (items.length === 0) {
       return (
         <div className="p-6 text-sm text-secondary">
-          Aucun élément à afficher pour le moment.
+          {t("dashboard.reminders.emptySection")}
         </div>
       );
     }
@@ -200,19 +189,19 @@ export default function ANePasOublierPage() {
           <thead className="bg-surface border-b border-subtle">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                Type
+                {t("dashboard.reminders.table.type")}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                Nom
+                {t("dashboard.reminders.table.name")}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                Montant
+                {t("dashboard.reminders.table.amount")}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                Date d&apos;échéance
+                {t("dashboard.reminders.table.dueDate")}
               </th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
-                Lien
+                {t("dashboard.reminders.table.link")}
               </th>
             </tr>
           </thead>
@@ -221,15 +210,23 @@ export default function ANePasOublierPage() {
               <tr key={item.id} className="hover:bg-surface transition-colors">
                 <td className="px-6 py-4">
                   <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-hover text-secondary">
-                    {item.type}
+                    {t(`dashboard.reminders.types.${item.type}`)}
                   </span>
                 </td>
                 <td className="px-6 py-4 font-medium">{item.nom}</td>
                 <td className="px-6 py-4 font-semibold">
-                  {formatMontant(item.montant)}
+                  {new Intl.NumberFormat(localeToIntl[locale], {
+                    style: "currency",
+                    currency: "CHF",
+                  }).format(item.montant)}
                 </td>
                 <td className="px-6 py-4 text-secondary">
-                  {formatDate(item.dateEcheance)}
+                  {(() => {
+                    if (!item.dateEcheance) return "-";
+                    const date = new Date(item.dateEcheance);
+                    if (Number.isNaN(date.getTime())) return item.dateEcheance;
+                    return date.toLocaleDateString(localeToIntl[locale]);
+                  })()}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <Link
@@ -237,7 +234,7 @@ export default function ANePasOublierPage() {
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                   >
                     <Eye className="w-4 h-4" />
-                    Voir
+                    {t("dashboard.common.view")}
                   </Link>
                 </td>
               </tr>
@@ -253,15 +250,13 @@ export default function ANePasOublierPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">À ne pas oublier</h1>
-        <p className="mt-2 text-secondary">
-          Une vue claire et priorisée de ce qui nécessite votre attention.
-        </p>
+        <h1 className="text-3xl font-bold">{t("dashboard.reminders.title")}</h1>
+        <p className="mt-2 text-secondary">{t("dashboard.reminders.subtitle")}</p>
       </div>
 
       {rienAAfficher && (
         <div className="rounded-xl border border-subtle bg-surface p-6 text-secondary">
-          Tout est à jour. Rien d&apos;urgent pour le moment.
+          {t("dashboard.reminders.allClear")}
         </div>
       )}
 
@@ -269,10 +264,10 @@ export default function ANePasOublierPage() {
         <section className="rounded-xl border border-red-500/30 bg-red-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-red-500/20">
             <h2 className="text-lg font-semibold text-red-700">
-              🔴 Priorité — En retard
+              {t("dashboard.reminders.overdueTitle")}
             </h2>
             <p className="text-sm text-secondary mt-1">
-              Éléments dont la date d&apos;échéance est dépassée.
+              {t("dashboard.reminders.overdueSubtitle")}
             </p>
           </div>
           {afficherTableau(enRetard)}
@@ -281,10 +276,10 @@ export default function ANePasOublierPage() {
         <section className="rounded-xl border border-orange-500/30 bg-orange-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-orange-500/20">
             <h2 className="text-lg font-semibold text-orange-700">
-              🟠 À venir prochainement
+              {t("dashboard.reminders.upcomingTitle")}
             </h2>
             <p className="text-sm text-secondary mt-1">
-              Dépenses à payer bientôt et devis envoyés sans réponse.
+              {t("dashboard.reminders.upcomingSubtitle")}
             </p>
           </div>
           {afficherTableau(aVenir)}

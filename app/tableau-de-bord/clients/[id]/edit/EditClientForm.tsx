@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useI18n } from "@/components/I18nProvider";
 
 interface Client {
   id: string;
@@ -22,6 +23,7 @@ export default function EditClientForm({
   initialData,
 }: EditClientFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     nom: initialData.nom || "",
     email: initialData.email || "",
@@ -36,13 +38,13 @@ export default function EditClientForm({
 
     // Vérification de l'ID
     if (!clientId || typeof clientId !== "string" || clientId.trim().length === 0) {
-      setError("ID du client manquant");
+      setError(t("dashboard.clients.errors.missingId"));
       return;
     }
 
     // Validation du nom
     if (!formData.nom || formData.nom.trim().length === 0) {
-      setError("Le nom est obligatoire");
+      setError(t("dashboard.clients.errors.nameRequired"));
       return;
     }
 
@@ -58,7 +60,7 @@ export default function EditClientForm({
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Erreur lors de la mise à jour du client");
+        throw new Error(errorData.error || t("dashboard.clients.errors.updateError"));
       }
 
       // Rediriger vers la liste
@@ -66,7 +68,7 @@ export default function EditClientForm({
       router.refresh();
     } catch (err: any) {
       console.error("[EditClientForm] Erreur lors de la mise à jour", err);
-      setError(err.message || "Erreur lors de la mise à jour du client");
+      setError(err.message || t("dashboard.clients.errors.updateError"));
     } finally {
       setSaving(false);
     }
@@ -75,8 +77,8 @@ export default function EditClientForm({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Modifier le client</h1>
-        <p className="mt-2 text-secondary">Modifier les informations du client</p>
+        <h1 className="text-3xl font-bold">{t("dashboard.clients.editTitle")}</h1>
+        <p className="mt-2 text-secondary">{t("dashboard.clients.editSubtitle")}</p>
       </div>
 
       {error && (
@@ -89,7 +91,7 @@ export default function EditClientForm({
         <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Nom *
+              {t("dashboard.clients.fields.name")}
             </label>
             <input
               type="text"
@@ -103,7 +105,7 @@ export default function EditClientForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Email
+              {t("dashboard.clients.fields.emailOptional")}
             </label>
             <input
               type="email"
@@ -116,7 +118,7 @@ export default function EditClientForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Téléphone
+              {t("dashboard.clients.fields.phone")}
             </label>
             <input
               type="tel"
@@ -129,7 +131,7 @@ export default function EditClientForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Adresse
+              {t("dashboard.clients.fields.address")}
             </label>
             <textarea
               value={formData.adresse}
@@ -147,14 +149,14 @@ export default function EditClientForm({
             href="/tableau-de-bord/clients"
             className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-center"
           >
-            Annuler
+            {t("dashboard.common.cancel")}
           </Link>
           <button
             type="submit"
             disabled={saving}
             className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? "Enregistrement..." : "Enregistrer les modifications"}
+            {saving ? t("dashboard.common.saving") : t("dashboard.clients.saveChanges")}
           </button>
         </div>
       </form>

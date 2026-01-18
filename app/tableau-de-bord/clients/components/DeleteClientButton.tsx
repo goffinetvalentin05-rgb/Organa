@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Trash, Loader } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
 
 interface DeleteClientButtonProps {
   clientId: string;
@@ -11,6 +12,7 @@ interface DeleteClientButtonProps {
 export default function DeleteClientButton({ clientId }: DeleteClientButtonProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useI18n();
 
   const handleDelete = async () => {
     // Garde de sécurité : vérifier que l'ID existe
@@ -18,7 +20,7 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
       return;
     }
 
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) {
+    if (!confirm(t("dashboard.clients.deleteConfirm"))) {
       return;
     }
 
@@ -31,14 +33,14 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Erreur lors de la suppression");
+        throw new Error(errorData.error || t("dashboard.clients.deleteError"));
       }
 
       // Rafraîchir pour recharger les données depuis la DB
       router.refresh();
     } catch (err: any) {
       console.error("[DeleteClientButton] Erreur lors de la suppression", err);
-      alert(err.message || "Erreur lors de la suppression du client");
+      alert(err.message || t("dashboard.clients.deleteErrorDetail"));
     } finally {
       setIsDeleting(false);
     }
@@ -55,7 +57,7 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
       ) : (
         <Trash className="w-4 h-4" />
       )}
-      Supprimer
+      {t("dashboard.clients.deleteAction")}
     </button>
   );
 }

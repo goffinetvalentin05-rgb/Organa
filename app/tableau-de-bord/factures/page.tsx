@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { Eye, Trash, Plus } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 interface Facture {
   id: string;
@@ -15,6 +17,7 @@ interface Facture {
 }
 
 export default function FacturesPage() {
+  const { t, locale } = useI18n();
   const [factures, setFactures] = useState<Facture[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,12 +34,12 @@ export default function FacturesPage() {
         cache: "no-store",
       });
       if (!response.ok) {
-        throw new Error("Erreur lors du chargement des factures");
+        throw new Error(t("dashboard.invoices.loadError"));
       }
       const data = await response.json();
       setFactures(data.documents || []);
     } catch (error: any) {
-      setErrorMessage(error?.message || "Erreur lors du chargement des factures");
+      setErrorMessage(error?.message || t("dashboard.invoices.loadError"));
       setFactures([]);
     } finally {
       setLoading(false);
@@ -44,13 +47,13 @@ export default function FacturesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) return;
+    if (!confirm(t("dashboard.invoices.deleteConfirm"))) return;
     try {
       const response = await fetch(`/api/documents?id=${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression de la facture");
+        throw new Error(t("dashboard.invoices.deleteError"));
       }
       await loadFactures();
     } catch (error) {
@@ -59,10 +62,17 @@ export default function FacturesPage() {
   };
 
   const formatMontant = (montant: number) => {
-    return new Intl.NumberFormat("fr-FR", {
+    return new Intl.NumberFormat(localeToIntl[locale], {
       style: "currency",
       currency: "CHF",
     }).format(montant);
+  };
+
+  const formatDate = (value: string) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString(localeToIntl[locale]);
   };
 
   const getStatutColor = (statut: string) => {
@@ -77,10 +87,10 @@ export default function FacturesPage() {
 
   const getStatutLabel = (statut: string) => {
     const labels: Record<string, string> = {
-      brouillon: "Brouillon",
-      envoye: "Envoyée",
-      paye: "Payée",
-      "en-retard": "En retard",
+      brouillon: t("dashboard.status.invoice.draft"),
+      envoye: t("dashboard.status.invoice.sent"),
+      paye: t("dashboard.status.invoice.paid"),
+      "en-retard": t("dashboard.status.invoice.overdue"),
     };
     return labels[statut] || statut;
   };
@@ -90,17 +100,15 @@ export default function FacturesPage() {
       {/* En-tête */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Factures</h1>
-          <p className="mt-2 text-secondary">
-            Gérez vos factures et suivez les paiements
-          </p>
+          <h1 className="text-3xl font-bold">{t("dashboard.invoices.title")}</h1>
+          <p className="mt-2 text-secondary">{t("dashboard.invoices.subtitle")}</p>
         </div>
         <Link
           href="/tableau-de-bord/factures/nouvelle"
           className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Créer une facture
+          {t("dashboard.invoices.newAction")}
         </Link>
       </div>
 
@@ -108,21 +116,21 @@ export default function FacturesPage() {
       <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">Chargement...</p>
+            <p className="text-secondary">{t("dashboard.common.loading")}</p>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">Erreur lors du chargement</p>
+            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
             <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : factures.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-secondary mb-4">Aucune facture pour le moment</p>
+            <p className="text-secondary mb-4">{t("dashboard.invoices.emptyState")}</p>
             <Link
               href="/tableau-de-bord/factures/nouvelle"
               className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
             >
-              Créer votre première facture
+              {t("dashboard.invoices.emptyCta")}
             </Link>
           </div>
         ) : (
@@ -131,22 +139,22 @@ export default function FacturesPage() {
               <thead className="bg-surface border-b border-subtle">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Numéro
+                    {t("dashboard.common.number")}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Client
+                    {t("dashboard.common.client")}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Montant
+                    {t("dashboard.common.amount")}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Statut
+                    {t("dashboard.common.status")}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Date
+                    {t("dashboard.common.date")}
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
-                    Actions
+                    {t("dashboard.common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -162,7 +170,7 @@ export default function FacturesPage() {
                         {facture.numero}
                       </td>
                       <td className="px-6 py-4 text-secondary">
-                        {facture.client?.nom || "Client inconnu"}
+                        {facture.client?.nom || t("dashboard.common.unknownClient")}
                       </td>
                       <td className="px-6 py-4 font-semibold">
                         {formatMontant(montant)}
@@ -177,7 +185,7 @@ export default function FacturesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-secondary">
-                        {facture.dateCreation}
+                        {formatDate(facture.dateCreation)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -186,12 +194,12 @@ export default function FacturesPage() {
                             className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-1.5"
                           >
                             <Eye className="w-4 h-4" />
-                            Voir
+                            {t("dashboard.common.view")}
                           </Link>
                           <button
                             onClick={() => handleDelete(facture.id)}
                             className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
-                            title="Supprimer"
+                            title={t("dashboard.common.delete")}
                           >
                             <Trash className="w-4 h-4" />
                           </button>

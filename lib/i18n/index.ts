@@ -6,6 +6,12 @@ export type Locale = "fr" | "en" | "de";
 
 export const defaultLocale: Locale = "fr";
 
+export const localeToIntl = {
+  fr: "fr-CH",
+  en: "en-GB",
+  de: "de-CH",
+} as const;
+
 export const translations = {
   fr,
   en,

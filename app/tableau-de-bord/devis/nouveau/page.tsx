@@ -10,6 +10,8 @@ import {
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
 import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 interface Client {
   id: string;
@@ -21,6 +23,7 @@ interface Client {
 
 export default function NouveauDevisPage() {
   const router = useRouter();
+  const { t, locale } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
   const [clientId, setClientId] = useState("");
@@ -41,7 +44,7 @@ export default function NouveauDevisPage() {
         const res = await fetch("/api/clients", { cache: "no-store" });
         if (!res.ok) {
           console.error("[Devis] Erreur chargement clients:", res.statusText);
-          toast.error("Erreur lors du chargement des clients");
+          toast.error(t("dashboard.quotes.clientsLoadError"));
           return;
         }
         const data = await res.json();
@@ -49,7 +52,7 @@ export default function NouveauDevisPage() {
         setClients(data.clients || []);
       } catch (error: any) {
         console.error("[Devis] Erreur chargement clients:", error);
-        toast.error("Erreur lors du chargement des clients");
+        toast.error(t("dashboard.quotes.clientsLoadError"));
       } finally {
         setLoadingClients(false);
       }
@@ -89,7 +92,7 @@ export default function NouveauDevisPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientId) {
-      toast.error("Veuillez sélectionner un client");
+      toast.error(t("dashboard.quotes.selectClientError"));
       return;
     }
 
@@ -98,7 +101,7 @@ export default function NouveauDevisPage() {
     );
 
     if (lignesValides.length === 0) {
-      toast.error("Veuillez ajouter au moins une ligne avec une désignation");
+      toast.error(t("dashboard.quotes.lineRequiredError"));
       return;
     }
 
@@ -121,7 +124,7 @@ export default function NouveauDevisPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erreur lors de la création du devis");
+        throw new Error(errorData.error || t("dashboard.quotes.createError"));
       }
 
       const data = await response.json();
@@ -130,7 +133,9 @@ export default function NouveauDevisPage() {
       router.push(`/tableau-de-bord/devis/${data.id}`);
     } catch (error: any) {
       console.error("[Devis] Erreur lors de la création:", error);
-      toast.error(`Erreur lors de la création du devis: ${error.message || "Erreur inconnue"}`);
+      toast.error(
+        `${t("dashboard.quotes.createError")}: ${error.message || t("dashboard.common.unknownError")}`
+      );
     }
   };
 
@@ -138,7 +143,7 @@ export default function NouveauDevisPage() {
   const saveAndOpenPdf = async (download: boolean = false) => {
     // Validation
     if (!clientId) {
-      toast.error("Veuillez sélectionner un client");
+      toast.error(t("dashboard.quotes.selectClientError"));
       return;
     }
 
@@ -147,7 +152,7 @@ export default function NouveauDevisPage() {
     );
 
     if (lignesValides.length === 0) {
-      toast.error("Veuillez ajouter au moins une ligne avec une désignation");
+      toast.error(t("dashboard.quotes.lineRequiredError"));
       return;
     }
 
@@ -177,7 +182,7 @@ export default function NouveauDevisPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Erreur lors de la création du document");
+          throw new Error(errorData.error || t("dashboard.quotes.createDocumentError"));
         }
 
         const data = await response.json();
@@ -205,7 +210,7 @@ export default function NouveauDevisPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Erreur lors de la mise à jour du document");
+          throw new Error(errorData.error || t("dashboard.quotes.updateDocumentError"));
         }
 
         const data = await response.json();
@@ -229,7 +234,9 @@ export default function NouveauDevisPage() {
       }
     } catch (error: any) {
       console.error("Erreur lors de la sauvegarde pour PDF:", error);
-      toast.error(`Impossible de sauvegarder le document: ${error.message || "Erreur inconnue"}`);
+      toast.error(
+        `${t("dashboard.quotes.saveForPdfError")}: ${error.message || t("dashboard.common.unknownError")}`
+      );
     } finally {
       setSavingForPdf(false);
     }
@@ -242,15 +249,15 @@ export default function NouveauDevisPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Nouveau devis</h1>
-        <p className="mt-2 text-secondary">Créer un nouveau devis</p>
+        <h1 className="text-3xl font-bold">{t("dashboard.quotes.newTitle")}</h1>
+        <p className="mt-2 text-secondary">{t("dashboard.quotes.newSubtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Client *
+              {t("dashboard.quotes.fields.client")}
             </label>
             <select
               required
@@ -260,7 +267,7 @@ export default function NouveauDevisPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">
-                {loadingClients ? "Chargement des clients..." : "Sélectionner un client"}
+                {loadingClients ? t("dashboard.quotes.loadingClients") : t("dashboard.quotes.selectClient")}
               </option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
@@ -272,7 +279,7 @@ export default function NouveauDevisPage() {
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Statut
+              {t("dashboard.common.status")}
             </label>
             <select
               value={statut}
@@ -283,16 +290,16 @@ export default function NouveauDevisPage() {
               }
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
-              <option value="brouillon">Brouillon</option>
-              <option value="envoye">Envoyé</option>
-              <option value="accepte">Accepté</option>
-              <option value="refuse">Refusé</option>
+              <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
+              <option value="envoye">{t("dashboard.status.quote.sent")}</option>
+              <option value="accepte">{t("dashboard.status.quote.accepted")}</option>
+              <option value="refuse">{t("dashboard.status.quote.refused")}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Date d'échéance
+              {t("dashboard.quotes.fields.dueDate")}
             </label>
             <input
               type="date"
@@ -305,14 +312,14 @@ export default function NouveauDevisPage() {
 
         <div className="rounded-xl border border-subtle bg-surface p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Lignes</h2>
+            <h2 className="text-xl font-semibold">{t("dashboard.quotes.lines.title")}</h2>
             <button
               type="button"
               onClick={ajouterLigne}
               className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-sm flex items-center gap-2 border border-subtle"
             >
               <Plus className="w-4 h-4" />
-              Ajouter une ligne
+              {t("dashboard.quotes.lines.add")}
             </button>
           </div>
 
@@ -325,7 +332,7 @@ export default function NouveauDevisPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-primary mb-2">
-                      Titre de la prestation *
+                      {t("dashboard.quotes.lines.titleLabel")}
                     </label>
                     <input
                       type="text"
@@ -335,13 +342,13 @@ export default function NouveauDevisPage() {
                           designation: e.target.value,
                         })
                       }
-                      placeholder="Description de la prestation"
+                      placeholder={t("dashboard.quotes.lines.titlePlaceholder")}
                       className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-primary mb-2">
-                      Description (optionnelle)
+                      {t("dashboard.quotes.lines.descriptionLabel")}
                     </label>
                     <textarea
                       value={ligne.description || ""}
@@ -350,14 +357,14 @@ export default function NouveauDevisPage() {
                           description: e.target.value,
                         })
                       }
-                      placeholder="Détails supplémentaires de la prestation..."
+                      placeholder={t("dashboard.quotes.lines.descriptionPlaceholder")}
                       rows={3}
                       className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] resize-y"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-primary mb-2">
-                      Quantité
+                      {t("dashboard.quotes.lines.quantity")}
                     </label>
                     <input
                       type="number"
@@ -374,7 +381,7 @@ export default function NouveauDevisPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-primary mb-2">
-                      Prix unitaire (CHF)
+                      {t("dashboard.quotes.lines.unitPrice")}
                     </label>
                     <input
                       type="number"
@@ -391,7 +398,7 @@ export default function NouveauDevisPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-primary mb-2">
-                      TVA (%)
+                      {t("dashboard.quotes.lines.vat")}
                     </label>
                     <input
                       type="number"
@@ -408,8 +415,8 @@ export default function NouveauDevisPage() {
                   </div>
                   <div className="col-span-2 flex items-center justify-between">
                     <div className="text-sm text-secondary">
-                      Sous-total:{" "}
-                      {new Intl.NumberFormat("fr-FR", {
+                      {t("dashboard.quotes.lines.subtotal")}{" "}
+                      {new Intl.NumberFormat(localeToIntl[locale], {
                         style: "currency",
                         currency: "CHF",
                       }).format(ligne.quantite * ligne.prixUnitaire)}
@@ -421,7 +428,7 @@ export default function NouveauDevisPage() {
                         className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-sm flex items-center gap-1.5"
                       >
                         <Trash className="w-4 h-4" />
-                        Supprimer
+                        {t("dashboard.common.delete")}
                       </button>
                     )}
                   </div>
@@ -432,12 +439,12 @@ export default function NouveauDevisPage() {
         </div>
 
         <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">Notes</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("dashboard.quotes.fields.notes")}</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
-            placeholder="Notes additionnelles..."
+            placeholder={t("dashboard.quotes.fields.notesPlaceholder")}
             className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           />
         </div>
@@ -445,27 +452,27 @@ export default function NouveauDevisPage() {
         <div className="rounded-xl border border-subtle bg-surface p-6">
           <div className="space-y-2 text-right">
             <div className="flex justify-between text-secondary">
-              <span>Total HT:</span>
+              <span>{t("dashboard.quotes.summary.totalHT")}</span>
               <span>
-                {new Intl.NumberFormat("fr-FR", {
+                {new Intl.NumberFormat(localeToIntl[locale], {
                   style: "currency",
                   currency: "CHF",
                 }).format(totalHT)}
               </span>
             </div>
             <div className="flex justify-between text-secondary">
-              <span>TVA:</span>
+              <span>{t("dashboard.quotes.summary.vat")}</span>
               <span>
-                {new Intl.NumberFormat("fr-FR", {
+                {new Intl.NumberFormat(localeToIntl[locale], {
                   style: "currency",
                   currency: "CHF",
                 }).format(totalTVA)}
               </span>
             </div>
             <div className="flex justify-between text-2xl font-bold pt-2 border-t border-subtle">
-              <span>Total TTC:</span>
+              <span>{t("dashboard.quotes.summary.totalTTC")}</span>
               <span>
-                {new Intl.NumberFormat("fr-FR", {
+                {new Intl.NumberFormat(localeToIntl[locale], {
                   style: "currency",
                   currency: "CHF",
                 }).format(totalTTC)}
@@ -480,7 +487,7 @@ export default function NouveauDevisPage() {
             onClick={() => router.back()}
             className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
           >
-            Annuler
+            {t("dashboard.common.cancel")}
           </button>
           <button
             type="button"
@@ -491,12 +498,12 @@ export default function NouveauDevisPage() {
             {savingForPdf ? (
               <>
                 <Loader className="w-4 h-4 animate-spin" />
-                Sauvegarde...
+                {t("dashboard.quotes.saving")}
               </>
             ) : (
               <>
                 <Eye className="w-4 h-4" />
-                Prévisualiser PDF
+                {t("dashboard.quotes.previewPdf")}
               </>
             )}
           </button>
@@ -509,12 +516,12 @@ export default function NouveauDevisPage() {
             {savingForPdf ? (
               <>
                 <Loader className="w-4 h-4 animate-spin" />
-                Sauvegarde...
+                {t("dashboard.quotes.saving")}
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                Télécharger PDF
+                {t("dashboard.quotes.downloadPdf")}
               </>
             )}
           </button>
@@ -522,7 +529,7 @@ export default function NouveauDevisPage() {
             type="submit"
             className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
           >
-            Créer le devis
+            {t("dashboard.quotes.createAction")}
           </button>
         </div>
       </form>

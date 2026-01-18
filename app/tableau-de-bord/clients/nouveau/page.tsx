@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function NouveauClientPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     nom: "",
     email: "",
@@ -37,7 +39,7 @@ export default function NouveauClientPage() {
         if (data.error === "LIMIT_REACHED") {
           setError({
             type: "LIMIT_REACHED",
-            message: data.message || "Limite du plan gratuit atteinte.",
+            message: data.message || t("dashboard.clients.limitReached"),
           });
           setLoading(false);
           return;
@@ -46,7 +48,7 @@ export default function NouveauClientPage() {
         // Autre erreur
         setError({
           type: "OTHER",
-          message: data.message || data.error || "Erreur lors de la création du client",
+          message: data.message || data.error || t("dashboard.clients.createError"),
         });
         setLoading(false);
         return;
@@ -57,7 +59,7 @@ export default function NouveauClientPage() {
     } catch (err) {
       setError({
         type: "OTHER",
-        message: "Une erreur inattendue s'est produite",
+        message: t("dashboard.common.unexpectedError"),
       });
       setLoading(false);
     }
@@ -66,8 +68,8 @@ export default function NouveauClientPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Nouveau client</h1>
-        <p className="mt-2 text-secondary">Ajouter un nouveau client</p>
+        <h1 className="text-3xl font-bold">{t("dashboard.clients.newTitle")}</h1>
+        <p className="mt-2 text-secondary">{t("dashboard.clients.newSubtitle")}</p>
       </div>
 
       {/* Message d'erreur pour limite atteinte */}
@@ -86,7 +88,7 @@ export default function NouveauClientPage() {
         <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Nom *
+              {t("dashboard.clients.fields.name")}
             </label>
             <input
               type="text"
@@ -100,7 +102,7 @@ export default function NouveauClientPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Email *
+              {t("dashboard.clients.fields.email")}
             </label>
             <input
               type="email"
@@ -114,7 +116,7 @@ export default function NouveauClientPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Téléphone
+              {t("dashboard.clients.fields.phone")}
             </label>
             <input
               type="tel"
@@ -127,7 +129,7 @@ export default function NouveauClientPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Adresse
+              {t("dashboard.clients.fields.address")}
             </label>
             <textarea
               value={formData.adresse}
@@ -146,14 +148,14 @@ export default function NouveauClientPage() {
             onClick={() => router.back()}
             className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
           >
-            Annuler
+            {t("dashboard.common.cancel")}
           </button>
           <button
             type="submit"
             disabled={loading}
             className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Création..." : "Créer le client"}
+            {loading ? t("dashboard.clients.creating") : t("dashboard.clients.createAction")}
           </button>
         </div>
       </form>

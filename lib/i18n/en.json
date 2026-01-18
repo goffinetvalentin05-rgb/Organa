@@ -213,6 +213,229 @@
     "title": "Ready to reduce your administrative workload?",
     "paragraph": "Discover Organa and focus on what matters most.",
     "cta": "Discover Organa"
+  },
+  "dashboard": {
+    "brandLabel": "Dashboard",
+    "navigation": {
+      "primary": "Navigation",
+      "secondary": "Monitoring",
+      "backHome": "Back to home"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "clients": "Clients",
+      "quotes": "Quotes",
+      "invoices": "Invoices",
+      "expenses": "Expenses",
+      "reminders": "Reminders",
+      "calendar": "Calendar",
+      "settings": "Settings"
+    },
+    "pageTitles": {
+      "dashboard": "Dashboard",
+      "newClient": "New client",
+      "editClient": "Edit client",
+      "clients": "Clients",
+      "quotes": "Quotes",
+      "invoices": "Invoices",
+      "expenses": "Expenses",
+      "calendar": "Calendar",
+      "settings": "Settings",
+      "reminders": "Reminders"
+    },
+    "topbar": {
+      "upToDate": "All up to date",
+      "connectedAs": "Signed in:",
+      "userFallback": "User",
+      "logout": "Sign out"
+    },
+    "common": {
+      "loading": "Loading...",
+      "loadFailed": "Loading error",
+      "number": "Number",
+      "client": "Client",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "view": "View",
+      "delete": "Delete",
+      "unknownClient": "Unknown client",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "unexpectedError": "An unexpected error occurred",
+      "unknownError": "Unknown error"
+    },
+    "limits": {
+      "title": "Free plan limit reached",
+      "cta": "See plans"
+    },
+    "clients": {
+      "authError": "Authentication error",
+      "loadError": "Error loading clients",
+      "title": "Clients",
+      "subtitle": "A clear view to manage your contacts and key details.",
+      "newClient": "New client",
+      "editDisabledTitle": "Editing temporarily disabled",
+      "editDisabledText": "To edit a client, delete it and recreate it. This keeps data clean and reliable.",
+      "emptyState": "No clients yet.",
+      "emptyCta": "Create your first client",
+      "cardLabel": "Client",
+      "noName": "No name",
+      "emailLabel": "Email:",
+      "phoneLabel": "Phone:",
+      "addressLabel": "Address:",
+      "notProvided": "Not provided",
+      "addressNotProvided": "Not provided",
+      "deleteConfirm": "Are you sure you want to delete this client?",
+      "deleteError": "Error deleting",
+      "deleteErrorDetail": "Error deleting the client",
+      "deleteAction": "Delete",
+      "limitReached": "Free plan limit reached.",
+      "createError": "Error creating the client",
+      "newTitle": "New client",
+      "newSubtitle": "Add a new client",
+      "creating": "Creating...",
+      "createAction": "Create client",
+      "editDisabledDetail": "Client editing is no longer available.",
+      "editDisabledInstruction": "To edit a client, delete it and recreate it.",
+      "backToList": "Back to client list",
+      "editTitle": "Edit client",
+      "editSubtitle": "Edit client information",
+      "saveChanges": "Save changes",
+      "fields": {
+        "name": "Name *",
+        "email": "Email *",
+        "emailOptional": "Email",
+        "phone": "Phone",
+        "address": "Address"
+      },
+      "errors": {
+        "missingId": "Client ID missing",
+        "nameRequired": "Name is required",
+        "updateError": "Error updating the client"
+      }
+    },
+    "quotes": {
+      "title": "Quotes",
+      "subtitle": "Manage your quotes and commercial proposals",
+      "newAction": "Create a quote",
+      "newTitle": "New quote",
+      "newSubtitle": "Create a new quote",
+      "loadError": "Error loading quotes",
+      "clientsLoadError": "Error loading clients",
+      "selectClientError": "Please select a client",
+      "lineRequiredError": "Please add at least one line with a description",
+      "createError": "Error creating the quote",
+      "createDocumentError": "Error creating the document",
+      "updateDocumentError": "Error updating the document",
+      "saveForPdfError": "Unable to save the document",
+      "deleteConfirm": "Are you sure you want to delete this quote?",
+      "deleteError": "Error deleting the quote",
+      "emptyState": "No quotes yet",
+      "emptyCta": "Create your first quote",
+      "selectClient": "Select a client",
+      "loadingClients": "Loading clients...",
+      "createAction": "Create quote",
+      "saving": "Saving...",
+      "previewPdf": "Preview PDF",
+      "downloadPdf": "Download PDF",
+      "fields": {
+        "client": "Client *",
+        "dueDate": "Due date",
+        "notes": "Notes",
+        "notesPlaceholder": "Additional notes..."
+      },
+      "lines": {
+        "title": "Line items",
+        "add": "Add a line",
+        "titleLabel": "Service title *",
+        "titlePlaceholder": "Service description",
+        "descriptionLabel": "Description (optional)",
+        "descriptionPlaceholder": "Additional service details...",
+        "quantity": "Quantity",
+        "unitPrice": "Unit price (CHF)",
+        "vat": "VAT (%)",
+        "subtotal": "Subtotal:"
+      },
+      "summary": {
+        "totalHT": "Total excl. VAT:",
+        "vat": "VAT:",
+        "totalTTC": "Total incl. VAT:"
+      }
+    },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Manage invoices and track payments",
+      "newAction": "Create an invoice",
+      "loadError": "Error loading invoices",
+      "deleteConfirm": "Are you sure you want to delete this invoice?",
+      "deleteError": "Error deleting the invoice",
+      "emptyState": "No invoices yet",
+      "emptyCta": "Create your first invoice"
+    },
+    "status": {
+      "quote": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "accepted": "Accepted",
+        "refused": "Declined"
+      },
+      "invoice": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "paid": "Paid",
+        "overdue": "Overdue"
+      }
+    },
+    "reminders": {
+      "title": "Reminders",
+      "subtitle": "A clear, prioritized view of what needs your attention.",
+      "allClear": "All up to date. Nothing urgent right now.",
+      "emptySection": "Nothing to show at the moment.",
+      "table": {
+        "type": "Type",
+        "name": "Name",
+        "amount": "Amount",
+        "dueDate": "Due date",
+        "link": "Link"
+      },
+      "types": {
+        "expense": "Expense",
+        "invoice": "Invoice",
+        "quote": "Quote"
+      },
+      "overdueTitle": "🔴 Priority — Overdue",
+      "overdueSubtitle": "Items past their due date.",
+      "upcomingTitle": "🟠 Coming up soon",
+      "upcomingSubtitle": "Expenses due soon and quotes sent without reply."
+    },
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Manage your plan and limits",
+      "current": "Current",
+      "free": {
+        "title": "Free Plan",
+        "subtitle": "Ideal to get started",
+        "features": {
+          "clients": "Up to 2 clients",
+          "documents": "Up to 3 documents per month",
+          "core": "All core features"
+        }
+      },
+      "pro": {
+        "title": "Pro Plan",
+        "subtitle": "Unlimited access",
+        "features": {
+          "clients": "Unlimited clients",
+          "documents": "Unlimited documents",
+          "support": "Priority support",
+          "all": "All features"
+        },
+        "notice": "Payments will be available soon. For now, enjoy the free plan!",
+        "cta": "Back to settings"
+      }
+    }
   }
 }
 

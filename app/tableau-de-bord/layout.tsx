@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
   Users,
@@ -22,10 +24,11 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
-  const [companyName, setCompanyName] = useState<string>("Organa");
+  const [companyName, setCompanyName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState<boolean>(true);
 
@@ -50,9 +53,7 @@ export default function DashboardLayout({
         });
 
         setUserEmail(data.user?.email ?? null);
-        setCompanyName(
-          data.user?.email?.split("@")[0] || "Mon entreprise"
-        );
+        setCompanyName(data.user?.email?.split("@")[0] || "");
         setCompanyLogo(null);
       } catch (error) {
         console.error("[AUTH][DashboardLayout] Erreur lors de l'appel à /api/me", error);
@@ -83,17 +84,17 @@ export default function DashboardLayout({
   };
 
   const navigation = [
-    { name: "Tableau de bord", href: "/tableau-de-bord", icon: LayoutDashboard },
-    { name: "Clients", href: "/tableau-de-bord/clients", icon: Users },
-    { name: "Devis", href: "/tableau-de-bord/devis", icon: FileText },
-    { name: "Factures", href: "/tableau-de-bord/factures", icon: Receipt },
-    { name: "Dépenses", href: "/tableau-de-bord/depenses", icon: Receipt },
+    { name: t("dashboard.nav.dashboard"), href: "/tableau-de-bord", icon: LayoutDashboard },
+    { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
+    { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
+    { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
+    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Receipt },
   ];
 
   const secondaryNavigation = [
-    { name: "À ne pas oublier", href: "/tableau-de-bord/a-ne-pas-oublier", icon: AlertTriangle },
-    { name: "Calendrier", href: "/tableau-de-bord/calendrier", icon: Calendar },
-    { name: "Paramètres", href: "/tableau-de-bord/parametres", icon: Settings },
+    { name: t("dashboard.nav.reminders"), href: "/tableau-de-bord/a-ne-pas-oublier", icon: AlertTriangle },
+    { name: t("dashboard.nav.calendar"), href: "/tableau-de-bord/calendrier", icon: Calendar },
+    { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -103,10 +104,26 @@ export default function DashboardLayout({
     return pathname?.startsWith(href);
   };
 
+  const getPageTitle = () => {
+    if (!pathname) return t("dashboard.pageTitles.dashboard");
+    if (pathname.startsWith("/tableau-de-bord/clients/nouveau")) return t("dashboard.pageTitles.newClient");
+    if (pathname.startsWith("/tableau-de-bord/clients/") && pathname.includes("/edit")) {
+      return t("dashboard.pageTitles.editClient");
+    }
+    if (pathname.startsWith("/tableau-de-bord/clients")) return t("dashboard.pageTitles.clients");
+    if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
+    if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
+    if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
+    if (pathname.startsWith("/tableau-de-bord/calendrier")) return t("dashboard.pageTitles.calendar");
+    if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
+    if (pathname.startsWith("/tableau-de-bord/a-ne-pas-oublier")) return t("dashboard.pageTitles.reminders");
+    return t("dashboard.pageTitles.dashboard");
+  };
+
   return (
     <div className="dashboard-shell min-h-screen bg-dashboard text-primary relative">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-surface/90 border-r border-subtle z-40 backdrop-blur-xl shadow-[0_24px_80px_rgba(2,6,23,0.35)]">
+      <aside className="fixed left-0 top-0 h-screen w-72 bg-surface border-r border-subtle z-40 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-subtle">
@@ -129,7 +146,7 @@ export default function DashboardLayout({
                 />
               )}
               <span className="text-xs uppercase tracking-[0.32em] text-tertiary">
-                Dashboard
+                {t("dashboard.brandLabel")}
               </span>
             </Link>
           </div>
@@ -138,7 +155,7 @@ export default function DashboardLayout({
           <nav className="flex-1 p-4 space-y-6">
             <div>
               <p className="px-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-tertiary">
-                Navigation
+                {t("dashboard.navigation.primary")}
               </p>
               <div className="mt-4 space-y-2">
                 {navigation.map((item) => {
@@ -150,7 +167,7 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`font-body flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                         active
-                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_0_24px_rgba(99,102,241,0.18)]"
+                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_12px_30px_rgba(37,99,235,0.18)]"
                           : "text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle"
                       }`}
                     >
@@ -164,7 +181,7 @@ export default function DashboardLayout({
 
             <div>
               <p className="px-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-tertiary">
-                Suivi
+                {t("dashboard.navigation.secondary")}
               </p>
               <div className="mt-4 space-y-2">
                 {secondaryNavigation.map((item) => {
@@ -176,7 +193,7 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`font-body flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                         active
-                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_0_24px_rgba(99,102,241,0.18)]"
+                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_12px_30px_rgba(37,99,235,0.18)]"
                           : "text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle"
                       }`}
                     >
@@ -196,7 +213,7 @@ export default function DashboardLayout({
               className="font-body flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle transition-all duration-200"
             >
               <Home className="w-5 h-5 text-secondary" />
-              <span className="font-medium">Retour à l'accueil</span>
+              <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
             </Link>
           </div>
         </div>
@@ -205,8 +222,8 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="ml-72 relative z-10">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-surface/80 border-b border-subtle backdrop-blur-xl">
-          <div className="flex items-center justify-between px-6 py-3">
+        <header className="sticky top-0 z-30 bg-surface border-b border-subtle">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center px-6 py-3">
             <div className="flex items-center gap-4">
               {companyLogo ? (
                 <Image
@@ -226,24 +243,30 @@ export default function DashboardLayout({
                 />
               )}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-subtle bg-surface px-3 py-1 text-xs text-secondary">
+            <div className="flex items-center justify-center">
+              <div className="rounded-full border border-subtle bg-surface-hover px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+                {getPageTitle()}
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-4">
+              <LanguageSwitcher />
+              <div className="hidden sm:flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
                 <CheckCircle className="w-4 h-4 text-success" />
-                <span>Tout est à jour</span>
+                <span>{t("dashboard.topbar.upToDate")}</span>
               </div>
               {!loadingUser && (
-                <div className="flex items-center gap-2 rounded-full border border-subtle bg-surface px-3 py-1 text-xs text-secondary">
-                  <span className="text-tertiary">Connecté :</span>
+                <div className="flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
+                  <span className="text-tertiary">{t("dashboard.topbar.connectedAs")}</span>
                   <span className="text-primary">
-                    {companyName && companyName !== "Organa" ? companyName : userEmail || "Utilisateur"}
+                    {companyName ? companyName : userEmail || t("dashboard.topbar.userFallback")}
                   </span>
                 </div>
               )}
               <button
                 onClick={handleLogout}
-                className="btn-secondary px-4 py-2 rounded-full bg-surface hover:bg-surface-hover text-secondary hover:text-primary transition-all duration-200 border border-subtle hover:border-subtle-hover"
+                className="btn-secondary px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all duration-200 border border-subtle hover:border-subtle-hover"
               >
-                Se déconnecter
+                {t("dashboard.topbar.logout")}
               </button>
             </div>
           </div>
