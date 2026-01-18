@@ -205,7 +205,7 @@ export default function DevisDetailPage() {
         <p className="text-secondary">Erreur : données de devis invalides</p>
         <Link
           href="/tableau-de-bord/devis"
-          className="text-secondary hover:text-white mt-4 inline-block"
+          className="text-secondary hover:text-primary mt-4 inline-block"
         >
           ← Retour aux devis
         </Link>
@@ -223,12 +223,12 @@ export default function DevisDetailPage() {
 
   const getStatutColor = (statut: string) => {
     const colors: Record<string, string> = {
-      brouillon: "bg-gray-500/20 text-gray-300",
-      envoye: "bg-blue-500/20 text-blue-300",
-      accepte: "bg-green-500/20 text-green-300",
-      refuse: "bg-red-500/20 text-red-300",
+      brouillon: "bg-slate-100 text-slate-700",
+      envoye: "bg-blue-100 text-blue-700",
+      accepte: "bg-green-100 text-green-700",
+      refuse: "bg-red-100 text-red-700",
     };
-    return colors[statut] || "bg-gray-500/20 text-gray-300";
+    return colors[statut] || "bg-slate-100 text-slate-700";
   };
 
   return (
@@ -237,7 +237,7 @@ export default function DevisDetailPage() {
         <div>
           <Link
             href="/tableau-de-bord/devis"
-            className="text-secondary hover:text-white mb-2 inline-block"
+            className="text-secondary hover:text-primary mb-2 inline-block"
           >
             ← Retour aux devis
           </Link>
@@ -250,7 +250,7 @@ export default function DevisDetailPage() {
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !devis.client?.email}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Mail className="w-4 h-4" />
             {envoiEmail ? "Envoi..." : "Envoyer par email"}
@@ -266,7 +266,7 @@ export default function DevisDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Eye className="w-4 h-4" />
             Prévisualiser PDF
@@ -287,7 +287,7 @@ export default function DevisDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Download className="w-4 h-4" />
             Télécharger PDF
@@ -301,7 +301,7 @@ export default function DevisDetailPage() {
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
           >
             <Trash className="w-4 h-4" />
             Supprimer
@@ -331,7 +331,7 @@ export default function DevisDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
               )
             }
-            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           >
             <option value="brouillon">Brouillon</option>
             <option value="envoye">Envoyé</option>
@@ -370,7 +370,7 @@ export default function DevisDetailPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-200/70">
               {devis.lignes && devis.lignes.length > 0 ? (
                 devis.lignes.map((ligne) => {
                   if (!ligne) return null;

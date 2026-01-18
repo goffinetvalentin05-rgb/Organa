@@ -261,7 +261,7 @@ export default function NouvelleFacturePage() {
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
               disabled={loadingClients}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">
                 {loadingClients ? "Chargement des clients..." : "Sélectionner un client"}
@@ -285,7 +285,7 @@ export default function NouvelleFacturePage() {
                   e.target.value as "brouillon" | "envoye" | "paye" | "en-retard"
                 )
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
               <option value="brouillon">Brouillon</option>
               <option value="envoye">Envoyée</option>
@@ -303,7 +303,7 @@ export default function NouvelleFacturePage() {
                 type="date"
                 value={dateEcheance}
                 onChange={(e) => setDateEcheance(e.target.value)}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
@@ -314,7 +314,7 @@ export default function NouvelleFacturePage() {
                 type="date"
                 value={datePaiement}
                 onChange={(e) => setDatePaiement(e.target.value)}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
           </div>
@@ -326,7 +326,7 @@ export default function NouvelleFacturePage() {
             <button
               type="button"
               onClick={ajouterLigne}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all text-sm flex items-center gap-2 border border-subtle"
+              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-sm flex items-center gap-2 border border-subtle"
             >
               <Plus className="w-4 h-4" />
               Ajouter une ligne
@@ -337,7 +337,7 @@ export default function NouvelleFacturePage() {
             {lignes.map((ligne) => (
               <div
                 key={ligne.id}
-                className="p-4 rounded-lg border border-subtle bg-black/20 space-y-3"
+                className="p-4 rounded-lg border border-subtle bg-surface-hover space-y-3"
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
@@ -353,7 +353,7 @@ export default function NouvelleFacturePage() {
                         })
                       }
                       placeholder="Description de la prestation"
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div className="col-span-2">
@@ -369,7 +369,7 @@ export default function NouvelleFacturePage() {
                       }
                       placeholder="Détails supplémentaires de la prestation..."
                       rows={3}
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] resize-y"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] resize-y"
                     />
                   </div>
                   <div>
@@ -386,7 +386,7 @@ export default function NouvelleFacturePage() {
                           quantite: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div>
@@ -403,7 +403,7 @@ export default function NouvelleFacturePage() {
                           prixUnitaire: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div>
@@ -420,7 +420,7 @@ export default function NouvelleFacturePage() {
                           tva: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                   <div className="col-span-2 flex items-center justify-between">
@@ -435,7 +435,7 @@ export default function NouvelleFacturePage() {
                       <button
                         type="button"
                         onClick={() => supprimerLigne(ligne.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-sm flex items-center gap-1.5"
                       >
                         <Trash className="w-4 h-4" />
                         Supprimer
@@ -455,7 +455,7 @@ export default function NouvelleFacturePage() {
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
             placeholder="Notes additionnelles..."
-            className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           />
         </div>
 
@@ -495,7 +495,7 @@ export default function NouvelleFacturePage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
           >
             Annuler
           </button>
@@ -503,7 +503,7 @@ export default function NouvelleFacturePage() {
             type="button"
             onClick={() => saveAndOpenPdf(false)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
               <>
@@ -521,7 +521,7 @@ export default function NouvelleFacturePage() {
             type="button"
             onClick={() => saveAndOpenPdf(true)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
               <>

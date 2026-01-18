@@ -212,8 +212,8 @@ export default function CalendrierPage() {
           onClick={() => setOngletActif("calendrier")}
           className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "calendrier"
-              ? "border-b-2 accent-border-strong text-white"
-              : "text-secondary hover:text-white"
+              ? "border-b-2 accent-border-strong text-primary"
+              : "text-secondary hover:text-primary"
           }`}
         >
           <Calendar className="w-5 h-5" />
@@ -223,8 +223,8 @@ export default function CalendrierPage() {
           onClick={() => setOngletActif("taches")}
           className={`px-6 py-3 font-medium transition-all flex items-center gap-2 ${
             ongletActif === "taches"
-              ? "border-b-2 accent-border-strong text-white"
-              : "text-secondary hover:text-white"
+              ? "border-b-2 accent-border-strong text-primary"
+              : "text-secondary hover:text-primary"
           }`}
         >
           <CheckCircle className="w-5 h-5" />
@@ -240,19 +240,19 @@ export default function CalendrierPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={moisPrecedent}
-                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
               >
                 ←
               </button>
               <button
                 onClick={allerAujourdhui}
-                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
               >
                 Aujourd'hui
               </button>
               <button
                 onClick={moisSuivant}
-                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+                className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
               >
                 →
               </button>
@@ -266,7 +266,7 @@ export default function CalendrierPage() {
                 className={`px-4 py-2 rounded-lg transition-all ${
                   vueCalendrier === "calendrier"
                     ? "accent-bg-light text-primary"
-                    : "bg-surface-hover text-secondary hover:text-white"
+                    : "bg-surface-hover text-secondary hover:text-primary"
                 }`}
               >
                 Calendrier
@@ -276,7 +276,7 @@ export default function CalendrierPage() {
                 className={`px-4 py-2 rounded-lg transition-all ${
                   vueCalendrier === "liste"
                     ? "accent-bg-light text-primary"
-                    : "bg-surface-hover text-secondary hover:text-white"
+                    : "bg-surface-hover text-secondary hover:text-primary"
                 }`}
               >
                 Liste
@@ -314,8 +314,8 @@ export default function CalendrierPage() {
                             key={evt.id}
                             className={`text-xs p-1 rounded truncate ${
                               evt.type === "rdv"
-                                ? "bg-blue-500/20 text-blue-300"
-                                : "bg-green-500/20 text-green-300"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
                             }`}
                             title={evt.titre}
                           >
@@ -349,7 +349,7 @@ export default function CalendrierPage() {
                   </button>
                 </div>
               ) : (
-                <div className="divide-y divide-white/10">
+                <div className="divide-y divide-slate-200/70">
                   {evenements
                     .filter((evt) => {
                       const dateEvt = new Date(evt.date);
@@ -378,15 +378,15 @@ export default function CalendrierPage() {
                       return (
                         <div
                           key={evt.id}
-                          className="p-6 hover:bg-black/20 transition-all"
+                          className="p-6 hover:bg-surface-hover transition-all"
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-4 flex-1">
                               <div className="mt-1">
                                 {evt.type === "rdv" ? (
-                                  <Calendar className="w-5 h-5 text-blue-300" />
+                                  <Calendar className="w-5 h-5 text-blue-600" />
                                 ) : (
-                                  <CheckCircle className={`w-5 h-5 ${evt.statut === "fait" ? "text-green-300" : "text-yellow-300"}`} />
+                                  <CheckCircle className={`w-5 h-5 ${evt.statut === "fait" ? "text-green-600" : "text-yellow-600"}`} />
                                 )}
                               </div>
                               <div className="flex-1">
@@ -395,8 +395,8 @@ export default function CalendrierPage() {
                                   {evt.type === "tache" && evt.statut && (
                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                                       evt.statut === "fait"
-                                        ? "bg-green-500/20 text-green-300"
-                                        : "bg-yellow-500/20 text-yellow-300"
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-yellow-100 text-yellow-700"
                                     }`}>
                                       {evt.statut === "fait" ? "Terminé" : "À faire"}
                                     </span>
@@ -438,28 +438,28 @@ export default function CalendrierPage() {
                             </div>
                             <div className="flex items-center gap-2">
                               {evt.type === "tache" && (
-                                <button
-                                  onClick={() => handleToggleStatut(evt.id, evt.statut || "a-faire")}
-                                  className={`px-3 py-1.5 rounded-lg transition-all text-sm flex items-center justify-center ${
-                                    evt.statut === "fait"
-                                      ? "bg-green-500/20 hover:bg-green-500/30 text-green-300"
-                                      : "bg-surface-hover hover:bg-surface text-secondary hover:text-white"
-                                  }`}
-                                  title={evt.statut === "fait" ? "Marquer comme à faire" : "Marquer comme terminé"}
-                                >
+                                  <button
+                                    onClick={() => handleToggleStatut(evt.id, evt.statut || "a-faire")}
+                                    className={`px-3 py-1.5 rounded-lg transition-all text-sm flex items-center justify-center ${
+                                      evt.statut === "fait"
+                                        ? "bg-green-100 hover:bg-green-200 text-green-700"
+                                        : "bg-surface-hover hover:bg-surface text-secondary hover:text-primary"
+                                    }`}
+                                    title={evt.statut === "fait" ? "Marquer comme à faire" : "Marquer comme terminé"}
+                                  >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
                               )}
                               <button
                                 onClick={() => handleOpenModal(evt)}
-                                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center justify-center"
+                                  className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center justify-center"
                                 title="Modifier"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(evt.id)}
-                                className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                                  className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                                 title="Supprimer"
                               >
                                 <Trash className="w-4 h-4" />
@@ -482,7 +482,7 @@ export default function CalendrierPage() {
           {/* Tâches à faire */}
           <div className="rounded-xl border border-subtle bg-surface p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-yellow-300" />
+              <CheckCircle className="w-5 h-5 text-yellow-600" />
               À faire ({tachesAFaire.length})
             </h2>
             {tachesAFaire.length === 0 ? (
@@ -515,7 +515,7 @@ export default function CalendrierPage() {
                     return (
                       <div
                         key={tache.id}
-                        className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-black/20 hover:bg-black/30 transition-all"
+                        className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-surface-hover hover:bg-surface transition-all"
                       >
                         <div className="flex items-start gap-4 flex-1">
                           <button
@@ -533,9 +533,9 @@ export default function CalendrierPage() {
                                 <span
                                   className={`text-sm font-medium ${
                                     estEnRetard
-                                      ? "text-red-300"
+                                      ? "text-red-600"
                                       : estAujourdhuiDate
-                                      ? "text-yellow-300"
+                                      ? "text-yellow-600"
                                       : "text-secondary"
                                   }`}
                                 >
@@ -560,7 +560,7 @@ export default function CalendrierPage() {
                                 </span>
                               )}
                               {tache.typeTache && (
-                                <span className="px-2 py-1 rounded bg-surface-hover text-xs font-medium">
+                                <span className="px-2 py-1 rounded bg-surface-hover text-xs font-medium text-secondary">
                                   {tache.typeTache === "relance" && "🔔 Relance"}
                                   {tache.typeTache === "rdv" && "📅 Rendez-vous"}
                                   {tache.typeTache === "admin" && "⚙️ Admin"}
@@ -573,14 +573,14 @@ export default function CalendrierPage() {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleOpenModal(tache)}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center justify-center"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center justify-center"
                             title="Modifier"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(tache.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                             title="Supprimer"
                           >
                             <Trash className="w-4 h-4" />
@@ -597,7 +597,7 @@ export default function CalendrierPage() {
           {tachesFaites.length > 0 && (
             <div className="rounded-xl border border-subtle bg-surface p-6 opacity-70">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-300" />
+                <CheckCircle className="w-5 h-5 text-green-600" />
                 Terminées ({tachesFaites.length})
               </h2>
               <div className="space-y-3">
@@ -611,7 +611,7 @@ export default function CalendrierPage() {
                   .map((tache) => (
                     <div
                       key={tache.id}
-                      className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-black/20"
+                      className="flex items-start justify-between p-4 rounded-lg border border-subtle bg-surface-hover"
                     >
                       <div className="flex items-start gap-4 flex-1">
                         <button
@@ -634,7 +634,7 @@ export default function CalendrierPage() {
                               })}
                             </span>
                             {tache.typeTache && (
-                              <span className="px-2 py-0.5 rounded bg-surface text-xs">
+                            <span className="px-2 py-0.5 rounded bg-surface text-xs text-secondary">
                                 {tache.typeTache === "relance" && "Relance"}
                                 {tache.typeTache === "rdv" && "Rendez-vous"}
                                 {tache.typeTache === "admin" && "Admin"}
@@ -647,7 +647,7 @@ export default function CalendrierPage() {
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <button
                           onClick={() => handleDelete(tache.id)}
-                          className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                          className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                           title="Supprimer"
                         >
                           <Trash className="w-4 h-4" />
@@ -681,7 +681,7 @@ export default function CalendrierPage() {
                       type: e.target.value as "rdv" | "tache",
                     })
                   }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 >
                   <option value="rdv">Rendez-vous</option>
                   <option value="tache">Tâche</option>
@@ -701,7 +701,7 @@ export default function CalendrierPage() {
                           typeTache: e.target.value as "relance" | "rdv" | "admin" | "autre",
                         })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     >
                       <option value="relance">Relance</option>
                       <option value="rdv">Rendez-vous</option>
@@ -721,7 +721,7 @@ export default function CalendrierPage() {
                           statut: e.target.value as "a-faire" | "fait",
                         })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     >
                       <option value="a-faire">À faire</option>
                       <option value="fait">Fait</option>
@@ -737,7 +737,7 @@ export default function CalendrierPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, dateEcheance: e.target.value })
                       }
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                     />
                   </div>
                 </>
@@ -753,7 +753,7 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, titre: e.target.value })
                   }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
@@ -766,7 +766,7 @@ export default function CalendrierPage() {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   rows={3}
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
@@ -780,7 +780,7 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
@@ -793,14 +793,14 @@ export default function CalendrierPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, heure: e.target.value })
                   }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
                 >
                   Annuler
                 </button>

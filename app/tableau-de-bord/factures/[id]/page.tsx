@@ -198,7 +198,7 @@ export default function FactureDetailPage() {
         <p className="text-secondary">Erreur : données de facture invalides</p>
         <Link
           href="/tableau-de-bord/factures"
-          className="text-secondary hover:text-white mt-4 inline-block"
+          className="text-secondary hover:text-primary mt-4 inline-block"
         >
           ← Retour aux factures
         </Link>
@@ -221,7 +221,7 @@ export default function FactureDetailPage() {
         <div>
           <Link
             href="/tableau-de-bord/factures"
-            className="text-secondary hover:text-white mb-2 inline-block"
+            className="text-secondary hover:text-primary mb-2 inline-block"
           >
             ← Retour aux factures
           </Link>
@@ -234,7 +234,7 @@ export default function FactureDetailPage() {
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !facture.client?.email}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Mail className="w-4 h-4" />
             {envoiEmail ? "Envoi..." : "Envoyer par email"}
@@ -250,7 +250,7 @@ export default function FactureDetailPage() {
               window.open(url, "_blank");
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Eye className="w-4 h-4" />
             Prévisualiser PDF
@@ -271,7 +271,7 @@ export default function FactureDetailPage() {
               document.body.removeChild(link);
             }}
             disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Download className="w-4 h-4" />
             Télécharger PDF
@@ -279,7 +279,7 @@ export default function FactureDetailPage() {
           {facture.statut !== "paye" && (
             <button
               onClick={handleCreerTacheRelance}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-white font-medium transition-all flex items-center gap-2 border border-subtle"
+              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all flex items-center gap-2 border border-subtle"
             >
               <FileText className="w-4 h-4" />
               Créer tâche de relance
@@ -287,7 +287,7 @@ export default function FactureDetailPage() {
           )}
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
           >
             <Trash className="w-4 h-4" />
             Supprimer
@@ -324,7 +324,7 @@ export default function FactureDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "paye" | "en-retard"
               )
             }
-            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           >
             <option value="brouillon">Brouillon</option>
             <option value="envoye">Envoyée</option>
@@ -364,7 +364,7 @@ export default function FactureDetailPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-200/70">
               {facture.lignes && facture.lignes.length > 0 ? (
                 facture.lignes.map((ligne) => {
                   if (!ligne) return null;

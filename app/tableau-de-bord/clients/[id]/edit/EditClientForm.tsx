@@ -80,8 +80,8 @@ export default function EditClientForm({
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-500/20 border border-red-500/50 p-4">
-          <p className="text-red-300">{error}</p>
+        <div className="rounded-lg bg-red-50 border border-red-500/50 p-4">
+          <p className="text-red-700">{error}</p>
         </div>
       )}
 
@@ -98,7 +98,7 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -111,7 +111,7 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -124,7 +124,7 @@ export default function EditClientForm({
               onChange={(e) =>
                 setFormData({ ...formData, telephone: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -137,7 +137,7 @@ export default function EditClientForm({
                 setFormData({ ...formData, adresse: e.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function EditClientForm({
         <div className="flex gap-3">
           <Link
             href="/tableau-de-bord/clients"
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all text-center"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-center"
           >
             Annuler
           </Link>

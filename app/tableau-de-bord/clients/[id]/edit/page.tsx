@@ -10,8 +10,8 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="p-12 text-center space-y-4">
-        <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-6 mb-6">
-          <p className="text-yellow-300 text-lg font-medium mb-2 flex items-center gap-2 justify-center">
+        <div className="rounded-lg border border-yellow-500/30 bg-yellow-50 p-6 mb-6">
+          <p className="text-yellow-700 text-lg font-medium mb-2 flex items-center gap-2 justify-center">
             <AlertTriangle className="w-5 h-5" />
             Modification désactivée
           </p>

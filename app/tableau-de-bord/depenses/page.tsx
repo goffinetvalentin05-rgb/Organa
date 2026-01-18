@@ -68,11 +68,11 @@ const getStatutLabel = (statut: string) => {
 
 const getStatutColor = (statut: string) => {
   const colors: Record<string, string> = {
-    a_payer: "bg-yellow-500/20 text-yellow-300",
-    paye: "bg-green-500/20 text-green-300",
-    en_retard: "bg-red-500/20 text-red-300",
+      a_payer: "bg-yellow-100 text-yellow-700",
+      paye: "bg-green-100 text-green-700",
+      en_retard: "bg-red-100 text-red-700",
   };
-  return colors[statut] || "bg-gray-500/20 text-gray-300";
+    return colors[statut] || "bg-slate-100 text-slate-700";
 };
 
 export default function DepensesPage() {
@@ -392,7 +392,7 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, label: event.target.value })
                 }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
@@ -408,7 +408,7 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, amount: event.target.value })
                 }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
@@ -422,7 +422,7 @@ export default function DepensesPage() {
                 onChange={(event) =>
                   setFormData({ ...formData, date: event.target.value })
                 }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
             <div>
@@ -437,7 +437,7 @@ export default function DepensesPage() {
                     status: event.target.value as DepenseStatut,
                   })
                 }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               >
                 <option value="a_payer">À payer</option>
                 <option value="paye">Payé</option>
@@ -454,7 +454,7 @@ export default function DepensesPage() {
                 setFormData({ ...formData, notes: event.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -470,7 +470,7 @@ export default function DepensesPage() {
                   pieceJointe: event.target.files?.[0] ?? null,
                 })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-surface"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-primary hover:file:bg-surface"
             />
             <p className="mt-2 text-xs text-tertiary">
               Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
@@ -486,7 +486,7 @@ export default function DepensesPage() {
                 resetForm();
                 setShowForm(false);
               }}
-              className="flex-1 px-6 py-3 rounded-full bg-surface-hover hover:bg-surface text-white transition-all"
+              className="flex-1 px-6 py-3 rounded-full bg-surface-hover hover:bg-surface text-primary transition-all"
             >
               Annuler
             </button>
@@ -509,7 +509,7 @@ export default function DepensesPage() {
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-400 mb-2">Erreur lors du chargement</p>
+            <p className="text-red-600 mb-2">Erreur lors du chargement</p>
             <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : depensesTriees.length === 0 ? (
@@ -547,7 +547,7 @@ export default function DepensesPage() {
                           Échéance : {formatDate(depense.date)}
                         </p>
                         {besoinAction && (
-                          <p className="mt-2 text-sm text-warning">
+                          <p className="mt-2 text-sm text-yellow-600">
                             Une action est recommandée pour sécuriser ce paiement.
                           </p>
                         )}
@@ -573,20 +573,20 @@ export default function DepensesPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <button
                           onClick={() => handleVoir(depense)}
-                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-2"
+                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
                         >
                           <Eye className="w-4 h-4" />
                           Voir
                         </button>
                         <button
                           onClick={() => handleModifier(depense)}
-                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                         >
                           Modifier
                         </button>
                         <button
                           onClick={() => handleDelete(depense.id)}
-                          className="px-4 py-2 rounded-full bg-red-500/15 hover:bg-red-500/25 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                          className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                           title="Supprimer"
                         >
                           <Trash className="w-4 h-4" />
@@ -611,7 +611,7 @@ export default function DepensesPage() {
                   setShowViewModal(false);
                   setSelectedDepense(null);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
               >
                 Fermer
               </button>
@@ -655,7 +655,7 @@ export default function DepensesPage() {
                   href={selectedDepense.attachmentUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                  className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                 >
                   Télécharger la pièce jointe
                 </a>
@@ -676,7 +676,7 @@ export default function DepensesPage() {
                   setSelectedDepense(null);
                   resetEditForm();
                 }}
-                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
               >
                 Fermer
               </button>
@@ -695,7 +695,7 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, label: event.target.value })
                     }
-                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
@@ -711,7 +711,7 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, amount: event.target.value })
                     }
-                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
@@ -725,7 +725,7 @@ export default function DepensesPage() {
                     onChange={(event) =>
                       setEditFormData({ ...editFormData, date: event.target.value })
                     }
-                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   />
                 </div>
                 <div>
@@ -740,7 +740,7 @@ export default function DepensesPage() {
                         status: event.target.value as DepenseStatut,
                       })
                     }
-                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   >
                     <option value="a_payer">À payer</option>
                     <option value="paye">Payé</option>
@@ -757,7 +757,7 @@ export default function DepensesPage() {
                     setEditFormData({ ...editFormData, notes: event.target.value })
                   }
                   rows={4}
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                 />
               </div>
               <div>
@@ -773,7 +773,7 @@ export default function DepensesPage() {
                       pieceJointe: event.target.files?.[0] ?? null,
                     })
                   }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-surface"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-primary hover:file:bg-surface"
                 />
                 <p className="mt-2 text-xs text-tertiary">
                   Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
@@ -790,7 +790,7 @@ export default function DepensesPage() {
                     setSelectedDepense(null);
                     resetEditForm();
                   }}
-                  className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+                  className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
                 >
                   Annuler
                 </button>

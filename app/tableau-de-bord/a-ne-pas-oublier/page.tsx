@@ -216,7 +216,7 @@ export default function ANePasOublierPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-slate-200/70">
             {items.map((item) => (
               <tr key={item.id} className="hover:bg-surface transition-colors">
                 <td className="px-6 py-4">
@@ -234,7 +234,7 @@ export default function ANePasOublierPage() {
                 <td className="px-6 py-4 text-right">
                   <Link
                     href={item.href}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                   >
                     <Eye className="w-4 h-4" />
                     Voir
@@ -268,7 +268,7 @@ export default function ANePasOublierPage() {
       <div className="space-y-6">
         <section className="rounded-xl border border-red-500/30 bg-red-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-red-500/20">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-red-700">
               🔴 Priorité — En retard
             </h2>
             <p className="text-sm text-secondary mt-1">
@@ -280,7 +280,7 @@ export default function ANePasOublierPage() {
 
         <section className="rounded-xl border border-orange-500/30 bg-orange-500/10 overflow-hidden">
           <div className="px-6 py-4 border-b border-orange-500/20">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-orange-700">
               🟠 À venir prochainement
             </h2>
             <p className="text-sm text-secondary mt-1">

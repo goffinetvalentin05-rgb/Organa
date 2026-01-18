@@ -67,12 +67,12 @@ export default function DevisPage() {
 
   const getStatutColor = (statut: string) => {
     const colors: Record<string, string> = {
-      brouillon: "bg-gray-500/20 text-gray-300",
-      envoye: "bg-blue-500/20 text-blue-300",
-      accepte: "bg-green-500/20 text-green-300",
-      refuse: "bg-red-500/20 text-red-300",
+      brouillon: "bg-slate-100 text-slate-700",
+      envoye: "bg-blue-100 text-blue-700",
+      accepte: "bg-green-100 text-green-700",
+      refuse: "bg-red-100 text-red-700",
     };
-    return colors[statut] || "bg-gray-500/20 text-gray-300";
+    return colors[statut] || "bg-slate-100 text-slate-700";
   };
 
   const getStatutLabel = (statut: string) => {
@@ -112,7 +112,7 @@ export default function DevisPage() {
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-400 mb-2">Erreur lors du chargement</p>
+            <p className="text-red-600 mb-2">Erreur lors du chargement</p>
             <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : devis.length === 0 ? (
@@ -150,7 +150,7 @@ export default function DevisPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-slate-200/70">
                 {devis.map((devisItem) => {
                   const montant = calculerTotalTTC(devisItem.lignes);
                   return (
@@ -183,14 +183,14 @@ export default function DevisPage() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/tableau-de-bord/devis/${devisItem.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-1.5"
                           >
                             <Eye className="w-4 h-4" />
                             Voir
                           </Link>
                           <button
                             onClick={() => handleDelete(devisItem.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                             title="Supprimer"
                           >
                             <Trash className="w-4 h-4" />

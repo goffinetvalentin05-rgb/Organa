@@ -77,8 +77,8 @@ export default function NouveauClientPage() {
 
       {/* Message d'erreur générique */}
       {error?.type === "OTHER" && (
-        <div className="rounded-xl border border-red-500/50 bg-red-500/10 p-4">
-          <p className="text-red-400">{error.message}</p>
+        <div className="rounded-xl border border-red-500/50 bg-red-50 p-4">
+          <p className="text-red-700">{error.message}</p>
         </div>
       )}
 
@@ -95,7 +95,7 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -109,7 +109,7 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function NouveauClientPage() {
               onChange={(e) =>
                 setFormData({ ...formData, telephone: e.target.value })
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
           <div>
@@ -135,7 +135,7 @@ export default function NouveauClientPage() {
                 setFormData({ ...formData, adresse: e.target.value })
               }
               rows={3}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function NouveauClientPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
           >
             Annuler
           </button>

@@ -30,7 +30,7 @@ export default async function ClientsPage() {
       return (
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="p-12 text-center">
-            <p className="text-red-400">Erreur d'authentification</p>
+            <p className="text-red-600">Erreur d'authentification</p>
           </div>
         </div>
       );
@@ -66,7 +66,7 @@ export default async function ClientsPage() {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="p-12 text-center">
-          <p className="text-red-400 mb-4">Erreur lors du chargement des clients</p>
+          <p className="text-red-600 mb-4">Erreur lors du chargement des clients</p>
           <p className="text-secondary text-sm">{errorMessage}</p>
         </div>
       </div>
