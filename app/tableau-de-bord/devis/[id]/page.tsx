@@ -11,6 +11,8 @@ import {
 } from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 interface Devis {
   id: string;
@@ -29,6 +31,7 @@ export default function DevisDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = (params?.id as string) || "";
+  const { t, locale } = useI18n();
   const [devis, setDevis] = useState<Devis | null>(null);
   const [envoiEmail, setEnvoiEmail] = useState(false);
   const [currency, setCurrency] = useState<string>("CHF");
@@ -77,25 +80,25 @@ export default function DevisDetailPage() {
   }, [id, router]);
 
   const handleDelete = async () => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce devis ?")) return;
+    if (!confirm(t("dashboard.quotes.detail.deleteConfirm"))) return;
     try {
       const response = await fetch(`/api/documents?id=${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression du devis");
+        throw new Error(t("dashboard.quotes.detail.deleteError"));
       }
       router.push("/tableau-de-bord/devis");
     } catch (error: any) {
-      toast.error(error?.message || "Erreur lors de la suppression");
+      toast.error(error?.message || t("dashboard.quotes.detail.deleteErrorFallback"));
     }
   };
 
   const handleTransformerEnFacture = async () => {
     if (!devis) return;
-    if (!confirm("Transformer ce devis en facture ?")) return;
+    if (!confirm(t("dashboard.quotes.detail.convertConfirm"))) return;
     if (!devis.clientId) {
-      toast.error("Client manquant pour ce devis");
+      toast.error(t("dashboard.quotes.detail.missingClient"));
       return;
     }
     try {
@@ -115,13 +118,13 @@ export default function DevisDetailPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || "Erreur lors de la création de la facture");
+        throw new Error(errorData?.error || t("dashboard.quotes.detail.convertError"));
       }
 
       const data = await response.json();
       router.push(`/tableau-de-bord/factures/${data.id}`);
     } catch (error: any) {
-      toast.error(error?.message || "Erreur lors de la transformation");
+      toast.error(error?.message || t("dashboard.quotes.detail.convertErrorFallback"));
     }
   };
 
@@ -139,19 +142,19 @@ export default function DevisDetailPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la mise à jour du statut");
+        throw new Error(t("dashboard.quotes.detail.statusUpdateError"));
       }
 
       setDevis({ ...devis, statut: nouveauStatut });
     } catch (error: any) {
-      toast.error(error?.message || "Erreur lors de la mise à jour du statut");
+      toast.error(error?.message || t("dashboard.quotes.detail.statusUpdateError"));
     }
   };
 
   const handleEnvoyerEmail = async () => {
     if (!devis || !devis.client?.email) {
       if (typeof toast !== "undefined" && toast.error) {
-        toast.error("Email du client manquant");
+        toast.error(t("dashboard.quotes.detail.missingClientEmail"));
       }
       return;
     }
@@ -172,18 +175,18 @@ export default function DevisDetailPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Erreur lors de l'envoi");
+        throw new Error(data?.error || t("dashboard.quotes.detail.sendError"));
       }
 
       if (typeof toast !== "undefined" && toast.success) {
-        toast.success("Email envoyé avec succès !");
+        toast.success(t("dashboard.quotes.detail.sendSuccess"));
       }
       if (devis.statut === "brouillon") {
         handleChangerStatut("envoye");
       }
     } catch (error: any) {
       if (typeof toast !== "undefined" && toast.error) {
-        const errorMessage = error?.message || "Erreur lors de l'envoi de l'email";
+        const errorMessage = error?.message || t("dashboard.quotes.detail.sendErrorFallback");
         toast.error(String(errorMessage));
       }
     } finally {
@@ -194,7 +197,7 @@ export default function DevisDetailPage() {
   if (!devis) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">Chargement...</p>
+        <p className="text-secondary">{t("dashboard.common.loading")}</p>
       </div>
     );
   }
@@ -202,12 +205,12 @@ export default function DevisDetailPage() {
   if (!devis.lignes || !Array.isArray(devis.lignes)) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">Erreur : données de devis invalides</p>
+        <p className="text-secondary">{t("dashboard.quotes.detail.invalidData")}</p>
         <Link
           href="/tableau-de-bord/devis"
           className="text-secondary hover:text-primary mt-4 inline-block"
         >
-          ← Retour aux devis
+          ← {t("dashboard.quotes.detail.backToList")}
         </Link>
       </div>
     );
@@ -219,6 +222,13 @@ export default function DevisDetailPage() {
 
   const formatMontant = (montant: number) => {
     return formatCurrency(montant, currency);
+  };
+
+  const formatDate = (value?: string | null) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString(localeToIntl[locale]);
   };
 
   const getStatutColor = (statut: string) => {
@@ -239,11 +249,11 @@ export default function DevisDetailPage() {
             href="/tableau-de-bord/devis"
             className="text-secondary hover:text-primary mb-2 inline-block"
           >
-            ← Retour aux devis
+            ← {t("dashboard.quotes.detail.backToList")}
           </Link>
           <h1 className="text-3xl font-bold">{devis.numero}</h1>
           <p className="mt-2 text-secondary">
-            Client: {devis.client?.nom || "Client inconnu"}
+            {t("dashboard.common.client")}: {devis.client?.nom || t("dashboard.common.unknownClient")}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -253,12 +263,12 @@ export default function DevisDetailPage() {
             className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Mail className="w-4 h-4" />
-            {envoiEmail ? "Envoi..." : "Envoyer par email"}
+            {envoiEmail ? t("dashboard.quotes.detail.sending") : t("dashboard.quotes.detail.sendEmail")}
           </button>
           <button
             onClick={() => {
               if (!id) {
-                toast.error("ID du document manquant");
+                toast.error(t("dashboard.common.missingDocumentId"));
                 return;
               }
               const url = `/api/documents/${id}/pdf?type=quote`;
@@ -269,12 +279,12 @@ export default function DevisDetailPage() {
             className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Eye className="w-4 h-4" />
-            Prévisualiser PDF
+            {t("dashboard.quotes.detail.previewPdf")}
           </button>
           <button
             onClick={() => {
               if (!id) {
-                toast.error("ID du document manquant");
+                toast.error(t("dashboard.common.missingDocumentId"));
                 return;
               }
               const url = `/api/documents/${id}/pdf?type=quote&download=true`;
@@ -290,21 +300,21 @@ export default function DevisDetailPage() {
             className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             <Download className="w-4 h-4" />
-            Télécharger PDF
+            {t("dashboard.quotes.detail.downloadPdf")}
           </button>
           <button
             onClick={handleTransformerEnFacture}
             className="px-4 py-2 rounded-lg accent-bg text-white font-medium transition-all flex items-center gap-2"
           >
             <ArrowRight className="w-4 h-4" />
-            Transformer en facture
+            {t("dashboard.quotes.detail.convertAction")}
           </button>
           <button
             onClick={handleDelete}
             className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
           >
             <Trash className="w-4 h-4" />
-            Supprimer
+            {t("dashboard.common.delete")}
           </button>
         </div>
       </div>
@@ -312,18 +322,18 @@ export default function DevisDetailPage() {
       <div className="rounded-xl border border-subtle bg-surface p-6">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="text-sm text-secondary">Date de création</label>
-            <p className="font-medium">{devis.dateCreation}</p>
+            <label className="text-sm text-secondary">{t("dashboard.quotes.detail.createdAt")}</label>
+            <p className="font-medium">{formatDate(devis.dateCreation)}</p>
           </div>
           {devis.dateEcheance && (
             <div>
-              <label className="text-sm text-secondary">Date d'échéance</label>
-              <p className="font-medium">{devis.dateEcheance}</p>
+              <label className="text-sm text-secondary">{t("dashboard.quotes.detail.dueDate")}</label>
+              <p className="font-medium">{formatDate(devis.dateEcheance)}</p>
             </div>
           )}
         </div>
         <div className="mb-4">
-          <label className="text-sm text-secondary mb-2 block">Statut</label>
+          <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.status")}</label>
           <select
             value={devis.statut}
             onChange={(e) =>
@@ -333,40 +343,40 @@ export default function DevisDetailPage() {
             }
             className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           >
-            <option value="brouillon">Brouillon</option>
-            <option value="envoye">Envoyé</option>
-            <option value="accepte">Accepté</option>
-            <option value="refuse">Refusé</option>
+            <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
+            <option value="envoye">{t("dashboard.status.quote.sent")}</option>
+            <option value="accepte">{t("dashboard.status.quote.accepted")}</option>
+            <option value="refuse">{t("dashboard.status.quote.refused")}</option>
           </select>
         </div>
         {devis.notes && (
           <div>
-            <label className="text-sm text-secondary mb-2 block">Notes</label>
+            <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.notes")}</label>
             <p className="text-primary">{devis.notes}</p>
           </div>
         )}
       </div>
 
       <div className="rounded-xl border border-subtle bg-surface p-6">
-        <h2 className="text-xl font-semibold mb-4">Lignes</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("dashboard.common.lines")}</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-surface border-b border-subtle">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-primary">
-                  Désignation
+                  {t("dashboard.common.designation")}
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  Quantité
+                  {t("dashboard.common.quantity")}
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  Prix unitaire
+                  {t("dashboard.common.unitPrice")}
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  TVA
+                  {t("dashboard.common.vat")}
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  Total
+                  {t("dashboard.common.total")}
                 </th>
               </tr>
             </thead>
@@ -401,7 +411,7 @@ export default function DevisDetailPage() {
               ) : (
                 <tr>
                   <td colSpan={5} className="px-4 py-3 text-center text-secondary">
-                    Aucune ligne
+                    {t("dashboard.common.noLines")}
                   </td>
                 </tr>
               )}
@@ -411,15 +421,15 @@ export default function DevisDetailPage() {
 
         <div className="mt-6 pt-6 border-t border-subtle space-y-2 text-right">
           <div className="flex justify-between text-secondary">
-            <span>Total HT:</span>
+            <span>{t("dashboard.common.totalHT")}</span>
             <span>{formatMontant(totalHT)}</span>
           </div>
           <div className="flex justify-between text-secondary">
-            <span>TVA:</span>
+            <span>{t("dashboard.common.vatLabel")}</span>
             <span>{formatMontant(totalTVA)}</span>
           </div>
           <div className="flex justify-between text-2xl font-bold pt-2">
-            <span>Total TTC:</span>
+            <span>{t("dashboard.common.totalTTC")}</span>
             <span>{formatMontant(totalTTC)}</span>
           </div>
         </div>

@@ -7,11 +7,14 @@ import {
   EvenementCalendrier,
 } from "@/lib/mock-data";
 import { Plus, Calendar, CheckCircle, Edit, Trash } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 type VueCalendrier = "calendrier" | "liste";
 type Onglet = "calendrier" | "taches";
 
 export default function CalendrierPage() {
+  const { t, locale } = useI18n();
   const [ongletActif, setOngletActif] = useState<Onglet>("calendrier");
   const [vueCalendrier, setVueCalendrier] = useState<VueCalendrier>("calendrier");
   const [dateCourante, setDateCourante] = useState(new Date());
@@ -79,12 +82,12 @@ export default function CalendrierPage() {
     if (editingEvenement) {
       calendrierAPI.update(editingEvenement.id, formData);
       if (typeof toast !== "undefined" && toast.success) {
-        toast.success("Événement modifié");
+        toast.success(t("dashboard.calendar.toast.updated"));
       }
     } else {
       calendrierAPI.create(formData);
       if (typeof toast !== "undefined" && toast.success) {
-        toast.success("Événement créé");
+        toast.success(t("dashboard.calendar.toast.created"));
       }
     }
     loadEvenements();
@@ -92,11 +95,11 @@ export default function CalendrierPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
+    if (confirm(t("dashboard.calendar.deleteConfirm"))) {
       calendrierAPI.delete(id);
       loadEvenements();
       if (typeof toast !== "undefined" && toast.success) {
-        toast.success("Événement supprimé");
+        toast.success(t("dashboard.calendar.toast.deleted"));
       }
     }
   };
@@ -181,11 +184,15 @@ export default function CalendrierPage() {
   const tachesAFaire = taches.filter((t) => t.statut !== "fait");
   const tachesFaites = taches.filter((t) => t.statut === "fait");
 
-  const nomsMois = [
-    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-  ];
-  const nomsJours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+  const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+  const monthFormatter = new Intl.DateTimeFormat(localeToIntl[locale], { month: "long" });
+  const dayFormatter = new Intl.DateTimeFormat(localeToIntl[locale], { weekday: "short" });
+  const nomsMois = Array.from({ length: 12 }, (_, index) =>
+    capitalize(monthFormatter.format(new Date(2024, index, 1)))
+  );
+  const nomsJours = Array.from({ length: 7 }, (_, index) =>
+    capitalize(dayFormatter.format(new Date(2024, 0, 1 + index)))
+  );
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">

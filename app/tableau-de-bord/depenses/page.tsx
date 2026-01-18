@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Eye, Plus, Trash, Calendar, ArrowRight } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 type DepenseStatut = "a_payer" | "paye";
 
@@ -16,20 +18,6 @@ interface Depense {
   notes?: string;
   attachmentUrl?: string;
 }
-
-const formatMontant = (montant: number) => {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "CHF",
-  }).format(montant);
-};
-
-const formatDate = (value: string) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("fr-FR");
-};
 
 const isDatePassee = (value: string) => {
   if (!value) return false;
@@ -57,11 +45,11 @@ const getStatutAffiche = (depense: Depense) => {
   return depense.status;
 };
 
-const getStatutLabel = (statut: string) => {
+const getStatutLabel = (statut: string, t: (key: string) => string) => {
   const labels: Record<string, string> = {
-    a_payer: "À payer",
-    paye: "Payé",
-    en_retard: "En retard",
+    a_payer: t("dashboard.expenses.status.toPay"),
+    paye: t("dashboard.expenses.status.paid"),
+    en_retard: t("dashboard.expenses.status.overdue"),
   };
   return labels[statut] || statut;
 };
@@ -76,6 +64,7 @@ const getStatutColor = (statut: string) => {
 };
 
 export default function DepensesPage() {
+  const { t, locale } = useI18n();
   const [depenses, setDepenses] = useState<Depense[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -102,6 +91,20 @@ export default function DepensesPage() {
     attachmentUrl: "",
   });
 
+  const formatMontant = (montant: number) => {
+    return new Intl.NumberFormat(localeToIntl[locale], {
+      style: "currency",
+      currency: "CHF",
+    }).format(montant);
+  };
+
+  const formatDate = (value: string) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString(localeToIntl[locale]);
+  };
+
   useEffect(() => {
     void loadDepenses();
   }, []);
@@ -117,7 +120,7 @@ export default function DepensesPage() {
         .order("date", { ascending: false });
 
       if (error) {
-        throw new Error(error.message || "Erreur lors du chargement des dépenses");
+        throw new Error(error.message || t("dashboard.expenses.loadError"));
       }
 
       const depensesChargees = (data ?? []).map((depense: any) => ({
@@ -135,7 +138,7 @@ export default function DepensesPage() {
 
       setDepenses(depensesChargees);
     } catch (error: any) {
-      setErrorMessage(error?.message || "Erreur lors du chargement des dépenses");
+      setErrorMessage(error?.message || t("dashboard.expenses.loadError"));
       setDepenses([]);
     } finally {
       setLoading(false);
@@ -184,7 +187,7 @@ export default function DepensesPage() {
       .upload(filePath, file, { upsert: false });
 
     if (uploadError) {
-      throw new Error("Erreur lors de l'upload de la pièce jointe");
+      throw new Error(t("dashboard.expenses.uploadError"));
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -216,7 +219,7 @@ export default function DepensesPage() {
       } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        throw new Error("Erreur lors de la création de la dépense");
+        throw new Error(t("dashboard.expenses.createError"));
       }
 
       let attachmentUrl: string | null = null;
@@ -239,7 +242,7 @@ export default function DepensesPage() {
       });
 
       if (error) {
-        throw new Error("Erreur lors de la création de la dépense");
+        throw new Error(t("dashboard.expenses.createError"));
       }
 
       await loadDepenses();
@@ -268,7 +271,7 @@ export default function DepensesPage() {
       } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        throw new Error("Erreur lors de la mise à jour de la dépense");
+        throw new Error(t("dashboard.expenses.updateError"));
       }
 
       let attachmentUrl = editFormData.attachmentUrl || null;
@@ -293,7 +296,7 @@ export default function DepensesPage() {
         .eq("id", selectedDepense.id);
 
       if (error) {
-        throw new Error("Erreur lors de la mise à jour de la dépense");
+        throw new Error(t("dashboard.expenses.updateError"));
       }
 
       await loadDepenses();
@@ -308,13 +311,13 @@ export default function DepensesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette dépense ?")) return;
+    if (!confirm(t("dashboard.expenses.deleteConfirm"))) return;
     try {
       const supabase = createClient();
       const { error } = await supabase.from("expenses").delete().eq("id", id);
 
       if (error) {
-        throw new Error("Erreur lors de la suppression de la dépense");
+        throw new Error(t("dashboard.expenses.deleteError"));
       }
       await loadDepenses();
       if (selectedDepense?.id === id) {
@@ -350,9 +353,9 @@ export default function DepensesPage() {
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Dépenses</h1>
+          <h1 className="text-3xl font-bold">{t("dashboard.expenses.title")}</h1>
           <p className="mt-2 text-secondary">
-            Suivez vos factures fournisseurs et gardez le contrôle sur vos échéances.
+            {t("dashboard.expenses.subtitle")}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -361,7 +364,7 @@ export default function DepensesPage() {
             className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"
           >
             <Calendar className="w-4 h-4" />
-            Planifier un rappel
+            {t("dashboard.expenses.planReminder")}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <button
@@ -373,7 +376,7 @@ export default function DepensesPage() {
             style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
           >
             <Plus className="w-5 h-5" />
-            Nouvelle dépense
+            {t("dashboard.expenses.newExpense")}
           </button>
         </div>
       </div>
@@ -383,7 +386,7 @@ export default function DepensesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Fournisseur
+                {t("dashboard.expenses.fields.supplier")}
               </label>
               <input
                 type="text"
@@ -397,7 +400,7 @@ export default function DepensesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Montant
+                {t("dashboard.common.amount")}
               </label>
               <input
                 type="number"
@@ -413,7 +416,7 @@ export default function DepensesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Date d&apos;échéance
+                {t("dashboard.expenses.fields.dueDate")}
               </label>
               <input
                 type="date"
@@ -427,7 +430,7 @@ export default function DepensesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Statut
+                {t("dashboard.common.status")}
               </label>
               <select
                 value={formData.status}
@@ -439,14 +442,14 @@ export default function DepensesPage() {
                 }
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               >
-                <option value="a_payer">À payer</option>
-                <option value="paye">Payé</option>
+                <option value="a_payer">{t("dashboard.expenses.status.toPay")}</option>
+                <option value="paye">{t("dashboard.expenses.status.paid")}</option>
               </select>
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Note (optionnel)
+              {t("dashboard.expenses.fields.noteOptional")}
             </label>
             <textarea
               value={formData.notes}
@@ -459,7 +462,7 @@ export default function DepensesPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Ajouter une pièce jointe
+              {t("dashboard.expenses.fields.attachment")}
             </label>
             <input
               type="file"
@@ -473,7 +476,7 @@ export default function DepensesPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-primary hover:file:bg-surface"
             />
             <p className="mt-2 text-xs text-tertiary">
-              Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
+              {t("dashboard.expenses.attachmentHint")}
             </p>
           </div>
           <div
@@ -488,7 +491,7 @@ export default function DepensesPage() {
               }}
               className="flex-1 px-6 py-3 rounded-full bg-surface-hover hover:bg-surface text-primary transition-all"
             >
-              Annuler
+              {t("dashboard.common.cancel")}
             </button>
             <button
               type="button"
@@ -496,7 +499,7 @@ export default function DepensesPage() {
               className="flex-1 px-6 py-3 rounded-full accent-bg text-white font-medium transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
-              Ajouter la dépense
+              {t("dashboard.expenses.addAction")}
             </button>
           </div>
         </div>
@@ -505,17 +508,17 @@ export default function DepensesPage() {
       <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">Chargement...</p>
+            <p className="text-secondary">{t("dashboard.common.loading")}</p>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">Erreur lors du chargement</p>
+            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
             <p className="text-secondary text-sm">{errorMessage}</p>
           </div>
         ) : depensesTriees.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-secondary mb-4">
-              Aucune dépense enregistrée pour le moment.
+              {t("dashboard.expenses.emptyState")}
             </p>
             <button
               type="button"
@@ -523,7 +526,7 @@ export default function DepensesPage() {
               className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
-              Ajouter votre première dépense
+              {t("dashboard.expenses.emptyCta")}
             </button>
           </div>
         ) : (
@@ -541,10 +544,12 @@ export default function DepensesPage() {
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-tertiary">Fournisseur</p>
+                        <p className="text-xs uppercase tracking-wide text-tertiary">
+                          {t("dashboard.expenses.fields.supplier")}
+                        </p>
                         <p className="mt-2 text-lg font-semibold text-primary">{depense.label}</p>
                         <p className="mt-1 text-sm text-secondary">
-                          Échéance : {formatDate(depense.date)}
+                          {t("dashboard.expenses.dueLabel")} {formatDate(depense.date)}
                         </p>
                         {besoinAction && (
                           <p className="mt-2 text-sm text-yellow-600">
@@ -553,7 +558,7 @@ export default function DepensesPage() {
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-xs uppercase tracking-wide text-tertiary">Montant</p>
+                        <p className="text-xs uppercase tracking-wide text-tertiary">{t("dashboard.common.amount")}</p>
                         <p className="mt-2 text-2xl font-semibold text-primary">
                           {formatMontant(depense.amount)}
                         </p>
@@ -562,13 +567,15 @@ export default function DepensesPage() {
                             statutAffiche
                           )}`}
                         >
-                          {getStatutLabel(statutAffiche)}
+                          {getStatutLabel(statutAffiche, t)}
                         </span>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div className="text-sm text-secondary">
-                        {depense.attachmentUrl ? "Pièce jointe disponible" : "Aucune pièce jointe"}
+                        {depense.attachmentUrl
+                          ? t("dashboard.expenses.attachmentAvailable")
+                          : t("dashboard.expenses.noAttachment")}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <button
@@ -576,18 +583,18 @@ export default function DepensesPage() {
                           className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
                         >
                           <Eye className="w-4 h-4" />
-                          Voir
+                          {t("dashboard.common.view")}
                         </button>
                         <button
                           onClick={() => handleModifier(depense)}
                           className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                         >
-                          Modifier
+                          {t("dashboard.expenses.editAction")}
                         </button>
                         <button
                           onClick={() => handleDelete(depense.id)}
                           className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
-                          title="Supprimer"
+                          title={t("dashboard.common.delete")}
                         >
                           <Trash className="w-4 h-4" />
                         </button>
@@ -605,7 +612,7 @@ export default function DepensesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-2xl rounded-xl border border-subtle bg-surface p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Dépense</h2>
+              <h2 className="text-xl font-semibold">{t("dashboard.expenses.viewTitle")}</h2>
               <button
                 onClick={() => {
                   setShowViewModal(false);
@@ -619,31 +626,31 @@ export default function DepensesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-lg bg-surface p-4">
-                <p className="text-xs uppercase text-tertiary">Fournisseur</p>
+                <p className="text-xs uppercase text-tertiary">{t("dashboard.expenses.fields.supplier")}</p>
                 <p className="mt-2 font-medium break-words">
                   {selectedDepense.label}
                 </p>
               </div>
               <div className="rounded-lg bg-surface p-4">
-                <p className="text-xs uppercase text-tertiary">Montant</p>
+                <p className="text-xs uppercase text-tertiary">{t("dashboard.common.amount")}</p>
                 <p className="mt-2 font-semibold">
                   {formatMontant(selectedDepense.amount)}
                 </p>
               </div>
               <div className="rounded-lg bg-surface p-4">
-                <p className="text-xs uppercase text-tertiary">Date d&apos;échéance</p>
+                <p className="text-xs uppercase text-tertiary">{t("dashboard.expenses.fields.dueDate")}</p>
                 <p className="mt-2">{formatDate(selectedDepense.date)}</p>
               </div>
               <div className="rounded-lg bg-surface p-4">
-                <p className="text-xs uppercase text-tertiary">Statut</p>
+                <p className="text-xs uppercase text-tertiary">{t("dashboard.common.status")}</p>
                 <p className="mt-2">
-                  {getStatutLabel(getStatutAffiche(selectedDepense))}
+                  {getStatutLabel(getStatutAffiche(selectedDepense), t)}
                 </p>
               </div>
             </div>
 
             <div className="rounded-lg bg-surface p-4">
-              <p className="text-xs uppercase text-tertiary">Notes</p>
+              <p className="text-xs uppercase text-tertiary">{t("dashboard.common.notes")}</p>
               <p className="mt-2 whitespace-pre-wrap break-words text-secondary">
                 {selectedDepense.notes || "-"}
               </p>
@@ -657,7 +664,7 @@ export default function DepensesPage() {
                   rel="noreferrer"
                   className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                 >
-                  Télécharger la pièce jointe
+                  {t("dashboard.expenses.downloadAttachment")}
                 </a>
               </div>
             )}
@@ -669,7 +676,7 @@ export default function DepensesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-2xl rounded-xl border border-subtle bg-surface p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Modifier la dépense</h2>
+              <h2 className="text-xl font-semibold">{t("dashboard.expenses.editTitle")}</h2>
               <button
                 onClick={() => {
                   setShowEditModal(false);
@@ -686,7 +693,7 @@ export default function DepensesPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-primary mb-2">
-                    Fournisseur
+                    {t("dashboard.expenses.fields.supplier")}
                   </label>
                   <input
                     type="text"
@@ -700,7 +707,7 @@ export default function DepensesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary mb-2">
-                    Montant
+                    {t("dashboard.common.amount")}
                   </label>
                   <input
                     type="number"
@@ -716,7 +723,7 @@ export default function DepensesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary mb-2">
-                    Date d&apos;échéance
+                    {t("dashboard.expenses.fields.dueDate")}
                   </label>
                   <input
                     type="date"
@@ -730,7 +737,7 @@ export default function DepensesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary mb-2">
-                    Statut
+                    {t("dashboard.common.status")}
                   </label>
                   <select
                     value={editFormData.status}
@@ -742,14 +749,14 @@ export default function DepensesPage() {
                     }
                     className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
                   >
-                    <option value="a_payer">À payer</option>
-                    <option value="paye">Payé</option>
+                    <option value="a_payer">{t("dashboard.expenses.status.toPay")}</option>
+                    <option value="paye">{t("dashboard.expenses.status.paid")}</option>
                   </select>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-2">
-                  Notes (optionnel)
+                  {t("dashboard.expenses.fields.noteOptional")}
                 </label>
                 <textarea
                   value={editFormData.notes}
@@ -762,7 +769,7 @@ export default function DepensesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-2">
-                  Remplacer la pièce jointe
+                  {t("dashboard.expenses.replaceAttachment")}
                 </label>
                 <input
                   type="file"
@@ -776,7 +783,7 @@ export default function DepensesPage() {
                   className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary file:mr-4 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-1.5 file:text-sm file:text-primary hover:file:bg-surface"
                 />
                 <p className="mt-2 text-xs text-tertiary">
-                  Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.
+                  {t("dashboard.expenses.attachmentHint")}
                 </p>
               </div>
               <div
@@ -792,7 +799,7 @@ export default function DepensesPage() {
                   }}
                   className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
                 >
-                  Annuler
+                  {t("dashboard.common.cancel")}
                 </button>
                 <button
                   type="button"
@@ -800,7 +807,7 @@ export default function DepensesPage() {
                   style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
                   className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
                 >
-                  Enregistrer
+                  {t("dashboard.expenses.saveAction")}
                 </button>
               </div>
             </div>

@@ -16,6 +16,8 @@ import {
   ArrowRight,
 } from "@/lib/icons";
 import Link from "next/link";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 interface Client {
   id: string;
@@ -47,7 +49,7 @@ interface Depense {
 
 type ATraiterItem = {
   id: string;
-  type: string;
+  type: "expense" | "invoice" | "quote" | "expense_due" | "invoice_followup" | "quote_followup";
   nom: string;
   date: string;
   montant?: number;
@@ -57,12 +59,13 @@ type ATraiterItem = {
 function CheckoutHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
 
   useEffect(() => {
     // Vérifier si on revient d'un checkout réussi
     const checkout = searchParams?.get("checkout");
     if (checkout === "success") {
-      toast.success("Paiement réussi ! Votre compte est maintenant Pro.");
+      toast.success(t("dashboard.overview.checkoutSuccess"));
       // Nettoyer l'URL
       router.replace("/tableau-de-bord");
     }
@@ -72,6 +75,7 @@ function CheckoutHandler() {
 }
 
 export default function TableauDeBordPage() {
+  const { t, locale } = useI18n();
   const [stats, setStats] = useState({
     totalClients: 0,
     totalDevis: 0,
@@ -181,7 +185,7 @@ export default function TableauDeBordPage() {
   }, []);
 
   const formatMontant = (montant: number) => {
-    return new Intl.NumberFormat("fr-FR", {
+    return new Intl.NumberFormat(localeToIntl[locale], {
       style: "currency",
       currency: "CHF",
     }).format(montant);
@@ -212,12 +216,12 @@ export default function TableauDeBordPage() {
 
   const getStatutLabel = (statut: string) => {
     const labels: Record<string, string> = {
-      brouillon: "Brouillon",
-      envoye: "Envoyé",
-      accepte: "Accepté",
-      refuse: "Refusé",
-      paye: "Payé",
-      "en-retard": "En retard",
+      brouillon: t("dashboard.status.quote.draft"),
+      envoye: t("dashboard.status.generic.sent"),
+      accepte: t("dashboard.status.quote.accepted"),
+      refuse: t("dashboard.status.quote.refused"),
+      paye: t("dashboard.status.invoice.paid"),
+      "en-retard": t("dashboard.status.generic.overdue"),
     };
     return labels[statut] || statut;
   };
@@ -226,7 +230,7 @@ export default function TableauDeBordPage() {
     if (!value) return "-";
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString("fr-FR");
+    return date.toLocaleDateString(localeToIntl[locale]);
   };
 
   const parseDate = (value?: string) => {
@@ -284,7 +288,7 @@ export default function TableauDeBordPage() {
       }
       items.push({
         id: `depense-${depense.id}`,
-        type: "Dépense",
+        type: "expense",
         nom: depense.fournisseur,
         date: depense.dateEcheance,
         montant: depense.montant,
@@ -298,8 +302,8 @@ export default function TableauDeBordPage() {
       if (!isPast(dateRef) && !isWithinDays(dateRef, 7)) return;
       items.push({
         id: `facture-${facture.id}`,
-        type: "Facture",
-        nom: facture.client?.nom || "Client inconnu",
+        type: "invoice",
+        nom: facture.client?.nom || t("dashboard.common.unknownClient"),
         date: dateRef || facture.dateCreation,
         montant: getMontantDocument(facture),
         href: `/tableau-de-bord/factures/${facture.id}`,
@@ -311,8 +315,8 @@ export default function TableauDeBordPage() {
       if (!isOlderThanDays(devisItem.dateCreation, 7)) return;
       items.push({
         id: `devis-${devisItem.id}`,
-        type: "Devis",
-        nom: devisItem.client?.nom || "Client inconnu",
+        type: "quote",
+        nom: devisItem.client?.nom || t("dashboard.common.unknownClient"),
         date: devisItem.dateEcheance || devisItem.dateCreation,
         montant: getMontantDocument(devisItem),
         href: `/tableau-de-bord/devis/${devisItem.id}`,
@@ -336,7 +340,7 @@ export default function TableauDeBordPage() {
       }
       items.push({
         id: `suivi-depense-${depense.id}`,
-        type: "Échéance dépense",
+        type: "expense_due",
         nom: depense.fournisseur,
         date: depense.dateEcheance,
         montant: depense.montant,
@@ -350,8 +354,8 @@ export default function TableauDeBordPage() {
       if (isPast(dateRef) || !isWithinDays(dateRef, 30)) return;
       items.push({
         id: `suivi-facture-${facture.id}`,
-        type: "Relance facture",
-        nom: facture.client?.nom || "Client inconnu",
+        type: "invoice_followup",
+        nom: facture.client?.nom || t("dashboard.common.unknownClient"),
         date: dateRef || facture.dateCreation,
         montant: getMontantDocument(facture),
         href: `/tableau-de-bord/factures/${facture.id}`,
@@ -363,8 +367,8 @@ export default function TableauDeBordPage() {
       if (isPast(devisItem.dateCreation) || !isWithinDays(devisItem.dateCreation, 30)) return;
       items.push({
         id: `suivi-devis-${devisItem.id}`,
-        type: "Relance devis",
-        nom: devisItem.client?.nom || "Client inconnu",
+        type: "quote_followup",
+        nom: devisItem.client?.nom || t("dashboard.common.unknownClient"),
         date: devisItem.dateEcheance || devisItem.dateCreation,
         montant: getMontantDocument(devisItem),
         href: `/tableau-de-bord/devis/${devisItem.id}`,
@@ -383,15 +387,15 @@ export default function TableauDeBordPage() {
       <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-heading text-2xl md:text-3xl font-bold mb-2 text-primary">
-          Tableau de bord
+            {t("dashboard.overview.title")}
           </h1>
           <p className="font-body text-sm text-secondary font-normal">
-            Une vue claire pour piloter vos documents et vos échéances.
+            {t("dashboard.overview.subtitle")}
           </p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-subtle bg-surface px-4 py-2 text-xs text-secondary">
           <CheckCircle className="w-4 h-4 text-success" />
-          <span>Votre activité est sous contrôle</span>
+          <span>{t("dashboard.overview.statusNote")}</span>
         </div>
       </div>
 
@@ -402,7 +406,7 @@ export default function TableauDeBordPage() {
           className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">Clients</span>
+            <span className="font-body text-secondary text-sm font-medium">{t("dashboard.overview.kpis.clients")}</span>
             <Users className="w-6 h-6 text-secondary" />
           </div>
           <div className="font-heading text-4xl font-bold text-primary">
@@ -410,7 +414,7 @@ export default function TableauDeBordPage() {
           </div>
           {stats.totalClients === 0 && (
             <div className="mt-3 font-body text-sm text-secondary">
-              Tout est prêt pour démarrer
+              {t("dashboard.overview.kpis.clientsEmpty")}
             </div>
           )}
         </Link>
@@ -420,7 +424,7 @@ export default function TableauDeBordPage() {
           className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">Devis</span>
+            <span className="font-body text-secondary text-sm font-medium">{t("dashboard.overview.kpis.quotes")}</span>
             <FileText className="w-6 h-6 text-secondary" />
           </div>
           <div className="font-heading text-4xl font-bold text-primary">
@@ -428,12 +432,12 @@ export default function TableauDeBordPage() {
           </div>
           {stats.devisEnAttente > 0 && (
             <div className="mt-3 font-body text-sm accent font-medium">
-              {stats.devisEnAttente} en attente
+              {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
             </div>
           )}
           {stats.devisEnAttente === 0 && (
             <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
+              {t("dashboard.overview.kpis.allClear")}
             </div>
           )}
         </Link>
@@ -443,7 +447,7 @@ export default function TableauDeBordPage() {
           className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">Factures</span>
+            <span className="font-body text-secondary text-sm font-medium">{t("dashboard.overview.kpis.invoices")}</span>
             <Receipt className="w-6 h-6 text-secondary" />
           </div>
           <div className="font-heading text-4xl font-bold text-primary">
@@ -451,11 +455,11 @@ export default function TableauDeBordPage() {
           </div>
           {stats.facturesNonPayees > 0 ? (
             <div className="mt-3 font-body text-sm" style={{ color: "var(--error)" }}>
-              {stats.facturesNonPayees} non payées
+              {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
             </div>
           ) : (
             <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
+              {t("dashboard.overview.kpis.allClear")}
             </div>
           )}
         </Link>
@@ -465,7 +469,7 @@ export default function TableauDeBordPage() {
           className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-red-500/30 transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">En retard</span>
+            <span className="font-body text-secondary text-sm font-medium">{t("dashboard.overview.kpis.overdue")}</span>
             <div style={{ color: 'var(--error)' }}>
               <AlertCircle className="w-6 h-6" />
             </div>
@@ -475,7 +479,7 @@ export default function TableauDeBordPage() {
           </div>
           {stats.elementsEnRetard === 0 && (
             <div className="mt-3 font-body text-sm text-secondary">
-              Tout est à jour
+              {t("dashboard.overview.kpis.allClear")}
             </div>
           )}
         </Link>
@@ -485,17 +489,17 @@ export default function TableauDeBordPage() {
       <div className="rounded-[32px] border border-subtle bg-gradient-to-br from-white via-[#F5F8FF] to-[#E0E7FF] p-8 shadow-premium">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="font-heading text-2xl font-semibold text-primary">
-            À traiter maintenant
+            {t("dashboard.overview.now.title")}
           </h2>
           <span className="text-xs uppercase tracking-[0.25em] text-tertiary">
-            Zone prioritaire
+            {t("dashboard.overview.now.badge")}
           </span>
         </div>
         {aTraiterMaintenant.length === 0 ? (
           <div className="mt-6 flex items-center gap-3 rounded-[24px] border border-subtle bg-surface px-5 py-4 text-secondary">
             <CheckCircle className="w-5 h-5 text-success" />
             <p className="font-body text-sm">
-              Rien d&apos;urgent pour le moment. Vous gardez la main.
+              {t("dashboard.overview.now.empty")}
             </p>
           </div>
         ) : (
@@ -509,13 +513,13 @@ export default function TableauDeBordPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-body text-xs uppercase tracking-wide text-secondary">
-                      {item.type}
+                      {t(`dashboard.overview.types.${item.type}`)}
                     </div>
                     <div className="font-body font-semibold text-lg text-primary">
                       {item.nom}
                     </div>
                     <div className="font-body text-sm text-secondary">
-                      Échéance : {formatDate(item.date)}
+                      {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
                     </div>
                   </div>
                   {typeof item.montant === "number" && (
@@ -523,7 +527,7 @@ export default function TableauDeBordPage() {
                       <div className="font-body font-bold text-lg text-primary">
                         {formatMontant(item.montant)}
                       </div>
-                      <div className="font-body text-xs text-tertiary">Voir le détail</div>
+                      <div className="font-body text-xs text-tertiary">{t("dashboard.overview.now.viewDetail")}</div>
                     </div>
                   )}
                 </div>
@@ -541,7 +545,7 @@ export default function TableauDeBordPage() {
               Suivi &amp; calendrier
             </h2>
             <p className="mt-2 text-sm text-secondary">
-              Reliez vos documents à des actions planifiées pour garder une vision claire.
+              {t("dashboard.overview.calendar.subtitle")}
             </p>
           </div>
           <Link
@@ -549,7 +553,7 @@ export default function TableauDeBordPage() {
             className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"
           >
             <Calendar className="w-4 h-4" />
-            Ouvrir le calendrier
+            {t("dashboard.overview.calendar.open")}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -558,7 +562,7 @@ export default function TableauDeBordPage() {
           <div className="mt-6 flex items-center gap-3 rounded-[24px] border border-subtle bg-surface px-5 py-4 text-secondary">
             <CheckCircle className="w-5 h-5 text-success" />
             <p className="font-body text-sm">
-              Aucun rappel planifié dans les 30 prochains jours. Ajoutez-en si besoin.
+              {t("dashboard.overview.calendar.empty")}
             </p>
           </div>
         ) : (
@@ -572,11 +576,11 @@ export default function TableauDeBordPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-xs uppercase tracking-wide text-tertiary">
-                      {item.type}
+                      {t(`dashboard.overview.types.${item.type}`)}
                     </div>
                     <div className="text-base font-semibold text-primary">{item.nom}</div>
                     <div className="text-sm text-secondary">
-                      Planifié le {formatDate(item.date)}
+                      {t("dashboard.overview.calendar.scheduled")} {formatDate(item.date)}
                     </div>
                   </div>
                   {typeof item.montant === "number" && (
@@ -584,7 +588,7 @@ export default function TableauDeBordPage() {
                       <div className="text-base font-semibold text-primary">
                         {formatMontant(item.montant)}
                       </div>
-                      <div className="text-xs text-tertiary">Accéder</div>
+                      <div className="text-xs text-tertiary">{t("dashboard.overview.calendar.access")}</div>
                     </div>
                   )}
                 </div>
@@ -597,7 +601,7 @@ export default function TableauDeBordPage() {
       {/* Actions rapides */}
       <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
-          Actions rapides
+          {t("dashboard.overview.quickActions.title")}
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
           <Link
@@ -605,11 +609,11 @@ export default function TableauDeBordPage() {
             className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-primary">Nouveau devis</span>
+              <span className="text-sm font-semibold text-primary">{t("dashboard.overview.quickActions.newQuote")}</span>
               <FilePlus className="w-5 h-5 text-secondary group-hover:text-primary" />
             </div>
             <p className="text-sm text-secondary">
-              Préparez un devis clair, prêt à être envoyé.
+              {t("dashboard.overview.quickActions.newQuoteText")}
             </p>
           </Link>
           <Link
@@ -617,11 +621,11 @@ export default function TableauDeBordPage() {
             className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-primary">Nouvelle facture</span>
+              <span className="text-sm font-semibold text-primary">{t("dashboard.overview.quickActions.newInvoice")}</span>
               <FilePlus className="w-5 h-5 text-secondary group-hover:text-primary" />
             </div>
             <p className="text-sm text-secondary">
-              Gardez un suivi précis des paiements attendus.
+              {t("dashboard.overview.quickActions.newInvoiceText")}
             </p>
           </Link>
           <Link
@@ -629,11 +633,11 @@ export default function TableauDeBordPage() {
             className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-primary">Nouveau client</span>
+              <span className="text-sm font-semibold text-primary">{t("dashboard.overview.quickActions.newClient")}</span>
               <UserPlus className="w-5 h-5 text-secondary group-hover:text-primary" />
             </div>
             <p className="text-sm text-secondary">
-              Centralisez vos contacts dans un espace unique.
+              {t("dashboard.overview.quickActions.newClientText")}
             </p>
           </Link>
         </div>
@@ -642,11 +646,11 @@ export default function TableauDeBordPage() {
       {/* Derniers documents */}
       <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
-          Derniers documents
+          {t("dashboard.overview.lastDocuments.title")}
         </h2>
         {derniersDocuments.length === 0 ? (
           <p className="font-body text-secondary text-lg font-normal">
-            Aucun document pour le moment.
+            {t("dashboard.overview.lastDocuments.empty")}
           </p>
         ) : (
           <div className="space-y-4">
@@ -666,7 +670,7 @@ export default function TableauDeBordPage() {
                     <div>
                       <div className="font-body font-semibold text-lg text-primary">{doc.numero}</div>
                       <div className="font-body text-sm text-secondary">
-                        {doc.client?.nom || "Client inconnu"}
+                        {doc.client?.nom || t("dashboard.common.unknownClient")}
                       </div>
                     </div>
                   </div>
@@ -679,7 +683,7 @@ export default function TableauDeBordPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-secondary">
-                  <span>Créé le {formatDate(doc.dateCreation)}</span>
+                  <span>{t("dashboard.overview.lastDocuments.created")} {formatDate(doc.dateCreation)}</span>
                   <span className="text-base font-semibold text-primary">
                     {formatMontant(doc.montant)}
                   </span>

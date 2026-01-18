@@ -6,7 +6,7 @@ import { defaultLocale, getTranslation, getTranslationValue, Locale } from "@/li
 type I18nContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: string, vars?: Record<string, string | number>) => string;
   tList: (key: string) => string[];
 };
 
@@ -34,7 +34,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, [locale]);
 
-  const t = useCallback((key: string) => getTranslation(locale, key), [locale]);
+  const t = useCallback(
+    (key: string, vars?: Record<string, string | number>) => {
+      let value = getTranslation(locale, key);
+      if (vars) {
+        Object.entries(vars).forEach(([varKey, varValue]) => {
+          value = value.replace(new RegExp(`\\{${varKey}\\}`, "g"), String(varValue));
+        });
+      }
+      return value;
+    },
+    [locale]
+  );
   const tList = useCallback((key: string) => {
     const value = getTranslationValue(locale, key);
     return Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
