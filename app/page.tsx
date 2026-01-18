@@ -270,13 +270,30 @@ export default function Home() {
 
         <section className="px-6 pb-20 md:pb-28">
           <div className="mx-auto max-w-6xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="flex flex-wrap items-center justify-between gap-6 text-sm uppercase tracking-[0.2em] text-slate-400">
-              <span>Agences</span>
-              <span>Cabinets</span>
-              <span>Studios</span>
-              <span>PME</span>
-              <span>Consultants</span>
-              <span>Associations</span>
+            <div className="grid gap-6 md:grid-cols-2">
+              {[
+                {
+                  text: "Interface claire, on gagne vite du temps sur les devis et factures.",
+                  author: "Marc — PME",
+                },
+                {
+                  text: "Enfin un outil simple pour suivre clients et paiements.",
+                  author: "Julie — Indépendante",
+                },
+                {
+                  text: "Tout est centralisé, on voit immédiatement ce qui est en attente.",
+                  author: "Nadia — Cabinet",
+                },
+                {
+                  text: "Moins d’administratif, plus de visibilité sur l’activité.",
+                  author: "Antoine — Studio",
+                },
+              ].map((item) => (
+                <div key={item.author} className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
+                  <p className="text-base leading-relaxed text-slate-800">“{item.text}”</p>
+                  <p className="mt-4 text-sm font-semibold text-slate-500">{item.author}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

@@ -7,7 +7,8 @@ export default function LandingNav() {
       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between rounded-full border border-slate-200 bg-white px-7 py-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-16 w-16">
+            <div className="rounded-full bg-slate-900 p-2 shadow-[0_10px_24px_rgba(15,23,42,0.25)]">
+              <div className="relative h-12 w-12">
               <Image
                 src="/organa-logo.png"
                 alt="Organa Logo"
@@ -16,7 +17,7 @@ export default function LandingNav() {
                 priority
               />
             </div>
-            <span className="text-xl font-semibold text-slate-900">Organa</span>
+            </div>
           </Link>
           <div className="flex items-center gap-4">
             <Link
