@@ -11,17 +11,16 @@ export default function Home() {
             <div className="grid gap-14 px-8 py-14 md:px-14 md:py-18 lg:grid-cols-[1.1fr_0.9fr]">
               <div className="text-white">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
-                  Logiciel de gestion administrative
+                  Gestion administrative
                 </div>
                 <h1 className="mt-7 text-4xl font-semibold leading-tight md:text-6xl lg:text-7xl">
-                  Organa, pour une gestion plus claire
+                  Moins d’administratif.
                   <br />
-                  et plus sereine.
+                  Plus de temps pour ce qui compte vraiment.
                 </h1>
                 <p className="mt-6 text-lg leading-relaxed text-white/80 md:text-xl">
-                  Organa est un logiciel de gestion administrative conçu pour les indépendants et les petites
-                  entreprises. Il réduit le temps et la charge mentale liés à l’administratif en centralisant
-                  l’essentiel dans un outil clair et structuré.
+                  Organa automatise la gestion administrative de votre entreprise afin que vous puissiez consacrer
+                  plus de temps à vos clients, à votre activité… et à ce qui compte vraiment pour vous.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <Link
@@ -31,10 +30,10 @@ export default function Home() {
                     Découvrir Organa
                   </Link>
                   <Link
-                    href="#demo"
+                    href="#comment-ca-marche"
                     className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/5 px-8 py-3 text-sm font-semibold text-white hover:bg-white/15 transition-colors"
                   >
-                    Voir la démo
+                    Comment ça marche
                   </Link>
                 </div>
               </div>
@@ -104,8 +103,8 @@ export default function Home() {
             <div className="grid gap-6">
               {[
                 {
-                  title: "Documents éparpillés",
-                  text: "Clients, devis et factures se retrouvent souvent dispersés dans plusieurs outils.",
+                  title: "Documents dispersés",
+                  text: "Factures, devis, suivi des clients et documents éparpillés.",
                   icon: (
                     <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
@@ -115,12 +114,22 @@ export default function Home() {
                   ),
                 },
                 {
-                  title: "Manque de visibilité",
-                  text: "Statuts peu clairs, paiements à surveiller et relances oubliées ralentissent l’activité.",
+                  title: "Outils isolés",
+                  text: "Des outils qui ne communiquent pas entre eux et un suivi difficile.",
                   icon: (
                     <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                       <rect x="3" y="6" width="18" height="12" rx="2" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h4M7 14h6" />
+                    </svg>
+                  ),
+                },
+                {
+                  title: "Charge mentale",
+                  text: "L’administratif s’accumule et ralentit l’activité au quotidien.",
+                  icon: (
+                    <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v5l3 3" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 0-9 9" />
                     </svg>
                   ),
                 },
@@ -137,45 +146,49 @@ export default function Home() {
             <div className="rounded-[36px] border border-slate-200 bg-white p-11 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Le problème</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                L’administratif crée de la confusion et de la charge mentale.
+                Votre temps est trop précieux pour être perdu dans l’administratif.
               </h2>
               <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
-                Documents éparpillés, statuts peu clairs, paiements à surveiller et relances oubliées&nbsp;: ces
-                tâches prennent une place excessive et rendent le suivi global difficile.
+                Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre
+                eux… l’administratif s’accumule, ralentit votre activité et devient une charge mentale permanente.
+              </p>
+              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                Ce temps perdu a un coût réel&nbsp;: moins de disponibilité pour vos clients, moins d’énergie pour
+                développer votre entreprise, et moins de temps investi là où il crée réellement de la valeur.
               </p>
               <div className="mt-8">
                 <Link
                   href="/inscription"
                   className="inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
                 >
-                  Réduire l’administratif
+                  Découvrir Organa
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
+        <section id="comment-ca-marche" className="px-4 pb-20 md:px-6 md:pb-28">
           <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">La solution Organa</p>
               <h2 className="mt-4 text-3xl font-semibold md:text-4xl">
-                Un outil unique pour centraliser l’essentiel de la gestion quotidienne.
+                Centraliser l’essentiel de votre activité, au même endroit.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-white/80 md:text-lg">
-                Avec Organa, vous gérez vos clients, créez des devis, les transformez en factures, suivez les
-                paiements et organisez vos échéances sans ressaisie inutile ni outils dispersés.
+                Organa a été conçu pour centraliser les éléments essentiels de votre activité&nbsp;: factures,
+                devis, clients, suivi administratif et gestion des tâches, au même endroit.
               </p>
             </div>
             <div className="mt-12 grid gap-6 md:grid-cols-2">
               {[
                 {
-                  title: "Centralisation structurée",
-                  text: "Clients, devis, factures et échéances réunis dans un même espace clair.",
+                  title: "Organisation claire",
+                  text: "Un seul espace pour rassembler les documents et le suivi administratif.",
                 },
                 {
-                  title: "Vue d’ensemble fiable",
-                  text: "Vous voyez immédiatement ce qui est envoyé, validé, payé, en attente ou à relancer.",
+                  title: "Vision précise",
+                  text: "Une vue fiable de l’activité pour avancer sereinement.",
                 },
               ].map((card) => (
                 <div key={card.title} className="rounded-[30px] border border-white/15 bg-white/5 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.35)]">
@@ -186,10 +199,10 @@ export default function Home() {
             </div>
             <div className="mt-10 text-center">
               <Link
-                href="#demo"
+                href="/inscription"
                 className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors"
               >
-                Planifier une démo
+                Découvrir Organa
               </Link>
             </div>
           </div>
@@ -198,20 +211,20 @@ export default function Home() {
         <section className="px-4 pb-20 md:px-6 md:pb-28">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Comment ça fonctionne</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Comment ça marche</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                Un flux simple, sans complexité inutile.
+                Un fonctionnement simple, pensé pour votre gestion quotidienne.
               </h2>
               <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
-                L’outil a été pensé pour être simple à prendre en main, afin de vous concentrer sur votre activité
-                plutôt que sur la gestion administrative.
+                En simplifiant et en structurant vos tâches administratives, ainsi que leur suivi dans le temps,
+                Organa vous permet de gérer plus efficacement votre activité.
               </p>
               <div className="mt-8">
                 <Link
                   href="/inscription"
                   className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-800 hover:border-slate-400 transition-colors"
                 >
-                  Commencer maintenant
+                  Découvrir Organa
                 </Link>
               </div>
               <div className="mt-10 rounded-[34px] border border-slate-200 bg-white p-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
@@ -222,10 +235,22 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    {[
-                    { label: "Clients", value: "Centraliser les informations utiles" },
-                    { label: "Devis → factures", value: "Créer et convertir sans ressaisie" },
-                    { label: "Paiements", value: "Suivre les statuts et échéances" },
+                  {[
+                    { label: "1", value: "Créez vos clients" },
+                    { label: "2", value: "Créez et envoyez vos devis" },
+                    { label: "3", value: "Transformez vos devis en factures" },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-xl bg-slate-50 px-4 py-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
+                      <p className="text-sm font-semibold text-slate-900">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                  {[
+                    { label: "4", value: "Personnalisez vos documents" },
+                    { label: "5", value: "Pilotez votre activité depuis le dashboard" },
+                    { label: "6", value: "Suivez vos paiements, vos tâches et votre planning" },
                   ].map((item) => (
                     <div key={item.label} className="rounded-xl bg-slate-50 px-4 py-3">
                       <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
@@ -238,8 +263,8 @@ export default function Home() {
             <div className="grid gap-6">
               {[
                 {
-                  title: "Créer des devis",
-                  text: "Construisez un devis clair et transformez-le en facture en un clic.",
+                  title: "Devis et factures",
+                  text: "Créez des devis, envoyez-les, puis transformez-les en factures.",
                   icon: (
                     <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
@@ -249,12 +274,12 @@ export default function Home() {
                   ),
                 },
                 {
-                  title: "Suivre les paiements",
-                  text: "Identifiez ce qui est payé, en attente ou à relancer, sans effort.",
+                  title: "Tâches et échéances",
+                  text: "Associez des tâches à vos devis ou factures et suivez-les dans le temps.",
                   icon: (
                     <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                      <rect x="3" y="6" width="18" height="12" rx="2" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h4M7 14h6" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v5l3 3" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 0-9 9" />
                     </svg>
                   ),
                 },
@@ -274,24 +299,43 @@ export default function Home() {
         <section className="px-4 pb-20 md:px-6 md:pb-28">
           <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Les bénéfices</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                Gestion des tâches & calendrier
+              </p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                Moins de charge mentale, plus de clarté au quotidien.
+                Suivre les actions dans le temps, simplement.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                Organa ne se limite pas à la création de documents. Chaque devis, facture ou client peut être
+                associé à des tâches et à des échéances. Grâce au calendrier intégré, vous pouvez planifier vos
+                rendez-vous, organiser vos relances et garder une vue claire sur ce qui doit être fait, aujourd’hui
+                comme demain.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Pourquoi Organa</p>
+              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
+                Pourquoi les entreprises font confiance à Organa
               </h2>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Temps gagné",
-                  text: "Moins d’allers-retours et de ressaisies grâce à un flux unique.",
+                  title: "Sécurité et confidentialité des données",
+                  text: "Sécurité et confidentialité des données.",
                 },
                 {
-                  title: "Visibilité immédiate",
-                  text: "Une vue d’ensemble fiable sur ce qui est envoyé, validé ou en attente.",
+                  title: "Une plateforme fiable et disponible",
+                  text: "Une plateforme fiable et disponible.",
                 },
                 {
-                  title: "Gestion sereine",
-                  text: "Vous avancez avec des informations claires, sans confusion inutile.",
+                  title: "Conçu pour les indépendants et les PME",
+                  text: "Conçu pour les indépendants et les PME.",
                 },
               ].map((card) => (
                 <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
@@ -306,60 +350,28 @@ export default function Home() {
         <section className="px-4 pb-20 md:px-6 md:pb-28">
           <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Pour qui</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Avis utilisateurs</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                Conçu pour les indépendants et les petites entreprises.
+                Retours concrets sur l’usage réel.
               </h2>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
               {[
                 {
-                  title: "Indépendants",
-                  text: "Une gestion simple pour se concentrer sur l’activité principale.",
+                  text: "Je gère mes devis et factures dans Organa, et je vois tout de suite ce qui est envoyé, payé ou à relancer. Le suivi est devenu plus clair.",
+                  author: "Camille — Indépendante",
                 },
                 {
-                  title: "Petites entreprises",
-                  text: "Une vue d’ensemble fiable pour structurer le suivi quotidien.",
-                },
-                {
-                  title: "Structures en croissance",
-                  text: "Une organisation plus claire, plus structurée et plus sereine.",
-                },
-              ].map((card) => (
-                <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                  <p className="text-base font-semibold text-slate-900">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Confiance</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                Des retours concrets sur l’usage quotidien.
-              </h2>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              {[
-                {
-                  text: "J’utilise Organa au quotidien pour gérer mes devis et factures. Tout est clair, je vois immédiatement ce qui est envoyé, ce qui est payé et ce qui doit être relancé. Ça m’a vraiment fait gagner du temps.",
+                  text: "On a enfin un seul endroit pour les clients, les documents et le suivi des paiements. Tout est centralisé.",
                   author: "Marc — PME",
                 },
                 {
-                  text: "On suit nos clients et nos paiements dans un seul espace. Les statuts sont lisibles et les relances sont faciles à déclencher. C’est devenu notre référence interne.",
-                  author: "Julie — Indépendante",
+                  text: "Les tâches liées aux devis et factures sont simples à suivre, et le calendrier nous aide à organiser les échéances.",
+                  author: "Julie — Cabinet",
                 },
                 {
-                  text: "Tout est centralisé : clients, documents, paiements. On voit immédiatement ce qui est en attente et où agir. Le suivi est enfin propre et partagé.",
-                  author: "Nadia — Cabinet",
-                },
-                {
-                  text: "Organa nous a apporté une vraie visibilité sur l’activité. On perd moins de temps dans l’administratif et on sait où en sont les dossiers sans chercher.",
-                  author: "Antoine — Studio",
+                  text: "Le dashboard nous donne une vue d’ensemble fiable. On sait ce qui est validé, payé, en attente ou à relancer.",
+                  author: "Nadia — Petite entreprise",
                 },
               ].map((item) => (
                 <div key={item.author} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
@@ -371,20 +383,75 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">FAQ</p>
+              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
+                Réponses aux questions principales.
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {[
+                {
+                  question: "À qui s’adresse Organa ?",
+                  answer: "Aux indépendants et aux PME qui veulent une gestion claire et structurée.",
+                },
+                {
+                  question: "Y a-t-il une version gratuite ?",
+                  answer: "Oui, Organa propose un plan gratuit.",
+                },
+                {
+                  question: "Mes données sont-elles sécurisées ?",
+                  answer: "Oui, la sécurité et la confidentialité des données sont prioritaires.",
+                },
+                {
+                  question: "Est-ce simple à prendre en main ?",
+                  answer: "Oui, l’outil a été pensé pour être simple et sans fonctionnalités superflues.",
+                },
+              ].map((item) => (
+                <div key={item.question} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
+                  <p className="text-base font-semibold text-slate-900">{item.question}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tarifs</p>
+              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
+                Plan Gratuit et Plan Pro.
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
+                <p className="text-base font-semibold text-slate-900">Plan Gratuit</p>
+              </div>
+              <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+                <p className="text-base font-semibold text-slate-900">Plan Pro</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="demo" className="px-4 py-20 md:px-6 md:py-28">
           <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-center text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
             <h2 className="text-3xl font-semibold md:text-4xl">
-              Prêt à alléger votre gestion administrative ?
+              Prêt à réduire votre charge administrative ?
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/80 md:text-lg">
-              Essayez Organa et retrouvez une vision claire de vos clients, documents et paiements.
+              Découvrez Organa et concentrez-vous sur ce qui compte vraiment.
             </p>
             <div className="mt-8">
               <Link
                 href="/inscription"
                 className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-100 transition-colors"
               >
-                Essayer gratuitement
+                Découvrir Organa
               </Link>
             </div>
           </div>
