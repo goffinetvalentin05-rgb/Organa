@@ -5,9 +5,9 @@ export default function LandingNav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="mx-auto max-w-6xl">
-        <div className="flex items-center justify-between rounded-full border border-slate-200 bg-white px-5 py-3 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur">
+        <div className="flex items-center justify-between rounded-full border border-slate-200 bg-white px-6 py-3 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-12 w-12">
+            <div className="relative h-14 w-14">
               <Image
                 src="/organa-logo.png"
                 alt="Organa Logo"
@@ -16,7 +16,7 @@ export default function LandingNav() {
                 priority
               />
             </div>
-            <span className="text-base font-semibold text-slate-900">Organa</span>
+            <span className="text-lg font-semibold text-slate-900">Organa</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link
