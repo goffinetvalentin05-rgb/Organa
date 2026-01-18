@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
+import FaqAccordion from "@/components/FaqAccordion";
 
 export default function Home() {
   return (
@@ -326,16 +327,16 @@ export default function Home() {
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Sécurité et confidentialité des données",
-                  text: "Sécurité et confidentialité des données.",
+                  title: "Sécurité & données",
+                  text: "Hébergement fiable, confidentialité respectée et accès sécurisé aux informations.",
                 },
                 {
-                  title: "Une plateforme fiable et disponible",
-                  text: "Une plateforme fiable et disponible.",
+                  title: "Gain de temps & clarté",
+                  text: "Centralisation des documents et visibilité immédiate sur ce qui est envoyé ou payé.",
                 },
                 {
-                  title: "Conçu pour les indépendants et les PME",
-                  text: "Conçu pour les indépendants et les PME.",
+                  title: "Organisation & suivi",
+                  text: "Suivi des documents, paiements, tâches et calendrier pour une gestion structurée.",
                 },
               ].map((card) => (
                 <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
@@ -391,30 +392,29 @@ export default function Home() {
                 Réponses aux questions principales.
               </h2>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
-              {[
-                {
-                  question: "À qui s’adresse Organa ?",
-                  answer: "Aux indépendants et aux PME qui veulent une gestion claire et structurée.",
-                },
-                {
-                  question: "Y a-t-il une version gratuite ?",
-                  answer: "Oui, Organa propose un plan gratuit.",
-                },
-                {
-                  question: "Mes données sont-elles sécurisées ?",
-                  answer: "Oui, la sécurité et la confidentialité des données sont prioritaires.",
-                },
-                {
-                  question: "Est-ce simple à prendre en main ?",
-                  answer: "Oui, l’outil a été pensé pour être simple et sans fonctionnalités superflues.",
-                },
-              ].map((item) => (
-                <div key={item.question} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                  <p className="text-base font-semibold text-slate-900">{item.question}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.answer}</p>
-                </div>
-              ))}
+            <div className="mt-10">
+              <FaqAccordion
+                items={[
+                  {
+                    question: "À qui s’adresse Organa ?",
+                    answer:
+                      "Aux indépendants et aux PME qui veulent une gestion claire, structurée et simple à suivre.",
+                  },
+                  {
+                    question: "Y a-t-il une version gratuite ?",
+                    answer: "Oui, Organa propose un plan gratuit pour démarrer.",
+                  },
+                  {
+                    question: "Mes données sont-elles sécurisées ?",
+                    answer: "Oui, la sécurité et la confidentialité des données sont prioritaires.",
+                  },
+                  {
+                    question: "Est-ce simple à prendre en main ?",
+                    answer:
+                      "Oui, l’outil est conçu pour être clair, sans fonctionnalités superflues.",
+                  },
+                ]}
+              />
             </div>
           </div>
         </section>
@@ -430,9 +430,44 @@ export default function Home() {
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
                 <p className="text-base font-semibold text-slate-900">Plan Gratuit</p>
+                <p className="mt-2 text-sm text-slate-600">
+                  Pour démarrer et centraliser vos documents essentiels.
+                </p>
+                <ul className="mt-6 space-y-3 text-sm text-slate-600">
+                  <li>Clients, devis et factures au même endroit</li>
+                  <li>Suivi des paiements et des statuts</li>
+                  <li>Gestion simple des tâches</li>
+                </ul>
+                <div className="mt-6">
+                  <Link
+                    href="/inscription"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-400 transition-colors"
+                  >
+                    Commencer gratuitement
+                  </Link>
+                </div>
               </div>
-              <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+              <div className="relative rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+                <span className="absolute -top-3 right-6 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+                  Recommandé
+                </span>
                 <p className="text-base font-semibold text-slate-900">Plan Pro</p>
+                <p className="mt-2 text-sm text-slate-600">
+                  Pour piloter l’administratif avec un suivi complet.
+                </p>
+                <ul className="mt-6 space-y-3 text-sm text-slate-600">
+                  <li>Devis, factures et documents personnalisés</li>
+                  <li>Suivi des paiements et relances</li>
+                  <li>Gestion des tâches et calendrier intégré</li>
+                </ul>
+                <div className="mt-6">
+                  <Link
+                    href="/inscription"
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+                  >
+                    Découvrir le plan Pro
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
