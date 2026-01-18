@@ -119,3 +119,4 @@ COMMENT ON COLUMN public.profiles.currency_symbol IS 'Symbole de la devise (ex: 
 
 
 
+

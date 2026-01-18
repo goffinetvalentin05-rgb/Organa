@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
+import SiteFooter from "@/components/SiteFooter";
 import FaqAccordion from "@/components/FaqAccordion";
 
 export default function Home() {
@@ -493,20 +494,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white px-6 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 Organa. Développé en Suisse.</p>
-          <div className="flex items-center gap-2">
-            <Link href="/connexion" className="text-slate-500 hover:text-slate-700">
-              Connexion
-            </Link>
-            <span>·</span>
-            <Link href="/inscription" className="text-slate-500 hover:text-slate-700">
-              Inscription
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -48,7 +48,7 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
     <button
       onClick={handleDelete}
       disabled={isDeleting}
-      className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+      className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-red-200 shadow-sm"
     >
       {isDeleting ? (
         <Loader className="w-4 h-4 animate-spin" />
