@@ -6,8 +6,8 @@ export default function Home() {
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <LandingNav />
       <main className="pt-32">
-        <section className="px-6 py-20 md:py-28">
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-[64px] bg-premium-gradient shadow-[0_36px_110px_rgba(2,6,23,0.45)]">
+        <section className="px-4 py-20 md:px-6 md:py-28">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-[64px] bg-premium-gradient shadow-[0_36px_110px_rgba(2,6,23,0.45)]">
             <div className="grid gap-14 px-8 py-14 md:px-14 md:py-18 lg:grid-cols-[1.1fr_0.9fr]">
               <div className="text-white">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
@@ -98,8 +98,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-6 py-20 md:py-28">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+        <section className="px-4 py-20 md:px-6 md:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="grid gap-6">
               {[
                 {
@@ -133,7 +133,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="rounded-[36px] border border-slate-200 bg-white p-10 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+            <div className="rounded-[36px] border border-slate-200 bg-white p-11 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Constat</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
                 Votre temps est trop précieux pour être perdu dans l’administratif.
@@ -154,8 +154,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-6 pb-20 md:pb-28">
-          <div className="mx-auto max-w-6xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Clarté opérationnelle</p>
               <h2 className="mt-4 text-3xl font-semibold md:text-4xl">
@@ -194,8 +194,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-6 pb-20 md:pb-28">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Vision claire</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
@@ -268,38 +268,38 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-6 pb-20 md:pb-28">
-          <div className="mx-auto max-w-6xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
             <div className="grid gap-6 md:grid-cols-2">
               {[
                 {
-                  text: "Interface claire, on gagne vite du temps sur les devis et factures.",
+                  text: "J’utilise Organa au quotidien pour gérer mes devis et factures. Tout est clair, je vois immédiatement ce qui est envoyé, ce qui est payé et ce qui doit être relancé. Ça m’a vraiment fait gagner du temps.",
                   author: "Marc — PME",
                 },
                 {
-                  text: "Enfin un outil simple pour suivre clients et paiements.",
+                  text: "On suit nos clients et nos paiements dans un seul espace. Les statuts sont lisibles et les relances sont faciles à déclencher. C’est devenu notre référence interne.",
                   author: "Julie — Indépendante",
                 },
                 {
-                  text: "Tout est centralisé, on voit immédiatement ce qui est en attente.",
+                  text: "Tout est centralisé : clients, documents, paiements. On voit immédiatement ce qui est en attente et où agir. Le suivi est enfin propre et partagé.",
                   author: "Nadia — Cabinet",
                 },
                 {
-                  text: "Moins d’administratif, plus de visibilité sur l’activité.",
+                  text: "Organa nous a apporté une vraie visibilité sur l’activité. On perd moins de temps dans l’administratif et on sait où en sont les dossiers sans chercher.",
                   author: "Antoine — Studio",
                 },
               ].map((item) => (
-                <div key={item.author} className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
+                <div key={item.author} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
                   <p className="text-base leading-relaxed text-slate-800">“{item.text}”</p>
-                  <p className="mt-4 text-sm font-semibold text-slate-500">{item.author}</p>
+                  <p className="mt-5 text-sm font-semibold text-slate-600">{item.author}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="demo" className="px-6 py-20 md:py-28">
-          <div className="mx-auto max-w-6xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-center text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
+        <section id="demo" className="px-4 py-20 md:px-6 md:py-28">
+          <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-center text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
             <h2 className="text-3xl font-semibold md:text-4xl">
               Prêt à reprendre le contrôle de votre administratif ?
             </h2>
