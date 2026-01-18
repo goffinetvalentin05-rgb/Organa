@@ -375,7 +375,7 @@ export default function TableauDeBordPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
+    <div className="max-w-7xl mx-auto space-y-12">
       <Suspense fallback={null}>
         <CheckoutHandler />
       </Suspense>
@@ -399,7 +399,7 @@ export default function TableauDeBordPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link
           href="/tableau-de-bord/clients"
-          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Clients</span>
@@ -417,7 +417,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/devis?statut=en-attente"
-          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Devis</span>
@@ -440,7 +440,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/factures?statut=non-payees"
-          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Factures</span>
@@ -462,7 +462,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/a-ne-pas-oublier"
-          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-red-500/30 transition-all duration-200"
+          className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-red-500/30 transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">En retard</span>
@@ -482,7 +482,7 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* À traiter maintenant */}
-      <div className="rounded-3xl border border-subtle bg-gradient-to-br from-[#0B1229] via-[#121A34] to-[#0B1229] p-8 shadow-premium">
+      <div className="rounded-[32px] border border-subtle bg-gradient-to-br from-white via-[#F5F8FF] to-[#E0E7FF] p-8 shadow-premium">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="font-heading text-2xl font-semibold text-primary">
             À traiter maintenant
@@ -492,19 +492,19 @@ export default function TableauDeBordPage() {
           </span>
         </div>
         {aTraiterMaintenant.length === 0 ? (
-          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-subtle bg-surface/60 px-5 py-4 text-secondary">
+          <div className="mt-6 flex items-center gap-3 rounded-[24px] border border-subtle bg-surface px-5 py-4 text-secondary">
             <CheckCircle className="w-5 h-5 text-success" />
             <p className="font-body text-sm">
               Rien d&apos;urgent pour le moment. Vous gardez la main.
             </p>
           </div>
         ) : (
-          <div className="mt-6 space-y-3">
+          <div className="mt-6 space-y-4">
             {aTraiterMaintenant.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex flex-col gap-4 rounded-2xl border border-subtle bg-surface/70 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className="flex flex-col gap-4 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -534,7 +534,7 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* Suivi & calendrier */}
-      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
+      <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="font-heading text-2xl font-semibold text-primary">
@@ -555,19 +555,19 @@ export default function TableauDeBordPage() {
         </div>
 
         {suiviCalendrier.length === 0 ? (
-          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-subtle bg-surface/60 px-5 py-4 text-secondary">
+          <div className="mt-6 flex items-center gap-3 rounded-[24px] border border-subtle bg-surface px-5 py-4 text-secondary">
             <CheckCircle className="w-5 h-5 text-success" />
             <p className="font-body text-sm">
               Aucun rappel planifié dans les 30 prochains jours. Ajoutez-en si besoin.
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-3">
+          <div className="mt-6 grid gap-4">
             {suiviCalendrier.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/70 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className="flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -595,14 +595,14 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* Actions rapides */}
-      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
+      <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
           Actions rapides
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
           <Link
             href="/tableau-de-bord/devis/nouveau"
-            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+            className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-primary">Nouveau devis</span>
@@ -614,7 +614,7 @@ export default function TableauDeBordPage() {
           </Link>
           <Link
             href="/tableau-de-bord/factures/nouvelle"
-            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+            className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-primary">Nouvelle facture</span>
@@ -626,7 +626,7 @@ export default function TableauDeBordPage() {
           </Link>
           <Link
             href="/tableau-de-bord/clients/nouveau"
-            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+            className="group flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-primary">Nouveau client</span>
@@ -640,7 +640,7 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* Derniers documents */}
-      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
+      <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
           Derniers documents
         </h2>
@@ -649,12 +649,12 @@ export default function TableauDeBordPage() {
             Aucun document pour le moment.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {derniersDocuments.map((doc) => (
               <Link
                 key={`${doc.type}-${doc.id}`}
                 href={`/tableau-de-bord/${doc.type === "devis" ? "devis" : "factures"}/${doc.id}`}
-                className="flex flex-col gap-4 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className="flex flex-col gap-4 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
