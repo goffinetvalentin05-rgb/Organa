@@ -2,6 +2,7 @@ import "./globals.css";
 import Image from "next/image";
 import { Toaster } from "react-hot-toast";
 import { Inter } from "next/font/google";
+import { I18nProvider } from "@/components/I18nProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +26,7 @@ export default function RootLayout({
       <body className="font-body min-h-screen text-white app-bg">
         {/* CONTENU DES PAGES */}
         {/* Note: Les pages gèrent leur propre structure HTML (balise <main> incluse) */}
-        {children}
+        <I18nProvider>{children}</I18nProvider>
         <Toaster
           position="top-right"
           toastOptions={{

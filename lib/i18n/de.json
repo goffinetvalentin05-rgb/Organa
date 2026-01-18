@@ -1,0 +1,218 @@
+{
+  "nav": {
+    "login": "Anmelden",
+    "cta": "Organa entdecken"
+  },
+  "footer": {
+    "copyright": "© 2026 Organa. Entwickelt in der Schweiz.",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "legal": {
+      "mentions": "Impressum",
+      "privacy": "Datenschutzerklärung",
+      "terms": "Nutzungsbedingungen",
+      "cookies": "Cookie-Richtlinie"
+    }
+  },
+  "hero": {
+    "badge": "Administrative Verwaltung",
+    "title": "Weniger Administration.\nMehr Zeit für das, was wirklich zählt.",
+    "subtitle": "Organa automatisiert Ihre administrativen Abläufe, damit Sie mehr Zeit für Ihre Kunden, Ihr Geschäft und das Wesentliche haben.",
+    "ctaPrimary": "Organa entdecken",
+    "ctaSecondary": "So funktioniert’s",
+    "overview": "Überblick",
+    "period": "7 Tage",
+    "stats": {
+      "clients": { "label": "Kunden", "value": "18 aktiv" },
+      "quotes": { "label": "Angebote", "value": "7 gesendet" },
+      "invoices": { "label": "Rechnungen", "value": "12 erstellt" },
+      "payments": { "label": "Zahlungen", "value": "9 erhalten" }
+    },
+    "quoteCard": {
+      "title": "Angebot",
+      "number": "#2041",
+      "status": "Bestätigt · 3 200 CHF"
+    },
+    "paymentsCard": {
+      "title": "Zahlungen",
+      "count": "4 erhalten",
+      "period": "Diese Woche",
+      "statuses": {
+        "paid": "Bezahlt",
+        "followUp": "Nachfassen",
+        "pending": "Ausstehend"
+      }
+    },
+    "clientFollowUp": {
+      "title": "Kunden-Nachverfolgung",
+      "items": {
+        "emailSent": "E-Mail gesendet",
+        "followUpPlanned": "Nachverfolgung geplant",
+        "paymentReceived": "Zahlung erhalten"
+      }
+    }
+  },
+  "problem": {
+    "cards": {
+      "docs": {
+        "title": "Verteilte Dokumente",
+        "text": "Rechnungen, Angebote, Kunden-Nachverfolgung und verstreute Dokumente."
+      },
+      "tools": {
+        "title": "Isolierte Tools",
+        "text": "Tools, die nicht zusammenarbeiten, und ein schwieriges Follow-up."
+      },
+      "mentalLoad": {
+        "title": "Mentale Belastung",
+        "text": "Administrative Aufgaben stapeln sich und bremsen den Alltag."
+      }
+    },
+    "label": "Das Problem",
+    "title": "Ihre Zeit ist zu wertvoll, um in Administration zu verlieren.",
+    "paragraphs": {
+      "first": "Rechnungen, Angebote, Kunden-Nachverfolgung, verstreute Dokumente, Tools, die nicht miteinander kommunizieren… die Administration häuft sich an, bremst Ihr Geschäft und wird zur ständigen Belastung.",
+      "second": "Diese verlorene Zeit hat einen realen Preis: weniger Verfügbarkeit für Kunden, weniger Energie, um Ihr Unternehmen zu entwickeln, und weniger Zeit dort, wo sie wirklich Wert schafft."
+    },
+    "cta": "Organa entdecken"
+  },
+  "solution": {
+    "label": "Die Organa-Lösung",
+    "title": "Das Wesentliche Ihres Geschäfts an einem Ort bündeln.",
+    "paragraph": "Organa wurde entwickelt, um die wichtigsten Elemente Ihres Geschäfts zu zentralisieren: Rechnungen, Angebote, Kunden, administrative Nachverfolgung und Aufgabenmanagement an einem Ort.",
+    "cards": {
+      "organization": {
+        "title": "Klare Organisation",
+        "text": "Ein einziger Ort für Dokumente und administrative Nachverfolgung."
+      },
+      "visibility": {
+        "title": "Präziser Überblick",
+        "text": "Ein verlässlicher Blick auf die Aktivität für ein sicheres Vorankommen."
+      }
+    },
+    "cta": "Organa entdecken"
+  },
+  "howItWorks": {
+    "label": "So funktioniert’s",
+    "title": "Ein einfacher Ablauf, gedacht für Ihre tägliche Verwaltung.",
+    "paragraph": "Durch die Vereinfachung und Strukturierung Ihrer administrativen Aufgaben sowie deren Nachverfolgung hilft Organa, Ihr Geschäft effizienter zu steuern.",
+    "cta": "Organa entdecken",
+    "stepsTitle": "Wichtige Schritte",
+    "stepsBadge": "Echtzeit",
+    "steps": {
+      "one": "Erstellen Sie Ihre Kunden",
+      "two": "Erstellen und senden Sie Ihre Angebote",
+      "three": "Wandeln Sie Angebote in Rechnungen um",
+      "four": "Passen Sie Ihre Dokumente an",
+      "five": "Steuern Sie Ihr Geschäft über das Dashboard",
+      "six": "Verfolgen Sie Zahlungen, Aufgaben und Ihren Kalender"
+    },
+    "cards": {
+      "quotes": {
+        "title": "Angebote und Rechnungen",
+        "text": "Erstellen Sie Angebote, versenden Sie sie und wandeln Sie sie in Rechnungen um."
+      },
+      "tasks": {
+        "title": "Aufgaben und Fristen",
+        "text": "Verknüpfen Sie Aufgaben mit Angeboten oder Rechnungen und verfolgen Sie sie im Zeitverlauf."
+      }
+    }
+  },
+  "tasksCalendar": {
+    "label": "Aufgaben- & Kalenderverwaltung",
+    "title": "Aktionen über die Zeit einfach verfolgen.",
+    "paragraph": "Organa beschränkt sich nicht auf die Dokumentenerstellung. Jedes Angebot, jede Rechnung oder jeder Kunde kann mit Aufgaben und Fristen verknüpft werden. Mit dem integrierten Kalender planen Sie Termine, organisieren Nachfassaktionen und behalten den Überblick über alles, was heute und morgen zu erledigen ist."
+  },
+  "whyOrgana": {
+    "label": "Warum Organa",
+    "title": "Warum Unternehmen Organa vertrauen",
+    "cards": {
+      "security": {
+        "title": "Sicherheit & Daten",
+        "text": "Zuverlässiges Hosting, respektierte Vertraulichkeit und sicherer Zugriff auf Informationen."
+      },
+      "time": {
+        "title": "Zeitgewinn & Klarheit",
+        "text": "Zentralisierte Dokumente und sofortige Sichtbarkeit dessen, was gesendet oder bezahlt wurde."
+      },
+      "organization": {
+        "title": "Organisation & Nachverfolgung",
+        "text": "Nachverfolgung von Dokumenten, Zahlungen, Aufgaben und Kalender für eine strukturierte Verwaltung."
+      }
+    }
+  },
+  "testimonials": {
+    "label": "Nutzerstimmen",
+    "title": "Konkrete Einblicke aus der Praxis.",
+    "items": {
+      "one": {
+        "text": "Ich verwalte meine Angebote und Rechnungen in Organa und sehe sofort, was gesendet, bezahlt oder nachzufassen ist. Die Nachverfolgung ist viel klarer.",
+        "author": "Camille — Selbstständig"
+      },
+      "two": {
+        "text": "Endlich haben wir einen einzigen Ort für Kunden, Dokumente und die Nachverfolgung von Zahlungen. Alles ist zentralisiert.",
+        "author": "Marc — KMU"
+      },
+      "three": {
+        "text": "Aufgaben zu Angeboten und Rechnungen sind leicht zu verfolgen, und der Kalender hilft uns, Fristen zu organisieren.",
+        "author": "Julie — Kanzlei"
+      },
+      "four": {
+        "text": "Das Dashboard gibt uns einen verlässlichen Überblick. Wir wissen, was bestätigt, bezahlt, ausstehend oder nachzufassen ist.",
+        "author": "Nadia — Kleinunternehmen"
+      }
+    }
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Antworten auf die wichtigsten Fragen.",
+    "items": {
+      "target": {
+        "question": "Für wen ist Organa gedacht?",
+        "answer": "Für Selbstständige und KMU, die eine klare, strukturierte und einfache Verwaltung wollen."
+      },
+      "free": {
+        "question": "Gibt es einen kostenlosen Plan?",
+        "answer": "Ja, Organa bietet einen kostenlosen Plan für den Einstieg."
+      },
+      "security": {
+        "question": "Sind meine Daten sicher?",
+        "answer": "Ja, Datensicherheit und Vertraulichkeit haben höchste Priorität."
+      },
+      "easy": {
+        "question": "Ist der Einstieg einfach?",
+        "answer": "Ja, das Tool ist klar aufgebaut und verzichtet auf unnötige Funktionen."
+      }
+    }
+  },
+  "pricing": {
+    "label": "Preise",
+    "title": "Kostenloser Plan und Pro-Plan.",
+    "free": {
+      "title": "Kostenloser Plan",
+      "subtitle": "Für den Einstieg und die zentralisierte Ablage Ihrer wichtigsten Dokumente.",
+      "features": [
+        "Kunden, Angebote und Rechnungen an einem Ort",
+        "Zahlungs- und Statusverfolgung",
+        "Einfache Aufgabenverwaltung"
+      ],
+      "cta": "Kostenlos starten"
+    },
+    "pro": {
+      "badge": "Empfohlen",
+      "title": "Pro-Plan",
+      "subtitle": "Für die vollständige Steuerung der Administration.",
+      "features": [
+        "Angebote, Rechnungen und personalisierte Dokumente",
+        "Zahlungsnachverfolgung und Erinnerungen",
+        "Aufgabenverwaltung und integrierter Kalender"
+      ],
+      "cta": "Pro-Plan entdecken"
+    }
+  },
+  "finalCta": {
+    "title": "Bereit, Ihre administrative Last zu reduzieren?",
+    "paragraph": "Entdecken Sie Organa und konzentrieren Sie sich auf das, was wirklich zählt.",
+    "cta": "Organa entdecken"
+  }
+}
+

@@ -1,0 +1,218 @@
+{
+  "nav": {
+    "login": "Connexion",
+    "cta": "Découvrir Organa"
+  },
+  "footer": {
+    "copyright": "© 2026 Organa. Développé en Suisse.",
+    "login": "Connexion",
+    "signup": "Inscription",
+    "legal": {
+      "mentions": "Mentions légales",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d’utilisation",
+      "cookies": "Politique de cookies"
+    }
+  },
+  "hero": {
+    "badge": "Gestion administrative",
+    "title": "Moins d’administratif.\nPlus de temps pour ce qui compte vraiment.",
+    "subtitle": "Organa automatise la gestion administrative de votre entreprise afin que vous puissiez consacrer plus de temps à vos clients, à votre activité… et à ce qui compte vraiment pour vous.",
+    "ctaPrimary": "Découvrir Organa",
+    "ctaSecondary": "Comment ça marche",
+    "overview": "Vue d'ensemble",
+    "period": "7 jours",
+    "stats": {
+      "clients": { "label": "Clients", "value": "18 actifs" },
+      "quotes": { "label": "Devis", "value": "7 envoyés" },
+      "invoices": { "label": "Factures", "value": "12 émises" },
+      "payments": { "label": "Paiements", "value": "9 reçus" }
+    },
+    "quoteCard": {
+      "title": "Devis",
+      "number": "#2041",
+      "status": "Validé · 3 200 CHF"
+    },
+    "paymentsCard": {
+      "title": "Paiements",
+      "count": "4 reçus",
+      "period": "Cette semaine",
+      "statuses": {
+        "paid": "Payé",
+        "followUp": "À relancer",
+        "pending": "En attente"
+      }
+    },
+    "clientFollowUp": {
+      "title": "Suivi client",
+      "items": {
+        "emailSent": "Email envoyé",
+        "followUpPlanned": "Relance planifiée",
+        "paymentReceived": "Paiement reçu"
+      }
+    }
+  },
+  "problem": {
+    "cards": {
+      "docs": {
+        "title": "Documents dispersés",
+        "text": "Factures, devis, suivi des clients et documents éparpillés."
+      },
+      "tools": {
+        "title": "Outils isolés",
+        "text": "Des outils qui ne communiquent pas entre eux et un suivi difficile."
+      },
+      "mentalLoad": {
+        "title": "Charge mentale",
+        "text": "L’administratif s’accumule et ralentit l’activité au quotidien."
+      }
+    },
+    "label": "Le problème",
+    "title": "Votre temps est trop précieux pour être perdu dans l’administratif.",
+    "paragraphs": {
+      "first": "Factures, devis, suivi des clients, documents dispersés, outils qui ne communiquent pas entre eux… l’administratif s’accumule, ralentit votre activité et devient une charge mentale permanente.",
+      "second": "Ce temps perdu a un coût réel : moins de disponibilité pour vos clients, moins d’énergie pour développer votre entreprise, et moins de temps investi là où il crée réellement de la valeur."
+    },
+    "cta": "Découvrir Organa"
+  },
+  "solution": {
+    "label": "La solution Organa",
+    "title": "Centraliser l’essentiel de votre activité, au même endroit.",
+    "paragraph": "Organa a été conçu pour centraliser les éléments essentiels de votre activité : factures, devis, clients, suivi administratif et gestion des tâches, au même endroit.",
+    "cards": {
+      "organization": {
+        "title": "Organisation claire",
+        "text": "Un seul espace pour rassembler les documents et le suivi administratif."
+      },
+      "visibility": {
+        "title": "Vision précise",
+        "text": "Une vue fiable de l’activité pour avancer sereinement."
+      }
+    },
+    "cta": "Découvrir Organa"
+  },
+  "howItWorks": {
+    "label": "Comment ça marche",
+    "title": "Un fonctionnement simple, pensé pour votre gestion quotidienne.",
+    "paragraph": "En simplifiant et en structurant vos tâches administratives, ainsi que leur suivi dans le temps, Organa vous permet de gérer plus efficacement votre activité.",
+    "cta": "Découvrir Organa",
+    "stepsTitle": "Étapes clés",
+    "stepsBadge": "Temps réel",
+    "steps": {
+      "one": "Créez vos clients",
+      "two": "Créez et envoyez vos devis",
+      "three": "Transformez vos devis en factures",
+      "four": "Personnalisez vos documents",
+      "five": "Pilotez votre activité depuis le dashboard",
+      "six": "Suivez vos paiements, vos tâches et votre planning"
+    },
+    "cards": {
+      "quotes": {
+        "title": "Devis et factures",
+        "text": "Créez des devis, envoyez-les, puis transformez-les en factures."
+      },
+      "tasks": {
+        "title": "Tâches et échéances",
+        "text": "Associez des tâches à vos devis ou factures et suivez-les dans le temps."
+      }
+    }
+  },
+  "tasksCalendar": {
+    "label": "Gestion des tâches & calendrier",
+    "title": "Suivre les actions dans le temps, simplement.",
+    "paragraph": "Organa ne se limite pas à la création de documents. Chaque devis, facture ou client peut être associé à des tâches et à des échéances. Grâce au calendrier intégré, vous pouvez planifier vos rendez-vous, organiser vos relances et garder une vue claire sur ce qui doit être fait, aujourd’hui comme demain."
+  },
+  "whyOrgana": {
+    "label": "Pourquoi Organa",
+    "title": "Pourquoi les entreprises font confiance à Organa",
+    "cards": {
+      "security": {
+        "title": "Sécurité & données",
+        "text": "Hébergement fiable, confidentialité respectée et accès sécurisé aux informations."
+      },
+      "time": {
+        "title": "Gain de temps & clarté",
+        "text": "Centralisation des documents et visibilité immédiate sur ce qui est envoyé ou payé."
+      },
+      "organization": {
+        "title": "Organisation & suivi",
+        "text": "Suivi des documents, paiements, tâches et calendrier pour une gestion structurée."
+      }
+    }
+  },
+  "testimonials": {
+    "label": "Avis utilisateurs",
+    "title": "Retours concrets sur l’usage réel.",
+    "items": {
+      "one": {
+        "text": "Je gère mes devis et factures dans Organa, et je vois tout de suite ce qui est envoyé, payé ou à relancer. Le suivi est devenu plus clair.",
+        "author": "Camille — Indépendante"
+      },
+      "two": {
+        "text": "On a enfin un seul endroit pour les clients, les documents et le suivi des paiements. Tout est centralisé.",
+        "author": "Marc — PME"
+      },
+      "three": {
+        "text": "Les tâches liées aux devis et factures sont simples à suivre, et le calendrier nous aide à organiser les échéances.",
+        "author": "Julie — Cabinet"
+      },
+      "four": {
+        "text": "Le dashboard nous donne une vue d’ensemble fiable. On sait ce qui est validé, payé, en attente ou à relancer.",
+        "author": "Nadia — Petite entreprise"
+      }
+    }
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Réponses aux questions principales.",
+    "items": {
+      "target": {
+        "question": "À qui s’adresse Organa ?",
+        "answer": "Aux indépendants et aux PME qui veulent une gestion claire, structurée et simple à suivre."
+      },
+      "free": {
+        "question": "Y a-t-il une version gratuite ?",
+        "answer": "Oui, Organa propose un plan gratuit pour démarrer."
+      },
+      "security": {
+        "question": "Mes données sont-elles sécurisées ?",
+        "answer": "Oui, la sécurité et la confidentialité des données sont prioritaires."
+      },
+      "easy": {
+        "question": "Est-ce simple à prendre en main ?",
+        "answer": "Oui, l’outil est conçu pour être clair, sans fonctionnalités superflues."
+      }
+    }
+  },
+  "pricing": {
+    "label": "Tarifs",
+    "title": "Plan Gratuit et Plan Pro.",
+    "free": {
+      "title": "Plan Gratuit",
+      "subtitle": "Pour démarrer et centraliser vos documents essentiels.",
+      "features": [
+        "Clients, devis et factures au même endroit",
+        "Suivi des paiements et des statuts",
+        "Gestion simple des tâches"
+      ],
+      "cta": "Commencer gratuitement"
+    },
+    "pro": {
+      "badge": "Recommandé",
+      "title": "Plan Pro",
+      "subtitle": "Pour piloter l’administratif avec un suivi complet.",
+      "features": [
+        "Devis, factures et documents personnalisés",
+        "Suivi des paiements et relances",
+        "Gestion des tâches et calendrier intégré"
+      ],
+      "cta": "Découvrir le plan Pro"
+    }
+  },
+  "finalCta": {
+    "title": "Prêt à réduire votre charge administrative ?",
+    "paragraph": "Découvrez Organa et concentrez-vous sur ce qui compte vraiment.",
+    "cta": "Découvrir Organa"
+  }
+}
+
