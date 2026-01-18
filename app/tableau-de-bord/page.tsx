@@ -4,7 +4,17 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Users, FileText, Receipt, UserPlus, FilePlus, AlertCircle } from "@/lib/icons";
+import {
+  Users,
+  FileText,
+  Receipt,
+  UserPlus,
+  FilePlus,
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  ArrowRight,
+} from "@/lib/icons";
 import Link from "next/link";
 
 interface Client {
@@ -75,6 +85,7 @@ export default function TableauDeBordPage() {
 
   const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
   const [aTraiterMaintenant, setATraiterMaintenant] = useState<ATraiterItem[]>([]);
+  const [suiviCalendrier, setSuiviCalendrier] = useState<ATraiterItem[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -145,6 +156,9 @@ export default function TableauDeBordPage() {
 
         const aTraiter = buildATraiterMaintenant(devis, factures, depenses);
         setATraiterMaintenant(aTraiter);
+
+        const suivi = buildSuiviCalendrier(devis, factures, depenses);
+        setSuiviCalendrier(suivi);
       } catch (error) {
         console.error("[TableauDeBord] Erreur chargement:", error);
         setStats({
@@ -159,6 +173,7 @@ export default function TableauDeBordPage() {
         });
         setDerniersDocuments([]);
         setATraiterMaintenant([]);
+        setSuiviCalendrier([]);
       }
     };
 
@@ -193,6 +208,18 @@ export default function TableauDeBordPage() {
       "en-retard": "bg-error-bg text-error",
     };
     return colors[statut] || "bg-surface-hover text-secondary";
+  };
+
+  const getStatutLabel = (statut: string) => {
+    const labels: Record<string, string> = {
+      brouillon: "Brouillon",
+      envoye: "Envoyé",
+      accepte: "Accepté",
+      refuse: "Refusé",
+      paye: "Payé",
+      "en-retard": "En retard",
+    };
+    return labels[statut] || statut;
   };
 
   const formatDate = (value?: string) => {
@@ -295,26 +322,84 @@ export default function TableauDeBordPage() {
     return items.sort((a, b) => a.date.localeCompare(b.date));
   };
 
+  const buildSuiviCalendrier = (
+    devis: DocumentItem[],
+    factures: DocumentItem[],
+    depenses: Depense[]
+  ): ATraiterItem[] => {
+    const items: ATraiterItem[] = [];
+
+    depenses.forEach((depense) => {
+      if (depense.statut !== "a_payer") return;
+      if (isPast(depense.dateEcheance) || !isWithinDays(depense.dateEcheance, 30)) {
+        return;
+      }
+      items.push({
+        id: `suivi-depense-${depense.id}`,
+        type: "Échéance dépense",
+        nom: depense.fournisseur,
+        date: depense.dateEcheance,
+        montant: depense.montant,
+        href: "/tableau-de-bord/depenses",
+      });
+    });
+
+    factures.forEach((facture) => {
+      if (facture.statut !== "envoye" && facture.statut !== "en-retard") return;
+      const dateRef = facture.dateEcheance || facture.dateCreation;
+      if (isPast(dateRef) || !isWithinDays(dateRef, 30)) return;
+      items.push({
+        id: `suivi-facture-${facture.id}`,
+        type: "Relance facture",
+        nom: facture.client?.nom || "Client inconnu",
+        date: dateRef || facture.dateCreation,
+        montant: getMontantDocument(facture),
+        href: `/tableau-de-bord/factures/${facture.id}`,
+      });
+    });
+
+    devis.forEach((devisItem) => {
+      if (devisItem.statut !== "envoye") return;
+      if (isPast(devisItem.dateCreation) || !isWithinDays(devisItem.dateCreation, 30)) return;
+      items.push({
+        id: `suivi-devis-${devisItem.id}`,
+        type: "Relance devis",
+        nom: devisItem.client?.nom || "Client inconnu",
+        date: devisItem.dateEcheance || devisItem.dateCreation,
+        montant: getMontantDocument(devisItem),
+        href: `/tableau-de-bord/devis/${devisItem.id}`,
+      });
+    });
+
+    return items.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-10">
       <Suspense fallback={null}>
         <CheckoutHandler />
       </Suspense>
       {/* En-tête */}
-      <div className="relative">
-        <h1 className="font-heading text-2xl md:text-3xl font-bold mb-2 text-primary">
+      <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="font-heading text-2xl md:text-3xl font-bold mb-2 text-primary">
           Tableau de bord
-        </h1>
-        <p className="font-body text-sm text-secondary font-normal">
-          Vue d'ensemble de votre activité
-        </p>
+          </h1>
+          <p className="font-body text-sm text-secondary font-normal">
+            Une vue claire pour piloter vos documents et vos échéances.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-subtle bg-surface px-4 py-2 text-xs text-secondary">
+          <CheckCircle className="w-4 h-4 text-success" />
+          <span>Votre activité est sous contrôle</span>
+        </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link
           href="/tableau-de-bord/clients"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Clients</span>
@@ -332,7 +417,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/devis?statut=en-attente"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Devis</span>
@@ -355,7 +440,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/factures?statut=non-payees"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-accent-border transition-all duration-200"
+          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">Factures</span>
@@ -377,7 +462,7 @@ export default function TableauDeBordPage() {
 
         <Link
           href="/tableau-de-bord/a-ne-pas-oublier"
-          className="group relative rounded-xl border border-subtle bg-surface p-6 hover:border-red-500/30 transition-all duration-200"
+          className="group relative rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium hover:shadow-premium-hover hover:border-red-500/30 transition-all duration-200"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="font-body text-secondary text-sm font-medium">En retard</span>
@@ -397,27 +482,35 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* À traiter maintenant */}
-      <div className="rounded-xl border border-subtle bg-surface p-8">
-        <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
-          À traiter maintenant
-        </h2>
+      <div className="rounded-3xl border border-subtle bg-gradient-to-br from-[#0B1229] via-[#121A34] to-[#0B1229] p-8 shadow-premium">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="font-heading text-2xl font-semibold text-primary">
+            À traiter maintenant
+          </h2>
+          <span className="text-xs uppercase tracking-[0.25em] text-tertiary">
+            Zone prioritaire
+          </span>
+        </div>
         {aTraiterMaintenant.length === 0 ? (
-          <p className="font-body text-secondary text-lg font-normal">
-            Rien d&apos;urgent pour le moment
-          </p>
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-subtle bg-surface/60 px-5 py-4 text-secondary">
+            <CheckCircle className="w-5 h-5 text-success" />
+            <p className="font-body text-sm">
+              Rien d&apos;urgent pour le moment. Vous gardez la main.
+            </p>
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="mt-6 space-y-3">
             {aTraiterMaintenant.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex items-center justify-between p-5 rounded-lg border border-subtle bg-surface-hover hover:border-accent-border transition-all duration-200 group"
+                className="flex flex-col gap-4 rounded-2xl border border-subtle bg-surface/70 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
-                <div className="flex items-center gap-4">
-                  <div className="font-body text-xs uppercase tracking-wide text-secondary">
-                    {item.type}
-                  </div>
+                <div className="flex items-start justify-between gap-4">
                   <div>
+                    <div className="font-body text-xs uppercase tracking-wide text-secondary">
+                      {item.type}
+                    </div>
                     <div className="font-body font-semibold text-lg text-primary">
                       {item.nom}
                     </div>
@@ -425,14 +518,75 @@ export default function TableauDeBordPage() {
                       Échéance : {formatDate(item.date)}
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
                   {typeof item.montant === "number" && (
-                    <div className="font-body font-bold text-lg text-primary">
-                      {formatMontant(item.montant)}
+                    <div className="text-right">
+                      <div className="font-body font-bold text-lg text-primary">
+                        {formatMontant(item.montant)}
+                      </div>
+                      <div className="font-body text-xs text-tertiary">Voir le détail</div>
                     </div>
                   )}
-                  <div className="font-body text-xs text-tertiary">Voir le détail</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Suivi & calendrier */}
+      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="font-heading text-2xl font-semibold text-primary">
+              Suivi &amp; calendrier
+            </h2>
+            <p className="mt-2 text-sm text-secondary">
+              Reliez vos documents à des actions planifiées pour garder une vision claire.
+            </p>
+          </div>
+          <Link
+            href="/tableau-de-bord/calendrier"
+            className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"
+          >
+            <Calendar className="w-4 h-4" />
+            Ouvrir le calendrier
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {suiviCalendrier.length === 0 ? (
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-subtle bg-surface/60 px-5 py-4 text-secondary">
+            <CheckCircle className="w-5 h-5 text-success" />
+            <p className="font-body text-sm">
+              Aucun rappel planifié dans les 30 prochains jours. Ajoutez-en si besoin.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-3">
+            {suiviCalendrier.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/70 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-tertiary">
+                      {item.type}
+                    </div>
+                    <div className="text-base font-semibold text-primary">{item.nom}</div>
+                    <div className="text-sm text-secondary">
+                      Planifié le {formatDate(item.date)}
+                    </div>
+                  </div>
+                  {typeof item.montant === "number" && (
+                    <div className="text-right">
+                      <div className="text-base font-semibold text-primary">
+                        {formatMontant(item.montant)}
+                      </div>
+                      <div className="text-xs text-tertiary">Accéder</div>
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}
@@ -441,74 +595,93 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* Actions rapides */}
-      <div className="rounded-xl border border-subtle bg-surface p-8">
+      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
           Actions rapides
         </h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Link
             href="/tableau-de-bord/devis/nouveau"
-            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
+            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
-            <FilePlus className="w-4 h-4" />
-            Nouveau devis
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-primary">Nouveau devis</span>
+              <FilePlus className="w-5 h-5 text-secondary group-hover:text-primary" />
+            </div>
+            <p className="text-sm text-secondary">
+              Préparez un devis clair, prêt à être envoyé.
+            </p>
           </Link>
           <Link
             href="/tableau-de-bord/factures/nouvelle"
-            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
+            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
-            <FilePlus className="w-4 h-4" />
-            Nouvelle facture
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-primary">Nouvelle facture</span>
+              <FilePlus className="w-5 h-5 text-secondary group-hover:text-primary" />
+            </div>
+            <p className="text-sm text-secondary">
+              Gardez un suivi précis des paiements attendus.
+            </p>
           </Link>
           <Link
             href="/tableau-de-bord/clients/nouveau"
-            className="btn-primary px-6 py-3 accent-bg text-white rounded-lg transition-all duration-200 flex items-center gap-2 hover:opacity-90"
+            className="group flex flex-col gap-3 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
           >
-            <UserPlus className="w-4 h-4" />
-            Nouveau client
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-primary">Nouveau client</span>
+              <UserPlus className="w-5 h-5 text-secondary group-hover:text-primary" />
+            </div>
+            <p className="text-sm text-secondary">
+              Centralisez vos contacts dans un espace unique.
+            </p>
           </Link>
         </div>
       </div>
 
       {/* Derniers documents */}
-      <div className="rounded-xl border border-subtle bg-surface p-8">
+      <div className="rounded-2xl border border-subtle bg-surface/80 p-8 shadow-premium">
         <h2 className="font-heading text-2xl font-semibold mb-6 text-primary">
           Derniers documents
         </h2>
         {derniersDocuments.length === 0 ? (
-          <p className="font-body text-secondary text-lg font-normal">Aucun document pour le moment</p>
+          <p className="font-body text-secondary text-lg font-normal">
+            Aucun document pour le moment.
+          </p>
         ) : (
           <div className="space-y-3">
             {derniersDocuments.map((doc) => (
               <Link
                 key={`${doc.type}-${doc.id}`}
                 href={`/tableau-de-bord/${doc.type === "devis" ? "devis" : "factures"}/${doc.id}`}
-                className="flex items-center justify-between p-5 rounded-lg border border-subtle bg-surface-hover hover:border-accent-border transition-all duration-200 group"
+                className="flex flex-col gap-4 rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
-                <div className="flex items-center gap-4">
-                  {doc.type === "devis" ? (
-                    <FileText className="w-5 h-5 text-secondary" />
-                  ) : (
-                    <Receipt className="w-5 h-5 text-secondary" />
-                  )}
-                  <div>
-                    <div className="font-body font-semibold text-lg text-primary">{doc.numero}</div>
-                    <div className="font-body text-sm text-secondary">
-                      {doc.client?.nom || "Client inconnu"}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    {doc.type === "devis" ? (
+                      <FileText className="w-5 h-5 text-secondary" />
+                    ) : (
+                      <Receipt className="w-5 h-5 text-secondary" />
+                    )}
+                    <div>
+                      <div className="font-body font-semibold text-lg text-primary">{doc.numero}</div>
+                      <div className="font-body text-sm text-secondary">
+                        {doc.client?.nom || "Client inconnu"}
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="font-body font-bold text-lg text-primary">{formatMontant(doc.montant)}</div>
-                    <div className="font-body text-xs text-tertiary">{doc.dateCreation}</div>
                   </div>
                   <span
                     className={`px-4 py-1.5 rounded-full text-xs font-semibold ${getStatutColor(
                       doc.statut
                     )}`}
                   >
-                    {doc.statut}
+                    {getStatutLabel(doc.statut)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-secondary">
+                  <span>Créé le {formatDate(doc.dateCreation)}</span>
+                  <span className="text-base font-semibold text-primary">
+                    {formatMontant(doc.montant)}
                   </span>
                 </div>
               </Link>

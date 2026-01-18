@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Plus, Trash } from "@/lib/icons";
+import Link from "next/link";
+import { Eye, Plus, Trash, Calendar, ArrowRight } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 
 type DepenseStatut = "a_payer" | "paye";
@@ -36,6 +37,17 @@ const isDatePassee = (value: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return date.getTime() < today.getTime();
+};
+
+const isDateProche = (value: string, days = 7) => {
+  if (!value) return false;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const limit = new Date(today);
+  limit.setDate(today.getDate() + days);
+  return date.getTime() >= today.getTime() && date.getTime() <= limit.getTime();
 };
 
 const getStatutAffiche = (depense: Depense) => {
@@ -335,29 +347,39 @@ export default function DepensesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto space-y-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dépenses</h1>
           <p className="mt-2 text-secondary">
-            Suivez vos factures reçues et vos paiements à venir
+            Suivez vos factures fournisseurs et gardez le contrôle sur vos échéances.
           </p>
         </div>
-        <button
-          onClick={() => {
-            console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
-            setShowForm((value) => !value);
-          }}
-          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
-          style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-        >
-          <Plus className="w-5 h-5" />
-          Nouvelle dépense
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/tableau-de-bord/calendrier"
+            className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"
+          >
+            <Calendar className="w-4 h-4" />
+            Planifier un rappel
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <button
+            onClick={() => {
+              console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
+              setShowForm((value) => !value);
+            }}
+            className="px-6 py-3 accent-bg text-white font-medium rounded-full transition-all flex items-center gap-2"
+            style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+          >
+            <Plus className="w-5 h-5" />
+            Nouvelle dépense
+          </button>
+        </div>
       </div>
 
       {showForm && (
-        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
+        <div className="rounded-2xl border border-subtle bg-surface/80 p-6 space-y-4 shadow-premium">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
@@ -464,14 +486,14 @@ export default function DepensesPage() {
                 resetForm();
                 setShowForm(false);
               }}
-              className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-white transition-all"
+              className="flex-1 px-6 py-3 rounded-full bg-surface-hover hover:bg-surface text-white transition-all"
             >
               Annuler
             </button>
             <button
               type="button"
               onClick={onCreateExpense}
-              className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
+              className="flex-1 px-6 py-3 rounded-full accent-bg text-white font-medium transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter la dépense
@@ -480,7 +502,7 @@ export default function DepensesPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
+      <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
         {loading ? (
           <div className="p-12 text-center">
             <p className="text-secondary">Chargement...</p>
@@ -493,100 +515,88 @@ export default function DepensesPage() {
         ) : depensesTriees.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-secondary mb-4">
-              Aucune dépense enregistrée pour le moment
+              Aucune dépense enregistrée pour le moment.
             </p>
             <button
               type="button"
               onClick={openCreateForm}
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
+              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               Ajouter votre première dépense
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-surface border-b border-subtle">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Fournisseur
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Montant
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Date d&apos;échéance
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Statut
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    Pièce jointe
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {depensesTriees.map((depense) => {
-                  const statutAffiche = getStatutAffiche(depense);
-                  return (
-                    <tr
-                      key={depense.id}
-                      className="hover:bg-surface transition-colors"
-                    >
-                      <td className="px-6 py-4 font-medium">
-                        {depense.label}
-                      </td>
-                      <td className="px-6 py-4 font-semibold">
-                        {formatMontant(depense.amount)}
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {formatDate(depense.date)}
-                      </td>
-                      <td className="px-6 py-4">
+          <div className="p-6 space-y-4">
+            {depensesTriees.map((depense) => {
+              const statutAffiche = getStatutAffiche(depense);
+              const besoinAction =
+                depense.status === "a_payer" &&
+                (isDatePassee(depense.date) || isDateProche(depense.date, 7));
+              return (
+                <div
+                  key={depense.id}
+                  className="rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-tertiary">Fournisseur</p>
+                        <p className="mt-2 text-lg font-semibold text-primary">{depense.label}</p>
+                        <p className="mt-1 text-sm text-secondary">
+                          Échéance : {formatDate(depense.date)}
+                        </p>
+                        {besoinAction && (
+                          <p className="mt-2 text-sm text-warning">
+                            Une action est recommandée pour sécuriser ce paiement.
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs uppercase tracking-wide text-tertiary">Montant</p>
+                        <p className="mt-2 text-2xl font-semibold text-primary">
+                          {formatMontant(depense.amount)}
+                        </p>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatutColor(
+                          className={`mt-3 inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getStatutColor(
                             statutAffiche
                           )}`}
                         >
                           {getStatutLabel(statutAffiche)}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {depense.attachmentUrl ? "📎" : "-"}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleVoir(depense)}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-1.5"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Voir
-                          </button>
-                          <button
-                            onClick={() => handleModifier(depense)}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
-                          >
-                            Modifier
-                          </button>
-                          <button
-                            onClick={() => handleDelete(depense.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
-                            title="Supprimer"
-                          >
-                            <Trash className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="text-sm text-secondary">
+                        {depense.attachmentUrl ? "Pièce jointe disponible" : "Aucune pièce jointe"}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => handleVoir(depense)}
+                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm flex items-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Voir
+                        </button>
+                        <button
+                          onClick={() => handleModifier(depense)}
+                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-white transition-all text-sm"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(depense.id)}
+                          className="px-4 py-2 rounded-full bg-red-500/15 hover:bg-red-500/25 text-red-300 hover:text-red-200 transition-all text-sm flex items-center justify-center"
+                          title="Supprimer"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
