@@ -253,6 +253,19 @@ export default function DepensesPage() {
       return;
     }
 
+    const normalizeDateToIso = (value: string) => {
+      if (!value) return value;
+      if (value.includes(".")) {
+        const [day, month, year] = value.split(".");
+        if (day && month && year) {
+          return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+        }
+      }
+      return value;
+    };
+
+    const formattedDate = normalizeDateToIso(formData.date);
+
     try {
       const supabase = createClient();
       const {
@@ -267,7 +280,7 @@ export default function DepensesPage() {
       const payload = {
         label: formData.label.trim(),
         amount,
-        date: formData.date,
+        date: formattedDate,
         status: formData.status,
         notes: formData.notes.trim() || null,
       };
