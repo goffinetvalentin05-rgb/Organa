@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, Plus } from "@/lib/icons";
+import { Eye, Trash, Plus, Download } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 
@@ -103,13 +103,22 @@ export default function FacturesPage() {
           <h1 className="text-3xl font-bold">{t("dashboard.invoices.title")}</h1>
           <p className="mt-2 text-secondary">{t("dashboard.invoices.subtitle")}</p>
         </div>
-        <Link
-          href="/tableau-de-bord/factures/nouvelle"
-          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          {t("dashboard.invoices.newAction")}
-        </Link>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/export?resource=invoices"
+            className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
+          >
+            <Download className="w-5 h-5" />
+            {t("dashboard.invoices.exportAction")}
+          </a>
+          <Link
+            href="/tableau-de-bord/factures/nouvelle"
+            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            {t("dashboard.invoices.newAction")}
+          </Link>
+        </div>
       </div>
 
       {/* Liste */}

@@ -193,22 +193,22 @@
     "title": "Plan Gratuit et Plan Pro.",
     "free": {
       "title": "Plan Gratuit",
-      "subtitle": "Pour démarrer et centraliser vos documents essentiels.",
+      "subtitle": "Gratuit — pour démarrer simplement.",
       "features": [
-        "Clients, devis et factures au même endroit",
-        "Suivi des paiements et des statuts",
-        "Gestion simple des tâches"
+        "Jusqu’à 2 clients",
+        "Jusqu’à 3 documents par mois",
+        "Fonctionnalités essentielles pour débuter"
       ],
       "cta": "Commencer gratuitement"
     },
     "pro": {
       "badge": "Recommandé",
       "title": "Plan Pro",
-      "subtitle": "Pour piloter l’administratif avec un suivi complet.",
+      "subtitle": "29 CHF / mois",
       "features": [
-        "Devis, factures et documents personnalisés",
-        "Suivi des paiements et relances",
-        "Gestion des tâches et calendrier intégré"
+        "Clients illimités",
+        "Documents illimités",
+        "Toutes les fonctionnalités"
       ],
       "cta": "Découvrir le plan Pro"
     }
@@ -401,6 +401,7 @@
       "loadError": "Erreur lors du chargement des clients",
       "title": "Clients",
       "subtitle": "Une vue claire pour gérer vos contacts et leurs informations clés.",
+      "exportAction": "Exporter",
       "newClient": "Nouveau client",
       "editDisabledTitle": "Modification temporairement désactivée",
       "editDisabledText": "Pour modifier un client, supprimez-le puis recréez-le. Cela garantit des données propres et une base toujours fiable.",
@@ -516,6 +517,7 @@
     "invoices": {
       "title": "Factures",
       "subtitle": "Gérez vos factures et suivez les paiements",
+      "exportAction": "Exporter",
       "newAction": "Créer une facture",
       "form": {
         "title": "Nouvelle facture",
@@ -655,6 +657,7 @@
     "expenses": {
       "title": "Dépenses",
       "subtitle": "Suivez vos factures fournisseurs et gardez le contrôle sur vos échéances.",
+      "exportAction": "Exporter",
       "planReminder": "Planifier un rappel",
       "newExpense": "Nouvelle dépense",
       "addAction": "Ajouter la dépense",

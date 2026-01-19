@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Plus, Trash, Calendar, ArrowRight } from "@/lib/icons";
+import { Eye, Plus, Trash, Calendar, ArrowRight, Download } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -359,6 +359,13 @@ export default function DepensesPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <a
+            href="/api/export?resource=expenses"
+            className="inline-flex items-center gap-2 rounded-full border border-subtle bg-white px-4 py-2 text-xs font-semibold text-secondary transition-all hover:text-primary"
+          >
+            <Download className="w-4 h-4" />
+            {t("dashboard.expenses.exportAction")}
+          </a>
           <Link
             href="/tableau-de-bord/calendrier"
             className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"

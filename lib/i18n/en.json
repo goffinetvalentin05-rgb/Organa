@@ -193,22 +193,22 @@
     "title": "Free plan and Pro plan.",
     "free": {
       "title": "Free Plan",
-      "subtitle": "To get started and centralize your essential documents.",
+      "subtitle": "Free — a simple way to get started.",
       "features": [
-        "Clients, quotes, and invoices in one place",
-        "Payment and status tracking",
-        "Simple task management"
+        "Up to 2 clients",
+        "Up to 3 documents per month",
+        "Essential features to begin"
       ],
       "cta": "Start for free"
     },
     "pro": {
       "badge": "Recommended",
       "title": "Pro Plan",
-      "subtitle": "For complete administrative oversight.",
+      "subtitle": "29 CHF / month",
       "features": [
-        "Quotes, invoices, and custom documents",
-        "Payment tracking and reminders",
-        "Task management and integrated calendar"
+        "Unlimited clients",
+        "Unlimited documents",
+        "All features included"
       ],
       "cta": "Discover the Pro plan"
     }
@@ -401,6 +401,7 @@
       "loadError": "Error loading clients",
       "title": "Clients",
       "subtitle": "A clear view to manage your contacts and key details.",
+      "exportAction": "Export",
       "newClient": "New client",
       "editDisabledTitle": "Editing temporarily disabled",
       "editDisabledText": "To edit a client, delete it and recreate it. This keeps data clean and reliable.",
@@ -516,6 +517,7 @@
     "invoices": {
       "title": "Invoices",
       "subtitle": "Manage invoices and track payments",
+      "exportAction": "Export",
       "newAction": "Create an invoice",
       "form": {
         "title": "New invoice",
@@ -655,6 +657,7 @@
     "expenses": {
       "title": "Expenses",
       "subtitle": "Track supplier invoices and keep control of your due dates.",
+      "exportAction": "Export",
       "planReminder": "Schedule a reminder",
       "newExpense": "New expense",
       "addAction": "Add expense",

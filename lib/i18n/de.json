@@ -193,22 +193,22 @@
     "title": "Kostenloser Plan und Pro-Plan.",
     "free": {
       "title": "Kostenloser Plan",
-      "subtitle": "Für den Einstieg und die zentralisierte Ablage Ihrer wichtigsten Dokumente.",
+      "subtitle": "Kostenlos — einfach starten.",
       "features": [
-        "Kunden, Angebote und Rechnungen an einem Ort",
-        "Zahlungs- und Statusverfolgung",
-        "Einfache Aufgabenverwaltung"
+        "Bis zu 2 Kunden",
+        "Bis zu 3 Dokumente pro Monat",
+        "Wesentliche Funktionen für den Start"
       ],
       "cta": "Kostenlos starten"
     },
     "pro": {
       "badge": "Empfohlen",
       "title": "Pro-Plan",
-      "subtitle": "Für die vollständige Steuerung der Administration.",
+      "subtitle": "29 CHF / Monat",
       "features": [
-        "Angebote, Rechnungen und personalisierte Dokumente",
-        "Zahlungsnachverfolgung und Erinnerungen",
-        "Aufgabenverwaltung und integrierter Kalender"
+        "Unbegrenzte Kunden",
+        "Unbegrenzte Dokumente",
+        "Alle Funktionen inklusive"
       ],
       "cta": "Pro-Plan entdecken"
     }
@@ -401,6 +401,7 @@
       "loadError": "Fehler beim Laden der Kunden",
       "title": "Kunden",
       "subtitle": "Ein klarer Überblick über Ihre Kontakte und wichtige Informationen.",
+      "exportAction": "Exportieren",
       "newClient": "Neuer Kunde",
       "editDisabledTitle": "Bearbeitung vorübergehend deaktiviert",
       "editDisabledText": "Um einen Kunden zu ändern, löschen Sie ihn und legen Sie ihn neu an. So bleiben die Daten zuverlässig.",
@@ -516,6 +517,7 @@
     "invoices": {
       "title": "Rechnungen",
       "subtitle": "Rechnungen verwalten und Zahlungen verfolgen",
+      "exportAction": "Exportieren",
       "newAction": "Rechnung erstellen",
       "form": {
         "title": "Neue Rechnung",
@@ -655,6 +657,7 @@
     "expenses": {
       "title": "Ausgaben",
       "subtitle": "Verfolgen Sie Lieferantenrechnungen und behalten Sie Fälligkeiten im Blick.",
+      "exportAction": "Exportieren",
       "planReminder": "Erinnerung planen",
       "newExpense": "Neue Ausgabe",
       "addAction": "Ausgabe hinzufügen",
