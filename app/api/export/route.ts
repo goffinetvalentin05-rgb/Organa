@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("expenses")
-      .select("label, amount, date, status, notes")
+      .select("description, amount, date, status, notes")
       .eq("user_id", user.id)
       .order("date", { ascending: false });
 
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
     }
 
     const rows = (data || []).map((item: any) => [
-      item.label || "",
+      item.description || "",
       formatAmount(item.amount),
       formatDate(item.date),
       formatExpenseStatus(item.status),
@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     const csv = buildCsv(
-      ["label", "amount", "date", "status", "notes"],
+      ["description", "amount", "date", "status", "notes"],
       rows
     );
 

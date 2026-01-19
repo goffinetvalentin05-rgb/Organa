@@ -122,11 +122,19 @@ export default function DepensesPage() {
         const data = await response.json().catch(() => null);
         console.error(
           "[Depenses] Erreur Supabase (GET):",
-          data?.details || data?.error || data
+          {
+            error: data?.error,
+            details: data?.details,
+            code: data?.code,
+            hint: data?.hint,
+          }
         );
         throw new Error(data?.error || t("dashboard.expenses.loadError"));
       }
       const data = await response.json();
+      if (!data?.depenses) {
+        console.warn("[Depenses] Réponse dépourvue de données:", data);
+      }
       const depensesChargees = (data?.depenses ?? []).map((depense: any) => ({
         id: depense.id,
         label: depense.label || "",
@@ -319,14 +327,15 @@ export default function DepensesPage() {
       const { error } = await supabase
         .from("expenses")
         .update({
-          label: editFormData.label.trim(),
+          description: editFormData.label.trim(),
           amount,
           date: editFormData.date,
           status: editFormData.status,
           notes: editFormData.notes.trim() || null,
           attachment_url: attachmentUrl,
         })
-        .eq("id", selectedDepense.id);
+        .eq("id", selectedDepense.id)
+        .eq("user_id", user.id);
 
       if (error) {
         throw new Error(t("dashboard.expenses.updateError"));
@@ -347,7 +356,20 @@ export default function DepensesPage() {
     if (!confirm(t("dashboard.expenses.deleteConfirm"))) return;
     try {
       const supabase = createClient();
-      const { error } = await supabase.from("expenses").delete().eq("id", id);
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error(t("dashboard.expenses.deleteError"));
+      }
+
+      const { error } = await supabase
+        .from("expenses")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
 
       if (error) {
         throw new Error(t("dashboard.expenses.deleteError"));

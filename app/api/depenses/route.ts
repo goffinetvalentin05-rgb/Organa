@@ -18,12 +18,16 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("expenses")
-      .select("id, label, amount, date, status, notes, attachment_url")
+      .select("id, description, amount, date, status, notes, attachment_url")
       .eq("user_id", user.id)
       .order("date", { ascending: true });
 
     if (error) {
-      console.error("[API][depenses][GET] Erreur Supabase:", error);
+      console.error("[API][depenses][GET] Erreur Supabase:", {
+        message: error.message,
+        details: error.details,
+        code: error.code,
+      });
       return NextResponse.json(
         {
           error: "Erreur lors du chargement des dépenses",
@@ -33,6 +37,10 @@ export async function GET() {
         },
         { status: 500 }
       );
+    }
+
+    if (!data) {
+      console.warn("[API][depenses][GET] Données nulles pour expenses.");
     }
 
     return NextResponse.json(
@@ -61,9 +69,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { label, amount, date, status, notes } = body || {};
+    const { label, description, amount, date, status, notes } = body || {};
 
-    if (!label || !date || typeof amount !== "number") {
+    const descriptionValue = label ?? description;
+    if (!descriptionValue || !date || typeof amount !== "number") {
       return NextResponse.json(
         { error: "Données invalides" },
         { status: 400 }
@@ -74,18 +83,22 @@ export async function POST(request: NextRequest) {
       .from("expenses")
       .insert({
         user_id: user.id,
-        label: String(label).trim(),
+        description: String(descriptionValue).trim(),
         amount,
         date,
         status: status || "a_payer",
         notes: notes || null,
         attachment_url: null,
       })
-      .select("id, label, amount, date, status, notes, attachment_url")
+      .select("id, description, amount, date, status, notes, attachment_url")
       .single();
 
     if (error) {
-      console.error("[API][depenses][POST] Erreur Supabase:", error);
+      console.error("[API][depenses][POST] Erreur Supabase:", {
+        message: error.message,
+        details: error.details,
+        code: error.code,
+      });
       return NextResponse.json(
         {
           error: "Erreur lors de la création de la dépense",
@@ -175,7 +188,7 @@ function formatDepense(depense: any) {
 
   return {
     id: depense.id,
-    label: depense.label || "",
+    label: depense.description || "",
     amount,
     date: depense.date || "",
     status: depense.status || "a_payer",
