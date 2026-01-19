@@ -79,19 +79,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const payload = {
+      user_id: user.id,
+      description: String(descriptionValue).trim(),
+      amount,
+      date,
+      status: status || "a_payer",
+      notes: notes || null,
+      attachment_url: null,
+    };
+
+    console.log("[API][depenses][POST] user:", user);
+    console.log("[API][depenses][POST] payload:", payload);
+
     const { data, error } = await supabase
       .from("expenses")
-      .insert({
-        user_id: user.id,
-        description: String(descriptionValue).trim(),
-        amount,
-        date,
-        status: status || "a_payer",
-        notes: notes || null,
-        attachment_url: null,
-      })
+      .insert(payload)
       .select("id, description, amount, date, status, notes, attachment_url")
       .single();
+
+    console.log("[API][depenses][POST] data:", data);
+    console.log("[API][depenses][POST] error:", error);
+    if (error) {
+      console.error("[API][depenses][POST] error.message:", error.message);
+      console.error("[API][depenses][POST] error.code:", error.code);
+      if ("details" in error) {
+        console.error("[API][depenses][POST] error.details:", error.details);
+      }
+    }
 
     if (error) {
       console.error("[API][depenses][POST] Erreur Supabase:", {

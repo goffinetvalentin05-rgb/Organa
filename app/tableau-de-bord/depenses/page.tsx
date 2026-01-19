@@ -264,16 +264,21 @@ export default function DepensesPage() {
         throw new Error(t("dashboard.expenses.createError"));
       }
 
+      const payload = {
+        label: formData.label.trim(),
+        amount,
+        date: formData.date,
+        status: formData.status,
+        notes: formData.notes.trim() || null,
+      };
+
+      console.log("[Depenses][create] user:", user);
+      console.log("[Depenses][create] payload:", payload);
+
       const response = await fetch("/api/depenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          label: formData.label.trim(),
-          amount,
-          date: formData.date,
-          status: formData.status,
-          notes: formData.notes.trim() || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       console.log("response", response);
