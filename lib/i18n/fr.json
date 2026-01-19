@@ -282,6 +282,116 @@
       "title": "Limite du plan gratuit atteinte",
       "cta": "Voir les offres"
     },
+    "settings": {
+      "title": "Paramètres",
+      "subtitle": "Configurez votre entreprise et votre marque",
+      "loadingPage": "Chargement des paramètres...",
+      "saveSuccess": "Paramètres enregistrés avec succès",
+      "saveButton": "💾 Enregistrer les paramètres",
+      "subscription": {
+        "title": "Abonnement",
+        "currentPlan": "Plan actuel :",
+        "planPro": "Pro",
+        "planFree": "Gratuit",
+        "freeLimit": "Limite : {clients} clients, {documents} documents par mois",
+        "unlimitedAccess": "Accès illimité à toutes les fonctionnalités",
+        "upgrade": "🚀 Passer à Pro",
+        "proBadge": "✓ Abonné Pro",
+        "proOfferTitle": "Plan Pro - 29 CHF / mois",
+        "proFeatures": [
+          "Clients illimités",
+          "Documents illimités",
+          "Toutes les fonctionnalités"
+        ]
+      },
+      "branding": {
+        "title": "Marque",
+        "logoLabel": "Logo de l'entreprise",
+        "logoAlt": "Logo entreprise",
+        "noLogo": "Aucun logo",
+        "upload": "Choisir un logo",
+        "uploading": "Upload en cours...",
+        "delete": "Supprimer le logo",
+        "deleting": "Suppression...",
+        "formats": "Formats acceptés : PNG, JPG, SVG (max 5MB)",
+        "headerStyleLabel": "Style d'en-tête",
+        "headerStyleHelp": "Style utilisé pour l'affichage des documents (devis, factures)",
+        "headerStyles": {
+          "simple": "Simple",
+          "moderne": "Moderne",
+          "classique": "Classique"
+        },
+        "primaryColorLabel": "Couleur principale",
+        "primaryColorHelp": "Couleur utilisée pour le nom de l'entreprise et les éléments visuels sur les factures PDF",
+        "currencyLabel": "Devise de facturation",
+        "currencyHelp": "Devise par défaut utilisée sur les devis et factures",
+        "currencies": {
+          "CHF": "CHF - Franc suisse",
+          "EUR": "EUR - Euro",
+          "USD": "USD - Dollar américain",
+          "GBP": "GBP - Livre sterling",
+          "CAD": "CAD - Dollar canadien",
+          "AUD": "AUD - Dollar australien",
+          "JPY": "JPY - Yen japonais"
+        }
+      },
+      "companyInfo": {
+        "title": "Informations entreprise",
+        "nameLabel": "Nom de l'entreprise *",
+        "addressLabel": "Adresse *",
+        "emailLabel": "Email *",
+        "phoneLabel": "Téléphone *"
+      },
+      "billing": {
+        "title": "Informations bancaires",
+        "subtitle": "Ces informations seront affichées sur les factures et devis PDF.",
+        "ibanLabel": "IBAN",
+        "ibanPlaceholder": "CH93 0076 2011 6238 5295 7",
+        "bankNameLabel": "Nom de la banque",
+        "bankNamePlaceholder": "Banque Suisse",
+        "paymentTermsLabel": "Conditions de paiement",
+        "paymentTermsPlaceholder": "Paiement à réception, délai de paiement : 30 jours",
+        "paymentTermsHelp": "Conditions affichées dans le footer des PDF"
+      },
+      "email": {
+        "title": "Configuration Email",
+        "subtitleBefore": "Configurez l'envoi d'emails pour les devis et factures. Utilisez",
+        "subtitleAfter": "pour envoyer des emails.",
+        "senderNameLabel": "Nom de l'expéditeur",
+        "senderNamePlaceholder": "Organa",
+        "senderNameHelp": "Nom affiché dans les emails envoyés",
+        "senderEmailLabel": "Email de l'expéditeur *",
+        "senderEmailPlaceholder": "noreply@votredomaine.com",
+        "senderEmailHelp": "Doit être un domaine vérifié dans Resend",
+        "apiKeyLabel": "Clé API Resend *",
+        "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
+        "apiKeyHelpBefore": "Obtenez votre clé API sur",
+        "apiKeyHelpAfter": "."
+      },
+      "validation": {
+        "companyNameRequired": "Le nom de l'entreprise est obligatoire"
+      },
+      "notifications": {
+        "authReconnect": "Veuillez vous reconnecter",
+        "loadError": "Erreur: {message}",
+        "stripeInvalidJson": "Erreur : La réponse n'est pas du JSON valide. Vérifiez la console.",
+        "stripeMissingUrl": "Erreur Stripe : URL manquante. Réponse: {response}",
+        "stripeOpenError": "Erreur lors de l'ouverture du paiement : {message}",
+        "paymentSuccess": "Paiement réussi ! Votre compte est maintenant Pro.",
+        "paymentCanceled": "Paiement annulé",
+        "uploadError": "Erreur lors de l'upload",
+        "uploadLogoError": "Erreur lors de l'upload du logo",
+        "deleteError": "Erreur lors de la suppression",
+        "logoUploaded": "Logo uploadé avec succès !",
+        "logoDeleted": "Logo supprimé avec succès",
+        "saveError": "Erreur lors de la sauvegarde",
+        "readResponseError": "Erreur lors de la lecture de la réponse",
+        "unknownError": "Erreur inconnue"
+      },
+      "confirm": {
+        "deleteLogo": "Êtes-vous sûr de vouloir supprimer le logo ?"
+      }
+    },
     "clients": {
       "authError": "Erreur d'authentification",
       "loadError": "Erreur lors du chargement des clients",

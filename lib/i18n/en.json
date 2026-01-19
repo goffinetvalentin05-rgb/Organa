@@ -282,6 +282,116 @@
       "title": "Free plan limit reached",
       "cta": "See plans"
     },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Configure your company and your brand",
+      "loadingPage": "Loading settings...",
+      "saveSuccess": "Settings saved successfully",
+      "saveButton": "💾 Save settings",
+      "subscription": {
+        "title": "Subscription",
+        "currentPlan": "Current plan:",
+        "planPro": "Pro",
+        "planFree": "Free",
+        "freeLimit": "Limit: {clients} clients, {documents} documents per month",
+        "unlimitedAccess": "Unlimited access to all features",
+        "upgrade": "🚀 Upgrade to Pro",
+        "proBadge": "✓ Pro subscriber",
+        "proOfferTitle": "Pro plan - 29 CHF / month",
+        "proFeatures": [
+          "Unlimited clients",
+          "Unlimited documents",
+          "All features"
+        ]
+      },
+      "branding": {
+        "title": "Brand",
+        "logoLabel": "Company logo",
+        "logoAlt": "Company logo",
+        "noLogo": "No logo",
+        "upload": "Choose a logo",
+        "uploading": "Uploading...",
+        "delete": "Delete logo",
+        "deleting": "Deleting...",
+        "formats": "Accepted formats: PNG, JPG, SVG (max 5MB)",
+        "headerStyleLabel": "Header style",
+        "headerStyleHelp": "Style used for document display (quotes, invoices)",
+        "headerStyles": {
+          "simple": "Simple",
+          "moderne": "Modern",
+          "classique": "Classic"
+        },
+        "primaryColorLabel": "Primary color",
+        "primaryColorHelp": "Color used for the company name and visual elements on PDF invoices",
+        "currencyLabel": "Billing currency",
+        "currencyHelp": "Default currency used on quotes and invoices",
+        "currencies": {
+          "CHF": "CHF - Swiss franc",
+          "EUR": "EUR - Euro",
+          "USD": "USD - US dollar",
+          "GBP": "GBP - British pound",
+          "CAD": "CAD - Canadian dollar",
+          "AUD": "AUD - Australian dollar",
+          "JPY": "JPY - Japanese yen"
+        }
+      },
+      "companyInfo": {
+        "title": "Company information",
+        "nameLabel": "Company name *",
+        "addressLabel": "Address *",
+        "emailLabel": "Email *",
+        "phoneLabel": "Phone *"
+      },
+      "billing": {
+        "title": "Banking information",
+        "subtitle": "These details will appear on PDF invoices and quotes.",
+        "ibanLabel": "IBAN",
+        "ibanPlaceholder": "CH93 0076 2011 6238 5295 7",
+        "bankNameLabel": "Bank name",
+        "bankNamePlaceholder": "Swiss Bank",
+        "paymentTermsLabel": "Payment terms",
+        "paymentTermsPlaceholder": "Payment on receipt, payment term: 30 days",
+        "paymentTermsHelp": "Terms shown in the PDF footer"
+      },
+      "email": {
+        "title": "Email configuration",
+        "subtitleBefore": "Configure email sending for quotes and invoices. Use",
+        "subtitleAfter": "to send emails.",
+        "senderNameLabel": "Sender name",
+        "senderNamePlaceholder": "Organa",
+        "senderNameHelp": "Name shown in sent emails",
+        "senderEmailLabel": "Sender email *",
+        "senderEmailPlaceholder": "noreply@yourdomain.com",
+        "senderEmailHelp": "Must be a verified domain in Resend",
+        "apiKeyLabel": "Resend API key *",
+        "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
+        "apiKeyHelpBefore": "Get your API key at",
+        "apiKeyHelpAfter": "."
+      },
+      "validation": {
+        "companyNameRequired": "Company name is required"
+      },
+      "notifications": {
+        "authReconnect": "Please sign in again",
+        "loadError": "Error: {message}",
+        "stripeInvalidJson": "Error: The response isn't valid JSON. Check the console.",
+        "stripeMissingUrl": "Stripe error: missing URL. Response: {response}",
+        "stripeOpenError": "Error opening payment: {message}",
+        "paymentSuccess": "Payment successful! Your account is now Pro.",
+        "paymentCanceled": "Payment canceled",
+        "uploadError": "Upload error",
+        "uploadLogoError": "Error uploading the logo",
+        "deleteError": "Error deleting",
+        "logoUploaded": "Logo uploaded successfully!",
+        "logoDeleted": "Logo deleted successfully",
+        "saveError": "Error while saving",
+        "readResponseError": "Error reading the response",
+        "unknownError": "Unknown error"
+      },
+      "confirm": {
+        "deleteLogo": "Are you sure you want to delete the logo?"
+      }
+    },
     "clients": {
       "authError": "Authentication error",
       "loadError": "Error loading clients",

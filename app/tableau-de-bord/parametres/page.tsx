@@ -7,42 +7,18 @@ import toast from "react-hot-toast";
 import { Parametres } from "@/lib/mock-data";
 import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
-
-/**
- * Helper pour lire le body d'une Response une seule fois
- * Évite l'erreur "body stream already read"
- * @param response - Response object à parser
- * @returns Promise<any> - Données parsées (JSON ou texte)
- */
-async function parseResponseBody(response: Response): Promise<any> {
-  const contentType = response.headers.get("content-type");
-  
-  try {
-    if (contentType?.includes("application/json")) {
-      return await response.json();
-    } else {
-      const text = await response.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        return { error: "Erreur inconnue", details: text };
-      }
-    }
-  } catch (parseError) {
-    console.error("[PARAMETRES] Erreur parsing response:", parseError);
-    return { error: "Erreur lors de la lecture de la réponse" };
-  }
-}
+import { useI18n } from "@/components/I18nProvider";
 
 function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
 
   useEffect(() => {
     // Vérifier si on revient d'un paiement réussi
     const sessionId = searchParams?.get("session_id");
     if (sessionId) {
-      toast.success("Paiement réussi ! Votre compte est maintenant Pro.");
+      toast.success(t("dashboard.settings.notifications.paymentSuccess"));
       onSuccess();
       // Nettoyer l'URL
       router.replace("/tableau-de-bord/parametres");
@@ -51,16 +27,17 @@ function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
     // Vérifier si le paiement a été annulé
     const canceled = searchParams?.get("canceled");
     if (canceled) {
-      toast.error("Paiement annulé");
+      toast.error(t("dashboard.settings.notifications.paymentCanceled"));
       router.replace("/tableau-de-bord/parametres");
     }
-  }, [searchParams, router, onSuccess]);
+  }, [searchParams, router, onSuccess, t]);
 
   return null;
 }
 
 export default function ParametresPage() {
   const router = useRouter();
+  const { t, tList } = useI18n();
   const [parametres, setParametres] = useState<Parametres | null>(null);
   const [userPlan, setUserPlan] = useState<"free" | "pro" | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
@@ -89,6 +66,32 @@ export default function ParametresPage() {
   const [deleting, setDeleting] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
+  /**
+   * Helper pour lire le body d'une Response une seule fois
+   * Évite l'erreur "body stream already read"
+   * @param response - Response object à parser
+   * @returns Promise<any> - Données parsées (JSON ou texte)
+   */
+  const parseResponseBody = async (response: Response): Promise<any> => {
+    const contentType = response.headers.get("content-type");
+
+    try {
+      if (contentType?.includes("application/json")) {
+        return await response.json();
+      } else {
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch {
+          return { error: t("dashboard.settings.notifications.unknownError"), details: text };
+        }
+      }
+    } catch (parseError) {
+      console.error("[PARAMETRES] Erreur parsing response:", parseError);
+      return { error: t("dashboard.settings.notifications.readResponseError") };
+    }
+  };
+
   // Fonction pour charger les paramètres directement depuis Supabase
   const loadSettingsFromDB = async () => {
     try {
@@ -102,7 +105,7 @@ export default function ParametresPage() {
       
       if (authError || !user) {
         console.error("[PARAMETRES] Erreur auth:", authError);
-        toast.error("Veuillez vous reconnecter");
+        toast.error(t("dashboard.settings.notifications.authReconnect"));
         router.push("/connexion");
         return;
       }
@@ -216,7 +219,11 @@ export default function ParametresPage() {
       });
     } catch (error: any) {
       console.error("[PARAMETRES] Erreur catch loadSettingsFromDB:", error);
-      toast.error(`Erreur: ${error.message || "Erreur lors du chargement"}`);
+      toast.error(
+        t("dashboard.settings.notifications.loadError", {
+          message: error.message || t("dashboard.common.unknownError"),
+        })
+      );
     } finally {
       setLoadingSettings(false);
     }
@@ -262,7 +269,7 @@ export default function ParametresPage() {
       } catch (parseError) {
         console.error("Erreur de parsing JSON:", parseError);
         console.error("Réponse reçue (premiers 500 caractères):", text.substring(0, 500));
-        alert("Erreur : La réponse n'est pas du JSON valide. Vérifiez la console.");
+        alert(t("dashboard.settings.notifications.stripeInvalidJson"));
         return;
       }
 
@@ -272,11 +279,19 @@ export default function ParametresPage() {
         // Rediriger EXCLUSIVEMENT vers Stripe Checkout
         window.location.href = data.url;
       } else {
-        alert("Erreur Stripe : URL manquante. Réponse: " + JSON.stringify(data));
+        alert(
+          t("dashboard.settings.notifications.stripeMissingUrl", {
+            response: JSON.stringify(data),
+          })
+        );
       }
     } catch (error: any) {
       console.error("Erreur lors de l'appel à Stripe:", error);
-      alert("Erreur lors de l'ouverture du paiement : " + (error.message || "Erreur inconnue"));
+      alert(
+        t("dashboard.settings.notifications.stripeOpenError", {
+          message: error.message || t("dashboard.common.unknownError"),
+        })
+      );
     } finally {
       setLoadingCheckout(false);
     }
@@ -287,7 +302,7 @@ export default function ParametresPage() {
     
     // Validation frontend
     if (!formData.nomEntreprise || formData.nomEntreprise.trim() === "") {
-      toast.error("Le nom de l'entreprise est obligatoire");
+      toast.error(t("dashboard.settings.validation.companyNameRequired"));
       return;
     }
 
@@ -412,7 +427,11 @@ export default function ParametresPage() {
         });
         
         // Afficher le message d'erreur exact de Supabase
-        const errorMessage = errorData.error || errorData.message || errorData.details || "Erreur lors de la sauvegarde";
+        const errorMessage =
+          errorData.error ||
+          errorData.message ||
+          errorData.details ||
+          t("dashboard.settings.notifications.saveError");
         toast.error(errorMessage);
         return; // Ne pas throw pour éviter l'overlay Next.js
       }
@@ -422,7 +441,7 @@ export default function ParametresPage() {
       await loadSettingsFromDB();
 
       setSaved(true);
-      toast.success("Paramètres enregistrés avec succès");
+      toast.success(t("dashboard.settings.saveSuccess"));
       setTimeout(() => setSaved(false), 3000);
     } catch (error: any) {
       console.error("Erreur lors de la sauvegarde:", error);
@@ -448,16 +467,16 @@ export default function ParametresPage() {
       const data = await parseResponseBody(response);
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de l'upload");
+        throw new Error(data.error || t("dashboard.settings.notifications.uploadError"));
       }
 
       // Recharger depuis la DB pour synchroniser le state
       console.log("[PARAMETRES] Logo uploadé, rechargement depuis DB...");
       await loadSettingsFromDB();
-      
-      toast.success("Logo uploadé avec succès !");
+
+      toast.success(t("dashboard.settings.notifications.logoUploaded"));
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de l'upload du logo");
+      toast.error(error.message || t("dashboard.settings.notifications.uploadLogoError"));
     } finally {
       setUploading(false);
       // Réinitialiser l'input
@@ -466,7 +485,7 @@ export default function ParametresPage() {
   };
 
   const handleLogoDelete = async () => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer le logo ?")) {
+    if (!confirm(t("dashboard.settings.confirm.deleteLogo"))) {
       return;
     }
 
@@ -480,16 +499,16 @@ export default function ParametresPage() {
       const data = await parseResponseBody(response);
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de la suppression");
+        throw new Error(data.error || t("dashboard.settings.notifications.deleteError"));
       }
 
       // Recharger depuis la DB pour synchroniser le state
       console.log("[PARAMETRES] Logo supprimé, rechargement depuis DB...");
       await loadSettingsFromDB();
-      
-      toast.success("Logo supprimé avec succès");
+
+      toast.success(t("dashboard.settings.notifications.logoDeleted"));
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la suppression du logo");
+      toast.error(error.message || t("dashboard.settings.notifications.deleteError"));
     } finally {
       setDeleting(false);
     }
@@ -498,10 +517,16 @@ export default function ParametresPage() {
   if (loadingSettings || !parametres) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">Chargement des paramètres...</p>
+        <p className="text-secondary">{t("dashboard.settings.loadingPage")}</p>
       </div>
     );
   }
+
+  const planLabel =
+    userPlan === "pro"
+      ? t("dashboard.settings.subscription.planPro")
+      : t("dashboard.settings.subscription.planFree");
+  const proFeatures = tList("dashboard.settings.subscription.proFeatures");
 
   return (
     <>
@@ -511,40 +536,44 @@ export default function ParametresPage() {
       <div className="max-w-4xl mx-auto space-y-6">
       {/* En-tête */}
       <div>
-        <h1 className="text-3xl font-bold">Paramètres</h1>
+        <h1 className="text-3xl font-bold">{t("dashboard.settings.title")}</h1>
         <p className="mt-2 text-secondary">
-          Configurez votre entreprise et votre marque
+          {t("dashboard.settings.subtitle")}
         </p>
       </div>
 
       {saved && (
         <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-green-700 flex items-center gap-2">
           <CheckCircle className="w-5 h-5" />
-          Paramètres enregistrés avec succès
+          {t("dashboard.settings.saveSuccess")}
         </div>
       )}
 
       {/* Section Abonnement */}
       <div className="rounded-xl border border-subtle bg-surface p-6">
-        <h2 className="text-xl font-semibold mb-4">Abonnement</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.subscription.title")}</h2>
         
         {loadingPlan ? (
-          <p className="text-secondary">Chargement...</p>
+          <p className="text-secondary">{t("dashboard.common.loading")}</p>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg font-medium">
-                  Plan actuel : <span className="accent">{userPlan === "pro" ? "Pro" : "Gratuit"}</span>
+                  {t("dashboard.settings.subscription.currentPlan")}{" "}
+                  <span className="accent">{planLabel}</span>
                 </p>
                 {userPlan === "free" && (
                   <p className="text-sm text-secondary mt-1">
-                    Limite : 2 clients, 3 documents par mois
+                    {t("dashboard.settings.subscription.freeLimit", {
+                      clients: 2,
+                      documents: 3,
+                    })}
                   </p>
                 )}
                 {userPlan === "pro" && (
                   <p className="text-sm text-secondary mt-1">
-                    Accès illimité à toutes les fonctionnalités
+                    {t("dashboard.settings.subscription.unlimitedAccess")}
                   </p>
                 )}
               </div>
@@ -555,22 +584,26 @@ export default function ParametresPage() {
                   disabled={loadingCheckout}
                   className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loadingCheckout ? "Chargement..." : "🚀 Passer à Pro"}
+                  {loadingCheckout
+                    ? t("dashboard.common.loading")
+                    : t("dashboard.settings.subscription.upgrade")}
                 </button>
               )}
               {userPlan === "pro" && (
                 <div className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-lg font-medium">
-                  ✓ Abonné Pro
+                  {t("dashboard.settings.subscription.proBadge")}
                 </div>
               )}
             </div>
             {userPlan === "free" && (
               <div className="mt-4 p-4 accent-bg-light accent-border rounded-lg border">
-                <p className="text-sm text-primary font-medium mb-2">Plan Pro - 29 CHF / mois</p>
+                <p className="text-sm text-primary font-medium mb-2">
+                  {t("dashboard.settings.subscription.proOfferTitle")}
+                </p>
                 <ul className="text-sm text-secondary space-y-1 list-disc list-inside">
-                  <li>Clients illimités</li>
-                  <li>Documents illimités</li>
-                  <li>Toutes les fonctionnalités</li>
+                  {proFeatures.map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -581,18 +614,18 @@ export default function ParametresPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section Marque */}
         <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">Marque</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.branding.title")}</h2>
           
           <div className="mb-6">
             <label className="block text-sm font-medium text-primary mb-2">
-              Logo de l'entreprise
+              {t("dashboard.settings.branding.logoLabel")}
             </label>
             <div className="flex items-start gap-6">
               <div className="w-32 h-32 rounded-xl border border-subtle-hover bg-surface flex items-center justify-center overflow-hidden relative group">
                 {logoPreview ? (
                   <Image
                     src={logoPreview}
-                    alt="Logo entreprise"
+                    alt={t("dashboard.settings.branding.logoAlt")}
                     width={128}
                     height={128}
                     className="object-contain p-2"
@@ -601,7 +634,7 @@ export default function ParametresPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center text-tertiary p-4">
                     <Building2 className="w-12 h-12 mb-2" />
-                    <span className="text-xs text-center">Aucun logo</span>
+                    <span className="text-xs text-center">{t("dashboard.settings.branding.noLogo")}</span>
                   </div>
                 )}
               </div>
@@ -611,12 +644,12 @@ export default function ParametresPage() {
                     {uploading ? (
                       <>
                         <Loader className="w-4 h-4 animate-spin" />
-                        Upload en cours...
+                        {t("dashboard.settings.branding.uploading")}
                       </>
                     ) : (
                       <>
                         <Upload className="w-4 h-4" />
-                        Choisir un logo
+                        {t("dashboard.settings.branding.upload")}
                       </>
                     )}
                     <input
@@ -628,7 +661,7 @@ export default function ParametresPage() {
                     />
                   </label>
                   <p className="text-xs text-tertiary mt-2">
-                    Formats acceptés : PNG, JPG, SVG (max 5MB)
+                    {t("dashboard.settings.branding.formats")}
                   </p>
                 </div>
                 {logoPreview && (
@@ -641,12 +674,12 @@ export default function ParametresPage() {
                     {deleting ? (
                       <>
                         <Loader className="w-4 h-4 animate-spin" />
-                        Suppression...
+                        {t("dashboard.settings.branding.deleting")}
                       </>
                     ) : (
                       <>
                         <Trash className="w-4 h-4" />
-                        Supprimer le logo
+                        {t("dashboard.settings.branding.delete")}
                       </>
                     )}
                   </button>
@@ -657,7 +690,7 @@ export default function ParametresPage() {
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Style d'en-tête
+              {t("dashboard.settings.branding.headerStyleLabel")}
             </label>
             <select
               value={formData.styleEnTete ?? "moderne"}
@@ -669,18 +702,18 @@ export default function ParametresPage() {
               }
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
-              <option value="simple">Simple</option>
-              <option value="moderne">Moderne</option>
-              <option value="classique">Classique</option>
+              <option value="simple">{t("dashboard.settings.branding.headerStyles.simple")}</option>
+              <option value="moderne">{t("dashboard.settings.branding.headerStyles.moderne")}</option>
+              <option value="classique">{t("dashboard.settings.branding.headerStyles.classique")}</option>
             </select>
             <p className="text-xs text-tertiary mt-2">
-              Style utilisé pour l'affichage des documents (devis, factures)
+              {t("dashboard.settings.branding.headerStyleHelp")}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Couleur principale
+              {t("dashboard.settings.branding.primaryColorLabel")}
             </label>
             <div className="flex items-center gap-4">
               <input
@@ -705,13 +738,13 @@ export default function ParametresPage() {
               />
             </div>
             <p className="text-xs text-tertiary mt-2">
-              Couleur utilisée pour le nom de l'entreprise et les éléments visuels sur les factures PDF
+              {t("dashboard.settings.branding.primaryColorHelp")}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              Devise de facturation
+              {t("dashboard.settings.branding.currencyLabel")}
             </label>
             <select
               value={formData.currency ?? "CHF"}
@@ -720,28 +753,28 @@ export default function ParametresPage() {
               }
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             >
-              <option value="CHF">CHF - Franc suisse</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="USD">USD - Dollar américain</option>
-              <option value="GBP">GBP - Livre sterling</option>
-              <option value="CAD">CAD - Dollar canadien</option>
-              <option value="AUD">AUD - Dollar australien</option>
-              <option value="JPY">JPY - Yen japonais</option>
+              <option value="CHF">{t("dashboard.settings.branding.currencies.CHF")}</option>
+              <option value="EUR">{t("dashboard.settings.branding.currencies.EUR")}</option>
+              <option value="USD">{t("dashboard.settings.branding.currencies.USD")}</option>
+              <option value="GBP">{t("dashboard.settings.branding.currencies.GBP")}</option>
+              <option value="CAD">{t("dashboard.settings.branding.currencies.CAD")}</option>
+              <option value="AUD">{t("dashboard.settings.branding.currencies.AUD")}</option>
+              <option value="JPY">{t("dashboard.settings.branding.currencies.JPY")}</option>
             </select>
             <p className="text-xs text-tertiary mt-2">
-              Devise par défaut utilisée sur les devis et factures
+              {t("dashboard.settings.branding.currencyHelp")}
             </p>
           </div>
         </div>
 
         {/* Section Informations entreprise */}
         <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">Informations entreprise</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.companyInfo.title")}</h2>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Nom de l'entreprise *
+                {t("dashboard.settings.companyInfo.nameLabel")}
               </label>
               <input
                 type="text"
@@ -756,7 +789,7 @@ export default function ParametresPage() {
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Adresse *
+                {t("dashboard.settings.companyInfo.addressLabel")}
               </label>
               <textarea
                 required
@@ -772,7 +805,7 @@ export default function ParametresPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-primary mb-2">
-                  Email *
+                  {t("dashboard.settings.companyInfo.emailLabel")}
                 </label>
                 <input
                   type="email"
@@ -787,7 +820,7 @@ export default function ParametresPage() {
 
               <div>
                 <label className="block text-sm font-medium text-primary mb-2">
-                  Téléphone *
+                  {t("dashboard.settings.companyInfo.phoneLabel")}
                 </label>
                 <input
                   type="tel"
@@ -805,15 +838,15 @@ export default function ParametresPage() {
 
         {/* Section Informations bancaires */}
         <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">Informations bancaires</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.billing.title")}</h2>
           <p className="text-sm text-secondary mb-4">
-            Ces informations seront affichées sur les factures et devis PDF.
+            {t("dashboard.settings.billing.subtitle")}
           </p>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                IBAN
+                {t("dashboard.settings.billing.ibanLabel")}
               </label>
               <input
                 type="text"
@@ -821,14 +854,14 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, iban: e.target.value })
                 }
-                placeholder="CH93 0076 2011 6238 5295 7"
+                placeholder={t("dashboard.settings.billing.ibanPlaceholder")}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Nom de la banque
+                {t("dashboard.settings.billing.bankNameLabel")}
               </label>
               <input
                 type="text"
@@ -836,26 +869,26 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, bankName: e.target.value })
                 }
-                placeholder="Banque Suisse"
+                placeholder={t("dashboard.settings.billing.bankNamePlaceholder")}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Conditions de paiement
+                {t("dashboard.settings.billing.paymentTermsLabel")}
               </label>
               <textarea
                 value={formData.conditionsPaiement ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData, conditionsPaiement: e.target.value })
                 }
-                placeholder="Paiement à réception, délai de paiement : 30 jours"
+                placeholder={t("dashboard.settings.billing.paymentTermsPlaceholder")}
                 rows={3}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
               <p className="text-xs text-tertiary mt-1">
-                Conditions affichées dans le footer des PDF
+                {t("dashboard.settings.billing.paymentTermsHelp")}
               </p>
             </div>
           </div>
@@ -863,9 +896,9 @@ export default function ParametresPage() {
 
         {/* Section Email */}
         <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">Configuration Email</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.email.title")}</h2>
           <p className="text-sm text-secondary mb-4">
-            Configurez l'envoi d'emails pour les devis et factures. Utilisez{" "}
+            {t("dashboard.settings.email.subtitleBefore")}{" "}
             <a
               href="https://resend.com"
               target="_blank"
@@ -874,13 +907,13 @@ export default function ParametresPage() {
             >
               Resend
             </a>{" "}
-            pour envoyer des emails.
+            {t("dashboard.settings.email.subtitleAfter")}
           </p>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Nom de l'expéditeur
+                {t("dashboard.settings.email.senderNameLabel")}
               </label>
               <input
                 type="text"
@@ -888,17 +921,17 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, nomExpediteur: e.target.value })
                 }
-                placeholder="Organa"
+                placeholder={t("dashboard.settings.email.senderNamePlaceholder")}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
               <p className="text-xs text-tertiary mt-1">
-                Nom affiché dans les emails envoyés
+                {t("dashboard.settings.email.senderNameHelp")}
               </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Email de l'expéditeur *
+                {t("dashboard.settings.email.senderEmailLabel")}
               </label>
               <input
                 type="email"
@@ -907,17 +940,17 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, emailExpediteur: e.target.value })
                 }
-                placeholder="noreply@votredomaine.com"
+                placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
               <p className="text-xs text-tertiary mt-1">
-                Doit être un domaine vérifié dans Resend
+                {t("dashboard.settings.email.senderEmailHelp")}
               </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
-                Clé API Resend *
+                {t("dashboard.settings.email.apiKeyLabel")}
               </label>
               <input
                 type="password"
@@ -926,11 +959,11 @@ export default function ParametresPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, resendApiKey: e.target.value })
                 }
-                placeholder="re_xxxxxxxxxxxxx"
+                placeholder={t("dashboard.settings.email.apiKeyPlaceholder")}
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
               <p className="text-xs text-tertiary mt-1">
-                Obtenez votre clé API sur{" "}
+                {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
                 <a
                   href="https://resend.com/api-keys"
                   target="_blank"
@@ -939,6 +972,7 @@ export default function ParametresPage() {
                 >
                   resend.com/api-keys
                 </a>
+                {t("dashboard.settings.email.apiKeyHelpAfter")}
               </p>
             </div>
           </div>
@@ -950,7 +984,7 @@ export default function ParametresPage() {
             type="submit"
             className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
           >
-            💾 Enregistrer les paramètres
+            {t("dashboard.settings.saveButton")}
           </button>
         </div>
       </form>

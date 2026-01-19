@@ -282,6 +282,116 @@
       "title": "Limit des Gratisplans erreicht",
       "cta": "Pläne ansehen"
     },
+    "settings": {
+      "title": "Einstellungen",
+      "subtitle": "Konfigurieren Sie Ihr Unternehmen und Ihre Marke",
+      "loadingPage": "Einstellungen werden geladen...",
+      "saveSuccess": "Einstellungen erfolgreich gespeichert",
+      "saveButton": "💾 Einstellungen speichern",
+      "subscription": {
+        "title": "Abonnement",
+        "currentPlan": "Aktueller Plan:",
+        "planPro": "Pro",
+        "planFree": "Gratis",
+        "freeLimit": "Limit: {clients} Kunden, {documents} Dokumente pro Monat",
+        "unlimitedAccess": "Uneingeschränkter Zugriff auf alle Funktionen",
+        "upgrade": "🚀 Auf Pro upgraden",
+        "proBadge": "✓ Pro-Abo",
+        "proOfferTitle": "Pro-Plan – 29 CHF / Monat",
+        "proFeatures": [
+          "Unbegrenzte Kunden",
+          "Unbegrenzte Dokumente",
+          "Alle Funktionen"
+        ]
+      },
+      "branding": {
+        "title": "Marke",
+        "logoLabel": "Firmenlogo",
+        "logoAlt": "Firmenlogo",
+        "noLogo": "Kein Logo",
+        "upload": "Logo auswählen",
+        "uploading": "Wird hochgeladen...",
+        "delete": "Logo löschen",
+        "deleting": "Wird gelöscht...",
+        "formats": "Akzeptierte Formate: PNG, JPG, SVG (max. 5 MB)",
+        "headerStyleLabel": "Header-Stil",
+        "headerStyleHelp": "Stil für die Darstellung der Dokumente (Angebote, Rechnungen)",
+        "headerStyles": {
+          "simple": "Einfach",
+          "moderne": "Modern",
+          "classique": "Klassisch"
+        },
+        "primaryColorLabel": "Primärfarbe",
+        "primaryColorHelp": "Farbe für den Firmennamen und visuelle Elemente auf PDF-Rechnungen",
+        "currencyLabel": "Abrechnungswährung",
+        "currencyHelp": "Standardwährung für Angebote und Rechnungen",
+        "currencies": {
+          "CHF": "CHF - Schweizer Franken",
+          "EUR": "EUR - Euro",
+          "USD": "USD - US-Dollar",
+          "GBP": "GBP - Britisches Pfund",
+          "CAD": "CAD - Kanadischer Dollar",
+          "AUD": "AUD - Australischer Dollar",
+          "JPY": "JPY - Japanischer Yen"
+        }
+      },
+      "companyInfo": {
+        "title": "Unternehmensinformationen",
+        "nameLabel": "Firmenname *",
+        "addressLabel": "Adresse *",
+        "emailLabel": "E-Mail *",
+        "phoneLabel": "Telefon *"
+      },
+      "billing": {
+        "title": "Bankinformationen",
+        "subtitle": "Diese Angaben werden auf PDF-Rechnungen und Angeboten angezeigt.",
+        "ibanLabel": "IBAN",
+        "ibanPlaceholder": "CH93 0076 2011 6238 5295 7",
+        "bankNameLabel": "Bankname",
+        "bankNamePlaceholder": "Schweizer Bank",
+        "paymentTermsLabel": "Zahlungsbedingungen",
+        "paymentTermsPlaceholder": "Zahlung bei Erhalt, Zahlungsfrist: 30 Tage",
+        "paymentTermsHelp": "Bedingungen im Footer der PDFs"
+      },
+      "email": {
+        "title": "E-Mail-Konfiguration",
+        "subtitleBefore": "Richten Sie den E-Mail-Versand für Angebote und Rechnungen ein. Nutzen Sie",
+        "subtitleAfter": "um E-Mails zu versenden.",
+        "senderNameLabel": "Absendername",
+        "senderNamePlaceholder": "Organa",
+        "senderNameHelp": "Name, der in versendeten E-Mails angezeigt wird",
+        "senderEmailLabel": "Absender-E-Mail *",
+        "senderEmailPlaceholder": "noreply@ihredomain.com",
+        "senderEmailHelp": "Muss in Resend als Domain verifiziert sein",
+        "apiKeyLabel": "Resend-API-Schlüssel *",
+        "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
+        "apiKeyHelpBefore": "Holen Sie Ihren API-Schlüssel unter",
+        "apiKeyHelpAfter": "."
+      },
+      "validation": {
+        "companyNameRequired": "Firmenname ist erforderlich"
+      },
+      "notifications": {
+        "authReconnect": "Bitte melden Sie sich erneut an",
+        "loadError": "Fehler: {message}",
+        "stripeInvalidJson": "Fehler: Die Antwort ist kein gültiges JSON. Prüfen Sie die Konsole.",
+        "stripeMissingUrl": "Stripe-Fehler: URL fehlt. Antwort: {response}",
+        "stripeOpenError": "Fehler beim Öffnen der Zahlung: {message}",
+        "paymentSuccess": "Zahlung erfolgreich! Ihr Konto ist jetzt Pro.",
+        "paymentCanceled": "Zahlung abgebrochen",
+        "uploadError": "Fehler beim Upload",
+        "uploadLogoError": "Fehler beim Hochladen des Logos",
+        "deleteError": "Fehler beim Löschen",
+        "logoUploaded": "Logo erfolgreich hochgeladen!",
+        "logoDeleted": "Logo erfolgreich gelöscht",
+        "saveError": "Fehler beim Speichern",
+        "readResponseError": "Fehler beim Lesen der Antwort",
+        "unknownError": "Unbekannter Fehler"
+      },
+      "confirm": {
+        "deleteLogo": "Möchten Sie das Logo wirklich löschen?"
+      }
+    },
     "clients": {
       "authError": "Authentifizierungsfehler",
       "loadError": "Fehler beim Laden der Kunden",
