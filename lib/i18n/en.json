@@ -231,6 +231,7 @@
       "quotes": "Quotes",
       "invoices": "Invoices",
       "expenses": "Expenses",
+      "assistant": "AI Assistant",
       "reminders": "Reminders",
       "calendar": "Calendar",
       "settings": "Settings"
@@ -245,6 +246,7 @@
       "expenses": "Expenses",
       "calendar": "Calendar",
       "settings": "Settings",
+      "assistant": "AI Assistant",
       "reminders": "Reminders"
     },
     "topbar": {
@@ -328,6 +330,44 @@
         "client": "Client",
         "document": "Document",
         "amount": "Amount"
+      }
+    },
+    "assistantPage": {
+      "title": "AI Assistant",
+      "subtitle": "A dedicated space to collaborate with your administrative assistant.",
+      "quickActions": {
+        "title": "Common actions",
+        "invoiceFollowup": "Draft a follow-up email",
+        "professional": "Draft a professional email",
+        "rephrase": "Rephrase this message",
+        "translate": "Translate to English / German"
+      },
+      "templates": {
+        "invoiceFollowup": "Draft a polite follow-up for an outstanding invoice.",
+        "professional": "Draft a professional email to a client.",
+        "rephrase": "Can you rephrase this message professionally?",
+        "translate": "Translate this message into the selected language."
+      },
+      "emptyState": "Describe your need to start the conversation.",
+      "subjectPrefix": "Subject:",
+      "controls": {
+        "action": "Mode",
+        "language": "Language",
+        "composeType": "Email type",
+        "tone": "Tone",
+        "inputLabel": "Your message",
+        "inputPlaceholder": "e.g. draft a follow-up for invoice 2024-18",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "email": {
+        "title": "Send the email",
+        "subtitle": "Review the content before sending.",
+        "send": "Send email",
+        "sending": "Sending email..."
+      },
+      "errors": {
+        "emptyMessage": "Please enter a message."
       }
     },
     "common": {

@@ -3,7 +3,6 @@ import DeleteClientButton from "./components/DeleteClientButton";
 import { Download, Info, Plus } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/server";
 import I18nText from "@/components/I18nText";
-import AssistantTriggerButton from "@/components/assistant/AssistantTriggerButton";
 
 export const dynamic = 'force-dynamic';
 
@@ -177,16 +176,6 @@ export default async function ClientsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <AssistantTriggerButton
-                      context={{
-                        source: "client",
-                        client: {
-                          id: client.id,
-                          nom: client.nom,
-                          email: client.email,
-                        },
-                      }}
-                    />
                     <DeleteClientButton clientId={client.id} />
                   </div>
                 </div>

@@ -231,6 +231,7 @@
       "quotes": "Angebote",
       "invoices": "Rechnungen",
       "expenses": "Ausgaben",
+      "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen",
       "calendar": "Kalender",
       "settings": "Einstellungen"
@@ -245,6 +246,7 @@
       "expenses": "Ausgaben",
       "calendar": "Kalender",
       "settings": "Einstellungen",
+      "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen"
     },
     "topbar": {
@@ -328,6 +330,44 @@
         "client": "Kunde",
         "document": "Dokument",
         "amount": "Betrag"
+      }
+    },
+    "assistantPage": {
+      "title": "KI-Assistent",
+      "subtitle": "Ein eigener Bereich für Ihren Verwaltungsassistenten.",
+      "quickActions": {
+        "title": "Häufige Aktionen",
+        "invoiceFollowup": "Mahnung verfassen",
+        "professional": "Professionelle E-Mail verfassen",
+        "rephrase": "Nachricht umformulieren",
+        "translate": "Ins Englische / Deutsche übersetzen"
+      },
+      "templates": {
+        "invoiceFollowup": "Bitte eine höfliche Erinnerung für eine offene Rechnung verfassen.",
+        "professional": "Bitte eine professionelle E-Mail an einen Kunden verfassen.",
+        "rephrase": "Bitte diese Nachricht professionell umformulieren.",
+        "translate": "Bitte diese Nachricht in die ausgewählte Sprache übersetzen."
+      },
+      "emptyState": "Beschreiben Sie Ihr Anliegen, um die Unterhaltung zu starten.",
+      "subjectPrefix": "Betreff:",
+      "controls": {
+        "action": "Modus",
+        "language": "Sprache",
+        "composeType": "E-Mail-Typ",
+        "tone": "Ton",
+        "inputLabel": "Ihre Nachricht",
+        "inputPlaceholder": "z. B. Mahnung für Rechnung 2024-18 verfassen",
+        "send": "Senden",
+        "sending": "Wird gesendet..."
+      },
+      "email": {
+        "title": "E-Mail senden",
+        "subtitle": "Inhalt vor dem Senden prüfen.",
+        "send": "E-Mail senden",
+        "sending": "E-Mail wird gesendet..."
+      },
+      "errors": {
+        "emptyMessage": "Bitte eine Nachricht eingeben."
       }
     },
     "common": {

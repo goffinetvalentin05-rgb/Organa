@@ -6,8 +6,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { AssistantProvider } from "@/components/assistant/AssistantProvider";
-import AssistantTriggerButton from "@/components/assistant/AssistantTriggerButton";
 import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
@@ -19,6 +17,7 @@ import {
   Home,
   AlertTriangle,
   CheckCircle,
+  Mail,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -91,6 +90,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
     { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Receipt },
+    { name: t("dashboard.nav.assistant"), href: "/tableau-de-bord/assistant-ia", icon: Mail },
   ];
 
   const secondaryNavigation = [
@@ -118,13 +118,13 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
     if (pathname.startsWith("/tableau-de-bord/calendrier")) return t("dashboard.pageTitles.calendar");
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
+    if (pathname.startsWith("/tableau-de-bord/assistant-ia")) return t("dashboard.pageTitles.assistant");
     if (pathname.startsWith("/tableau-de-bord/a-ne-pas-oublier")) return t("dashboard.pageTitles.reminders");
     return t("dashboard.pageTitles.dashboard");
   };
 
   return (
-    <AssistantProvider>
-      <div className="dashboard-shell min-h-screen bg-dashboard text-primary relative">
+    <div className="dashboard-shell min-h-screen bg-dashboard text-primary relative">
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-screen w-72 bg-surface border-r border-subtle z-40 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
         <div className="flex flex-col h-full">
@@ -249,9 +249,6 @@ export default function DashboardLayout({
               </div>
             </div>
             <div className="flex items-center justify-end gap-4">
-              <AssistantTriggerButton
-                className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold uppercase tracking-[0.2em] hover:bg-slate-800 transition-all"
-              />
               <LanguageSwitcher />
               {!loadingUser && (
                 <div className="flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
@@ -274,8 +271,7 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="p-8">{children}</main>
       </div>
-      </div>
-    </AssistantProvider>
+    </div>
   );
 }
 

@@ -231,6 +231,7 @@
       "quotes": "Devis",
       "invoices": "Factures",
       "expenses": "Dépenses",
+      "assistant": "Assistant IA",
       "reminders": "À ne pas oublier",
       "calendar": "Calendrier",
       "settings": "Paramètres"
@@ -245,6 +246,7 @@
       "expenses": "Dépenses",
       "calendar": "Calendrier",
       "settings": "Paramètres",
+      "assistant": "Assistant IA",
       "reminders": "À ne pas oublier"
     },
     "topbar": {
@@ -328,6 +330,44 @@
         "client": "Client",
         "document": "Document",
         "amount": "Montant"
+      }
+    },
+    "assistantPage": {
+      "title": "Assistant IA",
+      "subtitle": "Un espace dédié pour échanger avec votre assistant administratif.",
+      "quickActions": {
+        "title": "Actions courantes",
+        "invoiceFollowup": "Rédiger un email de relance",
+        "professional": "Rédiger un email professionnel",
+        "rephrase": "Reformuler ce message",
+        "translate": "Traduire en anglais / allemand"
+      },
+      "templates": {
+        "invoiceFollowup": "Rédige une relance polie pour une facture en attente.",
+        "professional": "Rédige un email professionnel pour un client.",
+        "rephrase": "Peux-tu reformuler ce message de manière professionnelle ?",
+        "translate": "Traduis ce message dans la langue sélectionnée."
+      },
+      "emptyState": "Décrivez votre besoin pour démarrer la conversation.",
+      "subjectPrefix": "Objet :",
+      "controls": {
+        "action": "Mode",
+        "language": "Langue",
+        "composeType": "Type d'email",
+        "tone": "Ton",
+        "inputLabel": "Votre message",
+        "inputPlaceholder": "Ex : rédige une relance pour la facture 2024-18",
+        "send": "Envoyer",
+        "sending": "Envoi..."
+      },
+      "email": {
+        "title": "Envoyer l'email",
+        "subtitle": "Vérifiez le contenu avant envoi.",
+        "send": "Envoyer l'email",
+        "sending": "Envoi de l'email..."
+      },
+      "errors": {
+        "emptyMessage": "Veuillez saisir un message."
       }
     },
     "common": {
