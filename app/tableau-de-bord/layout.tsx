@@ -145,9 +145,6 @@ export default function DashboardLayout({
                   className="h-auto transition-transform group-hover:scale-105"
                 />
               )}
-              <span className="text-xs uppercase tracking-[0.32em] text-tertiary">
-                {t("dashboard.brandLabel")}
-              </span>
             </Link>
           </div>
 
@@ -250,10 +247,6 @@ export default function DashboardLayout({
             </div>
             <div className="flex items-center justify-end gap-4">
               <LanguageSwitcher />
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
-                <CheckCircle className="w-4 h-4 text-success" />
-                <span>{t("dashboard.topbar.upToDate")}</span>
-              </div>
               {!loadingUser && (
                 <div className="flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
                   <span className="text-tertiary">{t("dashboard.topbar.connectedAs")}</span>
