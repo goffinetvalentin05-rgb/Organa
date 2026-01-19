@@ -779,6 +779,7 @@
       "newExpense": "Neue Ausgabe",
       "addAction": "Ausgabe hinzufügen",
       "createSuccess": "Ausgabe erfolgreich hinzugefügt.",
+      "uploadWarning": "Ausgabe erstellt, aber der Anhang konnte nicht hochgeladen werden.",
       "emptyState": "Noch keine Ausgaben erfasst.",
       "emptyCta": "Erste Ausgabe hinzufügen",
       "dueLabel": "Fällig:",

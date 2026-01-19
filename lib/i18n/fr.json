@@ -779,6 +779,7 @@
       "newExpense": "Nouvelle dépense",
       "addAction": "Ajouter la dépense",
       "createSuccess": "Dépense ajoutée avec succès.",
+      "uploadWarning": "Dépense créée, mais la pièce jointe n'a pas pu être uploadée.",
       "emptyState": "Aucune dépense enregistrée pour le moment.",
       "emptyCta": "Ajouter votre première dépense",
       "dueLabel": "Échéance :",

@@ -74,6 +74,7 @@ export default function DepensesPage() {
   const [selectedDepense, setSelectedDepense] = useState<Depense | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     label: "",
     amount: "",
@@ -114,6 +115,7 @@ export default function DepensesPage() {
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
+    setWarningMessage(null);
     try {
       const response = await fetch("/api/depenses", { cache: "no-store" });
       if (!response.ok) {
@@ -221,15 +223,6 @@ export default function DepensesPage() {
         throw new Error(t("dashboard.expenses.createError"));
       }
 
-      let attachmentUrl: string | null = null;
-      if (formData.pieceJointe) {
-        attachmentUrl = await uploadAttachment(
-          supabase,
-          user.id,
-          formData.pieceJointe
-        );
-      }
-
       const response = await fetch("/api/depenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -239,7 +232,6 @@ export default function DepensesPage() {
           dateEcheance: formData.date,
           statut: formData.status,
           note: formData.notes.trim() || null,
-          pieceJointe: attachmentUrl,
         }),
       });
 
@@ -248,6 +240,29 @@ export default function DepensesPage() {
 
       if (!response.ok) {
         throw new Error(data?.error || t("dashboard.expenses.createError"));
+      }
+
+      const createdId = data?.depense?.id as string | undefined;
+      if (formData.pieceJointe && createdId) {
+        try {
+          const attachmentUrl = await uploadAttachment(
+            supabase,
+            user.id,
+            formData.pieceJointe
+          );
+          const { error: updateError } = await supabase
+            .from("depenses")
+            .update({ piece_jointe: attachmentUrl })
+            .eq("id", createdId)
+            .eq("user_id", user.id);
+          if (updateError) {
+            console.warn("[Depenses] Mise à jour pièce jointe échouée:", updateError);
+            setWarningMessage(t("dashboard.expenses.uploadWarning"));
+          }
+        } catch (uploadError) {
+          console.warn("[Depenses] Upload pièce jointe échoué:", uploadError);
+          setWarningMessage(t("dashboard.expenses.uploadWarning"));
+        }
       }
 
       await loadDepenses();
@@ -409,6 +424,9 @@ export default function DepensesPage() {
         >
           {successMessage && (
             <p className="text-sm text-green-600">{successMessage}</p>
+          )}
+          {warningMessage && (
+            <p className="text-sm text-yellow-700">{warningMessage}</p>
           )}
           {errorMessage && (
             <p className="text-sm text-red-600">{errorMessage}</p>

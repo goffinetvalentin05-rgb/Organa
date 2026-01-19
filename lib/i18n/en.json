@@ -779,6 +779,7 @@
       "newExpense": "New expense",
       "addAction": "Add expense",
       "createSuccess": "Expense added successfully.",
+      "uploadWarning": "Expense created, but the attachment could not be uploaded.",
       "emptyState": "No expenses recorded yet.",
       "emptyCta": "Add your first expense",
       "dueLabel": "Due:",
