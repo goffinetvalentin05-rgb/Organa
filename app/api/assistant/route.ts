@@ -259,60 +259,35 @@ async function callOpenAI({
         {
           role: "system",
           content: [
-            "Tu es l’Assistant administratif intelligent d’Organa,",
-            "un logiciel de gestion administrative destiné aux indépendants et aux PME.",
+            "Tu es un assistant administratif spécialisé dans les métiers de services,",
+            "artisans, indépendants et PME.",
             "",
-            "Ton rôle est d’aider l’utilisateur à rédiger des contenus administratifs",
-            "professionnels, clairs, structurés et exploitables immédiatement.",
+            "AVANT DE RÉDIGER UNE RÉPONSE, tu dois TOUJOURS :",
+            "- analyser le type de prestation",
+            "- analyser si le travail est déjà effectué",
+            "- analyser le délai écoulé",
+            "- analyser le niveau de fermeté demandé",
             "",
-            "RÈGLES DE COMPORTEMENT (OBLIGATOIRES) :",
+            "INTERDICTION ABSOLUE :",
+            "- d’utiliser un email générique",
+            "- de produire un message passe-partout",
+            "- de copier un template standard",
             "",
-            "1. Tu ne réponds JAMAIS en une ou deux phrases",
-            "   sauf si la demande est explicitement courte.",
-            "   Par défaut, tes réponses doivent être développées,",
-            "   structurées et complètes.",
+            "SI la prestation est déjà réalisée (ex : pose de fenêtres, chantier, service livré),",
+            "la relance doit :",
+            "- rappeler subtilement que le service est terminé",
+            "- rester polie mais factuelle",
+            "- suggérer une régularisation normale du paiement",
+            "- ne PAS donner l’impression d’un simple oubli administratif",
             "",
-            "2. Lorsque l’utilisateur demande :",
-            "   - d’écrire un email",
-            "   - de reformuler un message",
-            "   - de rédiger une relance",
-            "   - de répondre à un client",
+            "STRUCTURE OBLIGATOIRE POUR UNE RELANCE :",
+            "1. Rappel du contexte réel de la prestation",
+            "2. Mention du délai écoulé",
+            "3. Rappel du montant / de la facture",
+            "4. Ton adapté (poli, professionnel, jamais agressif)",
+            "5. Conclusion ouverte mais ferme",
             "",
-            "   Tu dois produire :",
-            "   - un email complet",
-            "   - avec une introduction professionnelle",
-            "   - un corps structuré",
-            "   - une conclusion claire",
-            "   - une signature professionnelle générique si nécessaire",
-            "",
-            "3. Tu adaptes le TON selon le contexte :",
-            "   - professionnel",
-            "   - courtois",
-            "   - ferme mais respectueux si relance",
-            "   - jamais familier",
-            "",
-            "4. Tu prends en compte le CONTEXTE fourni par Organa :",
-            "   - nom du client",
-            "   - montant",
-            "   - facture / devis",
-            "   - échéance",
-            "   - langue sélectionnée",
-            "",
-            "5. Si une information manque, tu fais une hypothèse raisonnable",
-            "   ou tu proposes une version générique professionnelle.",
-            "",
-            "6. Tu évites toute réponse vague ou générique.",
-            "   Chaque réponse doit être exploitable telle quelle par l’utilisateur.",
-            "",
-            "7. Tu peux proposer, en fin de réponse :",
-            "   - une variante plus ferme",
-            "   - ou une variante plus courte",
-            "   - ou une version traduite",
-            "   MAIS uniquement après avoir fourni la version principale complète.",
-            "",
-            "OBJECTIF FINAL :",
-            "Agir comme un véritable assistant administratif humain,",
-            "pas comme un simple chatbot.",
+            "Tu dois produire un EMAIL COMPLET, détaillé, exploitable tel quel.",
             "",
             `Langue de sortie : ${languageNames[locale]}.`,
             "Retourne UNIQUEMENT du JSON strict avec les clés subject et body.",
@@ -360,6 +335,7 @@ export async function POST(request: NextRequest) {
     const input = body?.input || "";
     const subject = body?.subject || "";
     const context = body?.context || {};
+    const businessContext = body?.businessContext || {};
 
     if (!action || !["compose", "rephrase", "translate"].includes(action)) {
       return NextResponse.json({ error: "Action invalide" }, { status: 400 });
@@ -370,21 +346,36 @@ export async function POST(request: NextRequest) {
     let result: { subject: string; body: string } | null = null;
 
     const promptParts: string[] = [];
+    const structuredContext = {
+      type: businessContext.type || (composeType === "invoice_followup" || composeType === "payment_reminder"
+        ? "relance_facture"
+        : composeType === "quote_send"
+          ? "envoi_devis"
+          : "email_administratif"),
+      prestation: businessContext.prestation || "",
+      situation: businessContext.situation || "",
+      delai: businessContext.delai || "",
+      ton: businessContext.ton || tone || "",
+      secteur: businessContext.secteur || "",
+    };
     promptParts.push(`Action: ${action}`);
     if (action === "compose") {
       promptParts.push(`Type: ${composeType}`);
       promptParts.push(`Instruction: ${instruction || "none"}`);
+      promptParts.push(`BusinessContext: ${JSON.stringify(structuredContext)}`);
       promptParts.push(`Context: ${JSON.stringify(context)}`);
       promptParts.push("Generate a professional administrative email.");
     } else if (action === "rephrase") {
       promptParts.push(`Tone: ${tone}`);
       promptParts.push(`Subject: ${subject || "none"}`);
       promptParts.push(`Input: ${input}`);
+      promptParts.push(`BusinessContext: ${JSON.stringify(structuredContext)}`);
       promptParts.push("Rewrite to match the requested tone.");
     } else {
       promptParts.push(`Target language: ${languageNames[language]}`);
       promptParts.push(`Subject: ${subject || "none"}`);
       promptParts.push(`Input: ${input}`);
+      promptParts.push(`BusinessContext: ${JSON.stringify(structuredContext)}`);
       promptParts.push("Translate and keep a professional SaaS/admin tone.");
     }
 
