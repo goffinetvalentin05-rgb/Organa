@@ -13,6 +13,8 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import AssistantTriggerButton from "@/components/assistant/AssistantTriggerButton";
+import EmailHistoryList from "@/components/assistant/EmailHistoryList";
 
 interface Devis {
   id: string;
@@ -257,6 +259,24 @@ export default function DevisDetailPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <AssistantTriggerButton
+            context={{
+              source: "devis",
+              client: {
+                id: devis.clientId ?? undefined,
+                nom: devis.client?.nom,
+                email: devis.client?.email,
+              },
+              document: {
+                id: devis.id,
+                numero: devis.numero,
+                type: "devis",
+                montant: totalTTC,
+                dateEcheance: devis.dateEcheance,
+                currency,
+              },
+            }}
+          />
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !devis.client?.email}
@@ -434,6 +454,8 @@ export default function DevisDetailPage() {
           </div>
         </div>
       </div>
+
+      <EmailHistoryList relatedType="devis" relatedId={devis.id} clientId={devis.clientId ?? undefined} />
     </div>
   );
 }

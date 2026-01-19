@@ -253,6 +253,83 @@
       "userFallback": "Benutzer",
       "logout": "Abmelden"
     },
+    "assistant": {
+      "badge": "Verwaltungsassistent",
+      "title": "Ihr intelligenter Verwaltungsassistent",
+      "subtitle": "E-Mails verfassen, umformulieren, übersetzen und senden.",
+      "openButton": "KI-Assistent",
+      "close": "Schließen",
+      "language": "E-Mail-Sprache",
+      "languages": {
+        "fr": "Französisch",
+        "en": "Englisch",
+        "de": "Deutsch"
+      },
+      "tabs": {
+        "compose": "Verfassen",
+        "rephrase": "Umformulieren",
+        "translate": "Übersetzen"
+      },
+      "compose": {
+        "typeLabel": "E-Mail-Typ",
+        "types": {
+          "invoice_followup": "Rechnungsnachverfolgung",
+          "quote_send": "Angebotsversand",
+          "payment_reminder": "Zahlungserinnerung",
+          "generic": "Professionelle E-Mail"
+        },
+        "instructionLabel": "Anweisung (optional)",
+        "instructionPlaceholder": "z. B. höfliche Erinnerung mit Fälligkeitsdatum"
+      },
+      "rephrase": {
+        "toneLabel": "Ton",
+        "tones": {
+          "professional": "Professionell",
+          "firm": "Bestimmter",
+          "courteous": "Höflicher",
+          "correct": "Grammatik korrigieren"
+        },
+        "sourceLabel": "Text zum Umformulieren",
+        "sourcePlaceholder": "E-Mail hier einfügen"
+      },
+      "translate": {
+        "sourceLabel": "Text zum Übersetzen",
+        "sourcePlaceholder": "E-Mail hier einfügen",
+        "note": "Übersetzung auf {language}"
+      },
+      "generate": "Generieren",
+      "generating": "Generiere...",
+      "editor": {
+        "title": "E-Mail",
+        "recipient": "Empfänger",
+        "recipientPlaceholder": "client@beispiel.com",
+        "subject": "Betreff",
+        "subjectPlaceholder": "E-Mail-Betreff",
+        "body": "Inhalt",
+        "bodyPlaceholder": "E-Mail-Inhalt"
+      },
+      "send": "Senden",
+      "sending": "Wird gesendet...",
+      "messages": {
+        "sent": "E-Mail erfolgreich gesendet"
+      },
+      "errors": {
+        "generate": "Fehler bei der Generierung",
+        "send": "Fehler beim Senden",
+        "missingFields": "Empfänger, Betreff und Inhalt sind erforderlich",
+        "history": "Fehler beim Laden des Verlaufs"
+      },
+      "history": {
+        "title": "E-Mail-Verlauf",
+        "empty": "Noch keine E-Mails für dieses Element gesendet.",
+        "loading": "Verlauf wird geladen..."
+      },
+      "context": {
+        "client": "Kunde",
+        "document": "Dokument",
+        "amount": "Betrag"
+      }
+    },
     "common": {
       "loading": "Laden...",
       "loadFailed": "Fehler beim Laden",

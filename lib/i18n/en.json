@@ -253,6 +253,83 @@
       "userFallback": "User",
       "logout": "Sign out"
     },
+    "assistant": {
+      "badge": "Administrative assistant",
+      "title": "Your intelligent administrative assistant",
+      "subtitle": "Draft, rephrase, translate, and send your emails.",
+      "openButton": "AI Assistant",
+      "close": "Close",
+      "language": "Email language",
+      "languages": {
+        "fr": "French",
+        "en": "English",
+        "de": "German"
+      },
+      "tabs": {
+        "compose": "Draft",
+        "rephrase": "Rephrase",
+        "translate": "Translate"
+      },
+      "compose": {
+        "typeLabel": "Email type",
+        "types": {
+          "invoice_followup": "Invoice follow-up",
+          "quote_send": "Quote delivery",
+          "payment_reminder": "Payment reminder",
+          "generic": "Professional email"
+        },
+        "instructionLabel": "Instruction (optional)",
+        "instructionPlaceholder": "e.g. polite follow-up with due date"
+      },
+      "rephrase": {
+        "toneLabel": "Tone",
+        "tones": {
+          "professional": "Professional",
+          "firm": "Firmer",
+          "courteous": "More courteous",
+          "correct": "Fix grammar"
+        },
+        "sourceLabel": "Text to rephrase",
+        "sourcePlaceholder": "Paste your email here"
+      },
+      "translate": {
+        "sourceLabel": "Text to translate",
+        "sourcePlaceholder": "Paste your email here",
+        "note": "Translation to {language}"
+      },
+      "generate": "Generate",
+      "generating": "Generating...",
+      "editor": {
+        "title": "Email",
+        "recipient": "Recipient",
+        "recipientPlaceholder": "client@example.com",
+        "subject": "Subject",
+        "subjectPlaceholder": "Email subject",
+        "body": "Content",
+        "bodyPlaceholder": "Email content"
+      },
+      "send": "Send",
+      "sending": "Sending...",
+      "messages": {
+        "sent": "Email sent successfully"
+      },
+      "errors": {
+        "generate": "Error while generating",
+        "send": "Error while sending",
+        "missingFields": "Recipient, subject, and content are required",
+        "history": "Error loading history"
+      },
+      "history": {
+        "title": "Email history",
+        "empty": "No emails sent for this item yet.",
+        "loading": "Loading history..."
+      },
+      "context": {
+        "client": "Client",
+        "document": "Document",
+        "amount": "Amount"
+      }
+    },
     "common": {
       "loading": "Loading...",
       "loadFailed": "Loading error",

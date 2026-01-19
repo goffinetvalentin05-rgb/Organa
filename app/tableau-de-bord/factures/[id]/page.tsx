@@ -10,6 +10,8 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import AssistantTriggerButton from "@/components/assistant/AssistantTriggerButton";
+import EmailHistoryList from "@/components/assistant/EmailHistoryList";
 
 interface Facture {
   id: string;
@@ -244,6 +246,24 @@ export default function FactureDetailPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <AssistantTriggerButton
+            context={{
+              source: "facture",
+              client: {
+                id: facture.clientId ?? undefined,
+                nom: facture.client?.nom,
+                email: facture.client?.email,
+              },
+              document: {
+                id: facture.id,
+                numero: facture.numero,
+                type: "facture",
+                montant: totalTTC,
+                dateEcheance: facture.dateEcheance,
+                currency,
+              },
+            }}
+          />
           <button
             onClick={handleEnvoyerEmail}
             disabled={envoiEmail || !facture.client?.email}
@@ -432,6 +452,8 @@ export default function FactureDetailPage() {
           </div>
         </div>
       </div>
+
+      <EmailHistoryList relatedType="facture" relatedId={facture.id} clientId={facture.clientId ?? undefined} />
     </div>
   );
 }

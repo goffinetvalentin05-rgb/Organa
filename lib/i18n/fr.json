@@ -253,6 +253,83 @@
       "userFallback": "Utilisateur",
       "logout": "Se déconnecter"
     },
+    "assistant": {
+      "badge": "Assistant administratif",
+      "title": "Votre assistant administratif intelligent",
+      "subtitle": "Rédigez, reformulez, traduisez et envoyez vos emails.",
+      "openButton": "Assistant IA",
+      "close": "Fermer",
+      "language": "Langue de l'email",
+      "languages": {
+        "fr": "Français",
+        "en": "Anglais",
+        "de": "Allemand"
+      },
+      "tabs": {
+        "compose": "Rédiger",
+        "rephrase": "Reformuler",
+        "translate": "Traduire"
+      },
+      "compose": {
+        "typeLabel": "Type d'email",
+        "types": {
+          "invoice_followup": "Relance de facture",
+          "quote_send": "Envoi de devis",
+          "payment_reminder": "Rappel de paiement",
+          "generic": "Email professionnel"
+        },
+        "instructionLabel": "Consigne (optionnel)",
+        "instructionPlaceholder": "Ex : relance polie avec mention de la date d'échéance"
+      },
+      "rephrase": {
+        "toneLabel": "Ton",
+        "tones": {
+          "professional": "Professionnel",
+          "firm": "Plus ferme",
+          "courteous": "Plus courtois",
+          "correct": "Corriger la grammaire"
+        },
+        "sourceLabel": "Texte à reformuler",
+        "sourcePlaceholder": "Collez votre email ici"
+      },
+      "translate": {
+        "sourceLabel": "Texte à traduire",
+        "sourcePlaceholder": "Collez votre email ici",
+        "note": "Traduction en {language}"
+      },
+      "generate": "Générer",
+      "generating": "Génération...",
+      "editor": {
+        "title": "Email",
+        "recipient": "Destinataire",
+        "recipientPlaceholder": "client@exemple.com",
+        "subject": "Objet",
+        "subjectPlaceholder": "Objet de l'email",
+        "body": "Contenu",
+        "bodyPlaceholder": "Contenu de l'email"
+      },
+      "send": "Envoyer",
+      "sending": "Envoi...",
+      "messages": {
+        "sent": "Email envoyé avec succès"
+      },
+      "errors": {
+        "generate": "Erreur lors de la génération",
+        "send": "Erreur lors de l'envoi",
+        "missingFields": "Destinataire, objet et contenu requis",
+        "history": "Erreur lors du chargement de l'historique"
+      },
+      "history": {
+        "title": "Historique des emails",
+        "empty": "Aucun email envoyé pour cet élément.",
+        "loading": "Chargement de l'historique..."
+      },
+      "context": {
+        "client": "Client",
+        "document": "Document",
+        "amount": "Montant"
+      }
+    },
     "common": {
       "loading": "Chargement...",
       "loadFailed": "Erreur lors du chargement",
