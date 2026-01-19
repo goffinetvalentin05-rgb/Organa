@@ -778,6 +778,7 @@
       "planReminder": "Planifier un rappel",
       "newExpense": "Nouvelle dépense",
       "addAction": "Ajouter la dépense",
+      "createSuccess": "Dépense ajoutée avec succès.",
       "emptyState": "Aucune dépense enregistrée pour le moment.",
       "emptyCta": "Ajouter votre première dépense",
       "dueLabel": "Échéance :",

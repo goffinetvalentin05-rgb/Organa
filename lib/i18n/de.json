@@ -778,6 +778,7 @@
       "planReminder": "Erinnerung planen",
       "newExpense": "Neue Ausgabe",
       "addAction": "Ausgabe hinzufügen",
+      "createSuccess": "Ausgabe erfolgreich hinzugefügt.",
       "emptyState": "Noch keine Ausgaben erfasst.",
       "emptyCta": "Erste Ausgabe hinzufügen",
       "dueLabel": "Fällig:",

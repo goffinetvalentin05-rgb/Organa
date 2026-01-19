@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Eye, Plus, Trash, Calendar, ArrowRight, Download } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
@@ -73,6 +73,7 @@ export default function DepensesPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDepense, setSelectedDepense] = useState<Depense | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     label: "",
     amount: "",
@@ -112,28 +113,25 @@ export default function DepensesPage() {
   const loadDepenses = async () => {
     setLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("expenses")
-        .select("*")
-        .order("date", { ascending: false });
-
-      if (error) {
-        throw new Error(error.message || t("dashboard.expenses.loadError"));
+      const response = await fetch("/api/depenses", { cache: "no-store" });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || t("dashboard.expenses.loadError"));
       }
-
-      const depensesChargees = (data ?? []).map((depense: any) => ({
+      const data = await response.json();
+      const depensesChargees = (data?.depenses ?? []).map((depense: any) => ({
         id: depense.id,
-        label: depense.label || "",
+        label: depense.fournisseur || "",
         amount:
-          typeof depense.amount === "number"
-            ? depense.amount
-            : Number(depense.amount) || 0,
-        date: depense.date || "",
-        status: (depense.status || "a_payer") as DepenseStatut,
-        notes: depense.notes || undefined,
-        attachmentUrl: depense.attachment_url || undefined,
+          typeof depense.montant === "number"
+            ? depense.montant
+            : Number(depense.montant) || 0,
+        date: depense.dateEcheance || "",
+        status: (depense.statut || "a_payer") as DepenseStatut,
+        notes: depense.note || undefined,
+        attachmentUrl: depense.pieceJointe || undefined,
       }));
 
       setDepenses(depensesChargees);
@@ -205,9 +203,10 @@ export default function DepensesPage() {
   };
 
   const onCreateExpense = async () => {
-    console.log("CLICK AJOUTER DEPENSE OK");
+    console.log("submit fired");
     const amount = Number.parseFloat(formData.amount);
     if (!formData.label || !formData.date || Number.isNaN(amount)) {
+      setErrorMessage(t("dashboard.expenses.createError"));
       return;
     }
 
@@ -231,26 +230,41 @@ export default function DepensesPage() {
         );
       }
 
-      const { error } = await supabase.from("expenses").insert({
-        label: formData.label.trim(),
-        amount,
-        date: formData.date,
-        status: formData.status,
-        notes: formData.notes.trim() || null,
-        attachment_url: attachmentUrl,
-        user_id: user.id,
+      const response = await fetch("/api/depenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fournisseur: formData.label.trim(),
+          montant: amount,
+          dateEcheance: formData.date,
+          statut: formData.status,
+          note: formData.notes.trim() || null,
+          pieceJointe: attachmentUrl,
+        }),
       });
 
-      if (error) {
-        throw new Error(t("dashboard.expenses.createError"));
+      console.log("response", response);
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error || t("dashboard.expenses.createError"));
       }
 
       await loadDepenses();
       resetForm();
       setShowForm(false);
+      setSuccessMessage(t("dashboard.expenses.createSuccess"));
     } catch (error) {
       console.error(error);
+      setErrorMessage(
+        error instanceof Error ? error.message : t("dashboard.expenses.createError")
+      );
     }
+  };
+
+  const handleCreateSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await onCreateExpense();
   };
 
   const onUpdateExpense = async () => {
@@ -389,7 +403,16 @@ export default function DepensesPage() {
       </div>
 
       {showForm && (
-        <div className="rounded-2xl border border-subtle bg-surface/80 p-6 space-y-4 shadow-premium">
+        <form
+          onSubmit={handleCreateSubmit}
+          className="rounded-2xl border border-subtle bg-surface/80 p-6 space-y-4 shadow-premium"
+        >
+          {successMessage && (
+            <p className="text-sm text-green-600">{successMessage}</p>
+          )}
+          {errorMessage && (
+            <p className="text-sm text-red-600">{errorMessage}</p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-primary mb-2">
@@ -486,10 +509,7 @@ export default function DepensesPage() {
               {t("dashboard.expenses.attachmentHint")}
             </p>
           </div>
-          <div
-            className="flex gap-3"
-            style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-          >
+          <div className="flex gap-3" style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}>
             <button
               type="button"
               onClick={() => {
@@ -501,15 +521,14 @@ export default function DepensesPage() {
               {t("dashboard.common.cancel")}
             </button>
             <button
-              type="button"
-              onClick={onCreateExpense}
+              type="submit"
               className="flex-1 px-6 py-3 rounded-full accent-bg text-white font-medium transition-all"
               style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
             >
               {t("dashboard.expenses.addAction")}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">

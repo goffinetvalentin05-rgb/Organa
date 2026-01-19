@@ -778,6 +778,7 @@
       "planReminder": "Schedule a reminder",
       "newExpense": "New expense",
       "addAction": "Add expense",
+      "createSuccess": "Expense added successfully.",
       "emptyState": "No expenses recorded yet.",
       "emptyCta": "Add your first expense",
       "dueLabel": "Due:",
