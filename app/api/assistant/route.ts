@@ -236,16 +236,17 @@ function fallbackTranslate(input: string, language: AssistantLocale) {
 
 async function callOpenAI({
   apiKey,
-  prompt,
-  locale,
-  action,
+  messages,
+  temperature,
+  maxTokens,
+  model,
 }: {
   apiKey: string;
-  prompt: string;
-  locale: AssistantLocale;
-  action: AssistantAction;
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
+  temperature: number;
+  maxTokens: number;
+  model: string;
 }) {
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -254,48 +255,9 @@ async function callOpenAI({
     },
     body: JSON.stringify({
       model,
-      temperature: action === "compose" ? 0.3 : 0.2,
-      messages: [
-        {
-          role: "system",
-          content: [
-            "Tu es un assistant administratif spécialisé dans les métiers de services,",
-            "artisans, indépendants et PME.",
-            "",
-            "AVANT DE RÉDIGER UNE RÉPONSE, tu dois TOUJOURS :",
-            "- analyser le type de prestation",
-            "- analyser si le travail est déjà effectué",
-            "- analyser le délai écoulé",
-            "- analyser le niveau de fermeté demandé",
-            "",
-            "INTERDICTION ABSOLUE :",
-            "- d’utiliser un email générique",
-            "- de produire un message passe-partout",
-            "- de copier un template standard",
-            "",
-            "SI la prestation est déjà réalisée (ex : pose de fenêtres, chantier, service livré),",
-            "la relance doit :",
-            "- rappeler subtilement que le service est terminé",
-            "- rester polie mais factuelle",
-            "- suggérer une régularisation normale du paiement",
-            "- ne PAS donner l’impression d’un simple oubli administratif",
-            "",
-            "STRUCTURE OBLIGATOIRE POUR UNE RELANCE :",
-            "1. Rappel du contexte réel de la prestation",
-            "2. Mention du délai écoulé",
-            "3. Rappel du montant / de la facture",
-            "4. Ton adapté (poli, professionnel, jamais agressif)",
-            "5. Conclusion ouverte mais ferme",
-            "",
-            "Tu dois produire un EMAIL COMPLET, détaillé, exploitable tel quel.",
-            "",
-            `Langue de sortie : ${languageNames[locale]}.`,
-            "Retourne UNIQUEMENT du JSON strict avec les clés subject et body.",
-            "Aucun markdown. Aucun texte hors JSON.",
-          ].join("\n"),
-        },
-        { role: "user", content: prompt },
-      ],
+      temperature,
+      max_tokens: maxTokens,
+      messages,
       response_format: { type: "json_object" },
     }),
   });
@@ -342,6 +304,8 @@ export async function POST(request: NextRequest) {
     }
 
     const openaiKey = process.env.OPENAI_API_KEY;
+    const model = process.env.OPENAI_MODEL || "gpt-4o";
+    const maxTokens = Number(process.env.OPENAI_MAX_TOKENS || 850);
 
     let result: { subject: string; body: string } | null = null;
 
@@ -380,11 +344,74 @@ export async function POST(request: NextRequest) {
     }
 
     if (openaiKey) {
+      const analysisSystemPrompt = [
+        "Tu es un assistant administratif spécialisé dans les métiers de services, artisans, indépendants et PME.",
+        "",
+        "ÉTAPE 1 — ANALYSE :",
+        "- Analyse le contexte métier et résume-le.",
+        "- NE RÉDIGE PAS l’email.",
+        "- Structure le contexte : type, prestation, situation, delai, ton, secteur.",
+        "- Aucune réponse générique.",
+        "",
+        "Retourne UNIQUEMENT du JSON strict avec ces clés :",
+        "type, prestation, situation, delai, ton, secteur, resume, hypothese.",
+        `Langue de sortie : ${languageNames[language]}.`,
+      ].join("\n");
+
+      const analysis = await callOpenAI({
+        apiKey: openaiKey,
+        messages: [
+          { role: "system", content: analysisSystemPrompt },
+          { role: "user", content: promptParts.join("\n") },
+        ],
+        temperature: 0.2,
+        maxTokens: 400,
+        model,
+      });
+
+      const writingSystemPrompt = [
+        "Tu es l’assistant administratif professionnel d’Organa.",
+        "Tu aides des indépendants, artisans et PME.",
+        "",
+        "Règles strictes :",
+        "- Tu produis toujours des réponses développées et exploitables.",
+        "- Tu adaptes le contenu au métier et à la situation réelle.",
+        "- Si la prestation est déjà réalisée, tu le rappelles subtilement.",
+        "- Ton professionnel, crédible, jamais familier.",
+        "- Si une information manque, tu fais une hypothèse raisonnable.",
+        "- Tu n’écris JAMAIS un email générique.",
+        "",
+        "Structure obligatoire :",
+        "1. Introduction professionnelle",
+        "2. Rappel du contexte réel",
+        "3. Message principal (relance / info / réponse)",
+        "4. Conclusion claire et professionnelle",
+        "5. Signature générique",
+        "",
+        `Langue de sortie : ${languageNames[language]}.`,
+        "Retourne UNIQUEMENT du JSON strict avec les clés subject et body.",
+        "Aucun markdown. Aucun texte hors JSON.",
+      ].join("\n");
+
+      const writingPromptParts = [
+        `Action: ${action}`,
+        `Analyse: ${JSON.stringify(analysis || {})}`,
+        `BusinessContext: ${JSON.stringify(structuredContext)}`,
+        `Context: ${JSON.stringify(context)}`,
+        `SubjectHint: ${subject || ""}`,
+        `UserMessage: ${input || instruction || ""}`,
+        "Rédige un email complet et détaillé conforme aux règles.",
+      ];
+
       result = await callOpenAI({
         apiKey: openaiKey,
-        prompt: promptParts.join("\n"),
-        locale: language,
-        action,
+        messages: [
+          { role: "system", content: writingSystemPrompt },
+          { role: "user", content: writingPromptParts.join("\n") },
+        ],
+        temperature: 0.6,
+        maxTokens,
+        model,
       });
     }
 
