@@ -17,17 +17,20 @@ export async function GET() {
     }
 
     const { data, error } = await supabase
-      .from("depenses")
-      .select(
-        "id, fournisseur, montant, date_echeance, statut, note, piece_jointe"
-      )
+      .from("expenses")
+      .select("id, label, amount, date, status, notes, attachment_url")
       .eq("user_id", user.id)
-      .order("date_echeance", { ascending: true });
+      .order("date", { ascending: true });
 
     if (error) {
       console.error("[API][depenses][GET] Erreur Supabase:", error);
       return NextResponse.json(
-        { error: "Erreur lors du chargement des dépenses" },
+        {
+          error: "Erreur lors du chargement des dépenses",
+          details: error.message,
+          hint: error.hint,
+          code: error.code,
+        },
         { status: 500 }
       );
     }
@@ -58,10 +61,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { fournisseur, montant, dateEcheance, statut, note, pieceJointe } =
-      body || {};
+    const { label, amount, date, status, notes } = body || {};
 
-    if (!fournisseur || !dateEcheance || typeof montant !== "number") {
+    if (!label || !date || typeof amount !== "number") {
       return NextResponse.json(
         { error: "Données invalides" },
         { status: 400 }
@@ -69,25 +71,28 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from("depenses")
+      .from("expenses")
       .insert({
         user_id: user.id,
-        fournisseur: String(fournisseur).trim(),
-        montant,
-        date_echeance: dateEcheance,
-        statut: statut || "a_payer",
-        note: note || null,
-        piece_jointe: pieceJointe || null,
+        label: String(label).trim(),
+        amount,
+        date,
+        status: status || "a_payer",
+        notes: notes || null,
+        attachment_url: null,
       })
-      .select(
-        "id, fournisseur, montant, date_echeance, statut, note, piece_jointe"
-      )
+      .select("id, label, amount, date, status, notes, attachment_url")
       .single();
 
     if (error) {
       console.error("[API][depenses][POST] Erreur Supabase:", error);
       return NextResponse.json(
-        { error: "Erreur lors de la création de la dépense" },
+        {
+          error: "Erreur lors de la création de la dépense",
+          details: error.message,
+          hint: error.hint,
+          code: error.code,
+        },
         { status: 500 }
       );
     }
@@ -131,7 +136,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from("depenses")
+      .from("expenses")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id);
@@ -139,7 +144,12 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error("[API][depenses][DELETE] Erreur Supabase:", error);
       return NextResponse.json(
-        { error: "Erreur lors de la suppression" },
+        {
+          error: "Erreur lors de la suppression",
+          details: error.message,
+          hint: error.hint,
+          code: error.code,
+        },
         { status: 500 }
       );
     }
@@ -158,19 +168,19 @@ export async function DELETE(request: NextRequest) {
 }
 
 function formatDepense(depense: any) {
-  const montant =
-    typeof depense.montant === "number"
-      ? depense.montant
-      : Number(depense.montant) || 0;
+  const amount =
+    typeof depense.amount === "number"
+      ? depense.amount
+      : Number(depense.amount) || 0;
 
   return {
     id: depense.id,
-    fournisseur: depense.fournisseur || "",
-    montant,
-    dateEcheance: depense.date_echeance || "",
-    statut: depense.statut || "a_payer",
-    note: depense.note || undefined,
-    pieceJointe: depense.piece_jointe || undefined,
+    label: depense.label || "",
+    amount,
+    date: depense.date || "",
+    status: depense.status || "a_payer",
+    notes: depense.notes || undefined,
+    attachmentUrl: depense.attachment_url || undefined,
   };
 }
 

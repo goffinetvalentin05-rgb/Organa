@@ -120,20 +120,24 @@ export default function DepensesPage() {
       const response = await fetch("/api/depenses", { cache: "no-store" });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
+        console.error(
+          "[Depenses] Erreur Supabase (GET):",
+          data?.details || data?.error || data
+        );
         throw new Error(data?.error || t("dashboard.expenses.loadError"));
       }
       const data = await response.json();
       const depensesChargees = (data?.depenses ?? []).map((depense: any) => ({
         id: depense.id,
-        label: depense.fournisseur || "",
+        label: depense.label || "",
         amount:
-          typeof depense.montant === "number"
-            ? depense.montant
-            : Number(depense.montant) || 0,
-        date: depense.dateEcheance || "",
-        status: (depense.statut || "a_payer") as DepenseStatut,
-        notes: depense.note || undefined,
-        attachmentUrl: depense.pieceJointe || undefined,
+          typeof depense.amount === "number"
+            ? depense.amount
+            : Number(depense.amount) || 0,
+        date: depense.date || "",
+        status: (depense.status || "a_payer") as DepenseStatut,
+        notes: depense.notes || undefined,
+        attachmentUrl: depense.attachmentUrl || undefined,
       }));
 
       setDepenses(depensesChargees);
@@ -227,11 +231,11 @@ export default function DepensesPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fournisseur: formData.label.trim(),
-          montant: amount,
-          dateEcheance: formData.date,
-          statut: formData.status,
-          note: formData.notes.trim() || null,
+          label: formData.label.trim(),
+          amount,
+          date: formData.date,
+          status: formData.status,
+          notes: formData.notes.trim() || null,
         }),
       });
 
@@ -251,8 +255,8 @@ export default function DepensesPage() {
             formData.pieceJointe
           );
           const { error: updateError } = await supabase
-            .from("depenses")
-            .update({ piece_jointe: attachmentUrl })
+            .from("expenses")
+            .update({ attachment_url: attachmentUrl })
             .eq("id", createdId)
             .eq("user_id", user.id);
           if (updateError) {
