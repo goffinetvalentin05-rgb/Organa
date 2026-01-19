@@ -78,7 +78,7 @@
   "solution": {
     "label": "La solution Organa",
     "title": "Centraliser l’essentiel de votre activité, au même endroit.",
-    "paragraph": "Organa a été conçu pour centraliser les éléments essentiels de votre activité : factures, devis, clients, suivi administratif et gestion des tâches, au même endroit.",
+    "paragraph": "Organa a été conçu pour centraliser les éléments essentiels de votre activité : factures, devis, clients, suivi administratif et gestion des tâches, au même endroit. Organa évolue en permanence pour couvrir toujours plus de besoins administratifs, en s’appuyant sur les retours concrets de ses utilisateurs. Vos documents restent accessibles, exportables et archivables à tout moment, et vous gardez le contrôle de vos données.",
     "cards": {
       "organization": {
         "title": "Organisation claire",
@@ -181,6 +181,10 @@
       "easy": {
         "question": "Est-ce simple à prendre en main ?",
         "answer": "Oui, l’outil est conçu pour être clair, sans fonctionnalités superflues."
+      },
+      "future": {
+        "question": "Est-ce que de nouvelles fonctionnalités seront ajoutées à l’avenir ?",
+        "answer": "Oui. Organa est une plateforme en constante évolution. Les fonctionnalités sont développées en priorité à partir des retours des utilisateurs, pour répondre aux besoins réels du terrain. L’objectif est de faire évoluer Organa dans le bon sens, sans complexité inutile."
       }
     }
   },

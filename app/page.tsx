@@ -134,6 +134,7 @@ export default function Home() {
     { question: t("faq.items.free.question"), answer: t("faq.items.free.answer") },
     { question: t("faq.items.security.question"), answer: t("faq.items.security.answer") },
     { question: t("faq.items.easy.question"), answer: t("faq.items.easy.answer") },
+    { question: t("faq.items.future.question"), answer: t("faq.items.future.answer") },
   ];
 
   const freePlanFeatures = tList("pricing.free.features");

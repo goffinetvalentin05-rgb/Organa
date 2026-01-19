@@ -78,7 +78,7 @@
   "solution": {
     "label": "Die Organa-Lösung",
     "title": "Das Wesentliche Ihres Geschäfts an einem Ort bündeln.",
-    "paragraph": "Organa wurde entwickelt, um die wichtigsten Elemente Ihres Geschäfts zu zentralisieren: Rechnungen, Angebote, Kunden, administrative Nachverfolgung und Aufgabenmanagement an einem Ort.",
+    "paragraph": "Organa wurde entwickelt, um die wichtigsten Elemente Ihres Geschäfts zu zentralisieren: Rechnungen, Angebote, Kunden, administrative Nachverfolgung und Aufgabenmanagement an einem Ort. Organa entwickelt sich kontinuierlich weiter, um immer mehr administrative Bedürfnisse abzudecken, gestützt auf konkretes Nutzerfeedback. Ihre Dokumente bleiben jederzeit zugänglich, exportierbar und archivierbar, und Sie behalten die Kontrolle über Ihre Daten.",
     "cards": {
       "organization": {
         "title": "Klare Organisation",
@@ -181,6 +181,10 @@
       "easy": {
         "question": "Ist der Einstieg einfach?",
         "answer": "Ja, das Tool ist klar aufgebaut und verzichtet auf unnötige Funktionen."
+      },
+      "future": {
+        "question": "Werden künftig neue Funktionen hinzugefügt?",
+        "answer": "Ja. Organa ist eine Plattform in ständiger Weiterentwicklung. Funktionen werden vorrangig auf Basis von Nutzerfeedback entwickelt, um reale Anforderungen zu erfüllen. Ziel ist es, Organa in die richtige Richtung weiterzuentwickeln, ohne unnötige Komplexität."
       }
     }
   },
