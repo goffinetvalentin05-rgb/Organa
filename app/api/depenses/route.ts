@@ -18,7 +18,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("expenses")
-      .select("id, description, amount, date, status, notes, attachment_url")
+      .select("*")
       .eq("user_id", user.id)
       .order("date", { ascending: true });
 

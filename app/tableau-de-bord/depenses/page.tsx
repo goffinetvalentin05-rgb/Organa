@@ -117,9 +117,29 @@ export default function DepensesPage() {
     setSuccessMessage(null);
     setWarningMessage(null);
     try {
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      console.log("[Depenses] user:", user);
+      if (authError) {
+        console.error("[Depenses] auth error:", {
+          message: authError.message,
+          details: authError.details,
+          code: authError.code,
+        });
+      }
+
       const response = await fetch("/api/depenses", { cache: "no-store" });
       if (!response.ok) {
-        const data = await response.json().catch(() => null);
+        let data: any = null;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error("[Depenses] Impossible de parser la réponse:", parseError);
+        }
         console.error(
           "[Depenses] Erreur Supabase (GET):",
           {
@@ -129,7 +149,12 @@ export default function DepensesPage() {
             hint: data?.hint,
           }
         );
-        throw new Error(data?.error || t("dashboard.expenses.loadError"));
+        const messageParts = [
+          data?.error || t("dashboard.expenses.loadError"),
+          data?.details ? `details: ${data.details}` : null,
+          data?.code ? `code: ${data.code}` : null,
+        ].filter(Boolean);
+        throw new Error(messageParts.join(" | "));
       }
       const data = await response.json();
       if (!data?.depenses) {
@@ -150,7 +175,12 @@ export default function DepensesPage() {
 
       setDepenses(depensesChargees);
     } catch (error: any) {
-      setErrorMessage(error?.message || t("dashboard.expenses.loadError"));
+      console.error("[Depenses] Erreur attrapée:", error);
+      const explicitMessage =
+        typeof error?.message === "string"
+          ? error.message
+          : JSON.stringify(error);
+      setErrorMessage(explicitMessage || t("dashboard.expenses.loadError"));
       setDepenses([]);
     } finally {
       setLoading(false);
