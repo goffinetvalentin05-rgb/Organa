@@ -127,7 +127,6 @@ export default function DepensesPage() {
       if (authError) {
         console.error("[Depenses] auth error:", {
           message: authError.message,
-          details: authError.details,
           code: authError.code,
         });
       }
