@@ -5,6 +5,42 @@ export const runtime = "nodejs";
 
 type ExportResource = "invoices" | "clients" | "expenses";
 
+const formatDate = (value: string | null | undefined) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  return `${day}/${month}/${year}`;
+};
+
+const formatAmount = (value: number | string | null | undefined) => {
+  if (value === null || value === undefined || value === "") return "";
+  const numberValue = typeof value === "number" ? value : Number(value);
+  if (Number.isNaN(numberValue)) return "";
+  return numberValue.toFixed(2);
+};
+
+const formatInvoiceStatus = (status: string | null | undefined) => {
+  const labels: Record<string, string> = {
+    brouillon: "Brouillon",
+    envoye: "Envoyée",
+    paye: "Payée",
+    "en-retard": "En retard",
+  };
+  return labels[status ?? ""] || status || "";
+};
+
+const formatExpenseStatus = (status: string | null | undefined) => {
+  const labels: Record<string, string> = {
+    a_payer: "À payer",
+    paye: "Payée",
+    en_retard: "En retard",
+  };
+  return labels[status ?? ""] || status || "";
+};
+
 const csvEscape = (value: string | number | null | undefined) => {
   if (value === null || value === undefined) return "\"\"";
   const str = String(value);
@@ -48,7 +84,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase
         .from("documents")
         .select(
-          "id, numero, status, date_creation, total_ttc, client:clients(nom)"
+          "numero, status, date_creation, total_ht, total_tva, total_ttc, client:clients(nom)"
         )
         .eq("user_id", user.id)
         .eq("type", "invoice")
@@ -65,17 +101,26 @@ export async function GET(request: NextRequest) {
       const rows = (data || []).map((item: any) => {
         const client = Array.isArray(item.client) ? item.client[0] : item.client;
         return [
-          item.id,
           item.numero,
           client?.nom || "",
-          item.status || "",
-          item.date_creation || "",
-          item.total_ttc ?? "",
+          formatInvoiceStatus(item.status),
+          formatDate(item.date_creation),
+          formatAmount(item.total_ht),
+          formatAmount(item.total_tva),
+          formatAmount(item.total_ttc),
         ];
       });
 
       const csv = buildCsv(
-        ["id", "numero", "client", "statut", "date_creation", "total_ttc"],
+        [
+          "numero",
+          "client",
+          "statut",
+          "date_creation",
+          "total_ht",
+          "total_tva",
+          "total_ttc",
+        ],
         rows
       );
 
@@ -91,7 +136,7 @@ export async function GET(request: NextRequest) {
     if (resource === "clients") {
       const { data, error } = await supabase
         .from("clients")
-        .select("id, nom, email, telephone, adresse, created_at")
+        .select("nom, email, telephone, adresse, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -104,16 +149,15 @@ export async function GET(request: NextRequest) {
       }
 
       const rows = (data || []).map((item: any) => [
-        item.id,
         item.nom || "",
         item.email || "",
         item.telephone || "",
         item.adresse || "",
-        item.created_at || "",
+        formatDate(item.created_at),
       ]);
 
       const csv = buildCsv(
-        ["id", "nom", "email", "telephone", "adresse", "created_at"],
+        ["nom", "email", "telephone", "adresse", "created_at"],
         rows
       );
 
@@ -128,7 +172,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("expenses")
-      .select("id, label, amount, date, status, notes, attachment_url")
+      .select("label, amount, date, status, notes")
       .eq("user_id", user.id)
       .order("date", { ascending: false });
 
@@ -141,17 +185,15 @@ export async function GET(request: NextRequest) {
     }
 
     const rows = (data || []).map((item: any) => [
-      item.id,
       item.label || "",
-      item.amount ?? "",
-      item.date || "",
-      item.status || "",
+      formatAmount(item.amount),
+      formatDate(item.date),
+      formatExpenseStatus(item.status),
       item.notes || "",
-      item.attachment_url || "",
     ]);
 
     const csv = buildCsv(
-      ["id", "label", "amount", "date", "status", "notes", "attachment_url"],
+      ["label", "amount", "date", "status", "notes"],
       rows
     );
 
