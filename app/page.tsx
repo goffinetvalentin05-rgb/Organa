@@ -461,26 +461,76 @@ export default function Home() {
         </section>
 
         <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[44px] border border-indigo-900/20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 px-8 py-12 text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)]">
+          <div className="mx-auto max-w-7xl rounded-[44px] border border-slate-200 bg-white px-8 py-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">Valeur OBILLZ</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white md:text-4xl">
-                Moins d'administratif. Plus de croissance.
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-500/80">Comparatif</p>
+              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
+                Sans OBILLZ vs Avec OBILLZ
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-indigo-100/80 md:text-lg">
-                Des bénéfices concrets pour gagner du temps et de la clarté.
+              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                Une comparaison claire pour comprendre l'impact immédiat sur votre quotidien.
               </p>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
-              {valueCards.map((card) => (
-                <div
-                  key={card.title}
-                  className="rounded-[28px] border border-white/10 bg-white/5 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.3)]"
-                >
-                  <p className="text-base font-semibold text-white">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-indigo-100/80">{card.text}</p>
+            <div className="mt-12 grid gap-8 lg:grid-cols-2">
+              <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Sans OBILLZ</p>
+                <ul className="mt-6 space-y-4 text-sm text-slate-600">
+                  {[
+                    "Création manuelle des factures, longue et source d’erreurs",
+                    "Factures et dépenses dispersées sur plusieurs outils",
+                    "Aucune alerte sur les échéances de paiement",
+                    "Manque de visibilité sur ce qui est payé ou en retard",
+                    "Perte de temps à chercher des documents",
+                    "Suivi financier stressant et peu clair",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+                        ×
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-[28px] border border-indigo-100 bg-white p-7 shadow-[0_20px_50px_rgba(79,70,229,0.12)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Avec OBILLZ</p>
+                <div className="mt-6 grid gap-4">
+                  {[
+                    {
+                      title: "Facturation rapide et centralisée",
+                      text: "Créez et envoyez vos factures en quelques clics depuis un seul outil.",
+                    },
+                    {
+                      title: "Suivi clair des paiements et dépenses",
+                      text: "Visualisez instantanément ce que vous devez payer et encaisser.",
+                    },
+                    {
+                      title: "Alertes automatiques",
+                      text: "Recevez des notifications avant les échéances importantes.",
+                    },
+                    {
+                      title: "Vue d’ensemble en temps réel",
+                      text: "Statuts clairs : payé, en attente, en retard.",
+                    },
+                    {
+                      title: "Organisation sans effort",
+                      text: "Tous vos documents sont centralisés et accessibles.",
+                    },
+                  ].map((item) => (
+                    <div key={item.title} className="rounded-[22px] border border-indigo-100 bg-indigo-50/40 p-5">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+                          ✓
+                        </span>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                          <p className="mt-1 text-sm text-slate-600">{item.text}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>
