@@ -461,17 +461,24 @@ export default function Home() {
         </section>
 
         <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[44px] border border-slate-200 bg-slate-950 px-8 py-12 text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)]">
-            <SectionTitle
-              label="Valeur OBILLZ"
-              title="Moins d'administratif. Plus de croissance."
-              description="Des bénéfices concrets pour gagner du temps et de la clarté."
-            />
+          <div className="mx-auto max-w-7xl rounded-[44px] border border-indigo-900/20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 px-8 py-12 text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)]">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">Valeur OBILLZ</p>
+              <h2 className="mt-4 text-3xl font-semibold text-white md:text-4xl">
+                Moins d'administratif. Plus de croissance.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-indigo-100/80 md:text-lg">
+                Des bénéfices concrets pour gagner du temps et de la clarté.
+              </p>
+            </div>
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               {valueCards.map((card) => (
-                <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-7">
+                <div
+                  key={card.title}
+                  className="rounded-[28px] border border-white/10 bg-white/5 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.3)]"
+                >
                   <p className="text-base font-semibold text-white">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-white/75">{card.text}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-indigo-100/80">{card.text}</p>
                 </div>
               ))}
             </div>
