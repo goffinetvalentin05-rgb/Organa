@@ -461,19 +461,24 @@ export default function Home() {
         </section>
 
         <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[44px] border border-slate-200 bg-white px-8 py-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
+          <div className="mx-auto max-w-7xl rounded-[48px] border border-slate-200 bg-slate-50 px-8 py-12 shadow-[0_26px_70px_rgba(15,23,42,0.08)]">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-500/80">Comparatif</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-indigo-500/80">Comparatif</p>
               <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
-                Sans OBILLZ vs Avec OBILLZ
+                Sans OBILLZ / Avec OBILLZ
               </h2>
               <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
-                Une comparaison claire pour comprendre l'impact immédiat sur votre quotidien.
+                Une lecture rapide de la différence, comme un avant / après.
               </p>
             </div>
-            <div className="mt-12 grid gap-8 lg:grid-cols-2">
-              <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Sans OBILLZ</p>
+            <div className="mt-12 grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-stretch">
+              <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Sans OBILLZ</p>
+                  <span className="rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-500">
+                    Avant
+                  </span>
+                </div>
                 <ul className="mt-6 space-y-4 text-sm text-slate-600">
                   {[
                     "Création manuelle des factures, longue et source d’erreurs",
@@ -484,16 +489,32 @@ export default function Home() {
                     "Suivi financier stressant et peu clair",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-rose-500">
-                        ×
+                      <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+                        ✕
                       </span>
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
+              <div className="hidden items-center justify-center lg:flex">
+                <div className="flex h-full w-16 flex-col items-center justify-center gap-3">
+                  <span className="rounded-full border border-indigo-100 bg-white px-3 py-1 text-[11px] font-semibold text-indigo-600">
+                    AVANT
+                  </span>
+                  <div className="h-40 w-px bg-gradient-to-b from-transparent via-indigo-200 to-transparent" />
+                  <span className="rounded-full border border-indigo-100 bg-white px-3 py-1 text-[11px] font-semibold text-indigo-600">
+                    APRÈS
+                  </span>
+                </div>
+              </div>
               <div className="rounded-[28px] border border-indigo-100 bg-white p-7 shadow-[0_20px_50px_rgba(79,70,229,0.12)]">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Avec OBILLZ</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Avec OBILLZ</p>
+                  <span className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-600">
+                    Après
+                  </span>
+                </div>
                 <div className="mt-6 grid gap-4">
                   {[
                     {
@@ -519,7 +540,7 @@ export default function Home() {
                   ].map((item) => (
                     <div key={item.title} className="rounded-[22px] border border-indigo-100 bg-indigo-50/40 p-5">
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+                        <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
                           ✓
                         </span>
                         <div>
