@@ -1,244 +1,310 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
 import LandingNav from "@/components/LandingNav";
 import SiteFooter from "@/components/SiteFooter";
 import FaqAccordion from "@/components/FaqAccordion";
-import { useI18n } from "@/components/I18nProvider";
+
+export const metadata: Metadata = {
+  title: "OBILLZ — La facturation en deux clics",
+  description:
+    "Logiciel de facturation et de suivi des dépenses pour indépendants et petites entreprises. Simple, rapide, moderne, pensé pour l'Europe.",
+};
+
+const featureCards = [
+  {
+    title: "Devis & factures en 2 clics",
+    text: "Créez, envoyez et suivez vos documents sans friction, avec des modèles clairs et pro.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6M9 17h6" />
+      </svg>
+    ),
+  },
+  {
+    title: "Suivi des paiements",
+    text: "Visualisez en un coup d'œil ce qui est payé, en attente ou à relancer.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16v10H4z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 11h4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Dépenses & échéances",
+    text: "Enregistrez vos dépenses et planifiez les échéances importantes sans tableaux externes.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v5l3 3" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 0-9 9" />
+      </svg>
+    ),
+  },
+  {
+    title: "Notifications utiles",
+    text: "Recevez les rappels clés au bon moment pour relancer ou payer sans stress.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a3 3 0 0 0 6 0" />
+      </svg>
+    ),
+  },
+  {
+    title: "Assistant IA intégré",
+    text: "Rédigez des relances et emails pro en quelques secondes, sans y penser.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l2.2 4.5L19 9l-4 3.9.9 5.6-5-2.7-5 2.7.9-5.6L5 9l4.8-1.5L12 3z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Dashboard complet",
+    text: "Un cockpit clair pour piloter vos clients, vos revenus et vos charges.",
+    icon: (
+      <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7 9h4M7 13h6" />
+      </svg>
+    ),
+  },
+];
+
+const howItWorksSteps = [
+  { label: "01", text: "Créez un client en 30 secondes." },
+  { label: "02", text: "Générez un devis ou une facture." },
+  { label: "03", text: "Envoyez et suivez le statut." },
+  { label: "04", text: "Ajoutez vos dépenses." },
+  { label: "05", text: "Laissez OBILLZ gérer les rappels." },
+  { label: "06", text: "Pilotez tout depuis le dashboard." },
+];
+
+const valueCards = [
+  {
+    title: "Zéro friction",
+    text: "Une interface claire, sans jargon administratif, pour rester concentré sur l'essentiel.",
+  },
+  {
+    title: "Pensé pour l'Europe",
+    text: "Gestion simple des devises et des pratiques européennes, sans être centré sur un pays.",
+  },
+  {
+    title: "Visibilité immédiate",
+    text: "Retards, paiements, échéances : tout est lisible instantanément.",
+  },
+  {
+    title: "Toujours maîtrisé",
+    text: "Pas de surcharges inutiles : uniquement ce qui vous aide à facturer et suivre vos dépenses.",
+  },
+];
+
+const faqItems = [
+  {
+    question: "OBILLZ convient-il aux freelances et petites équipes ?",
+    answer: "Oui, OBILLZ est conçu pour les indépendants, freelances et petites entreprises.",
+  },
+  {
+    question: "Puis-je commencer gratuitement ?",
+    answer: "Oui, le plan Free vous permet de créer devis et factures avec un accès limité.",
+  },
+  {
+    question: "Le plan Pro est-il sans engagement ?",
+    answer: "Oui, vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez.",
+  },
+  {
+    question: "L'assistant IA est-il inclus dans Pro ?",
+    answer: "Oui, l'assistant IA fait partie du plan Pro avec les notifications et le dashboard complet.",
+  },
+];
+
+const pricing = {
+  free: ["Création de devis et factures", "Suivi basique", "Accès limité"],
+  pro: [
+    "Facturation illimitée",
+    "Dépenses + échéances",
+    "Notifications",
+    "IA assistant",
+    "Dashboard complet",
+  ],
+};
+
+function SectionTitle({ label, title, description }: { label: string; title: string; description?: string }) {
+  return (
+    <div className="mx-auto max-w-3xl text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-500/80">{label}</p>
+      <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{title}</h2>
+      {description ? <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{description}</p> : null}
+    </div>
+  );
+}
 
 export default function Home() {
-  const { t, tList } = useI18n();
-  const heroTitleLines = t("hero.title").split("\n");
-
-  const heroStats = [
-    { label: t("hero.stats.clients.label"), value: t("hero.stats.clients.value") },
-    { label: t("hero.stats.quotes.label"), value: t("hero.stats.quotes.value") },
-    { label: t("hero.stats.invoices.label"), value: t("hero.stats.invoices.value") },
-    { label: t("hero.stats.payments.label"), value: t("hero.stats.payments.value") },
-  ];
-
-  const paymentStatuses = [
-    t("hero.paymentsCard.statuses.paid"),
-    t("hero.paymentsCard.statuses.followUp"),
-    t("hero.paymentsCard.statuses.pending"),
-  ];
-
-  const clientFollowUpItems = [
-    t("hero.clientFollowUp.items.emailSent"),
-    t("hero.clientFollowUp.items.followUpPlanned"),
-    t("hero.clientFollowUp.items.paymentReceived"),
-  ];
-
-  const problemCards = [
-    {
-      title: t("problem.cards.docs.title"),
-      text: t("problem.cards.docs.text"),
-      icon: (
-        <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6M9 17h6" />
-        </svg>
-      ),
-    },
-    {
-      title: t("problem.cards.tools.title"),
-      text: t("problem.cards.tools.text"),
-      icon: (
-        <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <rect x="3" y="6" width="18" height="12" rx="2" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h4M7 14h6" />
-        </svg>
-      ),
-    },
-    {
-      title: t("problem.cards.mentalLoad.title"),
-      text: t("problem.cards.mentalLoad.text"),
-      icon: (
-        <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v5l3 3" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 0-9 9" />
-        </svg>
-      ),
-    },
-  ];
-
-  const solutionCards = [
-    {
-      title: t("solution.cards.organization.title"),
-      text: t("solution.cards.organization.text"),
-    },
-    {
-      title: t("solution.cards.visibility.title"),
-      text: t("solution.cards.visibility.text"),
-    },
-  ];
-
-  const howItWorksSteps = [
-    { label: "1", value: t("howItWorks.steps.one") },
-    { label: "2", value: t("howItWorks.steps.two") },
-    { label: "3", value: t("howItWorks.steps.three") },
-    { label: "4", value: t("howItWorks.steps.four") },
-    { label: "5", value: t("howItWorks.steps.five") },
-    { label: "6", value: t("howItWorks.steps.six") },
-  ];
-
-  const howItWorksCards = [
-    {
-      title: t("howItWorks.cards.quotes.title"),
-      text: t("howItWorks.cards.quotes.text"),
-      icon: (
-        <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6M9 17h6" />
-        </svg>
-      ),
-    },
-    {
-      title: t("howItWorks.cards.tasks.title"),
-      text: t("howItWorks.cards.tasks.text"),
-      icon: (
-        <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v5l3 3" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 0-9 9" />
-        </svg>
-      ),
-    },
-  ];
-
-  const whyOrganaCards = [
-    {
-      title: t("whyOrgana.cards.security.title"),
-      text: t("whyOrgana.cards.security.text"),
-    },
-    {
-      title: t("whyOrgana.cards.time.title"),
-      text: t("whyOrgana.cards.time.text"),
-    },
-    {
-      title: t("whyOrgana.cards.organization.title"),
-      text: t("whyOrgana.cards.organization.text"),
-    },
-  ];
-
-  const testimonials = [
-    { text: t("testimonials.items.one.text"), author: t("testimonials.items.one.author") },
-    { text: t("testimonials.items.two.text"), author: t("testimonials.items.two.author") },
-    { text: t("testimonials.items.three.text"), author: t("testimonials.items.three.author") },
-    { text: t("testimonials.items.four.text"), author: t("testimonials.items.four.author") },
-  ];
-
-  const faqItems = [
-    { question: t("faq.items.target.question"), answer: t("faq.items.target.answer") },
-    { question: t("faq.items.free.question"), answer: t("faq.items.free.answer") },
-    { question: t("faq.items.security.question"), answer: t("faq.items.security.answer") },
-    { question: t("faq.items.easy.question"), answer: t("faq.items.easy.answer") },
-    { question: t("faq.items.future.question"), answer: t("faq.items.future.answer") },
-  ];
-
-  const freePlanFeatures = tList("pricing.free.features");
-  const proPlanFeatures = tList("pricing.pro.features");
-
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <LandingNav />
-      <main className="pt-32">
+      <main className="pt-28">
         <section className="px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-[64px] bg-premium-gradient shadow-[0_36px_110px_rgba(2,6,23,0.45)]">
-            <div className="grid gap-14 px-8 py-14 md:px-14 md:py-18 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="text-white">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
-                  {t("hero.badge")}
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-[56px] border border-indigo-100 bg-white shadow-[0_35px_120px_rgba(15,23,42,0.15)]">
+            <div className="grid gap-14 px-8 py-14 md:px-12 lg:grid-cols-[1.15fr_0.85fr]">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">
+                  OBILLZ — La facturation en deux clics
                 </div>
-                <h1 className="mt-7 text-4xl font-semibold leading-tight md:text-6xl lg:text-7xl">
-                  {heroTitleLines.map((line, index) => (
-                    <span key={`${line}-${index}`}>
-                      {line}
-                      {index < heroTitleLines.length - 1 && <br />}
-                    </span>
-                  ))}
+                <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate-900 md:text-6xl">
+                  Facturez vite. Suivez vos dépenses. <br /> Pilotez votre activité en Europe.
                 </h1>
-                <p className="mt-6 text-lg leading-relaxed text-white/80 md:text-xl">{t("hero.subtitle")}</p>
+                <p className="mt-6 text-lg leading-relaxed text-slate-600 md:text-xl">
+                  OBILLZ est un logiciel de facturation et de suivi des dépenses pensé pour les indépendants et petites entreprises.
+                  Simple, rapide, moderne, sans lourdeur administrative.
+                </p>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <Link
                     href="/inscription"
-                    className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.25)] hover:bg-slate-100 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(79,70,229,0.35)] hover:bg-indigo-500 transition-colors"
                   >
-                    {t("hero.ctaPrimary")}
+                    Commencer gratuitement
                   </Link>
                   <Link
-                    href="#comment-ca-marche"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/5 px-8 py-3 text-sm font-semibold text-white hover:bg-white/15 transition-colors"
+                    href="#dashboard"
+                    className="inline-flex items-center justify-center rounded-full border border-indigo-200 bg-white px-8 py-3 text-sm font-semibold text-indigo-700 hover:border-indigo-300 transition-colors"
                   >
-                    {t("hero.ctaSecondary")}
+                    Voir la démo
                   </Link>
                 </div>
               </div>
               <div className="relative">
-                <div className="absolute -left-8 top-10 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
-                <div className="absolute -right-10 bottom-6 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-                <div className="relative grid gap-6">
-                  <div className="rounded-[28px] border border-white/15 bg-white/5 p-5 text-white shadow-[0_18px_40px_rgba(0,0,0,0.35)]">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs uppercase tracking-[0.2em] text-white/60">{t("hero.overview")}</p>
-                      <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] text-white/85">
-                        {t("hero.period")}
-                      </span>
-                    </div>
-                    <div className="mt-4 grid grid-cols-2 gap-3">
-                      {heroStats.map((stat) => (
-                        <div key={stat.label} className="rounded-xl bg-white/10 px-3 py-3">
-                          <p className="text-[11px] uppercase tracking-[0.14em] text-white/55">{stat.label}</p>
-                          <p className="text-sm font-semibold text-white">{stat.value}</p>
-                        </div>
-                      ))}
-                    </div>
+                <div className="absolute -left-12 top-10 h-52 w-52 rounded-full bg-indigo-200/40 blur-3xl" />
+                <div className="absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-violet-200/40 blur-3xl" />
+                <div className="relative rounded-[32px] border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.15)]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">Dashboard OBILLZ</p>
+                    <span className="rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-semibold text-white">Live</span>
                   </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-[24px] border border-white/15 bg-white/5 p-4 text-white shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-white/60">{t("hero.quoteCard.title")}</p>
-                      <p className="mt-2 text-lg font-semibold">{t("hero.quoteCard.number")}</p>
-                      <p className="mt-1 text-xs text-white/80">{t("hero.quoteCard.status")}</p>
-                      <div className="mt-4 h-2 w-full rounded-full bg-white/15">
-                        <div className="h-2 w-3/4 rounded-full bg-white" />
+                  <div className="mt-6 grid gap-4">
+                    <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Revenus</p>
+                      <p className="mt-2 text-2xl font-semibold text-slate-900">€18 420</p>
+                      <div className="mt-4 h-2 w-full rounded-full bg-indigo-100">
+                        <div className="h-2 w-2/3 rounded-full bg-indigo-600" />
                       </div>
                     </div>
-                    <div className="rounded-[24px] border border-white/15 bg-white/5 p-4 text-white shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-white/60">{t("hero.paymentsCard.title")}</p>
-                      <p className="mt-2 text-lg font-semibold">{t("hero.paymentsCard.count")}</p>
-                      <p className="mt-1 text-xs text-white/80">{t("hero.paymentsCard.period")}</p>
-                      <div className="mt-4 grid gap-2">
-                        {paymentStatuses.map((item) => (
-                          <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-[11px]">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Factures</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">12 en cours</p>
+                        <p className="mt-1 text-xs text-slate-500">3 en attente</p>
+                      </div>
+                      <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Dépenses</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">€4 980</p>
+                        <p className="mt-1 text-xs text-slate-500">Échéances à 7 jours</p>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Actions clés</p>
+                      <div className="mt-3 grid gap-2 text-xs text-slate-600 md:grid-cols-3">
+                        {["Relance #2043", "Paiement reçu", "Échéance dépense"].map((item) => (
+                          <div key={item} className="rounded-lg bg-indigo-50 px-3 py-2">
                             {item}
-                          </span>
+                          </div>
                         ))}
                       </div>
                     </div>
                   </div>
-                  <div className="rounded-[24px] border border-white/15 bg-white/5 p-4 text-white shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/60">{t("hero.clientFollowUp.title")}</p>
-                    <div className="mt-3 grid gap-2 text-xs text-white/85 md:grid-cols-3">
-                      {clientFollowUpItems.map((item) => (
-                        <div key={item} className="rounded-lg bg-white/10 px-3 py-2">
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
+                <p className="mt-4 text-xs text-slate-400">Mockup dashboard (placeholder).</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="px-4 py-20 md:px-6 md:py-28">
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="grid gap-6">
-              {problemCards.map((card) => (
+              {[
+                {
+                  title: "Trop d'outils dispersés",
+                  text: "Factures, dépenses, relances… tout est éparpillé entre des fichiers et des apps.",
+                },
+                {
+                  title: "Suivi approximatif",
+                  text: "Impossible de voir rapidement ce qui est payé, en retard, ou à prévoir.",
+                },
+                {
+                  title: "Charge mentale inutile",
+                  text: "Vous perdez du temps sur l'administratif au lieu de développer votre activité.",
+                },
+              ].map((card) => (
                 <div key={card.title} className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 ring-1 ring-slate-200">
+                  <p className="text-base font-semibold text-slate-900">{card.title}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.text}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-[36px] border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-11 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500/80">Le problème</p>
+              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">
+                L'administratif ne doit pas ralentir votre business.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                OBILLZ centralise facturation et dépenses pour vous donner une vue claire, rapide, actionnable.
+              </p>
+              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
+                Vous gagnez du temps, évitez les oublis, et gardez un suivi fiable sans complexité.
+              </p>
+              <div className="mt-8">
+                <Link
+                  href="/inscription"
+                  className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-7 py-3 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
+                >
+                  Commencer gratuitement
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-indigo-600 via-violet-600 to-blue-600 px-8 py-14 text-white shadow-[0_32px_90px_rgba(15,23,42,0.35)] md:px-12">
+            <SectionTitle
+              label="La solution OBILLZ"
+              title="Une seule interface pour facturer, suivre et avancer."
+              description="Structure claire, actions rapides, et une vue globale de votre activité. Sans jargon, sans lourdeur."
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-2">
+              {[
+                {
+                  title: "Tout est centralisé",
+                  text: "Clients, documents, dépenses et échéances réunis dans un espace simple.",
+                },
+                {
+                  title: "Vous gardez le contrôle",
+                  text: "Des rappels intelligents pour ne plus laisser passer un paiement ou une dépense.",
+                },
+              ].map((card) => (
+                <div key={card.title} className="rounded-[30px] border border-white/15 bg-white/10 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.25)]">
+                  <p className="text-base font-semibold text-white">{card.title}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-white/85">{card.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle
+              label="Fonctionnalités clés"
+              title="Tout ce dont vous avez besoin. Rien de superflu."
+              description="Pensé pour les indépendants et petites entreprises qui veulent aller vite."
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {featureCards.map((card) => (
+                <div key={card.title} className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 ring-1 ring-indigo-100">
                     {card.icon}
                   </div>
                   <p className="text-base font-semibold text-slate-900">{card.title}</p>
@@ -246,171 +312,91 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="rounded-[36px] border border-slate-200 bg-white p-11 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("problem.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("problem.title")}</h2>
-              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{t("problem.paragraphs.first")}</p>
-              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{t("problem.paragraphs.second")}</p>
-              <div className="mt-8">
-                <Link
-                  href="/inscription"
-                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
-                >
-                  {t("problem.cta")}
-                </Link>
+          </div>
+        </section>
+
+        <section id="dashboard" className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <SectionTitle
+                label="Vue produit"
+                title="Un dashboard qui parle vraiment."
+                description="Suivi des revenus, paiements, dépenses et échéances, tout est là, lisible et actionnable."
+              />
+              <div className="mt-8 flex flex-wrap gap-3">
+                {["Suivi paiements", "Relances IA", "Vue dépenses", "Notifications"].map((item) => (
+                  <span key={item} className="rounded-full border border-indigo-100 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700">
+                    {item}
+                  </span>
+                ))}
               </div>
+            </div>
+            <div className="relative">
+              <div className="absolute -left-8 top-10 h-48 w-48 rounded-full bg-indigo-200/50 blur-3xl" />
+              <div className="rounded-[32px] border border-indigo-100 bg-white p-6 shadow-[0_30px_70px_rgba(15,23,42,0.12)]">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">Aperçu dashboard</p>
+                  <span className="rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold text-white">OBILLZ</span>
+                </div>
+                <div className="mt-6 grid gap-4">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {["Factures payées", "En attente", "Dépenses"].map((label) => (
+                      <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{label}</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">+12%</p>
+                        <p className="mt-1 text-xs text-slate-500">Cette semaine</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Échéances</p>
+                    <div className="mt-3 grid gap-2 text-xs text-slate-600">
+                      {["Relance facture #1098", "Paiement dépense cloud", "Devis à valider"].map((item) => (
+                        <div key={item} className="flex items-center justify-between rounded-lg bg-white px-3 py-2">
+                          <span>{item}</span>
+                          <span className="text-indigo-600">Aujourd'hui</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-4 text-xs text-slate-400">Mockup UI (placeholder).</p>
             </div>
           </div>
         </section>
 
         <section id="comment-ca-marche" className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{t("solution.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold md:text-4xl">{t("solution.title")}</h2>
-              <p className="mt-5 text-base leading-relaxed text-white/80 md:text-lg">{t("solution.paragraph")}</p>
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle
+              label="Comment ça marche"
+              title="Simple, fluide, sans surcharge."
+              description="6 étapes claires pour garder votre facturation sous contrôle."
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {howItWorksSteps.map((step) => (
+                <div key={step.label} className="rounded-[26px] border border-slate-200 bg-white p-7 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">{step.label}</p>
+                  <p className="mt-3 text-base font-semibold text-slate-900">{step.text}</p>
+                </div>
+              ))}
             </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[44px] border border-indigo-100 bg-white px-8 py-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
+            <SectionTitle label="Tarifs" title="Deux plans, clairs et efficaces." />
             <div className="mt-12 grid gap-6 md:grid-cols-2">
-              {solutionCards.map((card) => (
-                <div key={card.title} className="rounded-[30px] border border-white/15 bg-white/5 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.35)]">
-                  <p className="text-base font-semibold text-white">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-white/80">{card.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 text-center">
-              <Link
-                href="/inscription"
-                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                {t("solution.cta")}
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("howItWorks.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("howItWorks.title")}</h2>
-              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{t("howItWorks.paragraph")}</p>
-              <div className="mt-8">
-                <Link
-                  href="/inscription"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-800 hover:border-slate-400 transition-colors"
-                >
-                  {t("howItWorks.cta")}
-                </Link>
-              </div>
-              <div className="mt-10 rounded-[34px] border border-slate-200 bg-white p-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-slate-900">{t("howItWorks.stepsTitle")}</p>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {t("howItWorks.stepsBadge")}
-                  </span>
-                </div>
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  {howItWorksSteps.slice(0, 3).map((item) => (
-                    <div key={item.label} className="rounded-xl bg-slate-50 px-4 py-3">
-                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
-                      <p className="text-sm font-semibold text-slate-900">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  {howItWorksSteps.slice(3).map((item) => (
-                    <div key={item.label} className="rounded-xl bg-slate-50 px-4 py-3">
-                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
-                      <p className="text-sm font-semibold text-slate-900">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="grid gap-6">
-              {howItWorksCards.map((card) => (
-                <div key={card.title} className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 ring-1 ring-slate-200">
-                    {card.icon}
-                  </div>
-                  <p className="text-base font-semibold text-slate-900">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("tasksCalendar.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("tasksCalendar.title")}</h2>
-              <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{t("tasksCalendar.paragraph")}</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("whyOrgana.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("whyOrgana.title")}</h2>
-            </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {whyOrganaCards.map((card) => (
-                <div key={card.title} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                  <p className="text-base font-semibold text-slate-900">{card.title}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("testimonials.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("testimonials.title")}</h2>
-            </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
-              {testimonials.map((item) => (
-                <div key={item.author} className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                  <p className="text-base leading-relaxed text-slate-800">“{item.text}”</p>
-                  <p className="mt-5 text-sm font-semibold text-slate-600">{item.author}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("faq.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("faq.title")}</h2>
-            </div>
-            <div className="mt-10">
-              <FaqAccordion items={faqItems} />
-            </div>
-          </div>
-        </section>
-
-        <section className="px-4 pb-20 md:px-6 md:pb-28">
-          <div className="mx-auto max-w-7xl rounded-[40px] border border-slate-200 bg-white px-8 py-10 shadow-[0_18px_46px_rgba(15,23,42,0.06)]">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("pricing.label")}</p>
-              <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-4xl">{t("pricing.title")}</h2>
-            </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
               <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-7">
-                <p className="text-base font-semibold text-slate-900">{t("pricing.free.title")}</p>
-                <p className="mt-2 text-sm text-slate-600">{t("pricing.free.subtitle")}</p>
+                <p className="text-base font-semibold text-slate-900">Free</p>
+                <p className="mt-2 text-sm text-slate-600">Pour démarrer sans risque.</p>
                 <ul className="mt-6 space-y-3 text-sm text-slate-600">
-                  {freePlanFeatures.map((feature) => (
-                    <li key={feature}>{feature}</li>
+                  {pricing.free.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                      {feature}
+                    </li>
                   ))}
                 </ul>
                 <div className="mt-6">
@@ -418,27 +404,30 @@ export default function Home() {
                     href="/inscription"
                     className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-400 transition-colors"
                   >
-                    {t("pricing.free.cta")}
+                    Commencer gratuitement
                   </Link>
                 </div>
               </div>
-              <div className="relative rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
-                <span className="absolute -top-3 right-6 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                  {t("pricing.pro.badge")}
+              <div className="relative rounded-[28px] border border-indigo-200 bg-white p-7 shadow-[0_18px_40px_rgba(79,70,229,0.2)]">
+                <span className="absolute -top-3 right-6 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                  Recommandé
                 </span>
-                <p className="text-base font-semibold text-slate-900">{t("pricing.pro.title")}</p>
-                <p className="mt-2 text-sm text-slate-600">{t("pricing.pro.subtitle")}</p>
+                <p className="text-base font-semibold text-slate-900">Pro</p>
+                <p className="mt-2 text-sm text-slate-600">29€ / mois (prix provisoire)</p>
                 <ul className="mt-6 space-y-3 text-sm text-slate-600">
-                  {proPlanFeatures.map((feature) => (
-                    <li key={feature}>{feature}</li>
+                  {pricing.pro.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                      {feature}
+                    </li>
                   ))}
                 </ul>
                 <div className="mt-6">
                   <Link
                     href="/inscription"
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
                   >
-                    {t("pricing.pro.cta")}
+                    Passer au plan Pro
                   </Link>
                 </div>
               </div>
@@ -446,17 +435,29 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="demo" className="px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto max-w-7xl rounded-[56px] bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-8 py-14 text-center text-white shadow-[0_32px_90px_rgba(2,6,23,0.45)] md:px-12">
-            <h2 className="text-3xl font-semibold md:text-4xl">{t("finalCta.title")}</h2>
-            <p className="mt-5 text-base leading-relaxed text-white/80 md:text-lg">{t("finalCta.paragraph")}</p>
-            <div className="mt-8">
-              <Link
-                href="/inscription"
-                className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-100 transition-colors"
-              >
-                {t("finalCta.cta")}
-              </Link>
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[44px] border border-slate-200 bg-slate-950 px-8 py-12 text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)]">
+            <SectionTitle
+              label="Valeur OBILLZ"
+              title="Moins d'administratif. Plus de croissance."
+              description="Des bénéfices concrets pour gagner du temps et de la clarté."
+            />
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {valueCards.map((card) => (
+                <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-7">
+                  <p className="text-base font-semibold text-white">{card.title}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-white/75">{card.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-20 md:px-6 md:pb-28">
+          <div className="mx-auto max-w-7xl rounded-[44px] border border-slate-200 bg-white px-8 py-12 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            <SectionTitle label="FAQ" title="Questions fréquentes." />
+            <div className="mt-10">
+              <FaqAccordion items={faqItems} />
             </div>
           </div>
         </section>
