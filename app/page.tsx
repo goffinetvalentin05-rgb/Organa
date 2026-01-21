@@ -154,12 +154,26 @@ export default function Home() {
                   OBILLZ — La facturation en deux clics
                 </div>
                 <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate-900 md:text-6xl">
-                  Facturez vite. Suivez vos dépenses. <br /> Pilotez votre activité en Europe.
+                  Gérez vos devis et factures <br />
+                  où que vous soyez.
                 </h1>
-                <p className="mt-6 text-lg leading-relaxed text-slate-600 md:text-xl">
-                  OBILLZ est un logiciel de facturation et de suivi des dépenses pensé pour les indépendants et petites entreprises.
-                  Simple, rapide, moderne, sans lourdeur administrative.
+                <p className="mt-5 text-lg leading-relaxed text-slate-600 md:text-xl">
+                  Un outil moderne pour facturer vite, suivre vos dépenses et rester concentré sur votre activité.
                 </p>
+                <ul className="mt-6 space-y-3 text-sm text-slate-600">
+                  {[
+                    "Facturation rapide et professionnelle",
+                    "Suivi clair des paiements et relances",
+                    "Dépenses + échéances réunies",
+                    "Accès simple, sans jargon administratif",
+                    "Pensé pour l'Europe et l'international",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <Link
                     href="/inscription"
@@ -174,37 +188,45 @@ export default function Home() {
                     Voir la démo
                   </Link>
                 </div>
+                <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                  <span>Compatible paiements :</span>
+                  {["SEPA", "Carte", "Virement", "Multi-devises"].map((item) => (
+                    <span key={item} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+                      {item}
+                    </span>
+                  ))}
+                </div>
               </div>
               <div className="relative">
                 <div className="absolute -left-12 top-10 h-52 w-52 rounded-full bg-indigo-200/40 blur-3xl" />
                 <div className="absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-violet-200/40 blur-3xl" />
                 <div className="relative rounded-[32px] border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.15)]">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">Dashboard OBILLZ</p>
-                    <span className="rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-semibold text-white">Live</span>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">Aperçu produit</p>
+                    <span className="rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-semibold text-white">OBILLZ</span>
                   </div>
                   <div className="mt-6 grid gap-4">
                     <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Revenus</p>
-                      <p className="mt-2 text-2xl font-semibold text-slate-900">€18 420</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Factures</p>
+                      <p className="mt-2 text-2xl font-semibold text-slate-900">€12 300</p>
                       <div className="mt-4 h-2 w-full rounded-full bg-indigo-100">
-                        <div className="h-2 w-2/3 rounded-full bg-indigo-600" />
+                        <div className="h-2 w-3/4 rounded-full bg-indigo-600" />
                       </div>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
-                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Factures</p>
-                        <p className="mt-2 text-lg font-semibold text-slate-900">12 en cours</p>
-                        <p className="mt-1 text-xs text-slate-500">3 en attente</p>
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Devis</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">8 envoyés</p>
+                        <p className="mt-1 text-xs text-slate-500">2 en attente</p>
                       </div>
                       <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
                         <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Dépenses</p>
-                        <p className="mt-2 text-lg font-semibold text-slate-900">€4 980</p>
-                        <p className="mt-1 text-xs text-slate-500">Échéances à 7 jours</p>
+                        <p className="mt-2 text-lg font-semibold text-slate-900">€3 480</p>
+                        <p className="mt-1 text-xs text-slate-500">Échéances à 10 jours</p>
                       </div>
                     </div>
                     <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Actions clés</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Suivi</p>
                       <div className="mt-3 grid gap-2 text-xs text-slate-600 md:grid-cols-3">
                         {["Relance #2043", "Paiement reçu", "Échéance dépense"].map((item) => (
                           <div key={item} className="rounded-lg bg-indigo-50 px-3 py-2">
@@ -215,7 +237,10 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <p className="mt-4 text-xs text-slate-400">Mockup dashboard (placeholder).</p>
+                <div className="mt-6 rounded-[24px] border border-slate-200 bg-white p-5 text-sm text-slate-600 shadow-[0_16px_36px_rgba(15,23,42,0.08)]">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Visuel abstrait</p>
+                  <div className="mt-4 h-28 rounded-2xl bg-gradient-to-r from-indigo-100 via-violet-100 to-blue-100" />
+                </div>
               </div>
             </div>
           </div>
