@@ -1,6 +1,6 @@
 import Link from "next/link";
 import DeleteClientButton from "./components/DeleteClientButton";
-import { Download, Info, Plus } from "@/lib/icons";
+import { Info, Plus } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/server";
 import I18nText from "@/components/I18nText";
 
@@ -91,13 +91,6 @@ export default async function ClientsPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <a
-            href="/api/export?resource=clients"
-            className="px-5 py-2.5 rounded-full border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
-          >
-            <Download className="w-5 h-5" />
-            <I18nText id="dashboard.clients.exportAction" />
-          </a>
           <Link
             href="/tableau-de-bord/clients/nouveau"
             className="px-6 py-3 accent-bg text-white font-semibold rounded-full transition-all flex items-center gap-2 shadow-premium hover:shadow-premium-hover"

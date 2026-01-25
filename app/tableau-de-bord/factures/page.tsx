@@ -151,13 +151,6 @@ export default function FacturesPage() {
               </div>
             )}
           </div>
-          <a
-            href="/api/export?resource=invoices"
-            className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
-          >
-            <Download className="w-5 h-5" />
-            {t("dashboard.invoices.exportAction")}
-          </a>
           <Link
             href="/tableau-de-bord/factures/nouvelle"
             className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
