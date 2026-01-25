@@ -222,7 +222,6 @@
     "brandLabel": "Dashboard",
     "navigation": {
       "primary": "Navigation",
-      "secondary": "Suivi",
       "backHome": "Retour à l'accueil"
     },
     "nav": {
@@ -231,9 +230,6 @@
       "quotes": "Devis",
       "invoices": "Factures",
       "expenses": "Dépenses",
-      "assistant": "Assistant IA",
-      "reminders": "À ne pas oublier",
-      "calendar": "Calendrier",
       "settings": "Paramètres"
     },
     "pageTitles": {
@@ -244,131 +240,13 @@
       "quotes": "Devis",
       "invoices": "Factures",
       "expenses": "Dépenses",
-      "calendar": "Calendrier",
-      "settings": "Paramètres",
-      "assistant": "Assistant IA",
-      "reminders": "À ne pas oublier"
+      "settings": "Paramètres"
     },
     "topbar": {
       "upToDate": "Tout est à jour",
       "connectedAs": "Connecté :",
       "userFallback": "Utilisateur",
       "logout": "Se déconnecter"
-    },
-    "assistant": {
-      "badge": "Assistant administratif",
-      "title": "Votre assistant administratif intelligent",
-      "subtitle": "Rédigez, reformulez, traduisez et envoyez vos emails.",
-      "openButton": "Assistant IA",
-      "close": "Fermer",
-      "language": "Langue de l'email",
-      "languages": {
-        "fr": "Français",
-        "en": "Anglais",
-        "de": "Allemand"
-      },
-      "tabs": {
-        "compose": "Rédiger",
-        "rephrase": "Reformuler",
-        "translate": "Traduire"
-      },
-      "compose": {
-        "typeLabel": "Type d'email",
-        "types": {
-          "invoice_followup": "Relance de facture",
-          "quote_send": "Envoi de devis",
-          "payment_reminder": "Rappel de paiement",
-          "generic": "Email professionnel"
-        },
-        "instructionLabel": "Consigne (optionnel)",
-        "instructionPlaceholder": "Ex : relance polie avec mention de la date d'échéance"
-      },
-      "rephrase": {
-        "toneLabel": "Ton",
-        "tones": {
-          "professional": "Professionnel",
-          "firm": "Plus ferme",
-          "courteous": "Plus courtois",
-          "correct": "Corriger la grammaire"
-        },
-        "sourceLabel": "Texte à reformuler",
-        "sourcePlaceholder": "Collez votre email ici"
-      },
-      "translate": {
-        "sourceLabel": "Texte à traduire",
-        "sourcePlaceholder": "Collez votre email ici",
-        "note": "Traduction en {language}"
-      },
-      "generate": "Générer",
-      "generating": "Génération...",
-      "editor": {
-        "title": "Email",
-        "recipient": "Destinataire",
-        "recipientPlaceholder": "client@exemple.com",
-        "subject": "Objet",
-        "subjectPlaceholder": "Objet de l'email",
-        "body": "Contenu",
-        "bodyPlaceholder": "Contenu de l'email"
-      },
-      "send": "Envoyer",
-      "sending": "Envoi...",
-      "messages": {
-        "sent": "Email envoyé avec succès"
-      },
-      "errors": {
-        "generate": "Erreur lors de la génération",
-        "send": "Erreur lors de l'envoi",
-        "missingFields": "Destinataire, objet et contenu requis",
-        "history": "Erreur lors du chargement de l'historique"
-      },
-      "history": {
-        "title": "Historique des emails",
-        "empty": "Aucun email envoyé pour cet élément.",
-        "loading": "Chargement de l'historique..."
-      },
-      "context": {
-        "client": "Client",
-        "document": "Document",
-        "amount": "Montant"
-      }
-    },
-    "assistantPage": {
-      "title": "Assistant IA",
-      "subtitle": "Un espace dédié pour échanger avec votre assistant administratif.",
-      "quickActions": {
-        "title": "Actions courantes",
-        "invoiceFollowup": "Rédiger un email de relance",
-        "professional": "Rédiger un email professionnel",
-        "rephrase": "Reformuler ce message",
-        "translate": "Traduire en anglais / allemand"
-      },
-      "templates": {
-        "invoiceFollowup": "Rédige une relance polie pour une facture en attente.",
-        "professional": "Rédige un email professionnel pour un client.",
-        "rephrase": "Peux-tu reformuler ce message de manière professionnelle ?",
-        "translate": "Traduis ce message dans la langue sélectionnée."
-      },
-      "emptyState": "Décrivez votre besoin pour démarrer la conversation.",
-      "subjectPrefix": "Objet :",
-      "controls": {
-        "action": "Mode",
-        "language": "Langue",
-        "composeType": "Type d'email",
-        "tone": "Ton",
-        "inputLabel": "Votre message",
-        "inputPlaceholder": "Ex : rédige une relance pour la facture 2024-18",
-        "send": "Envoyer",
-        "sending": "Envoi..."
-      },
-      "email": {
-        "title": "Envoyer l'email",
-        "subtitle": "Vérifiez le contenu avant envoi.",
-        "send": "Envoyer l'email",
-        "sending": "Envoi de l'email..."
-      },
-      "errors": {
-        "emptyMessage": "Veuillez saisir un message."
-      }
     },
     "common": {
       "loading": "Chargement...",
@@ -728,7 +606,6 @@
         "clients": "Clients",
         "quotes": "Devis",
         "invoices": "Factures",
-        "overdue": "En retard",
         "clientsEmpty": "Tout est prêt pour démarrer",
         "quotesPending": "en attente",
         "unpaid": "non payées",
@@ -744,17 +621,7 @@
       "types": {
         "expense": "Dépense",
         "invoice": "Facture",
-        "quote": "Devis",
-        "expense_due": "Échéance dépense",
-        "invoice_followup": "Relance facture",
-        "quote_followup": "Relance devis"
-      },
-      "calendar": {
-        "subtitle": "Reliez vos documents à des actions planifiées pour garder une vision claire.",
-        "open": "Ouvrir le calendrier",
-        "empty": "Aucun rappel planifié dans les 30 prochains jours. Ajoutez-en si besoin.",
-        "scheduled": "Planifié le",
-        "access": "Accéder"
+        "quote": "Devis"
       },
       "quickActions": {
         "title": "Actions rapides",
@@ -775,7 +642,6 @@
       "title": "Dépenses",
       "subtitle": "Suivez vos factures fournisseurs et gardez le contrôle sur vos échéances.",
       "exportAction": "Exporter",
-      "planReminder": "Planifier un rappel",
       "newExpense": "Nouvelle dépense",
       "addAction": "Ajouter la dépense",
       "createSuccess": "Dépense ajoutée avec succès.",
@@ -809,28 +675,6 @@
       "createError": "Erreur lors de la création de la dépense",
       "updateError": "Erreur lors de la mise à jour de la dépense",
       "deleteError": "Erreur lors de la suppression de la dépense"
-    },
-    "reminders": {
-      "title": "À ne pas oublier",
-      "subtitle": "Une vue claire et priorisée de ce qui nécessite votre attention.",
-      "allClear": "Tout est à jour. Rien d'urgent pour le moment.",
-      "emptySection": "Aucun élément à afficher pour le moment.",
-      "table": {
-        "type": "Type",
-        "name": "Nom",
-        "amount": "Montant",
-        "dueDate": "Date d'échéance",
-        "link": "Lien"
-      },
-      "types": {
-        "expense": "Dépense",
-        "invoice": "Facture",
-        "quote": "Devis"
-      },
-      "overdueTitle": "🔴 Priorité — En retard",
-      "overdueSubtitle": "Éléments dont la date d'échéance est dépassée.",
-      "upcomingTitle": "🟠 À venir prochainement",
-      "upcomingSubtitle": "Dépenses à payer bientôt et devis envoyés sans réponse."
     },
     "subscription": {
       "title": "Abonnement",

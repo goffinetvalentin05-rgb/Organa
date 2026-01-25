@@ -13,7 +13,6 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import EmailHistoryList from "@/components/assistant/EmailHistoryList";
 
 interface Devis {
   id: string;
@@ -436,7 +435,6 @@ export default function DevisDetailPage() {
         </div>
       </div>
 
-      <EmailHistoryList relatedType="devis" relatedId={devis.id} clientId={devis.clientId ?? undefined} />
     </div>
   );
 }

@@ -10,10 +10,7 @@ import {
   Receipt,
   UserPlus,
   FilePlus,
-  AlertCircle,
-  Calendar,
   CheckCircle,
-  ArrowRight,
 } from "@/lib/icons";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
@@ -49,7 +46,7 @@ interface Depense {
 
 type ATraiterItem = {
   id: string;
-  type: "expense" | "invoice" | "quote" | "expense_due" | "invoice_followup" | "quote_followup";
+  type: "expense" | "invoice" | "quote";
   nom: string;
   date: string;
   montant?: number;
@@ -82,14 +79,12 @@ export default function TableauDeBordPage() {
     devisEnAttente: 0,
     totalFactures: 0,
     facturesNonPayees: 0,
-    elementsEnRetard: 0,
     montantFactureMois: 0,
     montantDepensesMois: 0,
   });
 
   const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
   const [aTraiterMaintenant, setATraiterMaintenant] = useState<ATraiterItem[]>([]);
-  const [suiviCalendrier, setSuiviCalendrier] = useState<ATraiterItem[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -121,22 +116,12 @@ export default function TableauDeBordPage() {
         const devisEnAttente = devis.filter((devisItem) => devisItem.statut === "envoye").length;
         const facturesNonPayees = factures.filter((facture) => facture.statut !== "paye").length;
 
-        const depensesRetard = depenses.filter(
-          (depense) => depense.statut === "a_payer" && isPast(depense.dateEcheance)
-        );
-        const facturesRetard = factures.filter(
-          (facture) =>
-            (facture.statut === "envoye" || facture.statut === "en-retard") &&
-            isPast(facture.dateEcheance || facture.dateCreation)
-        );
-
         setStats({
           totalClients: clients.length,
           totalDevis: devis.length,
           devisEnAttente,
           totalFactures: factures.length,
           facturesNonPayees,
-          elementsEnRetard: depensesRetard.length + facturesRetard.length,
           montantFactureMois: facturesMois.reduce(
             (total, facture) => total + getMontantDocument(facture),
             0
@@ -161,8 +146,6 @@ export default function TableauDeBordPage() {
         const aTraiter = buildATraiterMaintenant(devis, factures, depenses);
         setATraiterMaintenant(aTraiter);
 
-        const suivi = buildSuiviCalendrier(devis, factures, depenses);
-        setSuiviCalendrier(suivi);
       } catch (error) {
         console.error("[TableauDeBord] Erreur chargement:", error);
         setStats({
@@ -171,13 +154,11 @@ export default function TableauDeBordPage() {
           devisEnAttente: 0,
           totalFactures: 0,
           facturesNonPayees: 0,
-          elementsEnRetard: 0,
           montantFactureMois: 0,
           montantDepensesMois: 0,
         });
         setDerniersDocuments([]);
         setATraiterMaintenant([]);
-        setSuiviCalendrier([]);
       }
     };
 
@@ -326,57 +307,6 @@ export default function TableauDeBordPage() {
     return items.sort((a, b) => a.date.localeCompare(b.date));
   };
 
-  const buildSuiviCalendrier = (
-    devis: DocumentItem[],
-    factures: DocumentItem[],
-    depenses: Depense[]
-  ): ATraiterItem[] => {
-    const items: ATraiterItem[] = [];
-
-    depenses.forEach((depense) => {
-      if (depense.statut !== "a_payer") return;
-      if (isPast(depense.dateEcheance) || !isWithinDays(depense.dateEcheance, 30)) {
-        return;
-      }
-      items.push({
-        id: `suivi-depense-${depense.id}`,
-        type: "expense_due",
-        nom: depense.fournisseur,
-        date: depense.dateEcheance,
-        montant: depense.montant,
-        href: "/tableau-de-bord/depenses",
-      });
-    });
-
-    factures.forEach((facture) => {
-      if (facture.statut !== "envoye" && facture.statut !== "en-retard") return;
-      const dateRef = facture.dateEcheance || facture.dateCreation;
-      if (isPast(dateRef) || !isWithinDays(dateRef, 30)) return;
-      items.push({
-        id: `suivi-facture-${facture.id}`,
-        type: "invoice_followup",
-        nom: facture.client?.nom || t("dashboard.common.unknownClient"),
-        date: dateRef || facture.dateCreation,
-        montant: getMontantDocument(facture),
-        href: `/tableau-de-bord/factures/${facture.id}`,
-      });
-    });
-
-    devis.forEach((devisItem) => {
-      if (devisItem.statut !== "envoye") return;
-      if (isPast(devisItem.dateCreation) || !isWithinDays(devisItem.dateCreation, 30)) return;
-      items.push({
-        id: `suivi-devis-${devisItem.id}`,
-        type: "quote_followup",
-        nom: devisItem.client?.nom || t("dashboard.common.unknownClient"),
-        date: devisItem.dateEcheance || devisItem.dateCreation,
-        montant: getMontantDocument(devisItem),
-        href: `/tableau-de-bord/devis/${devisItem.id}`,
-      });
-    });
-
-    return items.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5);
-  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">
@@ -400,7 +330,7 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link
           href="/tableau-de-bord/clients"
           className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-accent-border transition-all duration-200"
@@ -464,25 +394,6 @@ export default function TableauDeBordPage() {
           )}
         </Link>
 
-        <Link
-          href="/tableau-de-bord/a-ne-pas-oublier"
-          className="group relative rounded-[24px] border border-subtle bg-surface p-6 shadow-premium hover:shadow-premium-hover hover:border-red-500/30 transition-all duration-200"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-body text-secondary text-sm font-medium">{t("dashboard.overview.kpis.overdue")}</span>
-            <div style={{ color: 'var(--error)' }}>
-              <AlertCircle className="w-6 h-6" />
-            </div>
-          </div>
-          <div className="font-heading text-4xl font-bold" style={{ color: 'var(--error)' }}>
-            {stats.elementsEnRetard}
-          </div>
-          {stats.elementsEnRetard === 0 && (
-            <div className="mt-3 font-body text-sm text-secondary">
-              {t("dashboard.overview.kpis.allClear")}
-            </div>
-          )}
-        </Link>
       </div>
 
       {/* À traiter maintenant */}
@@ -528,67 +439,6 @@ export default function TableauDeBordPage() {
                         {formatMontant(item.montant)}
                       </div>
                       <div className="font-body text-xs text-tertiary">{t("dashboard.overview.now.viewDetail")}</div>
-                    </div>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Suivi & calendrier */}
-      <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="font-heading text-2xl font-semibold text-primary">
-              Suivi &amp; calendrier
-            </h2>
-            <p className="mt-2 text-sm text-secondary">
-              {t("dashboard.overview.calendar.subtitle")}
-            </p>
-          </div>
-          <Link
-            href="/tableau-de-bord/calendrier"
-            className="inline-flex items-center gap-2 rounded-full border border-accent-border bg-accent-light px-4 py-2 text-xs font-semibold text-primary transition-all hover:opacity-90"
-          >
-            <Calendar className="w-4 h-4" />
-            {t("dashboard.overview.calendar.open")}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {suiviCalendrier.length === 0 ? (
-          <div className="mt-6 flex items-center gap-3 rounded-[24px] border border-subtle bg-surface px-5 py-4 text-secondary">
-            <CheckCircle className="w-5 h-5 text-success" />
-            <p className="font-body text-sm">
-              {t("dashboard.overview.calendar.empty")}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-6 grid gap-4">
-            {suiviCalendrier.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="flex flex-col gap-3 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs uppercase tracking-wide text-tertiary">
-                      {t(`dashboard.overview.types.${item.type}`)}
-                    </div>
-                    <div className="text-base font-semibold text-primary">{item.nom}</div>
-                    <div className="text-sm text-secondary">
-                      {t("dashboard.overview.calendar.scheduled")} {formatDate(item.date)}
-                    </div>
-                  </div>
-                  {typeof item.montant === "number" && (
-                    <div className="text-right">
-                      <div className="text-base font-semibold text-primary">
-                        {formatMontant(item.montant)}
-                      </div>
-                      <div className="text-xs text-tertiary">{t("dashboard.overview.calendar.access")}</div>
                     </div>
                   )}
                 </div>

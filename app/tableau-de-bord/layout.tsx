@@ -12,12 +12,9 @@ import {
   Users,
   FileText,
   Receipt,
-  Calendar,
   Settings,
   Home,
-  AlertTriangle,
   CheckCircle,
-  Mail,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -90,12 +87,6 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
     { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Receipt },
-    { name: t("dashboard.nav.assistant"), href: "/tableau-de-bord/assistant-ia", icon: Mail },
-  ];
-
-  const secondaryNavigation = [
-    { name: t("dashboard.nav.reminders"), href: "/tableau-de-bord/a-ne-pas-oublier", icon: AlertTriangle },
-    { name: t("dashboard.nav.calendar"), href: "/tableau-de-bord/calendrier", icon: Calendar },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
 
@@ -116,10 +107,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
-    if (pathname.startsWith("/tableau-de-bord/calendrier")) return t("dashboard.pageTitles.calendar");
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
-    if (pathname.startsWith("/tableau-de-bord/assistant-ia")) return t("dashboard.pageTitles.assistant");
-    if (pathname.startsWith("/tableau-de-bord/a-ne-pas-oublier")) return t("dashboard.pageTitles.reminders");
     return t("dashboard.pageTitles.dashboard");
   };
 
@@ -170,31 +158,6 @@ export default function DashboardLayout({
               </div>
             </div>
 
-            <div>
-              <p className="px-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-tertiary">
-                {t("dashboard.navigation.secondary")}
-              </p>
-              <div className="mt-4 space-y-2">
-                {secondaryNavigation.map((item) => {
-                  const IconComponent = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`font-body flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                        active
-                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_12px_30px_rgba(37,99,235,0.18)]"
-                          : "text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle"
-                      }`}
-                    >
-                      <IconComponent className={`w-5 h-5 ${active ? "text-accent" : "text-secondary"}`} />
-                      <span className="font-medium">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
           </nav>
 
           {/* Footer sidebar */}
