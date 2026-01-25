@@ -698,6 +698,9 @@
       "loadError": "Fehler beim Laden der Rechnungen",
       "deleteConfirm": "Möchten Sie diese Rechnung wirklich löschen?",
       "deleteError": "Fehler beim Löschen der Rechnung",
+      "exportAccountingAction": "Export für die Buchhaltung",
+      "exportAccountingYearLabel": "Geschäftsjahr",
+      "exportAccountingDownload": "Export herunterladen",
       "emptyState": "Noch keine Rechnungen",
       "emptyCta": "Erste Rechnung erstellen"
     },

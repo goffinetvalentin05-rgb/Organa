@@ -576,6 +576,9 @@
       "loadError": "Erreur lors du chargement des factures",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette facture ?",
       "deleteError": "Erreur lors de la suppression de la facture",
+      "exportAccountingAction": "Exporter pour la comptabilité",
+      "exportAccountingYearLabel": "Année comptable",
+      "exportAccountingDownload": "Télécharger l'export",
       "emptyState": "Aucune facture pour le moment",
       "emptyCta": "Créer votre première facture"
     },

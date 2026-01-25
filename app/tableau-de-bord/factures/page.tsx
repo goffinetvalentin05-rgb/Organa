@@ -21,6 +21,12 @@ export default function FacturesPage() {
   const [factures, setFactures] = useState<Facture[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const currentYear = new Date().getFullYear();
+  const [showAccountingExport, setShowAccountingExport] = useState(false);
+  const [accountingYear, setAccountingYear] = useState<string>(String(currentYear));
+  const accountingYears = Array.from({ length: 5 }, (_, index) =>
+    String(currentYear - index)
+  );
 
   useEffect(() => {
     void loadFactures();
@@ -95,6 +101,12 @@ export default function FacturesPage() {
     return labels[statut] || statut;
   };
 
+  const handleExportAccounting = () => {
+    const url = `/api/export/accounting?year=${accountingYear}`;
+    window.location.href = url;
+    setShowAccountingExport(false);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* En-tête */}
@@ -104,6 +116,41 @@ export default function FacturesPage() {
           <p className="mt-2 text-secondary">{t("dashboard.invoices.subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowAccountingExport((value) => !value)}
+              className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
+            >
+              <Download className="w-5 h-5" />
+              {t("dashboard.invoices.exportAccountingAction")}
+            </button>
+            {showAccountingExport && (
+              <div className="absolute right-0 mt-3 w-64 rounded-xl border border-subtle bg-white p-4 shadow-premium z-10">
+                <label className="block text-sm text-secondary mb-2">
+                  {t("dashboard.invoices.exportAccountingYearLabel")}
+                </label>
+                <select
+                  value={accountingYear}
+                  onChange={(event) => setAccountingYear(event.target.value)}
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                >
+                  {accountingYears.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleExportAccounting}
+                  className="mt-4 w-full rounded-lg accent-bg text-white py-2 text-sm font-medium"
+                >
+                  {t("dashboard.invoices.exportAccountingDownload")}
+                </button>
+              </div>
+            )}
+          </div>
           <a
             href="/api/export?resource=invoices"
             className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
