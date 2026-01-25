@@ -5,9 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
-import { calendrierAPI } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Eye, Download, Mail, Trash, FileText } from "@/lib/icons";
+import { Eye, Download, Mail, Trash } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 
@@ -180,32 +179,6 @@ export default function FactureDetailPage() {
     }
   };
 
-  const handleCreerTacheRelance = () => {
-    if (!facture) return;
-    
-    const dateEcheance = facture.dateEcheance 
-      ? new Date(facture.dateEcheance)
-      : new Date();
-    dateEcheance.setDate(dateEcheance.getDate() + 7); // 7 jours après l'échéance
-
-    calendrierAPI.create({
-      titre: t("dashboard.invoices.detail.followupTaskTitle", { number: facture.numero || "" }),
-      description: t("dashboard.invoices.detail.followupTaskDescription", {
-        client: facture.client?.nom || "",
-        number: facture.numero || "",
-      }),
-      date: new Date().toISOString().split("T")[0],
-      type: "tache",
-      statut: "a-faire",
-      typeTache: "relance",
-      dateEcheance: dateEcheance.toISOString().split("T")[0],
-      factureId: facture.id || "",
-    });
-
-    if (typeof toast !== "undefined" && toast.success) {
-      toast.success(t("dashboard.invoices.detail.followupTaskCreated"));
-    }
-  };
 
   if (!facture) {
     return (
@@ -306,15 +279,6 @@ export default function FactureDetailPage() {
             <Download className="w-4 h-4" />
             {t("dashboard.invoices.detail.downloadPdf")}
           </button>
-          {facture.statut !== "paye" && (
-            <button
-              onClick={handleCreerTacheRelance}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all flex items-center gap-2 border border-subtle"
-            >
-              <FileText className="w-4 h-4" />
-              {t("dashboard.invoices.detail.createFollowup")}
-            </button>
-          )}
           <button
             onClick={handleDelete}
             className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"

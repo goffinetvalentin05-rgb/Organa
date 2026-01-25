@@ -46,10 +46,12 @@ interface Depense {
 
 type ATraiterItem = {
   id: string;
-  type: "expense" | "invoice" | "quote";
-  nom: string;
+  numero: string;
+  client: string;
   date: string;
-  montant?: number;
+  montant: number;
+  statutLabel: string;
+  statutColor: string;
   href: string;
 };
 
@@ -143,7 +145,7 @@ export default function TableauDeBordPage() {
 
         setDerniersDocuments(tousDocuments);
 
-        const aTraiter = buildATraiterMaintenant(devis, factures, depenses);
+        const aTraiter = buildATraiterMaintenant(factures);
         setATraiterMaintenant(aTraiter);
 
       } catch (error) {
@@ -256,51 +258,25 @@ export default function TableauDeBordPage() {
   };
 
   const buildATraiterMaintenant = (
-    devis: DocumentItem[],
-    factures: DocumentItem[],
-    depenses: Depense[]
+    factures: DocumentItem[]
   ): ATraiterItem[] => {
     const items: ATraiterItem[] = [];
-
-    depenses.forEach((depense) => {
-      if (depense.statut !== "a_payer") return;
-      if (!isPast(depense.dateEcheance) && !isWithinDays(depense.dateEcheance, 7)) {
-        return;
-      }
-      items.push({
-        id: `depense-${depense.id}`,
-        type: "expense",
-        nom: depense.fournisseur,
-        date: depense.dateEcheance,
-        montant: depense.montant,
-        href: "/tableau-de-bord/depenses",
-      });
-    });
+    const followUpLabel = t("hero.paymentsCard.statuses.followUp");
+    const overdueLabel = t("dashboard.status.generic.overdue");
 
     factures.forEach((facture) => {
-      if (facture.statut !== "envoye" && facture.statut !== "en-retard") return;
+      if (facture.statut === "paye" || facture.statut === "brouillon") return;
       const dateRef = facture.dateEcheance || facture.dateCreation;
-      if (!isPast(dateRef) && !isWithinDays(dateRef, 7)) return;
+      const isOverdue = !!facture.dateEcheance && isPast(facture.dateEcheance);
       items.push({
-        id: `facture-${facture.id}`,
-        type: "invoice",
-        nom: facture.client?.nom || t("dashboard.common.unknownClient"),
+        id: facture.id,
+        numero: facture.numero,
+        client: facture.client?.nom || t("dashboard.common.unknownClient"),
         date: dateRef || facture.dateCreation,
         montant: getMontantDocument(facture),
+        statutLabel: isOverdue ? overdueLabel : followUpLabel,
+        statutColor: isOverdue ? "bg-error-bg text-error" : "bg-accent-light text-accent",
         href: `/tableau-de-bord/factures/${facture.id}`,
-      });
-    });
-
-    devis.forEach((devisItem) => {
-      if (devisItem.statut !== "envoye") return;
-      if (!isOlderThanDays(devisItem.dateCreation, 7)) return;
-      items.push({
-        id: `devis-${devisItem.id}`,
-        type: "quote",
-        nom: devisItem.client?.nom || t("dashboard.common.unknownClient"),
-        date: devisItem.dateEcheance || devisItem.dateCreation,
-        montant: getMontantDocument(devisItem),
-        href: `/tableau-de-bord/devis/${devisItem.id}`,
       });
     });
 
@@ -416,33 +392,43 @@ export default function TableauDeBordPage() {
         ) : (
           <div className="mt-6 space-y-4">
             {aTraiterMaintenant.map((item) => (
-              <Link
+              <div
                 key={item.id}
-                href={item.href}
                 className="flex flex-col gap-4 rounded-[24px] border border-subtle bg-surface p-6 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <div className="font-body text-xs uppercase tracking-wide text-secondary">
-                      {t(`dashboard.overview.types.${item.type}`)}
+                      {t("dashboard.overview.types.invoice")}
                     </div>
                     <div className="font-body font-semibold text-lg text-primary">
-                      {item.nom}
+                      {item.numero}
+                    </div>
+                    <div className="font-body text-sm text-secondary">
+                      {item.client}
                     </div>
                     <div className="font-body text-sm text-secondary">
                       {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
                     </div>
                   </div>
-                  {typeof item.montant === "number" && (
-                    <div className="text-right">
-                      <div className="font-body font-bold text-lg text-primary">
-                        {formatMontant(item.montant)}
-                      </div>
-                      <div className="font-body text-xs text-tertiary">{t("dashboard.overview.now.viewDetail")}</div>
+                  <div className="text-right">
+                    <div className="font-body font-bold text-lg text-primary">
+                      {formatMontant(item.montant)}
                     </div>
-                  )}
+                    <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${item.statutColor}`}>
+                      {item.statutLabel}
+                    </span>
+                  </div>
                 </div>
-              </Link>
+                <div className="flex justify-end">
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center justify-center rounded-full border border-subtle bg-white px-4 py-2 text-xs font-semibold text-secondary transition-all hover:text-primary"
+                  >
+                    Voir la facture
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         )}
