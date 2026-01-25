@@ -69,12 +69,28 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { label, description, amount, date, status, notes } = body || {};
+    const {
+      label,
+      description,
+      amount,
+      date,
+      status,
+      notes,
+      attachmentUrl,
+      attachment_url,
+    } = body || {};
 
     const descriptionValue = label ?? description;
-    if (!descriptionValue || !date || typeof amount !== "number") {
+    if (
+      !descriptionValue ||
+      typeof descriptionValue !== "string" ||
+      !date ||
+      typeof date !== "string" ||
+      typeof amount !== "number" ||
+      !Number.isFinite(amount)
+    ) {
       return NextResponse.json(
-        { error: "Données invalides" },
+        { error: "Données invalides", details: "description, date ou montant" },
         { status: 400 }
       );
     }
@@ -84,9 +100,9 @@ export async function POST(request: NextRequest) {
       description: String(descriptionValue).trim(),
       amount,
       date,
-      status: status || "a_payer",
+      status: status === "paye" ? "paye" : "a_payer",
       notes: notes || null,
-      attachment_url: null,
+      attachment_url: attachment_url ?? attachmentUrl ?? null,
     };
 
     console.log("[API][depenses][POST] user:", user);

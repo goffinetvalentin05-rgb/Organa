@@ -228,12 +228,24 @@ export default function DepensesPage() {
       .upload(filePath, file, { upsert: false });
 
     if (uploadError) {
-      throw new Error(t("dashboard.expenses.uploadError"));
+      console.error("[Depenses][upload] Erreur upload:", {
+        message: uploadError.message,
+        statusCode: (uploadError as any).statusCode,
+        error: uploadError,
+      });
+      throw new Error(
+        uploadError.message || t("dashboard.expenses.uploadError")
+      );
     }
 
     const { data: publicUrlData } = supabase.storage
       .from("expenses")
       .getPublicUrl(filePath);
+
+    if (!publicUrlData?.publicUrl) {
+      console.error("[Depenses][upload] URL publique manquante:", publicUrlData);
+      throw new Error(t("dashboard.expenses.uploadError"));
+    }
 
     return publicUrlData.publicUrl;
   };
@@ -249,7 +261,7 @@ export default function DepensesPage() {
     console.log("submit fired");
     const amount = Number.parseFloat(formData.amount);
     if (!formData.label || !formData.date || Number.isNaN(amount)) {
-      setErrorMessage(t("dashboard.expenses.createError"));
+      setErrorMessage(`${t("dashboard.expenses.createError")} | Données invalides`);
       return;
     }
 
@@ -277,12 +289,22 @@ export default function DepensesPage() {
         throw new Error(t("dashboard.expenses.createError"));
       }
 
+      let attachmentUrl: string | null = null;
+      if (formData.pieceJointe) {
+        attachmentUrl = await uploadAttachment(
+          supabase,
+          user.id,
+          formData.pieceJointe
+        );
+      }
+
       const payload = {
         label: formData.label.trim(),
         amount,
         date: formattedDate,
         status: formData.status,
         notes: formData.notes.trim() || null,
+        attachmentUrl: attachmentUrl || null,
       };
 
       console.log("[Depenses][create] user:", user);
@@ -298,30 +320,12 @@ export default function DepensesPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.error || t("dashboard.expenses.createError"));
-      }
-
-      const createdId = data?.depense?.id as string | undefined;
-      if (formData.pieceJointe && createdId) {
-        try {
-          const attachmentUrl = await uploadAttachment(
-            supabase,
-            user.id,
-            formData.pieceJointe
-          );
-          const { error: updateError } = await supabase
-            .from("expenses")
-            .update({ attachment_url: attachmentUrl })
-            .eq("id", createdId)
-            .eq("user_id", user.id);
-          if (updateError) {
-            console.warn("[Depenses] Mise à jour pièce jointe échouée:", updateError);
-            setWarningMessage(t("dashboard.expenses.uploadWarning"));
-          }
-        } catch (uploadError) {
-          console.warn("[Depenses] Upload pièce jointe échoué:", uploadError);
-          setWarningMessage(t("dashboard.expenses.uploadWarning"));
-        }
+        const messageParts = [
+          data?.error || t("dashboard.expenses.createError"),
+          data?.details ? `details: ${data.details}` : null,
+          data?.code ? `code: ${data.code}` : null,
+        ].filter(Boolean);
+        throw new Error(messageParts.join(" | "));
       }
 
       await loadDepenses();
@@ -329,7 +333,7 @@ export default function DepensesPage() {
       setShowForm(false);
       setSuccessMessage(t("dashboard.expenses.createSuccess"));
     } catch (error) {
-      console.error(error);
+      console.error("[Depenses][create] Erreur attrapée:", error);
       setErrorMessage(
         error instanceof Error ? error.message : t("dashboard.expenses.createError")
       );
