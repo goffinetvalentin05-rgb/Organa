@@ -7,12 +7,12 @@ export default function LandingNav() {
       <div className="mx-auto max-w-7xl">
         <div className="flex items-center justify-between rounded-full border border-slate-200 bg-white px-7 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur">
           <Link href="/" className="flex items-center">
-            <div className="relative -ml-1 h-[52px] w-52 sm:h-16 sm:w-60">
+            <div className="relative -ml-2 h-[52px] w-64 sm:h-16 sm:w-80">
               <Image
                 src="/logo-obillz.png"
                 alt="OBILLZ — La facturation en deux clics"
                 fill
-                className="object-contain"
+                className="object-contain object-left"
                 priority
               />
             </div>
