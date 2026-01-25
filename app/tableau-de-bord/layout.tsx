@@ -131,23 +131,14 @@ export default function DashboardLayout({
           {/* Logo */}
           <div className="p-6 border-b border-subtle">
             <Link href="/tableau-de-bord" className="flex items-center gap-4 group">
-              {companyLogo ? (
-                <Image
-                  src={companyLogo}
-                  alt={companyName}
-                  width={160}
-                  height={42}
-                  className="h-auto max-h-12 w-auto transition-transform group-hover:scale-105 object-contain"
-                />
-              ) : (
-                <Image
-                  src="/organa-logo.png"
-                  alt="Organa"
-                  width={160}
-                  height={32}
-                  className="h-auto transition-transform group-hover:scale-105"
-                />
-              )}
+              <Image
+                src="/logo-obillz.png"
+                alt="OBILLZ — La facturation en deux clics"
+                width={180}
+                height={48}
+                className="h-auto max-h-12 w-auto transition-transform group-hover:scale-105 object-contain"
+                priority
+              />
             </Link>
           </div>
 
@@ -224,25 +215,7 @@ export default function DashboardLayout({
         {/* Topbar */}
         <header className="sticky top-0 z-30 bg-surface border-b border-subtle">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center px-6 py-3">
-            <div className="flex items-center gap-4">
-              {companyLogo ? (
-                <Image
-                  src={companyLogo}
-                  alt={companyName}
-                  width={120}
-                  height={32}
-                  className="h-8 w-auto object-contain"
-                />
-              ) : (
-                <Image
-                  src="/organa-logo.png"
-                  alt="Organa"
-                  width={120}
-                  height={28}
-                  className="h-8 w-auto object-contain"
-                />
-              )}
-            </div>
+            <div className="flex items-center gap-4" />
             <div className="flex items-center justify-center">
               <div className="rounded-full border border-subtle bg-surface-hover px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
                 {getPageTitle()}
