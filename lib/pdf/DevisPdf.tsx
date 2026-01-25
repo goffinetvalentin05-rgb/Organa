@@ -11,95 +11,118 @@ import {
 // Styles pour le PDF
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 48,
     fontSize: 10,
     fontFamily: "Helvetica",
+    color: "#0F172A",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 30,
-    paddingBottom: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: "#3B82F6",
+    alignItems: "flex-start",
+    marginBottom: 24,
   },
-  logoSection: {
-    width: "40%",
+  companyBlock: {
+    width: "58%",
+  },
+  companyTop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
   logo: {
-    maxHeight: 80,
-    maxWidth: 200,
-  },
-  companyInfo: {
-    width: "55%",
-    textAlign: "right",
+    maxHeight: 56,
+    maxWidth: 160,
+    marginRight: 12,
   },
   companyName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#3B82F6",
-    marginBottom: 5,
+    marginBottom: 4,
   },
   companyDetails: {
-    fontSize: 8,
-    color: "#666",
-    lineHeight: 1.5,
+    fontSize: 9,
+    color: "#475569",
+    lineHeight: 1.4,
+  },
+  documentBlock: {
+    width: "38%",
+    alignItems: "flex-end",
   },
   documentType: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#3B82F6",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  documentNumber: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 30,
-  },
-  documentInfo: {
-    flexDirection: "row",
-    marginBottom: 30,
-    gap: 20,
-  },
-  infoBlock: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
-    padding: 15,
-    borderRadius: 4,
-  },
-  infoBlockTitle: {
-    fontSize: 9,
-    color: "#666",
-    textTransform: "uppercase",
     marginBottom: 8,
-    fontWeight: "bold",
   },
-  infoBlockText: {
+  metaBox: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 6,
+    padding: 10,
+    backgroundColor: "#F8FAFC",
+  },
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     fontSize: 9,
-    color: "#333",
+    color: "#475569",
     marginBottom: 4,
+  },
+  metaLabel: {
+    color: "#64748B",
+  },
+  clientSection: {
+    marginBottom: 18,
+  },
+  sectionTitle: {
+    fontSize: 8,
+    color: "#64748B",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  clientBox: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 6,
+    padding: 12,
+  },
+  clientName: {
+    fontSize: 11,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  wrapText: {
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "normal",
   },
   table: {
     width: "100%",
-    marginBottom: 20,
+    marginTop: 6,
+    marginBottom: 16,
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#3B82F6",
-    color: "white",
-    padding: 10,
+    backgroundColor: "#F1F5F9",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
   },
   tableHeaderCell: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "bold",
     textTransform: "uppercase",
+    color: "#475569",
   },
   tableRow: {
     flexDirection: "row",
-    padding: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    borderBottomColor: "#E5E7EB",
+    alignItems: "flex-start",
   },
   tableCell: {
     fontSize: 9,
@@ -111,58 +134,56 @@ const styles = StyleSheet.create({
     wordBreak: "break-word",
   },
   colDesignation: {
-    width: "50%",
+    width: "52%",
+    flexShrink: 1,
   },
   colQty: {
     width: "12%",
     textAlign: "right",
   },
   colPrice: {
-    width: "19%",
+    width: "18%",
     textAlign: "right",
   },
   colTotal: {
-    width: "19%",
+    width: "18%",
     textAlign: "right",
   },
   totals: {
-    marginTop: 20,
+    marginTop: 10,
     marginLeft: "auto",
-    width: 250,
+    width: 230,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 6,
+    padding: 10,
+    backgroundColor: "#F8FAFC",
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 6,
+    paddingVertical: 3,
     fontSize: 9,
-  },
-  totalRowSubtotal: {
-    color: "#666",
-  },
-  totalRowVat: {
-    color: "#666",
+    color: "#475569",
   },
   totalRowTotal: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
-    color: "#3B82F6",
-    borderTopWidth: 2,
-    borderTopColor: "#3B82F6",
-    paddingTop: 10,
-    marginTop: 5,
+    paddingTop: 6,
+    marginTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
   },
-  notes: {
-    marginTop: 30,
-    backgroundColor: "#F8F9FA",
-    padding: 15,
-    borderRadius: 4,
-    fontSize: 9,
+  footer: {
+    marginTop: 18,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
   },
-  notesTitle: {
+  footerText: {
     fontSize: 9,
-    color: "#666",
-    marginBottom: 8,
-    fontWeight: "bold",
+    color: "#475569",
+    lineHeight: 1.4,
   },
 });
 
@@ -174,6 +195,9 @@ interface DevisPdfProps {
     email?: string;
     phone?: string;
     logoUrl?: string;
+    iban?: string;
+    bankName?: string;
+    conditionsPaiement?: string;
   };
   client: {
     name: string;
@@ -232,17 +256,11 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
 }) => {
   // Styles dynamiques avec la couleur primaire
   const dynamicStyles = StyleSheet.create({
-    headerBorder: {
-      borderBottomColor: primaryColor,
-    },
     documentType: {
       color: primaryColor,
     },
     companyName: {
       color: primaryColor,
-    },
-    tableHeader: {
-      backgroundColor: primaryColor,
     },
     totalRowTotal: {
       color: primaryColor,
@@ -256,80 +274,74 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-        <View style={[styles.header, dynamicStyles.headerBorder]}>
-          <View style={styles.logoSection}>
-            {company.logoUrl && (
-              <Image src={company.logoUrl} style={styles.logo} />
-            )}
+        <View style={styles.header}>
+          <View style={styles.companyBlock}>
+            <View style={styles.companyTop}>
+              {company.logoUrl && (
+                <Image src={company.logoUrl} style={styles.logo} />
+              )}
+              <View>
+                <Text style={[styles.companyName, dynamicStyles.companyName]}>
+                  {company.name}
+                </Text>
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {company.address && `${company.address}\n`}
+                  {company.email && `${company.email}\n`}
+                  {company.phone}
+                </Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.companyInfo}>
-            <Text
-              style={[
-                styles.companyName,
-                dynamicStyles.companyName,
-                styles.textBlock,
-              ]}
-            >
-              {company.name}
+          <View style={styles.documentBlock}>
+            <Text style={[styles.documentType, dynamicStyles.documentType]}>
+              DEVIS
             </Text>
-            <Text style={[styles.companyDetails, styles.textBlock]}>
-              {company.address && `${company.address}\n`}
-              {company.email && `${company.email}\n`}
-              {company.phone}
-            </Text>
+            <View style={styles.metaBox}>
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Numéro</Text>
+                <Text>{document.number}</Text>
+              </View>
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Date d'émission</Text>
+                <Text>{formatDate(document.date)}</Text>
+              </View>
+              <View style={[styles.metaRow, { marginBottom: 0 }]}>
+                <Text style={styles.metaLabel}>Devise</Text>
+                <Text>{currencySymbol}</Text>
+              </View>
+            </View>
           </View>
         </View>
 
-        {/* Document Type */}
-        <Text style={[styles.documentType, dynamicStyles.documentType]}>
-          DEVIS
-        </Text>
-        <Text style={styles.documentNumber}>N° {document.number}</Text>
-
-        {/* Client and Document Info */}
-        <View style={styles.documentInfo}>
-          <View style={styles.infoBlock}>
-            <Text style={styles.infoBlockTitle}>Facturer à</Text>
-            <Text
-              style={[
-                styles.infoBlockText,
-                { fontWeight: "bold" },
-                styles.textBlock,
-              ]}
-            >
+        {/* Client */}
+        <View style={styles.clientSection}>
+          <Text style={styles.sectionTitle}>Client</Text>
+          <View style={styles.clientBox}>
+            <Text style={[styles.clientName, styles.textBlock]}>
               {client.name}
             </Text>
             {client.address && (
-              <Text style={[styles.infoBlockText, styles.textBlock]}>
+              <Text style={[styles.companyDetails, styles.wrapText]}>
                 {client.address}
               </Text>
             )}
             {client.email && (
-              <Text style={[styles.infoBlockText, styles.textBlock]}>
+              <Text style={[styles.companyDetails, styles.wrapText]}>
                 {client.email}
               </Text>
             )}
-          </View>
-          <View style={styles.infoBlock}>
-            <Text style={styles.infoBlockTitle}>Informations</Text>
-            <Text style={styles.infoBlockText}>
-              <Text style={{ fontWeight: "bold" }}>Date:</Text>{" "}
-              {formatDate(document.date)}
-            </Text>
-            <Text style={styles.infoBlockText}>
-              <Text style={{ fontWeight: "bold" }}>Devise:</Text>{" "}
-              {currencySymbol}
-            </Text>
           </View>
         </View>
 
         {/* Lines Table */}
         <View style={styles.table}>
-          <View style={[styles.tableHeader, dynamicStyles.tableHeader]}>
+          <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, styles.colDesignation]}>
-              Désignation
+              Description
             </Text>
-            <Text style={[styles.tableHeaderCell, styles.colQty]}>Qté</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQty]}>
+              Quantité
+            </Text>
             <Text style={[styles.tableHeaderCell, styles.colPrice]}>
               Prix unitaire
             </Text>
@@ -340,11 +352,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
               <View style={styles.tableRow}>
                 <View style={styles.colDesignation}>
                   <Text
-                    style={[
-                      styles.tableCell,
-                      styles.textBlock,
-                      { fontWeight: "bold" },
-                    ]}
+                    style={[styles.tableCell, styles.textBlock]}
                   >
                     {line.label}
                   </Text>
@@ -353,7 +361,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
                       style={[
                         styles.tableCell,
                         styles.textBlock,
-                        { fontSize: 8, color: "#666", marginTop: 4 },
+                        { fontSize: 8, color: "#64748B", marginTop: 4 },
                       ]}
                     >
                       {line.description}
@@ -376,27 +384,44 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
 
         {/* Totals */}
         <View style={styles.totals}>
-          <View style={[styles.totalRow, styles.totalRowSubtotal]}>
-            <Text>Sous-total HT:</Text>
+          <View style={styles.totalRow}>
+            <Text>Sous-total HT</Text>
             <Text>{formatCurrency(totals.subtotal, currencySymbol)}</Text>
           </View>
           {document.vatRate && document.vatRate > 0 && (
-            <View style={[styles.totalRow, styles.totalRowVat]}>
-              <Text>TVA ({document.vatRate}%):</Text>
+            <View style={styles.totalRow}>
+              <Text>TVA ({document.vatRate}%)</Text>
               <Text>{formatCurrency(totals.vat, currencySymbol)}</Text>
             </View>
           )}
           <View style={[styles.totalRow, styles.totalRowTotal, dynamicStyles.totalRowTotal]}>
-            <Text>Total TTC:</Text>
+            <Text>Total TTC</Text>
             <Text>{formatCurrency(totals.total, currencySymbol)}</Text>
           </View>
         </View>
 
-        {/* Notes */}
-        {document.notes && (
-          <View style={styles.notes}>
-            <Text style={styles.notesTitle}>Notes</Text>
-            <Text style={styles.textBlock}>{document.notes}</Text>
+        {/* Footer */}
+        {(document.notes ||
+          company.iban ||
+          company.bankName ||
+          company.conditionsPaiement) && (
+          <View style={styles.footer}>
+            {document.notes && (
+              <Text style={[styles.footerText, styles.wrapText]}>
+                {document.notes}
+              </Text>
+            )}
+            {(company.iban || company.bankName) && (
+              <Text style={[styles.footerText, styles.wrapText]}>
+                {company.bankName ? `${company.bankName} • ` : ""}
+                {company.iban ? `IBAN ${company.iban}` : ""}
+              </Text>
+            )}
+            {company.conditionsPaiement && (
+              <Text style={[styles.footerText, styles.wrapText]}>
+                {company.conditionsPaiement}
+              </Text>
+            )}
           </View>
         )}
       </Page>

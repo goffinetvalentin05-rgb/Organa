@@ -18,13 +18,26 @@ interface Devis {
   id: string;
   numero: string;
   clientId?: string | null;
-  client?: { nom?: string; email?: string };
+  client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
   lignes: any[];
   statut: "brouillon" | "envoye" | "accepte" | "refuse";
   dateCreation: string;
   dateEcheance?: string | null;
   notes?: string | null;
   type?: string;
+}
+
+interface CompanySettings {
+  company_name?: string;
+  company_address?: string;
+  company_email?: string;
+  company_phone?: string;
+  logo_url?: string | null;
+  iban?: string;
+  bank_name?: string;
+  payment_terms?: string;
+  primary_color?: string;
+  currency_symbol?: string;
 }
 
 export default function DevisDetailPage() {
@@ -35,6 +48,7 @@ export default function DevisDetailPage() {
   const [devis, setDevis] = useState<Devis | null>(null);
   const [envoiEmail, setEnvoiEmail] = useState(false);
   const [currency, setCurrency] = useState<string>("CHF");
+  const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -69,6 +83,9 @@ export default function DevisDetailPage() {
         const data = await res.json();
         if (data.settings?.currency) {
           setCurrency(data.settings.currency);
+        }
+        if (data.settings) {
+          setCompanySettings(data.settings);
         }
       } catch (err) {
         console.error("Erreur lors du chargement de la devise:", err);
@@ -319,19 +336,168 @@ export default function DevisDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-subtle bg-surface p-6">
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="text-sm text-secondary">{t("dashboard.quotes.detail.createdAt")}</label>
-            <p className="font-medium">{formatDate(devis.dateCreation)}</p>
-          </div>
-          {devis.dateEcheance && (
+      <div className="rounded-2xl border border-subtle bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start gap-4">
+            {companySettings?.logo_url && (
+              <img
+                src={companySettings.logo_url}
+                alt={companySettings.company_name || "Logo"}
+                className="h-12 w-auto object-contain"
+              />
+            )}
             <div>
-              <label className="text-sm text-secondary">{t("dashboard.quotes.detail.dueDate")}</label>
-              <p className="font-medium">{formatDate(devis.dateEcheance)}</p>
+              <p className="text-lg font-semibold text-slate-900">
+                {companySettings?.company_name || ""}
+              </p>
+              <p className="text-sm text-slate-500 whitespace-pre-line">
+                {companySettings?.company_address || ""}
+              </p>
+              <p className="text-sm text-slate-500">
+                {companySettings?.company_email || ""}
+                {companySettings?.company_phone
+                  ? ` • ${companySettings.company_phone}`
+                  : ""}
+              </p>
             </div>
+          </div>
+          <div className="min-w-[220px] rounded-lg border border-slate-200 bg-slate-50 p-4 text-right">
+            <p
+              className="text-2xl font-semibold"
+              style={{ color: companySettings?.primary_color || "#1D4ED8" }}
+            >
+              Devis
+            </p>
+            <p className="text-sm text-slate-500 mt-1">
+              N° {devis.numero}
+            </p>
+            <div className="mt-3 space-y-1 text-sm text-slate-600">
+              <div className="flex items-center justify-between gap-4">
+                <span>{t("dashboard.quotes.detail.createdAt")}</span>
+                <span className="font-medium">{formatDate(devis.dateCreation)}</span>
+              </div>
+              {devis.dateEcheance && (
+                <div className="flex items-center justify-between gap-4">
+                  <span>{t("dashboard.quotes.detail.dueDate")}</span>
+                  <span className="font-medium">{formatDate(devis.dateEcheance)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-lg border border-slate-200 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Client
+          </p>
+          <p className="mt-2 text-sm font-semibold text-slate-900">
+            {devis.client?.nom || t("dashboard.common.unknownClient")}
+          </p>
+          {devis.client?.adresse && (
+            <p className="text-sm text-slate-500 whitespace-pre-line">
+              {devis.client.adresse}
+            </p>
+          )}
+          {devis.client?.email && (
+            <p className="text-sm text-slate-500">{devis.client.email}</p>
           )}
         </div>
+
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-slate-500">
+              <tr>
+                <th className="px-3 py-3 text-left font-semibold uppercase tracking-[0.12em]">
+                  {t("dashboard.common.designation")}
+                </th>
+                <th className="px-3 py-3 text-right font-semibold uppercase tracking-[0.12em]">
+                  {t("dashboard.common.quantity")}
+                </th>
+                <th className="px-3 py-3 text-right font-semibold uppercase tracking-[0.12em]">
+                  {t("dashboard.common.unitPrice")}
+                </th>
+                <th className="px-3 py-3 text-right font-semibold uppercase tracking-[0.12em]">
+                  {t("dashboard.common.total")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200/70">
+              {devis.lignes?.length ? (
+                devis.lignes.map((ligne) => {
+                  if (!ligne) return null;
+                  const sousTotal = (ligne.quantite || 0) * (ligne.prixUnitaire || 0);
+                  return (
+                    <tr key={ligne.id || Math.random()}>
+                      <td className="px-3 py-3">
+                        <div className="font-medium text-slate-900">
+                          {ligne.designation || ""}
+                        </div>
+                        {ligne.description && (
+                          <div className="text-xs text-slate-500 mt-1 whitespace-pre-line">
+                            {ligne.description}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-right">{ligne.quantite || 0}</td>
+                      <td className="px-3 py-3 text-right">
+                        {formatMontant(ligne.prixUnitaire || 0)}
+                      </td>
+                      <td className="px-3 py-3 text-right font-medium text-slate-900">
+                        {formatMontant(sousTotal)}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-3 py-4 text-center text-slate-500">
+                    {t("dashboard.common.noLines")}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <div className="w-full max-w-xs space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
+            <div className="flex items-center justify-between text-slate-600">
+              <span>{t("dashboard.common.totalHT")}</span>
+              <span>{formatMontant(totalHT)}</span>
+            </div>
+            {totalTVA > 0 && (
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{t("dashboard.common.vatLabel")}</span>
+                <span>{formatMontant(totalTVA)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-lg font-semibold text-slate-900">
+              <span>{t("dashboard.common.totalTTC")}</span>
+              <span>{formatMontant(totalTTC)}</span>
+            </div>
+          </div>
+        </div>
+
+        {(devis.notes ||
+          companySettings?.iban ||
+          companySettings?.bank_name ||
+          companySettings?.payment_terms) && (
+          <div className="mt-6 border-t border-slate-200 pt-4 text-sm text-slate-500 space-y-2">
+            {devis.notes && <p className="whitespace-pre-line">{devis.notes}</p>}
+            {(companySettings?.iban || companySettings?.bank_name) && (
+              <p>
+                {companySettings?.bank_name ? `${companySettings.bank_name} • ` : ""}
+                {companySettings?.iban ? `IBAN ${companySettings.iban}` : ""}
+              </p>
+            )}
+            {companySettings?.payment_terms && (
+              <p className="whitespace-pre-line">{companySettings.payment_terms}</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-subtle bg-surface p-6">
         <div className="mb-4">
           <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.status")}</label>
           <select
@@ -355,84 +521,6 @@ export default function DevisDetailPage() {
             <p className="text-primary">{devis.notes}</p>
           </div>
         )}
-      </div>
-
-      <div className="rounded-xl border border-subtle bg-surface p-6">
-        <h2 className="text-xl font-semibold mb-4">{t("dashboard.common.lines")}</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-surface border-b border-subtle">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-primary">
-                  {t("dashboard.common.designation")}
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  {t("dashboard.common.quantity")}
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  {t("dashboard.common.unitPrice")}
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  {t("dashboard.common.vat")}
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-primary">
-                  {t("dashboard.common.total")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200/70">
-              {devis.lignes && devis.lignes.length > 0 ? (
-                devis.lignes.map((ligne) => {
-                  if (!ligne) return null;
-                  const sousTotal = (ligne.quantite || 0) * (ligne.prixUnitaire || 0);
-                  return (
-                    <tr key={ligne.id || Math.random()}>
-                      <td className="px-4 py-3">
-                        <div className="font-medium">{ligne.designation || ""}</div>
-                        {ligne.description && (
-                          <div className="text-sm text-secondary mt-1 whitespace-pre-line">
-                            {ligne.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">{ligne.quantite || 0}</td>
-                      <td className="px-4 py-3 text-right">
-                        {formatMontant(ligne.prixUnitaire || 0)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {ligne.tva || 0}%
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium">
-                        {formatMontant(sousTotal)}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-4 py-3 text-center text-secondary">
-                    {t("dashboard.common.noLines")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-subtle space-y-2 text-right">
-          <div className="flex justify-between text-secondary">
-            <span>{t("dashboard.common.totalHT")}</span>
-            <span>{formatMontant(totalHT)}</span>
-          </div>
-          <div className="flex justify-between text-secondary">
-            <span>{t("dashboard.common.vatLabel")}</span>
-            <span>{formatMontant(totalTVA)}</span>
-          </div>
-          <div className="flex justify-between text-2xl font-bold pt-2">
-            <span>{t("dashboard.common.totalTTC")}</span>
-            <span>{formatMontant(totalTTC)}</span>
-          </div>
-        </div>
       </div>
 
     </div>
