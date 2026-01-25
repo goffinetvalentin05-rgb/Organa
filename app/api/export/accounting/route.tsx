@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
     const filename = `export-comptabilite-${year}.zip`;
 
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(new Uint8Array(zipBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/zip",
