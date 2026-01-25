@@ -14,15 +14,45 @@ const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "organa_locale";
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
+const isLocale = (value: string | null | undefined): value is Locale =>
+  value === "fr" || value === "en" || value === "de";
 
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-    if (stored === "fr" || stored === "en" || stored === "de") {
-      setLocale(stored);
-    }
-  }, []);
+const getLocaleFromNavigator = (): Locale | null => {
+  if (typeof navigator === "undefined") return null;
+  const candidates = [navigator.language, ...(navigator.languages || [])].filter(Boolean);
+  for (const candidate of candidates) {
+    const lower = candidate.toLowerCase();
+    if (lower.startsWith("fr")) return "fr";
+    if (lower.startsWith("en")) return "en";
+    if (lower.startsWith("de")) return "de";
+  }
+  return null;
+};
+
+const getLocaleFromCookie = (): Locale | null => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${STORAGE_KEY}=`));
+  if (!match) return null;
+  const value = match.split("=")[1];
+  return isLocale(value) ? value : null;
+};
+
+const resolveInitialLocale = (): Locale => {
+  if (typeof window !== "undefined") {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (isLocale(stored)) return stored;
+  }
+  const cookieLocale = getLocaleFromCookie();
+  if (cookieLocale) return cookieLocale;
+  const navigatorLocale = getLocaleFromNavigator();
+  return navigatorLocale ?? defaultLocale;
+};
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocale] = useState<Locale>(resolveInitialLocale);
 
   useEffect(() => {
     if (typeof document !== "undefined") {

@@ -3,6 +3,254 @@
     "login": "Connexion",
     "cta": "Découvrir Organa"
   },
+  "landing": {
+    "brand": "OBILLZ",
+    "metadata": {
+      "title": "OBILLZ — La facturation en deux clics",
+      "description": "Logiciel de facturation et de suivi des dépenses pour indépendants et petites entreprises. Simple, rapide, moderne, pensé pour l'Europe."
+    },
+    "nav": {
+      "login": "Connexion",
+      "cta": "Commencer gratuitement",
+      "logoAlt": "OBILLZ — La facturation en deux clics"
+    },
+    "hero": {
+      "badge": "OBILLZ — La facturation en deux clics",
+      "title": "Gérez vos devis et factures\noù que vous soyez.",
+      "subtitle": "Un outil moderne pour facturer vite, suivre vos dépenses et rester concentré sur votre activité.",
+      "bullets": [
+        "Facturation rapide et professionnelle",
+        "Suivi clair des paiements et relances",
+        "Dépenses + échéances réunies",
+        "Accès simple, sans jargon administratif",
+        "Pensé pour l'Europe et l'international"
+      ],
+      "ctaPrimary": "Commencer gratuitement",
+      "ctaSecondary": "Voir la démo",
+      "paymentsLabel": "Compatible paiements :",
+      "payments": ["SEPA", "Carte", "Virement", "Multi-devises"],
+      "preview": {
+        "label": "Aperçu produit",
+        "invoices": { "label": "Factures", "value": "€12 300" },
+        "quotes": { "label": "Devis", "sent": "8 envoyés", "pending": "2 en attente" },
+        "expenses": { "label": "Dépenses", "value": "€3 480", "due": "Échéances à 10 jours" },
+        "followUp": {
+          "label": "Suivi",
+          "items": ["Relance #2043", "Paiement reçu", "Échéance dépense"]
+        },
+        "abstract": { "label": "Visuel abstrait" }
+      }
+    },
+    "problem": {
+      "cards": {
+        "tools": {
+          "title": "Trop d'outils dispersés",
+          "text": "Factures, dépenses, relances… tout est éparpillé entre des fichiers et des apps."
+        },
+        "tracking": {
+          "title": "Suivi approximatif",
+          "text": "Impossible de voir rapidement ce qui est payé, en retard, ou à prévoir."
+        },
+        "load": {
+          "title": "Charge mentale inutile",
+          "text": "Vous perdez du temps sur l'administratif au lieu de développer votre activité."
+        }
+      },
+      "label": "Le problème",
+      "title": "L'administratif ne doit pas ralentir votre business.",
+      "paragraphs": {
+        "first": "OBILLZ centralise facturation et dépenses pour vous donner une vue claire, rapide, actionnable.",
+        "second": "Vous gagnez du temps, évitez les oublis, et gardez un suivi fiable sans complexité."
+      },
+      "cta": "Commencer gratuitement"
+    },
+    "solution": {
+      "label": "La solution OBILLZ",
+      "title": "Une seule interface pour facturer, suivre et avancer.",
+      "description": "Structure claire, actions rapides, et une vue globale de votre activité. Sans jargon, sans lourdeur.",
+      "cards": {
+        "centralized": {
+          "title": "Tout est centralisé",
+          "text": "Clients, documents, dépenses et échéances réunis dans un espace simple."
+        },
+        "control": {
+          "title": "Vous gardez le contrôle",
+          "text": "Des rappels intelligents pour ne plus laisser passer un paiement ou une dépense."
+        }
+      }
+    },
+    "features": {
+      "label": "Fonctionnalités clés",
+      "title": "Tout ce dont vous avez besoin. Rien de superflu.",
+      "description": "Pensé pour les indépendants et petites entreprises qui veulent aller vite.",
+      "cards": {
+        "quotes": {
+          "title": "Devis & factures en 2 clics",
+          "text": "Créez, envoyez et suivez vos documents sans friction, avec des modèles clairs et pro."
+        },
+        "payments": {
+          "title": "Suivi des paiements",
+          "text": "Visualisez en un coup d'œil ce qui est payé, en attente ou à relancer."
+        },
+        "expenses": {
+          "title": "Dépenses & échéances",
+          "text": "Enregistrez vos dépenses et planifiez les échéances importantes sans tableaux externes."
+        },
+        "notifications": {
+          "title": "Notifications utiles",
+          "text": "Recevez les rappels clés au bon moment pour relancer ou payer sans stress."
+        },
+        "assistant": {
+          "title": "Assistant IA intégré",
+          "text": "Rédigez des relances et emails pro en quelques secondes, sans y penser."
+        },
+        "dashboard": {
+          "title": "Dashboard complet",
+          "text": "Un cockpit clair pour piloter vos clients, vos revenus et vos charges."
+        }
+      }
+    },
+    "dashboard": {
+      "label": "Vue produit",
+      "title": "Un dashboard qui parle vraiment.",
+      "description": "Suivi des revenus, paiements, dépenses et échéances, tout est là, lisible et actionnable.",
+      "tags": ["Suivi paiements", "Relances IA", "Vue dépenses", "Notifications"],
+      "preview": {
+        "label": "Aperçu dashboard",
+        "stats": {
+          "labels": ["Factures payées", "En attente", "Dépenses"],
+          "value": "+12%",
+          "period": "Cette semaine"
+        },
+        "deadlines": {
+          "label": "Échéances",
+          "items": ["Relance facture #1098", "Paiement dépense cloud", "Devis à valider"],
+          "today": "Aujourd'hui"
+        }
+      },
+      "mockupNote": "Mockup UI (placeholder)."
+    },
+    "howItWorks": {
+      "label": "Comment ça marche",
+      "title": "Simple, fluide, sans surcharge.",
+      "description": "6 étapes claires pour garder votre facturation sous contrôle.",
+      "steps": [
+        "Créez un client en 30 secondes.",
+        "Générez un devis ou une facture.",
+        "Envoyez et suivez le statut.",
+        "Ajoutez vos dépenses.",
+        "Laissez OBILLZ gérer les rappels.",
+        "Pilotez tout depuis le dashboard."
+      ]
+    },
+    "pricing": {
+      "label": "Tarifs",
+      "title": "Deux plans, clairs et efficaces.",
+      "free": {
+        "title": "Free",
+        "subtitle": "Pour démarrer sans risque.",
+        "features": ["Création de devis et factures", "Suivi basique", "Accès limité"],
+        "cta": "Commencer gratuitement"
+      },
+      "pro": {
+        "badge": "Recommandé",
+        "title": "Pro",
+        "subtitle": "29€ / mois (prix provisoire)",
+        "features": [
+          "Facturation illimitée",
+          "Dépenses + échéances",
+          "Notifications",
+          "IA assistant",
+          "Dashboard complet"
+        ],
+        "cta": "Passer au plan Pro"
+      }
+    },
+    "comparison": {
+      "label": "Comparatif",
+      "title": "Sans OBILLZ / Avec OBILLZ",
+      "description": "Une lecture rapide de la différence, comme un avant / après.",
+      "before": {
+        "label": "Sans OBILLZ",
+        "badge": "Avant",
+        "items": [
+          "Création manuelle des factures, longue et source d’erreurs",
+          "Factures et dépenses dispersées sur plusieurs outils",
+          "Aucune alerte sur les échéances de paiement",
+          "Manque de visibilité sur ce qui est payé ou en retard",
+          "Perte de temps à chercher des documents",
+          "Suivi financier stressant et peu clair"
+        ]
+      },
+      "middle": {
+        "before": "AVANT",
+        "after": "APRÈS"
+      },
+      "after": {
+        "label": "Avec OBILLZ",
+        "badge": "Après",
+        "items": {
+          "fast": {
+            "title": "Facturation rapide et centralisée",
+            "text": "Créez et envoyez vos factures en quelques clics depuis un seul outil."
+          },
+          "tracking": {
+            "title": "Suivi clair des paiements et dépenses",
+            "text": "Visualisez instantanément ce que vous devez payer et encaisser."
+          },
+          "alerts": {
+            "title": "Alertes automatiques",
+            "text": "Recevez des notifications avant les échéances importantes."
+          },
+          "realtime": {
+            "title": "Vue d’ensemble en temps réel",
+            "text": "Statuts clairs : payé, en attente, en retard."
+          },
+          "organization": {
+            "title": "Organisation sans effort",
+            "text": "Tous vos documents sont centralisés et accessibles."
+          }
+        }
+      }
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Questions fréquentes.",
+      "items": {
+        "fit": {
+          "question": "OBILLZ convient-il aux freelances et petites équipes ?",
+          "answer": "Oui, OBILLZ est conçu pour les indépendants, freelances et petites entreprises."
+        },
+        "free": {
+          "question": "Puis-je commencer gratuitement ?",
+          "answer": "Oui, le plan Free vous permet de créer devis et factures avec un accès limité."
+        },
+        "export": {
+          "question": "Puis-je exporter mes factures pour ma comptabilité ou ma fiduciaire ?",
+          "answer": "Oui. En un clic, vous pouvez exporter toutes vos factures d’une année donnée avec les PDF correspondants, prêtes à être transmises à votre fiduciaire ou comptable."
+        },
+        "noCommitment": {
+          "question": "Le plan Pro est-il sans engagement ?",
+          "answer": "Oui, vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez."
+        },
+        "assistant": {
+          "question": "L'assistant IA est-il inclus dans Pro ?",
+          "answer": "Oui, l'assistant IA fait partie du plan Pro avec les notifications et le dashboard complet."
+        }
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 OBILLZ. Tous droits réservés.",
+      "login": "Connexion",
+      "signup": "Inscription",
+      "legal": {
+        "mentions": "Mentions légales",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions d’utilisation",
+        "cookies": "Politique de cookies"
+      }
+    }
+  },
   "footer": {
     "copyright": "© 2026 Organa. Développé en Suisse.",
     "login": "Connexion",

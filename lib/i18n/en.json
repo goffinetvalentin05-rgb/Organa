@@ -3,6 +3,254 @@
     "login": "Sign in",
     "cta": "Discover Organa"
   },
+  "landing": {
+    "brand": "OBILLZ",
+    "metadata": {
+      "title": "OBILLZ — Invoicing in two clicks",
+      "description": "Invoicing and expense tracking software for freelancers and small businesses. Simple, fast, modern, built for Europe."
+    },
+    "nav": {
+      "login": "Sign in",
+      "cta": "Start for free",
+      "logoAlt": "OBILLZ — Invoicing in two clicks"
+    },
+    "hero": {
+      "badge": "OBILLZ — Invoicing in two clicks",
+      "title": "Manage your quotes and invoices\nwherever you are.",
+      "subtitle": "A modern tool to invoice fast, track your expenses, and stay focused on your business.",
+      "bullets": [
+        "Fast, professional invoicing",
+        "Clear tracking of payments and follow-ups",
+        "Expenses + deadlines combined",
+        "Simple access, no admin jargon",
+        "Built for Europe and internationally"
+      ],
+      "ctaPrimary": "Start for free",
+      "ctaSecondary": "See the demo",
+      "paymentsLabel": "Compatible payments:",
+      "payments": ["SEPA", "Card", "Bank transfer", "Multi-currency"],
+      "preview": {
+        "label": "Product preview",
+        "invoices": { "label": "Invoices", "value": "€12 300" },
+        "quotes": { "label": "Quotes", "sent": "8 sent", "pending": "2 pending" },
+        "expenses": { "label": "Expenses", "value": "€3 480", "due": "Due in 10 days" },
+        "followUp": {
+          "label": "Follow-up",
+          "items": ["Follow-up #2043", "Payment received", "Expense due"]
+        },
+        "abstract": { "label": "Abstract visual" }
+      }
+    },
+    "problem": {
+      "cards": {
+        "tools": {
+          "title": "Too many scattered tools",
+          "text": "Invoices, expenses, follow-ups… everything is scattered across files and apps."
+        },
+        "tracking": {
+          "title": "Approximate tracking",
+          "text": "Impossible to quickly see what's paid, late, or upcoming."
+        },
+        "load": {
+          "title": "Unnecessary mental load",
+          "text": "You lose time on admin instead of growing your business."
+        }
+      },
+      "label": "The problem",
+      "title": "Admin work shouldn't slow your business.",
+      "paragraphs": {
+        "first": "OBILLZ centralizes invoicing and expenses to give you a clear, fast, actionable view.",
+        "second": "You save time, avoid oversights, and keep reliable tracking without complexity."
+      },
+      "cta": "Start for free"
+    },
+    "solution": {
+      "label": "The OBILLZ solution",
+      "title": "A single interface to invoice, track, and move forward.",
+      "description": "Clear structure, fast actions, and a global view of your activity. No jargon, no heaviness.",
+      "cards": {
+        "centralized": {
+          "title": "Everything is centralized",
+          "text": "Clients, documents, expenses, and deadlines gathered in a simple space."
+        },
+        "control": {
+          "title": "You stay in control",
+          "text": "Smart reminders so you don't miss a payment or expense."
+        }
+      }
+    },
+    "features": {
+      "label": "Key features",
+      "title": "Everything you need. Nothing extra.",
+      "description": "Built for freelancers and small businesses that want to move fast.",
+      "cards": {
+        "quotes": {
+          "title": "Quotes & invoices in 2 clicks",
+          "text": "Create, send, and track your documents without friction, with clear professional templates."
+        },
+        "payments": {
+          "title": "Payment tracking",
+          "text": "See at a glance what's paid, pending, or needs a follow-up."
+        },
+        "expenses": {
+          "title": "Expenses & deadlines",
+          "text": "Record expenses and plan important deadlines without external spreadsheets."
+        },
+        "notifications": {
+          "title": "Useful notifications",
+          "text": "Get key reminders at the right time to follow up or pay without stress."
+        },
+        "assistant": {
+          "title": "Built-in AI assistant",
+          "text": "Draft follow-ups and professional emails in seconds, without thinking about it."
+        },
+        "dashboard": {
+          "title": "Full dashboard",
+          "text": "A clear cockpit to manage clients, revenue, and expenses."
+        }
+      }
+    },
+    "dashboard": {
+      "label": "Product view",
+      "title": "A dashboard that truly speaks.",
+      "description": "Track revenue, payments, expenses, and deadlines — everything is readable and actionable.",
+      "tags": ["Payment tracking", "AI follow-ups", "Expense view", "Notifications"],
+      "preview": {
+        "label": "Dashboard preview",
+        "stats": {
+          "labels": ["Paid invoices", "Pending", "Expenses"],
+          "value": "+12%",
+          "period": "This week"
+        },
+        "deadlines": {
+          "label": "Deadlines",
+          "items": ["Invoice follow-up #1098", "Cloud expense payment", "Quote to approve"],
+          "today": "Today"
+        }
+      },
+      "mockupNote": "Mockup UI (placeholder)."
+    },
+    "howItWorks": {
+      "label": "How it works",
+      "title": "Simple, smooth, no overload.",
+      "description": "6 clear steps to keep your invoicing under control.",
+      "steps": [
+        "Create a client in 30 seconds.",
+        "Generate a quote or an invoice.",
+        "Send and track the status.",
+        "Add your expenses.",
+        "Let OBILLZ handle reminders.",
+        "Manage everything from the dashboard."
+      ]
+    },
+    "pricing": {
+      "label": "Pricing",
+      "title": "Two plans, clear and efficient.",
+      "free": {
+        "title": "Free",
+        "subtitle": "Start with no risk.",
+        "features": ["Quote and invoice creation", "Basic tracking", "Limited access"],
+        "cta": "Start for free"
+      },
+      "pro": {
+        "badge": "Recommended",
+        "title": "Pro",
+        "subtitle": "€29 / month (provisional price)",
+        "features": [
+          "Unlimited invoicing",
+          "Expenses + deadlines",
+          "Notifications",
+          "AI assistant",
+          "Full dashboard"
+        ],
+        "cta": "Upgrade to Pro"
+      }
+    },
+    "comparison": {
+      "label": "Comparison",
+      "title": "Without OBILLZ / With OBILLZ",
+      "description": "A quick read of the difference, like a before / after.",
+      "before": {
+        "label": "Without OBILLZ",
+        "badge": "Before",
+        "items": [
+          "Manual invoice creation, long and error-prone",
+          "Invoices and expenses scattered across multiple tools",
+          "No alerts for payment deadlines",
+          "Lack of visibility on what's paid or overdue",
+          "Time wasted searching for documents",
+          "Stressful and unclear financial tracking"
+        ]
+      },
+      "middle": {
+        "before": "BEFORE",
+        "after": "AFTER"
+      },
+      "after": {
+        "label": "With OBILLZ",
+        "badge": "After",
+        "items": {
+          "fast": {
+            "title": "Fast, centralized invoicing",
+            "text": "Create and send invoices in a few clicks from a single tool."
+          },
+          "tracking": {
+            "title": "Clear tracking of payments and expenses",
+            "text": "See instantly what you need to pay and collect."
+          },
+          "alerts": {
+            "title": "Automatic alerts",
+            "text": "Receive notifications before key deadlines."
+          },
+          "realtime": {
+            "title": "Real-time overview",
+            "text": "Clear statuses: paid, pending, overdue."
+          },
+          "organization": {
+            "title": "Effortless organization",
+            "text": "All your documents are centralized and accessible."
+          }
+        }
+      }
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Frequently asked questions.",
+      "items": {
+        "fit": {
+          "question": "Is OBILLZ suitable for freelancers and small teams?",
+          "answer": "Yes, OBILLZ is designed for freelancers and small businesses."
+        },
+        "free": {
+          "question": "Can I start for free?",
+          "answer": "Yes, the Free plan lets you create quotes and invoices with limited access."
+        },
+        "export": {
+          "question": "Can I export my invoices for accounting or my trustee?",
+          "answer": "Yes. In one click, you can export all your invoices for a given year with the corresponding PDFs, ready to send to your trustee or accountant."
+        },
+        "noCommitment": {
+          "question": "Is the Pro plan commitment-free?",
+          "answer": "Yes, you can switch to Pro and cancel whenever you want."
+        },
+        "assistant": {
+          "question": "Is the AI assistant included in Pro?",
+          "answer": "Yes, the AI assistant is part of the Pro plan with notifications and the full dashboard."
+        }
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 OBILLZ. All rights reserved.",
+      "login": "Sign in",
+      "signup": "Sign up",
+      "legal": {
+        "mentions": "Legal notice",
+        "privacy": "Privacy policy",
+        "terms": "Terms of use",
+        "cookies": "Cookie policy"
+      }
+    }
+  },
   "footer": {
     "copyright": "© 2026 Organa. Built in Switzerland.",
     "login": "Sign in",

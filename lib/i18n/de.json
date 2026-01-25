@@ -3,6 +3,254 @@
     "login": "Anmelden",
     "cta": "Organa entdecken"
   },
+  "landing": {
+    "brand": "OBILLZ",
+    "metadata": {
+      "title": "OBILLZ — Rechnungen in zwei Klicks",
+      "description": "Rechnungs- und Ausgaben-Tracking für Selbstständige und kleine Unternehmen. Einfach, schnell, modern, für Europa gedacht."
+    },
+    "nav": {
+      "login": "Anmelden",
+      "cta": "Kostenlos starten",
+      "logoAlt": "OBILLZ — Rechnungen in zwei Klicks"
+    },
+    "hero": {
+      "badge": "OBILLZ — Rechnungen in zwei Klicks",
+      "title": "Verwalten Sie Ihre Angebote und Rechnungen\nwo immer Sie sind.",
+      "subtitle": "Ein modernes Tool, um schnell zu fakturieren, Ausgaben zu verfolgen und sich auf Ihr Geschäft zu konzentrieren.",
+      "bullets": [
+        "Schnelle, professionelle Fakturierung",
+        "Klarer Überblick über Zahlungen und Nachfassaktionen",
+        "Ausgaben + Fristen gebündelt",
+        "Einfacher Zugang, ohne Verwaltungsjargon",
+        "Für Europa und international gedacht"
+      ],
+      "ctaPrimary": "Kostenlos starten",
+      "ctaSecondary": "Demo ansehen",
+      "paymentsLabel": "Kompatible Zahlungen:",
+      "payments": ["SEPA", "Karte", "Überweisung", "Mehrwährungen"],
+      "preview": {
+        "label": "Produktvorschau",
+        "invoices": { "label": "Rechnungen", "value": "€12 300" },
+        "quotes": { "label": "Angebote", "sent": "8 gesendet", "pending": "2 ausstehend" },
+        "expenses": { "label": "Ausgaben", "value": "€3 480", "due": "Fälligkeiten in 10 Tagen" },
+        "followUp": {
+          "label": "Nachverfolgung",
+          "items": ["Nachfassen #2043", "Zahlung erhalten", "Ausgabenfälligkeit"]
+        },
+        "abstract": { "label": "Abstraktes Visual" }
+      }
+    },
+    "problem": {
+      "cards": {
+        "tools": {
+          "title": "Zu viele verstreute Tools",
+          "text": "Rechnungen, Ausgaben, Nachfassaktionen… alles ist über Dateien und Apps verteilt."
+        },
+        "tracking": {
+          "title": "Ungenaue Nachverfolgung",
+          "text": "Es ist unmöglich, schnell zu sehen, was bezahlt, überfällig oder anstehend ist."
+        },
+        "load": {
+          "title": "Unnötige mentale Belastung",
+          "text": "Sie verlieren Zeit für Administration statt für den Ausbau Ihres Geschäfts."
+        }
+      },
+      "label": "Das Problem",
+      "title": "Administration darf Ihr Geschäft nicht ausbremsen.",
+      "paragraphs": {
+        "first": "OBILLZ zentralisiert Fakturierung und Ausgaben, damit Sie eine klare, schnelle und umsetzbare Sicht erhalten.",
+        "second": "Sie sparen Zeit, vermeiden Versäumnisse und behalten eine zuverlässige Nachverfolgung ohne Komplexität."
+      },
+      "cta": "Kostenlos starten"
+    },
+    "solution": {
+      "label": "Die OBILLZ-Lösung",
+      "title": "Eine einzige Oberfläche zum Fakturieren, Nachverfolgen und Vorankommen.",
+      "description": "Klare Struktur, schnelle Aktionen und ein Gesamtüberblick über Ihre Aktivität. Ohne Jargon, ohne Ballast.",
+      "cards": {
+        "centralized": {
+          "title": "Alles ist zentralisiert",
+          "text": "Kunden, Dokumente, Ausgaben und Fristen in einem einfachen Bereich."
+        },
+        "control": {
+          "title": "Sie behalten die Kontrolle",
+          "text": "Intelligente Erinnerungen, damit keine Zahlung oder Ausgabe durchrutscht."
+        }
+      }
+    },
+    "features": {
+      "label": "Zentrale Funktionen",
+      "title": "Alles, was Sie brauchen. Nichts Überflüssiges.",
+      "description": "Gedacht für Selbstständige und kleine Unternehmen, die schnell vorankommen wollen.",
+      "cards": {
+        "quotes": {
+          "title": "Angebote & Rechnungen in 2 Klicks",
+          "text": "Erstellen, senden und verfolgen Sie Ihre Dokumente ohne Reibung, mit klaren, professionellen Vorlagen."
+        },
+        "payments": {
+          "title": "Zahlungsverfolgung",
+          "text": "Sehen Sie auf einen Blick, was bezahlt, ausstehend oder nachzufassen ist."
+        },
+        "expenses": {
+          "title": "Ausgaben & Fristen",
+          "text": "Erfassen Sie Ausgaben und planen Sie wichtige Fristen ohne externe Tabellen."
+        },
+        "notifications": {
+          "title": "Nützliche Benachrichtigungen",
+          "text": "Erhalten Sie wichtige Erinnerungen zur richtigen Zeit, um nachzufassen oder zu bezahlen – ohne Stress."
+        },
+        "assistant": {
+          "title": "Integrierter KI-Assistent",
+          "text": "Verfassen Sie Mahnungen und professionelle E-Mails in Sekunden, ohne nachzudenken."
+        },
+        "dashboard": {
+          "title": "Vollständiges Dashboard",
+          "text": "Ein klares Cockpit, um Kunden, Einnahmen und Ausgaben zu steuern."
+        }
+      }
+    },
+    "dashboard": {
+      "label": "Produktansicht",
+      "title": "Ein Dashboard, das wirklich spricht.",
+      "description": "Überblick über Einnahmen, Zahlungen, Ausgaben und Fristen – alles klar und handlungsorientiert.",
+      "tags": ["Zahlungsverfolgung", "KI-Nachfassungen", "Ausgabenübersicht", "Benachrichtigungen"],
+      "preview": {
+        "label": "Dashboard-Vorschau",
+        "stats": {
+          "labels": ["Bezahlte Rechnungen", "Ausstehend", "Ausgaben"],
+          "value": "+12%",
+          "period": "Diese Woche"
+        },
+        "deadlines": {
+          "label": "Fälligkeiten",
+          "items": ["Rechnungsnachfassung #1098", "Zahlung Cloud-Ausgabe", "Angebot zur Freigabe"],
+          "today": "Heute"
+        }
+      },
+      "mockupNote": "UI-Mockup (Platzhalter)."
+    },
+    "howItWorks": {
+      "label": "So funktioniert’s",
+      "title": "Einfach, flüssig, ohne Überladung.",
+      "description": "6 klare Schritte, um Ihre Fakturierung im Griff zu behalten.",
+      "steps": [
+        "Legen Sie in 30 Sekunden einen Kunden an.",
+        "Erstellen Sie ein Angebot oder eine Rechnung.",
+        "Versenden Sie es und verfolgen Sie den Status.",
+        "Fügen Sie Ihre Ausgaben hinzu.",
+        "Lassen Sie OBILLZ die Erinnerungen übernehmen.",
+        "Steuern Sie alles über das Dashboard."
+      ]
+    },
+    "pricing": {
+      "label": "Preise",
+      "title": "Zwei Pläne, klar und effizient.",
+      "free": {
+        "title": "Free",
+        "subtitle": "Zum Start ohne Risiko.",
+        "features": ["Angebote und Rechnungen erstellen", "Basis-Tracking", "Begrenzter Zugang"],
+        "cta": "Kostenlos starten"
+      },
+      "pro": {
+        "badge": "Empfohlen",
+        "title": "Pro",
+        "subtitle": "29€ / Monat (provisorischer Preis)",
+        "features": [
+          "Unbegrenzte Fakturierung",
+          "Ausgaben + Fristen",
+          "Benachrichtigungen",
+          "KI-Assistent",
+          "Vollständiges Dashboard"
+        ],
+        "cta": "Auf Pro wechseln"
+      }
+    },
+    "comparison": {
+      "label": "Vergleich",
+      "title": "Ohne OBILLZ / Mit OBILLZ",
+      "description": "Ein schneller Überblick über den Unterschied, wie ein Vorher / Nachher.",
+      "before": {
+        "label": "Ohne OBILLZ",
+        "badge": "Vorher",
+        "items": [
+          "Manuelle Rechnungserstellung, langwierig und fehleranfällig",
+          "Rechnungen und Ausgaben auf mehrere Tools verteilt",
+          "Keine Warnungen zu Zahlungsfristen",
+          "Kaum Überblick über bezahlte oder überfällige Posten",
+          "Zeitverlust durch die Suche nach Dokumenten",
+          "Stressiges und unübersichtliches Finanz-Tracking"
+        ]
+      },
+      "middle": {
+        "before": "VORHER",
+        "after": "NACHHER"
+      },
+      "after": {
+        "label": "Mit OBILLZ",
+        "badge": "Nachher",
+        "items": {
+          "fast": {
+            "title": "Schnelle, zentralisierte Fakturierung",
+            "text": "Erstellen und senden Sie Rechnungen in wenigen Klicks aus einem Tool."
+          },
+          "tracking": {
+            "title": "Klarer Überblick über Zahlungen und Ausgaben",
+            "text": "Sehen Sie sofort, was Sie zahlen und einnehmen müssen."
+          },
+          "alerts": {
+            "title": "Automatische Erinnerungen",
+            "text": "Erhalten Sie Benachrichtigungen vor wichtigen Fristen."
+          },
+          "realtime": {
+            "title": "Echtzeit-Überblick",
+            "text": "Klare Status: bezahlt, ausstehend, überfällig."
+          },
+          "organization": {
+            "title": "Organisation ohne Aufwand",
+            "text": "Alle Ihre Dokumente sind zentralisiert und jederzeit zugänglich."
+          }
+        }
+      }
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Häufig gestellte Fragen.",
+      "items": {
+        "fit": {
+          "question": "Ist OBILLZ für Freelancer und kleine Teams geeignet?",
+          "answer": "Ja, OBILLZ ist für Selbstständige, Freelancer und kleine Unternehmen gedacht."
+        },
+        "free": {
+          "question": "Kann ich kostenlos starten?",
+          "answer": "Ja, der Free-Plan ermöglicht die Erstellung von Angeboten und Rechnungen mit begrenztem Zugriff."
+        },
+        "export": {
+          "question": "Kann ich meine Rechnungen für die Buchhaltung oder Treuhand exportieren?",
+          "answer": "Ja. Mit einem Klick exportieren Sie alle Rechnungen eines Jahres mit den entsprechenden PDFs, bereit für Ihre Treuhand oder Ihren Buchhalter."
+        },
+        "noCommitment": {
+          "question": "Ist der Pro-Plan ohne Bindung?",
+          "answer": "Ja, Sie können auf Pro wechseln und jederzeit kündigen."
+        },
+        "assistant": {
+          "question": "Ist der KI-Assistent in Pro enthalten?",
+          "answer": "Ja, der KI-Assistent ist Teil des Pro-Plans mit Benachrichtigungen und dem vollständigen Dashboard."
+        }
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 OBILLZ. Alle Rechte vorbehalten.",
+      "login": "Anmelden",
+      "signup": "Registrieren",
+      "legal": {
+        "mentions": "Impressum",
+        "privacy": "Datenschutzerklärung",
+        "terms": "Nutzungsbedingungen",
+        "cookies": "Cookie-Richtlinie"
+      }
+    }
+  },
   "footer": {
     "copyright": "© 2026 Organa. Entwickelt in der Schweiz.",
     "login": "Anmelden",
