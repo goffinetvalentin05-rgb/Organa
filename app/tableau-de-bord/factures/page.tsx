@@ -125,6 +125,9 @@ export default function FacturesPage() {
               <Download className="w-5 h-5" />
               {t("dashboard.invoices.exportAccountingAction")}
             </button>
+            <p className="mt-1 text-xs text-tertiary">
+              Export comptable annuel simplifié
+            </p>
             {showAccountingExport && (
               <div className="absolute right-0 mt-3 w-64 rounded-xl border border-subtle bg-white p-4 shadow-premium z-10">
                 <label className="block text-sm text-secondary mb-2">

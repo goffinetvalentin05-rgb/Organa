@@ -111,6 +111,11 @@ const faqItems = [
     answer: "Oui, le plan Free vous permet de créer devis et factures avec un accès limité.",
   },
   {
+    question: "Puis-je exporter mes factures pour ma comptabilité ou ma fiduciaire ?",
+    answer:
+      "Oui. En un clic, vous pouvez exporter toutes vos factures d’une année donnée avec les PDF correspondants, prêtes à être transmises à votre fiduciaire ou comptable.",
+  },
+  {
     question: "Le plan Pro est-il sans engagement ?",
     answer: "Oui, vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez.",
   },
