@@ -17,13 +17,13 @@
     "hero": {
       "badge": "OBILLZ — Rechnungen in zwei Klicks",
       "title": "Verwalten Sie Ihre Angebote und Rechnungen\nwo immer Sie sind.",
-      "subtitle": "Ein modernes Tool, um schnell zu fakturieren, Ausgaben zu verfolgen und sich auf Ihr Geschäft zu konzentrieren.",
+      "subtitle": "Ein einfaches Tool, um schnell zu fakturieren, den Rechnungsstatus im Dashboard zu verfolgen und die Kontrolle über Nachfassungen zu behalten.",
       "bullets": [
         "Schnelle, professionelle Fakturierung",
-        "Klarer Überblick über Zahlungen und Nachfassaktionen",
+        "Klarer Überblick über Zahlungen und Status",
+        "Manuelle Nachfassungen, Sie behalten die Kontrolle",
         "Ausgaben + Fristen gebündelt",
-        "Einfacher Zugang, ohne Verwaltungsjargon",
-        "Für Europa und international gedacht"
+        "Einfacher Zugang, ohne Verwaltungsjargon, für Europa gedacht"
       ],
       "ctaPrimary": "Kostenlos starten",
       "ctaSecondary": "Demo ansehen",
@@ -75,14 +75,14 @@
         },
         "control": {
           "title": "Sie behalten die Kontrolle",
-          "text": "Intelligente Erinnerungen, damit keine Zahlung oder Ausgabe durchrutscht."
+          "text": "Sie entscheiden, wann Sie nachfassen, mit klarer Sicht im Dashboard."
         }
       }
     },
     "features": {
       "label": "Zentrale Funktionen",
       "title": "Alles, was Sie brauchen. Nichts Überflüssiges.",
-      "description": "Gedacht für Selbstständige und kleine Unternehmen, die schnell vorankommen wollen.",
+      "description": "Ideal für Freelancer und kleine Unternehmen, die es einfach halten wollen.",
       "cards": {
         "quotes": {
           "title": "Angebote & Rechnungen in 2 Klicks",
@@ -97,12 +97,12 @@
           "text": "Erfassen Sie Ausgaben und planen Sie wichtige Fristen ohne externe Tabellen."
         },
         "notifications": {
-          "title": "Nützliche Benachrichtigungen",
-          "text": "Erhalten Sie wichtige Erinnerungen zur richtigen Zeit, um nachzufassen oder zu bezahlen – ohne Stress."
+          "title": "Status-Tracking",
+          "text": "Sehen Sie leicht, was bezahlt, ausstehend oder überfällig ist."
         },
         "assistant": {
-          "title": "Integrierter KI-Assistent",
-          "text": "Verfassen Sie Mahnungen und professionelle E-Mails in Sekunden, ohne nachzudenken."
+          "title": "Manuelle Nachfassungen",
+          "text": "Sie entscheiden, wann Sie Kunden nachfassen, direkt aus Ihren Rechnungen."
         },
         "dashboard": {
           "title": "Vollständiges Dashboard",
@@ -113,8 +113,8 @@
     "dashboard": {
       "label": "Produktansicht",
       "title": "Ein Dashboard, das wirklich spricht.",
-      "description": "Überblick über Einnahmen, Zahlungen, Ausgaben und Fristen – alles klar und handlungsorientiert.",
-      "tags": ["Zahlungsverfolgung", "KI-Nachfassungen", "Ausgabenübersicht", "Benachrichtigungen"],
+      "description": "Verfolgen Sie den Rechnungsstatus in Echtzeit über ein klares Dashboard, mit Status bezahlt / ausstehend / überfällig.",
+      "tags": ["Status-Tracking", "Manuelle Nachfassungen", "Ausgabenübersicht", "Alles zentral"],
       "preview": {
         "label": "Dashboard-Vorschau",
         "stats": {
@@ -139,7 +139,7 @@
         "Erstellen Sie ein Angebot oder eine Rechnung.",
         "Versenden Sie es und verfolgen Sie den Status.",
         "Fügen Sie Ihre Ausgaben hinzu.",
-        "Lassen Sie OBILLZ die Erinnerungen übernehmen.",
+        "Fassen Sie bei Bedarf manuell nach.",
         "Steuern Sie alles über das Dashboard."
       ]
     },
@@ -159,8 +159,8 @@
         "features": [
           "Unbegrenzte Fakturierung",
           "Ausgaben + Fristen",
-          "Benachrichtigungen",
-          "KI-Assistent",
+          "Zahlungsstatus-Tracking",
+          "Manuelle Nachfassungen",
           "Vollständiges Dashboard"
         ],
         "cta": "Auf Pro wechseln"
@@ -176,7 +176,7 @@
         "items": [
           "Manuelle Rechnungserstellung, langwierig und fehleranfällig",
           "Rechnungen und Ausgaben auf mehrere Tools verteilt",
-          "Keine Warnungen zu Zahlungsfristen",
+          "Kein einfacher Überblick über Zahlungsfristen",
           "Kaum Überblick über bezahlte oder überfällige Posten",
           "Zeitverlust durch die Suche nach Dokumenten",
           "Stressiges und unübersichtliches Finanz-Tracking"
@@ -199,8 +199,8 @@
             "text": "Sehen Sie sofort, was Sie zahlen und einnehmen müssen."
           },
           "alerts": {
-            "title": "Automatische Erinnerungen",
-            "text": "Erhalten Sie Benachrichtigungen vor wichtigen Fristen."
+            "title": "Nachfassungen unter Ihrer Kontrolle",
+            "text": "Sie fassen nach, wenn Sie es entscheiden, mit Status im Dashboard."
           },
           "realtime": {
             "title": "Echtzeit-Überblick",
@@ -234,8 +234,8 @@
           "answer": "Ja, Sie können auf Pro wechseln und jederzeit kündigen."
         },
         "assistant": {
-          "question": "Ist der KI-Assistent in Pro enthalten?",
-          "answer": "Ja, der KI-Assistent ist Teil des Pro-Plans mit Benachrichtigungen und dem vollständigen Dashboard."
+          "question": "Gibt es automatische Benachrichtigungen?",
+          "answer": "Nein. Es gibt keine automatischen Push- oder E-Mail-Benachrichtigungen. Die Nachverfolgung passiert im Dashboard und Nachfassungen bleiben manuell."
         }
       }
     },

@@ -17,13 +17,13 @@
     "hero": {
       "badge": "OBILLZ — La facturation en deux clics",
       "title": "Gérez vos devis et factures\noù que vous soyez.",
-      "subtitle": "Un outil moderne pour facturer vite, suivre vos dépenses et rester concentré sur votre activité.",
+      "subtitle": "Un outil simple pour facturer vite, suivre l'état de vos factures dans le dashboard et garder la main sur vos relances.",
       "bullets": [
         "Facturation rapide et professionnelle",
-        "Suivi clair des paiements et relances",
+        "Suivi clair des paiements et des statuts",
+        "Relances manuelles, vous gardez la main",
         "Dépenses + échéances réunies",
-        "Accès simple, sans jargon administratif",
-        "Pensé pour l'Europe et l'international"
+        "Accès simple, sans jargon administratif, pensé pour l'Europe"
       ],
       "ctaPrimary": "Commencer gratuitement",
       "ctaSecondary": "Voir la démo",
@@ -75,14 +75,14 @@
         },
         "control": {
           "title": "Vous gardez le contrôle",
-          "text": "Des rappels intelligents pour ne plus laisser passer un paiement ou une dépense."
+          "text": "Vous décidez quand relancer, avec une vue claire dans le dashboard."
         }
       }
     },
     "features": {
       "label": "Fonctionnalités clés",
       "title": "Tout ce dont vous avez besoin. Rien de superflu.",
-      "description": "Pensé pour les indépendants et petites entreprises qui veulent aller vite.",
+      "description": "Idéal pour freelances et petites entreprises qui veulent aller à l'essentiel.",
       "cards": {
         "quotes": {
           "title": "Devis & factures en 2 clics",
@@ -97,12 +97,12 @@
           "text": "Enregistrez vos dépenses et planifiez les échéances importantes sans tableaux externes."
         },
         "notifications": {
-          "title": "Notifications utiles",
-          "text": "Recevez les rappels clés au bon moment pour relancer ou payer sans stress."
+          "title": "Suivi des statuts",
+          "text": "Visualisez facilement ce qui est payé, en attente ou en retard."
         },
         "assistant": {
-          "title": "Assistant IA intégré",
-          "text": "Rédigez des relances et emails pro en quelques secondes, sans y penser."
+          "title": "Relances sous votre contrôle",
+          "text": "Vous décidez quand relancer vos clients, directement depuis vos factures."
         },
         "dashboard": {
           "title": "Dashboard complet",
@@ -113,8 +113,8 @@
     "dashboard": {
       "label": "Vue produit",
       "title": "Un dashboard qui parle vraiment.",
-      "description": "Suivi des revenus, paiements, dépenses et échéances, tout est là, lisible et actionnable.",
-      "tags": ["Suivi paiements", "Relances IA", "Vue dépenses", "Notifications"],
+      "description": "Suivez l'état de vos factures en temps réel depuis un tableau de bord clair, avec des statuts payée / en attente / en retard.",
+      "tags": ["Suivi des statuts", "Relances manuelles", "Vue dépenses", "Tout centralisé"],
       "preview": {
         "label": "Aperçu dashboard",
         "stats": {
@@ -139,7 +139,7 @@
         "Générez un devis ou une facture.",
         "Envoyez et suivez le statut.",
         "Ajoutez vos dépenses.",
-        "Laissez OBILLZ gérer les rappels.",
+        "Relancez manuellement si besoin.",
         "Pilotez tout depuis le dashboard."
       ]
     },
@@ -159,8 +159,8 @@
         "features": [
           "Facturation illimitée",
           "Dépenses + échéances",
-          "Notifications",
-          "IA assistant",
+          "Suivi des statuts de paiement",
+          "Relances manuelles",
           "Dashboard complet"
         ],
         "cta": "Passer au plan Pro"
@@ -176,7 +176,7 @@
         "items": [
           "Création manuelle des factures, longue et source d’erreurs",
           "Factures et dépenses dispersées sur plusieurs outils",
-          "Aucune alerte sur les échéances de paiement",
+          "Pas de suivi simple des échéances de paiement",
           "Manque de visibilité sur ce qui est payé ou en retard",
           "Perte de temps à chercher des documents",
           "Suivi financier stressant et peu clair"
@@ -199,8 +199,8 @@
             "text": "Visualisez instantanément ce que vous devez payer et encaisser."
           },
           "alerts": {
-            "title": "Alertes automatiques",
-            "text": "Recevez des notifications avant les échéances importantes."
+            "title": "Relances sous votre contrôle",
+            "text": "Vous relancez quand vous le décidez, avec un suivi visible dans le dashboard."
           },
           "realtime": {
             "title": "Vue d’ensemble en temps réel",
@@ -234,8 +234,8 @@
           "answer": "Oui, vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez."
         },
         "assistant": {
-          "question": "L'assistant IA est-il inclus dans Pro ?",
-          "answer": "Oui, l'assistant IA fait partie du plan Pro avec les notifications et le dashboard complet."
+          "question": "Y a-t-il des notifications automatiques ?",
+          "answer": "Non. Il n'y a pas de notifications push ou email automatiques. Le suivi se fait dans le dashboard et les relances restent manuelles."
         }
       }
     },

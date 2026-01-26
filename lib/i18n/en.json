@@ -17,13 +17,13 @@
     "hero": {
       "badge": "OBILLZ — Invoicing in two clicks",
       "title": "Manage your quotes and invoices\nwherever you are.",
-      "subtitle": "A modern tool to invoice fast, track your expenses, and stay focused on your business.",
+      "subtitle": "A simple tool to invoice fast, track invoice status in the dashboard, and stay in control of your follow-ups.",
       "bullets": [
         "Fast, professional invoicing",
-        "Clear tracking of payments and follow-ups",
+        "Clear tracking of payments and statuses",
+        "Manual follow-ups, you stay in control",
         "Expenses + deadlines combined",
-        "Simple access, no admin jargon",
-        "Built for Europe and internationally"
+        "Simple access, no admin jargon, built for Europe"
       ],
       "ctaPrimary": "Start for free",
       "ctaSecondary": "See the demo",
@@ -75,14 +75,14 @@
         },
         "control": {
           "title": "You stay in control",
-          "text": "Smart reminders so you don't miss a payment or expense."
+          "text": "You decide when to follow up, with a clear view in the dashboard."
         }
       }
     },
     "features": {
       "label": "Key features",
       "title": "Everything you need. Nothing extra.",
-      "description": "Built for freelancers and small businesses that want to move fast.",
+      "description": "Ideal for freelancers and small businesses that want to keep it simple.",
       "cards": {
         "quotes": {
           "title": "Quotes & invoices in 2 clicks",
@@ -97,12 +97,12 @@
           "text": "Record expenses and plan important deadlines without external spreadsheets."
         },
         "notifications": {
-          "title": "Useful notifications",
-          "text": "Get key reminders at the right time to follow up or pay without stress."
+          "title": "Status tracking",
+          "text": "Easily see what's paid, pending, or overdue."
         },
         "assistant": {
-          "title": "Built-in AI assistant",
-          "text": "Draft follow-ups and professional emails in seconds, without thinking about it."
+          "title": "Manual follow-ups",
+          "text": "You decide when to follow up with clients, right from your invoices."
         },
         "dashboard": {
           "title": "Full dashboard",
@@ -113,8 +113,8 @@
     "dashboard": {
       "label": "Product view",
       "title": "A dashboard that truly speaks.",
-      "description": "Track revenue, payments, expenses, and deadlines — everything is readable and actionable.",
-      "tags": ["Payment tracking", "AI follow-ups", "Expense view", "Notifications"],
+      "description": "Track invoice status in real time from a clear dashboard, with paid / pending / overdue statuses.",
+      "tags": ["Status tracking", "Manual follow-ups", "Expense view", "All in one place"],
       "preview": {
         "label": "Dashboard preview",
         "stats": {
@@ -139,7 +139,7 @@
         "Generate a quote or an invoice.",
         "Send and track the status.",
         "Add your expenses.",
-        "Let OBILLZ handle reminders.",
+        "Follow up manually when needed.",
         "Manage everything from the dashboard."
       ]
     },
@@ -159,8 +159,8 @@
         "features": [
           "Unlimited invoicing",
           "Expenses + deadlines",
-          "Notifications",
-          "AI assistant",
+          "Payment status tracking",
+          "Manual follow-ups",
           "Full dashboard"
         ],
         "cta": "Upgrade to Pro"
@@ -176,7 +176,7 @@
         "items": [
           "Manual invoice creation, long and error-prone",
           "Invoices and expenses scattered across multiple tools",
-          "No alerts for payment deadlines",
+          "No simple way to track payment deadlines",
           "Lack of visibility on what's paid or overdue",
           "Time wasted searching for documents",
           "Stressful and unclear financial tracking"
@@ -199,8 +199,8 @@
             "text": "See instantly what you need to pay and collect."
           },
           "alerts": {
-            "title": "Automatic alerts",
-            "text": "Receive notifications before key deadlines."
+            "title": "Follow-ups under your control",
+            "text": "You follow up when you decide, with status visible in the dashboard."
           },
           "realtime": {
             "title": "Real-time overview",
@@ -234,8 +234,8 @@
           "answer": "Yes, you can switch to Pro and cancel whenever you want."
         },
         "assistant": {
-          "question": "Is the AI assistant included in Pro?",
-          "answer": "Yes, the AI assistant is part of the Pro plan with notifications and the full dashboard."
+          "question": "Are there automatic notifications?",
+          "answer": "No. There are no automatic push or email notifications. Tracking happens in the dashboard and follow-ups are manual."
         }
       }
     },
