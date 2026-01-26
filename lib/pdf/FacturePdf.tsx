@@ -16,6 +16,9 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#0F172A",
   },
+  content: {
+    paddingBottom: 96,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -174,16 +177,33 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
   },
-  footer: {
+  notesSection: {
     marginTop: 18,
+    width: "100%",
+    maxWidth: "100%",
+  },
+  notesText: {
+    fontSize: 9,
+    color: "#475569",
+    lineHeight: 1.4,
+    width: "100%",
+    maxWidth: "100%",
+  },
+  footer: {
+    position: "absolute",
+    left: 48,
+    right: 48,
+    bottom: 48,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
   },
   footerText: {
-    fontSize: 9,
+    fontSize: 8,
     color: "#475569",
     lineHeight: 1.4,
+    width: "100%",
+    maxWidth: "100%",
   },
 });
 
@@ -249,6 +269,42 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const formatIban = (iban?: string) => {
+  if (!iban) return "";
+  const compact = iban.replace(/\s+/g, "");
+  return compact.replace(/(.{4})/g, "$1 ").trim();
+};
+
+const sanitizeNotes = (
+  notes: string | undefined,
+  company: { iban?: string; bankName?: string; conditionsPaiement?: string }
+) => {
+  if (!notes) return "";
+  const ibanCompact = company.iban ? company.iban.replace(/\s+/g, "") : "";
+  const bankName = company.bankName?.trim().toLowerCase() || "";
+  const paymentTerms = company.conditionsPaiement?.trim().toLowerCase() || "";
+
+  const cleanedLines = notes
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => {
+      const normalized = line.replace(/\s+/g, "").toLowerCase();
+      if (ibanCompact && normalized.includes(ibanCompact.toLowerCase())) return false;
+      if (bankName && line.toLowerCase().includes(bankName)) return false;
+      if (paymentTerms && line.toLowerCase().includes(paymentTerms)) return false;
+      if (/^iban\b/i.test(line)) return false;
+      return true;
+    });
+
+  return cleanedLines.join("\n");
+};
+
+const hyphenationCallback = (word: string) => {
+  if (word.length <= 18) return [word];
+  return word.match(/.{1,18}/g) || [word];
+};
+
 export const FacturePdf: React.FC<FacturePdfProps> = ({
   company,
   client,
@@ -276,159 +332,167 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.companyBlock}>
-            <View style={styles.companyTop}>
-              {company.logoUrl && (
-                <Image src={company.logoUrl} style={styles.logo} />
-              )}
-              <View>
-                <Text style={[styles.companyName, dynamicStyles.companyName]}>
-                  {company.name}
-                </Text>
-                <Text style={[styles.companyDetails, styles.wrapText]}>
-                  {company.address && `${company.address}\n`}
-                  {company.email && `${company.email}\n`}
-                  {company.phone}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.documentBlock}>
-            <Text style={[styles.documentType, dynamicStyles.documentType]}>
-              FACTURE
-            </Text>
-            <View style={styles.metaBox}>
-              <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Numéro</Text>
-                <Text>{document.number}</Text>
-              </View>
-              <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Date d'émission</Text>
-                <Text>{formatDate(document.date)}</Text>
-              </View>
-              {document.dueDate && (
-                <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Date d'échéance</Text>
-                  <Text>{formatDate(document.dueDate)}</Text>
-                </View>
-              )}
-              <View style={[styles.metaRow, { marginBottom: 0 }]}>
-                <Text style={styles.metaLabel}>Devise</Text>
-                <Text>{currencySymbol}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Client */}
-        <View style={styles.clientSection}>
-          <Text style={styles.sectionTitle}>Client</Text>
-          <View style={styles.clientBox}>
-            <Text style={[styles.clientName, styles.textBlock]}>
-              {client.name}
-            </Text>
-            {client.address && (
-              <Text style={[styles.companyDetails, styles.wrapText]}>
-                {client.address}
-              </Text>
-            )}
-            {client.email && (
-              <Text style={[styles.companyDetails, styles.wrapText]}>
-                {client.email}
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* Lines Table */}
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.colDesignation]}>
-              Description
-            </Text>
-            <Text style={[styles.tableHeaderCell, styles.colQty]}>
-              Quantité
-            </Text>
-            <Text style={[styles.tableHeaderCell, styles.colPrice]}>
-              Prix unitaire
-            </Text>
-            <Text style={[styles.tableHeaderCell, styles.colTotal]}>Total</Text>
-          </View>
-          {lines.map((line, index) => (
-            <View key={index}>
-              <View style={styles.tableRow}>
-                <View style={styles.colDesignation}>
-                  <Text
-                    style={[styles.tableCell, styles.wrapText, styles.textBlock]}
-                  >
-                    {line.label}
+        <View style={styles.content}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.companyBlock}>
+              <View style={styles.companyTop}>
+                {company.logoUrl && (
+                  <Image src={company.logoUrl} style={styles.logo} />
+                )}
+                <View>
+                  <Text style={[styles.companyName, dynamicStyles.companyName]}>
+                    {company.name}
                   </Text>
-                  {line.description && (
-                    <Text
-                      style={[
-                        styles.tableCell,
-                        styles.wrapText,
-                        styles.textBlock,
-                        { fontSize: 8, color: "#64748B", marginTop: 4 },
-                      ]}
-                    >
-                      {line.description}
-                    </Text>
-                  )}
+                  <Text style={[styles.companyDetails, styles.wrapText]}>
+                    {company.address && `${company.address}\n`}
+                    {company.email && `${company.email}\n`}
+                    {company.phone}
+                  </Text>
                 </View>
-                <Text style={[styles.tableCell, styles.colQty]}>
-                  {line.qty}
-                </Text>
-                <Text style={[styles.tableCell, styles.colPrice]}>
-                  {formatCurrency(line.unitPrice, currencySymbol)}
-                </Text>
-                <Text style={[styles.tableCell, styles.colTotal]}>
-                  {formatCurrency(line.total, currencySymbol)}
-                </Text>
               </View>
             </View>
-          ))}
-        </View>
-
-        {/* Totals */}
-        <View style={styles.totals}>
-          <View style={styles.totalRow}>
-            <Text>Sous-total HT</Text>
-            <Text>{formatCurrency(totals.subtotal, currencySymbol)}</Text>
+            <View style={styles.documentBlock}>
+              <Text style={[styles.documentType, dynamicStyles.documentType]}>
+                FACTURE
+              </Text>
+              <View style={styles.metaBox}>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>Numéro</Text>
+                  <Text>{document.number}</Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>Date d'émission</Text>
+                  <Text>{formatDate(document.date)}</Text>
+                </View>
+                {document.dueDate && (
+                  <View style={styles.metaRow}>
+                    <Text style={styles.metaLabel}>Date d'échéance</Text>
+                    <Text>{formatDate(document.dueDate)}</Text>
+                  </View>
+                )}
+                <View style={[styles.metaRow, { marginBottom: 0 }]}>
+                  <Text style={styles.metaLabel}>Devise</Text>
+                  <Text>{currencySymbol}</Text>
+                </View>
+              </View>
+            </View>
           </View>
-          {document.vatRate && document.vatRate > 0 && (
+
+          {/* Client */}
+          <View style={styles.clientSection}>
+            <Text style={styles.sectionTitle}>Client</Text>
+            <View style={styles.clientBox}>
+              <Text style={[styles.clientName, styles.textBlock]}>
+                {client.name}
+              </Text>
+              {client.address && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.address}
+                </Text>
+              )}
+              {client.email && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.email}
+                </Text>
+              )}
+            </View>
+          </View>
+
+          {/* Lines Table */}
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableHeaderCell, styles.colDesignation]}>
+                Description
+              </Text>
+              <Text style={[styles.tableHeaderCell, styles.colQty]}>
+                Quantité
+              </Text>
+              <Text style={[styles.tableHeaderCell, styles.colPrice]}>
+                Prix unitaire
+              </Text>
+              <Text style={[styles.tableHeaderCell, styles.colTotal]}>Total</Text>
+            </View>
+            {lines.map((line, index) => (
+              <View key={index}>
+                <View style={styles.tableRow}>
+                  <View style={styles.colDesignation}>
+                    <Text
+                      style={[styles.tableCell, styles.wrapText, styles.textBlock]}
+                    >
+                      {line.label}
+                    </Text>
+                    {line.description && (
+                      <Text
+                        style={[
+                          styles.tableCell,
+                          styles.wrapText,
+                          styles.textBlock,
+                          { fontSize: 8, color: "#64748B", marginTop: 4 },
+                        ]}
+                      >
+                        {line.description}
+                      </Text>
+                    )}
+                  </View>
+                  <Text style={[styles.tableCell, styles.colQty]}>
+                    {line.qty}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.colPrice]}>
+                    {formatCurrency(line.unitPrice, currencySymbol)}
+                  </Text>
+                  <Text style={[styles.tableCell, styles.colTotal]}>
+                    {formatCurrency(line.total, currencySymbol)}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Totals */}
+          <View style={styles.totals}>
             <View style={styles.totalRow}>
-              <Text>TVA ({document.vatRate}%)</Text>
-              <Text>{formatCurrency(totals.vat, currencySymbol)}</Text>
+              <Text>Sous-total HT</Text>
+              <Text>{formatCurrency(totals.subtotal, currencySymbol)}</Text>
+            </View>
+            {document.vatRate && document.vatRate > 0 && (
+              <View style={styles.totalRow}>
+                <Text>TVA ({document.vatRate}%)</Text>
+                <Text>{formatCurrency(totals.vat, currencySymbol)}</Text>
+              </View>
+            )}
+            <View
+              style={[styles.totalRow, styles.totalRowTotal, dynamicStyles.totalRowTotal]}
+            >
+              <Text>Total TTC</Text>
+              <Text>{formatCurrency(totals.total, currencySymbol)}</Text>
+            </View>
+          </View>
+
+          {sanitizeNotes(document.notes, company) && (
+            <View style={styles.notesSection}>
+              <Text
+                style={[styles.notesText, styles.wrapText, styles.textBlock]}
+                wrap
+                hyphenationCallback={hyphenationCallback}
+              >
+                {sanitizeNotes(document.notes, company)}
+              </Text>
             </View>
           )}
-          <View style={[styles.totalRow, styles.totalRowTotal, dynamicStyles.totalRowTotal]}>
-            <Text>Total TTC</Text>
-            <Text>{formatCurrency(totals.total, currencySymbol)}</Text>
-          </View>
         </View>
 
         {/* Footer */}
-        {(document.notes ||
-          company.iban ||
-          company.bankName ||
-          company.conditionsPaiement) && (
-          <View style={styles.footer}>
-            {document.notes && (
-              <Text style={[styles.footerText, styles.wrapText]}>
-                {document.notes}
-              </Text>
-            )}
+        {(company.iban || company.bankName || company.conditionsPaiement) && (
+          <View style={styles.footer} fixed>
             {(company.iban || company.bankName) && (
-              <Text style={[styles.footerText, styles.wrapText]}>
+              <Text style={styles.footerText}>
                 {company.bankName ? `${company.bankName} • ` : ""}
-                {company.iban ? `IBAN ${company.iban}` : ""}
+                {company.iban ? `IBAN ${formatIban(company.iban)}` : ""}
               </Text>
             )}
             {company.conditionsPaiement && (
-              <Text style={[styles.footerText, styles.wrapText]}>
+              <Text style={styles.footerText}>
                 {company.conditionsPaiement}
               </Text>
             )}
