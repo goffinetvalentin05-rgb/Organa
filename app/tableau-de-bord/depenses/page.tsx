@@ -68,6 +68,12 @@ export default function DepensesPage() {
   const [depenses, setDepenses] = useState<Depense[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const currentYear = new Date().getFullYear();
+  const [showAccountingExport, setShowAccountingExport] = useState(false);
+  const [accountingYear, setAccountingYear] = useState<string>(String(currentYear));
+  const accountingYears = Array.from({ length: 5 }, (_, index) =>
+    String(currentYear - index)
+  );
   const [showForm, setShowForm] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -455,29 +461,63 @@ export default function DepensesPage() {
     setShowEditModal(true);
   };
 
+  const handleExportAccounting = () => {
+    const url = `/api/export/accounting?resource=expenses&year=${accountingYear}`;
+    window.location.href = url;
+    setShowAccountingExport(false);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t("dashboard.expenses.title")}</h1>
           <p className="mt-2 text-secondary">
             {t("dashboard.expenses.subtitle")}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <a
-            href="/api/export?resource=expenses"
-            className="inline-flex items-center gap-2 rounded-full border border-subtle bg-white px-4 py-2 text-xs font-semibold text-secondary transition-all hover:text-primary"
-          >
-            <Download className="w-4 h-4" />
-            {t("dashboard.expenses.exportAction")}
-          </a>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowAccountingExport((value) => !value)}
+              className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
+            >
+              <Download className="w-5 h-5" />
+              {t("dashboard.expenses.exportAccountingAction")}
+            </button>
+            {showAccountingExport && (
+              <div className="absolute right-0 mt-3 w-64 rounded-xl border border-subtle bg-white p-4 shadow-premium z-10">
+                <label className="block text-sm text-secondary mb-2">
+                  {t("dashboard.expenses.exportAccountingYearLabel")}
+                </label>
+                <select
+                  value={accountingYear}
+                  onChange={(event) => setAccountingYear(event.target.value)}
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                >
+                  {accountingYears.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleExportAccounting}
+                  className="mt-4 w-full rounded-lg accent-bg text-white py-2 text-sm font-medium"
+                >
+                  {t("dashboard.expenses.exportAccountingDownload")}
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={() => {
               console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
               setShowForm((value) => !value);
             }}
-            className="px-6 py-3 accent-bg text-white font-medium rounded-full transition-all flex items-center gap-2"
+            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
             style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
           >
             <Plus className="w-5 h-5" />
