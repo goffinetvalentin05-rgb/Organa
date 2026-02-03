@@ -142,42 +142,39 @@ export default function LandingPage() {
               La gestion des clubs sportifs centralisée.
             </p>
 
-            {/* Zone cartes + titre — 4 flashcards dispersées (pas de chevauchement) */}
-            <div className="relative mt-8 flex min-h-[320px] w-full flex-1 flex-col items-center justify-end md:mt-10 md:min-h-[360px]">
-              {/* Carte haut gauche */}
+            {/* Zone cartes — 4 flashcards dispersées AUTOUR du hero (jamais l'une sous l'autre) */}
+            <div className="relative mt-8 flex min-h-[380px] w-full flex-1 flex-col items-center justify-end md:mt-10 md:min-h-[420px]">
+              {/* Dispersées autour du texte hero : 4 positions décalées (pas en colonnes) */}
               <FloatingHeroCard
                 title="Joueur / Membre"
-                position="left-0 top-0 md:left-[4%] md:top-[5%]"
+                position="left-[2%] top-[8%] md:left-[5%] md:top-[10%]"
                 animationDelay="0s"
               >
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
                 <p className="mt-1 text-xs text-white/80">124 membres</p>
               </FloatingHeroCard>
 
-              {/* Carte haut droite */}
               <FloatingHeroCard
                 title="Manifestation"
-                position="right-0 top-0 md:right-[4%] md:top-[5%]"
+                position="right-[2%] top-[12%] md:right-[5%] md:top-[14%]"
                 animationDelay="0.5s"
               >
                 <p className="font-semibold text-white">Match domicile</p>
                 <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
               </FloatingHeroCard>
 
-              {/* Carte bas gauche — remontée pour rester visible au-dessus de la courbe */}
               <FloatingHeroCard
                 title="Cotisation"
-                position="bottom-[38%] left-0 md:bottom-[36%] md:left-[4%]"
+                position="left-[12%] bottom-[28%] md:left-[18%] md:bottom-[30%]"
                 animationDelay="1s"
               >
                 <p className="font-semibold text-white">Saison 2024-2025</p>
                 <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
               </FloatingHeroCard>
 
-              {/* Carte bas droite — remontée pour rester visible au-dessus de la courbe */}
               <FloatingHeroCard
                 title="Dépense / Recette"
-                position="bottom-[38%] right-0 md:bottom-[36%] md:right-[4%]"
+                position="right-[12%] bottom-[28%] md:right-[18%] md:bottom-[30%]"
                 animationDelay="1.5s"
               >
                 <p className="font-semibold text-white">- 420 €</p>
