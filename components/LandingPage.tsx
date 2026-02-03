@@ -2,28 +2,89 @@
 
 import Link from "next/link";
 
-function SectionTitle({
-  label,
+/* ----- Grid d'arrière-plan ----- */
+function GridBackground() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-40"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)`,
+        backgroundSize: "56px 56px",
+      }}
+    />
+  );
+}
+
+/* ----- Accent graphique type "main" ----- */
+function HandDrawnArrow({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={`text-emerald-400 ${className}`}
+      width="80"
+      height="40"
+      viewBox="0 0 80 40"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 20h55M55 12l8 8-8 8" />
+    </svg>
+  );
+}
+
+function HandDrawnCircle({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex rounded-full border-2 border-dashed border-emerald-400 px-4 py-2 text-sm font-medium text-emerald-400">
+      {children}
+    </span>
+  );
+}
+
+/* ----- Carte flottante hero ----- */
+function FloatingHeroCard({
   title,
-  description,
+  children,
+  position,
+  animationDelay = "0s",
 }: {
-  label: string;
   title: string;
-  description?: string;
+  children: React.ReactNode;
+  rotate?: string;
+  position: string;
+  animationDelay?: string;
 }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-        {label}
-      </p>
-      <h2 className="mt-3 text-2xl font-semibold text-slate-900 md:text-3xl">
+    <div
+      className={`absolute rounded-3xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:border-white/30 ${position}`}
+      style={{ animation: "hero-float 6s ease-in-out infinite", animationDelay }}
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
         {title}
-      </h2>
-      {description ? (
-        <p className="mt-3 text-base leading-relaxed text-slate-600">
-          {description}
-        </p>
-      ) : null}
+      </p>
+      <div className="mt-2 text-sm text-white">{children}</div>
+    </div>
+  );
+}
+
+/* ----- Carte section (non flottante) ----- */
+function FeatureCard({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/30 hover:bg-white/10">
+      <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-400">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold text-white">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-white/70">{text}</p>
     </div>
   );
 }
@@ -31,22 +92,25 @@ function SectionTitle({
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/80 bg-slate-50/95 backdrop-blur-sm">
+      {/* ----- Nav (intégrée au hero bleu) ----- */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-blue-950/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
-          <Link href="/" className="text-xl font-semibold text-slate-900">
+          <Link
+            href="/"
+            className="text-xl font-semibold text-white transition-opacity hover:opacity-90"
+          >
             Obillz
           </Link>
           <div className="flex items-center gap-3">
             <Link
               href="/connexion"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 transition-colors"
+              className="rounded-full border border-white/30 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
             >
               Connexion
             </Link>
             <Link
               href="#demo"
-              className="rounded-full bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+              className="rounded-full border-2 border-emerald-400 bg-transparent px-5 py-2 text-sm font-medium text-emerald-400 transition-all hover:bg-emerald-400 hover:text-blue-950"
             >
               Demander une démo
             </Link>
@@ -54,234 +118,252 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <main className="pt-20">
-        {/* 1. Hero */}
-        <section className="px-4 py-16 md:px-6 md:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-3xl font-semibold leading-tight text-slate-900 md:text-4xl">
-              Logiciel de gestion pour les clubs sportifs
+      <main className="pt-16">
+        {/* ========== 1. HERO VISUEL ========== */}
+        <section className="relative min-h-[90vh] overflow-hidden bg-gradient-to-b from-blue-950 via-indigo-950 to-blue-950 px-4 pb-24 pt-28 md:px-6 md:pt-36">
+          <GridBackground />
+
+          <div className="relative mx-auto max-w-5xl text-center">
+            <h1 className="text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+              Gestion pour
+              <br />
+              clubs sportifs
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-slate-600">
-              Obillz centralise les joueurs, les membres, les cotisations, les
-              manifestations, les calendriers, les dépenses, les recettes et la
-              communication par e-mail. Tout est dans un seul outil.
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 md:text-xl">
+              Joueurs, membres, cotisations, manifestations, calendriers,
+              dépenses, recettes et communication — tout dans un seul outil.
             </p>
-            <div className="mt-8">
+
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="#demo"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-emerald-400 bg-emerald-400 px-8 py-3.5 text-sm font-semibold text-blue-950 transition-all hover:bg-emerald-300 hover:border-emerald-300"
               >
                 Demander une démo
               </Link>
+              <HandDrawnCircle>Démo sur mesure</HandDrawnCircle>
+            </div>
+
+            <div className="relative mx-auto mt-16 h-72 w-full max-w-4xl md:mt-20 md:h-80 lg:mt-24">
+              {/* Cartes flottantes hero */}
+              <FloatingHeroCard
+                title="Joueur / Membre"
+                rotate="-rotate-6"
+                position="left-0 top-0 md:left-[2%] md:top-[5%]"
+                animationDelay="0s"
+              >
+                <p className="font-medium text-white">Marie Dupont</p>
+                <p className="text-white/80">marie.dupont@email.fr</p>
+              </FloatingHeroCard>
+
+              <FloatingHeroCard
+                title="Manifestation"
+                rotate="rotate-3"
+                position="right-0 top-0 md:right-[2%] md:top-[0%]"
+                animationDelay="1s"
+              >
+                <p className="font-medium text-white">Match domicile</p>
+                <p className="text-white/80">Sam. 14h · Stade Jean-Moulin</p>
+              </FloatingHeroCard>
+
+              <FloatingHeroCard
+                title="Cotisation"
+                rotate="-rotate-2"
+                position="bottom-0 left-0 md:left-[8%] md:bottom-[5%]"
+                animationDelay="0.5s"
+              >
+                <p className="font-medium text-white">Saison 2024-2025</p>
+                <p className="mt-1 inline-block rounded-full bg-emerald-400/30 px-2 py-0.5 text-xs text-emerald-300">
+                  Payé
+                </p>
+                <p className="mt-0.5 text-xs text-white/60">2 en attente</p>
+              </FloatingHeroCard>
+
+              <FloatingHeroCard
+                title="Dépense / Recette"
+                rotate="rotate-4"
+                position="bottom-0 right-0 md:right-[5%] md:bottom-[0%]"
+                animationDelay="1.5s"
+              >
+                <p className="font-medium text-white">- 420 €</p>
+                <p className="text-white/80">Arbitrage · Match 12/01</p>
+              </FloatingHeroCard>
+            </div>
+
+            {/* Flèche accent */}
+            <div className="absolute -right-4 top-1/2 hidden translate-y-4 lg:block">
+              <HandDrawnArrow />
             </div>
           </div>
         </section>
 
-        {/* 2. Ce que permet Obillz */}
-        <section className="border-t border-slate-200 bg-white px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle
-              label="Fonctionnalités"
-              title="Ce que permet Obillz"
-              description="Un seul logiciel pour gérer l’ensemble des activités du club."
-            />
-            <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* ========== 2. CARTES FONCTIONNEMENT ========== */}
+        <section className="relative bg-gradient-to-b from-blue-950 to-indigo-950 px-4 py-20 md:px-6 md:py-28">
+          <GridBackground />
+          <div className="relative mx-auto max-w-6xl">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+              Fonctionnement
+            </p>
+            <h2 className="mt-3 text-center text-3xl font-bold text-white md:text-4xl">
+              Tout centralisé, tout visible
+            </h2>
+
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                "Joueurs et membres dans une base unique",
-                "Cotisations créées et envoyées par e-mail",
-                "Suivi des paiements (payé / non payé)",
-                "Manifestations (matchs, événements, fêtes, tournois)",
-                "Calendriers liés à chaque manifestation",
-                "Plages horaires et affectation des personnes",
-                "E-mail automatique aux personnes assignées (date, heure, lieu, rôle)",
-                "Dépenses et recettes enregistrées",
-                "Lien dépense ↔ manifestation ou activité",
-                "Vue du coût et du revenu par manifestation",
-                "Tri des membres et campagnes e-mail",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-sm text-slate-700"
+                {
+                  title: "Joueur / Membre",
+                  items: ["Une base unique", "E-mail, téléphone", "Filtres et tri"],
+                },
+                {
+                  title: "Manifestation",
+                  items: ["Date, heure, lieu", "Calendrier lié", "Plages horaires"],
+                },
+                {
+                  title: "Cotisation",
+                  items: ["Création dans l’outil", "Envoi par e-mail", "Payé / en attente"],
+                },
+                {
+                  title: "Dépense / Recette",
+                  items: ["Montant enregistré", "Lien à l’événement", "Coût et revenu par événement"],
+                },
+              ].map((block) => (
+                <div
+                  key={block.title}
+                  className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/25 hover:bg-white/15"
                 >
-                  <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-slate-400" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* 3. Joueurs & Membres */}
-        <section className="border-t border-slate-200 px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <div className="grid gap-12 md:grid-cols-2 md:items-center">
-              <div>
-                <SectionTitle
-                  label="Base unique"
-                  title="Joueurs & membres"
-                  description="Tous les joueurs et membres sont dans une seule base, avec leurs e-mails et numéros de téléphone. Le club dispose d’une liste à jour pour les affectations et la communication."
-                />
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Exemple
-                </p>
-                <div className="mt-4 space-y-3 text-sm text-slate-600">
-                  <p>• Fiche par personne : nom, prénom, e-mail, téléphone</p>
-                  <p>• Filtres et tri pour retrouver rapidement un membre ou un joueur</p>
-                  <p>• Données utilisées pour les cotisations, les plages horaires et les e-mails</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                    {block.title}
+                  </p>
+                  <ul className="mt-4 space-y-2 text-sm text-white/90">
+                    {block.items.map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* 4. Cotisations */}
-        <section className="border-t border-slate-200 bg-white px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <div className="grid gap-12 md:grid-cols-2 md:items-center">
-              <div className="order-2 md:order-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-6">
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  En pratique
-                </p>
-                <ul className="mt-4 space-y-2 text-sm text-slate-600">
-                  <li>• Création des cotisations dans l’outil</li>
-                  <li>• Envoi des cotisations par e-mail aux membres</li>
-                  <li>• Suivi clair : qui a payé, qui n’a pas encore payé</li>
-                </ul>
-              </div>
-              <div className="order-1 md:order-2">
-                <SectionTitle
-                  label="Suivi des paiements"
-                  title="Cotisations"
-                  description="Le club peut créer des cotisations, les envoyer par e-mail et suivre qui a payé ou non. Plus besoin de tableaux séparés ou de relances manuelles sans vue d’ensemble."
-                />
-              </div>
+        {/* ========== 3. FONCTIONNALITÉS ========== */}
+        <section className="relative bg-indigo-950 px-4 py-20 md:px-6 md:py-28">
+          <GridBackground />
+          <div className="relative mx-auto max-w-6xl">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+              Fonctionnalités
+            </p>
+            <h2 className="mt-3 text-center text-3xl font-bold text-white md:text-4xl">
+              Ce que permet Obillz
+            </h2>
+
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <FeatureCard
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                }
+                title="Base unique"
+                text="Joueurs et membres dans une seule base, avec e-mails et téléphones."
+              />
+              <FeatureCard
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                }
+                title="Cotisations"
+                text="Création, envoi par e-mail et suivi payé / non payé."
+              />
+              <FeatureCard
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                }
+                title="Manifestations"
+                text="Calendriers, plages horaires, affectation des personnes, e-mail automatique (date, heure, lieu, rôle)."
+              />
+              <FeatureCard
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                }
+                title="Dépenses & recettes"
+                text="Enregistrement, lien à une manifestation ou activité, vue coût et revenu par événement."
+              />
             </div>
           </div>
         </section>
 
-        {/* 5. Manifestations & Calendriers */}
-        <section className="border-t border-slate-200 px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle
-              label="Événements"
-              title="Manifestations & calendriers"
-              description="Chaque manifestation (match, événement, fête, tournoi) est liée à un calendrier. Vous créez des plages horaires et vous assignez joueurs ou bénévoles à une plage précise."
-            />
-            <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
-              <p className="text-sm font-medium text-slate-900">
-                Notification automatique
-              </p>
-              <p className="mt-2 text-sm text-slate-600">
-                Dès qu’une personne est ajoutée à une plage horaire, un e-mail
-                automatique lui est envoyé avec les informations : date, heure,
-                lieu et rôle. Elle reçoit tout sans relance manuelle.
-              </p>
+        {/* ========== 4. CENTRALISATION / ORGANISATION ========== */}
+        <section className="relative bg-gradient-to-b from-indigo-950 to-blue-950 px-4 py-20 md:px-6 md:py-28">
+          <GridBackground />
+          <div className="relative mx-auto max-w-5xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+              Bénéfices
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+              Centralisation, clarté, organisation
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-white/80">
+              Un outil unique. Des données à jour. Une vue claire sur les activités et les finances du club.
+            </p>
+
+            <div className="mt-12 grid gap-6 sm:grid-cols-3">
+              {[
+                {
+                  title: "Centralisation",
+                  text: "Joueurs, membres, cotisations, manifestations, dépenses et recettes dans un seul logiciel.",
+                },
+                {
+                  title: "Clarté",
+                  text: "Suivi des paiements, coût et revenu par manifestation, affectations aux plages horaires.",
+                },
+                {
+                  title: "Organisation",
+                  text: "Calendriers liés aux manifestations, e-mails automatiques aux personnes assignées, campagnes ciblées.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl transition-all duration-300 hover:border-emerald-400/40 hover:bg-white/15"
+                >
+                  <p className="text-lg font-semibold text-white">{item.title}</p>
+                  <p className="mt-3 text-sm text-white/80">{item.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* 6. Dépenses & Recettes */}
-        <section className="border-t border-slate-200 bg-white px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <div className="grid gap-12 md:grid-cols-2 md:items-center">
-              <div>
-                <SectionTitle
-                  label="Compta & trésorerie"
-                  title="Dépenses & recettes"
-                  description="Le club enregistre les dépenses et les recettes. Chaque dépense peut être liée à une manifestation ou à une activité précise. Vous voyez clairement ce que chaque manifestation coûte et rapporte."
-                />
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6">
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Résultat
-                </p>
-                <p className="mt-3 text-sm text-slate-600">
-                  Vue par manifestation : coûts et revenus associés. Idéal pour
-                  équilibrer les événements et préparer les bilans.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 7. Communication */}
-        <section className="border-t border-slate-200 px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle
-              label="E-mail"
-              title="Communication"
-              description="Les membres sont triables et filtrables. Le club utilise leurs e-mails pour communiquer ou envoyer des campagnes (annonces, rappels, informations) directement depuis Obillz."
-            />
-            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-              <p>
-                Exemple : envoyer un message à tous les bénévoles, aux joueurs
-                d’une équipe, ou à ceux qui n’ont pas encore payé leur
-                cotisation. Les coordonnées sont déjà dans la base.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 8. Avantages concrets */}
-        <section className="border-t border-slate-200 bg-slate-100/80 px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle
-              label="Bénéfices"
-              title="Avantages concrets"
-              description="Un outil unique, des données à jour et une vue claire sur les activités et les finances."
-            />
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-white p-5">
-                <p className="font-medium text-slate-900">Centralisation</p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Joueurs, membres, cotisations, manifestations, dépenses et
-                  recettes dans un seul logiciel. Plus de fichiers éparpillés.
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5">
-                <p className="font-medium text-slate-900">Clarté</p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Suivi des paiements, coût et revenu par manifestation, et
-                  affectations aux plages horaires. Les informations sont
-                  structurées et accessibles.
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 sm:col-span-2 lg:col-span-1">
-                <p className="font-medium text-slate-900">Organisation</p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Calendriers liés aux manifestations, e-mails automatiques aux
-                  personnes assignées, et campagnes ciblées à partir de la base.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 9. CTA final */}
+        {/* ========== 5. CTA FINAL ========== */}
         <section
           id="demo"
-          className="border-t border-slate-200 bg-white px-4 py-16 md:px-6 md:py-24"
+          className="relative bg-blue-950 px-4 py-24 md:px-6 md:py-32"
         >
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-semibold text-slate-900 md:text-3xl">
+          <GridBackground />
+          <div className="relative mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold text-white md:text-4xl">
               Demander une démo
             </h2>
-            <p className="mt-4 text-slate-600">
-              Vous souhaitez voir Obillz en fonctionnement ? Contactez-nous pour
-              organiser une démonstration adaptée à votre club.
+            <p className="mt-4 text-white/80">
+              Vous souhaitez voir Obillz en fonctionnement ? Contactez-nous pour organiser une démonstration adaptée à votre club.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
-                href="mailto:contact@obis.fr?subject=Demande%20de%20d%C3%A9mo%20Obillz"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+                href="mailto:contact@obillz.fr?subject=Demande%20de%20d%C3%A9mo%20Obillz"
+                className="inline-flex items-center justify-center rounded-full border-2 border-emerald-400 bg-emerald-400 px-8 py-3.5 text-sm font-semibold text-blue-950 transition-all hover:bg-emerald-300 hover:border-emerald-300"
               >
                 Nous contacter
               </a>
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-sm font-medium text-slate-700 hover:border-slate-400 transition-colors"
+                className="inline-flex items-center justify-center rounded-full border-2 border-white/40 bg-white/10 px-8 py-3.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
               >
                 Créer un compte
               </Link>
@@ -316,6 +398,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
