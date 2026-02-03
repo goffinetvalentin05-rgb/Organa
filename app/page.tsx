@@ -1,11 +1,10 @@
-// CURSOR TEST – NE PAS SUPPRIMER
 import type { Metadata } from "next";
 import LandingPage from "@/components/LandingPage";
-import { defaultLocale, getTranslation } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: getTranslation(defaultLocale, "landing.metadata.title"),
-  description: getTranslation(defaultLocale, "landing.metadata.description"),
+  title: "Obillz — Logiciel de gestion pour les clubs sportifs",
+  description:
+    "Obillz centralise joueurs, membres, cotisations, manifestations, calendriers, dépenses, recettes et la communication par e-mail. Un seul outil pour votre club.",
 };
 
 export default function Home() {
