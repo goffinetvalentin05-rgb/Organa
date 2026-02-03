@@ -134,8 +134,8 @@ export default function LandingPage() {
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex min-h-[75vh] max-w-6xl flex-col items-center justify-center pb-0 pt-20 md:pt-28 lg:pt-36">
-            {/* Titre hero : un peu plus bas */}
+          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-0 pt-12 md:pt-16 lg:pt-20">
+            {/* Titre hero : plus haut */}
             <h1
               className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
               style={{ lineHeight: "1.15" }}
@@ -146,8 +146,8 @@ export default function LandingPage() {
             </h1>
           </div>
 
-          {/* Cartes sur la séparation bleu / blanc (vague) */}
-          <div className="absolute bottom-0 left-1/2 z-30 w-full max-w-5xl -translate-x-1/2 translate-y-1/2 px-4 md:px-6">
+          {/* Cartes sur la démarquation (bord supérieur de la vague), pas dans le blanc */}
+          <div className="absolute left-1/2 z-30 w-full max-w-5xl -translate-x-1/2 px-4 md:px-6 bottom-28 md:bottom-36 lg:bottom-44">
             <div className="flex flex-wrap items-stretch justify-center gap-4 md:gap-6">
               <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
