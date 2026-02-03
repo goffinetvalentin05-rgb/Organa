@@ -45,3 +45,5 @@ COMMENT ON COLUMN profiles.logo_path IS 'Chemin du logo dans Supabase Storage (b
 
 
 
+
+
