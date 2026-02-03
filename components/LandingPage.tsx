@@ -16,24 +16,6 @@ function GridBackground() {
   );
 }
 
-/* ----- Carte section colorée (exemples produit) ----- */
-function ProductExampleCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-3xl border border-emerald-200 bg-white p-5 shadow-md transition-all duration-300 hover:border-emerald-400 hover:shadow-lg">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-        {title}
-      </p>
-      <div className="mt-2 text-sm text-slate-700">{children}</div>
-    </div>
-  );
-}
-
 /* ----- Carte section blanche (fonctionnalités) ----- */
 function WhiteSectionCard({
   icon,
@@ -146,37 +128,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 2. EXEMPLES PRODUIT (fond teinté, 4 cartes) ========== */}
-        <section className="relative -mt-1 bg-slate-50 px-4 py-16 md:px-6 md:py-20">
-          <div className="relative mx-auto max-w-6xl">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              En un coup d&apos;œil
-            </p>
-            <h2 className="mt-3 text-center text-2xl font-bold text-slate-900 md:text-3xl">
-              Membre, cotisation, manifestation, finances
-            </h2>
-            <div className="mt-10 flex flex-wrap items-stretch justify-center gap-4 md:gap-6">
-              <ProductExampleCard title="Joueur / Membre">
-                <p className="font-semibold text-slate-800">marie.dupont@club.fr</p>
-                <p className="mt-1 text-xs text-slate-600">124 membres</p>
-              </ProductExampleCard>
-              <ProductExampleCard title="Cotisation">
-                <p className="font-semibold text-slate-800">Saison 2024-2025</p>
-                <p className="mt-1 text-xs text-slate-600">Payé · 2 en attente</p>
-              </ProductExampleCard>
-              <ProductExampleCard title="Manifestation">
-                <p className="font-semibold text-slate-800">Match domicile</p>
-                <p className="mt-1 text-sm text-slate-600">Sam. 14h · Stade Jean-Moulin</p>
-              </ProductExampleCard>
-              <ProductExampleCard title="Dépense / Recette">
-                <p className="font-semibold text-slate-800">- 420 €</p>
-                <p className="mt-1 text-xs text-slate-600">Arbitrage · Match 12/01</p>
-              </ProductExampleCard>
-            </div>
-          </div>
-        </section>
-
-        {/* ========== 3. FONCTIONNEMENT (fond blanc) ========== */}
+        {/* ========== 2. FONCTIONNEMENT (fond blanc) ========== */}
         <section
           id="fonctionnement"
           className="relative bg-white px-4 pt-16 pb-20 md:px-6 md:pt-20 md:pb-28"
@@ -235,7 +187,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 4. FONCTIONNALITÉS (fond blanc) ========== */}
+        {/* ========== 3. FONCTIONNALITÉS (fond blanc) ========== */}
         <section
           id="fonctionnalites"
           className="relative bg-white px-4 py-20 md:px-6 md:py-28"
@@ -289,7 +241,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 5. CENTRALISATION (fond blanc) ========== */}
+        {/* ========== 4. CENTRALISATION (fond blanc) ========== */}
         <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
           <div className="relative mx-auto max-w-5xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -334,7 +286,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 6. CTA FINAL (fond blanc) ========== */}
+        {/* ========== 5. CTA FINAL (fond blanc) ========== */}
         <section id="demo" className="relative bg-white px-4 py-24 md:px-6 md:py-32">
           <div className="relative mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
