@@ -137,8 +137,13 @@ export default function LandingPage() {
               />
             </div>
 
-            {/* Zone cartes + titre sous le logo */}
-            <div className="relative mt-6 flex min-h-[320px] w-full flex-1 flex-col items-center justify-end md:mt-8 md:min-h-[360px]">
+            {/* Texte hero : zone du rectangle rouge */}
+            <p className="relative z-10 mt-6 max-w-4xl shrink-0 text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              La gestion des clubs sportifs centralisée.
+            </p>
+
+            {/* Zone cartes + titre sous le texte hero */}
+            <div className="relative mt-8 flex min-h-[320px] w-full flex-1 flex-col items-center justify-end md:mt-10 md:min-h-[360px]">
               {/* 4 cartes flottantes */}
               <FloatingHeroCard
                 title="Joueur / Membre"
