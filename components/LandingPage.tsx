@@ -129,13 +129,13 @@ export default function LandingPage() {
       <main className="pt-16">
         {/* ========== 1. HERO — Titre 2 lignes max, 4 cartes en ligne en dessous ========== */}
         <section
-          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-12 md:px-6 md:pt-14 lg:pt-16"
+          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-6 md:px-6 md:pt-8 lg:pt-10"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center gap-12 pb-16 pt-24 md:gap-14 md:pt-32 lg:pt-40">
-            {/* Logo au-dessus du hero — bien visible */}
+          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center gap-8 pb-16 pt-8 md:gap-10 md:pt-10 lg:pt-12">
+            {/* Logo Obillz (public/logo-obillz.png) — remonté */}
             <div className="z-10 flex justify-center">
               <Image
                 src="/logo-obillz.png"
