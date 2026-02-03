@@ -16,22 +16,33 @@ function GridBackground() {
   );
 }
 
-/* ----- Carte flottante hero : taille identique, ombre douce, bordures arrondies, flottement ±6px ----- */
+/* ----- Carte hero : flottante (absolute) ou en ligne (inline) ----- */
 function FloatingHeroCard({
   title,
   children,
   position,
   animationDelay = "0s",
+  inline = false,
 }: {
   title: string;
   children: React.ReactNode;
-  position: string;
+  position?: string;
   animationDelay?: string;
+  inline?: boolean;
 }) {
+  const baseClass =
+    "w-[200px] min-w-[160px] max-w-[220px] rounded-3xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl transition-transform duration-300 hover:scale-[1.02] hover:border-white/35 hover:shadow-xl";
+  const positionedClass = inline
+    ? "flex-1 shrink-0"
+    : `absolute ${position ?? ""}`;
   return (
     <div
-      className={`absolute w-[200px] min-w-[180px] max-w-[220px] rounded-3xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl transition-transform duration-300 hover:scale-[1.02] hover:border-white/35 hover:shadow-xl ${position}`}
-      style={{ animation: "hero-float 6s ease-in-out infinite", animationDelay }}
+      className={`${baseClass} ${positionedClass}`}
+      style={
+        inline
+          ? undefined
+          : { animation: "hero-float 6s ease-in-out infinite", animationDelay }
+      }
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">
         {title}
@@ -117,16 +128,15 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO — Règles strictes : 1 titre à 40%, zone interdite 80px, 4 cartes aux 4 coins ========== */}
+        {/* ========== 1. HERO — Titre 2 lignes max, 4 cartes en ligne en dessous ========== */}
         <section
           className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-12 md:px-6 md:pt-14 lg:pt-16"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          {/* Conteneur de référence : hauteur du hero (zone bleue), titre à 40%, cartes hors zone interdite */}
-          <div className="relative mx-auto h-[80vh] max-w-6xl md:h-[82vh]">
-            {/* Logo discret au-dessus (hors zone de référence) */}
+          <div className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col items-center justify-center gap-10 py-12 md:min-h-[82vh] md:gap-12">
+            {/* Logo au-dessus */}
             <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2">
               <Image
                 src="/logo-obillz.png"
@@ -138,53 +148,35 @@ export default function LandingPage() {
               />
             </div>
 
-            {/* Titre UNIQUE : à 40% de la hauteur du hero, centré, zone interdite 80px (padding) autour */}
+            {/* Titre : 2 lignes max, centré */}
             <h1
-              className="absolute left-1/2 top-[40%] z-20 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
-              style={{ padding: "80px" }}
+              className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
+              style={{ lineHeight: "1.15" }}
             >
-              La gestion des clubs sportifs centralisée.
+              <span className="line-clamp-2 block">
+                La gestion des clubs sportifs centralisée.
+              </span>
             </h1>
 
-            {/* 1 — Joueur / Membre : haut gauche */}
-            <FloatingHeroCard
-              title="Joueur / Membre"
-              position="left-0 top-[18%] md:left-2 lg:left-4"
-              animationDelay="0s"
-            >
-              <p className="font-semibold text-white">marie.dupont@club.fr</p>
-              <p className="mt-1 text-xs text-white/80">124 membres</p>
-            </FloatingHeroCard>
-
-            {/* 2 — Cotisation : bas gauche */}
-            <FloatingHeroCard
-              title="Cotisation"
-              position="left-0 top-[58%] md:left-2 lg:left-4"
-              animationDelay="0.5s"
-            >
-              <p className="font-semibold text-white">Saison 2024-2025</p>
-              <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
-            </FloatingHeroCard>
-
-            {/* 3 — Dépense / Recette : bas droite */}
-            <FloatingHeroCard
-              title="Dépense / Recette"
-              position="right-0 top-[58%] md:right-2 lg:right-4"
-              animationDelay="1s"
-            >
-              <p className="font-semibold text-white">- 420 €</p>
-              <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
-            </FloatingHeroCard>
-
-            {/* 4 — Manifestation : haut droite */}
-            <FloatingHeroCard
-              title="Manifestation"
-              position="right-0 top-[18%] md:right-2 lg:right-4"
-              animationDelay="1.5s"
-            >
-              <p className="font-semibold text-white">Match domicile</p>
-              <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
-            </FloatingHeroCard>
+            {/* 4 cartes alignées sur une seule ligne sous le hero */}
+            <div className="z-20 flex w-full max-w-5xl flex-wrap items-stretch justify-center gap-4 px-2 md:gap-6">
+              <FloatingHeroCard title="Joueur / Membre" inline>
+                <p className="font-semibold text-white">marie.dupont@club.fr</p>
+                <p className="mt-1 text-xs text-white/80">124 membres</p>
+              </FloatingHeroCard>
+              <FloatingHeroCard title="Cotisation" inline>
+                <p className="font-semibold text-white">Saison 2024-2025</p>
+                <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
+              </FloatingHeroCard>
+              <FloatingHeroCard title="Dépense / Recette" inline>
+                <p className="font-semibold text-white">- 420 €</p>
+                <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
+              </FloatingHeroCard>
+              <FloatingHeroCard title="Manifestation" inline>
+                <p className="font-semibold text-white">Match domicile</p>
+                <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
+              </FloatingHeroCard>
+            </div>
           </div>
 
           {/* Transition nette : courbe blanche qui coupe le bleu */}
