@@ -38,11 +38,10 @@ function FloatingHeroCard({
   return (
     <div
       className={`${baseClass} ${positionedClass}`}
-      style={
-        inline
-          ? undefined
-          : { animation: "hero-float 6s ease-in-out infinite", animationDelay }
-      }
+      style={{
+        animation: "hero-float 4s ease-in-out infinite",
+        animationDelay,
+      }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">
         {title}
@@ -135,15 +134,15 @@ export default function LandingPage() {
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex min-h-[80vh] max-w-6xl flex-col items-center justify-center gap-10 py-12 md:min-h-[82vh] md:gap-12">
-            {/* Logo au-dessus */}
-            <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2">
+          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center gap-12 pb-16 pt-24 md:gap-14 md:pt-32 lg:pt-40">
+            {/* Logo au-dessus du hero — bien visible */}
+            <div className="z-10 flex justify-center">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
-                width={160}
-                height={44}
-                className="h-11 w-auto object-contain opacity-90 sm:h-12"
+                width={480}
+                height={132}
+                className="h-24 w-auto object-contain opacity-95 sm:h-28 md:h-32 lg:h-40 xl:h-44"
                 priority
               />
             </div>
@@ -158,21 +157,21 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            {/* 4 cartes alignées sur une seule ligne sous le hero */}
+            {/* 4 cartes alignées sur une seule ligne sous le hero — animées (flottement décalé) */}
             <div className="z-20 flex w-full max-w-5xl flex-wrap items-stretch justify-center gap-4 px-2 md:gap-6">
-              <FloatingHeroCard title="Joueur / Membre" inline>
+              <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
                 <p className="mt-1 text-xs text-white/80">124 membres</p>
               </FloatingHeroCard>
-              <FloatingHeroCard title="Cotisation" inline>
+              <FloatingHeroCard title="Cotisation" inline animationDelay="0.5s">
                 <p className="font-semibold text-white">Saison 2024-2025</p>
                 <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
               </FloatingHeroCard>
-              <FloatingHeroCard title="Dépense / Recette" inline>
+              <FloatingHeroCard title="Dépense / Recette" inline animationDelay="1s">
                 <p className="font-semibold text-white">- 420 €</p>
                 <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
               </FloatingHeroCard>
-              <FloatingHeroCard title="Manifestation" inline>
+              <FloatingHeroCard title="Manifestation" inline animationDelay="1.5s">
                 <p className="font-semibold text-white">Match domicile</p>
                 <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
               </FloatingHeroCard>
