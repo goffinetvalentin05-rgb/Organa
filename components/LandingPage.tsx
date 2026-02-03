@@ -164,20 +164,20 @@ export default function LandingPage() {
                 <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
               </FloatingHeroCard>
 
-              {/* Carte bas gauche */}
+              {/* Carte bas gauche — remontée pour rester visible au-dessus de la courbe */}
               <FloatingHeroCard
                 title="Cotisation"
-                position="bottom-[20%] left-0 md:bottom-[18%] md:left-[4%]"
+                position="bottom-[38%] left-0 md:bottom-[36%] md:left-[4%]"
                 animationDelay="1s"
               >
                 <p className="font-semibold text-white">Saison 2024-2025</p>
                 <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
               </FloatingHeroCard>
 
-              {/* Carte bas droite */}
+              {/* Carte bas droite — remontée pour rester visible au-dessus de la courbe */}
               <FloatingHeroCard
                 title="Dépense / Recette"
-                position="bottom-[20%] right-0 md:bottom-[18%] md:right-[4%]"
+                position="bottom-[38%] right-0 md:bottom-[36%] md:right-[4%]"
                 animationDelay="1.5s"
               >
                 <p className="font-semibold text-white">- 420 €</p>
