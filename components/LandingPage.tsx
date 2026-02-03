@@ -129,13 +129,13 @@ export default function LandingPage() {
       <main className="pt-16">
         {/* ========== 1. HERO — Titre 2 lignes max, 4 cartes en ligne en dessous ========== */}
         <section
-          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-6 md:px-6 md:pt-8 lg:pt-10"
+          className="relative min-h-[88vh] overflow-visible px-4 pb-0 pt-6 md:px-6 md:pt-8 lg:pt-10"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-16 pt-12 md:pt-16 lg:pt-20">
-            {/* Titre hero : 2 lignes max, centré (remonte à la place du logo) */}
+          <div className="relative mx-auto flex min-h-[75vh] max-w-6xl flex-col items-center justify-center pb-0 pt-20 md:pt-28 lg:pt-36">
+            {/* Titre hero : un peu plus bas */}
             <h1
               className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
               style={{ lineHeight: "1.15" }}
@@ -144,9 +144,11 @@ export default function LandingPage() {
                 La gestion des clubs sportifs centralisée.
               </span>
             </h1>
+          </div>
 
-            {/* Plus d'espace entre le hero et les cartes */}
-            <div className="z-20 mt-14 flex w-full max-w-5xl flex-wrap items-stretch justify-center gap-4 px-2 md:mt-20 md:gap-6 lg:mt-24">
+          {/* Cartes sur la séparation bleu / blanc (vague) */}
+          <div className="absolute bottom-0 left-1/2 z-30 w-full max-w-5xl -translate-x-1/2 translate-y-1/2 px-4 md:px-6">
+            <div className="flex flex-wrap items-stretch justify-center gap-4 md:gap-6">
               <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
                 <p className="mt-1 text-xs text-white/80">124 membres</p>
@@ -167,7 +169,7 @@ export default function LandingPage() {
           </div>
 
           {/* Transition nette : courbe blanche qui coupe le bleu */}
-          <div className="absolute bottom-0 left-0 right-0 h-28 w-full md:h-36 lg:h-44" aria-hidden>
+          <div className="absolute bottom-0 left-0 right-0 z-10 h-28 w-full md:h-36 lg:h-44" aria-hidden>
             <svg
               className="h-full w-full"
               viewBox="0 0 1440 180"
