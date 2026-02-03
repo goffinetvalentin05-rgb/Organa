@@ -117,37 +117,37 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO (fond bleu #1A23FF) — logo en haut (zone cercle rouge), hero remonté ========== */}
+        {/* ========== 1. HERO — Un seul titre, cartes qui l'entourent, rien ne touche le titre ni la vague ========== */}
         <section
-          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-16 md:px-6 md:pt-20 lg:pt-24"
+          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-14 md:px-6 md:pt-16 lg:pt-20"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex min-h-[75vh] max-w-6xl flex-col items-center justify-start pt-4">
-            {/* Logo en haut : emplacement du cercle rouge */}
+          <div className="relative mx-auto flex min-h-[78vh] max-w-6xl flex-col items-center pt-2">
+            {/* Logo discret au-dessus */}
             <div className="relative z-10 flex shrink-0 justify-center">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
-                width={320}
-                height={120}
-                className="h-20 w-auto object-contain sm:h-24 md:h-28 lg:h-32 xl:h-36"
+                width={200}
+                height={56}
+                className="h-14 w-auto object-contain opacity-95 sm:h-16"
                 priority
               />
             </div>
 
-            {/* Bloc hero + cartes : le texte au centre, les 4 cartes qui l'entourent (plus hautes, à gauche et à droite) */}
-            <div className="relative mt-6 flex min-h-[420px] w-full flex-1 flex-col items-center justify-center md:min-h-[480px]">
-              {/* Texte hero au centre */}
-              <p className="relative z-10 max-w-4xl shrink-0 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+            {/* Zone titre + cartes : titre central plus haut, cartes autour sans toucher le titre ni la vague */}
+            <div className="relative mt-4 flex min-h-[52vh] w-full flex-1 flex-col items-center justify-start md:mt-6 md:min-h-[56vh]">
+              {/* UN SEUL TITRE — point central du hero, placé plus haut, XXL */}
+              <h1 className="relative z-10 max-w-4xl shrink-0 px-6 py-8 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl">
                 La gestion des clubs sportifs centralisée.
-              </p>
+              </h1>
 
-              {/* 4 flashcards qui ENTOURENT le hero : plus hautes, gauche et droite (décalées pour ne pas être l'une sous l'autre) */}
+              {/* 4 cartes qui ENCADRENT le titre : 2 au-dessus, 2 en dessous, jamais sur le texte ni sur la vague */}
               <FloatingHeroCard
                 title="Joueur / Membre"
-                position="left-0 top-[32%] -translate-y-1/2 md:left-[2%] lg:left-[3%]"
+                position="left-0 top-[8%] md:left-[3%] lg:left-[4%]"
                 animationDelay="0s"
               >
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
@@ -155,17 +155,8 @@ export default function LandingPage() {
               </FloatingHeroCard>
 
               <FloatingHeroCard
-                title="Cotisation"
-                position="left-[14%] top-[50%] -translate-y-1/2 md:left-[16%] lg:left-[18%]"
-                animationDelay="1s"
-              >
-                <p className="font-semibold text-white">Saison 2024-2025</p>
-                <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
-              </FloatingHeroCard>
-
-              <FloatingHeroCard
                 title="Manifestation"
-                position="right-0 top-[32%] -translate-y-1/2 md:right-[2%] lg:right-[3%]"
+                position="right-0 top-[8%] md:right-[3%] lg:right-[4%]"
                 animationDelay="0.5s"
               >
                 <p className="font-semibold text-white">Match domicile</p>
@@ -173,18 +164,22 @@ export default function LandingPage() {
               </FloatingHeroCard>
 
               <FloatingHeroCard
+                title="Cotisation"
+                position="left-0 top-[62%] md:left-[3%] lg:left-[4%]"
+                animationDelay="1s"
+              >
+                <p className="font-semibold text-white">Saison 2024-2025</p>
+                <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
+              </FloatingHeroCard>
+
+              <FloatingHeroCard
                 title="Dépense / Recette"
-                position="right-[14%] top-[50%] -translate-y-1/2 md:right-[16%] lg:right-[18%]"
+                position="right-0 top-[62%] md:right-[3%] lg:right-[4%]"
                 animationDelay="1.5s"
               >
                 <p className="font-semibold text-white">- 420 €</p>
                 <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
               </FloatingHeroCard>
-
-              {/* Titre sous le bloc hero + cartes */}
-              <h1 className="relative z-10 mt-12 shrink-0 text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-                GESTION CLUBS SPORTIFS
-              </h1>
             </div>
           </div>
 
