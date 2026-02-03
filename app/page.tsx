@@ -1,3 +1,4 @@
+// CURSOR TEST – NE PAS SUPPRIMER
 import type { Metadata } from "next";
 import LandingPage from "@/components/LandingPage";
 import { defaultLocale, getTranslation } from "@/lib/i18n";
