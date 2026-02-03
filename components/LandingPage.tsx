@@ -16,7 +16,7 @@ function GridBackground() {
   );
 }
 
-/* ----- Carte flottante hero (glassmorphism) ----- */
+/* ----- Carte flottante hero : taille identique, ombre douce, bordures arrondies, flottement ±6px ----- */
 function FloatingHeroCard({
   title,
   children,
@@ -30,7 +30,7 @@ function FloatingHeroCard({
 }) {
   return (
     <div
-      className={`absolute rounded-3xl border border-white/25 bg-white/15 p-4 shadow-xl backdrop-blur-xl transition-transform duration-300 hover:scale-[1.02] hover:border-white/35 ${position}`}
+      className={`absolute w-[200px] min-w-[180px] max-w-[220px] rounded-3xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl transition-transform duration-300 hover:scale-[1.02] hover:border-white/35 hover:shadow-xl ${position}`}
       style={{ animation: "hero-float 6s ease-in-out infinite", animationDelay }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">
@@ -117,70 +117,74 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO — Un seul titre, cartes qui l'entourent, rien ne touche le titre ni la vague ========== */}
+        {/* ========== 1. HERO — Règles strictes : 1 titre à 40%, zone interdite 80px, 4 cartes aux 4 coins ========== */}
         <section
-          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-14 md:px-6 md:pt-16 lg:pt-20"
+          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-12 md:px-6 md:pt-14 lg:pt-16"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex min-h-[78vh] max-w-6xl flex-col items-center pt-2">
-            {/* Logo discret au-dessus */}
-            <div className="relative z-10 flex shrink-0 justify-center">
+          {/* Conteneur de référence : hauteur du hero (zone bleue), titre à 40%, cartes hors zone interdite */}
+          <div className="relative mx-auto h-[80vh] max-w-6xl md:h-[82vh]">
+            {/* Logo discret au-dessus (hors zone de référence) */}
+            <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
-                width={200}
-                height={56}
-                className="h-14 w-auto object-contain opacity-95 sm:h-16"
+                width={160}
+                height={44}
+                className="h-11 w-auto object-contain opacity-90 sm:h-12"
                 priority
               />
             </div>
 
-            {/* Zone titre + cartes : titre central plus haut, cartes autour sans toucher le titre ni la vague */}
-            <div className="relative mt-4 flex min-h-[52vh] w-full flex-1 flex-col items-center justify-start md:mt-6 md:min-h-[56vh]">
-              {/* UN SEUL TITRE — point central du hero, placé plus haut, XXL */}
-              <h1 className="relative z-10 max-w-4xl shrink-0 px-6 py-8 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl">
-                La gestion des clubs sportifs centralisée.
-              </h1>
+            {/* Titre UNIQUE : à 40% de la hauteur du hero, centré, zone interdite 80px (padding) autour */}
+            <h1
+              className="absolute left-1/2 top-[40%] z-20 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
+              style={{ padding: "80px" }}
+            >
+              La gestion des clubs sportifs centralisée.
+            </h1>
 
-              {/* 4 cartes qui ENCADRENT le titre : 2 au-dessus, 2 en dessous, jamais sur le texte ni sur la vague */}
-              <FloatingHeroCard
-                title="Joueur / Membre"
-                position="left-0 top-[8%] md:left-[3%] lg:left-[4%]"
-                animationDelay="0s"
-              >
-                <p className="font-semibold text-white">marie.dupont@club.fr</p>
-                <p className="mt-1 text-xs text-white/80">124 membres</p>
-              </FloatingHeroCard>
+            {/* 1 — Joueur / Membre : haut gauche */}
+            <FloatingHeroCard
+              title="Joueur / Membre"
+              position="left-0 top-[18%] md:left-2 lg:left-4"
+              animationDelay="0s"
+            >
+              <p className="font-semibold text-white">marie.dupont@club.fr</p>
+              <p className="mt-1 text-xs text-white/80">124 membres</p>
+            </FloatingHeroCard>
 
-              <FloatingHeroCard
-                title="Manifestation"
-                position="right-0 top-[8%] md:right-[3%] lg:right-[4%]"
-                animationDelay="0.5s"
-              >
-                <p className="font-semibold text-white">Match domicile</p>
-                <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
-              </FloatingHeroCard>
+            {/* 2 — Cotisation : bas gauche */}
+            <FloatingHeroCard
+              title="Cotisation"
+              position="left-0 top-[58%] md:left-2 lg:left-4"
+              animationDelay="0.5s"
+            >
+              <p className="font-semibold text-white">Saison 2024-2025</p>
+              <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
+            </FloatingHeroCard>
 
-              <FloatingHeroCard
-                title="Cotisation"
-                position="left-0 top-[62%] md:left-[3%] lg:left-[4%]"
-                animationDelay="1s"
-              >
-                <p className="font-semibold text-white">Saison 2024-2025</p>
-                <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
-              </FloatingHeroCard>
+            {/* 3 — Dépense / Recette : bas droite */}
+            <FloatingHeroCard
+              title="Dépense / Recette"
+              position="right-0 top-[58%] md:right-2 lg:right-4"
+              animationDelay="1s"
+            >
+              <p className="font-semibold text-white">- 420 €</p>
+              <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
+            </FloatingHeroCard>
 
-              <FloatingHeroCard
-                title="Dépense / Recette"
-                position="right-0 top-[62%] md:right-[3%] lg:right-[4%]"
-                animationDelay="1.5s"
-              >
-                <p className="font-semibold text-white">- 420 €</p>
-                <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
-              </FloatingHeroCard>
-            </div>
+            {/* 4 — Manifestation : haut droite */}
+            <FloatingHeroCard
+              title="Manifestation"
+              position="right-0 top-[18%] md:right-2 lg:right-4"
+              animationDelay="1.5s"
+            >
+              <p className="font-semibold text-white">Match domicile</p>
+              <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
+            </FloatingHeroCard>
           </div>
 
           {/* Transition nette : courbe blanche qui coupe le bleu */}
