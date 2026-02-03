@@ -117,31 +117,29 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO (fond bleu #1A23FF) ========== */}
+        {/* ========== 1. HERO (fond bleu #1A23FF) — logo en haut (zone cercle rouge), hero remonté ========== */}
         <section
-          className="relative min-h-[92vh] overflow-hidden px-4 pb-0 pt-24 md:px-6 md:pt-28 lg:pt-32"
+          className="relative min-h-[88vh] overflow-hidden px-4 pb-0 pt-16 md:px-6 md:pt-20 lg:pt-24"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center">
-            <div className="relative flex flex-1 flex-col items-center justify-center text-center">
-              {/* Logo + sous-titre */}
-              <h1 className="relative z-10 mt-4 flex flex-col items-center gap-3 text-center">
-                <Image
-                  src="/logo-obillz.png"
-                  alt="Obillz"
-                  width={320}
-                  height={120}
-                  className="h-16 w-auto object-contain sm:h-20 md:h-24 lg:h-28 xl:h-32"
-                  priority
-                />
-                <span className="block text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-                  GESTION CLUBS SPORTIFS
-                </span>
-              </h1>
+          <div className="relative mx-auto flex min-h-[75vh] max-w-6xl flex-col items-center justify-start pt-4">
+            {/* Logo en haut : emplacement du cercle rouge */}
+            <div className="relative z-10 flex shrink-0 justify-center">
+              <Image
+                src="/logo-obillz.png"
+                alt="Obillz"
+                width={320}
+                height={120}
+                className="h-20 w-auto object-contain sm:h-24 md:h-28 lg:h-32 xl:h-36"
+                priority
+              />
+            </div>
 
-              {/* 4 cartes flottantes utiles */}
+            {/* Zone cartes + titre sous le logo */}
+            <div className="relative mt-6 flex min-h-[320px] w-full flex-1 flex-col items-center justify-end md:mt-8 md:min-h-[360px]">
+              {/* 4 cartes flottantes */}
               <FloatingHeroCard
                 title="Joueur / Membre"
                 position="left-0 top-1/2 -translate-y-1/2 md:left-[2%] lg:left-0 xl:left-[4%]"
@@ -162,7 +160,7 @@ export default function LandingPage() {
 
               <FloatingHeroCard
                 title="Cotisation"
-                position="bottom-[15%] left-[8%] md:left-[12%]"
+                position="bottom-[20%] left-[8%] md:left-[12%]"
                 animationDelay="1s"
               >
                 <p className="font-semibold text-white">Saison 2024-2025</p>
@@ -171,12 +169,17 @@ export default function LandingPage() {
 
               <FloatingHeroCard
                 title="Dépense / Recette"
-                position="bottom-[15%] right-[8%] md:right-[12%]"
+                position="bottom-[20%] right-[8%] md:right-[12%]"
                 animationDelay="1.5s"
               >
                 <p className="font-semibold text-white">- 420 €</p>
                 <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
               </FloatingHeroCard>
+
+              {/* Titre sous les cartes */}
+              <h1 className="relative z-10 mt-8 shrink-0 text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+                GESTION CLUBS SPORTIFS
+              </h1>
             </div>
           </div>
 
