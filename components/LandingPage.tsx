@@ -15,30 +15,81 @@ function GridBackground() {
   );
 }
 
-/* ----- Accent graphique type "main" ----- */
-function HandDrawnArrow({ className = "" }: { className?: string }) {
+/* ----- Flèche spirale type "main" (vers le haut) ----- */
+function HandDrawnArrowUp({ className = "" }: { className?: string }) {
   return (
     <svg
       className={`text-emerald-400 ${className}`}
-      width="80"
-      height="40"
-      viewBox="0 0 80 40"
+      width="48"
+      height="64"
+      viewBox="0 0 48 64"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M5 20h55M55 12l8 8-8 8" />
+      <path d="M24 56C24 56 12 44 12 32C12 20 24 8 24 8M24 8C24 8 36 20 36 32C36 44 24 56 24 56" />
+      <path d="M24 8v56" />
     </svg>
   );
 }
 
-function HandDrawnCircle({ children }: { children: React.ReactNode }) {
+/* ----- Flèche spirale type "main" (vers le bas) ----- */
+function HandDrawnArrowDown({ className = "" }: { className?: string }) {
   return (
-    <span className="inline-flex rounded-full border-2 border-dashed border-emerald-400 px-4 py-2 text-sm font-medium text-emerald-400">
-      {children}
-    </span>
+    <svg
+      className={`text-emerald-400 ${className}`}
+      width="48"
+      height="64"
+      viewBox="0 0 48 64"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M24 8C24 8 12 20 12 32C12 44 24 56 24 56M24 56C24 56 36 44 36 32C36 20 24 8 24 8" />
+      <path d="M24 56V8" />
+    </svg>
+  );
+}
+
+/* Cercle CTA à droite du hero (style référence : cercle vert + texte + flèche) */
+function HeroCtaCircleSimple() {
+  return (
+    <Link
+      href="#demo"
+      className="relative flex h-28 w-28 flex-shrink-0 items-center justify-center md:h-36 md:w-36"
+      aria-label="Demander une démo"
+    >
+      <svg
+        className="absolute inset-0 h-full w-full -rotate-90 text-emerald-400"
+        viewBox="0 0 140 140"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      >
+        <circle cx="70" cy="70" r="62" strokeDasharray="4 3" />
+      </svg>
+      <span className="absolute flex flex-col items-center justify-center gap-0.5 text-center">
+        <span className="text-[9px] font-bold uppercase leading-tight tracking-widest text-emerald-400 md:text-[10px]">
+          Demander
+        </span>
+        <span className="text-[9px] font-bold uppercase leading-tight tracking-widest text-emerald-400 md:text-[10px]">
+          une démo
+        </span>
+      </span>
+      <svg
+        className="absolute bottom-5 h-5 w-5 text-emerald-400"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      >
+        <path d="M12 5v14M5 12l7 7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </Link>
   );
 }
 
@@ -55,9 +106,10 @@ function FloatingHeroCard({
   position: string;
   animationDelay?: string;
 }) {
+  const isRelative = position.includes("relative");
   return (
     <div
-      className={`absolute rounded-3xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:border-white/30 ${position}`}
+      className={`rounded-3xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:border-white/30 ${isRelative ? "" : "absolute"} ${position}`}
       style={{ animation: "hero-float 6s ease-in-out infinite", animationDelay }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
@@ -92,113 +144,100 @@ function FeatureCard({
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* ----- Nav (intégrée au hero bleu) ----- */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-blue-950/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+      {/* ----- Header (exactement comme maquette) ----- */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-blue-950/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 md:px-6">
+          {/* Logo sur fond arrondi vert menthe / blanc */}
           <Link
             href="/"
-            className="text-xl font-semibold text-white transition-opacity hover:opacity-90"
+            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-100 to-white px-4 py-2.5 shadow-sm transition-opacity hover:opacity-90"
           >
-            Obillz
+            <span className="text-lg font-bold text-blue-950">Obillz</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/connexion"
-              className="rounded-full border border-white/30 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
-            >
-              Connexion
+
+          {/* Liens nav au centre-droit */}
+          <div className="hidden flex-1 justify-center gap-8 md:flex">
+            <Link href="#fonctionnement" className="text-sm font-medium text-white/90 hover:text-white">
+              Fonctionnement
             </Link>
-            <Link
-              href="#demo"
-              className="rounded-full border-2 border-emerald-400 bg-transparent px-5 py-2 text-sm font-medium text-emerald-400 transition-all hover:bg-emerald-400 hover:text-blue-950"
-            >
-              Demander une démo
+            <Link href="#fonctionnalites" className="text-sm font-medium text-white/90 hover:text-white">
+              Fonctionnalités
+            </Link>
+            <Link href="#demo" className="text-sm font-medium text-white/90 hover:text-white">
+              Démo
             </Link>
           </div>
+
+          {/* Bouton type "Connect wallet" : bleu foncé, texte blanc */}
+          <Link
+            href="#demo"
+            className="rounded-full border border-white/20 bg-blue-950 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-900 hover:border-white/30"
+          >
+            Demander une démo
+          </Link>
         </div>
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO VISUEL ========== */}
-        <section className="relative min-h-[90vh] overflow-hidden bg-gradient-to-b from-blue-950 via-indigo-950 to-blue-950 px-4 pb-24 pt-28 md:px-6 md:pt-36">
+        {/* ========== 1. HERO (exactement comme maquette) ========== */}
+        <section className="relative min-h-[92vh] overflow-hidden bg-blue-950 px-4 pb-20 pt-24 md:px-6 md:pt-28 lg:pt-32">
           <GridBackground />
 
-          <div className="relative mx-auto max-w-5xl text-center">
-            <h1 className="text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-              Gestion pour
-              <br />
-              clubs sportifs
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 md:text-xl">
-              Joueurs, membres, cotisations, manifestations, calendriers,
-              dépenses, recettes et communication — tout dans un seul outil.
-            </p>
+          <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center lg:justify-between">
+            {/* Bloc titre centré + 2 cartes flottantes autour + flèches */}
+            <div className="relative flex flex-1 flex-col items-center justify-center text-center">
+              {/* Titre XXL deux lignes : ligne 1 avec accent vert (style #CLUB), ligne 2 blanche */}
+              <h1 className="relative z-10 mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+                <span className="block">
+                  <span className="text-emerald-400">O</span>
+                  <span>BILLZ</span>
+                </span>
+                <span className="mt-1 block">GESTION CLUBS SPORTIFS</span>
+              </h1>
 
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link
-                href="#demo"
-                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-emerald-400 bg-emerald-400 px-8 py-3.5 text-sm font-semibold text-blue-950 transition-all hover:bg-emerald-300 hover:border-emerald-300"
-              >
-                Demander une démo
-              </Link>
-              <HandDrawnCircle>Démo sur mesure</HandDrawnCircle>
-            </div>
-
-            <div className="relative mx-auto mt-16 h-72 w-full max-w-4xl md:mt-20 md:h-80 lg:mt-24">
-              {/* Cartes flottantes hero */}
+              {/* Carte gauche (petite) - sous "OBILLZ", à gauche */}
               <FloatingHeroCard
                 title="Joueur / Membre"
-                rotate="-rotate-6"
-                position="left-0 top-0 md:left-[2%] md:top-[5%]"
+                position="absolute left-0 top-1/2 -translate-y-1/2 md:left-[5%] lg:left-[0%] xl:left-[2%]"
                 animationDelay="0s"
               >
-                <p className="font-medium text-white">Marie Dupont</p>
-                <p className="text-white/80">marie.dupont@email.fr</p>
+                <p className="font-semibold text-white">marie.dupont@club.fr</p>
+                <p className="mt-1 text-xs text-white/80">124 membres</p>
               </FloatingHeroCard>
 
+              {/* Carte droite (plus grande) - à droite, niveau "GESTION CLUBS SPORTIFS" */}
               <FloatingHeroCard
                 title="Manifestation"
-                rotate="rotate-3"
-                position="right-0 top-0 md:right-[2%] md:top-[0%]"
-                animationDelay="1s"
-              >
-                <p className="font-medium text-white">Match domicile</p>
-                <p className="text-white/80">Sam. 14h · Stade Jean-Moulin</p>
-              </FloatingHeroCard>
-
-              <FloatingHeroCard
-                title="Cotisation"
-                rotate="-rotate-2"
-                position="bottom-0 left-0 md:left-[8%] md:bottom-[5%]"
+                position="absolute right-0 top-1/2 -translate-y-1/2 md:right-[5%] lg:right-[0%] xl:right-[2%]"
                 animationDelay="0.5s"
               >
-                <p className="font-medium text-white">Saison 2024-2025</p>
-                <p className="mt-1 inline-block rounded-full bg-emerald-400/30 px-2 py-0.5 text-xs text-emerald-300">
-                  Payé
+                <p className="font-semibold text-white">Match domicile</p>
+                <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
+                <p className="mt-2 inline-block rounded-full bg-emerald-400/30 px-2 py-0.5 text-xs font-medium text-emerald-300">
+                  Cotisation à jour
                 </p>
-                <p className="mt-0.5 text-xs text-white/60">2 en attente</p>
               </FloatingHeroCard>
 
-              <FloatingHeroCard
-                title="Dépense / Recette"
-                rotate="rotate-4"
-                position="bottom-0 right-0 md:right-[5%] md:bottom-[0%]"
-                animationDelay="1.5s"
-              >
-                <p className="font-medium text-white">- 420 €</p>
-                <p className="text-white/80">Arbitrage · Match 12/01</p>
-              </FloatingHeroCard>
+              {/* Flèche spirale vers le haut, sous "OBILLZ", près de la carte gauche */}
+              <div className="absolute left-[18%] top-[58%] hidden lg:block xl:left-[22%]">
+                <HandDrawnArrowUp className="h-10 w-10 text-emerald-400 md:h-12 md:w-12" />
+              </div>
+
+              {/* Flèche spirale vers le bas, près de la carte droite */}
+              <div className="absolute right-[18%] top-[42%] hidden lg:block xl:right-[22%]">
+                <HandDrawnArrowDown className="h-10 w-10 text-emerald-400 md:h-12 md:w-12" />
+              </div>
             </div>
 
-            {/* Flèche accent */}
-            <div className="absolute -right-4 top-1/2 hidden translate-y-4 lg:block">
-              <HandDrawnArrow />
+            {/* Cercle vert fluo à droite : "DEMANDER UNE DÉMO" + flèche centrale (style référence) */}
+            <div className="absolute right-4 top-1/2 hidden -translate-y-1/2 lg:flex lg:justify-end xl:right-8">
+              <HeroCtaCircleSimple />
             </div>
           </div>
         </section>
 
         {/* ========== 2. CARTES FONCTIONNEMENT ========== */}
-        <section className="relative bg-gradient-to-b from-blue-950 to-indigo-950 px-4 py-20 md:px-6 md:py-28">
+        <section id="fonctionnement" className="relative bg-gradient-to-b from-blue-950 to-indigo-950 px-4 py-20 md:px-6 md:py-28">
           <GridBackground />
           <div className="relative mx-auto max-w-6xl">
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
@@ -249,7 +288,7 @@ export default function LandingPage() {
         </section>
 
         {/* ========== 3. FONCTIONNALITÉS ========== */}
-        <section className="relative bg-indigo-950 px-4 py-20 md:px-6 md:py-28">
+        <section id="fonctionnalites" className="relative bg-indigo-950 px-4 py-20 md:px-6 md:py-28">
           <GridBackground />
           <div className="relative mx-auto max-w-6xl">
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
