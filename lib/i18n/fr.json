@@ -6,24 +6,24 @@
   "landing": {
     "brand": "OBILLZ",
     "metadata": {
-      "title": "OBILLZ — La facturation en deux clics",
-      "description": "Logiciel de facturation et de suivi des dépenses pour indépendants et petites entreprises. Simple, rapide, moderne, pensé pour l'Europe."
+      "title": "OBILLZ — La gestion du club en deux clics",
+      "description": "Outil de gestion des cotisations, des dépenses et du suivi des membres pour clubs de sport amateurs. Simple, centralisé, pensé pour les bénévoles."
     },
     "nav": {
       "login": "Connexion",
       "cta": "Commencer gratuitement",
-      "logoAlt": "OBILLZ — La facturation en deux clics"
+      "logoAlt": "OBILLZ — La gestion du club en deux clics"
     },
     "hero": {
-      "badge": "OBILLZ — La facturation en deux clics",
-      "title": "Gérez vos devis et factures\noù que vous soyez.",
-      "subtitle": "Un outil simple pour facturer vite, suivre l'état de vos factures dans le dashboard et garder la main sur vos relances.",
+      "badge": "OBILLZ — Pensé pour les clubs de sport amateurs",
+      "title": "Moins de paperasse,\nplus de terrain.",
+      "subtitle": "Un outil simple pour gérer les cotisations, suivre les paiements des membres et garder une vision claire des finances du club. Conçu pour les trésoriers et les bénévoles.",
       "bullets": [
-        "Facturation rapide et professionnelle",
-        "Suivi clair des paiements et des statuts",
-        "Relances manuelles, vous gardez la main",
-        "Dépenses + échéances réunies",
-        "Accès simple, sans jargon administratif, pensé pour l'Europe"
+        "Gestion des cotisations et des paiements des membres",
+        "Suivi clair : payé, en attente, à relancer",
+        "Dépenses du club centralisées (buvette, matériel, manifestations)",
+        "Vue d’ensemble des finances en un coup d’œil",
+        "Interface accessible, sans jargon, pour tous les bénévoles"
       ],
       "ctaPrimary": "Commencer gratuitement",
       "ctaSecondary": "Voir la démo",
@@ -31,12 +31,12 @@
       "payments": ["SEPA", "Carte", "Virement", "Multi-devises"],
       "preview": {
         "label": "Aperçu produit",
-        "invoices": { "label": "Factures", "value": "€12 300" },
-        "quotes": { "label": "Devis", "sent": "8 envoyés", "pending": "2 en attente" },
+        "invoices": { "label": "Cotisations", "value": "€12 300" },
+        "quotes": { "label": "Budgets", "sent": "8 prévus", "pending": "2 en attente" },
         "expenses": { "label": "Dépenses", "value": "€3 480", "due": "Échéances à 10 jours" },
         "followUp": {
           "label": "Suivi",
-          "items": ["Relance #2043", "Paiement reçu", "Échéance dépense"]
+          "items": ["Relance cotisation #2043", "Paiement reçu", "Échéance dépense"]
         },
         "abstract": { "label": "Visuel abstrait" }
       }
@@ -45,86 +45,86 @@
       "cards": {
         "tools": {
           "title": "Trop d'outils dispersés",
-          "text": "Factures, dépenses, relances… tout est éparpillé entre des fichiers et des apps."
+          "text": "Cotisations, dépenses, relances… tout est éparpillé entre Excel, papiers et mails."
         },
         "tracking": {
           "title": "Suivi approximatif",
-          "text": "Impossible de voir rapidement ce qui est payé, en retard, ou à prévoir."
+          "text": "Difficile de voir rapidement qui a payé sa cotisation, qui est en retard, ou ce qui reste à encaisser."
         },
         "load": {
           "title": "Charge mentale inutile",
-          "text": "Vous perdez du temps sur l'administratif au lieu de développer votre activité."
+          "text": "Le trésorier et le bureau perdent du temps sur la paperasse au lieu de se consacrer au club."
         }
       },
       "label": "Le problème",
-      "title": "L'administratif ne doit pas ralentir votre business.",
+      "title": "L'administratif ne doit pas plomber la vie du club.",
       "paragraphs": {
-        "first": "OBILLZ centralise facturation et dépenses pour vous donner une vue claire, rapide, actionnable.",
-        "second": "Vous gagnez du temps, évitez les oublis, et gardez un suivi fiable sans complexité."
+        "first": "OBILLZ centralise cotisations, dépenses et suivi des membres pour une vue claire et actionnable du club.",
+        "second": "Moins de paperasse, moins d’oublis, un suivi fiable pour les comités et les bénévoles."
       },
       "cta": "Commencer gratuitement"
     },
     "solution": {
       "label": "La solution OBILLZ",
-      "title": "Une seule interface pour facturer, suivre et avancer.",
-      "description": "Structure claire, actions rapides, et une vue globale de votre activité. Sans jargon, sans lourdeur.",
+      "title": "Une seule interface pour gérer le club, suivre et avancer.",
+      "description": "Structure claire, actions rapides, vue globale des finances du club. Sans jargon, sans lourdeur, pensée pour les bénévoles.",
       "cards": {
         "centralized": {
           "title": "Tout est centralisé",
-          "text": "Clients, documents, dépenses et échéances réunis dans un espace simple."
+          "text": "Membres, cotisations, dépenses et échéances réunis dans un espace simple."
         },
         "control": {
           "title": "Vous gardez le contrôle",
-          "text": "Vous décidez quand relancer, avec une vue claire dans le dashboard."
+          "text": "Vous décidez quand relancer les membres, avec une vue claire dans le dashboard."
         }
       }
     },
     "features": {
       "label": "Fonctionnalités clés",
-      "title": "Tout ce dont vous avez besoin. Rien de superflu.",
-      "description": "Idéal pour freelances et petites entreprises qui veulent aller à l'essentiel.",
+      "title": "Tout ce dont le club a besoin. Rien de superflu.",
+      "description": "Idéal pour clubs de foot, basket, handball, volley… et tous les clubs amateurs qui veulent simplifier leur gestion.",
       "cards": {
         "quotes": {
-          "title": "Devis & factures en 2 clics",
-          "text": "Créez, envoyez et suivez vos documents sans friction, avec des modèles clairs et pro."
+          "title": "Cotisations & budgets en 2 clics",
+          "text": "Créez les cotisations, suivez les paiements des membres et prévoyez les budgets sans prise de tête."
         },
         "payments": {
-          "title": "Suivi des paiements",
-          "text": "Visualisez en un coup d'œil ce qui est payé, en attente ou à relancer."
+          "title": "Suivi des paiements des membres",
+          "text": "Visualisez en un coup d'œil qui a payé sa cotisation, qui est en attente ou à relancer."
         },
         "expenses": {
-          "title": "Dépenses & échéances",
-          "text": "Enregistrez vos dépenses et planifiez les échéances importantes sans tableaux externes."
+          "title": "Dépenses du club & échéances",
+          "text": "Enregistrez les dépenses (buvette, matériel, manifestations) et planifiez les échéances sans tableaux externes."
         },
         "notifications": {
           "title": "Suivi des statuts",
-          "text": "Visualisez facilement ce qui est payé, en attente ou en retard."
+          "text": "Visualisez facilement ce qui est payé, en attente ou en retard pour chaque membre."
         },
         "assistant": {
           "title": "Relances sous votre contrôle",
-          "text": "Vous décidez quand relancer vos clients, directement depuis vos factures."
+          "text": "Vous décidez quand relancer les membres pour leur cotisation, directement depuis le dashboard."
         },
         "dashboard": {
           "title": "Dashboard complet",
-          "text": "Un cockpit clair pour piloter vos clients, vos revenus et vos charges."
+          "text": "Une vue claire pour piloter les cotisations, les dépenses et les finances du club."
         }
       }
     },
     "dashboard": {
       "label": "Vue produit",
       "title": "Un dashboard qui parle vraiment.",
-      "description": "Suivez l'état de vos factures en temps réel depuis un tableau de bord clair, avec des statuts payée / en attente / en retard.",
-      "tags": ["Suivi des statuts", "Relances manuelles", "Vue dépenses", "Tout centralisé"],
+      "description": "Suivez l'état des cotisations et des dépenses en temps réel : payé, en attente, en retard. Une vision claire des finances du club.",
+      "tags": ["Suivi des cotisations", "Relances manuelles", "Vue dépenses", "Tout centralisé"],
       "preview": {
         "label": "Aperçu dashboard",
         "stats": {
-          "labels": ["Factures payées", "En attente", "Dépenses"],
+          "labels": ["Cotisations encaissées", "En attente", "Dépenses"],
           "value": "+12%",
           "period": "Cette semaine"
         },
         "deadlines": {
           "label": "Échéances",
-          "items": ["Relance facture #1098", "Paiement dépense cloud", "Devis à valider"],
+          "items": ["Relance cotisation #1098", "Paiement fournisseur", "Budget à valider"],
           "today": "Aujourd'hui"
         }
       },
@@ -133,13 +133,13 @@
     "howItWorks": {
       "label": "Comment ça marche",
       "title": "Simple, fluide, sans surcharge.",
-      "description": "6 étapes claires pour garder votre facturation sous contrôle.",
+      "description": "6 étapes claires pour garder la gestion du club sous contrôle.",
       "steps": [
-        "Créez un client en 30 secondes.",
-        "Générez un devis ou une facture.",
-        "Envoyez et suivez le statut.",
-        "Ajoutez vos dépenses.",
-        "Relancez manuellement si besoin.",
+        "Ajoutez un membre en 30 secondes.",
+        "Créez les cotisations et suivez les paiements.",
+        "Envoyez les rappels et suivez le statut.",
+        "Enregistrez les dépenses du club (buvette, matériel, etc.).",
+        "Relancez manuellement les membres si besoin.",
         "Pilotez tout depuis le dashboard."
       ]
     },
@@ -149,7 +149,7 @@
       "free": {
         "title": "Free",
         "subtitle": "Pour démarrer sans risque.",
-        "features": ["Création de devis et factures", "Suivi basique", "Accès limité"],
+        "features": ["Cotisations et budgets", "Suivi basique des membres", "Accès limité"],
         "cta": "Commencer gratuitement"
       },
       "pro": {
@@ -157,9 +157,9 @@
         "title": "Pro",
         "subtitle": "29€ / mois (prix provisoire)",
         "features": [
-          "Facturation illimitée",
-          "Dépenses + échéances",
-          "Suivi des statuts de paiement",
+          "Cotisations et membres illimités",
+          "Dépenses du club + échéances",
+          "Suivi des paiements des membres",
           "Relances manuelles",
           "Dashboard complet"
         ],
@@ -174,12 +174,12 @@
         "label": "Sans OBILLZ",
         "badge": "Avant",
         "items": [
-          "Création manuelle des factures, longue et source d’erreurs",
-          "Factures et dépenses dispersées sur plusieurs outils",
-          "Pas de suivi simple des échéances de paiement",
-          "Manque de visibilité sur ce qui est payé ou en retard",
-          "Perte de temps à chercher des documents",
-          "Suivi financier stressant et peu clair"
+          "Cotisations et suivi à la main, source d’erreurs et d’oublis",
+          "Cotisations et dépenses dispersées (Excel, papiers, mails)",
+          "Pas de suivi simple des paiements des membres",
+          "Manque de visibilité sur qui a payé ou qui est en retard",
+          "Perte de temps à chercher les infos",
+          "Gestion du club stressante et peu claire pour les bénévoles"
         ]
       },
       "middle": {
@@ -191,24 +191,24 @@
         "badge": "Après",
         "items": {
           "fast": {
-            "title": "Facturation rapide et centralisée",
-            "text": "Créez et envoyez vos factures en quelques clics depuis un seul outil."
+            "title": "Gestion des cotisations centralisée",
+            "text": "Créez les cotisations et suivez les paiements des membres en quelques clics."
           },
           "tracking": {
             "title": "Suivi clair des paiements et dépenses",
-            "text": "Visualisez instantanément ce que vous devez payer et encaisser."
+            "text": "Visualisez instantanément ce qui est encaissé et ce qui reste à payer pour le club."
           },
           "alerts": {
             "title": "Relances sous votre contrôle",
-            "text": "Vous relancez quand vous le décidez, avec un suivi visible dans le dashboard."
+            "text": "Vous relancez les membres quand vous le décidez, avec un suivi visible dans le dashboard."
           },
           "realtime": {
             "title": "Vue d’ensemble en temps réel",
-            "text": "Statuts clairs : payé, en attente, en retard."
+            "text": "Statuts clairs : payé, en attente, en retard pour chaque membre."
           },
           "organization": {
             "title": "Organisation sans effort",
-            "text": "Tous vos documents sont centralisés et accessibles."
+            "text": "Cotisations, dépenses et membres : tout est centralisé et accessible au bureau."
           }
         }
       }
@@ -218,24 +218,24 @@
       "title": "Questions fréquentes.",
       "items": {
         "fit": {
-          "question": "OBILLZ convient-il aux freelances et petites équipes ?",
-          "answer": "Oui, OBILLZ est conçu pour les indépendants, freelances et petites entreprises."
+          "question": "OBILLZ convient-il à notre club ?",
+          "answer": "Oui. OBILLZ est pensé pour les clubs de sport amateurs : foot, basket, handball, volley… trésoriers, présidents et bénévoles peuvent s'en servir sans formation."
         },
         "free": {
           "question": "Puis-je commencer gratuitement ?",
-          "answer": "Oui, le plan Free vous permet de créer devis et factures avec un accès limité."
+          "answer": "Oui. Le plan Free vous permet de gérer les cotisations et les membres avec un accès limité, pour tester en conditions réelles."
         },
         "export": {
-          "question": "Puis-je exporter mes factures pour ma comptabilité ou ma fiduciaire ?",
-          "answer": "Oui. En un clic, vous pouvez exporter toutes vos factures d’une année donnée avec les PDF correspondants, prêtes à être transmises à votre fiduciaire ou comptable."
+          "question": "Puis-je exporter les données pour notre comptabilité ou notre association ?",
+          "answer": "Oui. En un clic, vous pouvez exporter les cotisations et documents d’une année, avec les PDF correspondants, prêts à être transmis au comptable ou à l'assemblée générale."
         },
         "noCommitment": {
           "question": "Le plan Pro est-il sans engagement ?",
-          "answer": "Oui, vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez."
+          "answer": "Oui. Vous pouvez passer au plan Pro et l'arrêter quand vous le souhaitez."
         },
         "assistant": {
-          "question": "Y a-t-il des notifications automatiques ?",
-          "answer": "Non. Il n'y a pas de notifications push ou email automatiques. Le suivi se fait dans le dashboard et les relances restent manuelles."
+          "question": "Y a-t-il des relances automatiques aux membres ?",
+          "answer": "Non. Les relances restent manuelles. Vous gardez la main sur le ton et le moment, le suivi se fait dans le dashboard."
         }
       }
     },
