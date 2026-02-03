@@ -83,10 +83,10 @@ export default function LandingPage() {
           </div>
 
           <Link
-            href="#demo"
+            href="/connexion"
             className="rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
           >
-            Demander une démo
+            Connexion
           </Link>
         </div>
       </nav>
@@ -110,6 +110,13 @@ export default function LandingPage() {
               Obillz permet de gérer les membres, les cotisations, les manifestations,
               les plannings et les finances du club depuis un seul endroit.
             </p>
+            <Link
+              href="/inscription"
+              className="hero-cta-button mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl md:px-10 md:py-4 md:text-lg"
+              style={{ color: "var(--obillz-hero-blue)" }}
+            >
+              Essayer gratuitement pendant 7 jours
+            </Link>
           </div>
 
           {/* Transition nette : courbe blanche qui coupe le bleu */}
