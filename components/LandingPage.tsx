@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 /* ----- Grid d'arrière-plan (hero bleu) ----- */
 function GridBackground() {
@@ -72,11 +73,17 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 md:px-6">
           <Link
             href="/"
-            className="flex items-center rounded-2xl border border-white/30 bg-white px-4 py-2.5 shadow-sm transition-opacity hover:opacity-90"
+            className="relative flex items-center transition-opacity hover:opacity-90"
+            aria-label="Obillz - Accueil"
           >
-            <span className="text-lg font-bold text-[var(--obillz-hero-blue)]">
-              Obillz
-            </span>
+            <Image
+              src="/logo-obillz.png"
+              alt="Obillz"
+              width={140}
+              height={40}
+              className="h-9 w-auto object-contain object-left md:h-10"
+              priority
+            />
           </Link>
 
           <div className="hidden flex-1 justify-center gap-8 md:flex">
@@ -119,10 +126,19 @@ export default function LandingPage() {
 
           <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center">
             <div className="relative flex flex-1 flex-col items-center justify-center text-center">
-              {/* Titre XXL blanc */}
-              <h1 className="relative z-10 mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-                <span className="block">OBILLZ</span>
-                <span className="mt-1 block">GESTION CLUBS SPORTIFS</span>
+              {/* Logo + sous-titre */}
+              <h1 className="relative z-10 mt-4 flex flex-col items-center gap-3 text-center">
+                <Image
+                  src="/logo-obillz.png"
+                  alt="Obillz"
+                  width={320}
+                  height={120}
+                  className="h-16 w-auto object-contain sm:h-20 md:h-24 lg:h-28 xl:h-32"
+                  priority
+                />
+                <span className="block text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+                  GESTION CLUBS SPORTIFS
+                </span>
               </h1>
 
               {/* 4 cartes flottantes utiles */}
