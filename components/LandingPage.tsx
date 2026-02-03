@@ -138,16 +138,16 @@ export default function LandingPage() {
             </div>
 
             {/* Texte hero : zone du rectangle rouge */}
-            <p className="relative z-10 mt-6 max-w-4xl shrink-0 text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+            <p className="relative z-10 mt-6 max-w-4xl shrink-0 text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
               La gestion des clubs sportifs centralisée.
             </p>
 
-            {/* Zone cartes + titre sous le texte hero */}
-            <div className="relative mt-8 flex min-h-[320px] w-full flex-1 flex-col items-center justify-end md:mt-10 md:min-h-[360px]">
-              {/* 4 cartes flottantes */}
+            {/* Zone cartes + titre sous le texte hero (flashcards remontées) */}
+            <div className="relative mt-8 flex min-h-[280px] w-full flex-1 flex-col items-center justify-end md:mt-10 md:min-h-[320px]">
+              {/* 4 cartes flottantes — remontées dans le bleu */}
               <FloatingHeroCard
                 title="Joueur / Membre"
-                position="left-0 top-1/2 -translate-y-1/2 md:left-[2%] lg:left-0 xl:left-[4%]"
+                position="left-0 top-[38%] -translate-y-1/2 md:left-[2%] lg:left-0 xl:left-[4%]"
                 animationDelay="0s"
               >
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
@@ -156,7 +156,7 @@ export default function LandingPage() {
 
               <FloatingHeroCard
                 title="Manifestation"
-                position="right-0 top-1/2 -translate-y-1/2 md:right-[2%] lg:right-0 xl:right-[4%]"
+                position="right-0 top-[38%] -translate-y-1/2 md:right-[2%] lg:right-0 xl:right-[4%]"
                 animationDelay="0.5s"
               >
                 <p className="font-semibold text-white">Match domicile</p>
@@ -165,7 +165,7 @@ export default function LandingPage() {
 
               <FloatingHeroCard
                 title="Cotisation"
-                position="bottom-[20%] left-[8%] md:left-[12%]"
+                position="bottom-[42%] left-[8%] md:left-[12%]"
                 animationDelay="1s"
               >
                 <p className="font-semibold text-white">Saison 2024-2025</p>
@@ -174,7 +174,7 @@ export default function LandingPage() {
 
               <FloatingHeroCard
                 title="Dépense / Recette"
-                position="bottom-[20%] right-[8%] md:right-[12%]"
+                position="bottom-[42%] right-[8%] md:right-[12%]"
                 animationDelay="1.5s"
               >
                 <p className="font-semibold text-white">- 420 €</p>
