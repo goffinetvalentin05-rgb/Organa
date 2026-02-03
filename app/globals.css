@@ -4,7 +4,11 @@
   /* Typography */
   --font-heading: var(--font-heading);
   --font-body: var(--font-heading);
-  
+
+  /* Obillz landing - bleu hero (identique à la maquette) */
+  --obillz-hero-blue: #1A23FF;
+  --obillz-hero-blue-hover: #151dd9;
+
   /* Colors - Landing (bleu nuit foncé premium) */
   --bg-landing-start: #03062A;
   --bg-landing-mid: #050A3A;
