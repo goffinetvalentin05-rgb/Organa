@@ -134,20 +134,8 @@ export default function LandingPage() {
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center gap-8 pb-16 pt-8 md:gap-10 md:pt-10 lg:pt-12">
-            {/* Logo Obillz (public/logo-obillz.png) — remonté */}
-            <div className="z-10 flex justify-center">
-              <Image
-                src="/logo-obillz.png"
-                alt="Obillz"
-                width={480}
-                height={132}
-                className="h-24 w-auto object-contain opacity-95 sm:h-28 md:h-32 lg:h-40 xl:h-44"
-                priority
-              />
-            </div>
-
-            {/* Titre : 2 lignes max, centré */}
+          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-16 pt-12 md:pt-16 lg:pt-20">
+            {/* Titre hero : 2 lignes max, centré (remonte à la place du logo) */}
             <h1
               className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
               style={{ lineHeight: "1.15" }}
@@ -157,8 +145,8 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            {/* 4 cartes alignées sur une seule ligne sous le hero — animées (flottement décalé) */}
-            <div className="z-20 flex w-full max-w-5xl flex-wrap items-stretch justify-center gap-4 px-2 md:gap-6">
+            {/* Plus d'espace entre le hero et les cartes */}
+            <div className="z-20 mt-14 flex w-full max-w-5xl flex-wrap items-stretch justify-center gap-4 px-2 md:mt-20 md:gap-6 lg:mt-24">
               <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
                 <p className="mt-1 text-xs text-white/80">124 membres</p>
