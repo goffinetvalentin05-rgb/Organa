@@ -127,28 +127,17 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO — Titre 2 lignes max, 4 cartes en ligne en dessous ========== */}
+        {/* ========== 1. HERO — Titre unique, sous-titre, 4 cartes encadrant le texte ========== */}
         <section
           className="relative min-h-[88vh] overflow-visible px-4 pb-0 pt-6 md:px-6 md:pt-8 lg:pt-10"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-0 pt-20 md:pt-24 lg:pt-28">
-            {/* Titre hero : plus haut */}
-            <h1
-              className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
-              style={{ lineHeight: "1.15" }}
-            >
-              <span className="line-clamp-2 block">
-                La gestion des clubs sportifs centralisée.
-              </span>
-            </h1>
-          </div>
-
-          {/* Cartes sur la démarquation (bord supérieur de la vague), pas dans le blanc */}
-          <div className="absolute left-1/2 z-30 w-full max-w-5xl -translate-x-1/2 px-4 md:px-6 bottom-28 md:bottom-36 lg:bottom-44">
-            <div className="flex flex-wrap items-stretch justify-center gap-4 md:gap-6">
+          {/* Bloc titre + sous-titre centré dans la moitié haute, 4 cards qui encadrent */}
+          <div className="relative z-20 mx-auto flex max-w-5xl flex-col items-center px-4 pb-24 pt-20 md:px-6 md:pt-24 lg:pt-28">
+            {/* 2 cards partie haute — encadrent le titre sans le toucher */}
+            <div className="mb-8 flex w-full max-w-4xl items-stretch justify-center gap-6 md:gap-8">
               <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
                 <p className="font-semibold text-white">marie.dupont@club.fr</p>
                 <p className="mt-1 text-xs text-white/80">124 membres</p>
@@ -157,13 +146,31 @@ export default function LandingPage() {
                 <p className="font-semibold text-white">Saison 2024-2025</p>
                 <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
               </FloatingHeroCard>
-              <FloatingHeroCard title="Dépense / Recette" inline animationDelay="1s">
-                <p className="font-semibold text-white">- 420 €</p>
-                <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
-              </FloatingHeroCard>
-              <FloatingHeroCard title="Manifestation" inline animationDelay="1.5s">
+            </div>
+
+            {/* Titre unique */}
+            <h1
+              className="max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
+              style={{ lineHeight: "1.15" }}
+            >
+              La gestion des clubs sportifs centralisée.
+            </h1>
+            {/* Sous-titre — 2 lignes max */}
+            <p className="mt-4 max-w-2xl text-center text-base leading-snug text-white/95 sm:text-lg md:text-xl">
+              <span className="line-clamp-2 block">
+                Obillz permet de gérer les membres, les cotisations, les manifestations, les plannings et les finances du club depuis un seul endroit.
+              </span>
+            </p>
+
+            {/* 2 cards partie basse — encadrent le texte sans toucher la séparation blanche */}
+            <div className="mt-8 flex w-full max-w-4xl items-stretch justify-center gap-6 md:gap-8">
+              <FloatingHeroCard title="Manifestation" inline animationDelay="1s">
                 <p className="font-semibold text-white">Match domicile</p>
                 <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
+              </FloatingHeroCard>
+              <FloatingHeroCard title="Dépense / Recette" inline animationDelay="1.5s">
+                <p className="font-semibold text-white">- 420 €</p>
+                <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
               </FloatingHeroCard>
             </div>
           </div>
