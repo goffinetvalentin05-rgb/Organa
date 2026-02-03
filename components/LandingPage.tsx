@@ -134,7 +134,7 @@ export default function LandingPage() {
         >
           <GridBackground />
 
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-0 pt-12 md:pt-16 lg:pt-20">
+          <div className="relative mx-auto flex max-w-6xl flex-col items-center justify-center pb-0 pt-16 md:pt-20 lg:pt-24">
             {/* Titre hero : plus haut */}
             <h1
               className="z-20 max-w-4xl text-center text-2xl font-bold uppercase leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
