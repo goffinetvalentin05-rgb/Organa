@@ -16,37 +16,20 @@ function GridBackground() {
   );
 }
 
-/* ----- Carte hero : flottante (absolute) ou en ligne (inline) ----- */
-function FloatingHeroCard({
+/* ----- Carte section colorée (exemples produit) ----- */
+function ProductExampleCard({
   title,
   children,
-  position,
-  animationDelay = "0s",
-  inline = false,
 }: {
   title: string;
   children: React.ReactNode;
-  position?: string;
-  animationDelay?: string;
-  inline?: boolean;
 }) {
-  const baseClass =
-    "w-[200px] min-w-[160px] max-w-[220px] rounded-3xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl transition-transform duration-300 hover:scale-[1.02] hover:border-white/35 hover:shadow-xl";
-  const positionedClass = inline
-    ? "flex-1 shrink-0"
-    : `absolute ${position ?? ""}`;
   return (
-    <div
-      className={`${baseClass} ${positionedClass}`}
-      style={{
-        animation: "hero-float 4s ease-in-out infinite",
-        animationDelay,
-      }}
-    >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">
+    <div className="rounded-3xl border border-emerald-200 bg-white p-5 shadow-md transition-all duration-300 hover:border-emerald-400 hover:shadow-lg">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
         {title}
       </p>
-      <div className="mt-2 text-sm text-white">{children}</div>
+      <div className="mt-2 text-sm text-slate-700">{children}</div>
     </div>
   );
 }
@@ -127,27 +110,14 @@ export default function LandingPage() {
       </nav>
 
       <main className="pt-16">
-        {/* ========== 1. HERO — Titre unique + sous-titre, 4 cartes encadrant le texte (2 haut, 2 bas) ========== */}
+        {/* ========== 1. HERO — Titre unique + sous-titre (sans cartes) ========== */}
         <section
           className="relative min-h-[88vh] overflow-visible px-4 pb-0 pt-6 md:px-6 md:pt-8 lg:pt-10"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
         >
           <GridBackground />
 
-          <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center pb-0 pt-16 md:pt-20 lg:pt-24">
-            {/* 2 cards partie haute — encadrent le titre sans le toucher */}
-            <div className="flex flex-wrap items-stretch justify-center gap-4 md:gap-6 pb-8 md:pb-10">
-              <FloatingHeroCard title="Joueur / Membre" inline animationDelay="0s">
-                <p className="font-semibold text-white">marie.dupont@club.fr</p>
-                <p className="mt-1 text-xs text-white/80">124 membres</p>
-              </FloatingHeroCard>
-              <FloatingHeroCard title="Cotisation" inline animationDelay="0.5s">
-                <p className="font-semibold text-white">Saison 2024-2025</p>
-                <p className="mt-1 text-xs text-white/80">Payé · 2 en attente</p>
-              </FloatingHeroCard>
-            </div>
-
-            {/* Titre unique + sous-titre — centrés, moitié haute, point focal */}
+          <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center justify-center pb-24 pt-16 md:pb-28 md:pt-24 lg:pb-32 lg:pt-28">
             <h1
               className="max-w-4xl text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
               style={{ lineHeight: "1.15" }}
@@ -158,18 +128,6 @@ export default function LandingPage() {
               Obillz permet de gérer les membres, les cotisations, les manifestations,
               les plannings et les finances du club depuis un seul endroit.
             </p>
-
-            {/* 2 cards partie basse — encadrent le texte, restent dans la zone bleue */}
-            <div className="mt-8 flex flex-wrap items-stretch justify-center gap-4 md:gap-6 pb-24 md:pb-28 lg:pb-32">
-              <FloatingHeroCard title="Manifestation" inline animationDelay="1s">
-                <p className="font-semibold text-white">Match domicile</p>
-                <p className="mt-1 text-sm text-white/80">Sam. 14h · Stade Jean-Moulin</p>
-              </FloatingHeroCard>
-              <FloatingHeroCard title="Dépense / Recette" inline animationDelay="1.5s">
-                <p className="font-semibold text-white">- 420 €</p>
-                <p className="mt-1 text-xs text-white/80">Arbitrage · Match 12/01</p>
-              </FloatingHeroCard>
-            </div>
           </div>
 
           {/* Transition nette : courbe blanche qui coupe le bleu */}
@@ -188,10 +146,40 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 2. FONCTIONNEMENT (fond blanc) ========== */}
+        {/* ========== 2. EXEMPLES PRODUIT (fond teinté, 4 cartes) ========== */}
+        <section className="relative -mt-1 bg-slate-50 px-4 py-16 md:px-6 md:py-20">
+          <div className="relative mx-auto max-w-6xl">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              En un coup d&apos;œil
+            </p>
+            <h2 className="mt-3 text-center text-2xl font-bold text-slate-900 md:text-3xl">
+              Membre, cotisation, manifestation, finances
+            </h2>
+            <div className="mt-10 flex flex-wrap items-stretch justify-center gap-4 md:gap-6">
+              <ProductExampleCard title="Joueur / Membre">
+                <p className="font-semibold text-slate-800">marie.dupont@club.fr</p>
+                <p className="mt-1 text-xs text-slate-600">124 membres</p>
+              </ProductExampleCard>
+              <ProductExampleCard title="Cotisation">
+                <p className="font-semibold text-slate-800">Saison 2024-2025</p>
+                <p className="mt-1 text-xs text-slate-600">Payé · 2 en attente</p>
+              </ProductExampleCard>
+              <ProductExampleCard title="Manifestation">
+                <p className="font-semibold text-slate-800">Match domicile</p>
+                <p className="mt-1 text-sm text-slate-600">Sam. 14h · Stade Jean-Moulin</p>
+              </ProductExampleCard>
+              <ProductExampleCard title="Dépense / Recette">
+                <p className="font-semibold text-slate-800">- 420 €</p>
+                <p className="mt-1 text-xs text-slate-600">Arbitrage · Match 12/01</p>
+              </ProductExampleCard>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== 3. FONCTIONNEMENT (fond blanc) ========== */}
         <section
           id="fonctionnement"
-          className="relative -mt-1 bg-white px-4 pt-16 pb-20 md:px-6 md:pt-20 md:pb-28"
+          className="relative bg-white px-4 pt-16 pb-20 md:px-6 md:pt-20 md:pb-28"
         >
           <div className="relative mx-auto max-w-6xl">
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -247,7 +235,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 3. FONCTIONNALITÉS (fond blanc) ========== */}
+        {/* ========== 4. FONCTIONNALITÉS (fond blanc) ========== */}
         <section
           id="fonctionnalites"
           className="relative bg-white px-4 py-20 md:px-6 md:py-28"
@@ -301,7 +289,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 4. CENTRALISATION (fond blanc) ========== */}
+        {/* ========== 5. CENTRALISATION (fond blanc) ========== */}
         <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
           <div className="relative mx-auto max-w-5xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -346,7 +334,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 5. CTA FINAL (fond blanc) ========== */}
+        {/* ========== 6. CTA FINAL (fond blanc) ========== */}
         <section id="demo" className="relative bg-white px-4 py-24 md:px-6 md:py-32">
           <div className="relative mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
