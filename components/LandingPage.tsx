@@ -180,7 +180,7 @@ export default function LandingPage() {
 
       <main className="pt-16">
         {/* ========== 1. HERO (exactement comme maquette) ========== */}
-        <section className="relative min-h-[92vh] overflow-hidden bg-blue-950 px-4 pb-20 pt-24 md:px-6 md:pt-28 lg:pt-32">
+        <section className="relative min-h-[92vh] overflow-hidden bg-blue-950 px-4 pb-0 pt-24 md:px-6 md:pt-28 lg:pt-32">
           <GridBackground />
 
           <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center lg:justify-between">
@@ -234,16 +234,31 @@ export default function LandingPage() {
               <HeroCtaCircleSimple />
             </div>
           </div>
+
+          {/* Courbe blanche arrondie qui coupe le bleu (transition vers section claire) */}
+          <div className="absolute bottom-0 left-0 right-0 h-28 w-full md:h-36 lg:h-44" aria-hidden>
+            <svg
+              className="h-full w-full"
+              viewBox="0 0 1440 180"
+              preserveAspectRatio="none"
+              fill="none"
+            >
+              {/* Gauche bas → courbe qui monte vers le centre-droit → redescend à droite */}
+              <path
+                d="M0 180 L0 100 Q400 20 720 50 Q1040 80 1440 90 L1440 180 Z"
+                fill="white"
+              />
+            </svg>
+          </div>
         </section>
 
-        {/* ========== 2. CARTES FONCTIONNEMENT ========== */}
-        <section id="fonctionnement" className="relative bg-gradient-to-b from-blue-950 to-indigo-950 px-4 py-20 md:px-6 md:py-28">
-          <GridBackground />
+        {/* ========== 2. CARTES FONCTIONNEMENT (fond clair sous la courbe) ========== */}
+        <section id="fonctionnement" className="relative -mt-1 bg-white px-4 pt-16 pb-20 md:px-6 md:pt-20 md:pb-28">
           <div className="relative mx-auto max-w-6xl">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
               Fonctionnement
             </p>
-            <h2 className="mt-3 text-center text-3xl font-bold text-white md:text-4xl">
+            <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 md:text-4xl">
               Tout centralisé, tout visible
             </h2>
 
@@ -268,15 +283,15 @@ export default function LandingPage() {
               ].map((block) => (
                 <div
                   key={block.title}
-                  className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-white/25 hover:bg-white/15"
+                  className="rounded-3xl border border-slate-200 bg-slate-50/80 p-6 shadow-lg transition-all duration-300 hover:border-emerald-200 hover:bg-white hover:shadow-xl"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
                     {block.title}
                   </p>
-                  <ul className="mt-4 space-y-2 text-sm text-white/90">
+                  <ul className="mt-4 space-y-2 text-sm text-slate-700">
                     {block.items.map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         {item}
                       </li>
                     ))}
