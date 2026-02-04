@@ -135,65 +135,93 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 2. CE QU'OBILLZ SIMPLIFIE (fond blanc) ========== */}
+        {/* ========== 2. UN OUTIL ADAPTÉ (fond blanc) ========== */}
         <section
           id="fonctionnement"
           className="relative bg-white px-4 pt-16 pb-20 md:px-6 md:pt-20 md:pb-28"
         >
           <div className="relative mx-auto max-w-6xl">
             <h2 className="text-center text-3xl font-bold text-slate-900 md:text-4xl">
-              Ce qu'Obillz simplifie au quotidien
+              Un outil adapté à l'organisation des clubs
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-slate-600">
-              Moins de fichiers éparpillés, moins de relances manuelles, plus de temps pour le club.
+              Obillz s'adapte à l'organisation du club, pas l'inverse.
             </p>
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-              <WhiteSectionCard
-                icon={
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {/* CARD 1 — Les membres du club */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                }
-                title="Annuaire du club"
-                text="Tous les membres au même endroit : coordonnées, statuts, historique. Fini les tableaux Excel dispersés."
-              />
-              <WhiteSectionCard
-                icon={
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Les membres du club</h3>
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                  <p>Une base unique avec les joueurs, bénévoles et membres, leurs rôles et leurs coordonnées.</p>
+                  <p>Chaque information est utilisée directement dans l'organisation du club.</p>
+                </div>
+              </div>
+
+              {/* CARD 2 — Manifestations & calendriers */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                }
-                title="Événements et repas"
-                text="Créez vos manifestations, tournois ou soirées du club. Chaque événement a sa fiche, son planning et ses participants."
-              />
-              <WhiteSectionCard
-                icon={
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Manifestations & calendriers</h3>
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                  <p>Créez des calendriers par événement ou par rôle. Assignez des personnes à des plages précises (bar, vestiaires, terrain, montage, etc.).</p>
+                  <p>Les personnes reçoivent automatiquement un e-mail lorsqu'elles sont inscrites.</p>
+                  <p>Chacun sait quand et où il doit être.</p>
+                </div>
+              </div>
+
+              {/* CARD 3 — Cotisations */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                }
-                title="Suivi des cotisations"
-                text="Visualisez en un coup d'œil qui a payé et qui doit encore régler. Envoyez les rappels en quelques clics."
-              />
-              <WhiteSectionCard
-                icon={
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Cotisations</h3>
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                  <p>Créez les cotisations du club et suivez les paiements sans gestion manuelle.</p>
+                  <p>Le statut payé / en attente est visible en temps réel.</p>
+                  <p>Le trésorier ne court plus après les gens.</p>
+                </div>
+              </div>
+
+              {/* CARD 4 — Finances par manifestation */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
-                }
-                title="Comptes du club"
-                text="Enregistrez les dépenses et recettes. Suivez le budget de chaque événement ou de la saison entière."
-              />
-              <WhiteSectionCard
-                icon={
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Finances par manifestation</h3>
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                  <p>Chaque manifestation peut avoir son propre suivi financier.</p>
+                  <p>Ajoutez les dépenses (location de salle, boissons, matériel, communication) et les recettes (repas, billets, ventes).</p>
+                  <p>Vous voyez immédiatement si un événement est rentable.</p>
+                </div>
+              </div>
+
+              {/* CARD 5 — Réservations par QR code */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                   </svg>
-                }
-                title="Inscriptions par QR code"
-                text="Générez un QR code pour vos repas ou événements. Les membres scannent, s'inscrivent, et tout est automatiquement enregistré."
-              />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Réservations par QR code</h3>
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
+                  <p>Créez un repas ou un événement sur réservation. Les participants s'inscrivent via un QR code.</p>
+                  <p>Les coordonnées sont enregistrées dans Obillz pour communiquer facilement sur les prochains événements du club.</p>
+                  <p>Le club construit sa communauté, naturellement.</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
