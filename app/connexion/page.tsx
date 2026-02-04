@@ -53,8 +53,7 @@ export default function ConnexionPage() {
           email: data.user.email,
         });
         toast.success("Connexion réussie !");
-        router.refresh();
-        router.push("/tableau-de-bord");
+        window.location.href = "/tableau-de-bord";
       }
     } catch (error: any) {
       // Erreurs réseau ou inattendues uniquement
