@@ -2,9 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  })
+  let response = NextResponse.next({ request })
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -26,9 +24,7 @@ export async function middleware(request: NextRequest) {
             request.cookies.set(name, value)
           )
 
-          response = NextResponse.next({
-            request,
-          })
+          response = NextResponse.next({ request })
 
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
@@ -44,19 +40,16 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // API toujours libre
   if (path.startsWith('/api')) {
     return response
   }
 
-  // PROTÉGER LE DASHBOARD
   if (!user && path.startsWith('/tableau-de-bord')) {
     const url = request.nextUrl.clone()
     url.pathname = '/connexion'
     return NextResponse.redirect(url)
   }
 
-  // ÉVITER CONNEXION / INSCRIPTION SI DÉJÀ CONNECTÉ
   if (
     user &&
     (path === '/connexion' || path === '/inscription')
@@ -76,5 +69,6 @@ export const config = {
     '/inscription',
   ],
 }
+
 
 
