@@ -1,24 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import toast from "react-hot-toast";
 
 export default function ConnexionPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Nettoyer l'erreur précédente
+  const handleSubmit = async () => {
+    if (loading) return;
+
     setErrorMessage(null);
 
-    // Validation
     if (!email || !email.includes("@")) {
       toast.error("Veuillez entrer une adresse email valide");
       return;
@@ -38,26 +34,25 @@ export default function ConnexionPage() {
       });
 
       if (error) {
-        // Ne pas throw, ne pas console.error pour éviter l'overlay Next.js
         const message =
-          error.message && error.message.toLowerCase().includes("invalid login credentials")
+          error.message?.toLowerCase().includes("invalid login credentials")
             ? "Email ou mot de passe incorrect"
             : error.message || "Erreur lors de la connexion";
+
         setErrorMessage(message);
+        toast.error(message);
         return;
       }
 
       if (data.user) {
-        console.log("[AUTH][Login] Connexion réussie", {
-          id: data.user.id,
-          email: data.user.email,
-        });
         toast.success("Connexion réussie !");
+        // Redirection HARD (fiable à 100 %)
         window.location.href = "/tableau-de-bord";
       }
-    } catch (error: any) {
-      // Erreurs réseau ou inattendues uniquement
-      setErrorMessage(error.message || "Erreur lors de la connexion");
+    } catch (err: any) {
+      const msg = err?.message || "Erreur lors de la connexion";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -65,26 +60,23 @@ export default function ConnexionPage() {
 
   return (
     <main className="min-h-screen text-white flex items-center justify-center px-6 relative overflow-hidden">
-      {/* FOND - DÉGRADÉ BLEU NOIR */}
-      <div 
+      {/* FOND */}
+      <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: "linear-gradient(180deg, #0a0e2e 0%, #080b1f 40%, #050616 70%, #000000 100%)",
+          background:
+            "linear-gradient(180deg, #0a0e2e 0%, #080b1f 40%, #050616 70%, #000000 100%)",
         }}
-      ></div>
-      
-      {/* Overlay très léger pour la lisibilité du texte */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-black/20"></div>
-
-      {/* Grille subtile en arrière-plan */}
-      <div 
+      />
+      <div className="fixed inset-0 pointer-events-none z-0 bg-black/20" />
+      <div
         className="fixed inset-0 pointer-events-none z-0 opacity-20"
         style={{
           backgroundImage: `
             linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
             linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
           `,
-          backgroundSize: '50px 50px',
+          backgroundSize: "50px 50px",
         }}
       />
 
@@ -95,50 +87,47 @@ export default function ConnexionPage() {
           Connectez-vous pour accéder à votre espace Organa.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4">
           {errorMessage && (
             <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2">
               {errorMessage}
             </div>
           )}
 
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
+          />
 
-          <div>
-            <input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-              className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            className="w-full rounded-lg bg-black border border-white/20 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
+          />
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             disabled={loading}
             className="w-full rounded-lg bg-white text-black py-2 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
-        </form>
+        </div>
 
         <p className="mt-6 text-sm text-white/70">
           Pas de compte ?{" "}
-          <a href="/inscription" className="underline text-white hover:text-white/80">
+          <a
+            href="/inscription"
+            className="underline text-white hover:text-white/80"
+          >
             Créer un compte
           </a>
         </p>
