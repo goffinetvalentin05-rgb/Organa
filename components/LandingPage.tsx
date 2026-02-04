@@ -236,41 +236,53 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 3. AVANT / AVEC OBILLZ (fond gris clair) ========== */}
-        <section className="relative bg-slate-50 px-4 py-20 md:px-6 md:py-28">
-          <div className="relative mx-auto max-w-4xl">
+        {/* ========== 3. SANS / AVEC OBILLZ (fond gris clair) ========== */}
+        <section className="relative bg-gradient-to-b from-slate-100 to-white px-4 py-20 md:px-6 md:py-28">
+          <div className="relative mx-auto max-w-5xl">
             <h2 className="text-center text-3xl font-bold text-slate-900 md:text-4xl">
-              Avant / Avec Obillz
+              Sans / Avec Obillz
             </h2>
 
-            <div className="mt-14 flex flex-col gap-5">
-              {/* En-têtes colonnes (desktop) */}
-              <div className="hidden md:grid md:grid-cols-2 md:gap-4">
-                <div className="rounded-lg bg-slate-200/60 px-5 py-3 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Avant
+            {/* En-têtes colonnes fixes */}
+            <div className="mt-14 grid grid-cols-2 gap-3 md:gap-6">
+              <div className="flex items-center justify-center gap-2 rounded-2xl bg-slate-200/80 px-4 py-4 md:gap-3 md:px-6">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 md:h-10 md:w-10">
+                  <svg className="h-4 w-4 text-red-500 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </div>
-                <div
-                  className="rounded-lg px-5 py-3 text-center text-sm font-semibold uppercase tracking-wide text-white"
-                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-                >
-                  Avec Obillz
-                </div>
+                <span className="text-sm font-bold uppercase tracking-wide text-slate-600 md:text-base">Sans</span>
               </div>
-
-              {/* SITUATION 1 — Cotisations */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 bg-slate-50 px-5 py-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Cotisations</span>
+              <div
+                className="flex items-center justify-center gap-2 rounded-2xl px-4 py-4 md:gap-3 md:px-6"
+                style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 md:h-10 md:w-10">
+                  <svg className="h-4 w-4 text-white md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
-                <div className="grid md:grid-cols-2">
-                  <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-slate-400 md:hidden">Avant</span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                <span className="text-sm font-bold uppercase tracking-wide text-white md:text-base">Avec Obillz</span>
+              </div>
+            </div>
+
+            {/* Comparaisons */}
+            <div className="mt-6 flex flex-col gap-4">
+              {/* SITUATION 1 — Cotisations */}
+              <div className="group relative">
+                <div className="absolute -left-3 top-4 z-10 hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-lg md:block">
+                  Cotisations
+                </div>
+                <div className="block rounded-xl bg-slate-900 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white md:hidden">
+                  Cotisations
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-6 md:pt-0">
+                  <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all group-hover:border-slate-300 md:p-6">
+                    <p className="text-sm leading-relaxed text-slate-500">
                       Vous imprimez les cotisations, vous les distribuez, vous relancez à la main.
                     </p>
                   </div>
-                  <div className="p-5">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-[var(--obillz-hero-blue)] md:hidden">Avec Obillz</span>
+                  <div className="rounded-2xl border-2 border-[var(--obillz-hero-blue)]/20 bg-[var(--obillz-hero-blue)]/5 p-4 transition-all group-hover:border-[var(--obillz-hero-blue)]/40 md:p-6">
                     <p className="text-sm leading-relaxed text-slate-700">
                       Les cotisations sont envoyées par e-mail directement depuis la plateforme. Ça prend deux secondes.
                     </p>
@@ -279,19 +291,20 @@ export default function LandingPage() {
               </div>
 
               {/* SITUATION 2 — Manifestations & organisation */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 bg-slate-50 px-5 py-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Manifestations & organisation</span>
+              <div className="group relative">
+                <div className="absolute -left-3 top-4 z-10 hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-lg md:block">
+                  Manifestations & organisation
                 </div>
-                <div className="grid md:grid-cols-2">
-                  <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-slate-400 md:hidden">Avant</span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                <div className="block rounded-xl bg-slate-900 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white md:hidden">
+                  Manifestations & organisation
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-6 md:pt-0">
+                  <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all group-hover:border-slate-300 md:p-6">
+                    <p className="text-sm leading-relaxed text-slate-500">
                       Vous remplissez des fichiers Excel, vous communiquez dans des groupes WhatsApp, les infos se perdent.
                     </p>
                   </div>
-                  <div className="p-5">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-[var(--obillz-hero-blue)] md:hidden">Avec Obillz</span>
+                  <div className="rounded-2xl border-2 border-[var(--obillz-hero-blue)]/20 bg-[var(--obillz-hero-blue)]/5 p-4 transition-all group-hover:border-[var(--obillz-hero-blue)]/40 md:p-6">
                     <p className="text-sm leading-relaxed text-slate-700">
                       Vous remplissez les cases directement dans le logiciel. Chaque personne assignée à une tâche reçoit automatiquement un e-mail de confirmation.
                     </p>
@@ -300,19 +313,20 @@ export default function LandingPage() {
               </div>
 
               {/* SITUATION 3 — Dépenses & recettes */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 bg-slate-50 px-5 py-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Dépenses & recettes</span>
+              <div className="group relative">
+                <div className="absolute -left-3 top-4 z-10 hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-lg md:block">
+                  Dépenses & recettes
                 </div>
-                <div className="grid md:grid-cols-2">
-                  <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-slate-400 md:hidden">Avant</span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                <div className="block rounded-xl bg-slate-900 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white md:hidden">
+                  Dépenses & recettes
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-6 md:pt-0">
+                  <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all group-hover:border-slate-300 md:p-6">
+                    <p className="text-sm leading-relaxed text-slate-500">
                       Pas de vrai suivi par événement. Les chiffres sont notés à part, sans vue globale.
                     </p>
                   </div>
-                  <div className="p-5">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-[var(--obillz-hero-blue)] md:hidden">Avec Obillz</span>
+                  <div className="rounded-2xl border-2 border-[var(--obillz-hero-blue)]/20 bg-[var(--obillz-hero-blue)]/5 p-4 transition-all group-hover:border-[var(--obillz-hero-blue)]/40 md:p-6">
                     <p className="text-sm leading-relaxed text-slate-700">
                       Vous ajoutez les dépenses et les recettes et les rattachez directement à une manifestation. Vous voyez clairement ce que l'événement rapporte.
                     </p>
@@ -321,19 +335,20 @@ export default function LandingPage() {
               </div>
 
               {/* SITUATION 4 — Communication du club */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 bg-slate-50 px-5 py-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Communication du club</span>
+              <div className="group relative">
+                <div className="absolute -left-3 top-4 z-10 hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-lg md:block">
+                  Communication du club
                 </div>
-                <div className="grid md:grid-cols-2">
-                  <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-slate-400 md:hidden">Avant</span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                <div className="block rounded-xl bg-slate-900 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white md:hidden">
+                  Communication du club
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-6 md:pt-0">
+                  <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all group-hover:border-slate-300 md:p-6">
+                    <p className="text-sm leading-relaxed text-slate-500">
                       Vous ne savez pas vraiment comment communiquer efficacement sur les prochains événements.
                     </p>
                   </div>
-                  <div className="p-5">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-[var(--obillz-hero-blue)] md:hidden">Avec Obillz</span>
+                  <div className="rounded-2xl border-2 border-[var(--obillz-hero-blue)]/20 bg-[var(--obillz-hero-blue)]/5 p-4 transition-all group-hover:border-[var(--obillz-hero-blue)]/40 md:p-6">
                     <p className="text-sm leading-relaxed text-slate-700">
                       Les inscriptions (repas, événements) vous permettent de garder des contacts pour informer et promouvoir les prochaines activités du club.
                     </p>
@@ -342,19 +357,20 @@ export default function LandingPage() {
               </div>
 
               {/* SITUATION 5 — Réservations de repas */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-100 bg-slate-50 px-5 py-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Réservations de repas</span>
+              <div className="group relative">
+                <div className="absolute -left-3 top-4 z-10 hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-lg md:block">
+                  Réservations de repas
                 </div>
-                <div className="grid md:grid-cols-2">
-                  <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-slate-400 md:hidden">Avant</span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                <div className="block rounded-xl bg-slate-900 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white md:hidden">
+                  Réservations de repas
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-6 md:pt-0">
+                  <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all group-hover:border-slate-300 md:p-6">
+                    <p className="text-sm leading-relaxed text-slate-500">
                       Vous recevez des messages, vous les transférez ou les notez à la main. Difficile de savoir qui vient, combien, et ce qu'ils mangent.
                     </p>
                   </div>
-                  <div className="p-5">
-                    <span className="mb-2 inline-block text-xs font-semibold uppercase text-[var(--obillz-hero-blue)] md:hidden">Avec Obillz</span>
+                  <div className="rounded-2xl border-2 border-[var(--obillz-hero-blue)]/20 bg-[var(--obillz-hero-blue)]/5 p-4 transition-all group-hover:border-[var(--obillz-hero-blue)]/40 md:p-6">
                     <p className="text-sm leading-relaxed text-slate-700">
                       Les personnes s'inscrivent via un QR code. Tout arrive directement dans le logiciel : nombre de participants, choix des repas, informations.
                     </p>
