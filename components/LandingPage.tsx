@@ -292,8 +292,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 4. SANS / AVEC OBILLZ (fond gris clair) ========== */}
-        <section className="relative bg-slate-50 px-4 py-20 md:px-6 md:py-28">
+        {/* ========== 4. SANS / AVEC OBILLZ (fond blanc) ========== */}
+        <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
           <div className="relative mx-auto max-w-4xl">
             <h2 className="text-center text-3xl font-bold text-slate-900 md:text-4xl">
               Sans / Avec Obillz
