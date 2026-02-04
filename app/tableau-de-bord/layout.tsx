@@ -14,7 +14,8 @@ import {
   Receipt,
   Settings,
   Home,
-  CheckCircle,
+  Menu,
+  X,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -25,10 +26,10 @@ export default function DashboardLayout({
   const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
-  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState<boolean>(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -38,21 +39,12 @@ export default function DashboardLayout({
           console.warn("[AUTH][DashboardLayout] Impossible de récupérer /api/me", {
             status: res.status,
           });
-          // Ne pas forcer de redirect ici : on laisse le middleware gérer la protection
-          // pour éviter de casser la navigation (clients/devis/factures).
           return;
         }
 
         const data = await res.json();
-
-        console.log("[AUTH][DashboardLayout] Session utilisateur chargée", {
-          userId: data.user?.id,
-          email: data.user?.email,
-        });
-
         setUserEmail(data.user?.email ?? null);
         setCompanyName(data.user?.email?.split("@")[0] || "");
-        setCompanyLogo(null);
       } catch (error) {
         console.error("[AUTH][DashboardLayout] Erreur lors de l'appel à /api/me", error);
       } finally {
@@ -61,19 +53,17 @@ export default function DashboardLayout({
     };
 
     fetchMe();
-  }, [pathname, router]); // Recharger quand on change de page
+  }, [pathname, router]);
 
   const supabase = createClient();
 
   const handleLogout = async () => {
     try {
-      console.log("[AUTH][Logout] Déconnexion demandée pour", { email: userEmail });
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("[AUTH][Logout] Erreur lors de la déconnexion", error);
         return;
       }
-      console.log("[AUTH][Logout] Déconnexion réussie");
       router.push("/connexion");
       router.refresh();
     } catch (error) {
@@ -112,61 +102,87 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell min-h-screen bg-dashboard text-primary relative">
+    <div className="dashboard-shell min-h-screen bg-slate-50">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-surface border-r border-subtle z-40 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-subtle">
-            <Link href="/tableau-de-bord" className="flex items-center gap-4 group">
+      <aside 
+        className={`fixed left-0 top-0 h-screen w-72 z-50 transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+      >
+        {/* Grille subtile en arrière-plan */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: "32px 32px",
+          }}
+        />
+
+        <div className="relative flex flex-col h-full">
+          {/* Logo & close button */}
+          <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <Link href="/tableau-de-bord" className="flex items-center group">
               <Image
                 src="/logo-obillz.png"
-                alt="OBILLZ — La facturation en deux clics"
-                width={180}
-                height={48}
-                className="h-auto max-h-12 w-auto transition-transform group-hover:scale-105 object-contain"
+                alt="Obillz"
+                width={140}
+                height={40}
+                className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
                 priority
               />
             </Link>
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-6">
-            <div>
-              <p className="px-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-tertiary">
-                {t("dashboard.navigation.primary")}
-              </p>
-              <div className="mt-4 space-y-2">
-                {navigation.map((item) => {
-                  const IconComponent = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`font-body flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                        active
-                          ? "bg-accent-light border border-accent-border text-primary font-semibold shadow-[0_12px_30px_rgba(37,99,235,0.18)]"
-                          : "text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle"
-                      }`}
-                    >
-                      <IconComponent className={`w-5 h-5 ${active ? "text-accent" : "text-secondary"}`} />
-                      <span className="font-medium">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+          <nav className="flex-1 p-4 overflow-y-auto">
+            <p className="px-4 mb-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+              {t("dashboard.navigation.primary")}
+            </p>
+            <div className="space-y-1">
+              {navigation.map((item) => {
+                const IconComponent = item.icon;
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                      active
+                        ? "bg-white text-[var(--obillz-hero-blue)] font-semibold shadow-lg"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <IconComponent className={`w-5 h-5 ${active ? "text-[var(--obillz-hero-blue)]" : ""}`} />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
             </div>
-
           </nav>
 
           {/* Footer sidebar */}
-          <div className="p-4 border-t border-subtle">
+          <div className="p-4 border-t border-white/10">
             <Link
               href="/"
-              className="font-body flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-hover border border-transparent hover:border-subtle transition-all duration-200"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
-              <Home className="w-5 h-5 text-secondary" />
+              <Home className="w-5 h-5" />
               <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
             </Link>
           </div>
@@ -174,29 +190,55 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="ml-72 relative z-10">
+      <div className="lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-surface border-b border-subtle">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center px-6 py-3">
-            <div className="flex items-center gap-4" />
-            <div className="flex items-center justify-center">
-              <div className="rounded-full border border-subtle bg-surface-hover px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
-                {getPageTitle()}
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between px-4 py-3 lg:px-6">
+            {/* Left: Mobile menu + Page title */}
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 -ml-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-semibold text-slate-900">
+                  {getPageTitle()}
+                </h1>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-4">
+
+            {/* Center: Page title (mobile) */}
+            <div className="sm:hidden">
+              <span className="text-sm font-semibold text-slate-700">
+                {getPageTitle()}
+              </span>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-3">
               <LanguageSwitcher />
+              
               {!loadingUser && (
-                <div className="flex items-center gap-2 rounded-full border border-subtle bg-surface-hover px-3 py-1 text-xs text-secondary">
-                  <span className="text-tertiary">{t("dashboard.topbar.connectedAs")}</span>
-                  <span className="text-primary">
-                    {companyName ? companyName : userEmail || t("dashboard.topbar.userFallback")}
-                  </span>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5">
+                    <div 
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                      style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                    >
+                      {(companyName || userEmail || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
+                      {companyName || userEmail || t("dashboard.topbar.userFallback")}
+                    </span>
+                  </div>
                 </div>
               )}
+
               <button
                 onClick={handleLogout}
-                className="btn-secondary px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all duration-200 border border-subtle hover:border-subtle-hover"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 {t("dashboard.topbar.logout")}
               </button>
@@ -205,14 +247,25 @@ export default function DashboardLayout({
         </header>
 
         {/* Page content */}
-        <main className="p-8">{children}</main>
+        <main className="flex-1 p-4 lg:p-8">
+          {children}
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-200 bg-white px-4 py-4 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <p>© 2024 Obillz — Gestion simplifiée pour les clubs</p>
+            <div className="flex items-center gap-4">
+              <Link href="/mentions-legales" className="hover:text-slate-700 transition-colors">
+                Mentions légales
+              </Link>
+              <Link href="/politique-confidentialite" className="hover:text-slate-700 transition-colors">
+                Confidentialité
+              </Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
 }
-
-
-
-
-
-

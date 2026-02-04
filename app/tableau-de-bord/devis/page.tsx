@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, Plus } from "@/lib/icons";
+import { Eye, Trash, Plus, FileText, ArrowRight } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 
@@ -77,12 +77,12 @@ export default function DevisPage() {
 
   const getStatutColor = (statut: string) => {
     const colors: Record<string, string> = {
-      brouillon: "bg-slate-100 text-slate-700",
-      envoye: "bg-blue-100 text-blue-700",
-      accepte: "bg-green-100 text-green-700",
-      refuse: "bg-red-100 text-red-700",
+      brouillon: "bg-slate-100 text-slate-600",
+      envoye: "badge-info",
+      accepte: "badge-success",
+      refuse: "badge-error",
     };
-    return colors[statut] || "bg-slate-100 text-slate-700";
+    return colors[statut] || "bg-slate-100 text-slate-600";
   };
 
   const getStatutLabel = (statut: string) => {
@@ -98,148 +98,124 @@ export default function DevisPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.quotes.title")}</h1>
-          <p className="mt-2 text-secondary">{t("dashboard.quotes.subtitle")}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.quotes.title")}</h1>
+          <p className="mt-1 text-slate-500">{t("dashboard.quotes.subtitle")}</p>
         </div>
         <Link
           href="/tableau-de-bord/devis/nouveau"
-          className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
+          className="btn-obillz"
         >
           <Plus className="w-5 h-5" />
           {t("dashboard.quotes.newAction")}
         </Link>
       </div>
 
-      {/* Liste */}
-      <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
+      {/* Contenu */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">{t("dashboard.common.loading")}</p>
+            <div className="inline-flex items-center gap-3 text-slate-500">
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              {t("dashboard.common.loading")}
+            </div>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-secondary text-sm">{errorMessage}</p>
+            <p className="text-red-600 font-medium mb-2">{t("dashboard.common.loadFailed")}</p>
+            <p className="text-slate-500 text-sm">{errorMessage}</p>
           </div>
         ) : devis.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-secondary mb-4">{t("dashboard.quotes.emptyState")}</p>
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-slate-600 mb-4">{t("dashboard.quotes.emptyState")}</p>
             <Link
               href="/tableau-de-bord/devis/nouveau"
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
+              className="btn-obillz inline-flex"
             >
+              <Plus className="w-5 h-5" />
               {t("dashboard.quotes.emptyCta")}
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-surface border-b border-subtle">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.number")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.client")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.amount")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.status")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.date")}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
-                    {t("dashboard.common.actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200/70">
-                {devis.map((devisItem) => {
-                  const montant = calculerTotalTTC(devisItem.lignes);
-                  return (
-                    <tr
-                      key={devisItem.id}
-                      className="hover:bg-surface transition-colors"
-                    >
-                      <td className="px-6 py-4 font-medium">
-                        {devisItem.numero}
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {devisItem.client?.nom || t("dashboard.common.unknownClient")}
-                      </td>
-                      <td className="px-6 py-4 font-semibold">
-                        {formatMontant(montant)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatutColor(
-                            devisItem.statut
-                          )}`}
+          <>
+            {/* Vue liste moderne */}
+            <div className="divide-y divide-slate-100">
+              {devis.map((devisItem) => {
+                const montant = calculerTotalTTC(devisItem.lignes);
+                return (
+                  <div
+                    key={devisItem.id}
+                    className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div className="flex items-start gap-4">
+                        <div 
+                          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: "var(--obillz-blue-light)" }}
                         >
-                          {getStatutLabel(devisItem.statut)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {formatDate(devisItem.dateCreation)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                          <FileText className="w-6 h-6" style={{ color: "var(--obillz-hero-blue)" }} />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <h3 className="font-semibold text-slate-900">{devisItem.numero}</h3>
+                            <span className={`badge-obillz ${getStatutColor(devisItem.statut)}`}>
+                              {getStatutLabel(devisItem.statut)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-500 mt-1">
+                            {devisItem.client?.nom || t("dashboard.common.unknownClient")}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            Créé le {formatDate(devisItem.dateCreation)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 md:gap-6">
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-slate-900">{formatMontant(montant)}</p>
+                          <p className="text-xs text-slate-400">TTC</p>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
                           <Link
                             href={`/tableau-de-bord/devis/${devisItem.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-1.5"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors"
                           >
                             <Eye className="w-4 h-4" />
-                            {t("dashboard.common.view")}
+                            <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
                           </Link>
                           <button
                             onClick={() => handleDelete(devisItem.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
+                            className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
                             title={t("dashboard.common.delete")}
                           >
                             <Trash className="w-4 h-4" />
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer avec compteur */}
+            <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
+              <p className="text-sm text-slate-500 text-center">
+                {devis.length} devis au total
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

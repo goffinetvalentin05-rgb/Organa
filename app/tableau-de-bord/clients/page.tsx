@@ -1,6 +1,6 @@
 import Link from "next/link";
 import DeleteClientButton from "./components/DeleteClientButton";
-import { Info, Plus } from "@/lib/icons";
+import { Info, Plus, Users } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/server";
 import I18nText from "@/components/I18nText";
 
@@ -22,16 +22,15 @@ export default async function ClientsPage() {
   try {
     const supabase = await createClient();
 
-    // Authentification
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user || !user.id) {
       return (
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="p-12 text-center">
-            <p className="text-red-600">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
+            <p className="text-red-600 font-medium">
               <I18nText id="dashboard.clients.authError" />
             </p>
           </div>
@@ -39,7 +38,6 @@ export default async function ClientsPage() {
       );
     }
 
-    // Charger les clients directement depuis Supabase
     const { data, error } = await supabase
       .from("clients")
       .select("id, nom, email, telephone, adresse, user_id")
@@ -50,7 +48,6 @@ export default async function ClientsPage() {
       console.error("[ClientsPage] Erreur Supabase", error);
       errorMessage = error.message || null;
     } else {
-      // Filtrer les clients valides (avec ID)
       clients = (data || []).filter(
         (c: Client): c is Client => 
           Boolean(c.id) && 
@@ -64,111 +61,111 @@ export default async function ClientsPage() {
     errorMessage = error.message || null;
   }
 
-  // Afficher l'erreur si présente
   if (errorMessage && clients.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="p-12 text-center">
-          <p className="text-red-600 mb-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
+          <p className="text-red-600 font-medium mb-2">
             <I18nText id="dashboard.clients.loadError" />
           </p>
-          {errorMessage && <p className="text-secondary text-sm">{errorMessage}</p>}
+          {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* En-tête */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
             <I18nText id="dashboard.clients.title" />
           </h1>
-          <p className="mt-2 text-secondary">
+          <p className="mt-1 text-slate-500">
             <I18nText id="dashboard.clients.subtitle" />
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/tableau-de-bord/clients/nouveau"
-            className="px-6 py-3 accent-bg text-white font-semibold rounded-full transition-all flex items-center gap-2 shadow-premium hover:shadow-premium-hover"
-          >
-            <Plus className="w-5 h-5" />
-            <I18nText id="dashboard.clients.newClient" />
-          </Link>
-        </div>
+        <Link
+          href="/tableau-de-bord/clients/nouveau"
+          className="btn-obillz"
+        >
+          <Plus className="w-5 h-5" />
+          <I18nText id="dashboard.clients.newClient" />
+        </Link>
       </div>
 
       {/* Message informatif */}
-      <div className="rounded-[24px] border border-yellow-300/40 bg-yellow-50 px-8 py-6 shadow-premium">
-        <div className="flex items-start gap-3 text-yellow-800">
-          <div className="mt-0.5 rounded-full bg-yellow-100 p-2">
-            <Info className="w-4 h-4" />
+      <div className="bg-amber-50 rounded-xl border border-amber-200 p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+            <Info className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="space-y-1 text-sm">
-            <p className="font-semibold">
+          <div>
+            <p className="font-medium text-amber-900">
               <I18nText id="dashboard.clients.editDisabledTitle" />
             </p>
-            <p>
+            <p className="text-sm text-amber-700 mt-1">
               <I18nText id="dashboard.clients.editDisabledText" />
             </p>
           </div>
         </div>
       </div>
 
-      {/* Liste */}
-      <div className="rounded-[28px] border border-subtle bg-surface p-8 shadow-premium">
+      {/* Liste des clients */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {clients.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-secondary mb-4">
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-slate-600 mb-4">
               <I18nText id="dashboard.clients.emptyState" />
             </p>
             <Link
               href="/tableau-de-bord/clients/nouveau"
-              className="inline-block px-6 py-3 accent-bg text-white font-semibold rounded-full transition-all shadow-premium hover:shadow-premium-hover"
+              className="btn-obillz inline-flex"
             >
+              <Plus className="w-5 h-5" />
               <I18nText id="dashboard.clients.emptyCta" />
             </Link>
           </div>
         ) : (
-          <div className="grid gap-5">
-            {clients.map((client) => (
+          <div className="divide-y divide-slate-100">
+            {clients.map((client, index) => (
               <div
                 key={client.id}
-                className="rounded-[24px] border border-subtle bg-white px-8 py-6 shadow-premium transition-all hover:shadow-premium-hover"
+                className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-tertiary">
-                      <I18nText id="dashboard.clients.cardLabel" />
-                    </p>
-                    <h3 className="mt-2 text-lg font-semibold text-primary">
-                      {client.nom || <I18nText id="dashboard.clients.noName" />}
-                    </h3>
-                    <div className="mt-3 grid gap-2 text-sm text-secondary md:grid-cols-2">
-                      <p>
-                        <span className="text-tertiary">
-                          <I18nText id="dashboard.clients.emailLabel" />
-                        </span>{" "}
-                        {client.email || <I18nText id="dashboard.clients.notProvided" />}
-                      </p>
-                      <p>
-                        <span className="text-tertiary">
-                          <I18nText id="dashboard.clients.phoneLabel" />
-                        </span>{" "}
-                        {client.telephone || <I18nText id="dashboard.clients.notProvided" />}
-                      </p>
-                      <p className="md:col-span-2">
-                        <span className="text-tertiary">
-                          <I18nText id="dashboard.clients.addressLabel" />
-                        </span>{" "}
-                        {client.adresse || <I18nText id="dashboard.clients.addressNotProvided" />}
-                      </p>
+                  <div className="flex items-start gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0"
+                      style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                    >
+                      {(client.nom || "?").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-slate-900 truncate">
+                        {client.nom || <I18nText id="dashboard.clients.noName" />}
+                      </h3>
+                      <div className="mt-2 grid gap-1 text-sm">
+                        <p className="text-slate-500 flex items-center gap-2">
+                          <span className="text-slate-400 w-16 shrink-0">Email</span>
+                          <span className="truncate">{client.email || <I18nText id="dashboard.clients.notProvided" />}</span>
+                        </p>
+                        <p className="text-slate-500 flex items-center gap-2">
+                          <span className="text-slate-400 w-16 shrink-0">Tél.</span>
+                          <span>{client.telephone || <I18nText id="dashboard.clients.notProvided" />}</span>
+                        </p>
+                        <p className="text-slate-500 flex items-center gap-2">
+                          <span className="text-slate-400 w-16 shrink-0">Adresse</span>
+                          <span className="truncate">{client.adresse || <I18nText id="dashboard.clients.addressNotProvided" />}</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 md:ml-4">
                     <DeleteClientButton clientId={client.id} />
                   </div>
                 </div>
@@ -177,9 +174,13 @@ export default async function ClientsPage() {
           </div>
         )}
       </div>
+
+      {/* Footer avec compteur */}
+      {clients.length > 0 && (
+        <div className="text-center text-sm text-slate-400">
+          {clients.length} client{clients.length > 1 ? "s" : ""} au total
+        </div>
+      )}
     </div>
   );
 }
-
-
-

@@ -517,7 +517,13 @@ export default function ParametresPage() {
   if (loadingSettings || !parametres) {
     return (
       <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">{t("dashboard.settings.loadingPage")}</p>
+        <div className="flex items-center gap-3 text-slate-500">
+          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <span>{t("dashboard.settings.loadingPage")}</span>
+        </div>
       </div>
     );
   }
@@ -536,35 +542,35 @@ export default function ParametresPage() {
       <div className="max-w-4xl mx-auto space-y-6">
       {/* En-tête */}
       <div>
-        <h1 className="text-3xl font-bold">{t("dashboard.settings.title")}</h1>
-        <p className="mt-2 text-secondary">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.settings.title")}</h1>
+        <p className="mt-1 text-slate-500">
           {t("dashboard.settings.subtitle")}
         </p>
       </div>
 
       {saved && (
-        <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-green-700 flex items-center gap-2">
+        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-700 flex items-center gap-2">
           <CheckCircle className="w-5 h-5" />
           {t("dashboard.settings.saveSuccess")}
         </div>
       )}
 
       {/* Section Abonnement */}
-      <div className="rounded-xl border border-subtle bg-surface p-6">
-        <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.subscription.title")}</h2>
+      <div className="bg-white rounded-2xl border border-slate-200 p-6">
+        <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.subscription.title")}</h2>
         
         {loadingPlan ? (
-          <p className="text-secondary">{t("dashboard.common.loading")}</p>
+          <p className="text-slate-500">{t("dashboard.common.loading")}</p>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-lg font-medium">
+                <p className="text-lg font-medium text-slate-900">
                   {t("dashboard.settings.subscription.currentPlan")}{" "}
-                  <span className="accent">{planLabel}</span>
+                  <span style={{ color: "var(--obillz-hero-blue)" }}>{planLabel}</span>
                 </p>
                 {userPlan === "free" && (
-                  <p className="text-sm text-secondary mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     {t("dashboard.settings.subscription.freeLimit", {
                       clients: 2,
                       documents: 3,
@@ -572,7 +578,7 @@ export default function ParametresPage() {
                   </p>
                 )}
                 {userPlan === "pro" && (
-                  <p className="text-sm text-secondary mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     {t("dashboard.settings.subscription.unlimitedAccess")}
                   </p>
                 )}
@@ -582,7 +588,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={handleUpgradeToPro}
                   disabled={loadingCheckout}
-                  className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-obillz disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingCheckout
                     ? t("dashboard.common.loading")
@@ -596,11 +602,11 @@ export default function ParametresPage() {
               )}
             </div>
             {userPlan === "free" && (
-              <div className="mt-4 p-4 accent-bg-light accent-border rounded-lg border">
-                <p className="text-sm text-primary font-medium mb-2">
+              <div className="mt-4 p-4 rounded-xl border" style={{ backgroundColor: "var(--obillz-blue-light)", borderColor: "var(--obillz-blue-border)" }}>
+                <p className="text-sm text-slate-900 font-medium mb-2">
                   {t("dashboard.settings.subscription.proOfferTitle")}
                 </p>
-                <ul className="text-sm text-secondary space-y-1 list-disc list-inside">
+                <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
                   {proFeatures.map((feature) => (
                     <li key={feature}>{feature}</li>
                   ))}
@@ -613,15 +619,15 @@ export default function ParametresPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section Marque */}
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.branding.title")}</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.branding.title")}</h2>
           
           <div className="mb-6">
-            <label className="block text-sm font-medium text-primary mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("dashboard.settings.branding.logoLabel")}
             </label>
             <div className="flex items-start gap-6">
-              <div className="w-32 h-32 rounded-xl border border-subtle-hover bg-surface flex items-center justify-center overflow-hidden relative group">
+              <div className="w-32 h-32 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden relative group">
                 {logoPreview ? (
                   <Image
                     src={logoPreview}
@@ -632,7 +638,7 @@ export default function ParametresPage() {
                     unoptimized={logoPreview.includes("supabase.co")}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-tertiary p-4">
+                  <div className="flex flex-col items-center justify-center text-slate-400 p-4">
                     <Building2 className="w-12 h-12 mb-2" />
                     <span className="text-xs text-center">{t("dashboard.settings.branding.noLogo")}</span>
                   </div>
@@ -640,7 +646,7 @@ export default function ParametresPage() {
               </div>
               <div className="flex-1 space-y-3">
                 <div>
-                  <label className="inline-block px-4 py-2 accent-bg text-white font-medium rounded-lg transition-all cursor-pointer flex items-center gap-2">
+                  <label className="inline-flex items-center gap-2 px-4 py-2 text-white font-medium rounded-xl transition-all cursor-pointer" style={{ backgroundColor: "var(--obillz-hero-blue)" }}>
                     {uploading ? (
                       <>
                         <Loader className="w-4 h-4 animate-spin" />
@@ -768,8 +774,8 @@ export default function ParametresPage() {
         </div>
 
         {/* Section Informations entreprise */}
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.companyInfo.title")}</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.companyInfo.title")}</h2>
           
           <div className="space-y-4">
             <div>
@@ -837,9 +843,9 @@ export default function ParametresPage() {
         </div>
 
         {/* Section Informations bancaires */}
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.billing.title")}</h2>
-          <p className="text-sm text-secondary mb-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.billing.title")}</h2>
+          <p className="text-sm text-slate-500 mb-4">
             {t("dashboard.settings.billing.subtitle")}
           </p>
           
@@ -895,15 +901,16 @@ export default function ParametresPage() {
         </div>
 
         {/* Section Email */}
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.settings.email.title")}</h2>
-          <p className="text-sm text-secondary mb-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.email.title")}</h2>
+          <p className="text-sm text-slate-500 mb-4">
             {t("dashboard.settings.email.subtitleBefore")}{" "}
             <a
               href="https://resend.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="accent hover:underline"
+              className="hover:underline"
+              style={{ color: "var(--obillz-hero-blue)" }}
             >
               Resend
             </a>{" "}
@@ -982,7 +989,7 @@ export default function ParametresPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
+            className="btn-obillz"
           >
             {t("dashboard.settings.saveButton")}
           </button>

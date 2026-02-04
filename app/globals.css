@@ -5,9 +5,11 @@
   --font-heading: var(--font-heading);
   --font-body: var(--font-heading);
 
-  /* Obillz landing - bleu hero (identique à la maquette) */
+  /* Obillz brand colors */
   --obillz-hero-blue: #1A23FF;
   --obillz-hero-blue-hover: #151dd9;
+  --obillz-blue-light: rgba(26, 35, 255, 0.08);
+  --obillz-blue-border: rgba(26, 35, 255, 0.25);
 
   /* Colors - Landing (bleu nuit foncé premium) */
   --bg-landing-start: #03062A;
@@ -15,34 +17,29 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Bleu-violet subtil */
-  --blue-violet: #6366F1;
-  --blue-violet-light: rgba(99, 102, 241, 0.1);
-  --blue-violet-glow: rgba(99, 102, 241, 0.3);
-  
-  /* Colors - Dashboard (clair premium) */
+  /* Colors - Dashboard (fond clair moderne) */
   --bg-dashboard: #F8FAFC;
   --bg-surface: #FFFFFF;
   --bg-surface-hover: #F1F5F9;
   --border: rgba(15, 23, 42, 0.08);
-  --border-hover: rgba(15, 23, 42, 0.12);
+  --border-hover: rgba(15, 23, 42, 0.15);
   --text-primary: #0F172A;
-  --text-secondary: rgba(15, 23, 42, 0.7);
-  --text-tertiary: rgba(15, 23, 42, 0.5);
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
   
-  /* Accent - Bleu Organa (discret) */
-  --accent: #2563EB;
-  --accent-hover: #1D4ED8;
-  --accent-light: rgba(37, 99, 235, 0.12);
-  --accent-border: rgba(37, 99, 235, 0.35);
+  /* Accent - Obillz Blue */
+  --accent: #1A23FF;
+  --accent-hover: #151dd9;
+  --accent-light: rgba(26, 35, 255, 0.08);
+  --accent-border: rgba(26, 35, 255, 0.25);
   
   /* Status colors */
   --success: #10B981;
-  --success-bg: rgba(16, 185, 129, 0.12);
+  --success-bg: rgba(16, 185, 129, 0.1);
   --warning: #F59E0B;
-  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-bg: rgba(245, 158, 11, 0.1);
   --error: #EF4444;
-  --error-bg: rgba(239, 68, 68, 0.12);
+  --error-bg: rgba(239, 68, 68, 0.1);
   
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -52,11 +49,15 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  /* Shadows - Plus modernes et subtiles */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  
+  /* Card shadows - Premium */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 @theme inline {
@@ -440,9 +441,112 @@ h3 {
 
 /* Ombre très subtile pour la profondeur */
 .shadow-premium {
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-card);
 }
 
 .shadow-premium-hover {
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Dashboard Cards - Style Obillz */
+.dashboard-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+  border-color: var(--obillz-blue-border);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Buttons - Style Obillz */
+.btn-obillz {
+  background-color: var(--obillz-hero-blue);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-obillz:hover {
+  background-color: var(--obillz-hero-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 35, 255, 0.25);
+}
+
+.btn-obillz-outline {
+  background: transparent;
+  color: var(--obillz-hero-blue);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--obillz-blue-border);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-obillz-outline:hover {
+  background: var(--obillz-blue-light);
+  border-color: var(--obillz-hero-blue);
+}
+
+/* Input - Style Obillz */
+.input-obillz {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.input-obillz:focus {
+  outline: none;
+  border-color: var(--obillz-hero-blue);
+  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.1);
+}
+
+.input-obillz::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Badge - Style Obillz */
+.badge-obillz {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.badge-error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.badge-info {
+  background: var(--obillz-blue-light);
+  color: var(--obillz-hero-blue);
 }

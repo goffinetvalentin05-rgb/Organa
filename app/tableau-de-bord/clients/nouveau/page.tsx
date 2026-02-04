@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
 import { useI18n } from "@/components/I18nProvider";
+import { ArrowRight, Users } from "@/lib/icons";
 
 export default function NouveauClientPage() {
   const router = useRouter();
@@ -35,7 +37,6 @@ export default function NouveauClientPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         
-        // Vérifier si c'est une erreur de limite atteinte
         if (data.error === "LIMIT_REACHED") {
           setError({
             type: "LIMIT_REACHED",
@@ -45,7 +46,6 @@ export default function NouveauClientPage() {
           return;
         }
 
-        // Autre erreur
         setError({
           type: "OTHER",
           message: data.message || data.error || t("dashboard.clients.createError"),
@@ -54,7 +54,6 @@ export default function NouveauClientPage() {
         return;
       }
 
-      // Succès : rediriger vers la liste des clients
       router.push("/tableau-de-bord/clients");
     } catch (err) {
       setError({
@@ -66,10 +65,28 @@ export default function NouveauClientPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{t("dashboard.clients.newTitle")}</h1>
-        <p className="mt-2 text-secondary">{t("dashboard.clients.newSubtitle")}</p>
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm">
+        <Link href="/tableau-de-bord/clients" className="text-slate-500 hover:text-slate-700 transition-colors">
+          Clients
+        </Link>
+        <span className="text-slate-400">/</span>
+        <span className="text-slate-900 font-medium">Nouveau</span>
+      </div>
+
+      {/* En-tête */}
+      <div className="flex items-start gap-4">
+        <div 
+          className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+          style={{ backgroundColor: "var(--obillz-blue-light)" }}
+        >
+          <Users className="w-7 h-7" style={{ color: "var(--obillz-hero-blue)" }} />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t("dashboard.clients.newTitle")}</h1>
+          <p className="mt-1 text-slate-500">{t("dashboard.clients.newSubtitle")}</p>
+        </div>
       </div>
 
       {/* Message d'erreur pour limite atteinte */}
@@ -79,95 +96,100 @@ export default function NouveauClientPage() {
 
       {/* Message d'erreur générique */}
       {error?.type === "OTHER" && (
-        <div className="rounded-xl border border-red-500/50 bg-red-50 p-4">
-          <p className="text-red-700">{error.message}</p>
+        <div className="bg-red-50 rounded-xl border border-red-200 p-4">
+          <p className="text-red-700 text-sm">{error.message}</p>
         </div>
       )}
 
+      {/* Formulaire */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.clients.fields.name")}
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("dashboard.clients.fields.name")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
+              placeholder="Nom du client ou de l'entreprise"
               value={formData.nom}
-              onChange={(e) =>
-                setFormData({ ...formData, nom: e.target.value })
-              }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              className="input-obillz"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.clients.fields.email")}
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("dashboard.clients.fields.email")} <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               required
+              placeholder="email@exemple.com"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="input-obillz"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("dashboard.clients.fields.phone")}
             </label>
             <input
               type="tel"
+              placeholder="+41 79 123 45 67"
               value={formData.telephone}
-              onChange={(e) =>
-                setFormData({ ...formData, telephone: e.target.value })
-              }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+              className="input-obillz"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("dashboard.clients.fields.address")}
             </label>
             <textarea
+              placeholder="Adresse complète"
               value={formData.adresse}
-              onChange={(e) =>
-                setFormData({ ...formData, adresse: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
               rows={3}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              className="input-obillz resize-none"
             />
           </div>
         </div>
 
+        {/* Actions */}
         <div className="flex gap-3">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
+            className="flex-1 px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-all"
           >
             {t("dashboard.common.cancel")}
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 btn-obillz justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? t("dashboard.clients.creating") : t("dashboard.clients.createAction")}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                {t("dashboard.clients.creating")}
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                {t("dashboard.clients.createAction")}
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            )}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

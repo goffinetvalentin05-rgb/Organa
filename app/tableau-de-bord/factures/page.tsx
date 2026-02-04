@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, Plus, Download } from "@/lib/icons";
+import { Eye, Trash, Plus, Download, Receipt } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 
@@ -83,12 +83,12 @@ export default function FacturesPage() {
 
   const getStatutColor = (statut: string) => {
     const colors: Record<string, string> = {
-      brouillon: "bg-slate-100 text-slate-700",
-      envoye: "bg-blue-100 text-blue-700",
-      paye: "bg-green-100 text-green-700",
-      "en-retard": "bg-red-100 text-red-700",
+      brouillon: "bg-slate-100 text-slate-600",
+      envoye: "badge-info",
+      paye: "badge-success",
+      "en-retard": "badge-error",
     };
-    return colors[statut] || "bg-slate-100 text-slate-700";
+    return colors[statut] || "bg-slate-100 text-slate-600";
   };
 
   const getStatutLabel = (statut: string) => {
@@ -110,30 +110,30 @@ export default function FacturesPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.invoices.title")}</h1>
-          <p className="mt-2 text-secondary">{t("dashboard.invoices.subtitle")}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.invoices.title")}</h1>
+          <p className="mt-1 text-slate-500">{t("dashboard.invoices.subtitle")}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <button
               type="button"
               onClick={() => setShowAccountingExport((value) => !value)}
-              className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-2 text-sm font-medium"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-4 h-4" />
               {t("dashboard.invoices.exportAccountingAction")}
             </button>
             {showAccountingExport && (
-              <div className="absolute right-0 mt-3 w-64 rounded-xl border border-subtle bg-white p-4 shadow-premium z-10">
-                <label className="block text-sm text-secondary mb-2">
+              <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-lg z-10">
+                <label className="block text-sm text-slate-600 mb-2">
                   {t("dashboard.invoices.exportAccountingYearLabel")}
                 </label>
                 <select
                   value={accountingYear}
                   onChange={(event) => setAccountingYear(event.target.value)}
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className="input-obillz"
                 >
                   {accountingYears.map((year) => (
                     <option key={year} value={year}>
@@ -144,7 +144,7 @@ export default function FacturesPage() {
                 <button
                   type="button"
                   onClick={handleExportAccounting}
-                  className="mt-4 w-full rounded-lg accent-bg text-white py-2 text-sm font-medium"
+                  className="mt-4 w-full btn-obillz justify-center text-sm"
                 >
                   {t("dashboard.invoices.exportAccountingDownload")}
                 </button>
@@ -153,7 +153,7 @@ export default function FacturesPage() {
           </div>
           <Link
             href="/tableau-de-bord/factures/nouvelle"
-            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
+            className="btn-obillz"
           >
             <Plus className="w-5 h-5" />
             {t("dashboard.invoices.newAction")}
@@ -161,134 +161,110 @@ export default function FacturesPage() {
         </div>
       </div>
 
-      {/* Liste */}
-      <div className="rounded-xl border border-subtle bg-surface overflow-hidden">
+      {/* Contenu */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">{t("dashboard.common.loading")}</p>
+            <div className="inline-flex items-center gap-3 text-slate-500">
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              {t("dashboard.common.loading")}
+            </div>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-secondary text-sm">{errorMessage}</p>
+            <p className="text-red-600 font-medium mb-2">{t("dashboard.common.loadFailed")}</p>
+            <p className="text-slate-500 text-sm">{errorMessage}</p>
           </div>
         ) : factures.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-secondary mb-4">{t("dashboard.invoices.emptyState")}</p>
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <Receipt className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-slate-600 mb-4">{t("dashboard.invoices.emptyState")}</p>
             <Link
               href="/tableau-de-bord/factures/nouvelle"
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all"
+              className="btn-obillz inline-flex"
             >
+              <Plus className="w-5 h-5" />
               {t("dashboard.invoices.emptyCta")}
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-surface border-b border-subtle">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.number")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.client")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.amount")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.status")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-primary">
-                    {t("dashboard.common.date")}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-primary">
-                    {t("dashboard.common.actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200/70">
-                {factures.map((facture) => {
-                  const montant = calculerTotalTTC(facture.lignes);
-                  return (
-                    <tr
-                      key={facture.id}
-                      className="hover:bg-surface transition-colors"
-                    >
-                      <td className="px-6 py-4 font-medium">
-                        {facture.numero}
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {facture.client?.nom || t("dashboard.common.unknownClient")}
-                      </td>
-                      <td className="px-6 py-4 font-semibold">
-                        {formatMontant(montant)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatutColor(
-                            facture.statut
-                          )}`}
+          <>
+            {/* Vue liste moderne */}
+            <div className="divide-y divide-slate-100">
+              {factures.map((facture) => {
+                const montant = calculerTotalTTC(facture.lignes);
+                return (
+                  <div
+                    key={facture.id}
+                    className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div className="flex items-start gap-4">
+                        <div 
+                          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: "var(--obillz-blue-light)" }}
                         >
-                          {getStatutLabel(facture.statut)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-secondary">
-                        {formatDate(facture.dateCreation)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                          <Receipt className="w-6 h-6" style={{ color: "var(--obillz-hero-blue)" }} />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <h3 className="font-semibold text-slate-900">{facture.numero}</h3>
+                            <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
+                              {getStatutLabel(facture.statut)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-500 mt-1">
+                            {facture.client?.nom || t("dashboard.common.unknownClient")}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            Créée le {formatDate(facture.dateCreation)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 md:gap-6">
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-slate-900">{formatMontant(montant)}</p>
+                          <p className="text-xs text-slate-400">TTC</p>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
                           <Link
                             href={`/tableau-de-bord/factures/${facture.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-1.5"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors"
                           >
                             <Eye className="w-4 h-4" />
-                            {t("dashboard.common.view")}
+                            <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
                           </Link>
                           <button
                             onClick={() => handleDelete(facture.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
+                            className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
                             title={t("dashboard.common.delete")}
                           >
                             <Trash className="w-4 h-4" />
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer avec compteur */}
+            <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
+              <p className="text-sm text-slate-500 text-center">
+                {factures.length} facture{factures.length > 1 ? "s" : ""} au total
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
