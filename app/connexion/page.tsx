@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { supabaseBrowser } from "@/lib/supabaseBrowser";
+import { useState, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 
 export default function ConnexionPage() {
@@ -9,6 +9,9 @@ export default function ConnexionPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Utiliser le client SSR qui gère correctement les cookies
+  const supabase = useMemo(() => createClient(), []);
 
   const handleSubmit = async () => {
     if (loading) return;
@@ -28,12 +31,15 @@ export default function ConnexionPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabaseBrowser.auth.signInWithPassword({
+      console.log("[LOGIN] Tentative de connexion...");
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("[LOGIN] Erreur:", error);
         const message =
           error.message?.toLowerCase().includes("invalid login credentials")
             ? "Email ou mot de passe incorrect"
@@ -45,11 +51,26 @@ export default function ConnexionPage() {
       }
 
       if (data.user) {
+        console.log("[LOGIN] Connexion réussie, user:", data.user.id);
+        console.log("[LOGIN] Session:", data.session ? "présente" : "absente");
+        
+        // Vérifier que la session est bien persistée
+        const { data: sessionCheck } = await supabase.auth.getSession();
+        console.log("[LOGIN] Vérification session après login:", sessionCheck.session ? "OK" : "PROBLÈME");
+        
+        // Vérifier les cookies
+        console.log("[LOGIN] Cookies:", document.cookie);
+        
         toast.success("Connexion réussie !");
+        
+        // Petit délai pour s'assurer que les cookies sont bien écrits
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Redirection HARD (fiable à 100 %)
         window.location.href = "/tableau-de-bord";
       }
     } catch (err: any) {
+      console.error("[LOGIN] Exception:", err);
       const msg = err?.message || "Erreur lors de la connexion";
       setErrorMessage(msg);
       toast.error(msg);
