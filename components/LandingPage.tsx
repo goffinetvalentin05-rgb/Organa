@@ -365,61 +365,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 4. FONCTIONNALITÉS (fond blanc) ========== */}
-        <section
-          id="fonctionnalites"
-          className="relative bg-white px-4 py-20 md:px-6 md:py-28"
-        >
-          <div className="relative mx-auto max-w-6xl">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              Fonctionnalités
-            </p>
-            <h2 className="mt-3 text-center text-3xl font-bold text-slate-900 md:text-4xl">
-              Ce que permet Obillz
-            </h2>
-
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              <WhiteSectionCard
-                icon={
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                }
-                title="Base unique"
-                text="Joueurs et membres dans une seule base, avec e-mails et téléphones."
-              />
-              <WhiteSectionCard
-                icon={
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                }
-                title="Cotisations"
-                text="Création, envoi par e-mail et suivi payé / non payé."
-              />
-              <WhiteSectionCard
-                icon={
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                }
-                title="Manifestations"
-                text="Calendriers, plages horaires, affectation des personnes, e-mail automatique (date, heure, lieu, rôle)."
-              />
-              <WhiteSectionCard
-                icon={
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                }
-                title="Dépenses & recettes"
-                text="Enregistrement, lien à une manifestation ou activité, vue coût et revenu par événement."
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ========== 5. CENTRALISATION (fond blanc) ========== */}
+        {/* ========== 4. CENTRALISATION (fond blanc) ========== */}
         <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
           <div className="relative mx-auto max-w-5xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -464,7 +410,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 6. CTA FINAL (fond blanc) ========== */}
+        {/* ========== 5. CTA FINAL (fond blanc) ========== */}
         <section id="demo" className="relative bg-white px-4 py-24 md:px-6 md:py-32">
           <div className="relative mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
