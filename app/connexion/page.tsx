@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import toast from "react-hot-toast";
 
 export default function ConnexionPage() {
@@ -32,8 +32,7 @@ export default function ConnexionPage() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseBrowser.auth.signInWithPassword({
         email,
         password,
       });
