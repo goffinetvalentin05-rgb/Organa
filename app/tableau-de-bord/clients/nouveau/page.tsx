@@ -81,7 +81,7 @@ export default function NouveauClientPage() {
           className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
           style={{ backgroundColor: "var(--obillz-blue-light)" }}
         >
-          <Users className="w-7 h-7" style={{ color: "var(--obillz-hero-blue)" }} />
+          <Users className="w-7 h-7 text-[var(--obillz-hero-blue)]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{t("dashboard.clients.newTitle")}</h1>

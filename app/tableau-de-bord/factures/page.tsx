@@ -209,7 +209,7 @@ export default function FacturesPage() {
                           className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                           style={{ backgroundColor: "var(--obillz-blue-light)" }}
                         >
-                          <Receipt className="w-6 h-6" style={{ color: "var(--obillz-hero-blue)" }} />
+                          <Receipt className="w-6 h-6 text-[var(--obillz-hero-blue)]" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-3 flex-wrap">
