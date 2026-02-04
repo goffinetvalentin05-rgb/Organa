@@ -421,29 +421,44 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 5. CTA FINAL (fond blanc) ========== */}
+        {/* ========== 5. CTA FINAL (fond blanc, design sobre) ========== */}
         <section id="demo" className="relative bg-white px-4 py-24 md:px-6 md:py-32">
           <div className="relative mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
-              Demander une démo
+              Prêt à voir si Obillz est fait pour votre club ?
             </h2>
-            <p className="mt-4 text-slate-600">
-              Vous souhaitez voir Obillz en fonctionnement ? Contactez-nous pour organiser une démonstration adaptée à votre club.
+            <p className="mx-auto mt-4 max-w-lg text-slate-600">
+              Vous pouvez découvrir Obillz de différentes manières, selon votre situation et vos besoins.
             </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+
+            {/* CTA Principal */}
+            <div className="mt-10">
               <a
                 href="mailto:contact@obillz.fr?subject=Demande%20de%20d%C3%A9mo%20Obillz"
-                className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-95"
+                className="inline-flex items-center justify-center rounded-full px-10 py-4 text-base font-semibold text-white transition-opacity hover:opacity-95"
                 style={{ backgroundColor: "var(--obillz-hero-blue)" }}
               >
-                Nous contacter
+                Demander une démo
               </a>
+              <p className="mt-3 text-sm text-slate-500">
+                Une démonstration adaptée à l'organisation de votre club.
+              </p>
+            </div>
+
+            {/* CTA Secondaires */}
+            <div className="mt-10 flex flex-col items-center gap-3 text-sm">
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center rounded-full border-2 border-slate-300 bg-white px-8 py-3.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                className="text-slate-600 underline underline-offset-2 transition-colors hover:text-slate-900"
               >
-                Créer un compte
+                Créer un compte pour découvrir l'outil par vous-même
               </Link>
+              <a
+                href="mailto:contact@obillz.fr?subject=Question%20Obillz"
+                className="text-slate-600 underline underline-offset-2 transition-colors hover:text-slate-900"
+              >
+                Nous contacter pour une question ou un cas particulier
+              </a>
             </div>
           </div>
         </section>
