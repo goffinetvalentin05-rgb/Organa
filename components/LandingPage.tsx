@@ -236,7 +236,63 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ========== 3. SANS / AVEC OBILLZ (fond gris clair) ========== */}
+        {/* ========== 3. ORGANISATION CLAIRE (fond blanc) ========== */}
+        <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
+          <div className="relative mx-auto max-w-5xl text-center">
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
+              Une organisation claire, sans bricolage
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+              Obillz remplace les solutions improvisées par une organisation structurée et fiable.
+            </p>
+
+            <div className="mt-12 grid gap-6 sm:grid-cols-3">
+              {/* BLOC 1 — Une seule façon de fonctionner */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--obillz-hero-blue)" }}
+                >
+                  Une seule façon de fonctionner
+                </h3>
+                <div className="mt-3 space-y-2 text-sm text-slate-600">
+                  <p>Le club travaille avec un seul outil et une seule source d'information.</p>
+                  <p>Moins de doublons, moins d'interprétations.</p>
+                </div>
+              </div>
+
+              {/* BLOC 2 — Des informations maîtrisées */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--obillz-hero-blue)" }}
+                >
+                  Des informations maîtrisées
+                </h3>
+                <div className="mt-3 space-y-2 text-sm text-slate-600">
+                  <p>Les événements, les inscriptions, les paiements et les finances sont liés.</p>
+                  <p>Chaque action a un impact clair et visible.</p>
+                </div>
+              </div>
+
+              {/* BLOC 3 — Un fonctionnement plus serein */}
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--obillz-hero-blue)" }}
+                >
+                  Un fonctionnement plus serein
+                </h3>
+                <div className="mt-3 space-y-2 text-sm text-slate-600">
+                  <p>Les rôles sont définis, les confirmations sont automatiques, les données restent accessibles.</p>
+                  <p>Le club avance sans désordre.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== 4. SANS / AVEC OBILLZ (fond gris clair) ========== */}
         <section className="relative bg-slate-50 px-4 py-20 md:px-6 md:py-28">
           <div className="relative mx-auto max-w-4xl">
             <h2 className="text-center text-3xl font-bold text-slate-900 md:text-4xl">
@@ -359,62 +415,6 @@ export default function LandingPage() {
                       Les personnes s'inscrivent via un QR code. Tout arrive directement dans le logiciel : nombre de participants, choix des repas, informations.
                     </p>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========== 4. ORGANISATION CLAIRE (fond blanc) ========== */}
-        <section className="relative bg-white px-4 py-20 md:px-6 md:py-28">
-          <div className="relative mx-auto max-w-5xl text-center">
-            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
-              Une organisation claire, sans bricolage
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              Obillz remplace les solutions improvisées par une organisation structurée et fiable.
-            </p>
-
-            <div className="mt-12 grid gap-6 sm:grid-cols-3">
-              {/* BLOC 1 — Une seule façon de fonctionner */}
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: "var(--obillz-hero-blue)" }}
-                >
-                  Une seule façon de fonctionner
-                </h3>
-                <div className="mt-3 space-y-2 text-sm text-slate-600">
-                  <p>Le club travaille avec un seul outil et une seule source d'information.</p>
-                  <p>Moins de doublons, moins d'interprétations.</p>
-                </div>
-              </div>
-
-              {/* BLOC 2 — Des informations maîtrisées */}
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: "var(--obillz-hero-blue)" }}
-                >
-                  Des informations maîtrisées
-                </h3>
-                <div className="mt-3 space-y-2 text-sm text-slate-600">
-                  <p>Les événements, les inscriptions, les paiements et les finances sont liés.</p>
-                  <p>Chaque action a un impact clair et visible.</p>
-                </div>
-              </div>
-
-              {/* BLOC 3 — Un fonctionnement plus serein */}
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:border-[var(--obillz-hero-blue)]/30 hover:shadow-xl text-left">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: "var(--obillz-hero-blue)" }}
-                >
-                  Un fonctionnement plus serein
-                </h3>
-                <div className="mt-3 space-y-2 text-sm text-slate-600">
-                  <p>Les rôles sont définis, les confirmations sont automatiques, les données restent accessibles.</p>
-                  <p>Le club avance sans désordre.</p>
                 </div>
               </div>
             </div>
