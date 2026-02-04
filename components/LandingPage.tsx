@@ -431,8 +431,8 @@ export default function LandingPage() {
               Vous pouvez découvrir Obillz de différentes manières, selon votre situation et vos besoins.
             </p>
 
-            {/* CTA Principal */}
-            <div className="mt-10">
+            {/* CTA Boutons */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
                 href="mailto:contact@obillz.fr?subject=Demande%20de%20d%C3%A9mo%20Obillz"
                 className="inline-flex items-center justify-center rounded-full px-10 py-4 text-base font-semibold text-white transition-opacity hover:opacity-95"
@@ -440,25 +440,12 @@ export default function LandingPage() {
               >
                 Demander une démo
               </a>
-              <p className="mt-3 text-sm text-slate-500">
-                Une démonstration adaptée à l'organisation de votre club.
-              </p>
-            </div>
-
-            {/* CTA Secondaires */}
-            <div className="mt-10 flex flex-col items-center gap-3 text-sm">
               <Link
                 href="/inscription"
-                className="text-slate-600 underline underline-offset-2 transition-colors hover:text-slate-900"
+                className="inline-flex items-center justify-center rounded-full border-2 border-slate-300 bg-white px-10 py-4 text-base font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
               >
-                Créer un compte pour découvrir l'outil par vous-même
+                Créer un compte
               </Link>
-              <a
-                href="mailto:contact@obillz.fr?subject=Question%20Obillz"
-                className="text-slate-600 underline underline-offset-2 transition-colors hover:text-slate-900"
-              >
-                Nous contacter pour une question ou un cas particulier
-              </a>
             </div>
           </div>
         </section>
