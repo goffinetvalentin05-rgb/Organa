@@ -182,6 +182,18 @@ export const Wallet = ({ className = "w-5 h-5" }: { className?: string }) => (
   </svg>
 );
 
+export const QrCode = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h6v6H3V3zm12 0h6v6h-6V3zM3 15h6v6H3v-6zm12 12h2v-2h-2v2zm4-4h2v-2h-2v2zm-4 0h2v-2h-2v2zm4-4h2v-2h-2v2zm-4 0h2v-2h-2v2zm0-4h6v2h-4v4h-2v-6z" />
+  </svg>
+);
+
+export const Calendar2 = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
 
 
 

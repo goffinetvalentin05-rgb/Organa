@@ -478,6 +478,7 @@
       "quotes": "Cotisations",
       "invoices": "Factures",
       "payments": "Paiements",
+      "qrcodes": "QR Codes",
       "expenses": "Charges",
       "settings": "Paramètres du club"
     },
@@ -489,6 +490,7 @@
       "quotes": "Cotisations",
       "invoices": "Factures",
       "payments": "Historique des paiements",
+      "qrcodes": "QR Codes",
       "expenses": "Charges du club",
       "settings": "Paramètres du club"
     },
@@ -985,6 +987,98 @@
       "status": {
         "paid": "Payé",
         "pending": "En attente"
+      }
+    },
+    "qrcodes": {
+      "title": "QR Codes",
+      "subtitle": "Créez des QR codes pour gérer les inscriptions à vos événements",
+      "newAction": "Créer un QR code",
+      "emptyState": "Aucun QR code pour le moment.",
+      "emptyCta": "Créer votre premier QR code",
+      "createTitle": "Nouveau QR code",
+      "createSubtitle": "Créez un QR code en 30 secondes pour votre événement",
+      "fields": {
+        "name": "Nom de l'événement *",
+        "namePlaceholder": "Ex: Repas après match – samedi",
+        "description": "Description (optionnel)",
+        "descriptionPlaceholder": "Informations complémentaires pour les inscrits...",
+        "eventType": "Type d'événement",
+        "eventDate": "Date de l'événement (optionnel)"
+      },
+      "eventTypes": {
+        "meal": "Repas",
+        "match": "Match",
+        "tournament": "Tournoi",
+        "party": "Soirée / Buvette",
+        "other": "Autre"
+      },
+      "createAction": "Créer le QR code",
+      "creating": "Création...",
+      "createSuccess": "QR code créé avec succès !",
+      "createError": "Erreur lors de la création du QR code",
+      "loadError": "Erreur lors du chargement des QR codes",
+      "deleteConfirm": "Supprimer ce QR code et toutes les inscriptions associées ?",
+      "deleteError": "Erreur lors de la suppression",
+      "card": {
+        "registrations": "inscription(s)",
+        "noRegistrations": "Aucune inscription",
+        "created": "Créé le",
+        "viewDetails": "Voir les inscrits",
+        "download": "Télécharger",
+        "share": "Partager",
+        "copyLink": "Copier le lien",
+        "linkCopied": "Lien copié !"
+      },
+      "detail": {
+        "title": "Détail du QR code",
+        "backToList": "Retour aux QR codes",
+        "eventInfo": "Informations de l'événement",
+        "qrCodeLabel": "QR Code à partager",
+        "downloadPng": "Télécharger PNG",
+        "downloadSvg": "Télécharger SVG",
+        "registrationLink": "Lien d'inscription",
+        "registrations": "Liste des inscrits",
+        "noRegistrations": "Aucune inscription pour le moment.",
+        "registrationsCount": "{count} inscription(s)",
+        "exportCsv": "Exporter CSV",
+        "deleteRegistration": "Supprimer",
+        "registrationDeleted": "Inscription supprimée"
+      },
+      "registration": {
+        "columns": {
+          "name": "Nom",
+          "email": "Email",
+          "phone": "Téléphone",
+          "date": "Date d'inscription",
+          "comment": "Commentaire"
+        }
+      }
+    },
+    "publicRegistration": {
+      "title": "Inscription",
+      "eventLabel": "Événement",
+      "organizerLabel": "Organisé par",
+      "fields": {
+        "firstName": "Prénom *",
+        "lastName": "Nom *",
+        "email": "Email *",
+        "phone": "Téléphone (optionnel)",
+        "comment": "Commentaire (optionnel)",
+        "commentPlaceholder": "Ex: Régime alimentaire, nombre de personnes..."
+      },
+      "submitAction": "S'inscrire",
+      "submitting": "Inscription en cours...",
+      "success": {
+        "title": "Inscription confirmée !",
+        "message": "Vous êtes bien inscrit(e) à cet événement.",
+        "backToClub": "Retour"
+      },
+      "errors": {
+        "required": "Ce champ est obligatoire",
+        "invalidEmail": "Email invalide",
+        "submitError": "Erreur lors de l'inscription",
+        "notFound": "QR code introuvable",
+        "expired": "Cet événement n'accepte plus d'inscriptions"
       }
     }
   }

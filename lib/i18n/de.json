@@ -479,6 +479,7 @@
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "payments": "Zahlungen",
+      "qrcodes": "QR-Codes",
       "expenses": "Vereinskosten",
       "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen",
@@ -493,6 +494,7 @@
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "payments": "Zahlungsverlauf",
+      "qrcodes": "QR-Codes",
       "expenses": "Vereinskosten",
       "calendar": "Kalender",
       "settings": "Vereinseinstellungen",
@@ -1132,6 +1134,98 @@
       "status": {
         "paid": "Bezahlt",
         "pending": "Ausstehend"
+      }
+    },
+    "qrcodes": {
+      "title": "QR-Codes",
+      "subtitle": "Erstellen Sie QR-Codes für Veranstaltungsanmeldungen",
+      "newAction": "QR-Code erstellen",
+      "emptyState": "Noch keine QR-Codes.",
+      "emptyCta": "Ersten QR-Code erstellen",
+      "createTitle": "Neuer QR-Code",
+      "createSubtitle": "Erstellen Sie in 30 Sekunden einen QR-Code für Ihre Veranstaltung",
+      "fields": {
+        "name": "Veranstaltungsname *",
+        "namePlaceholder": "Z.B.: Abendessen nach dem Spiel – Samstag",
+        "description": "Beschreibung (optional)",
+        "descriptionPlaceholder": "Zusätzliche Informationen für Teilnehmer...",
+        "eventType": "Veranstaltungsart",
+        "eventDate": "Datum (optional)"
+      },
+      "eventTypes": {
+        "meal": "Essen",
+        "match": "Spiel",
+        "tournament": "Turnier",
+        "party": "Party / Bar",
+        "other": "Sonstiges"
+      },
+      "createAction": "QR-Code erstellen",
+      "creating": "Wird erstellt...",
+      "createSuccess": "QR-Code erfolgreich erstellt!",
+      "createError": "Fehler beim Erstellen des QR-Codes",
+      "loadError": "Fehler beim Laden der QR-Codes",
+      "deleteConfirm": "Diesen QR-Code und alle Anmeldungen löschen?",
+      "deleteError": "Fehler beim Löschen",
+      "card": {
+        "registrations": "Anmeldung(en)",
+        "noRegistrations": "Keine Anmeldungen",
+        "created": "Erstellt am",
+        "viewDetails": "Teilnehmer anzeigen",
+        "download": "Herunterladen",
+        "share": "Teilen",
+        "copyLink": "Link kopieren",
+        "linkCopied": "Link kopiert!"
+      },
+      "detail": {
+        "title": "QR-Code Details",
+        "backToList": "Zurück zu QR-Codes",
+        "eventInfo": "Veranstaltungsinformationen",
+        "qrCodeLabel": "QR-Code zum Teilen",
+        "downloadPng": "PNG herunterladen",
+        "downloadSvg": "SVG herunterladen",
+        "registrationLink": "Anmeldelink",
+        "registrations": "Teilnehmerliste",
+        "noRegistrations": "Noch keine Anmeldungen.",
+        "registrationsCount": "{count} Anmeldung(en)",
+        "exportCsv": "CSV exportieren",
+        "deleteRegistration": "Löschen",
+        "registrationDeleted": "Anmeldung gelöscht"
+      },
+      "registration": {
+        "columns": {
+          "name": "Name",
+          "email": "E-Mail",
+          "phone": "Telefon",
+          "date": "Anmeldedatum",
+          "comment": "Kommentar"
+        }
+      }
+    },
+    "publicRegistration": {
+      "title": "Anmeldung",
+      "eventLabel": "Veranstaltung",
+      "organizerLabel": "Organisiert von",
+      "fields": {
+        "firstName": "Vorname *",
+        "lastName": "Nachname *",
+        "email": "E-Mail *",
+        "phone": "Telefon (optional)",
+        "comment": "Kommentar (optional)",
+        "commentPlaceholder": "Z.B.: Ernährungswünsche, Anzahl der Gäste..."
+      },
+      "submitAction": "Anmelden",
+      "submitting": "Anmeldung läuft...",
+      "success": {
+        "title": "Anmeldung bestätigt!",
+        "message": "Sie sind für diese Veranstaltung angemeldet.",
+        "backToClub": "Zurück"
+      },
+      "errors": {
+        "required": "Pflichtfeld",
+        "invalidEmail": "Ungültige E-Mail",
+        "submitError": "Anmeldefehler",
+        "notFound": "QR-Code nicht gefunden",
+        "expired": "Diese Veranstaltung nimmt keine Anmeldungen mehr an"
       }
     }
   }

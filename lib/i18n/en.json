@@ -479,6 +479,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payments",
+      "qrcodes": "QR Codes",
       "expenses": "Club Expenses",
       "assistant": "AI Assistant",
       "reminders": "Reminders",
@@ -493,6 +494,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payment History",
+      "qrcodes": "QR Codes",
       "expenses": "Club Expenses",
       "calendar": "Calendar",
       "settings": "Club Settings",
@@ -1134,6 +1136,98 @@
       "status": {
         "paid": "Paid",
         "pending": "Pending"
+      }
+    },
+    "qrcodes": {
+      "title": "QR Codes",
+      "subtitle": "Create QR codes to manage event registrations",
+      "newAction": "Create QR code",
+      "emptyState": "No QR codes yet.",
+      "emptyCta": "Create your first QR code",
+      "createTitle": "New QR code",
+      "createSubtitle": "Create a QR code in 30 seconds for your event",
+      "fields": {
+        "name": "Event name *",
+        "namePlaceholder": "E.g.: Post-game dinner – Saturday",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Additional information for attendees...",
+        "eventType": "Event type",
+        "eventDate": "Event date (optional)"
+      },
+      "eventTypes": {
+        "meal": "Meal",
+        "match": "Match",
+        "tournament": "Tournament",
+        "party": "Party / Bar",
+        "other": "Other"
+      },
+      "createAction": "Create QR code",
+      "creating": "Creating...",
+      "createSuccess": "QR code created successfully!",
+      "createError": "Error creating QR code",
+      "loadError": "Error loading QR codes",
+      "deleteConfirm": "Delete this QR code and all associated registrations?",
+      "deleteError": "Error deleting",
+      "card": {
+        "registrations": "registration(s)",
+        "noRegistrations": "No registrations",
+        "created": "Created on",
+        "viewDetails": "View attendees",
+        "download": "Download",
+        "share": "Share",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied!"
+      },
+      "detail": {
+        "title": "QR code details",
+        "backToList": "Back to QR codes",
+        "eventInfo": "Event information",
+        "qrCodeLabel": "QR Code to share",
+        "downloadPng": "Download PNG",
+        "downloadSvg": "Download SVG",
+        "registrationLink": "Registration link",
+        "registrations": "Attendee list",
+        "noRegistrations": "No registrations yet.",
+        "registrationsCount": "{count} registration(s)",
+        "exportCsv": "Export CSV",
+        "deleteRegistration": "Delete",
+        "registrationDeleted": "Registration deleted"
+      },
+      "registration": {
+        "columns": {
+          "name": "Name",
+          "email": "Email",
+          "phone": "Phone",
+          "date": "Registration date",
+          "comment": "Comment"
+        }
+      }
+    },
+    "publicRegistration": {
+      "title": "Registration",
+      "eventLabel": "Event",
+      "organizerLabel": "Organized by",
+      "fields": {
+        "firstName": "First name *",
+        "lastName": "Last name *",
+        "email": "Email *",
+        "phone": "Phone (optional)",
+        "comment": "Comment (optional)",
+        "commentPlaceholder": "E.g.: Dietary requirements, number of guests..."
+      },
+      "submitAction": "Register",
+      "submitting": "Registering...",
+      "success": {
+        "title": "Registration confirmed!",
+        "message": "You are registered for this event.",
+        "backToClub": "Back"
+      },
+      "errors": {
+        "required": "This field is required",
+        "invalidEmail": "Invalid email",
+        "submitError": "Registration error",
+        "notFound": "QR code not found",
+        "expired": "This event is no longer accepting registrations"
       }
     }
   }
