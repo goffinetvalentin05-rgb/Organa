@@ -108,7 +108,16 @@ export async function DELETE(request: NextRequest) {
       .eq("id", id)
       .single();
 
-    if (!registration || (registration.qrcode as { user_id: string }).user_id !== user.id) {
+    if (!registration) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
+    // Handle qrcode as array or single object
+    const qrcode = Array.isArray(registration.qrcode)
+      ? registration.qrcode[0]
+      : registration.qrcode;
+
+    if (!qrcode || qrcode.user_id !== user.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
