@@ -682,7 +682,28 @@
         "email": "Email *",
         "emailOptional": "Email",
         "phone": "Téléphone",
-        "address": "Adresse"
+        "address": "Adresse",
+        "role": "Rôle",
+        "category": "Catégorie"
+      },
+      "roles": {
+        "player": "Joueur",
+        "coach": "Entraîneur",
+        "volunteer": "Bénévole",
+        "staff": "Staff / Direction"
+      },
+      "categories": {
+        "first_team": "Équipe première",
+        "second_team": "Équipe réserve",
+        "junior": "Junior",
+        "president": "Président",
+        "treasurer": "Trésorier",
+        "secretary": "Secrétaire",
+        "other": "Autre"
+      },
+      "filters": {
+        "allRoles": "Tous les rôles",
+        "allCategories": "Toutes les catégories"
       },
       "errors": {
         "missingId": "ID du membre manquant",

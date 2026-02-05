@@ -804,7 +804,28 @@
         "email": "Email *",
         "emailOptional": "Email",
         "phone": "Phone",
-        "address": "Address"
+        "address": "Address",
+        "role": "Role",
+        "category": "Category"
+      },
+      "roles": {
+        "player": "Player",
+        "coach": "Coach",
+        "volunteer": "Volunteer",
+        "staff": "Staff / Management"
+      },
+      "categories": {
+        "first_team": "First team",
+        "second_team": "Second team",
+        "junior": "Junior",
+        "president": "President",
+        "treasurer": "Treasurer",
+        "secretary": "Secretary",
+        "other": "Other"
+      },
+      "filters": {
+        "allRoles": "All roles",
+        "allCategories": "All categories"
       },
       "errors": {
         "missingId": "Client ID missing",

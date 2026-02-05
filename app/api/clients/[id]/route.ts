@@ -40,7 +40,7 @@ export async function GET(
   // Récupérer le client depuis Supabase
   const { data, error } = await supabase
     .from("clients")
-    .select("id, nom, email, telephone, adresse, user_id")
+    .select("id, nom, email, telephone, adresse, user_id, role, category")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -99,7 +99,7 @@ export async function PUT(
     );
   }
 
-  const { nom, email, telephone, adresse } = body;
+  const { nom, email, telephone, adresse, role, category } = body;
 
   // Validation du nom (obligatoire)
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
@@ -117,6 +117,8 @@ export async function PUT(
       email: email || null,
       telephone: telephone || null,
       adresse: adresse || null,
+      role: role || "player",
+      category: category || null,
     })
     .eq("id", id)
     .eq("user_id", user.id);

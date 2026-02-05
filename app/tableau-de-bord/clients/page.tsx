@@ -1,10 +1,10 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import DeleteClientButton from "./components/DeleteClientButton";
-import { Info, Plus, Users } from "@/lib/icons";
-import { createClient } from "@/lib/supabase/server";
-import I18nText from "@/components/I18nText";
-
-export const dynamic = 'force-dynamic';
+import { Info, Plus, Users, Filter } from "@/lib/icons";
+import { useI18n } from "@/components/I18nProvider";
 
 interface Client {
   id: string;
@@ -13,62 +13,84 @@ interface Client {
   telephone: string;
   adresse: string;
   user_id: string;
+  role: string;
+  category: string | null;
 }
 
-export default async function ClientsPage() {
-  let clients: Client[] = [];
-  let errorMessage: string | null = null;
+// Couleurs pour les rôles
+const roleColors: Record<string, string> = {
+  player: "bg-blue-100 text-blue-700",
+  coach: "bg-green-100 text-green-700",
+  volunteer: "bg-purple-100 text-purple-700",
+  staff: "bg-orange-100 text-orange-700",
+};
 
-  try {
-    const supabase = await createClient();
+export default function ClientsPage() {
+  const { t } = useI18n();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Filtres
+  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  // Charger les clients
+  useEffect(() => {
+    async function fetchClients() {
+      try {
+        const res = await fetch("/api/clients");
+        if (!res.ok) {
+          throw new Error("Erreur lors du chargement");
+        }
+        const data = await res.json();
+        setClients(data.clients || []);
+      } catch (err: any) {
+        setError(err.message || "Erreur inconnue");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchClients();
+  }, []);
 
-    if (!user || !user.id) {
-      return (
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
-            <p className="text-red-600 font-medium">
-              <I18nText id="dashboard.clients.authError" />
-            </p>
-          </div>
+  // Filtrer les clients
+  const filteredClients = useMemo(() => {
+    return clients.filter((client) => {
+      if (roleFilter && client.role !== roleFilter) return false;
+      if (categoryFilter && client.category !== categoryFilter) return false;
+      return true;
+    });
+  }, [clients, roleFilter, categoryFilter]);
+
+  // Obtenir les catégories uniques présentes
+  const uniqueCategories = useMemo(() => {
+    const cats = new Set<string>();
+    clients.forEach((c) => {
+      if (c.category) cats.add(c.category);
+    });
+    return Array.from(cats);
+  }, [clients]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 bg-slate-200 rounded w-1/3"></div>
+          <div className="h-64 bg-slate-200 rounded-2xl"></div>
         </div>
-      );
-    }
-
-    const { data, error } = await supabase
-      .from("clients")
-      .select("id, nom, email, telephone, adresse, user_id")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("[ClientsPage] Erreur Supabase", error);
-      errorMessage = error.message || null;
-    } else {
-      clients = (data || []).filter(
-        (c: Client): c is Client => 
-          Boolean(c.id) && 
-          typeof c.id === "string" && 
-          c.id.length > 0 && 
-          c.user_id === user.id
-      );
-    }
-  } catch (error: any) {
-    console.error("[ClientsPage] Erreur", error);
-    errorMessage = error.message || null;
+      </div>
+    );
   }
 
-  if (errorMessage && clients.length === 0) {
+  if (error) {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
           <p className="text-red-600 font-medium mb-2">
-            <I18nText id="dashboard.clients.loadError" />
+            {t("dashboard.clients.loadError")}
           </p>
-          {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+          <p className="text-red-500 text-sm">{error}</p>
         </div>
       </div>
     );
@@ -80,10 +102,10 @@ export default async function ClientsPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            <I18nText id="dashboard.clients.title" />
+            {t("dashboard.clients.title")}
           </h1>
           <p className="mt-1 text-slate-500">
-            <I18nText id="dashboard.clients.subtitle" />
+            {t("dashboard.clients.subtitle")}
           </p>
         </div>
         <Link
@@ -91,9 +113,59 @@ export default async function ClientsPage() {
           className="btn-obillz"
         >
           <Plus className="w-5 h-5" />
-          <I18nText id="dashboard.clients.newClient" />
+          {t("dashboard.clients.newClient")}
         </Link>
       </div>
+
+      {/* Filtres */}
+      {clients.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-700">Filtres</span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t("dashboard.clients.filters.allRoles")}</option>
+              <option value="player">{t("dashboard.clients.roles.player")}</option>
+              <option value="coach">{t("dashboard.clients.roles.coach")}</option>
+              <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
+              <option value="staff">{t("dashboard.clients.roles.staff")}</option>
+            </select>
+
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t("dashboard.clients.filters.allCategories")}</option>
+              <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
+              <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
+              <option value="junior">{t("dashboard.clients.categories.junior")}</option>
+              <option value="president">{t("dashboard.clients.categories.president")}</option>
+              <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
+              <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
+              <option value="other">{t("dashboard.clients.categories.other")}</option>
+            </select>
+
+            {(roleFilter || categoryFilter) && (
+              <button
+                onClick={() => {
+                  setRoleFilter("");
+                  setCategoryFilter("");
+                }}
+                className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Réinitialiser
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Message informatif */}
       <div className="bg-amber-50 rounded-xl border border-amber-200 p-5">
@@ -103,10 +175,10 @@ export default async function ClientsPage() {
           </div>
           <div>
             <p className="font-medium text-amber-900">
-              <I18nText id="dashboard.clients.editDisabledTitle" />
+              {t("dashboard.clients.editDisabledTitle")}
             </p>
             <p className="text-sm text-amber-700 mt-1">
-              <I18nText id="dashboard.clients.editDisabledText" />
+              {t("dashboard.clients.editDisabledText")}
             </p>
           </div>
         </div>
@@ -114,25 +186,30 @@ export default async function ClientsPage() {
 
       {/* Liste des clients */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        {clients.length === 0 ? (
+        {filteredClients.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-slate-400" />
             </div>
             <p className="text-slate-600 mb-4">
-              <I18nText id="dashboard.clients.emptyState" />
+              {clients.length === 0 
+                ? t("dashboard.clients.emptyState")
+                : "Aucun membre ne correspond aux filtres sélectionnés."
+              }
             </p>
-            <Link
-              href="/tableau-de-bord/clients/nouveau"
-              className="btn-obillz inline-flex"
-            >
-              <Plus className="w-5 h-5" />
-              <I18nText id="dashboard.clients.emptyCta" />
-            </Link>
+            {clients.length === 0 && (
+              <Link
+                href="/tableau-de-bord/clients/nouveau"
+                className="btn-obillz inline-flex"
+              >
+                <Plus className="w-5 h-5" />
+                {t("dashboard.clients.emptyCta")}
+              </Link>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {clients.map((client, index) => (
+            {filteredClients.map((client) => (
               <div
                 key={client.id}
                 className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
@@ -145,22 +222,34 @@ export default async function ClientsPage() {
                     >
                       {(client.nom || "?").charAt(0).toUpperCase()}
                     </div>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-900 truncate">
-                        {client.nom || <I18nText id="dashboard.clients.noName" />}
-                      </h3>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-slate-900 truncate">
+                          {client.nom || t("dashboard.clients.noName")}
+                        </h3>
+                        {/* Badge Rôle */}
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}>
+                          {t(`dashboard.clients.roles.${client.role}`) || client.role}
+                        </span>
+                        {/* Badge Catégorie */}
+                        {client.category && (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                            {t(`dashboard.clients.categories.${client.category}`) || client.category}
+                          </span>
+                        )}
+                      </div>
                       <div className="mt-2 grid gap-1 text-sm">
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Email</span>
-                          <span className="truncate">{client.email || <I18nText id="dashboard.clients.notProvided" />}</span>
+                          <span className="truncate">{client.email || t("dashboard.clients.notProvided")}</span>
                         </p>
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Tél.</span>
-                          <span>{client.telephone || <I18nText id="dashboard.clients.notProvided" />}</span>
+                          <span>{client.telephone || t("dashboard.clients.notProvided")}</span>
                         </p>
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Adresse</span>
-                          <span className="truncate">{client.adresse || <I18nText id="dashboard.clients.addressNotProvided" />}</span>
+                          <span className="truncate">{client.adresse || t("dashboard.clients.addressNotProvided")}</span>
                         </p>
                       </div>
                     </div>
@@ -178,7 +267,10 @@ export default async function ClientsPage() {
       {/* Footer avec compteur */}
       {clients.length > 0 && (
         <div className="text-center text-sm text-slate-400">
-          {clients.length} client{clients.length > 1 ? "s" : ""} au total
+          {filteredClients.length === clients.length 
+            ? `${clients.length} membre${clients.length > 1 ? "s" : ""} au total`
+            : `${filteredClients.length} sur ${clients.length} membre${clients.length > 1 ? "s" : ""}`
+          }
         </div>
       )}
     </div>

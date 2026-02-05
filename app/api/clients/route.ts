@@ -25,7 +25,7 @@ export async function GET() {
   // Charger les clients depuis Supabase
   const { data, error } = await supabase
     .from("clients")
-    .select("id, nom, email, telephone, adresse, user_id")
+    .select("id, nom, email, telephone, adresse, user_id, role, category")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { nom, email, telephone, adresse } = body;
+  const { nom, email, telephone, adresse, role, category } = body;
 
   // Validation du nom (obligatoire)
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
@@ -142,8 +142,10 @@ export async function POST(request: NextRequest) {
       email: email || null,
       telephone: telephone || null,
       adresse: adresse || null,
+      role: role || "player",
+      category: category || null,
     })
-    .select("id, nom, email, telephone, adresse, user_id")
+    .select("id, nom, email, telephone, adresse, user_id, role, category")
     .single();
 
   if (insertError) {

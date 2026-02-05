@@ -804,7 +804,28 @@
         "email": "E-Mail *",
         "emailOptional": "E-Mail",
         "phone": "Telefon",
-        "address": "Adresse"
+        "address": "Adresse",
+        "role": "Rolle",
+        "category": "Kategorie"
+      },
+      "roles": {
+        "player": "Spieler",
+        "coach": "Trainer",
+        "volunteer": "Freiwilliger",
+        "staff": "Personal / Leitung"
+      },
+      "categories": {
+        "first_team": "Erste Mannschaft",
+        "second_team": "Reserve",
+        "junior": "Junioren",
+        "president": "Präsident",
+        "treasurer": "Kassenwart",
+        "secretary": "Sekretär",
+        "other": "Sonstiges"
+      },
+      "filters": {
+        "allRoles": "Alle Rollen",
+        "allCategories": "Alle Kategorien"
       },
       "errors": {
         "missingId": "Kunden-ID fehlt",

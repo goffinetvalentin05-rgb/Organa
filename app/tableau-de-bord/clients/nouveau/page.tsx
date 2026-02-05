@@ -15,6 +15,8 @@ export default function NouveauClientPage() {
     email: "",
     telephone: "",
     adresse: "",
+    role: "player",
+    category: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{
@@ -156,6 +158,45 @@ export default function NouveauClientPage() {
               rows={3}
               className="input-obillz resize-none"
             />
+          </div>
+
+          {/* Rôle et Catégorie */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                {t("dashboard.clients.fields.role")}
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                className="input-obillz"
+              >
+                <option value="player">{t("dashboard.clients.roles.player")}</option>
+                <option value="coach">{t("dashboard.clients.roles.coach")}</option>
+                <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
+                <option value="staff">{t("dashboard.clients.roles.staff")}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                {t("dashboard.clients.fields.category")}
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="input-obillz"
+              >
+                <option value="">{t("dashboard.clients.filters.allCategories")}</option>
+                <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
+                <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
+                <option value="junior">{t("dashboard.clients.categories.junior")}</option>
+                <option value="president">{t("dashboard.clients.categories.president")}</option>
+                <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
+                <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
+                <option value="other">{t("dashboard.clients.categories.other")}</option>
+              </select>
+            </div>
           </div>
         </div>
 
