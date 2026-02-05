@@ -120,7 +120,7 @@ export default function PaiementsPage() {
             <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-emerald-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Total encaissé</span>
+            <span className="text-sm font-medium text-slate-500">Chiffre généré</span>
           </div>
           <div className="text-3xl font-bold text-slate-900">
             {loading ? "-" : formatMontant(totalPayments)}
@@ -132,7 +132,7 @@ export default function PaiementsPage() {
             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Cotisations payées</span>
+            <span className="text-sm font-medium text-slate-500">Cotisations vendues</span>
           </div>
           <div className="text-3xl font-bold text-slate-900">
             {loading ? "-" : membershipPayments.length}
@@ -144,7 +144,7 @@ export default function PaiementsPage() {
             <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
               <Receipt className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Factures payées</span>
+            <span className="text-sm font-medium text-slate-500">Produits facturés</span>
           </div>
           <div className="text-3xl font-bold text-slate-900">
             {loading ? "-" : invoicePayments.length}
@@ -156,7 +156,7 @@ export default function PaiementsPage() {
       <div className="bg-white rounded-2xl border border-slate-200">
         <div className="p-6 border-b border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900">
-            Historique des paiements
+            Produits
           </h2>
         </div>
 

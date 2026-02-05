@@ -477,7 +477,7 @@
       "clients": "Membres",
       "quotes": "Cotisations",
       "invoices": "Factures",
-      "payments": "Paiements",
+      "payments": "Produits",
       "events": "Événements",
       "qrcodes": "QR Codes",
       "expenses": "Charges",
@@ -490,7 +490,7 @@
       "clients": "Membres",
       "quotes": "Cotisations",
       "invoices": "Factures",
-      "payments": "Historique des paiements",
+      "payments": "Produits",
       "events": "Événements",
       "qrcodes": "QR Codes",
       "expenses": "Charges du club",
@@ -993,9 +993,9 @@
       }
     },
     "payments": {
-      "title": "Historique des paiements",
-      "subtitle": "Consultez l'historique des paiements reçus",
-      "emptyState": "Aucun paiement enregistré pour le moment.",
+      "title": "Produits",
+      "subtitle": "Consultez les revenus générés par votre club",
+      "emptyState": "Aucun produit enregistré pour le moment.",
       "columns": {
         "date": "Date",
         "member": "Membre",
