@@ -467,33 +467,35 @@
     "cta": "Organa entdecken"
   },
   "dashboard": {
-    "brandLabel": "Dashboard",
+    "brandLabel": "Vereins-Dashboard",
     "navigation": {
       "primary": "Navigation",
       "secondary": "Überblick",
       "backHome": "Zur Startseite"
     },
     "nav": {
-      "dashboard": "Dashboard",
-      "clients": "Kunden",
-      "quotes": "Angebote",
+      "dashboard": "Vereins-Dashboard",
+      "clients": "Mitglieder",
+      "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
-      "expenses": "Ausgaben",
+      "payments": "Zahlungen",
+      "expenses": "Vereinskosten",
       "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen",
       "calendar": "Kalender",
-      "settings": "Einstellungen"
+      "settings": "Vereinseinstellungen"
     },
     "pageTitles": {
-      "dashboard": "Dashboard",
-      "newClient": "Neuer Kunde",
-      "editClient": "Kunden bearbeiten",
-      "clients": "Kunden",
-      "quotes": "Angebote",
+      "dashboard": "Vereins-Dashboard",
+      "newClient": "Neues Mitglied",
+      "editClient": "Mitglied bearbeiten",
+      "clients": "Mitglieder",
+      "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
-      "expenses": "Ausgaben",
+      "payments": "Zahlungsverlauf",
+      "expenses": "Vereinskosten",
       "calendar": "Kalender",
-      "settings": "Einstellungen",
+      "settings": "Vereinseinstellungen",
       "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen"
     },
@@ -1088,28 +1090,48 @@
     },
     "subscription": {
       "title": "Abonnement",
-      "subtitle": "Abonnement und Limits verwalten",
+      "subtitle": "Vereins-Abonnement verwalten",
       "current": "Aktuell",
       "free": {
         "title": "Gratis-Plan",
         "subtitle": "Ideal für den Einstieg",
         "features": {
-          "clients": "Maximal 2 Kunden",
+          "clients": "Maximal 2 Mitglieder",
           "documents": "Maximal 3 Dokumente pro Monat",
           "core": "Alle Basisfunktionen"
         }
       },
       "pro": {
         "title": "Pro-Plan",
-        "subtitle": "Unbegrenzter Zugriff",
+        "subtitle": "Unbegrenzter Zugriff für Ihren Verein",
         "features": {
-          "clients": "Unbegrenzte Kunden",
+          "clients": "Unbegrenzte Mitglieder",
           "documents": "Unbegrenzte Dokumente",
           "support": "Priorisierter Support",
           "all": "Alle Funktionen"
         },
         "notice": "Zahlungen sind bald verfügbar. Bis dahin nutzen Sie den Gratis-Plan!",
         "cta": "Zurück zu den Einstellungen"
+      }
+    },
+    "payments": {
+      "title": "Zahlungsverlauf",
+      "subtitle": "Übersicht über eingegangene Zahlungen",
+      "emptyState": "Noch keine Zahlungen erfasst.",
+      "columns": {
+        "date": "Datum",
+        "member": "Mitglied",
+        "type": "Art",
+        "amount": "Betrag",
+        "status": "Status"
+      },
+      "types": {
+        "membership": "Mitgliedsbeitrag",
+        "invoice": "Rechnung"
+      },
+      "status": {
+        "paid": "Bezahlt",
+        "pending": "Ausstehend"
       }
     }
   }

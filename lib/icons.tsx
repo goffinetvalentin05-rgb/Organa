@@ -170,6 +170,18 @@ export const ChevronRight = ({ className = "w-5 h-5" }: { className?: string }) 
   </svg>
 );
 
+export const CreditCard = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+  </svg>
+);
+
+export const Wallet = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18V6a1 1 0 00-1-1H4a1 1 0 00-1 1v4zm0 0v8a1 1 0 001 1h16a1 1 0 001-1v-8M3 10l9-4 9 4M16 14h.01" />
+  </svg>
+);
+
 
 
 

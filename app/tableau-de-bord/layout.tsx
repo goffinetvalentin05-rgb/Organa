@@ -16,6 +16,8 @@ import {
   Home,
   Menu,
   X,
+  CreditCard,
+  Wallet,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -76,7 +78,8 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
-    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Receipt },
+    { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
+    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Wallet },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
 
@@ -96,6 +99,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/clients")) return t("dashboard.pageTitles.clients");
     if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
+    if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
     return t("dashboard.pageTitles.dashboard");
@@ -254,7 +258,7 @@ export default function DashboardLayout({
         {/* Footer */}
         <footer className="border-t border-slate-200 bg-white px-4 py-4 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-            <p>© 2024 Obillz — Gestion simplifiée pour les clubs</p>
+            <p>© 2026 Obillz — La gestion du club en deux clics</p>
             <div className="flex items-center gap-4">
               <Link href="/mentions-legales" className="hover:text-slate-700 transition-colors">
                 Mentions légales

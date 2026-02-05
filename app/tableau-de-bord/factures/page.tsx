@@ -114,6 +114,21 @@ export default function FacturesPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.invoices.title")}</h1>
           <p className="mt-1 text-slate-500">{t("dashboard.invoices.subtitle")}</p>
+          {/* Cas d'usage club */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+              Sponsors
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+              Locations de salle
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+              Événements
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
+              Buvette
+            </span>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">

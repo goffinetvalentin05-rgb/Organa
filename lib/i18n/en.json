@@ -467,33 +467,35 @@
     "cta": "Discover Organa"
   },
   "dashboard": {
-    "brandLabel": "Dashboard",
+    "brandLabel": "Club Dashboard",
     "navigation": {
       "primary": "Navigation",
       "secondary": "Monitoring",
       "backHome": "Back to home"
     },
     "nav": {
-      "dashboard": "Dashboard",
-      "clients": "Clients",
-      "quotes": "Quotes",
+      "dashboard": "Club Dashboard",
+      "clients": "Members",
+      "quotes": "Memberships",
       "invoices": "Invoices",
-      "expenses": "Expenses",
+      "payments": "Payments",
+      "expenses": "Club Expenses",
       "assistant": "AI Assistant",
       "reminders": "Reminders",
       "calendar": "Calendar",
-      "settings": "Settings"
+      "settings": "Club Settings"
     },
     "pageTitles": {
-      "dashboard": "Dashboard",
-      "newClient": "New client",
-      "editClient": "Edit client",
-      "clients": "Clients",
-      "quotes": "Quotes",
+      "dashboard": "Club Dashboard",
+      "newClient": "New member",
+      "editClient": "Edit member",
+      "clients": "Members",
+      "quotes": "Memberships",
       "invoices": "Invoices",
-      "expenses": "Expenses",
+      "payments": "Payment History",
+      "expenses": "Club Expenses",
       "calendar": "Calendar",
-      "settings": "Settings",
+      "settings": "Club Settings",
       "assistant": "AI Assistant",
       "reminders": "Reminders"
     },
@@ -622,14 +624,14 @@
       "loading": "Loading...",
       "loadFailed": "Loading error",
       "number": "Number",
-      "client": "Client",
+      "client": "Member",
       "amount": "Amount",
       "status": "Status",
       "date": "Date",
       "actions": "Actions",
       "view": "View",
       "delete": "Delete",
-      "unknownClient": "Unknown client",
+      "unknownClient": "Unknown member",
       "cancel": "Cancel",
       "saving": "Saving...",
       "unexpectedError": "An unexpected error occurred",
@@ -652,8 +654,8 @@
       "cta": "See plans"
     },
     "settings": {
-      "title": "Settings",
-      "subtitle": "Configure your company and your brand",
+      "title": "Club Settings",
+      "subtitle": "Configure your club information",
       "loadingPage": "Loading settings...",
       "saveSuccess": "Settings saved successfully",
       "saveButton": "💾 Save settings",
@@ -662,21 +664,21 @@
         "currentPlan": "Current plan:",
         "planPro": "Pro",
         "planFree": "Free",
-        "freeLimit": "Limit: {clients} clients, {documents} documents per month",
+        "freeLimit": "Limit: {clients} members, {documents} documents per month",
         "unlimitedAccess": "Unlimited access to all features",
         "upgrade": "🚀 Upgrade to Pro",
         "proBadge": "✓ Pro subscriber",
         "proOfferTitle": "Pro plan - 29 CHF / month",
         "proFeatures": [
-          "Unlimited clients",
+          "Unlimited members",
           "Unlimited documents",
           "All features"
         ]
       },
       "branding": {
-        "title": "Brand",
-        "logoLabel": "Company logo",
-        "logoAlt": "Company logo",
+        "title": "Club Identity",
+        "logoLabel": "Club logo",
+        "logoAlt": "Club logo",
         "noLogo": "No logo",
         "upload": "Choose a logo",
         "uploading": "Uploading...",
@@ -705,10 +707,10 @@
         }
       },
       "companyInfo": {
-        "title": "Company information",
-        "nameLabel": "Company name *",
-        "addressLabel": "Address *",
-        "emailLabel": "Email *",
+        "title": "Club information",
+        "nameLabel": "Club name *",
+        "addressLabel": "Club address *",
+        "emailLabel": "Club email *",
         "phoneLabel": "Phone *"
       },
       "billing": {
@@ -763,37 +765,37 @@
     },
     "clients": {
       "authError": "Authentication error",
-      "loadError": "Error loading clients",
-      "title": "Clients",
-      "subtitle": "A clear view to manage your contacts and key details.",
+      "loadError": "Error loading members",
+      "title": "Club Members",
+      "subtitle": "Manage your club members and their information.",
       "exportAction": "Export",
-      "newClient": "New client",
+      "newClient": "New member",
       "editDisabledTitle": "Editing temporarily disabled",
-      "editDisabledText": "To edit a client, delete it and recreate it. This keeps data clean and reliable.",
-      "emptyState": "No clients yet.",
-      "emptyCta": "Create your first client",
-      "cardLabel": "Client",
+      "editDisabledText": "To edit a member, delete and recreate them. This keeps data clean.",
+      "emptyState": "No members yet.",
+      "emptyCta": "Add your first member",
+      "cardLabel": "Member",
       "noName": "No name",
       "emailLabel": "Email:",
       "phoneLabel": "Phone:",
       "addressLabel": "Address:",
       "notProvided": "Not provided",
       "addressNotProvided": "Not provided",
-      "deleteConfirm": "Are you sure you want to delete this client?",
+      "deleteConfirm": "Are you sure you want to delete this member?",
       "deleteError": "Error deleting",
-      "deleteErrorDetail": "Error deleting the client",
+      "deleteErrorDetail": "Error deleting the member",
       "deleteAction": "Delete",
       "limitReached": "Free plan limit reached.",
-      "createError": "Error creating the client",
-      "newTitle": "New client",
-      "newSubtitle": "Add a new client",
+      "createError": "Error creating the member",
+      "newTitle": "New member",
+      "newSubtitle": "Add a new member to the club",
       "creating": "Creating...",
-      "createAction": "Create client",
-      "editDisabledDetail": "Client editing is no longer available.",
-      "editDisabledInstruction": "To edit a client, delete it and recreate it.",
-      "backToList": "Back to client list",
-      "editTitle": "Edit client",
-      "editSubtitle": "Edit client information",
+      "createAction": "Add member",
+      "editDisabledDetail": "Member editing is no longer available.",
+      "editDisabledInstruction": "To edit a member, delete and recreate them.",
+      "backToList": "Back to member list",
+      "editTitle": "Edit member",
+      "editSubtitle": "Edit member information",
       "saveChanges": "Save changes",
       "fields": {
         "name": "Name *",
@@ -809,17 +811,17 @@
       }
     },
     "quotes": {
-      "title": "Quotes",
-      "subtitle": "Manage your quotes and commercial proposals",
-      "newAction": "Create a quote",
-      "newTitle": "New quote",
-      "newSubtitle": "Create a new quote",
+      "title": "Memberships",
+      "subtitle": "Manage club membership fees",
+      "newAction": "Create membership",
+      "newTitle": "New membership",
+      "newSubtitle": "Create a membership fee for a member",
       "detail": {
-        "deleteConfirm": "Are you sure you want to delete this quote?",
-        "deleteError": "Error deleting the quote",
+        "deleteConfirm": "Are you sure you want to delete this membership?",
+        "deleteError": "Error deleting the membership",
         "deleteErrorFallback": "Error deleting",
-        "convertConfirm": "Convert this quote to an invoice?",
-        "missingClient": "Client missing for this quote",
+        "convertConfirm": "Convert this membership to an invoice?",
+        "missingClient": "Member missing for this membership",
         "convertError": "Error creating the invoice",
         "convertErrorFallback": "Error converting the quote",
         "statusUpdateError": "Error updating status",
@@ -881,7 +883,7 @@
     },
     "invoices": {
       "title": "Invoices",
-      "subtitle": "Manage invoices and track payments",
+      "subtitle": "Invoice sponsors, rentals, events — in 30 seconds",
       "exportAction": "Export",
       "newAction": "Create an invoice",
       "form": {
@@ -971,34 +973,36 @@
       }
     },
     "overview": {
-      "title": "Dashboard",
-      "subtitle": "A clear view to manage your documents and deadlines.",
-      "statusNote": "Your activity is under control",
+      "title": "Club Dashboard",
+      "subtitle": "Overview of your club: members, memberships, finances.",
+      "statusNote": "Your club is under control",
       "checkoutSuccess": "Payment successful! Your account is now Pro.",
       "kpis": {
-        "clients": "Clients",
-        "quotes": "Quotes",
+        "clients": "Members",
+        "quotes": "Memberships",
         "invoices": "Invoices",
         "overdue": "Overdue",
-        "clientsEmpty": "Everything is ready to get started",
+        "clientsEmpty": "Add your first members",
         "quotesPending": "pending",
         "unpaid": "unpaid",
-        "allClear": "All up to date"
+        "allClear": "All up to date",
+        "paidQuotes": "paid",
+        "lateQuotes": "overdue"
       },
       "now": {
         "title": "Handle now",
         "badge": "Priority zone",
-        "empty": "Nothing urgent for now. You stay in control.",
+        "empty": "Nothing urgent for now. Your club is up to date.",
         "dueLabel": "Due:",
         "viewDetail": "View details"
       },
       "types": {
         "expense": "Expense",
         "invoice": "Invoice",
-        "quote": "Quote",
+        "quote": "Membership",
         "expense_due": "Expense due",
         "invoice_followup": "Invoice follow-up",
-        "quote_followup": "Quote follow-up"
+        "quote_followup": "Membership follow-up"
       },
       "calendar": {
         "subtitle": "Link your documents to planned actions to keep a clear view.",
@@ -1009,22 +1013,22 @@
       },
       "quickActions": {
         "title": "Quick actions",
-        "newQuote": "New quote",
-        "newQuoteText": "Prepare a clear quote, ready to send.",
+        "newQuote": "New membership",
+        "newQuoteText": "Create a membership fee for a club member.",
         "newInvoice": "New invoice",
-        "newInvoiceText": "Keep precise tracking of expected payments.",
-        "newClient": "New client",
-        "newClientText": "Centralize your contacts in one place."
+        "newInvoiceText": "Invoice a sponsor, rental, or event.",
+        "newClient": "New member",
+        "newClientText": "Add a member to your club."
       },
       "lastDocuments": {
-        "title": "Latest documents",
-        "empty": "No documents yet.",
+        "title": "Recent activity",
+        "empty": "No activity yet.",
         "created": "Created on"
       }
     },
     "expenses": {
-      "title": "Expenses",
-      "subtitle": "Track supplier invoices and keep control of your due dates.",
+      "title": "Club Expenses",
+      "subtitle": "Manage club expenses: equipment, bar, events...",
       "exportAction": "Export",
       "exportAccountingAction": "Export for accounting",
       "exportAccountingYearLabel": "Accounting year",
@@ -1088,28 +1092,48 @@
     },
     "subscription": {
       "title": "Subscription",
-      "subtitle": "Manage your plan and limits",
+      "subtitle": "Manage your club's subscription",
       "current": "Current",
       "free": {
         "title": "Free Plan",
         "subtitle": "Ideal to get started",
         "features": {
-          "clients": "Up to 2 clients",
+          "clients": "Up to 2 members",
           "documents": "Up to 3 documents per month",
           "core": "All core features"
         }
       },
       "pro": {
         "title": "Pro Plan",
-        "subtitle": "Unlimited access",
+        "subtitle": "Unlimited access for your club",
         "features": {
-          "clients": "Unlimited clients",
+          "clients": "Unlimited members",
           "documents": "Unlimited documents",
           "support": "Priority support",
           "all": "All features"
         },
         "notice": "Payments will be available soon. For now, enjoy the free plan!",
         "cta": "Back to settings"
+      }
+    },
+    "payments": {
+      "title": "Payment History",
+      "subtitle": "View received payments history",
+      "emptyState": "No payments recorded yet.",
+      "columns": {
+        "date": "Date",
+        "member": "Member",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status"
+      },
+      "types": {
+        "membership": "Membership",
+        "invoice": "Invoice"
+      },
+      "status": {
+        "paid": "Paid",
+        "pending": "Pending"
       }
     }
   }

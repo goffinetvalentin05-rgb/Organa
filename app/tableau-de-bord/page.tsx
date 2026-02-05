@@ -78,10 +78,14 @@ export default function TableauDeBordPage() {
     totalClients: 0,
     totalDevis: 0,
     devisEnAttente: 0,
+    devisPayes: 0,
+    devisEnRetard: 0,
     totalFactures: 0,
     facturesNonPayees: 0,
     montantFactureMois: 0,
     montantDepensesMois: 0,
+    montantCotisationsPayees: 0,
+    soldeClub: 0,
   });
 
   const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
@@ -116,12 +120,38 @@ export default function TableauDeBordPage() {
         );
 
         const devisEnAttente = devis.filter((devisItem) => devisItem.statut === "envoye").length;
+        const devisPayes = devis.filter((devisItem) => devisItem.statut === "accepte" || devisItem.statut === "paye").length;
+        const devisEnRetard = devis.filter((devisItem) => {
+          if (devisItem.statut === "accepte" || devisItem.statut === "paye") return false;
+          if (!devisItem.dateEcheance) return false;
+          return isPast(devisItem.dateEcheance);
+        }).length;
         const facturesNonPayees = factures.filter((facture) => facture.statut !== "paye").length;
+        
+        // Calcul du montant des cotisations payées
+        const montantCotisationsPayees = devis
+          .filter((d) => d.statut === "accepte" || d.statut === "paye")
+          .reduce((total, d) => total + getMontantDocument(d), 0);
+        
+        // Calcul du montant des factures payées
+        const montantFacturesPayees = factures
+          .filter((f) => f.statut === "paye")
+          .reduce((total, f) => total + getMontantDocument(f), 0);
+        
+        // Calcul du total des charges payées
+        const totalChargesPayees = depenses
+          .filter((d) => d.statut === "paye")
+          .reduce((total, d) => total + d.montant, 0);
+        
+        // Solde du club = cotisations payées + factures payées - charges payées
+        const soldeClub = montantCotisationsPayees + montantFacturesPayees - totalChargesPayees;
 
         setStats({
           totalClients: clients.length,
           totalDevis: devis.length,
           devisEnAttente,
+          devisPayes,
+          devisEnRetard,
           totalFactures: factures.length,
           facturesNonPayees,
           montantFactureMois: facturesMois.reduce(
@@ -132,6 +162,8 @@ export default function TableauDeBordPage() {
             (total, depense) => total + depense.montant,
             0
           ),
+          montantCotisationsPayees,
+          soldeClub,
         });
 
         const tousDocuments = documents
@@ -154,10 +186,14 @@ export default function TableauDeBordPage() {
           totalClients: 0,
           totalDevis: 0,
           devisEnAttente: 0,
+          devisPayes: 0,
+          devisEnRetard: 0,
           totalFactures: 0,
           facturesNonPayees: 0,
           montantFactureMois: 0,
           montantDepensesMois: 0,
+          montantCotisationsPayees: 0,
+          soldeClub: 0,
         });
         setDerniersDocuments([]);
         setATraiterMaintenant([]);
@@ -289,7 +325,8 @@ export default function TableauDeBordPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Membres */}
         <Link
           href="/tableau-de-bord/clients"
           className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
@@ -310,6 +347,7 @@ export default function TableauDeBordPage() {
           )}
         </Link>
 
+        {/* Cotisations */}
         <Link
           href="/tableau-de-bord/devis"
           className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
@@ -323,18 +361,31 @@ export default function TableauDeBordPage() {
           <div className="text-4xl font-bold text-slate-900">
             {loading ? "-" : stats.totalDevis}
           </div>
-          {!loading && stats.devisEnAttente > 0 && (
-            <p className="mt-2 text-sm font-medium" style={{ color: "var(--obillz-hero-blue)" }}>
-              {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
-            </p>
-          )}
-          {!loading && stats.devisEnAttente === 0 && (
-            <p className="mt-2 text-sm text-slate-400">
-              {t("dashboard.overview.kpis.allClear")}
-            </p>
+          {!loading && (
+            <div className="mt-2 flex flex-wrap gap-2 text-sm">
+              {stats.devisPayes > 0 && (
+                <span className="text-emerald-600 font-medium">
+                  {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
+                </span>
+              )}
+              {stats.devisEnRetard > 0 && (
+                <span className="text-red-500 font-medium">
+                  {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
+                </span>
+              )}
+              {stats.devisEnAttente > 0 && (
+                <span className="font-medium" style={{ color: "var(--obillz-hero-blue)" }}>
+                  {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
+                </span>
+              )}
+              {stats.totalDevis === 0 && (
+                <span className="text-slate-400">{t("dashboard.overview.kpis.allClear")}</span>
+              )}
+            </div>
           )}
         </Link>
 
+        {/* Factures */}
         <Link
           href="/tableau-de-bord/factures"
           className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
@@ -358,6 +409,22 @@ export default function TableauDeBordPage() {
             </p>
           )}
         </Link>
+
+        {/* Solde du club */}
+        <div className="group relative bg-gradient-to-br from-[var(--obillz-hero-blue)] to-blue-700 rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-white/80">Solde du club</span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <Receipt className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          <div className="text-3xl font-bold">
+            {loading ? "-" : formatMontant(stats.soldeClub)}
+          </div>
+          <p className="mt-2 text-sm text-white/70">
+            Cotisations + Factures - Charges
+          </p>
+        </div>
       </div>
 
       {/* À traiter maintenant */}
@@ -415,7 +482,7 @@ export default function TableauDeBordPage() {
             </div>
             <div>
               <p className="font-medium text-emerald-900">{t("dashboard.overview.now.empty")}</p>
-              <p className="text-sm text-emerald-700">Toutes vos factures sont à jour</p>
+              <p className="text-sm text-emerald-700">Toutes les cotisations et factures sont à jour</p>
             </div>
           </div>
         </div>
