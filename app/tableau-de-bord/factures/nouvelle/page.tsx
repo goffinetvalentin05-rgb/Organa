@@ -21,12 +21,19 @@ interface Client {
   adresse: string;
 }
 
+interface Event {
+  id: string;
+  name: string;
+}
+
 export default function NouvelleFacturePage() {
   const router = useRouter();
   const { t, locale } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
   const [clientId, setClientId] = useState("");
+  const [eventId, setEventId] = useState("");
   const [lignes, setLignes] = useState<LigneDocument[]>([
     { id: "1", designation: "", quantite: 1, prixUnitaire: 0, tva: 7.7 },
   ]);
@@ -37,7 +44,7 @@ export default function NouvelleFacturePage() {
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
 
-  // Charger les clients depuis l'API Supabase
+  // Charger les clients et les événements depuis l'API Supabase
   useEffect(() => {
     const loadClients = async () => {
       try {
@@ -59,7 +66,20 @@ export default function NouvelleFacturePage() {
       }
     };
 
+    const loadEvents = async () => {
+      try {
+        const res = await fetch("/api/events", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setEvents(data.events || []);
+        }
+      } catch (error: any) {
+        console.error("[Facture] Erreur chargement événements:", error);
+      }
+    };
+
     loadClients();
+    loadEvents();
   }, []);
 
   const ajouterLigne = () => {
@@ -121,6 +141,7 @@ export default function NouvelleFacturePage() {
           ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
           ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : {}),
           ...(notes && notes.trim() !== "" ? { notes } : {}),
+          ...(eventId ? { eventId } : {}),
         }),
       });
 
@@ -180,6 +201,7 @@ export default function NouvelleFacturePage() {
             ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
             ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : {}),
             ...(notes && notes.trim() !== "" ? { notes } : {}),
+            ...(eventId ? { eventId } : {}),
           }),
         });
 
@@ -325,6 +347,26 @@ export default function NouvelleFacturePage() {
               />
             </div>
           </div>
+
+          {events.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">
+                {t("dashboard.events.fields.type")} (optionnel)
+              </label>
+              <select
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              >
+                <option value="">— Aucun événement lié —</option>
+                {events.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div className="rounded-xl border border-subtle bg-surface p-6">

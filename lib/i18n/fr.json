@@ -478,6 +478,7 @@
       "quotes": "Cotisations",
       "invoices": "Factures",
       "payments": "Paiements",
+      "events": "Événements",
       "qrcodes": "QR Codes",
       "expenses": "Charges",
       "settings": "Paramètres du club"
@@ -490,6 +491,7 @@
       "quotes": "Cotisations",
       "invoices": "Factures",
       "payments": "Historique des paiements",
+      "events": "Événements",
       "qrcodes": "QR Codes",
       "expenses": "Charges du club",
       "settings": "Paramètres du club"
@@ -1100,6 +1102,80 @@
         "submitError": "Erreur lors de l'inscription",
         "notFound": "QR code introuvable",
         "expired": "Cet événement n'accepte plus d'inscriptions"
+      }
+    },
+    "events": {
+      "title": "Événements",
+      "subtitle": "Gérez les événements du club et leur bilan financier",
+      "newEvent": "Nouvel événement",
+      "emptyState": "Aucun événement pour le moment",
+      "emptyCta": "Créer votre premier événement",
+      "loadError": "Erreur lors du chargement des événements",
+      "createError": "Erreur lors de la création de l'événement",
+      "updateError": "Erreur lors de la mise à jour de l'événement",
+      "deleteError": "Erreur lors de la suppression de l'événement",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+      "createSuccess": "Événement créé avec succès",
+      "updateSuccess": "Événement mis à jour avec succès",
+      "limitReached": "Limite du plan gratuit atteinte",
+      "fields": {
+        "name": "Nom de l'événement *",
+        "namePlaceholder": "Ex: Repas de fin de saison, Tournoi annuel...",
+        "type": "Type d'événement",
+        "typePlaceholder": "Sélectionner un type",
+        "createType": "Créer un nouveau type",
+        "newTypeName": "Nom du nouveau type",
+        "startDate": "Date de début *",
+        "endDate": "Date de fin (optionnel)",
+        "description": "Description",
+        "descriptionPlaceholder": "Détails de l'événement...",
+        "status": "Statut"
+      },
+      "status": {
+        "planned": "Planifié",
+        "completed": "Terminé"
+      },
+      "defaultTypes": {
+        "meal": "Repas",
+        "match": "Match",
+        "tournament": "Tournoi",
+        "fundraising": "Événement caritatif",
+        "camp": "Stage / Camp"
+      },
+      "form": {
+        "title": "Nouvel événement",
+        "editTitle": "Modifier l'événement",
+        "subtitle": "Créer un événement pour le club",
+        "createAction": "Créer l'événement",
+        "saveAction": "Enregistrer",
+        "cancel": "Annuler"
+      },
+      "detail": {
+        "backToList": "Retour aux événements",
+        "editAction": "Modifier",
+        "deleteAction": "Supprimer",
+        "financialSummary": "Bilan financier",
+        "totalRevenue": "Total revenus",
+        "totalExpenses": "Total dépenses",
+        "netResult": "Résultat net",
+        "profit": "Bénéfice",
+        "loss": "Perte",
+        "linkedDocuments": "Factures liées",
+        "linkedExpenses": "Charges liées",
+        "noDocuments": "Aucune facture liée",
+        "noExpenses": "Aucune charge liée",
+        "linkDocument": "Lier une facture",
+        "linkExpense": "Lier une charge",
+        "chart": {
+          "title": "Revenus vs Dépenses",
+          "revenue": "Revenus",
+          "expenses": "Dépenses"
+        }
+      },
+      "card": {
+        "noType": "Sans type",
+        "period": "Période",
+        "singleDay": "Le"
       }
     }
   }

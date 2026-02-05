@@ -17,6 +17,12 @@ interface Depense {
   status: DepenseStatut;
   notes?: string;
   attachmentUrl?: string;
+  eventId?: string;
+}
+
+interface Event {
+  id: string;
+  name: string;
 }
 
 const isDatePassee = (value: string) => {
@@ -66,6 +72,7 @@ const getStatutColor = (statut: string) => {
 export default function DepensesPage() {
   const { t, locale } = useI18n();
   const [depenses, setDepenses] = useState<Depense[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const currentYear = new Date().getFullYear();
@@ -88,6 +95,7 @@ export default function DepensesPage() {
     status: "a_payer" as DepenseStatut,
     notes: "",
     pieceJointe: null as File | null,
+    eventId: "",
   });
   const [editFormData, setEditFormData] = useState({
     label: "",
@@ -115,7 +123,20 @@ export default function DepensesPage() {
 
   useEffect(() => {
     void loadDepenses();
+    void loadEvents();
   }, []);
+
+  const loadEvents = async () => {
+    try {
+      const response = await fetch("/api/events", { cache: "no-store" });
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(data?.events || []);
+      }
+    } catch (error) {
+      console.error("[Depenses] Erreur chargement événements:", error);
+    }
+  };
 
   const loadDepenses = async () => {
     setLoading(true);
@@ -206,6 +227,7 @@ export default function DepensesPage() {
       status: "a_payer",
       notes: "",
       pieceJointe: null,
+      eventId: "",
     });
   };
 
@@ -311,6 +333,7 @@ export default function DepensesPage() {
         status: formData.status,
         notes: formData.notes.trim() || null,
         attachmentUrl: attachmentUrl || null,
+        eventId: formData.eventId || null,
       };
 
       console.log("[Depenses][create] user:", user);
@@ -617,6 +640,27 @@ export default function DepensesPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
+          {events.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">
+                {t("dashboard.events.fields.type")} (optionnel)
+              </label>
+              <select
+                value={formData.eventId}
+                onChange={(event) =>
+                  setFormData({ ...formData, eventId: event.target.value })
+                }
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              >
+                <option value="">— Aucun événement lié —</option>
+                {events.map((evt) => (
+                  <option key={evt.id} value={evt.id}>
+                    {evt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
               {t("dashboard.expenses.fields.attachment")}

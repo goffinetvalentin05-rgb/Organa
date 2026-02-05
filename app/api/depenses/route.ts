@@ -78,6 +78,8 @@ export async function POST(request: NextRequest) {
       notes,
       attachmentUrl,
       attachment_url,
+      eventId,
+      event_id,
     } = body || {};
 
     const descriptionValue = label ?? description;
@@ -103,6 +105,7 @@ export async function POST(request: NextRequest) {
       status: status === "paye" ? "paye" : "a_payer",
       notes: notes || null,
       attachment_url: attachment_url ?? attachmentUrl ?? null,
+      event_id: event_id ?? eventId ?? null,
     };
 
     console.log("[API][depenses][POST] user:", user);

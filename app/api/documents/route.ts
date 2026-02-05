@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, clientId, lignes, statut, dateCreation, dateEcheance, datePaiement, notes } = body;
+    const { type, clientId, lignes, statut, dateCreation, dateEcheance, datePaiement, notes, eventId } = body;
 
     // Log du payload reçu pour debugging
     console.log("[API][documents][POST] Payload reçu:", {
@@ -262,6 +262,11 @@ export async function POST(request: NextRequest) {
     // Ajouter notes uniquement si fourni
     if (notes && notes.trim() !== "") {
       documentData.notes = notes;
+    }
+
+    // Ajouter event_id uniquement si fourni
+    if (eventId) {
+      documentData.event_id = eventId;
     }
 
     console.log("[API][documents][POST] Tentative d'insertion dans public.documents:", {
@@ -436,7 +441,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes } = body;
+    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes, eventId } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -506,6 +511,11 @@ export async function PATCH(request: NextRequest) {
       updateData.total_ht = calculerTotalHT(lignes);
       updateData.total_tva = calculerTVA(lignes);
       updateData.total_ttc = calculerTotalTTC(lignes);
+    }
+
+    // Ajouter event_id si fourni
+    if (eventId !== undefined) {
+      updateData.event_id = eventId || null;
     }
 
     if (clientId) {

@@ -479,6 +479,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payments",
+      "events": "Events",
       "qrcodes": "QR Codes",
       "expenses": "Club Expenses",
       "assistant": "AI Assistant",
@@ -494,6 +495,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payment History",
+      "events": "Events",
       "qrcodes": "QR Codes",
       "expenses": "Club Expenses",
       "calendar": "Calendar",
@@ -1249,6 +1251,80 @@
         "submitError": "Registration error",
         "notFound": "QR code not found",
         "expired": "This event is no longer accepting registrations"
+      }
+    },
+    "events": {
+      "title": "Events",
+      "subtitle": "Manage club events and their financial overview",
+      "newEvent": "New event",
+      "emptyState": "No events yet",
+      "emptyCta": "Create your first event",
+      "loadError": "Error loading events",
+      "createError": "Error creating event",
+      "updateError": "Error updating event",
+      "deleteError": "Error deleting event",
+      "deleteConfirm": "Are you sure you want to delete this event?",
+      "createSuccess": "Event created successfully",
+      "updateSuccess": "Event updated successfully",
+      "limitReached": "Free plan limit reached",
+      "fields": {
+        "name": "Event name *",
+        "namePlaceholder": "E.g.: End of season dinner, Annual tournament...",
+        "type": "Event type",
+        "typePlaceholder": "Select a type",
+        "createType": "Create new type",
+        "newTypeName": "New type name",
+        "startDate": "Start date *",
+        "endDate": "End date (optional)",
+        "description": "Description",
+        "descriptionPlaceholder": "Event details...",
+        "status": "Status"
+      },
+      "status": {
+        "planned": "Planned",
+        "completed": "Completed"
+      },
+      "defaultTypes": {
+        "meal": "Meal",
+        "match": "Match",
+        "tournament": "Tournament",
+        "fundraising": "Fundraising event",
+        "camp": "Training camp"
+      },
+      "form": {
+        "title": "New event",
+        "editTitle": "Edit event",
+        "subtitle": "Create an event for the club",
+        "createAction": "Create event",
+        "saveAction": "Save",
+        "cancel": "Cancel"
+      },
+      "detail": {
+        "backToList": "Back to events",
+        "editAction": "Edit",
+        "deleteAction": "Delete",
+        "financialSummary": "Financial summary",
+        "totalRevenue": "Total revenue",
+        "totalExpenses": "Total expenses",
+        "netResult": "Net result",
+        "profit": "Profit",
+        "loss": "Loss",
+        "linkedDocuments": "Linked invoices",
+        "linkedExpenses": "Linked expenses",
+        "noDocuments": "No linked invoices",
+        "noExpenses": "No linked expenses",
+        "linkDocument": "Link an invoice",
+        "linkExpense": "Link an expense",
+        "chart": {
+          "title": "Revenue vs Expenses",
+          "revenue": "Revenue",
+          "expenses": "Expenses"
+        }
+      },
+      "card": {
+        "noType": "No type",
+        "period": "Period",
+        "singleDay": "On"
       }
     }
   }
