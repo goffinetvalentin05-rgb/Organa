@@ -5,6 +5,39 @@ import { getCurrencySymbol } from "@/lib/utils/currency";
 
 type DocumentType = "quote" | "invoice";
 
+/**
+ * Convertit une URL d'image en Data URL (base64)
+ * Cela permet à @react-pdf/renderer de charger l'image de manière fiable
+ */
+async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
+  try {
+    console.log("[pdf-data] Tentative de chargement du logo:", url);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "image/*",
+      },
+    });
+
+    if (!response.ok) {
+      console.warn("[pdf-data] Erreur HTTP lors du chargement du logo:", response.status, response.statusText);
+      return undefined;
+    }
+
+    const contentType = response.headers.get("content-type") || "image/png";
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const dataUrl = `data:${contentType};base64,${base64}`;
+    
+    console.log("[pdf-data] Logo converti en base64 avec succès, taille:", base64.length, "caractères");
+    return dataUrl;
+  } catch (error) {
+    console.error("[pdf-data] Erreur lors de la conversion du logo en base64:", error);
+    return undefined;
+  }
+}
+
 export async function getDocumentPdfData(id: string, type: DocumentType) {
   const supabase = await createClient();
   const {
@@ -24,24 +57,33 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  // Récupérer l'URL du logo - doit être une URL absolue pour @react-pdf/renderer
-  let logoUrl: string | undefined;
+  // Récupérer l'URL du logo depuis le profil
+  let logoSourceUrl: string | undefined;
   if (profile?.logo_url) {
     // Utiliser l'URL stockée directement (déjà absolue depuis l'upload)
-    logoUrl = profile.logo_url;
+    logoSourceUrl = profile.logo_url;
   } else if (profile?.logo_path) {
     // Générer l'URL publique depuis le path (fallback)
     const { data: urlData } = supabase.storage
       .from("Logos")
       .getPublicUrl(profile.logo_path);
-    logoUrl = urlData.publicUrl;
+    logoSourceUrl = urlData.publicUrl;
   }
   
   // Vérifier que l'URL est absolue (commence par http:// ou https://)
-  // Si ce n'est pas le cas, ne pas utiliser le logo pour éviter les erreurs PDF
-  if (logoUrl && !logoUrl.startsWith("http://") && !logoUrl.startsWith("https://")) {
-    console.warn("[pdf-data] Logo URL n'est pas absolue, ignorée:", logoUrl);
-    logoUrl = undefined;
+  if (logoSourceUrl && !logoSourceUrl.startsWith("http://") && !logoSourceUrl.startsWith("https://")) {
+    console.warn("[pdf-data] Logo URL n'est pas absolue, ignorée:", logoSourceUrl);
+    logoSourceUrl = undefined;
+  }
+
+  // Convertir le logo en base64 pour un affichage fiable dans le PDF
+  // @react-pdf/renderer a des difficultés avec les URLs externes en server-side
+  let logoUrl: string | undefined;
+  if (logoSourceUrl) {
+    logoUrl = await fetchImageAsDataUrl(logoSourceUrl);
+    if (!logoUrl) {
+      console.warn("[pdf-data] Impossible de charger le logo, PDF généré sans logo");
+    }
   }
 
   const currency = profile?.currency || "CHF";
@@ -57,7 +99,7 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, nom, email, adresse)"
+      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, name, email, phone, address, postal_code, city, role, category)"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -71,6 +113,9 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
   const client = Array.isArray(document.client)
     ? document.client[0]
     : document.client;
+  
+  // Debug logo URL
+  console.log("[pdf-data] Logo URL finale:", logoUrl || "aucun logo défini");
   const lines = items.map((ligne: any) => {
     const qty = Number(ligne.quantite || 0);
     const unitPrice = Number(ligne.prixUnitaire || 0);
@@ -121,9 +166,14 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
       conditionsPaiement: profile?.payment_terms || "",
     },
     client: {
-      name: client?.nom || "",
-      address: client?.adresse || "",
+      name: client?.name || "",
       email: client?.email || "",
+      phone: client?.phone || "",
+      address: client?.address || "",
+      postalCode: client?.postal_code || "",
+      city: client?.city || "",
+      role: client?.role || "",
+      category: client?.category || "",
     },
     document: {
       number: document.numero || "",

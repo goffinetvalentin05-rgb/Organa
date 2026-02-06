@@ -221,8 +221,13 @@ interface DevisPdfProps {
   };
   client: {
     name: string;
-    address?: string;
     email?: string;
+    phone?: string;
+    address?: string;
+    postalCode?: string;
+    city?: string;
+    role?: string;
+    category?: string;
   };
   document: {
     number: string;
@@ -385,17 +390,38 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
           <View style={styles.clientSection}>
             <Text style={styles.sectionTitle}>{clientLabel}</Text>
             <View style={styles.clientBox}>
+              {/* Nom */}
               <Text style={[styles.clientName, styles.textBlock]}>
                 {client.name}
               </Text>
+              {/* Email */}
+              {client.email && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.email}
+                </Text>
+              )}
+              {/* Téléphone */}
+              {client.phone && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.phone}
+                </Text>
+              )}
+              {/* Adresse (rue) */}
               {client.address && (
                 <Text style={[styles.companyDetails, styles.wrapText]}>
                   {client.address}
                 </Text>
               )}
-              {client.email && (
+              {/* Code postal + Localité sur une seule ligne */}
+              {(client.postalCode || client.city) && (
                 <Text style={[styles.companyDetails, styles.wrapText]}>
-                  {client.email}
+                  {[client.postalCode, client.city].filter(Boolean).join(" ")}
+                </Text>
+              )}
+              {/* Rôle + Catégorie (ex: "Joueur – Équipe réserve") */}
+              {(client.role || client.category) && (
+                <Text style={[styles.companyDetails, styles.wrapText, { marginTop: 4, fontStyle: "italic" }]}>
+                  {[client.role, client.category].filter(Boolean).join(" – ")}
                 </Text>
               )}
             </View>
