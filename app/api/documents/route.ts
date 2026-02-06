@@ -172,8 +172,9 @@ export async function POST(request: NextRequest) {
       .gte("created_at", `${year}-01-01`)
       .lte("created_at", `${year}-12-31`);
     
+    // Préfixe COT pour les cotisations (quotes), FAC pour les factures
     const numero = type === "quote" 
-      ? `DEV-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`
+      ? `COT-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`
       : `FAC-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`;
 
     // Préparer les données d'insertion avec les noms de colonnes exacts

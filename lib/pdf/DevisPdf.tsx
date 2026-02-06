@@ -226,8 +226,6 @@ interface DevisPdfProps {
     address?: string;
     postalCode?: string;
     city?: string;
-    role?: string;
-    category?: string;
   };
   document: {
     number: string;
@@ -254,8 +252,9 @@ interface DevisPdfProps {
   primaryColor?: string;
   // Labels dynamiques pour cotisation vs devis
   documentLabel?: {
-    title: string;      // "COTISATION" ou "DEVIS"
+    title: string;       // "COTISATION" ou "DEVIS"
     clientLabel: string; // "CONCERNE" ou "CLIENT"
+    numberLabel: string; // "Référence" ou "Numéro"
   };
 }
 
@@ -341,6 +340,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   // Labels par défaut : cotisation pour les quotes, devis sinon
   const title = documentLabel?.title || "COTISATION";
   const clientLabel = documentLabel?.clientLabel || "Concerne";
+  const numberLabel = documentLabel?.numberLabel || "Référence";
 
   return (
     <Document>
@@ -371,7 +371,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
               </Text>
               <View style={styles.metaBox}>
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Numéro</Text>
+                  <Text style={styles.metaLabel}>{numberLabel}</Text>
                   <Text>{document.number}</Text>
                 </View>
                 <View style={styles.metaRow}>
@@ -390,38 +390,32 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
           <View style={styles.clientSection}>
             <Text style={styles.sectionTitle}>{clientLabel}</Text>
             <View style={styles.clientBox}>
-              {/* Nom */}
+              {/* 1. Nom (en gras) */}
               <Text style={[styles.clientName, styles.textBlock]}>
                 {client.name}
               </Text>
-              {/* Email */}
-              {client.email && (
-                <Text style={[styles.companyDetails, styles.wrapText]}>
-                  {client.email}
-                </Text>
-              )}
-              {/* Téléphone */}
-              {client.phone && (
-                <Text style={[styles.companyDetails, styles.wrapText]}>
-                  {client.phone}
-                </Text>
-              )}
-              {/* Adresse (rue) */}
+              {/* 2. Adresse (rue) */}
               {client.address && (
                 <Text style={[styles.companyDetails, styles.wrapText]}>
                   {client.address}
                 </Text>
               )}
-              {/* Code postal + Localité sur une seule ligne */}
+              {/* 3. Code postal + Localité sur une seule ligne */}
               {(client.postalCode || client.city) && (
                 <Text style={[styles.companyDetails, styles.wrapText]}>
                   {[client.postalCode, client.city].filter(Boolean).join(" ")}
                 </Text>
               )}
-              {/* Rôle + Catégorie (ex: "Joueur – Équipe réserve") */}
-              {(client.role || client.category) && (
-                <Text style={[styles.companyDetails, styles.wrapText, { marginTop: 4, fontStyle: "italic" }]}>
-                  {[client.role, client.category].filter(Boolean).join(" – ")}
+              {/* 4. Téléphone */}
+              {client.phone && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.phone}
+                </Text>
+              )}
+              {/* 5. Email */}
+              {client.email && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.email}
                 </Text>
               )}
             </View>
