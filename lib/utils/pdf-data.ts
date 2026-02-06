@@ -24,14 +24,24 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
     .eq("user_id", user.id)
     .maybeSingle();
 
+  // Récupérer l'URL du logo - doit être une URL absolue pour @react-pdf/renderer
   let logoUrl: string | undefined;
   if (profile?.logo_url) {
+    // Utiliser l'URL stockée directement (déjà absolue depuis l'upload)
     logoUrl = profile.logo_url;
   } else if (profile?.logo_path) {
+    // Générer l'URL publique depuis le path (fallback)
     const { data: urlData } = supabase.storage
       .from("Logos")
       .getPublicUrl(profile.logo_path);
     logoUrl = urlData.publicUrl;
+  }
+  
+  // Vérifier que l'URL est absolue (commence par http:// ou https://)
+  // Si ce n'est pas le cas, ne pas utiliser le logo pour éviter les erreurs PDF
+  if (logoUrl && !logoUrl.startsWith("http://") && !logoUrl.startsWith("https://")) {
+    console.warn("[pdf-data] Logo URL n'est pas absolue, ignorée:", logoUrl);
+    logoUrl = undefined;
   }
 
   const currency = profile?.currency || "CHF";
@@ -92,6 +102,13 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
 
   const vatRate = lines.length > 0 ? lines[0]?.vat || 0 : 0;
 
+  // Labels dynamiques selon le type de document
+  // Pour les quotes (cotisations), afficher "COTISATION" et "Concerne"
+  // Pour les autres cas (devis classiques), afficher "DEVIS" et "Client"
+  const documentLabel = type === "quote" 
+    ? { title: "COTISATION", clientLabel: "Concerne" }
+    : { title: "DEVIS", clientLabel: "Client" };
+
   return {
     company: {
       name: profile?.company_name || "",
@@ -121,6 +138,7 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
     lines,
     totals,
     primaryColor: companySettings.primary_color,
+    documentLabel,
   };
 }
 

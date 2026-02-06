@@ -28,11 +28,13 @@ export async function GET(request: Request) {
         lines={data.lines}
         totals={data.totals}
         primaryColor={data.primaryColor}
+        documentLabel={data.documentLabel}
       />
     );
 
-    // Nom du fichier avec la date
-    const filename = `devis-${data.document.number || id}-${new Date().toISOString().split("T")[0]}.pdf`;
+    // Nom du fichier avec la date - utiliser "cotisation" pour les quotes
+    const prefix = data.documentLabel?.title === "COTISATION" ? "cotisation" : "devis";
+    const filename = `${prefix}-${data.document.number || id}-${new Date().toISOString().split("T")[0]}.pdf`;
 
     // Retourner le PDF pour téléchargement (attachment)
     return new Response(new Uint8Array(pdfBuffer), {

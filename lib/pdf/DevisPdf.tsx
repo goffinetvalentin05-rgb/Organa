@@ -231,6 +231,7 @@ interface DevisPdfProps {
     currencySymbol?: string;
     vatRate?: number;
     notes?: string;
+    type?: "quote" | "invoice";
   };
   lines: Array<{
     label: string;
@@ -246,6 +247,11 @@ interface DevisPdfProps {
     total: number;
   };
   primaryColor?: string;
+  // Labels dynamiques pour cotisation vs devis
+  documentLabel?: {
+    title: string;      // "COTISATION" ou "DEVIS"
+    clientLabel: string; // "CONCERNE" ou "CLIENT"
+  };
 }
 
 // Fonction pour formater la monnaie
@@ -309,6 +315,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   lines,
   totals,
   primaryColor = "#3B82F6",
+  documentLabel,
 }) => {
   // Styles dynamiques avec la couleur primaire
   const dynamicStyles = StyleSheet.create({
@@ -325,6 +332,10 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   });
 
   const currencySymbol = document.currencySymbol || "€";
+  
+  // Labels par défaut : cotisation pour les quotes, devis sinon
+  const title = documentLabel?.title || "COTISATION";
+  const clientLabel = documentLabel?.clientLabel || "Concerne";
 
   return (
     <Document>
@@ -351,7 +362,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
             </View>
             <View style={styles.documentBlock}>
               <Text style={[styles.documentType, dynamicStyles.documentType]}>
-                DEVIS
+                {title}
               </Text>
               <View style={styles.metaBox}>
                 <View style={styles.metaRow}>
@@ -370,9 +381,9 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
             </View>
           </View>
 
-          {/* Client */}
+          {/* Client / Membre concerné */}
           <View style={styles.clientSection}>
-            <Text style={styles.sectionTitle}>Client</Text>
+            <Text style={styles.sectionTitle}>{clientLabel}</Text>
             <View style={styles.clientBox}>
               <Text style={[styles.clientName, styles.textBlock]}>
                 {client.name}

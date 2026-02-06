@@ -28,6 +28,7 @@ export async function GET(request: Request) {
         lines={data.lines}
         totals={data.totals}
         primaryColor={data.primaryColor}
+        documentLabel={data.documentLabel}
       />
     );
 
