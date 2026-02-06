@@ -20,6 +20,7 @@ import {
   Wallet,
   QrCode,
   Calendar,
+  ClipboardList,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -82,6 +83,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
     { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
+    { name: t("dashboard.nav.plannings") || "Plannings", href: "/tableau-de-bord/plannings", icon: ClipboardList },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
     { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Wallet },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
@@ -105,6 +107,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
     if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
     if (pathname.startsWith("/tableau-de-bord/evenements")) return t("dashboard.pageTitles.events");
+    if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings") || "Plannings";
     if (pathname.startsWith("/tableau-de-bord/qrcodes")) return t("dashboard.pageTitles.qrcodes");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");

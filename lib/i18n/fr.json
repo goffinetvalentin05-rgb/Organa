@@ -479,6 +479,7 @@
       "invoices": "Factures",
       "payments": "Produits",
       "events": "Événements",
+      "plannings": "Plannings",
       "qrcodes": "QR Codes",
       "expenses": "Charges",
       "settings": "Paramètres du club"
@@ -492,6 +493,7 @@
       "invoices": "Factures",
       "payments": "Produits",
       "events": "Événements",
+      "plannings": "Plannings",
       "qrcodes": "QR Codes",
       "expenses": "Charges du club",
       "settings": "Paramètres du club"
