@@ -27,14 +27,7 @@ export default function ConditionsUtilisationPage() {
             />
           </Link>
 
-          <div className="hidden flex-1 justify-center gap-8 md:flex">
-            <Link
-              href="/#demo"
-              className="text-sm font-medium text-white/90 hover:text-white"
-            >
-              Démo
-            </Link>
-          </div>
+          <div className="flex-1" />
 
           <Link
             href="/connexion"
