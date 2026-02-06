@@ -15,6 +15,8 @@ export default function NouveauClientPage() {
     email: "",
     telephone: "",
     adresse: "",
+    postal_code: "",
+    city: "",
     role: "player",
     category: "",
   });
@@ -40,10 +42,13 @@ export default function NouveauClientPage() {
 
     setLoading(true);
 
-    // Préparer les données avec trim() sur le nom
+    // Préparer les données avec trim() sur les champs texte
     const dataToSend = {
       ...formData,
       nom: trimmedNom,
+      adresse: formData.adresse.trim() || "",
+      postal_code: formData.postal_code.trim() || "",
+      city: formData.city.trim() || "",
     };
 
     try {
@@ -175,6 +180,35 @@ export default function NouveauClientPage() {
               rows={3}
               className="input-obillz resize-none"
             />
+          </div>
+
+          {/* Code postal et Localité */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Code postal
+              </label>
+              <input
+                type="text"
+                placeholder="1000"
+                value={formData.postal_code}
+                onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                className="input-obillz"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Localité
+              </label>
+              <input
+                type="text"
+                placeholder="Lausanne"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="input-obillz"
+              />
+            </div>
           </div>
 
           {/* Rôle et Catégorie */}

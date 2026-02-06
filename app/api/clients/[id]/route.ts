@@ -42,7 +42,7 @@ export async function GET(
   // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, email, phone, address, user_id, role, category")
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -61,6 +61,8 @@ export async function GET(
     email: data.email,
     telephone: data.phone,
     adresse: data.address,
+    postal_code: data.postal_code,
+    city: data.city,
     user_id: data.user_id,
     role: data.role,
     category: data.category,
@@ -119,7 +121,7 @@ export async function PUT(
     );
   }
 
-  const { nom, email, telephone, adresse, role, category } = body;
+  const { nom, email, telephone, adresse, postal_code, city, role, category } = body;
 
   // Validation du nom (obligatoire)
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
@@ -138,6 +140,8 @@ export async function PUT(
       email: email || null,
       phone: telephone || null,
       address: adresse || null,
+      postal_code: postal_code || null,
+      city: city || null,
       role: role || "player",
       category: category || null,
     })

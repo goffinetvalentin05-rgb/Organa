@@ -12,6 +12,8 @@ interface Client {
   email: string;
   telephone: string;
   adresse: string;
+  postal_code: string | null;
+  city: string | null;
   user_id: string;
   role: string;
   category: string | null;
@@ -249,7 +251,14 @@ export default function ClientsPage() {
                         </p>
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Adresse</span>
-                          <span className="truncate">{client.adresse || t("dashboard.clients.addressNotProvided")}</span>
+                          <span className="truncate">
+                            {client.adresse || client.postal_code || client.city
+                              ? [
+                                  client.adresse,
+                                  [client.postal_code, client.city].filter(Boolean).join(" ")
+                                ].filter(Boolean).join(", ")
+                              : t("dashboard.clients.addressNotProvided")}
+                          </span>
                         </p>
                       </div>
                     </div>

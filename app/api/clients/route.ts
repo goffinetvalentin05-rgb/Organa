@@ -27,7 +27,7 @@ export async function GET() {
   // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, email, phone, address, user_id, role, category")
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -48,6 +48,8 @@ export async function GET() {
       email: c.email,
       telephone: c.phone,
       adresse: c.address,
+      postal_code: c.postal_code,
+      city: c.city,
       user_id: c.user_id,
       role: c.role,
       category: c.category,
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { nom, email, telephone, adresse, role, category } = body;
+  const { nom, email, telephone, adresse, postal_code, city, role, category } = body;
 
   // Validation du nom (obligatoire)
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
@@ -111,10 +113,12 @@ export async function POST(request: NextRequest) {
       email: email || null,
       phone: telephone || null,
       address: adresse || null,
+      postal_code: postal_code || null,
+      city: city || null,
       role: role || "player",
       category: category || null,
     })
-    .select("id, name, email, phone, address, user_id, role, category")
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
     .single();
 
   if (insertError) {
@@ -139,6 +143,8 @@ export async function POST(request: NextRequest) {
     email: newClient.email,
     telephone: newClient.phone,
     adresse: newClient.address,
+    postal_code: newClient.postal_code,
+    city: newClient.city,
     user_id: newClient.user_id,
     role: newClient.role,
     category: newClient.category,
