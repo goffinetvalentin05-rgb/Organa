@@ -39,9 +39,10 @@ export async function GET(
   }
 
   // Récupérer le client depuis Supabase
+  // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, nom, email, telephone, adresse, user_id, role, category")
+    .select("id, name, email, phone, address, user_id, role, category")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -53,7 +54,19 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({ client: data });
+  // Mapper vers les noms français pour le frontend
+  const client = {
+    id: data.id,
+    nom: data.name,
+    email: data.email,
+    telephone: data.phone,
+    adresse: data.address,
+    user_id: data.user_id,
+    role: data.role,
+    category: data.category,
+  };
+
+  return NextResponse.json({ client });
 }
 
 /* =========================
@@ -117,13 +130,14 @@ export async function PUT(
   }
 
   // Mise à jour dans Supabase
+  // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { error: updateError } = await supabase
     .from("clients")
     .update({
-      nom: nom.trim(),
+      name: nom.trim(),
       email: email || null,
-      telephone: telephone || null,
-      adresse: adresse || null,
+      phone: telephone || null,
+      address: adresse || null,
       role: role || "player",
       category: category || null,
     })

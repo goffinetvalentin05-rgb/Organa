@@ -27,13 +27,30 @@ export default function NouveauClientPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Validation front-end : le nom est obligatoire et ne peut pas être vide
+    const trimmedNom = formData.nom.trim();
+    if (!trimmedNom) {
+      setError({
+        type: "OTHER",
+        message: t("dashboard.clients.nameRequired") || "Le nom est obligatoire",
+      });
+      return;
+    }
+
     setLoading(true);
+
+    // Préparer les données avec trim() sur le nom
+    const dataToSend = {
+      ...formData,
+      nom: trimmedNom,
+    };
 
     try {
       const res = await fetch("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!res.ok) {

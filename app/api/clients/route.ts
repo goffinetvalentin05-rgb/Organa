@@ -24,9 +24,10 @@ export async function GET() {
   }
 
   // Charger les clients depuis Supabase
+  // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, nom, email, telephone, adresse, user_id, role, category")
+    .select("id, name, email, phone, address, user_id, role, category")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -38,10 +39,19 @@ export async function GET() {
     );
   }
 
-  // Filtrer les clients valides (avec ID)
-  const clients = (data || []).filter(
-    (c) => c.id && typeof c.id === "string" && c.user_id === user.id
-  );
+  // Filtrer les clients valides (avec ID) et mapper vers les noms français pour le frontend
+  const clients = (data || [])
+    .filter((c) => c.id && typeof c.id === "string" && c.user_id === user.id)
+    .map((c) => ({
+      id: c.id,
+      nom: c.name,
+      email: c.email,
+      telephone: c.phone,
+      adresse: c.address,
+      user_id: c.user_id,
+      role: c.role,
+      category: c.category,
+    }));
 
   return NextResponse.json({ clients }, { status: 200 });
 }
@@ -92,18 +102,19 @@ export async function POST(request: NextRequest) {
   }
 
   // Insertion dans Supabase
+  // Note: La colonne BD s'appelle "name", on mappe depuis "nom" du formulaire
   const { data: newClient, error: insertError } = await supabase
     .from("clients")
     .insert({
       user_id: user.id,
-      nom: nom.trim(),
+      name: nom.trim(),
       email: email || null,
-      telephone: telephone || null,
-      adresse: adresse || null,
+      phone: telephone || null,
+      address: adresse || null,
       role: role || "player",
       category: category || null,
     })
-    .select("id, nom, email, telephone, adresse, user_id, role, category")
+    .select("id, name, email, phone, address, user_id, role, category")
     .single();
 
   if (insertError) {
@@ -121,8 +132,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Mapper vers les noms français pour le frontend
+  const clientResponse = {
+    id: newClient.id,
+    nom: newClient.name,
+    email: newClient.email,
+    telephone: newClient.phone,
+    adresse: newClient.address,
+    user_id: newClient.user_id,
+    role: newClient.role,
+    category: newClient.category,
+  };
+
   // Invalider le cache
   revalidatePath("/tableau-de-bord/clients");
 
-  return NextResponse.json({ client: newClient }, { status: 201 });
+  return NextResponse.json({ client: clientResponse }, { status: 201 });
 }
