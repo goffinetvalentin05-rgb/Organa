@@ -225,7 +225,7 @@ export default function NouveauDevisPage() {
       if (download) {
         const link = document.createElement("a");
         link.href = url;
-        link.download = `organa-quote-${numero || id}.pdf`;
+        link.download = `obillz-quote-${numero || id}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

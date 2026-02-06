@@ -1,4 +1,4 @@
-// Système de données mock en mémoire pour Organa
+// Système de données mock en mémoire pour Obillz
 
 export interface Client {
   id: string;
@@ -103,8 +103,8 @@ let parametres: Parametres = {
   email: 'contact@monentreprise.fr',
   telephone: '+33 1 23 45 67 89',
   styleEnTete: 'moderne',
-  emailExpediteur: 'noreply@organa.app',
-  nomExpediteur: 'Organa',
+  emailExpediteur: 'noreply@obillz.fr',
+  nomExpediteur: 'Obillz',
   resendApiKey: '', // À configurer dans les paramètres
   iban: 'CH93 0076 2011 6238 5295 7',
   bankName: 'Banque Suisse',

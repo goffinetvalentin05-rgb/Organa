@@ -55,7 +55,7 @@ const buildCsv = (headers: string[], rows: Array<Array<string | number | null | 
 
 const buildFileName = (resource: ExportResource) => {
   const date = new Date().toISOString().slice(0, 10);
-  return `organa-${resource}-${date}.csv`;
+  return `obillz-${resource}-${date}.csv`;
 };
 
 export async function GET(request: NextRequest) {

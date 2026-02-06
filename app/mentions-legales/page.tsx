@@ -12,7 +12,7 @@ export default function MentionsLegalesPage() {
               Mentions légales
             </h1>
             <p className="mt-3 text-sm text-slate-500">
-              Dernière mise à jour : 18 janvier 2026.
+              Dernière mise à jour : 6 février 2026.
             </p>
             <div className="mt-8 space-y-8 text-sm leading-relaxed text-slate-600">
               <div>
@@ -20,10 +20,10 @@ export default function MentionsLegalesPage() {
                   Éditeur du service
                 </h2>
                 <p className="mt-2">
-                  Organa est un service SaaS B2B édité par une société de droit
-                  suisse. Les informations d’identification complètes (raison
-                  sociale, adresse du siège et numéro d’enregistrement) sont
-                  communiquées sur demande légitime à l’adresse de contact.
+                  Obillz est un service SaaS de gestion pour clubs sportifs.
+                  Les informations d'identification complètes (raison sociale,
+                  adresse du siège et numéro d'enregistrement) sont
+                  communiquées sur demande légitime à l'adresse de contact.
                 </p>
               </div>
 
@@ -33,8 +33,8 @@ export default function MentionsLegalesPage() {
                 </h2>
                 <p className="mt-2">
                   Email :{" "}
-                  <a className="text-slate-900 underline" href="mailto:contact@organa.dev">
-                    contact@organa.dev
+                  <a className="text-slate-900 underline" href="mailto:contact@obillz.fr">
+                    contact@obillz.fr
                   </a>
                 </p>
               </div>
@@ -46,7 +46,7 @@ export default function MentionsLegalesPage() {
                 <p className="mt-2">
                   Le service est hébergé sur une infrastructure cloud sécurisée,
                   avec des standards élevés de disponibilité et de protection
-                  des données, située en Europe et/ou en Suisse.
+                  des données, située en Europe.
                 </p>
               </div>
 
@@ -55,8 +55,8 @@ export default function MentionsLegalesPage() {
                   Propriété intellectuelle
                 </h2>
                 <p className="mt-2">
-                  L’ensemble des contenus, marques, logos, interfaces et éléments
-                  visuels liés à Organa sont protégés par le droit de la
+                  L'ensemble des contenus, marques, logos, interfaces et éléments
+                  visuels liés à Obillz sont protégés par le droit de la
                   propriété intellectuelle. Toute reproduction non autorisée est
                   interdite.
                 </p>
@@ -67,9 +67,9 @@ export default function MentionsLegalesPage() {
                   Responsabilité
                 </h2>
                 <p className="mt-2">
-                  Organa met tout en œuvre pour fournir un service fiable et
+                  Obillz met tout en œuvre pour fournir un service fiable et
                   sécurisé. La responsabilité ne saurait être engagée en cas de
-                  perturbation temporaire, d’indisponibilité ou de dommages
+                  perturbation temporaire, d'indisponibilité ou de dommages
                   indirects, sous réserve des dispositions légales impératives
                   applicables.
                 </p>
@@ -77,13 +77,13 @@ export default function MentionsLegalesPage() {
 
               <div>
                 <h2 className="text-base font-semibold text-slate-900">
-                  Signalement d’abus
+                  Signalement d'abus
                 </h2>
                 <p className="mt-2">
                   Pour signaler un contenu illicite ou un usage abusif du
                   service, veuillez contacter{" "}
-                  <a className="text-slate-900 underline" href="mailto:contact@organa.dev">
-                    contact@organa.dev
+                  <a className="text-slate-900 underline" href="mailto:contact@obillz.fr">
+                    contact@obillz.fr
                   </a>
                   .
                 </p>
@@ -96,4 +96,3 @@ export default function MentionsLegalesPage() {
     </div>
   );
 }
-

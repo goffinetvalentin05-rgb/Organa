@@ -1,7 +1,7 @@
 {
   "nav": {
     "login": "Anmelden",
-    "cta": "Organa entdecken"
+    "cta": "Obillz entdecken"
   },
   "landing": {
     "brand": "OBILLZ",
@@ -252,7 +252,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 Organa. Entwickelt in der Schweiz.",
+    "copyright": "© 2026 OBILLZ. Alle Rechte vorbehalten.",
     "login": "Anmelden",
     "signup": "Registrieren",
     "legal": {
@@ -735,7 +735,7 @@
         "subtitleBefore": "Richten Sie den E-Mail-Versand für Angebote und Rechnungen ein. Nutzen Sie",
         "subtitleAfter": "um E-Mails zu versenden.",
         "senderNameLabel": "Absendername",
-        "senderNamePlaceholder": "Organa",
+        "senderNamePlaceholder": "Obillz",
         "senderNameHelp": "Name, der in versendeten E-Mails angezeigt wird",
         "senderEmailLabel": "Absender-E-Mail *",
         "senderEmailPlaceholder": "noreply@ihredomain.com",

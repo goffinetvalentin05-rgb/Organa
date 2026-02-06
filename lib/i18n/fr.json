@@ -1,7 +1,7 @@
 {
   "nav": {
     "login": "Connexion",
-    "cta": "Découvrir Organa"
+    "cta": "Découvrir Obillz"
   },
   "landing": {
     "brand": "OBILLZ",
@@ -252,7 +252,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 Organa. Développé en Suisse.",
+    "copyright": "© 2026 OBILLZ. Tous droits réservés.",
     "login": "Connexion",
     "signup": "Inscription",
     "legal": {

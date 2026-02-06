@@ -1,7 +1,7 @@
 {
   "nav": {
     "login": "Sign in",
-    "cta": "Discover Organa"
+    "cta": "Discover Obillz"
   },
   "landing": {
     "brand": "OBILLZ",
@@ -252,7 +252,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 Organa. Built in Switzerland.",
+    "copyright": "© 2026 OBILLZ. All rights reserved.",
     "login": "Sign in",
     "signup": "Sign up",
     "legal": {
@@ -735,7 +735,7 @@
         "subtitleBefore": "Configure email sending for quotes and invoices. Use",
         "subtitleAfter": "to send emails.",
         "senderNameLabel": "Sender name",
-        "senderNamePlaceholder": "Organa",
+        "senderNamePlaceholder": "Obillz",
         "senderNameHelp": "Name shown in sent emails",
         "senderEmailLabel": "Sender email *",
         "senderEmailPlaceholder": "noreply@yourdomain.com",

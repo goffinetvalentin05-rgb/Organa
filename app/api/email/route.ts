@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     document = documentData;
-    sujet = `Votre ${typeDoc} Organa n°${document.numero || ""}`;
+    sujet = `Votre ${typeDoc} Obillz n°${document.numero || ""}`;
 
     const client = Array.isArray(document.client)
       ? document.client[0]

@@ -12,17 +12,17 @@ export default function PolitiqueCookiesPage() {
               Politique de cookies
             </h1>
             <p className="mt-3 text-sm text-slate-500">
-              Dernière mise à jour : 18 janvier 2026.
+              Dernière mise à jour : 6 février 2026.
             </p>
             <div className="mt-8 space-y-8 text-sm leading-relaxed text-slate-600">
               <div>
                 <h2 className="text-base font-semibold text-slate-900">
-                  Vue d’ensemble
+                  Vue d'ensemble
                 </h2>
                 <p className="mt-2">
-                  Organa utilise des cookies strictement nécessaires au
-                  fonctionnement du service. Aucun cookie de suivi publicitaire
-                  n’est installé par défaut.
+                  Obillz utilise des cookies strictement nécessaires au
+                  fonctionnement du service de gestion pour clubs sportifs.
+                  Aucun cookie de suivi publicitaire n'est installé par défaut.
                 </p>
               </div>
 
@@ -39,10 +39,10 @@ export default function PolitiqueCookiesPage() {
 
               <div>
                 <h2 className="text-base font-semibold text-slate-900">
-                  Mesure d’audience
+                  Mesure d'audience
                 </h2>
                 <p className="mt-2">
-                  Si des statistiques d’usage basiques sont activées, elles
+                  Si des statistiques d'usage basiques sont activées, elles
                   servent uniquement à améliorer le service (performance,
                   stabilité, compréhension des parcours). Ces mesures sont
                   limitées et ne visent pas à vous profiler à des fins
@@ -57,7 +57,7 @@ export default function PolitiqueCookiesPage() {
                 <p className="mt-2">
                   Vous pouvez gérer ou supprimer les cookies via les paramètres
                   de votre navigateur. Le refus des cookies essentiels peut
-                  empêcher l’accès au service ou en dégrader le fonctionnement.
+                  empêcher l'accès au service ou en dégrader le fonctionnement.
                 </p>
               </div>
 
@@ -67,7 +67,7 @@ export default function PolitiqueCookiesPage() {
                 </h2>
                 <p className="mt-2">
                   Les cookies essentiels sont conservés pour la durée de la
-                  session ou selon une durée limitée afin d’assurer la sécurité
+                  session ou selon une durée limitée afin d'assurer la sécurité
                   et la continuité du service.
                 </p>
               </div>
@@ -79,4 +79,3 @@ export default function PolitiqueCookiesPage() {
     </div>
   );
 }
-

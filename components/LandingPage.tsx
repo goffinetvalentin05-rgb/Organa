@@ -63,18 +63,6 @@ export default function LandingPage() {
 
           <div className="hidden flex-1 justify-center gap-8 md:flex">
             <Link
-              href="#fonctionnement"
-              className="text-sm font-medium text-white/90 hover:text-white"
-            >
-              Fonctionnement
-            </Link>
-            <Link
-              href="#fonctionnalites"
-              className="text-sm font-medium text-white/90 hover:text-white"
-            >
-              Fonctionnalités
-            </Link>
-            <Link
               href="#demo"
               className="text-sm font-medium text-white/90 hover:text-white"
             >

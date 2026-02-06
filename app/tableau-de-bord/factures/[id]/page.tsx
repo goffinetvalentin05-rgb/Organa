@@ -268,7 +268,7 @@ export default function FactureDetailPage() {
               console.log("Downloading PDF URL:", url);
               const link = document.createElement("a");
               link.href = url;
-              link.download = `organa-invoice-${facture?.numero || id}.pdf`;
+              link.download = `obillz-invoice-${facture?.numero || id}.pdf`;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);

@@ -12,7 +12,7 @@ export default function PolitiqueConfidentialitePage() {
               Politique de confidentialité (RGPD)
             </h1>
             <p className="mt-3 text-sm text-slate-500">
-              Dernière mise à jour : 18 janvier 2026.
+              Dernière mise à jour : 6 février 2026.
             </p>
             <div className="mt-8 space-y-8 text-sm leading-relaxed text-slate-600">
               <div>
@@ -20,12 +20,12 @@ export default function PolitiqueConfidentialitePage() {
                   Responsable du traitement
                 </h2>
                 <p className="mt-2">
-                  Les données personnelles collectées via Organa sont traitées
-                  par la société éditrice du service, basée en Suisse. Pour
-                  toute question relative à la protection des données, vous
-                  pouvez nous contacter à{" "}
-                  <a className="text-slate-900 underline" href="mailto:contact@organa.dev">
-                    contact@organa.dev
+                  Les données personnelles collectées via Obillz sont traitées
+                  par la société éditrice du service. Pour toute question
+                  relative à la protection des données, vous pouvez nous
+                  contacter à{" "}
+                  <a className="text-slate-900 underline" href="mailto:contact@obillz.fr">
+                    contact@obillz.fr
                   </a>
                   .
                 </p>
@@ -36,12 +36,12 @@ export default function PolitiqueConfidentialitePage() {
                   Données traitées
                 </h2>
                 <p className="mt-2">
-                  Organa collecte uniquement les données nécessaires au
-                  fonctionnement du service, notamment : informations de compte
-                  (nom, email, identifiants), informations de facturation,
-                  données professionnelles saisies par les utilisateurs
-                  (clients, devis, factures, tâches), ainsi que des données
-                  techniques d’accès (logs, sécurité, métriques de performance).
+                  Obillz collecte uniquement les données nécessaires au
+                  fonctionnement du service de gestion pour clubs sportifs,
+                  notamment : informations de compte (nom, email, identifiants),
+                  informations relatives au club (membres, cotisations,
+                  événements, finances), ainsi que des données techniques
+                  d'accès (logs, sécurité, métriques de performance).
                 </p>
               </div>
 
@@ -50,10 +50,11 @@ export default function PolitiqueConfidentialitePage() {
                   Finalités
                 </h2>
                 <p className="mt-2">
-                  Les données sont utilisées pour : fournir et opérer le service,
-                  gérer les comptes et les paiements, sécuriser l’accès, assurer
-                  la maintenance, améliorer l’expérience utilisateur et répondre
-                  aux demandes d’assistance.
+                  Les données sont utilisées pour : fournir et opérer le service
+                  de gestion de club, gérer les comptes et les abonnements,
+                  sécuriser l'accès, assurer la maintenance, améliorer
+                  l'expérience utilisateur et répondre aux demandes
+                  d'assistance.
                 </p>
               </div>
 
@@ -62,9 +63,9 @@ export default function PolitiqueConfidentialitePage() {
                   Base légale
                 </h2>
                 <p className="mt-2">
-                  Les traitements reposent sur l’exécution du contrat (fourniture
-                  du service), le respect d’obligations légales (facturation),
-                  et l’intérêt légitime à sécuriser et améliorer la plateforme.
+                  Les traitements reposent sur l'exécution du contrat (fourniture
+                  du service), le respect d'obligations légales, et l'intérêt
+                  légitime à sécuriser et améliorer la plateforme.
                 </p>
               </div>
 
@@ -73,11 +74,11 @@ export default function PolitiqueConfidentialitePage() {
                   Destinataires et sous-traitants
                 </h2>
                 <p className="mt-2">
-                  Les données sont accessibles aux équipes Organa habilitées et
+                  Les données sont accessibles aux équipes Obillz habilitées et
                   à des prestataires techniques agissant comme sous-traitants
                   (hébergement cloud sécurisé, email transactionnel, support,
-                  paiement). Aucun usage publicitaire n’est réalisé et aucun
-                  partage à des fins de prospection n’est effectué.
+                  paiement). Aucun usage publicitaire n'est réalisé et aucun
+                  partage à des fins de prospection n'est effectué.
                 </p>
               </div>
 
@@ -86,10 +87,10 @@ export default function PolitiqueConfidentialitePage() {
                   Transferts internationaux
                 </h2>
                 <p className="mt-2">
-                  Organa privilégie un hébergement en Suisse et/ou en Europe.
-                  Si un transfert hors de ces zones devait intervenir, il serait
-                  encadré par des garanties appropriées (clauses contractuelles
-                  types ou mécanismes équivalents) conformément au RGPD.
+                  Obillz privilégie un hébergement en Europe. Si un transfert
+                  hors de l'UE devait intervenir, il serait encadré par des
+                  garanties appropriées (clauses contractuelles types ou
+                  mécanismes équivalents) conformément au RGPD.
                 </p>
               </div>
 
@@ -111,9 +112,9 @@ export default function PolitiqueConfidentialitePage() {
                   Sécurité
                 </h2>
                 <p className="mt-2">
-                  Organa met en place des mesures techniques et organisationnelles
-                  adaptées afin de protéger les données contre la perte, l’accès
-                  non autorisé ou l’altération (contrôles d’accès, chiffrement
+                  Obillz met en place des mesures techniques et organisationnelles
+                  adaptées afin de protéger les données contre la perte, l'accès
+                  non autorisé ou l'altération (contrôles d'accès, chiffrement
                   en transit, sauvegardes).
                 </p>
               </div>
@@ -123,16 +124,16 @@ export default function PolitiqueConfidentialitePage() {
                   Vos droits
                 </h2>
                 <p className="mt-2">
-                  Conformément au RGPD et au droit suisse, vous disposez de
-                  droits d’accès, de rectification, d’effacement, de limitation,
-                  d’opposition et de portabilité. Vous pouvez exercer vos droits
-                  en nous contactant à{" "}
-                  <a className="text-slate-900 underline" href="mailto:contact@organa.dev">
-                    contact@organa.dev
+                  Conformément au RGPD, vous disposez de droits d'accès, de
+                  rectification, d'effacement, de limitation, d'opposition et de
+                  portabilité. Vous pouvez exercer vos droits en nous contactant
+                  à{" "}
+                  <a className="text-slate-900 underline" href="mailto:contact@obillz.fr">
+                    contact@obillz.fr
                   </a>
                   . Vous pouvez également déposer une réclamation auprès de
-                  l’autorité de protection des données compétente (PFPDT en
-                  Suisse ou autorité locale au sein de l’UE).
+                  l'autorité de protection des données compétente (CNIL en
+                  France ou autorité locale au sein de l'UE).
                 </p>
               </div>
             </div>
@@ -143,4 +144,3 @@ export default function PolitiqueConfidentialitePage() {
     </div>
   );
 }
-

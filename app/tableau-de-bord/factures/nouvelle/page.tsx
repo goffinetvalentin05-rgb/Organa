@@ -251,7 +251,7 @@ export default function NouvelleFacturePage() {
       if (download) {
         const link = document.createElement("a");
         link.href = url;
-        link.download = `organa-invoice-${numero || id}.pdf`;
+        link.download = `obillz-invoice-${numero || id}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

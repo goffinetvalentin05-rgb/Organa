@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Organa",
-  description: "La gestion simple pour les indépendants",
+  title: "Obillz",
+  description: "La gestion simple pour les clubs sportifs",
 };
 
 export default function RootLayout({
