@@ -16,6 +16,7 @@ import {
   X,
   Edit,
   UserCheck,
+  Download,
 } from "@/lib/icons";
 import toast from "react-hot-toast";
 import { localeToIntl } from "@/lib/i18n";
@@ -94,6 +95,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     notes: "",
   });
   const [addingSlot, setAddingSlot] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -292,6 +294,34 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
            m.email?.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  const handleDownloadPdf = async () => {
+    setDownloading(true);
+    try {
+      const response = await fetch(`/api/pdf/planning/download?id=${id}`);
+      
+      if (!response.ok) {
+        throw new Error("Erreur lors de la génération du PDF");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `planning-${planning?.name || id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success("PDF téléchargé !");
+    } catch (error: any) {
+      console.error("[PlanningDetail] Erreur téléchargement PDF:", error);
+      toast.error(error.message || "Erreur lors du téléchargement");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "published": return "bg-green-100 text-green-700";
@@ -367,6 +397,14 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadPdf}
+            disabled={downloading}
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
+          >
+            <Download className="w-4 h-4" />
+            {downloading ? "Génération..." : "Télécharger PDF"}
+          </button>
           <select
             value={planning.status}
             onChange={(e) => handleUpdateStatus(e.target.value)}
