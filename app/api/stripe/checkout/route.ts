@@ -1,97 +1,95 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
+import { PRICING } from "@/lib/billing/subscription";
 
 export const runtime = "nodejs";
 
+/**
+ * Créer une session Stripe Checkout pour l'abonnement
+ *
+ * Body attendu:
+ * - billingCycle: "monthly" | "yearly" (obligatoire)
+ *
+ * Variables d'environnement requises:
+ * - STRIPE_SECRET_KEY
+ * - STRIPE_PRICE_MONTHLY (price_xxx pour 25 CHF/mois)
+ * - STRIPE_PRICE_YEARLY (price_xxx pour 270 CHF/an)
+ * - NEXT_PUBLIC_APP_URL
+ */
 export async function POST(request: NextRequest) {
-  // TOUJOURS retourner du JSON, JAMAIS de HTML
   try {
-    // DEBUG: Vérifier l'accès aux variables d'environnement
-    console.log("=== DEBUG ENV VARIABLES ===");
-    console.log("process.env.STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY ? "✅ ENV OK" : "❌ ENV MISSING");
-    console.log("process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO:", process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO ? `✅ ENV OK (${process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO})` : "❌ ENV MISSING");
-    console.log("process.env.NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL ? `✅ ENV OK (${process.env.NEXT_PUBLIC_APP_URL})` : "❌ ENV MISSING");
-    console.log("=== END DEBUG ===");
+    // 1. Parser le body pour obtenir le cycle de facturation
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
 
-    // 1. Vérifier les variables d'environnement au démarrage
+    const billingCycle = body.billingCycle as "monthly" | "yearly";
+
+    if (!billingCycle || (billingCycle !== "monthly" && billingCycle !== "yearly")) {
+      return NextResponse.json(
+        {
+          error: "INVALID_BILLING_CYCLE",
+          message: "Le cycle de facturation doit être 'monthly' ou 'yearly'",
+        },
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 2. Vérifier les variables d'environnement
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-    // Liste des variables manquantes
-    const missing: string[] = [];
+    // Sélectionner le price ID selon le cycle
+    const priceId =
+      billingCycle === "yearly"
+        ? process.env.STRIPE_PRICE_YEARLY
+        : process.env.STRIPE_PRICE_MONTHLY;
 
-    // Vérifier STRIPE_SECRET_KEY (OBLIGATOIRE - arrêter immédiatement si manquante)
+    // Fallback vers l'ancienne variable si les nouvelles ne sont pas définies
+    const fallbackPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const finalPriceId = priceId || fallbackPriceId;
+
+    console.log("[API][stripe/checkout] Configuration:", {
+      billingCycle,
+      priceId: finalPriceId ? "✅ Configuré" : "❌ Manquant",
+      appUrl: appUrl ? "✅ Configuré" : "❌ Manquant",
+    });
+
+    // Vérifier STRIPE_SECRET_KEY
     if (!stripeSecretKey || stripeSecretKey.includes("REMPLACEZ")) {
-      console.error("═══════════════════════════════════════════════════════════");
-      console.error("🚨 ERREUR CRITIQUE: STRIPE_SECRET_KEY manquante ou non configurée");
-      console.error("═══════════════════════════════════════════════════════════");
-      console.error("📝 ACTIONS REQUISES:");
-      console.error("   1. Ouvrez votre fichier .env.local à la racine du projet");
-      console.error("   2. Remplacez 'sk_test_REMPLACEZ_PAR_VOTRE_CLE_SECRETE_STRIPE'");
-      console.error("   3. Par votre vraie clé secrète Stripe (sk_test_...)");
-      console.error("   4. Obtenez votre clé sur: https://dashboard.stripe.com/apikeys");
-      console.error("   5. REDÉMARREZ le serveur Next.js (npm run dev)");
-      console.error("═══════════════════════════════════════════════════════════");
-      
+      console.error("🚨 STRIPE_SECRET_KEY manquante ou non configurée");
       return NextResponse.json(
         {
           error: "ENV_MISSING",
           missing: ["STRIPE_SECRET_KEY"],
-          message: "STRIPE_SECRET_KEY n'est pas configurée. Consultez les logs serveur pour les instructions.",
-          help: "Vérifiez votre fichier .env.local et redémarrez le serveur Next.js",
-          critical: true,
+          message: "STRIPE_SECRET_KEY n'est pas configurée.",
         },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
-    } else {
-      console.log("[API][stripe/checkout] ✅ STRIPE_SECRET_KEY configurée");
     }
 
-    // Vérifier NEXT_PUBLIC_STRIPE_PRICE_PRO
-    if (!priceId) {
-      missing.push("NEXT_PUBLIC_STRIPE_PRICE_PRO");
-      console.error("❌ NEXT_PUBLIC_STRIPE_PRICE_PRO manquante dans .env.local");
-      console.error("   Ajoutez: NEXT_PUBLIC_STRIPE_PRICE_PRO=price_1SgRipHvElMyrvJkrgMDLt2w");
-    } else {
-      console.log(`[API][stripe/checkout] ✅ NEXT_PUBLIC_STRIPE_PRICE_PRO: ${priceId}`);
-    }
+    // Vérifier les autres variables
+    const missing: string[] = [];
+    if (!finalPriceId) missing.push(billingCycle === "yearly" ? "STRIPE_PRICE_YEARLY" : "STRIPE_PRICE_MONTHLY");
+    if (!appUrl) missing.push("NEXT_PUBLIC_APP_URL");
 
-    // Vérifier NEXT_PUBLIC_APP_URL
-    if (!appUrl) {
-      missing.push("NEXT_PUBLIC_APP_URL");
-      console.error("❌ NEXT_PUBLIC_APP_URL manquante dans .env.local");
-      console.error("   Ajoutez: NEXT_PUBLIC_APP_URL=http://localhost:3000");
-    } else {
-      console.log(`[API][stripe/checkout] ✅ NEXT_PUBLIC_APP_URL: ${appUrl}`);
-    }
-
-    // Si des variables manquent (sauf STRIPE_SECRET_KEY déjà gérée), retourner une erreur JSON claire
     if (missing.length > 0) {
-      console.error("═══════════════════════════════════════════════════════════");
-      console.error(`🚨 Variables d'environnement manquantes: ${missing.join(", ")}`);
-      console.error("📝 Ajoutez les variables manquantes dans .env.local et redémarrez le serveur");
-      console.error("═══════════════════════════════════════════════════════════");
-      
+      console.error(`🚨 Variables manquantes: ${missing.join(", ")}`);
       return NextResponse.json(
         {
           error: "ENV_MISSING",
-          missing: missing,
-          message: `Variables manquantes: ${missing.join(", ")}. Consultez les logs serveur.`,
-          help: "Vérifiez votre fichier .env.local et redémarrez le serveur Next.js",
+          missing,
+          message: `Variables manquantes: ${missing.join(", ")}`,
         },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // 2. Initialiser Stripe (stripeSecretKey est garanti non-undefined ici)
+    // 3. Initialiser Stripe
     let stripe;
     try {
       stripe = new Stripe(stripeSecretKey!);
@@ -99,63 +97,33 @@ export async function POST(request: NextRequest) {
       console.error("[API][stripe/checkout] Erreur initialisation Stripe:", stripeInitError);
       return NextResponse.json(
         { error: "STRIPE_CHECKOUT_FAILED", details: "Erreur initialisation Stripe" },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // 3. Créer le client Supabase
-    let supabase;
-    try {
-      supabase = await createClient();
-    } catch (supabaseError: any) {
-      console.error("[API][stripe/checkout] Erreur création client Supabase:", supabaseError);
-      return NextResponse.json(
-        { error: "STRIPE_CHECKOUT_FAILED", details: "Erreur configuration Supabase" },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    // 4. Créer le client Supabase et vérifier l'authentification
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    // 4. Vérifier l'authentification
-    let user;
-    let authError;
-    try {
-      const authResult = await supabase.auth.getUser();
-      user = authResult.data.user;
-      authError = authResult.error;
-    } catch (authCheckError: any) {
-      console.error("[API][stripe/checkout] Erreur vérification auth:", authCheckError);
-      return NextResponse.json(
-        { error: "NOT_AUTHENTICATED" },
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Si l'utilisateur n'est pas authentifié, retourner du JSON
     if (authError || !user || !user.id) {
       console.log("[API][stripe/checkout] Utilisateur non authentifié");
       return NextResponse.json(
         { error: "NOT_AUTHENTICATED" },
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
     // 5. Créer la session Stripe Checkout
     console.log("[API][stripe/checkout] Création de la session Stripe Checkout...", {
-      price_id: priceId,
+      billingCycle,
+      price_id: finalPriceId,
       user_id: user.id,
       user_email: user.email,
+      amount: PRICING[billingCycle].amount,
+      currency: PRICING[billingCycle].currency,
     });
 
     let session;
@@ -165,19 +133,20 @@ export async function POST(request: NextRequest) {
         payment_method_types: ["card"],
         line_items: [
           {
-            price: priceId!,
+            price: finalPriceId!,
             quantity: 1,
           },
         ],
         customer_email: user.email || undefined,
         client_reference_id: user.id,
-        success_url: `${appUrl}/tableau-de-bord?checkout=success`,
-        cancel_url: `${appUrl}/tarifs`,
+        success_url: `${appUrl}/tableau-de-bord/parametres?checkout=success&cycle=${billingCycle}`,
+        cancel_url: `${appUrl}/tableau-de-bord/abonnement?checkout=cancelled`,
         metadata: {
           user_id: user.id,
+          billing_cycle: billingCycle,
         },
       });
-      
+
       console.log("[API][stripe/checkout] ✅ Session Stripe créée avec succès", {
         session_id: session.id,
         session_url: session.url ? "✅ URL présente" : "❌ URL manquante",
@@ -186,52 +155,38 @@ export async function POST(request: NextRequest) {
       console.error("[API][stripe/checkout] Erreur Stripe Checkout:", stripeError);
       return NextResponse.json(
         { error: "STRIPE_CHECKOUT_FAILED", details: stripeError.message },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
     // 6. Vérifier que l'URL de la session existe
     if (!session || !session.url) {
-      console.error("[API][stripe/checkout] Session créée mais URL manquante", {
-        session_id: session?.id,
-      });
+      console.error("[API][stripe/checkout] Session créée mais URL manquante");
       return NextResponse.json(
         { error: "STRIPE_CHECKOUT_FAILED", details: "URL de session manquante" },
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
     // 7. Succès - Retourner l'URL
-    console.log("[API][stripe/checkout] Session créée avec succès", {
-      session_id: session.id,
-      user_id: user.id,
-    });
-
     return NextResponse.json(
-      { url: session.url },
       {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
+        url: session.url,
+        sessionId: session.id,
+        billingCycle,
+        amount: PRICING[billingCycle].amount,
+        currency: PRICING[billingCycle].currency,
+      },
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    // Catch toutes les erreurs non gérées
     console.error("[API][stripe/checkout] Erreur inattendue:", error);
     return NextResponse.json(
       {
         error: "STRIPE_CHECKOUT_FAILED",
         details: error.message || "Erreur inconnue",
       },
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }

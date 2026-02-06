@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
+import { requireWriteAccess } from "@/lib/billing/checkAccess";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -98,69 +99,10 @@ export async function POST(request: NextRequest) {
 
     console.log("[API][documents][POST] User authentifié:", user.id);
 
-    // Vérifier le plan de l'utilisateur et les limites
-    const { getPlan } = await import("@/lib/billing/getPlan");
-    const { MAX_DOCS_PER_MONTH_FREE, getLimitErrorMessage } = await import("@/lib/billing/limits");
-
-    let planResult;
-    try {
-      planResult = await getPlan();
-    } catch (error: any) {
-      console.error("[API][documents][POST] Erreur récupération plan", error);
-      return NextResponse.json(
-        { error: "Erreur lors de la vérification du plan" },
-        { status: 500 }
-      );
-    }
-
-    const plan = planResult.plan;
-
-    // Si plan gratuit, vérifier la limite de documents par mois
-    if (plan === "free") {
-      const now = new Date();
-      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-      // Compter les documents du mois depuis Supabase
-      const { count, error: countError } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .gte("created_at", firstDayOfMonth.toISOString())
-        .lte("created_at", lastDayOfMonth.toISOString());
-
-      if (countError) {
-        console.error("[LIMIT][documents] Erreur comptage depuis public.documents:", {
-          status: "ERROR",
-          user_id: user.id,
-          plan: plan,
-          code: countError.code || "UNKNOWN",
-          message: countError.message || "Erreur inconnue",
-          details: countError.details || null,
-          hint: countError.hint || null,
-        });
-        return NextResponse.json(
-          { error: "Erreur lors de la vérification des limites" },
-          { status: 500 }
-        );
-      }
-
-      const totalDocumentsThisMonth = count ?? 0;
-      
-      console.log(`[LIMIT][documents] user=${user.id} plan=${plan} count=${totalDocumentsThisMonth} max=${MAX_DOCS_PER_MONTH_FREE}`);
-
-      if (totalDocumentsThisMonth >= MAX_DOCS_PER_MONTH_FREE) {
-        return NextResponse.json(
-          {
-            error: "LIMIT_REACHED",
-            message: getLimitErrorMessage("documents", plan),
-            limit: MAX_DOCS_PER_MONTH_FREE,
-            current: totalDocumentsThisMonth,
-            plan: plan,
-          },
-          { status: 403 }
-        );
-      }
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
     }
 
     const body = await request.json();
@@ -352,6 +294,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
+    }
+
     const { searchParams } = request.nextUrl;
     const id = searchParams.get("id");
 
@@ -438,6 +386,12 @@ export async function PATCH(request: NextRequest) {
         { error: "Non authentifié" },
         { status: 401 }
       );
+    }
+
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
     }
 
     const body = await request.json();

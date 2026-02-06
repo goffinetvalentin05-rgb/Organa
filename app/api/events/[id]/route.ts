@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireWriteAccess } from "@/lib/billing/checkAccess";
 
 export const runtime = "nodejs";
 
@@ -137,6 +138,12 @@ export async function PUT(
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
+    }
+
     if (!id) {
       return NextResponse.json({ error: "ID de l'événement requis" }, { status: 400 });
     }
@@ -234,6 +241,12 @@ export async function DELETE(
 
     if (authError || !user || !user.id) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
     }
 
     if (!id) {

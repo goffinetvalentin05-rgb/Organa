@@ -2,12 +2,24 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Parametres } from "@/lib/mock-data";
 import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
+
+// Types pour les infos d'abonnement
+interface SubscriptionInfo {
+  status: "trial" | "active" | "expired";
+  billingCycle: "monthly" | "yearly" | null;
+  trialDaysRemaining: number;
+  trialEndsAt: string | null;
+  isTrialExpired: boolean;
+  canWrite: boolean;
+  subscriptionEndsAt: string | null;
+}
 
 function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
@@ -16,15 +28,15 @@ function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
 
   useEffect(() => {
     // Vérifier si on revient d'un paiement réussi
-    const sessionId = searchParams?.get("session_id");
-    if (sessionId) {
-      toast.success(t("dashboard.settings.notifications.paymentSuccess"));
+    const checkoutStatus = searchParams?.get("checkout");
+    if (checkoutStatus === "success") {
+      toast.success("Abonnement activé avec succès !");
       onSuccess();
       // Nettoyer l'URL
       router.replace("/tableau-de-bord/parametres");
     }
 
-    // Vérifier si le paiement a été annulé
+    // Vérifier si le paiement a été annulé (ancien paramètre)
     const canceled = searchParams?.get("canceled");
     if (canceled) {
       toast.error(t("dashboard.settings.notifications.paymentCanceled"));
@@ -40,6 +52,7 @@ export default function ParametresPage() {
   const { t, tList } = useI18n();
   const [parametres, setParametres] = useState<Parametres | null>(null);
   const [userPlan, setUserPlan] = useState<"free" | "pro" | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   // State initial vide - sera hydraté depuis la DB
@@ -242,6 +255,7 @@ export default function ParametresPage() {
       if (response.ok) {
         const data = await parseResponseBody(response);
         setUserPlan(data.user?.plan || "free");
+        setSubscription(data.subscription || null);
       }
     } catch (error) {
       console.error("Erreur lors de la récupération du plan", error);
@@ -557,60 +571,102 @@ export default function ParametresPage() {
 
       {/* Section Abonnement */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.subscription.title")}</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Abonnement</h2>
         
         {loadingPlan ? (
           <p className="text-slate-500">{t("dashboard.common.loading")}</p>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-lg font-medium text-slate-900">
-                  {t("dashboard.settings.subscription.currentPlan")}{" "}
-                  <span style={{ color: "var(--obillz-hero-blue)" }}>{planLabel}</span>
-                </p>
-                {userPlan === "free" && (
-                  <p className="text-sm text-slate-500 mt-1">
-                    {t("dashboard.settings.subscription.freeLimit", {
-                      clients: 2,
-                      documents: 3,
-                    })}
-                  </p>
-                )}
-                {userPlan === "pro" && (
-                  <p className="text-sm text-slate-500 mt-1">
-                    {t("dashboard.settings.subscription.unlimitedAccess")}
-                  </p>
-                )}
-              </div>
-              {userPlan === "free" && (
-                <button
-                  type="button"
-                  onClick={handleUpgradeToPro}
-                  disabled={loadingCheckout}
-                  className="btn-obillz disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingCheckout
-                    ? t("dashboard.common.loading")
-                    : t("dashboard.settings.subscription.upgrade")}
-                </button>
-              )}
-              {userPlan === "pro" && (
-                <div className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-lg font-medium">
-                  {t("dashboard.settings.subscription.proBadge")}
+            {/* Statut de l'abonnement */}
+            {subscription && (
+              <div
+                className={`p-4 rounded-xl border-2 ${
+                  subscription.status === "active"
+                    ? "border-green-500 bg-green-50"
+                    : subscription.status === "trial"
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-red-500 bg-red-50"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {subscription.status === "active" ? (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-green-800">Abonnement actif</p>
+                          <p className="text-sm text-green-700">
+                            {subscription.billingCycle === "yearly" ? "Annuel" : "Mensuel"} – Accès complet
+                          </p>
+                        </div>
+                      </>
+                    ) : subscription.status === "trial" ? (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-blue-800">
+                            Période d'essai – {subscription.trialDaysRemaining} jour{subscription.trialDaysRemaining > 1 ? "s" : ""} restant{subscription.trialDaysRemaining > 1 ? "s" : ""}
+                          </p>
+                          <p className="text-sm text-blue-700">
+                            Profitez de toutes les fonctionnalités
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-red-800">Essai terminé</p>
+                          <p className="text-sm text-red-700">
+                            Abonnez-vous pour continuer
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Bouton d'action */}
+                  {subscription.status !== "active" && (
+                    <Link
+                      href="/tableau-de-bord/abonnement"
+                      className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      {subscription.status === "trial" ? "Voir les tarifs" : "S'abonner"}
+                    </Link>
+                  )}
                 </div>
-              )}
-            </div>
-            {userPlan === "free" && (
-              <div className="mt-4 p-4 rounded-xl border" style={{ backgroundColor: "var(--obillz-blue-light)", borderColor: "var(--obillz-blue-border)" }}>
-                <p className="text-sm text-slate-900 font-medium mb-2">
-                  {t("dashboard.settings.subscription.proOfferTitle")}
-                </p>
-                <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
-                  {proFeatures.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                </ul>
+              </div>
+            )}
+
+            {/* Tarifs rapides */}
+            {subscription && subscription.status !== "active" && (
+              <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                <p className="text-sm font-medium text-slate-900 mb-3">Tarifs</p>
+                <div className="flex gap-4">
+                  <div className="flex-1 p-3 rounded-lg bg-white border border-slate-200">
+                    <p className="text-xs text-slate-500 mb-1">Mensuel</p>
+                    <p className="text-lg font-bold text-slate-900">25 CHF<span className="text-sm font-normal text-slate-500">/mois</span></p>
+                  </div>
+                  <div className="flex-1 p-3 rounded-lg bg-white border-2 border-indigo-500 relative">
+                    <span className="absolute -top-2 right-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                      -10%
+                    </span>
+                    <p className="text-xs text-slate-500 mb-1">Annuel</p>
+                    <p className="text-lg font-bold text-slate-900">270 CHF<span className="text-sm font-normal text-slate-500">/an</span></p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

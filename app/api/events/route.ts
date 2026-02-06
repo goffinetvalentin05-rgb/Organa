@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireWriteAccess } from "@/lib/billing/checkAccess";
 
 export const runtime = "nodejs";
 
@@ -112,6 +113,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
+    // Vérifier l'accès en écriture (trial actif ou abonnement)
+    const accessCheck = await requireWriteAccess();
+    if (accessCheck.response) {
+      return accessCheck.response;
+    }
+
     const body = await request.json();
     const { name, description, startDate, endDate, status, eventTypeId } = body || {};
 
@@ -128,55 +135,6 @@ export async function POST(request: NextRequest) {
         { error: "La date de début est requise" },
         { status: 400 }
       );
-    }
-
-    // Vérifier le plan et les limites
-    const { getPlan } = await import("@/lib/billing/getPlan");
-    const { MAX_EVENTS_FREE, getLimitErrorMessage } = await import("@/lib/billing/limits");
-
-    let planResult;
-    try {
-      planResult = await getPlan();
-    } catch (error: any) {
-      console.error("[API][events][POST] Erreur récupération plan", error);
-      return NextResponse.json(
-        { error: "Erreur lors de la vérification du plan" },
-        { status: 500 }
-      );
-    }
-
-    const plan = planResult.plan;
-
-    // Si plan gratuit, vérifier la limite d'événements
-    if (plan === "free") {
-      const { count, error: countError } = await supabase
-        .from("events")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-
-      if (countError) {
-        console.error("[LIMIT][events] Erreur comptage", { user_id: user.id, error: countError });
-        return NextResponse.json(
-          { error: "Erreur lors de la vérification des limites" },
-          { status: 500 }
-        );
-      }
-
-      const currentCount = count ?? 0;
-      console.log(`[LIMIT][events] user=${user.id} plan=${plan} count=${currentCount} max=${MAX_EVENTS_FREE}`);
-
-      if (currentCount >= MAX_EVENTS_FREE) {
-        return NextResponse.json(
-          {
-            error: "LIMIT_REACHED",
-            message: getLimitErrorMessage("events", plan),
-            limit: MAX_EVENTS_FREE,
-            current: currentCount,
-            plan: plan,
-          },
-          { status: 403 }
-        );
-      }
     }
 
     const payload = {

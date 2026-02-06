@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireWriteAccess } from "@/lib/billing/checkAccess";
 
 export const runtime = "nodejs";
 
@@ -63,6 +64,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Vérifier l'accès en écriture (trial actif ou abonnement)
+  const accessCheck = await requireWriteAccess();
+  if (accessCheck.response) {
+    return accessCheck.response;
+  }
+
   // Parse du body
   let body;
   try {
@@ -82,55 +89,6 @@ export async function POST(request: NextRequest) {
       { error: "Le champ 'nom' est requis" },
       { status: 400 }
     );
-  }
-
-  // Vérifier le plan de l'utilisateur et les limites (source unique de vérité)
-  const { getPlan } = await import("@/lib/billing/getPlan");
-  const { MAX_CLIENTS_FREE, getLimitErrorMessage } = await import("@/lib/billing/limits");
-
-  let planResult;
-  try {
-    planResult = await getPlan();
-  } catch (error: any) {
-    console.error("[API][clients][POST] Erreur récupération plan", error);
-    return NextResponse.json(
-      { error: "Erreur lors de la vérification du plan" },
-      { status: 500 }
-    );
-  }
-
-  const plan = planResult.plan;
-
-  // Si plan gratuit, vérifier la limite de clients
-  if (plan === "free") {
-    const { count, error: countError } = await supabase
-      .from("clients")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
-
-    if (countError) {
-      console.error("[LIMIT][clients] Erreur comptage", { user_id: user.id, error: countError });
-      return NextResponse.json(
-        { error: "Erreur lors de la vérification des limites" },
-        { status: 500 }
-      );
-    }
-
-    const currentCount = count ?? 0;
-    console.log(`[LIMIT][clients] user=${user.id} plan=${plan} count=${currentCount} max=${MAX_CLIENTS_FREE}`);
-
-    if (currentCount >= MAX_CLIENTS_FREE) {
-      return NextResponse.json(
-        {
-          error: "LIMIT_REACHED",
-          message: getLimitErrorMessage("clients", plan),
-          limit: MAX_CLIENTS_FREE,
-          current: currentCount,
-          plan: plan,
-        },
-        { status: 403 }
-      );
-    }
   }
 
   // Insertion dans Supabase
