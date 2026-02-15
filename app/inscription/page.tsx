@@ -23,7 +23,6 @@ function GridBackground() {
 export default function InscriptionPage() {
   const router = useRouter();
 
-  const [nomEntreprise, setNomEntreprise] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -33,11 +32,6 @@ export default function InscriptionPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-
-    if (!nomEntreprise.trim()) {
-      toast.error("Le nom de l'organisation est obligatoire");
-      return;
-    }
 
     if (!email.includes("@")) {
       toast.error("Veuillez entrer une adresse email valide");
@@ -58,12 +52,7 @@ export default function InscriptionPage() {
 
     try {
       const supabase = createClient();
-
-      // 1️⃣ Créer l'utilisateur d'abord (requis pour la FK owner_id → auth.users.id)
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { error: signUpError } = await supabase.auth.signUp({ email, password });
 
       if (signUpError) {
         setErrorMessage(signUpError.message);
@@ -72,30 +61,8 @@ export default function InscriptionPage() {
         return;
       }
 
-      if (!signUpData.user) {
-        throw new Error("User creation failed");
-      }
-
-      const userId = signUpData.user.id;
-
-      // 2️⃣ Créer l'organisation uniquement si l'utilisateur existe
-      const { error: orgError } = await supabase
-        .from("organizations")
-        .insert({
-          name: nomEntreprise.trim(),
-          email: signUpData.user.email,
-          owner_id: userId,
-        });
-
-      if (orgError) {
-        setErrorMessage(orgError.message);
-        toast.error(orgError.message);
-        setLoading(false);
-        return;
-      }
-
       toast.success("Compte créé avec succès ! 🎉");
-      router.push("/tableau-de-bord");
+      router.push("/connexion");
       router.refresh();
     } catch (err: unknown) {
       console.error("Erreur inscription:", err);
@@ -179,21 +146,6 @@ export default function InscriptionPage() {
                     {errorMessage}
                   </div>
                 )}
-
-                <div>
-                  <label htmlFor="nomEntreprise" className="block text-sm font-medium text-slate-700 mb-2">
-                    Nom de l'organisation *
-                  </label>
-                  <input
-                    id="nomEntreprise"
-                    type="text"
-                    placeholder="FC Mon Club"
-                    value={nomEntreprise}
-                    onChange={(e) => setNomEntreprise(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
