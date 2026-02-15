@@ -72,13 +72,11 @@ export default function InscriptionPage() {
         return;
       }
 
-      const userId = signUpData?.user?.id;
-      if (!userId) {
-        setErrorMessage("Utilisateur non créé");
-        toast.error("Utilisateur non créé");
-        setLoading(false);
-        return;
+      if (!signUpData.user) {
+        throw new Error("User creation failed");
       }
+
+      const userId = signUpData.user.id;
 
       // 2️⃣ Créer l'organisation uniquement si l'utilisateur existe
       const { error: orgError } = await supabase
