@@ -59,33 +59,34 @@ export default function InscriptionPage() {
     try {
       const supabase = createClient();
 
-      // 1️⃣ Créer l'utilisateur
-      const { data, error } = await supabase.auth.signUp({
+      // 1️⃣ Créer l'utilisateur d'abord (requis pour la FK owner_id → auth.users.id)
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (error) {
-        setErrorMessage(error.message);
-        toast.error(error.message);
+      if (signUpError) {
+        setErrorMessage(signUpError.message);
+        toast.error(signUpError.message);
         setLoading(false);
         return;
       }
 
-      if (!data.user) {
+      const userId = signUpData?.user?.id;
+      if (!userId) {
         setErrorMessage("Utilisateur non créé");
         toast.error("Utilisateur non créé");
         setLoading(false);
         return;
       }
 
-      // 2️⃣ Créer l'organisation
+      // 2️⃣ Créer l'organisation uniquement si l'utilisateur existe
       const { error: orgError } = await supabase
         .from("organizations")
         .insert({
           name: nomEntreprise.trim(),
-          email: data.user.email,
-          owner_id: data.user.id,
+          email: signUpData.user.email,
+          owner_id: userId,
         });
 
       if (orgError) {
@@ -98,9 +99,9 @@ export default function InscriptionPage() {
       toast.success("Compte créé avec succès ! 🎉");
       router.push("/tableau-de-bord");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erreur inscription:", err);
-      const msg = err.message || "Erreur lors de la création du compte";
+      const msg = err instanceof Error ? err.message : "Erreur lors de la création du compte";
       setErrorMessage(msg);
       toast.error(msg);
     } finally {
