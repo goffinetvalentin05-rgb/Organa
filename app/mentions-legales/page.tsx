@@ -70,9 +70,9 @@ export default function MentionsLegalesPage() {
                   Email :{" "}
                   <a
                     className="font-medium text-[var(--obillz-hero-blue)] hover:underline"
-                    href="mailto:contact@obillz.fr"
+                    href="mailto:contact@obillz.com"
                   >
-                    contact@obillz.fr
+                    contact@obillz.com
                   </a>
                 </p>
               </section>
@@ -122,9 +122,9 @@ export default function MentionsLegalesPage() {
                   service, veuillez contacter{" "}
                   <a
                     className="font-medium text-[var(--obillz-hero-blue)] hover:underline"
-                    href="mailto:contact@obillz.fr"
+                    href="mailto:contact@obillz.com"
                   >
-                    contact@obillz.fr
+                    contact@obillz.com
                   </a>
                   .
                 </p>

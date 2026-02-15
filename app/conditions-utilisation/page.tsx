@@ -128,9 +128,9 @@ export default function ConditionsUtilisationPage() {
                   d'interruption. Le support est fourni par email à{" "}
                   <a
                     className="font-medium text-[var(--obillz-hero-blue)] hover:underline"
-                    href="mailto:contact@obillz.fr"
+                    href="mailto:contact@obillz.com"
                   >
-                    contact@obillz.fr
+                    contact@obillz.com
                   </a>
                   .
                 </p>

@@ -103,7 +103,7 @@ let parametres: Parametres = {
   email: 'contact@monentreprise.fr',
   telephone: '+33 1 23 45 67 89',
   styleEnTete: 'moderne',
-  emailExpediteur: 'noreply@obillz.fr',
+  emailExpediteur: 'noreply@obillz.com',
   nomExpediteur: 'Obillz',
   resendApiKey: '', // À configurer dans les paramètres
   iban: 'CH93 0076 2011 6238 5295 7',

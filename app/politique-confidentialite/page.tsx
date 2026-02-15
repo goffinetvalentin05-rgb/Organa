@@ -61,9 +61,9 @@ export default function PolitiqueConfidentialitePage() {
                   contacter à{" "}
                   <a
                     className="font-medium text-[var(--obillz-hero-blue)] hover:underline"
-                    href="mailto:contact@obillz.fr"
+                    href="mailto:contact@obillz.com"
                   >
-                    contact@obillz.fr
+                    contact@obillz.com
                   </a>
                   .
                 </p>
@@ -168,9 +168,9 @@ export default function PolitiqueConfidentialitePage() {
                   à{" "}
                   <a
                     className="font-medium text-[var(--obillz-hero-blue)] hover:underline"
-                    href="mailto:contact@obillz.fr"
+                    href="mailto:contact@obillz.com"
                   >
-                    contact@obillz.fr
+                    contact@obillz.com
                   </a>
                   . Vous pouvez également déposer une réclamation auprès de
                   l'autorité de protection des données compétente (CNIL en

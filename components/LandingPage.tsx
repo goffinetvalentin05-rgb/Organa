@@ -415,7 +415,7 @@ export default function LandingPage() {
             {/* CTA Boutons */}
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
-                href="mailto:contact@obillz.fr?subject=Demande%20de%20d%C3%A9mo%20Obillz"
+                href="mailto:contact@obillz.com?subject=Demande%20de%20d%C3%A9mo%20Obillz"
                 className="inline-flex items-center justify-center rounded-full px-10 py-4 text-base font-semibold text-white transition-opacity hover:opacity-95"
                 style={{ backgroundColor: "var(--obillz-hero-blue)" }}
               >
