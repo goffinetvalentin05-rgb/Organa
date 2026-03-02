@@ -14,7 +14,7 @@ export async function GET(
 
     const { data: profile, error } = await supabase
       .from("profiles")
-      .select("user_id, company_name")
+      .select("user_id, company_name, logo_url, primary_color")
       .eq("buvette_slug", slug)
       .maybeSingle();
 
@@ -25,6 +25,8 @@ export async function GET(
     return NextResponse.json(
       {
         clubName: profile.company_name || "Club",
+        logoUrl: profile.logo_url || null,
+        primaryColor: profile.primary_color || "#1d4ed8",
       },
       { status: 200 }
     );

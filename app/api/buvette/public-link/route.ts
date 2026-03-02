@@ -16,18 +16,6 @@ export async function GET() {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    const { data: requests, error } = await supabase
-      .from("buvette_requests")
-      .select(
-        "id, reservation_date, status, first_name, last_name, email, phone, event_type, message, created_at"
-      )
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
     const { data: profile } = await supabase
       .from("profiles")
       .select("company_name, buvette_slug")
@@ -43,13 +31,7 @@ export async function GET() {
         .eq("user_id", user.id);
     }
 
-    return NextResponse.json(
-      {
-        requests: requests || [],
-        publicUrlPath: `/club/${slug}/buvette`,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ slug, publicUrlPath: `/club/${slug}/buvette` }, { status: 200 });
   } catch (error: unknown) {
     return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }

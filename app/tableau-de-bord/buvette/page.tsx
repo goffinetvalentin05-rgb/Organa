@@ -42,27 +42,46 @@ export default function BuvettePage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [publicUrlPath, setPublicUrlPath] = useState<string>("");
+  const [loadingLink, setLoadingLink] = useState(true);
 
   const getErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Erreur";
 
+  const getApiError = async (res: Response, fallback: string) => {
+    try {
+      const data = await res.json();
+      return data?.error || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   const loadData = useCallback(async () => {
     setLoading(true);
-    setMessage(null);
     try {
-      const [calendarRes, requestsRes] = await Promise.all([
+      const [calendarRes, requestsRes] = await Promise.allSettled([
         fetch(`/api/buvette/calendar?month=${month}`, { cache: "no-store" }),
         fetch("/api/buvette/requests", { cache: "no-store" }),
       ]);
 
-      if (!calendarRes.ok) throw new Error("Impossible de charger le calendrier");
-      if (!requestsRes.ok) throw new Error("Impossible de charger les demandes");
+      if (calendarRes.status === "fulfilled") {
+        if (calendarRes.value.ok) {
+          const calendarData = await calendarRes.value.json();
+          setDays(calendarData.days || {});
+        } else {
+          setMessage(await getApiError(calendarRes.value, "Impossible de charger le calendrier"));
+        }
+      }
 
-      const calendarData = await calendarRes.json();
-      const requestsData = await requestsRes.json();
-      setDays(calendarData.days || {});
-      setRequests(requestsData.requests || []);
-      setPublicUrlPath(requestsData.publicUrlPath || "");
+      if (requestsRes.status === "fulfilled") {
+        if (requestsRes.value.ok) {
+          const requestsData = await requestsRes.value.json();
+          setRequests(requestsData.requests || []);
+          if (requestsData.publicUrlPath) setPublicUrlPath(requestsData.publicUrlPath);
+        } else {
+          setMessage(await getApiError(requestsRes.value, "Impossible de charger les demandes"));
+        }
+      }
     } catch (error: unknown) {
       setMessage(getErrorMessage(error));
     } finally {
@@ -70,9 +89,30 @@ export default function BuvettePage() {
     }
   }, [month]);
 
+  const loadPublicLink = useCallback(async () => {
+    setLoadingLink(true);
+    try {
+      const res = await fetch("/api/buvette/public-link", { cache: "no-store" });
+      if (!res.ok) {
+        setMessage(await getApiError(res, "Impossible de charger le lien public"));
+        return;
+      }
+      const data = await res.json();
+      setPublicUrlPath(data.publicUrlPath || "");
+    } catch (error: unknown) {
+      setMessage(getErrorMessage(error));
+    } finally {
+      setLoadingLink(false);
+    }
+  }, []);
+
   useEffect(() => {
     void loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    void loadPublicLink();
+  }, [loadPublicLink]);
 
   const grid = useMemo(() => buildMonthGrid(month), [month]);
 
@@ -98,7 +138,7 @@ export default function BuvettePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date: selectedDate, reason: "Événement interne" }),
       });
-      if (!res.ok) throw new Error("Impossible de bloquer la date");
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible de bloquer la date"));
       await loadData();
       setMessage("Date bloquée avec succès");
     } catch (error: unknown) {
@@ -114,7 +154,7 @@ export default function BuvettePage() {
     setMessage(null);
     try {
       const res = await fetch(`/api/buvette/blocks?date=${selectedDate}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Impossible de débloquer la date");
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible de débloquer la date"));
       await loadData();
       setMessage("Date débloquée");
     } catch (error: unknown) {
@@ -133,7 +173,7 @@ export default function BuvettePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ decision }),
       });
-      if (!res.ok) throw new Error("Impossible de traiter la demande");
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible de traiter la demande"));
       await loadData();
       setMessage(decision === "accepted" ? "Demande acceptée" : "Demande refusée");
     } catch (error: unknown) {
@@ -155,7 +195,25 @@ export default function BuvettePage() {
         </div>
         <div className="rounded-xl bg-white border border-slate-200 px-4 py-3 text-sm">
           <p className="font-medium text-slate-700 mb-1">Lien public</p>
-          <p className="text-slate-500 break-all">{publicUrl || "Chargement..."}</p>
+          <p className="text-slate-500 break-all">{loadingLink ? "Chargement..." : publicUrl || "Indisponible"}</p>
+          {!!publicUrl && (
+            <div className="mt-2 flex gap-2">
+              <a
+                href={publicUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs px-2.5 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50"
+              >
+                Ouvrir
+              </a>
+              <button
+                onClick={() => navigator.clipboard.writeText(publicUrl)}
+                className="text-xs px-2.5 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50"
+              >
+                Copier
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -228,6 +286,8 @@ export default function BuvettePage() {
                   ? "Disponible"
                   : selectedDayData.status === "reserved"
                   ? "Réservée"
+                  : selectedRequest
+                  ? "En attente"
                   : "Occupée"}
               </p>
               {selectedDayData?.reason && (

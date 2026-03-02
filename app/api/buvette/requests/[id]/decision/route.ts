@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { sendDecisionToRequester } from "@/lib/buvette/email";
 
 export const runtime = "nodejs";
@@ -20,9 +19,6 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
-
-    const accessCheck = await requireWriteAccess();
-    if (accessCheck.response) return accessCheck.response;
 
     const body = await request.json();
     const decision = body?.decision;

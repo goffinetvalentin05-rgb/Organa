@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
 
 function currentMonthKey() {
@@ -12,11 +13,14 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
   const { slug } = use(params);
   const [month, setMonth] = useState(currentMonthKey());
   const [clubName, setClubName] = useState("Club");
+  const [clubLogoUrl, setClubLogoUrl] = useState<string | null>(null);
+  const [clubColor, setClubColor] = useState("#1d4ed8");
   const [days, setDays] = useState<Record<string, "available" | "occupied" | "reserved">>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -31,6 +35,7 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
     error instanceof Error ? error.message : "Erreur";
 
   const load = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
       const [clubRes, calendarRes] = await Promise.all([
@@ -42,9 +47,13 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
       const clubData = await clubRes.json();
       const calendarData = await calendarRes.json();
       setClubName(clubData.clubName || "Club");
+      setClubLogoUrl(clubData.logoUrl || null);
+      setClubColor(clubData.primaryColor || "#1d4ed8");
       setDays(calendarData.days || {});
     } catch (error: unknown) {
       setError(getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   }, [month, slug]);
 
@@ -53,6 +62,17 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
   }, [load]);
 
   const grid = useMemo(() => buildMonthGrid(month), [month]);
+  const hasAvailableDates = useMemo(
+    () =>
+      grid.some((week) =>
+        week.some((date) => {
+          if (!date) return false;
+          const status = days[date] || "available";
+          return status === "available";
+        })
+      ),
+    [days, grid]
+  );
 
   const goMonth = (delta: number) => {
     const [year, monthNum] = month.split("-").map(Number);
@@ -106,17 +126,43 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-slate-900">Réservation de buvette</h1>
+          {clubLogoUrl ? (
+            <Image
+              src={clubLogoUrl}
+              alt={`Logo ${clubName}`}
+              width={64}
+              height={64}
+              className="w-16 h-16 object-cover rounded-full mx-auto mb-3 border border-slate-200"
+            />
+          ) : (
+            <div
+              className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold"
+              style={{ backgroundColor: clubColor }}
+            >
+              {clubName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Réservation de buvette</h1>
           <p className="text-slate-600 mt-2">{clubName}</p>
         </div>
 
+        {loading && (
+          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-500 text-sm">
+            Chargement du calendrier...
+          </div>
+        )}
         {message && <div className="rounded-lg bg-emerald-50 text-emerald-700 px-4 py-3">{message}</div>}
         {error && <div className="rounded-lg bg-rose-50 text-rose-700 px-4 py-3">{error}</div>}
 
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <div className="flex items-center gap-3 text-xs sm:text-sm mb-3 text-slate-700">
+            <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-500" /> Disponible</span>
+            <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Occupée</span>
+            <span className="inline-flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Réservée</span>
+          </div>
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => goMonth(-1)} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">{"<"}</button>
             <p className="font-semibold text-slate-800">{month}</p>
@@ -146,9 +192,10 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
                       key={date}
                       onClick={() => clickable && setSelectedDate(date)}
                       disabled={!clickable}
-                      className={`h-12 rounded-lg border text-sm font-medium ${cls} ${
+                      className={`h-11 sm:h-12 rounded-lg border text-sm font-medium ${cls} ${
                         isSelected ? "ring-2 ring-slate-700" : ""
                       }`}
+                      title={clickable ? "Date disponible" : "Date non disponible"}
                     >
                       {date.slice(-2)}
                     </button>
@@ -157,6 +204,11 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
               </div>
             ))}
           </div>
+          {!loading && !hasAvailableDates && (
+            <p className="text-sm text-slate-500 mt-4">
+              Aucune date disponible ce mois-ci. Merci de consulter le mois suivant.
+            </p>
+          )}
         </div>
 
         {selectedDate && (
