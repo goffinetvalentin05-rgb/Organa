@@ -43,6 +43,7 @@ export default function BuvettePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [publicUrlPath, setPublicUrlPath] = useState<string>("");
   const [loadingLink, setLoadingLink] = useState(true);
+  const [copying, setCopying] = useState(false);
 
   const getErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Erreur";
@@ -186,6 +187,32 @@ export default function BuvettePage() {
   const publicUrl =
     typeof window !== "undefined" && publicUrlPath ? `${window.location.origin}${publicUrlPath}` : "";
 
+  const copyPublicUrl = async () => {
+    if (!publicUrl) return;
+    setCopying(true);
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(publicUrl);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = publicUrl;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const copied = document.execCommand("copy");
+        document.body.removeChild(textarea);
+        if (!copied) throw new Error("Copie non supportée");
+      }
+      setMessage("Lien public copié dans le presse-papiers");
+    } catch {
+      setMessage("Impossible de copier automatiquement. Copiez le lien manuellement.");
+    } finally {
+      setCopying(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -207,10 +234,11 @@ export default function BuvettePage() {
                 Ouvrir
               </a>
               <button
-                onClick={() => navigator.clipboard.writeText(publicUrl)}
+                onClick={copyPublicUrl}
+                disabled={copying}
                 className="text-xs px-2.5 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50"
               >
-                Copier
+                {copying ? "Copie..." : "Copier"}
               </button>
             </div>
           )}
