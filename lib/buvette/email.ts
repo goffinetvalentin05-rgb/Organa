@@ -28,13 +28,18 @@ function canSend(config: ClubEmailConfig) {
   return Boolean(config.resendApiKey && getFromAddress(config));
 }
 
+function getResendClient(config: ClubEmailConfig): Resend | null {
+  if (!canSend(config) || !config.resendApiKey) return null;
+  return new Resend(config.resendApiKey);
+}
+
 export async function sendRequestReceivedToClub(
   config: ClubEmailConfig,
   payload: RequestPayload,
   manageUrl: string
 ) {
-  if (!canSend(config)) return;
-  const resend = new Resend(config.resendApiKey);
+  const resend = getResendClient(config);
+  if (!resend) return;
   const subject = `Nouvelle demande buvette - ${payload.date}`;
 
   const html = `
@@ -67,8 +72,8 @@ export async function sendPendingConfirmationToRequester(
   config: ClubEmailConfig,
   payload: RequestPayload
 ) {
-  if (!canSend(config)) return;
-  const resend = new Resend(config.resendApiKey);
+  const resend = getResendClient(config);
+  if (!resend) return;
   const subject = `Votre demande buvette est en cours de validation`;
 
   const html = `
@@ -93,8 +98,8 @@ export async function sendDecisionToRequester(
   payload: Pick<RequestPayload, "firstName" | "email" | "date">,
   decision: "accepted" | "refused"
 ) {
-  if (!canSend(config)) return;
-  const resend = new Resend(config.resendApiKey);
+  const resend = getResendClient(config);
+  if (!resend) return;
   const accepted = decision === "accepted";
   const subject = accepted
     ? "Votre réservation buvette est confirmée"
