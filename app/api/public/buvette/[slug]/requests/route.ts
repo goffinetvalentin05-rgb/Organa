@@ -4,6 +4,7 @@ import {
   sendPendingConfirmationToRequester,
   sendRequestReceivedToClub,
 } from "@/lib/buvette/email";
+import { upsertMarketingContact } from "@/lib/marketing/contacts";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
@@ -89,6 +90,16 @@ export async function POST(
     if (createError || !created) {
       return NextResponse.json({ error: createError?.message || "Erreur création demande" }, { status: 500 });
     }
+
+    await upsertMarketingContact({
+      clubId: profile.user_id,
+      firstName,
+      lastName,
+      email,
+      phone,
+      source: "buvette",
+      sourceId: created.id,
+    });
 
     await supabase.from("buvette_slots").insert({
       user_id: profile.user_id,

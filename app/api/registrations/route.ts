@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { upsertMarketingContact } from "@/lib/marketing/contacts";
 
 // POST: Create a new registration (public - no auth required)
 // Uses admin client to bypass RLS for public submissions
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Check if QR code exists and is active
     const { data: qrcode, error: qrError } = await supabase
       .from("qrcodes")
-      .select("id, is_active, name")
+      .select("id, is_active, name, user_id")
       .eq("id", qrcodeId)
       .single();
 
@@ -74,6 +75,18 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("[API][Registrations] Erreur création:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (qrcode.user_id) {
+      await upsertMarketingContact({
+        clubId: qrcode.user_id,
+        firstName,
+        lastName,
+        email,
+        phone,
+        source: "evenement",
+        sourceId: registration.id,
+      });
     }
 
     return NextResponse.json({ registration, eventName: qrcode.name }, { status: 201 });

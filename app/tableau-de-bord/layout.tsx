@@ -21,6 +21,7 @@ import {
   QrCode,
   Calendar,
   ClipboardList,
+  Mail,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -86,6 +87,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.buvette"), href: "/tableau-de-bord/buvette", icon: Calendar },
     { name: t("dashboard.nav.plannings") || "Plannings", href: "/tableau-de-bord/plannings", icon: ClipboardList },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
+    { name: t("dashboard.nav.marketing"), href: "/tableau-de-bord/campagnes-marketing", icon: Mail },
     { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Wallet },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
@@ -111,6 +113,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/buvette")) return t("dashboard.pageTitles.buvette");
     if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings") || "Plannings";
     if (pathname.startsWith("/tableau-de-bord/qrcodes")) return t("dashboard.pageTitles.qrcodes");
+    if (pathname.startsWith("/tableau-de-bord/campagnes-marketing")) return t("dashboard.pageTitles.marketing");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
     return t("dashboard.pageTitles.dashboard");
