@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateBuvetteSlug } from "@/lib/buvette/profile";
+import { buildUniqueSlug } from "@/lib/buvette/slug";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
@@ -28,7 +28,20 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const { slug } = await getOrCreateBuvetteSlug(supabase, user.id);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("company_name, buvette_slug")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let slug = profile?.buvette_slug || null;
+    if (!slug) {
+      slug = buildUniqueSlug(profile?.company_name || "Club", user.id);
+      await supabase
+        .from("profiles")
+        .update({ buvette_slug: slug, updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
+    }
 
     return NextResponse.json(
       {
