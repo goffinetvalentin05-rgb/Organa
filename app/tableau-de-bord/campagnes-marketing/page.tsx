@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type MarketingContact = {
   id: string;
@@ -9,7 +9,6 @@ type MarketingContact = {
   email: string;
   phone: string | null;
   source: string;
-  created_at: string;
   unsubscribed: boolean;
 };
 
@@ -50,10 +49,20 @@ export default function MarketingCampaignsPage() {
   const [audienceSource, setAudienceSource] = useState("");
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
   const editorRef = useRef<HTMLDivElement | null>(null);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
+  const [savingContact, setSavingContact] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    lastName: "",
+    firstName: "",
+    email: "",
+    phone: "",
+    source: "",
+  });
 
   const activeContacts = useMemo(() => contacts.filter((contact) => !contact.unsubscribed), [contacts]);
 
-  const refreshContacts = async () => {
+  const refreshContacts = useCallback(async () => {
     const params = new URLSearchParams();
     if (searchEmail.trim()) params.set("search", searchEmail.trim());
     if (sourceFilter) params.set("source", sourceFilter);
@@ -66,18 +75,18 @@ export default function MarketingCampaignsPage() {
 
     setContacts(data.contacts || []);
     setSources(data.sources || []);
-  };
+  }, [searchEmail, sourceFilter]);
 
-  const refreshCampaigns = async () => {
+  const refreshCampaigns = useCallback(async () => {
     const res = await fetch("/api/marketing/campaigns", { cache: "no-store" });
     const data = await res.json();
     if (!res.ok) {
       throw new Error(data.error || "Erreur chargement campagnes");
     }
     setCampaigns(data.campaigns || []);
-  };
+  }, []);
 
-  const refreshAll = async () => {
+  const refreshAll = useCallback(async () => {
     setLoading(true);
     try {
       await Promise.all([refreshContacts(), refreshCampaigns()]);
@@ -87,11 +96,11 @@ export default function MarketingCampaignsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [refreshCampaigns, refreshContacts]);
 
   useEffect(() => {
     void refreshAll();
-  }, []);
+  }, [refreshAll]);
 
   useEffect(() => {
     if (editorRef.current && !editorRef.current.innerHTML) {
@@ -103,7 +112,7 @@ export default function MarketingCampaignsPage() {
     if (!loading) {
       void refreshContacts();
     }
-  }, [searchEmail, sourceFilter]);
+  }, [loading, refreshContacts]);
 
   const handleDeleteContact = async (id: string) => {
     if (!confirm("Supprimer ce contact ?")) return;
@@ -118,6 +127,75 @@ export default function MarketingCampaignsPage() {
     } catch (error) {
       console.error("[MARKETING][contacts] delete error:", error);
       alert(error instanceof Error ? error.message : "Erreur suppression");
+    }
+  };
+
+  const openCreateContactModal = () => {
+    setEditingContactId(null);
+    setContactForm({
+      lastName: "",
+      firstName: "",
+      email: "",
+      phone: "",
+      source: "",
+    });
+    setContactModalOpen(true);
+  };
+
+  const openEditContactModal = (contact: MarketingContact) => {
+    setEditingContactId(contact.id);
+    setContactForm({
+      lastName: contact.last_name || "",
+      firstName: contact.first_name || "",
+      email: contact.email || "",
+      phone: contact.phone || "",
+      source: contact.source || "",
+    });
+    setContactModalOpen(true);
+  };
+
+  const closeContactModal = () => {
+    setContactModalOpen(false);
+    setEditingContactId(null);
+  };
+
+  const handleSaveContact = async (event: FormEvent) => {
+    event.preventDefault();
+    setSavingContact(true);
+
+    try {
+      const payload = {
+        lastName: contactForm.lastName,
+        firstName: contactForm.firstName,
+        email: contactForm.email,
+        phone: contactForm.phone,
+        source: contactForm.source,
+      };
+
+      const isEdit = Boolean(editingContactId);
+      const endpoint = isEdit
+        ? `/api/marketing/contacts/${editingContactId}`
+        : "/api/marketing/contacts";
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur enregistrement contact");
+      }
+
+      closeContactModal();
+      await refreshContacts();
+    } catch (error) {
+      console.error("[MARKETING][contacts] save error:", error);
+      alert(error instanceof Error ? error.message : "Erreur enregistrement");
+    } finally {
+      setSavingContact(false);
     }
   };
 
@@ -206,26 +284,37 @@ export default function MarketingCampaignsPage() {
 
       {activeTab === "contacts" && (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              type="text"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              placeholder="Rechercher par email"
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
-            <select
-              value={sourceFilter}
-              onChange={(e) => setSourceFilter(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2"
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
+              <input
+                type="text"
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                placeholder="Rechercher par email"
+                className="rounded-lg border border-slate-300 px-3 py-2"
+              />
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="">Toutes les sources</option>
+                {sources.map((source) => (
+                  <option key={source} value={source}>
+                    {source}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={openCreateContactModal}
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-white font-medium whitespace-nowrap"
+              style={{ backgroundColor: "var(--obillz-hero-blue)" }}
             >
-              <option value="">Toutes les sources</option>
-              {sources.map((source) => (
-                <option key={source} value={source}>
-                  {source}
-                </option>
-              ))}
-            </select>
+              ➕ Ajouter un contact
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -237,16 +326,14 @@ export default function MarketingCampaignsPage() {
                   <th className="py-3 pr-4">Email</th>
                   <th className="py-3 pr-4">Téléphone</th>
                   <th className="py-3 pr-4">Source</th>
-                  <th className="py-3 pr-4">Date d&apos;ajout</th>
-                  <th className="py-3 pr-4">Statut</th>
                   <th className="py-3 pr-0">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {contacts.length === 0 ? (
                   <tr>
-                    <td className="py-6 text-slate-500" colSpan={8}>
-                      Aucun contact.
+                    <td className="py-6 text-slate-500" colSpan={6}>
+                      Aucun contact pour le moment
                     </td>
                   </tr>
                 ) : (
@@ -257,24 +344,18 @@ export default function MarketingCampaignsPage() {
                       <td className="py-3 pr-4">{contact.email}</td>
                       <td className="py-3 pr-4">{contact.phone || "-"}</td>
                       <td className="py-3 pr-4">{contact.source}</td>
-                      <td className="py-3 pr-4">{formatDate(contact.created_at)}</td>
-                      <td className="py-3 pr-4">
-                        {contact.unsubscribed ? (
-                          <span className="text-amber-700 bg-amber-100 px-2 py-1 rounded-full text-xs">
-                            Désinscrit
-                          </span>
-                        ) : (
-                          <span className="text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full text-xs">
-                            Actif
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 pr-0">
+                      <td className="py-3 pr-0 flex items-center gap-3">
+                        <button
+                          className="text-slate-700 hover:text-slate-900"
+                          onClick={() => openEditContactModal(contact)}
+                        >
+                          ✏️ Modifier
+                        </button>
                         <button
                           className="text-red-600 hover:text-red-700"
                           onClick={() => handleDeleteContact(contact.id)}
                         >
-                          Supprimer
+                          🗑 Supprimer
                         </button>
                       </td>
                     </tr>
@@ -284,6 +365,76 @@ export default function MarketingCampaignsPage() {
             </table>
           </div>
         </section>
+      )}
+
+      {contactModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50" onClick={closeContactModal} />
+          <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">
+              {editingContactId ? "Modifier un contact" : "Ajouter un contact"}
+            </h3>
+
+            <form onSubmit={handleSaveContact} className="space-y-3">
+              <input
+                type="text"
+                value={contactForm.lastName}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, lastName: e.target.value }))}
+                placeholder="Nom *"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                required
+              />
+              <input
+                type="text"
+                value={contactForm.firstName}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, firstName: e.target.value }))}
+                placeholder="Prénom *"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                required
+              />
+              <input
+                type="email"
+                value={contactForm.email}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="Email *"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                required
+              />
+              <input
+                type="text"
+                value={contactForm.phone}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, phone: e.target.value }))}
+                placeholder="Téléphone"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+              <input
+                type="text"
+                value={contactForm.source}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, source: e.target.value }))}
+                placeholder="Source"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+
+              <div className="pt-2 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeContactModal}
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingContact}
+                  className="px-4 py-2 rounded-lg text-white font-medium disabled:opacity-60"
+                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                >
+                  {savingContact ? "Enregistrement..." : "Enregistrer"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {activeTab === "campaigns" && (
