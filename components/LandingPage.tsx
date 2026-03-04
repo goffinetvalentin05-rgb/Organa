@@ -8,6 +8,7 @@ type Feature = {
   title: string;
   description: string;
   icon: ReactNode;
+  tone: string;
 };
 
 type Faq = {
@@ -15,32 +16,35 @@ type Faq = {
   answer: string;
 };
 
-type Problem = {
-  title: string;
-  description: string;
-};
-
-const problems: Problem[] = [
+const pains = [
   {
-    title: "Organisation dispersée",
-    description: "Excel, messages et documents partout. Les infos sont difficiles à retrouver.",
+    title: "Informations dispersées",
+    description: "Excel, messages, documents : les infos sont partout et difficiles à suivre.",
+    style:
+      "md:col-span-2 border-white/28 bg-white/14",
   },
   {
     title: "Trop d'administratif",
     description:
-      "Les responsables passent trop de temps à organiser au lieu de faire vivre le club.",
+      "Le comité passe trop de temps à organiser au lieu de se concentrer sur la vie du club.",
+    style:
+      "md:col-span-1 md:translate-y-6 border-indigo-200/35 bg-indigo-200/10",
   },
   {
     title: "Communication compliquée",
     description:
-      "Les bénévoles et membres manquent souvent d'informations ou les reçoivent trop tard.",
+      "Bénévoles et membres manquent souvent d'informations au bon moment.",
+    style:
+      "md:col-span-1 border-sky-200/35 bg-sky-200/10",
   },
 ];
 
 const features: Feature[] = [
   {
-    title: "Gestion des membres",
-    description: "Centralisez profils, cotisations et suivi administratif en un seul endroit.",
+    title: "Centralisez toutes les informations de vos membres",
+    description:
+      "Accédez rapidement aux contacts, cotisations et informations importantes depuis un seul espace fiable.",
+    tone: "border-white/30 bg-white/12",
     icon: (
       <path
         strokeLinecap="round"
@@ -51,8 +55,10 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Organisation des événements",
-    description: "Planifiez matchs, tournois et activités avec une vue claire pour l'équipe.",
+    title: "Planifiez vos événements sans perdre de temps",
+    description:
+      "Matchs, tournois et manifestations sont structurés avec une vue claire pour toute l'équipe.",
+    tone: "border-indigo-200/35 bg-indigo-200/10",
     icon: (
       <path
         strokeLinecap="round"
@@ -63,20 +69,10 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Planning des bénévoles",
-    description: "Attribuez les créneaux rapidement et réduisez les oublis le jour J.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.8}
-        d="M4 5h16m-2 0v6a6 6 0 1 1-12 0V5m4 13v2m4-2v2m-9 0h14"
-      />
-    ),
-  },
-  {
-    title: "Buvette / bar",
-    description: "Organisez la buvette plus simplement avec un pilotage fluide au quotidien.",
+    title: "Organisez les bénévoles et la buvette plus sereinement",
+    description:
+      "Attribuez les créneaux facilement et gardez une coordination fluide le jour J.",
+    tone: "border-violet-200/35 bg-violet-200/10",
     icon: (
       <path
         strokeLinecap="round"
@@ -87,8 +83,10 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Communication club",
-    description: "Diffusez les informations importantes au bon moment à tout le club.",
+    title: "Diffusez la bonne information au bon moment",
+    description:
+      "La communication club devient plus claire pour les membres, bénévoles et responsables.",
+    tone: "border-sky-200/35 bg-sky-200/10",
     icon: (
       <path
         strokeLinecap="round"
@@ -100,47 +98,28 @@ const features: Feature[] = [
   },
 ];
 
-const benefits = [
-  {
-    title: "Gain de temps",
-    description: "Moins d'administratif, plus d'énergie pour le sport et la vie du club.",
-  },
-  {
-    title: "Organisation simplifiée",
-    description: "Une plateforme unique pour structurer les opérations du comité.",
-  },
-  {
-    title: "Communication claire",
-    description: "Les bonnes informations arrivent aux bonnes personnes au bon moment.",
-  },
-];
-
 const faqItems: Faq[] = [
   {
-    question: "La plateforme est-elle facile à utiliser ?",
-    answer: "Oui. Obillz est conçu pour les clubs sportifs avec une prise en main rapide.",
+    question: "La plateforme est-elle facile à prendre en main ?",
+    answer:
+      "Oui. Obillz est pensé pour les clubs sportifs, avec une interface claire et rapide à utiliser.",
   },
   {
-    question: "Combien de temps pour démarrer ?",
-    answer: "La plupart des clubs peuvent être opérationnels en moins d'une heure.",
+    question: "Combien de temps faut-il pour démarrer ?",
+    answer:
+      "La plupart des clubs peuvent lancer leur organisation principale en moins d'une heure.",
   },
   {
-    question: "Les membres ont-ils besoin d'une app ?",
-    answer: "Non. Obillz fonctionne directement dans le navigateur, sur mobile et ordinateur.",
+    question: "Les membres doivent-ils installer une application ?",
+    answer:
+      "Non. Obillz fonctionne directement dans le navigateur, sur mobile, tablette et ordinateur.",
   },
   {
-    question: "Quels clubs peuvent utiliser Obillz ?",
-    answer: "Obillz s'adapte aux clubs amateurs et associatifs, quel que soit le sport.",
+    question: "Pour quels clubs Obillz est-il adapté ?",
+    answer:
+      "Obillz convient aux clubs amateurs et associatifs, quel que soit le sport ou la taille.",
   },
 ];
-
-function SectionTag({ children }: { children: string }) {
-  return (
-    <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/90">
-      {children}
-    </p>
-  );
-}
 
 function BlueGrid() {
   return (
@@ -149,26 +128,28 @@ function BlueGrid() {
       style={{
         backgroundImage:
           "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-        backgroundSize: "48px 48px",
+        backgroundSize: "46px 46px",
       }}
     />
   );
 }
 
-function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+function GlassPanel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-[28px] border border-white/20 bg-white/10 p-6 text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-md ${className}`}
+      className={`rounded-[30px] border border-white/22 bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-md ${className}`}
     >
       {children}
     </div>
   );
 }
 
-function ProductPlaceholder({ label }: { label: string }) {
+function ProductPlaceholder({ label, className = "" }: { label: string; className?: string }) {
   return (
-    <div className="relative overflow-hidden rounded-[30px] border border-white/30 bg-white/12 p-7 shadow-[0_26px_70px_rgba(0,0,0,0.24)] backdrop-blur-md">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.15),transparent_45%),radial-gradient(circle_at_100%_100%,rgba(255,255,255,0.12),transparent_45%)]" />
+    <div
+      className={`relative overflow-hidden rounded-[30px] border border-white/30 bg-white/12 p-7 shadow-[0_26px_70px_rgba(0,0,0,0.24)] backdrop-blur-md ${className}`}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.16),transparent_45%),radial-gradient(circle_at_100%_100%,rgba(255,255,255,0.12),transparent_45%)]" />
       <div className="relative rounded-2xl border-2 border-dashed border-white/35 bg-white/8 px-6 py-20 text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/90">{label}</p>
         <p className="mt-3 text-sm text-white/80">Capture produit à venir</p>
@@ -199,14 +180,14 @@ export default function LandingPage() {
             />
           </Link>
           <div className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
-            <Link href="#probleme" className="transition hover:text-white">
-              Problème
+            <Link href="#clubs" className="transition hover:text-white">
+              Clubs
             </Link>
-            <Link href="#solution" className="transition hover:text-white">
-              Solution
+            <Link href="#plateforme" className="transition hover:text-white">
+              Plateforme
             </Link>
-            <Link href="#fonctionnalites" className="transition hover:text-white">
-              Fonctionnalités
+            <Link href="#impact" className="transition hover:text-white">
+              Impact
             </Link>
             <Link href="#faq" className="transition hover:text-white">
               FAQ
@@ -229,13 +210,15 @@ export default function LandingPage() {
         <section className="px-4 pb-14 pt-12 md:px-6 md:pt-20">
           <div className="relative z-10 mx-auto max-w-6xl">
             <div className="mx-auto max-w-4xl text-center">
-              <SectionTag>Plateforme SaaS pour clubs sportifs</SectionTag>
+              <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/90">
+                Pour les clubs sportifs
+              </p>
               <h1 className="mt-7 text-4xl font-bold leading-tight text-white md:text-6xl">
-                La gestion de votre club devient enfin simple et maîtrisée.
+                La gestion des clubs sportifs, enfin simple.
               </h1>
               <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-white/85 md:text-xl">
                 Obillz centralise membres, événements, bénévoles, buvette et communication
-                dans un seul outil moderne.
+                dans une plateforme claire, moderne et accessible à tout le club.
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link
@@ -245,7 +228,7 @@ export default function LandingPage() {
                   Essayer gratuitement
                 </Link>
                 <a
-                  href="#solution"
+                  href="#plateforme"
                   className="rounded-full border border-white/45 bg-transparent px-8 py-4 text-sm font-semibold text-white transition hover:bg-white/10 md:text-base"
                 >
                   Découvrir la plateforme
@@ -258,80 +241,82 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="px-4 py-14 md:px-6 md:py-16">
+        <section id="clubs" className="px-4 py-14 md:px-6 md:py-16">
           <div className="mx-auto max-w-6xl">
-            <GlassCard className="p-8 md:p-10">
-              <div className="mx-auto max-w-3xl text-center">
-                <SectionTag>Le problème</SectionTag>
-                <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
-                  Les clubs sportifs gèrent trop de complexité au quotidien.
+            <GlassPanel className="p-8 md:p-10">
+              <div className="max-w-3xl">
+                <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+                  Gérer un club sportif ne devrait pas être aussi compliqué.
                 </h2>
+                <p className="mt-4 text-base text-white/85 md:text-lg">
+                  La réalité des clubs est souvent la même : trop d'outils, trop de tâches manuelles,
+                  pas assez de visibilité.
+                </p>
               </div>
               <div className="mt-10 grid gap-5 md:grid-cols-3">
-                {problems.map((problem, index) => (
+                {pains.map((pain, index) => (
                   <article
-                    key={problem.title}
-                    className={`rounded-3xl border border-white/25 bg-white/12 p-6 transition duration-300 hover:-translate-y-1.5 hover:bg-white/16 ${
-                      index === 1 ? "md:-translate-y-2" : ""
-                    }`}
+                    key={pain.title}
+                    className={`rounded-3xl border p-6 transition duration-300 hover:-translate-y-1.5 hover:bg-white/18 ${pain.style}`}
                   >
                     <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/10 text-sm font-semibold text-white">
                       {index + 1}
                     </div>
-                    <h3 className="text-xl font-semibold text-white">{problem.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-white/80">{problem.description}</p>
+                    <h3 className="text-xl font-semibold text-white">{pain.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-white/80">{pain.description}</p>
                   </article>
                 ))}
               </div>
-            </GlassCard>
+            </GlassPanel>
           </div>
         </section>
 
-        <section id="solution" className="px-4 py-14 md:px-6 md:py-16">
+        <section id="plateforme" className="px-4 py-14 md:px-6 md:py-16">
           <div className="mx-auto max-w-6xl">
-            <GlassCard className="p-8 md:p-10">
+            <GlassPanel className="p-8 md:p-10">
               <div className="grid gap-10 md:grid-cols-2 md:items-center">
                 <div>
-                  <SectionTag>La solution</SectionTag>
-                  <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
-                    Obillz centralise tout ce dont votre club a besoin.
+                  <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+                    Une plateforme pensée pour simplifier la vie des clubs.
                   </h2>
                   <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg">
-                    Une plateforme claire et accessible pour simplifier l'organisation, fluidifier
-                    la communication et piloter le club en mobilité.
+                    Obillz rassemble les opérations du club dans un seul espace. Le comité gagne en
+                    clarté, les bénévoles sont mieux coordonnés, et tout reste accessible sur mobile.
                   </p>
                   <ul className="mt-8 grid gap-3">
                     <li className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm text-white/90">
-                      Simplicité pour les équipes non techniques
+                      Simplicité d'usage pour tous les profils du club
                     </li>
                     <li className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm text-white/90">
-                      Centralisation de tous les flux du club
+                      Centralisation des données et des actions importantes
                     </li>
                     <li className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm text-white/90">
-                      Utilisation mobile, tablette et ordinateur
+                      Utilisable partout : mobile, tablette et ordinateur
                     </li>
                   </ul>
                 </div>
-                <ProductPlaceholder label="Aperçu plateforme" />
+                <ProductPlaceholder label="Aperçu de la plateforme" />
               </div>
-            </GlassCard>
+            </GlassPanel>
           </div>
         </section>
 
-        <section id="fonctionnalites" className="px-4 py-14 md:px-6 md:py-16">
+        <section className="px-4 py-14 md:px-6 md:py-16">
           <div className="mx-auto max-w-6xl">
-            <div className="mx-auto max-w-3xl text-center">
-              <SectionTag>Fonctionnalités</SectionTag>
-              <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
-                Des modules pensés pour le quotidien d'un club sportif.
+            <div className="max-w-3xl">
+              <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+                Tout ce dont votre club a besoin pour s'organiser.
               </h2>
+              <p className="mt-4 text-base text-white/85 md:text-lg">
+                Chaque module est conçu pour vous faire gagner du temps et réduire la complexité.
+              </p>
             </div>
-            <div className="mt-10 grid gap-5 md:grid-cols-3">
+            <div className="mt-10 grid gap-5 md:grid-cols-2">
               {features.map((feature, index) => (
-                <GlassCard
+                <GlassPanel
                   key={feature.title}
-                  className={`group p-7 transition duration-300 hover:-translate-y-1.5 hover:bg-white/14 ${
-                    index === 1 || index === 4 ? "md:translate-y-7" : ""
+                  className={`group p-7 transition duration-300 hover:-translate-y-1.5 hover:bg-white/14 ${feature.tone} ${
+                    index % 2 === 1 ? "md:translate-y-8" : ""
                   }`}
                 >
                   <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/30 bg-white/10 text-white transition group-hover:scale-105 group-hover:bg-white/20">
@@ -339,66 +324,57 @@ export default function LandingPage() {
                       {feature.icon}
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+                  <h3 className="text-2xl font-semibold leading-tight text-white">{feature.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-white/80">{feature.description}</p>
-                </GlassCard>
+                </GlassPanel>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="px-4 py-14 md:px-6 md:py-16">
+        <section id="impact" className="px-4 py-14 md:px-6 md:py-16">
           <div className="mx-auto max-w-6xl">
-            <div className="grid gap-6 md:grid-cols-[1.1fr_1fr] md:items-stretch">
-              <GlassCard className="p-8 md:p-10">
-                <SectionTag>Bénéfices</SectionTag>
-                <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
-                  Pourquoi les clubs utilisent Obillz.
+            <div className="grid gap-6 md:grid-cols-[1.15fr_1fr] md:items-stretch">
+              <GlassPanel className="p-8 md:p-10">
+                <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+                  Plus de clarté. Moins de charge mentale. Plus de temps pour le sport.
                 </h2>
                 <p className="mt-5 max-w-xl text-base text-white/85 md:text-lg">
-                  Une organisation plus claire pour gagner du temps et mieux coordonner tout le club.
+                  Obillz crée un cadre simple pour organiser le club au quotidien sans alourdir les équipes.
                 </p>
-                <div className="mt-8 grid gap-3">
-                  {benefits.map((benefit, index) => (
-                    <div
-                      key={benefit.title}
-                      className="rounded-2xl border border-white/25 bg-white/10 px-4 py-4 transition hover:bg-white/15"
-                    >
-                      <p className="text-sm font-semibold text-white/85">0{index + 1}</p>
-                      <p className="mt-1 text-lg font-semibold text-white">{benefit.title}</p>
-                      <p className="mt-1 text-sm text-white/80">{benefit.description}</p>
-                    </div>
-                  ))}
+                <div className="mt-8 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-white/25 bg-white/12 p-5">
+                    <p className="text-sm font-semibold text-white/75">Organisation</p>
+                    <p className="mt-2 text-2xl font-semibold text-white">Plus lisible</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/25 bg-white/12 p-5 md:translate-y-5">
+                    <p className="text-sm font-semibold text-white/75">Comité</p>
+                    <p className="mt-2 text-2xl font-semibold text-white">Plus serein</p>
+                  </div>
                 </div>
-              </GlassCard>
+              </GlassPanel>
 
-              <GlassCard className="flex flex-col justify-between p-8 md:p-10">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/75">
-                    Impact
-                  </p>
-                  <p className="mt-4 text-4xl font-bold leading-tight text-white md:text-5xl">
-                    + de clarté
-                    <br />- de charge mentale
-                  </p>
-                </div>
-                <p className="mt-6 text-sm leading-relaxed text-white/80">
-                  Obillz vous aide à structurer durablement le club sans alourdir les équipes.
+              <GlassPanel className="flex flex-col justify-between p-8 md:p-10">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/75">
+                  Impact concret
                 </p>
-              </GlassCard>
+                <p className="mt-4 text-4xl font-bold leading-tight text-white md:text-5xl">
+                  Une gestion pro,
+                  <br />
+                  sans complexité.
+                </p>
+                <p className="mt-6 text-sm leading-relaxed text-white/80">
+                  Le club fonctionne mieux au quotidien, avec des décisions plus rapides et une meilleure coordination.
+                </p>
+              </GlassPanel>
             </div>
           </div>
         </section>
 
         <section id="faq" className="px-4 py-14 md:px-6 md:py-16">
           <div className="mx-auto max-w-4xl">
-            <GlassCard className="p-8 md:p-10">
-              <div className="text-center">
-                <SectionTag>FAQ</SectionTag>
-                <h2 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">
-                  Questions fréquentes
-                </h2>
-              </div>
+            <GlassPanel className="p-8 md:p-10">
+              <h2 className="text-center text-3xl font-bold leading-tight md:text-5xl">FAQ</h2>
               <div className="mt-10 space-y-4">
                 {faqItems.map((item) => (
                   <details
@@ -417,21 +393,20 @@ export default function LandingPage() {
                   </details>
                 ))}
               </div>
-            </GlassCard>
+            </GlassPanel>
           </div>
         </section>
 
         <section className="px-4 pb-20 pt-14 md:px-6 md:pt-16">
           <div className="mx-auto max-w-6xl">
-            <GlassCard className="relative overflow-hidden p-10 text-center md:p-14">
+            <GlassPanel className="relative overflow-hidden p-10 text-center md:p-14">
               <div className="pointer-events-none absolute -left-12 top-2 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
               <div className="pointer-events-none absolute -right-8 bottom-2 h-44 w-44 rounded-full bg-indigo-200/30 blur-3xl" />
-              <SectionTag>Final CTA</SectionTag>
-              <h2 className="mx-auto mt-5 max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl">
-                Lancez votre club dans une gestion moderne avec Obillz.
+              <h2 className="mx-auto max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl">
+                Simplifiez la gestion de votre club dès aujourd'hui.
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-base text-white/85 md:text-lg">
-                Testez la plateforme et découvrez une organisation plus fluide dès aujourd'hui.
+                Reprenez le contrôle sur l'organisation du club avec une plateforme claire et moderne.
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link
@@ -441,13 +416,13 @@ export default function LandingPage() {
                   Essayer gratuitement
                 </Link>
                 <a
-                  href="#solution"
+                  href="#plateforme"
                   className="rounded-full border border-white/45 bg-transparent px-8 py-4 text-sm font-semibold text-white transition hover:bg-white/10 md:text-base"
                 >
                   Découvrir la plateforme
                 </a>
               </div>
-            </GlassCard>
+            </GlassPanel>
           </div>
         </section>
       </main>
