@@ -1,0 +1,255 @@
+[33mcommit 27bbad8416453aac332e20b4e60c65e26b272aec[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 21:37:12 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 35a7228e99917669612a5c58ce70014e1dd8ebdf[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 21:32:04 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 0b3b677a628f8486ca7d29b0921f7de8d3f554ce[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 21:28:48 2026 +0100
+
+    description claire de la modif
+
+[33mcommit c24120c8e36002ac3791f5932c7a5671503cd0f1[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 18:39:47 2026 +0100
+
+    description claire de la modif
+
+[33mcommit cb6cf7f7d3cab377917c8cf95e3a42772ecedb38[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 18:07:30 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 5f8d638476f47c30d1bf19707d164bf296f882ee[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 17:58:32 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 5effe58d59ae8021f73b2e8bc2c31096fad35585[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 17:44:17 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 70f2c4c36b3fdb592626155047edcab9cb754c40[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 17:36:56 2026 +0100
+
+    description claire de la modif
+
+[33mcommit c5c17a91b06552fe5afc95ac9655b78196c21124[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 17:21:15 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 63c292306f08c9f1c40ad5f9482888fc02fe784f[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Mar 4 17:13:10 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 0ef8f275b7acb79f2569d29a93be6faf6db59e04[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 17:01:31 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 95da57e341f008c186131ae96ade41d5aac86033[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:52:54 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 75a098c20c4c21ffe769576206e40275eb8e1ed7[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:33:26 2026 +0100
+
+    description claire de la modif
+
+[33mcommit b275637f4455d5a438ed184a8ad780bf00a735cf[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:24:23 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 6660a4382369c4fbda7eb082b3b48958d38ce956[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:16:18 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 73c7176c450b02ab10870d34824bd072e3c1f95b[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:12:05 2026 +0100
+
+    description claire de la modif
+
+[33mcommit f8c6f857f23ecef5ed78a51be192dbf9be763a38[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Mon Mar 2 16:07:30 2026 +0100
+
+    description claire de la modif
+
+[33mcommit b4604d9086b1c5a9a56fedeec6496a71c5fe3b87[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Sun Feb 15 12:23:30 2026 +0100
+
+    refactor: simplify signup to auth only (remove organization insert)
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+[33mcommit 6a8c96b7672f1e0ae13dd58777760b27ac958752[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Sun Feb 15 12:02:29 2026 +0100
+
+    fix: handle nullable user after signup to fix build error
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+[33mcommit 52965174f5f7caf2f2da668aaf4bd3b06efdf164[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Sun Feb 15 11:49:06 2026 +0100
+
+    fix: correct signup flow to create user before organization
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+[33mcommit d95786fa12d84d608b4997cfba66db88d369ee1c[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Sun Feb 15 11:36:49 2026 +0100
+
+    chore: update contact email to contact@obillz.com
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+[33mcommit f734a4a927e5b665917513c1d51d5a02b70d397b[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:58:21 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 5487307c497bb7067c6f97eb96b2c4353fb40fca[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:54:09 2026 +0100
+
+    description claire de la modif
+
+[33mcommit d9eab2f9ebd7a374157ce6c196456a7596cffded[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:48:02 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 10c17bc504f337676c8441c81b6541ac0a10c6f9[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:35:00 2026 +0100
+
+    description claire de la modif
+
+[33mcommit b2dc366f8d7f735256f088124133babc3e00f647[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:25:55 2026 +0100
+
+    description claire de la modif
+
+[33mcommit f21f6eed7b07d5d3b8bffd19e5bcd8a99752120f[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 14:15:50 2026 +0100
+
+    description claire de la modif
+
+[33mcommit b0c652012c14026b1a405d7fe6416a5f0fde8de9[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 13:34:13 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 044b1d3abdf0dbeea984ddb5c637b7e0ce8cb556[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 13:28:17 2026 +0100
+
+    description claire de la modif
+
+[33mcommit edd12e80aeca62f57b40a78dab5069375a69469f[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 07:53:22 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 937315afe5daaa2ede28d03f7a850fe7a0a8fdd5[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 07:50:20 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 18b194d1177b06c0a97eeb05981e33281197baab[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 07:29:15 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 6a77f3633e5453de073918050eb160e16a578b47[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Fri Feb 6 07:18:35 2026 +0100
+
+    description claire de la modif
+
+[33mcommit de687a0cf4342d3d940c98b8f802cf08e75b6502[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 19:57:32 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 1c2826ccffd3585a113fac0b59d03d35e1aa5559[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 19:42:12 2026 +0100
+
+    description claire de la modif
+
+[33mcommit a252ecc2afe26b100b73b5330e4a28359677614b[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 19:17:24 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 223bc191bcabd4bf5adf8c306cd7b9689409bfaf[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 18:50:50 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 4bcf76bd3c392c8a8125ae50742cf0dbdd693815[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 18:12:03 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 20bdfd0c2c1a802e4d442bb6bfd0bd4218aa9455[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 18:03:48 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 00a6aa9742d35023d61eacc21113a59adea90ed7[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Thu Feb 5 17:50:18 2026 +0100
+
+    description claire de la modif
+
+[33mcommit ad15164733326dd89eba8773a5632955d869642b[m
+Author: Valentin Goffinet <goffinetvalentin05@gmail.com>
+Date:   Wed Feb 4 21:33:10 2026 +0100
+
+    description claire de la modif
+
+[33mcommit 500af20

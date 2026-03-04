@@ -44,8 +44,9 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
     } finally {
       setIsDeleting(false);
     }
+  };
 
-    return (
+  return (
     <button
       onClick={handleDelete}
       disabled={isDeleting}
@@ -60,24 +61,3 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
     </button>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
