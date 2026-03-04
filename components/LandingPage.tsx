@@ -36,10 +36,15 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <main className="relative isolate min-h-screen overflow-hidden text-slate-900">
-      <div className="pointer-events-none absolute inset-0" style={{ backgroundColor: "var(--obillz-hero-blue)" }} />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.18),transparent_44%),radial-gradient(circle_at_82%_80%,rgba(255,255,255,0.12),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-white/93" />
+    <main
+      className="relative isolate min-h-screen overflow-hidden text-slate-900"
+      style={{
+        background:
+          "radial-gradient(circle at 20% 20%, rgba(59,130,246,0.25), transparent 40%), radial-gradient(circle at 80% 60%, rgba(37,99,235,0.2), transparent 40%), #0f172a",
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1000px_560px_at_50%_6%,rgba(255,255,255,0.92),rgba(255,255,255,0.72)_38%,rgba(255,255,255,0.35)_56%,rgba(255,255,255,0)_72%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_100%,rgba(255,255,255,0.08),rgba(255,255,255,0)_70%)]" />
 
       <div className="relative z-10">
         <Hero />
