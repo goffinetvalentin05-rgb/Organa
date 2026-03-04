@@ -15,6 +15,11 @@ type Faq = {
   answer: string;
 };
 
+type Problem = {
+  title: string;
+  description: string;
+};
+
 const features: Feature[] = [
   {
     title: "Gestion des membres",
@@ -66,21 +71,39 @@ const features: Feature[] = [
   },
 ];
 
-const reasons = [
+const problems: Problem[] = [
+  {
+    title: "Organisation dispersée",
+    description:
+      "Les informations sont réparties entre Excel, messages et documents.",
+  },
+  {
+    title: "Temps administratif",
+    description:
+      "Les responsables passent trop de temps à organiser plutôt qu’à développer le club.",
+  },
+  {
+    title: "Manque de visibilité",
+    description:
+      "Les bénévoles et membres ne savent pas toujours où trouver les informations.",
+  },
+];
+
+const benefits = [
   {
     title: "Gain de temps",
     description:
-      "Fini les allers-retours entre fichiers, messages et tableaux. Vous pilotez tout depuis un seul outil.",
+      "Automatisez la coordination et réduisez les tâches administratives.",
   },
   {
-    title: "Moins d’erreurs",
+    title: "Organisation simplifiée",
     description:
-      "Les informations sont centralisées et partagées avec la bonne personne au bon moment.",
+      "Tout le club s’appuie sur une source unique d’information.",
   },
   {
     title: "Plus simple pour tous",
     description:
-      "Comité, bénévoles et membres accèdent facilement aux infos utiles, sur mobile comme sur ordinateur.",
+      "Comité, bénévoles et membres trouvent rapidement ce dont ils ont besoin.",
   },
 ];
 
@@ -120,88 +143,47 @@ function GridBackground() {
   );
 }
 
-function SectionTitle({
-  overline,
+function SectionHeader({
   title,
   description,
+  dark = false,
 }: {
-  overline: string;
   title: string;
   description: string;
+  dark?: boolean;
 }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--obillz-hero-blue)]">
-        {overline}
-      </p>
-      <h2 className="mt-4 text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
+      <h2
+        className={`text-3xl font-bold leading-tight md:text-5xl ${
+          dark ? "text-white" : "text-slate-900"
+        }`}
+      >
         {title}
       </h2>
-      <p className="mt-4 text-base text-slate-600 md:text-lg">{description}</p>
+      <p className={`mt-4 text-base md:text-lg ${dark ? "text-slate-200" : "text-slate-600"}`}>
+        {description}
+      </p>
     </div>
   );
 }
 
-function DashboardPreview() {
+function ProductPlaceholder({
+  className,
+  label,
+}: {
+  className?: string;
+  label: string;
+}) {
   return (
-    <div className="relative mt-14 w-full max-w-5xl animate-fade-in-up">
-      <div className="absolute -inset-1 rounded-[30px] bg-white/30 blur-2xl" aria-hidden />
-      <div className="relative overflow-hidden rounded-[28px] border border-white/30 bg-white/95 shadow-2xl">
-        <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-          <span className="ml-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Aperçu plateforme Obillz
-          </span>
-        </div>
-
-        <div className="grid gap-4 bg-slate-50 p-4 md:grid-cols-[1.25fr_1fr] md:p-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Prochains événements
-            </p>
-            <div className="mt-4 space-y-3">
-              {[
-                "Match seniors - 14h00",
-                "Tournoi jeunes - Samedi",
-                "Permanence buvette - Dimanche",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2"
-                >
-                  <span className="text-sm font-medium text-slate-700">{item}</span>
-                  <span className="rounded-full bg-[var(--obillz-hero-blue)]/10 px-2 py-1 text-xs font-semibold text-[var(--obillz-hero-blue)]">
-                    Planifié
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Bénévoles
-              </p>
-              <p className="mt-3 text-3xl font-bold text-slate-900">48</p>
-              <p className="text-sm text-slate-600">disponibilités centralisées</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Buvette
-              </p>
-              <div className="mt-4 h-2 rounded-full bg-slate-100">
-                <div
-                  className="h-2 rounded-full bg-[var(--obillz-hero-blue)]"
-                  style={{ width: "72%" }}
-                />
-              </div>
-              <p className="mt-3 text-sm text-slate-600">72% des services assignés</p>
-            </div>
-          </div>
-        </div>
+    <div
+      className={`relative overflow-hidden rounded-[28px] border border-slate-200 bg-slate-100/80 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.12)] ${className ?? ""}`}
+    >
+      <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 px-6 py-20 text-center">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+          {label}
+        </p>
+        <p className="mt-3 text-sm text-slate-500">Capture produit à venir</p>
       </div>
     </div>
   );
@@ -263,7 +245,7 @@ export default function LandingPage() {
             </h1>
             <p className="mt-6 max-w-3xl animate-fade-in-up text-base leading-relaxed text-white/90 md:text-xl">
               Obillz centralise l’organisation de votre club : membres, événements,
-              bénévoles et buvette, depuis une seule plateforme.
+              bénévoles et buvette sur une seule plateforme.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4 animate-fade-in-up">
               <Link
@@ -279,95 +261,150 @@ export default function LandingPage() {
                 Découvrir la plateforme
               </a>
             </div>
-            <DashboardPreview />
+            <ProductPlaceholder
+              className="mt-14 w-full max-w-5xl animate-fade-in-up border-white/35 bg-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.2)]"
+              label="Aperçu produit"
+            />
           </div>
         </section>
 
-        <section id="obillz" className="px-4 py-20 md:px-6 md:py-24">
-          <div className="mx-auto max-w-5xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--obillz-hero-blue)]">
-              Qu’est-ce qu’Obillz ?
-            </p>
-            <h2 className="mt-4 text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
-              Le cockpit de gestion de votre club.
-            </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-600">
-              Obillz est une plateforme moderne qui réunit vos membres, vos événements,
-              vos bénévoles et votre buvette dans un seul espace clair.
+        <section id="obillz" className="bg-white px-4 py-20 md:px-6 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader
+              title="Gérer un club sportif est souvent plus compliqué que le sport lui-même."
+              description="Obillz supprime la dispersion et vous redonne une vision claire de l’organisation."
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {problems.map((problem) => (
+                <article
+                  key={problem.title}
+                  className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <h3 className="text-xl font-semibold text-slate-900">{problem.title}</h3>
+                  <p className="mt-3 text-base leading-relaxed text-slate-600">
+                    {problem.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+            <p className="mt-10 text-center text-lg font-semibold text-[var(--obillz-hero-blue)]">
+              Obillz centralise tout au même endroit.
             </p>
           </div>
         </section>
 
         <section id="pourquoi" className="bg-slate-50/60 px-4 py-20 md:px-6 md:py-24">
-          <SectionTitle
-            overline="Pourquoi Obillz ?"
-            title="Parce qu’un club ne devrait pas tourner avec des outils bricolés."
-            description="Obillz remplace la dispersion par une organisation fiable, rapide et lisible."
-          />
-          <div className="mx-auto mt-12 grid w-full max-w-6xl gap-6 md:grid-cols-3">
-            {reasons.map((reason) => (
-              <div
-                key={reason.title}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-[var(--obillz-hero-blue)]/25 hover:shadow-xl"
-              >
-                <h3 className="text-xl font-semibold text-slate-900">{reason.title}</h3>
-                <p className="mt-3 text-base leading-relaxed text-slate-600">
-                  {reason.description}
-                </p>
-              </div>
-            ))}
+          <div className="mx-auto grid w-full max-w-6xl gap-10 md:grid-cols-2 md:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--obillz-hero-blue)]">
+                La solution
+              </p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
+                Une plateforme simple, pensée pour les clubs sportifs.
+              </h2>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
+                Obillz regroupe les informations et les actions clés dans un seul outil.
+                Votre équipe gagne en fluidité, en visibilité et en réactivité.
+              </p>
+              <ul className="mt-8 space-y-3 text-slate-700">
+                <li>• Interface claire et accessible à tous les profils</li>
+                <li>• Compatible mobile pour agir partout</li>
+                <li>• Processus plus fiables au quotidien</li>
+              </ul>
+            </div>
+            <div className="md:pl-6">
+              <ProductPlaceholder label="Aperçu plateforme" />
+            </div>
           </div>
         </section>
 
-        <section id="fonctionnalites" className="px-4 py-20 md:px-6 md:py-24">
-          <SectionTitle
-            overline="Fonctionnalités"
-            title="Les briques essentielles pour piloter votre club."
-            description="Des modules clairs, conçus pour l’action."
-          />
-          <div className="mx-auto mt-12 grid w-full max-w-6xl gap-6 md:grid-cols-2">
-            {features.map((feature) => (
-              <article
-                key={feature.title}
-                className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-[var(--obillz-hero-blue)]/25 hover:shadow-xl"
-              >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    {feature.icon}
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900">{feature.title}</h3>
-                <p className="mt-3 text-base leading-relaxed text-slate-600">
-                  {feature.description}
-                </p>
-              </article>
-            ))}
+        <section id="fonctionnalites" className="bg-white px-4 py-20 md:px-6 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader
+              title="Tout ce dont votre club a besoin."
+              description="Des modules premium pour gérer l’essentiel, sans friction."
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-2">
+              {features.map((feature, index) => (
+                <article
+                  key={feature.title}
+                  className={`rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:border-[var(--obillz-hero-blue)]/25 hover:shadow-xl ${
+                    index % 2 === 1 ? "md:translate-y-6" : ""
+                  }`}
+                >
+                  <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--obillz-hero-blue)]/10 text-[var(--obillz-hero-blue)]">
+                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      {feature.icon}
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">{feature.title}</h3>
+                  <p className="mt-3 text-base leading-relaxed text-slate-600">
+                    {feature.description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section id="faq" className="bg-slate-50/60 px-4 py-20 md:px-6 md:py-24">
-          <SectionTitle
-            overline="FAQ"
-            title="Questions fréquentes"
-            description="L’essentiel pour vous lancer rapidement."
-          />
-          <div className="mx-auto mt-12 w-full max-w-4xl space-y-4">
-            {faqItems.map((item) => (
-              <details
-                key={item.question}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
-                <summary className="cursor-pointer list-none text-base font-semibold text-slate-900">
-                  {item.question}
-                </summary>
-                <p className="mt-3 text-base leading-relaxed text-slate-600">{item.answer}</p>
-              </details>
-            ))}
+        <section className="bg-slate-900 px-4 py-20 md:px-6 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader
+              title="Pourquoi les clubs utilisent Obillz."
+              description="Une organisation plus fluide pour se concentrer sur le sport et la vie du club."
+              dark
+            />
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {benefits.map((benefit, index) => (
+                <article
+                  key={benefit.title}
+                  className="rounded-3xl border border-white/20 bg-white/5 p-6 text-white backdrop-blur-sm"
+                >
+                  <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-bold">
+                    {index + 1}
+                  </div>
+                  <h3 className="text-xl font-semibold">{benefit.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-200">
+                    {benefit.description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto w-full max-w-5xl rounded-[32px] bg-[var(--obillz-hero-blue)] px-6 py-12 text-center shadow-[0_28px_80px_rgba(26,35,255,0.33)] md:px-10 md:py-16">
+        <section id="faq" className="bg-slate-50/70 px-4 py-20 md:px-6 md:py-24">
+          <div className="mx-auto max-w-4xl">
+            <SectionHeader
+              title="FAQ"
+              description="Les réponses aux questions les plus fréquentes."
+            />
+            <div className="mt-12 space-y-4">
+              {faqItems.map((item) => (
+                <details
+                  key={item.question}
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <summary className="cursor-pointer list-none text-base font-semibold text-slate-900">
+                    {item.question}
+                  </summary>
+                  <p className="mt-3 text-base leading-relaxed text-slate-600">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="px-4 py-20 md:px-6 md:py-28"
+          style={{
+            background:
+              "radial-gradient(900px 380px at 50% -30%, rgba(255,255,255,0.16), transparent), linear-gradient(180deg, #1A23FF 0%, #121AD0 100%)",
+          }}
+        >
+          <div className="mx-auto w-full max-w-5xl rounded-[32px] border border-white/25 bg-white/10 px-6 py-12 text-center shadow-[0_28px_80px_rgba(0,0,0,0.22)] backdrop-blur-sm md:px-10 md:py-16">
             <h2 className="mx-auto max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd’hui.
             </h2>
@@ -379,7 +416,7 @@ export default function LandingPage() {
                 Essayer gratuitement
               </Link>
               <a
-                href="#obillz"
+                href="#pourquoi"
                 className="rounded-full border border-white/45 bg-transparent px-8 py-4 text-sm font-semibold text-white transition hover:bg-white/10 md:text-base"
               >
                 Découvrir la plateforme
