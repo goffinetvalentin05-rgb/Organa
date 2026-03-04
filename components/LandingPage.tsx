@@ -10,11 +10,6 @@ type Feature = {
   icon: ReactNode;
 };
 
-type Benefit = {
-  title: string;
-  description: string;
-};
-
 type Faq = {
   question: string;
   answer: string;
@@ -34,8 +29,8 @@ const features: Feature[] = [
     ),
   },
   {
-    title: "Organisation des evenements",
-    description: "Planifiez matchs, tournois et activites en quelques clics.",
+    title: "Organisation des événements",
+    description: "Planifiez matchs, tournois et activités en quelques clics.",
     icon: (
       <path
         strokeLinecap="round"
@@ -47,7 +42,7 @@ const features: Feature[] = [
   },
   {
     title: "Gestion de la buvette",
-    description: "Organisez facilement les benevoles et les services.",
+    description: "Organisez facilement les bénévoles et les services.",
     icon: (
       <path
         strokeLinecap="round"
@@ -71,41 +66,44 @@ const features: Feature[] = [
   },
 ];
 
-const benefits: Benefit[] = [
+const reasons = [
   {
     title: "Gain de temps",
-    description: "Reduisez les taches administratives et l'organisation manuelle.",
+    description:
+      "Fini les allers-retours entre fichiers, messages et tableaux. Vous pilotez tout depuis un seul outil.",
   },
   {
-    title: "Organisation simplifiee",
-    description: "Toutes les informations du club sont au meme endroit.",
+    title: "Moins d’erreurs",
+    description:
+      "Les informations sont centralisées et partagées avec la bonne personne au bon moment.",
   },
   {
-    title: "Plus simple pour tout le monde",
-    description: "Le comite, les benevoles et les membres trouvent vite ce qu'il faut.",
+    title: "Plus simple pour tous",
+    description:
+      "Comité, bénévoles et membres accèdent facilement aux infos utiles, sur mobile comme sur ordinateur.",
   },
 ];
 
 const faqItems: Faq[] = [
   {
-    question: "Obillz est-il facile a utiliser ?",
+    question: "Obillz est-il facile à utiliser ?",
     answer:
-      "Oui. L'interface est pensee pour les comites de clubs avec une prise en main rapide, sans formation technique.",
+      "Oui. L’interface est pensée pour les comités de clubs, avec une prise en main rapide, sans formation technique.",
   },
   {
-    question: "Combien de temps faut-il pour etre operationnel ?",
+    question: "Combien de temps faut-il pour être opérationnel ?",
     answer:
-      "La configuration initiale prend generalement moins d'une heure pour commencer a gerer membres, evenements et benevoles.",
+      "La configuration initiale prend généralement moins d’une heure pour démarrer la gestion des membres, événements et bénévoles.",
   },
   {
     question: "Les membres doivent-ils installer une application ?",
     answer:
-      "Non. Obillz fonctionne dans le navigateur sur mobile, tablette et ordinateur.",
+      "Non. Obillz fonctionne directement dans le navigateur, sur mobile, tablette et ordinateur.",
   },
   {
     question: "Quels types de clubs sportifs peuvent utiliser Obillz ?",
     answer:
-      "Obillz s'adapte aux clubs amateurs et associatifs, quel que soit le sport ou la taille de l'organisation.",
+      "Obillz s’adapte aux clubs amateurs et associatifs, quel que soit le sport ou la taille de l’organisation.",
   },
 ];
 
@@ -154,14 +152,14 @@ function DashboardPreview() {
           <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
           <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
           <span className="ml-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Apercu plateforme Obillz
+            Aperçu plateforme Obillz
           </span>
         </div>
 
         <div className="grid gap-4 bg-slate-50 p-4 md:grid-cols-[1.25fr_1fr] md:p-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Prochains evenements
+              Prochains événements
             </p>
             <div className="mt-4 space-y-3">
               {[
@@ -175,7 +173,7 @@ function DashboardPreview() {
                 >
                   <span className="text-sm font-medium text-slate-700">{item}</span>
                   <span className="rounded-full bg-[var(--obillz-hero-blue)]/10 px-2 py-1 text-xs font-semibold text-[var(--obillz-hero-blue)]">
-                    Planifie
+                    Planifié
                   </span>
                 </div>
               ))}
@@ -185,10 +183,10 @@ function DashboardPreview() {
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Benevoles
+                Bénévoles
               </p>
               <p className="mt-3 text-3xl font-bold text-slate-900">48</p>
-              <p className="text-sm text-slate-600">disponibilites centralisees</p>
+              <p className="text-sm text-slate-600">disponibilités centralisées</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -200,7 +198,7 @@ function DashboardPreview() {
                   style={{ width: "72%" }}
                 />
               </div>
-              <p className="mt-3 text-sm text-slate-600">72% des services assignes</p>
+              <p className="mt-3 text-sm text-slate-600">72% des services assignés</p>
             </div>
           </div>
         </div>
@@ -225,11 +223,14 @@ export default function LandingPage() {
             />
           </Link>
           <div className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
-            <Link href="#solution" className="transition hover:text-white">
-              Solution
+            <Link href="#obillz" className="transition hover:text-white">
+              Obillz
+            </Link>
+            <Link href="#pourquoi" className="transition hover:text-white">
+              Pourquoi
             </Link>
             <Link href="#fonctionnalites" className="transition hover:text-white">
-              Fonctionnalites
+              Fonctionnalités
             </Link>
             <Link href="#faq" className="transition hover:text-white">
               FAQ
@@ -261,8 +262,8 @@ export default function LandingPage() {
               La gestion des clubs sportifs, enfin simple.
             </h1>
             <p className="mt-6 max-w-3xl animate-fade-in-up text-base leading-relaxed text-white/90 md:text-xl">
-              Obillz centralise l'organisation de votre club : membres, evenements,
-              benevoles et buvette, depuis une seule plateforme.
+              Obillz centralise l’organisation de votre club : membres, événements,
+              bénévoles et buvette, depuis une seule plateforme.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4 animate-fade-in-up">
               <Link
@@ -272,75 +273,57 @@ export default function LandingPage() {
                 Essayer gratuitement
               </Link>
               <a
-                href="#solution"
+                href="#obillz"
                 className="rounded-full border border-white/40 bg-transparent px-8 py-4 text-sm font-semibold text-white transition hover:bg-white/10 md:text-base"
               >
-                Decouvrir la plateforme
+                Découvrir la plateforme
               </a>
             </div>
             <DashboardPreview />
           </div>
         </section>
 
-        <section className="px-4 py-20 md:px-6 md:py-24">
-          <div className="mx-auto grid w-full max-w-6xl gap-8 rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_80px_rgba(15,23,42,0.06)] md:grid-cols-2 md:p-10">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Le probleme
-              </p>
-              <h2 className="mt-4 text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
-                Trop d'outils, trop de frictions.
-              </h2>
-              <ul className="mt-6 space-y-4 text-base text-slate-600">
-                <li>Fichiers Excel disperses et difficiles a maintenir.</li>
-                <li>Groupes WhatsApp pour organiser l'urgence.</li>
-                <li>Planning des benevoles complexe a coordonner.</li>
-                <li>Temps perdu sur l'administratif au lieu du terrain.</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border border-[var(--obillz-hero-blue)]/15 bg-[var(--obillz-hero-blue)]/[0.03] p-6 md:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--obillz-hero-blue)]">
-                La reponse
-              </p>
-              <h3 className="mt-4 text-2xl font-bold leading-tight text-slate-900">
-                Obillz centralise tout au meme endroit.
-              </h3>
-              <p className="mt-4 text-base leading-relaxed text-slate-600">
-                Une seule plateforme pour piloter les operations quotidiennes de votre
-                club, avec des informations claires, partagees et toujours a jour.
-              </p>
-            </div>
+        <section id="obillz" className="px-4 py-20 md:px-6 md:py-24">
+          <div className="mx-auto max-w-5xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--obillz-hero-blue)]">
+              Qu’est-ce qu’Obillz ?
+            </p>
+            <h2 className="mt-4 text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
+              Le cockpit de gestion de votre club.
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-600">
+              Obillz est une plateforme moderne qui réunit vos membres, vos événements,
+              vos bénévoles et votre buvette dans un seul espace clair.
+            </p>
           </div>
         </section>
 
-        <section id="solution" className="px-4 py-16 md:px-6 md:py-24">
+        <section id="pourquoi" className="bg-slate-50/60 px-4 py-20 md:px-6 md:py-24">
           <SectionTitle
-            overline="La solution"
-            title="Une plateforme simple, moderne et accessible partout."
-            description="Obillz unifie la gestion du club dans une experience fluide, compatible mobile et pensee pour aller vite."
+            overline="Pourquoi Obillz ?"
+            title="Parce qu’un club ne devrait pas tourner avec des outils bricolés."
+            description="Obillz remplace la dispersion par une organisation fiable, rapide et lisible."
           />
-          <div className="mx-auto mt-12 grid w-full max-w-6xl gap-5 md:grid-cols-4">
-            {[
-              "Interface intuitive",
-              "Accessible en quelques clics",
-              "Compatible mobile",
-              "Gestion centralisee",
-            ].map((item) => (
+          <div className="mx-auto mt-12 grid w-full max-w-6xl gap-6 md:grid-cols-3">
+            {reasons.map((reason) => (
               <div
-                key={item}
-                className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                key={reason.title}
+                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-[var(--obillz-hero-blue)]/25 hover:shadow-xl"
               >
-                <p className="text-sm font-semibold text-slate-800">{item}</p>
+                <h3 className="text-xl font-semibold text-slate-900">{reason.title}</h3>
+                <p className="mt-3 text-base leading-relaxed text-slate-600">
+                  {reason.description}
+                </p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="fonctionnalites" className="bg-slate-50/60 px-4 py-20 md:px-6 md:py-24">
+        <section id="fonctionnalites" className="px-4 py-20 md:px-6 md:py-24">
           <SectionTitle
-            overline="Fonctionnalites"
+            overline="Fonctionnalités"
             title="Les briques essentielles pour piloter votre club."
-            description="Chaque module est concu pour simplifier le quotidien du comite et des benevoles."
+            description="Des modules clairs, conçus pour l’action."
           />
           <div className="mx-auto mt-12 grid w-full max-w-6xl gap-6 md:grid-cols-2">
             {features.map((feature) => (
@@ -362,32 +345,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="px-4 py-20 md:px-6 md:py-24">
-          <SectionTitle
-            overline="Benefices"
-            title="Des resultats concrets pour votre club."
-            description="Obillz fluidifie l'organisation et reduit la charge operationnelle."
-          />
-          <div className="mx-auto mt-12 grid w-full max-w-6xl gap-6 md:grid-cols-3">
-            {benefits.map((benefit) => (
-              <article
-                key={benefit.title}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                <h3 className="text-xl font-semibold text-slate-900">{benefit.title}</h3>
-                <p className="mt-3 text-base leading-relaxed text-slate-600">
-                  {benefit.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-
         <section id="faq" className="bg-slate-50/60 px-4 py-20 md:px-6 md:py-24">
           <SectionTitle
             overline="FAQ"
-            title="Questions frequentes."
-            description="Les reponses pour vous lancer sereinement avec Obillz."
+            title="Questions fréquentes"
+            description="L’essentiel pour vous lancer rapidement."
           />
           <div className="mx-auto mt-12 w-full max-w-4xl space-y-4">
             {faqItems.map((item) => (
@@ -407,7 +369,7 @@ export default function LandingPage() {
         <section className="px-4 py-20 md:px-6 md:py-28">
           <div className="mx-auto w-full max-w-5xl rounded-[32px] bg-[var(--obillz-hero-blue)] px-6 py-12 text-center shadow-[0_28px_80px_rgba(26,35,255,0.33)] md:px-10 md:py-16">
             <h2 className="mx-auto max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl">
-              Simplifiez la gestion de votre club des aujourd'hui.
+              Simplifiez la gestion de votre club dès aujourd’hui.
             </h2>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
@@ -417,10 +379,10 @@ export default function LandingPage() {
                 Essayer gratuitement
               </Link>
               <a
-                href="#solution"
+                href="#obillz"
                 className="rounded-full border border-white/45 bg-transparent px-8 py-4 text-sm font-semibold text-white transition hover:bg-white/10 md:text-base"
               >
-                Decouvrir la plateforme
+                Découvrir la plateforme
               </a>
             </div>
           </div>
@@ -429,16 +391,16 @@ export default function LandingPage() {
 
       <footer className="border-t border-slate-200 bg-white px-4 py-8 md:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 text-sm text-slate-500 sm:flex-row sm:justify-between">
-          <p>Obillz - Plateforme de gestion pour clubs sportifs</p>
+          <p>Obillz — Plateforme de gestion pour clubs sportifs</p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <Link href="/connexion" className="hover:text-slate-700">
               Connexion
             </Link>
             <Link href="/mentions-legales" className="hover:text-slate-700">
-              Mentions legales
+              Mentions légales
             </Link>
             <Link href="/politique-confidentialite" className="hover:text-slate-700">
-              Politique de confidentialite
+              Politique de confidentialité
             </Link>
             <Link href="/conditions-utilisation" className="hover:text-slate-700">
               Conditions d'utilisation
