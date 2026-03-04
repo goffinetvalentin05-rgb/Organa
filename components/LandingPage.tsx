@@ -35,10 +35,10 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#F9FAFF] via-white to-[#F7F9FF] text-slate-900">
-      <div className="mx-auto max-w-7xl px-4 pb-24 pt-14 md:px-8 md:pt-20">
-        <Hero />
+    <main className="min-h-screen bg-white text-slate-900">
+      <Hero />
 
+      <div className="mx-auto max-w-7xl px-4 pb-24 md:px-8">
         <section className="mt-20">
           <SectionLabel>PREUVES</SectionLabel>
           <h2 className="mt-4 text-3xl font-semibold leading-tight text-slate-950 md:text-5xl">
