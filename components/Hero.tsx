@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function HighlightedWord({ children }: { children: string }) {
   return (
-    <span className="relative inline-block px-1 text-[#2563EB]">
+    <span className="relative inline-block px-1 text-[#60A5FA]">
       <span className="relative z-10">{children}</span>
       <svg
         viewBox="0 0 210 52"
@@ -78,7 +78,7 @@ export default function Hero() {
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-hidden bg-transparent px-4 pb-8 pt-10 text-slate-950 sm:px-8 md:pb-14 md:pt-16"
+        className="relative isolate overflow-hidden bg-transparent px-4 pb-8 pt-10 text-white sm:px-8 md:pb-14 md:pt-16"
       >
         <div className="pointer-events-none absolute -left-44 -top-24 h-[27rem] w-[27rem] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),rgba(59,130,246,0)_68%)] blur-2xl" />
         <div className="pointer-events-none absolute -right-40 top-44 h-[25rem] w-[25rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.14),rgba(37,99,235,0)_68%)] blur-2xl" />
@@ -86,7 +86,7 @@ export default function Hero() {
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/80 px-4 py-2 text-xs font-semibold text-blue-900 shadow-[0_8px_20px_rgba(37,99,235,0.1)] sm:text-sm">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(15,23,42,0.2)] backdrop-blur-sm sm:text-sm">
               <span className="inline-flex -space-x-1">
                 <span className="h-5 w-5 rounded-full border border-white bg-blue-300" />
                 <span className="h-5 w-5 rounded-full border border-white bg-blue-400" />
@@ -101,7 +101,7 @@ export default function Hero() {
               {" "}qui <HighlightedWord>simplifie</HighlightedWord> votre comité.
             </h1>
 
-            <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+            <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
               Gérez membres, cotisations, événements, bénévoles, buvette et finances depuis une
               seule plateforme.
               <br className="hidden sm:block" />
@@ -118,7 +118,7 @@ export default function Hero() {
                   <CtaIcon />
                 </span>
               </Link>
-              <p className="mt-3 text-sm text-slate-500">Sans engagement, aucune CB requise</p>
+              <p className="mt-3 text-sm text-slate-400">Sans engagement, aucune CB requise</p>
             </div>
           </div>
 

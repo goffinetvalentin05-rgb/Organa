@@ -5,7 +5,7 @@ import ComparisonSection from "@/components/ComparisonSection";
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E7AB8]">
+    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">
       {children}
     </p>
   );
@@ -36,7 +36,7 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <main className="relative isolate min-h-screen overflow-hidden text-slate-900">
+    <main className="relative isolate min-h-screen overflow-hidden text-slate-100">
       <div className="relative z-10">
         <Hero />
       </div>
