@@ -2,6 +2,7 @@
 
 import Hero from "@/components/Hero";
 import ComparisonSection from "@/components/ComparisonSection";
+import ShowcaseSliderSection from "@/components/ShowcaseSliderSection";
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -43,6 +44,7 @@ export default function LandingPage() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-24 md:px-8">
         <ComparisonSection />
+        <ShowcaseSliderSection />
 
         <section className="mt-20 rounded-3xl border border-slate-200 bg-white p-8 md:p-12">
           <SectionLabel>PROBLÈME</SectionLabel>
