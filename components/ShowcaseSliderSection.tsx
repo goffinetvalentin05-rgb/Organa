@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type ComponentType } from "react";
 import { Calendar2, CreditCard, FileText, Mail, QrCode, Receipt, Users, Wallet } from "@/lib/icons";
 
 type SlideCard = {
   id: string;
   title: string;
   description: string;
-  icon: ({ className }: { className?: string }) => any;
+  icon: ComponentType<{ className?: string }>;
 };
 
 function SliderCard({ card }: { card: SlideCard }) {
