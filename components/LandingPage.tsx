@@ -35,26 +35,10 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <main className="relative isolate min-h-screen overflow-hidden bg-white text-slate-900">
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-24 md:w-36 lg:w-52 xl:w-64"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-40 opacity-40 sm:w-56 md:w-80 lg:w-[28rem]"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(26,35,255,0.45) 0%, rgba(26,35,255,0.18) 42%, rgba(26,35,255,0) 100%)",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-20 opacity-15 sm:w-24 md:w-36 lg:w-52 xl:w-64"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.22) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+    <main className="relative isolate min-h-screen overflow-hidden text-slate-900">
+      <div className="pointer-events-none absolute inset-0" style={{ backgroundColor: "var(--obillz-hero-blue)" }} />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.18),transparent_44%),radial-gradient(circle_at_82%_80%,rgba(255,255,255,0.12),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-white/93" />
 
       <div className="relative z-10">
         <Hero />

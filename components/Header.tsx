@@ -14,18 +14,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 overflow-hidden border-b border-slate-200/80 bg-white/95 backdrop-blur">
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-24 md:w-36 lg:w-52 xl:w-64"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-40 opacity-35 sm:w-56 md:w-80 lg:w-[28rem]"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(26,35,255,0.42) 0%, rgba(26,35,255,0.16) 42%, rgba(26,35,255,0) 100%)",
-        }}
-      />
+    <header className="sticky top-0 z-50 overflow-hidden border-b border-slate-200/80 bg-white/90 backdrop-blur">
       <div className="relative mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 md:px-8">
         <Link href="/" className="transition hover:opacity-90">
           <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
