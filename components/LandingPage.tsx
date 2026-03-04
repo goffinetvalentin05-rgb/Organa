@@ -1,6 +1,7 @@
 "use client";
 
 import Hero from "@/components/Hero";
+import ComparisonSection from "@/components/ComparisonSection";
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -45,27 +46,7 @@ export default function LandingPage() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-24 md:px-8">
-        <section className="mt-20">
-          <SectionLabel>PREUVES</SectionLabel>
-          <h2 className="mt-4 text-3xl font-semibold leading-tight text-slate-950 md:text-5xl">
-            Une organisation plus simple pour votre comité.
-          </h2>
-          <p className="mt-4 text-lg text-slate-600">Avec Obillz</p>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 text-base shadow-sm">
-              ⏱ Jusqu’à 60% de temps administratif en moins
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 text-base shadow-sm">
-              📊 Toutes les informations du club centralisées
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 text-base shadow-sm">
-              📅 Événements et bénévoles mieux organisés
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 text-base shadow-sm">
-              💳 Cotisations envoyées en quelques clics
-            </div>
-          </div>
-        </section>
+        <ComparisonSection />
 
         <section className="mt-20 rounded-3xl border border-slate-200 bg-white p-8 md:p-12">
           <SectionLabel>PROBLÈME</SectionLabel>
