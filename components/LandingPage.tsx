@@ -1,5 +1,7 @@
 "use client";
 
+import Hero from "@/components/Hero";
+
 function SectionLabel({ children }: { children: string }) {
   return (
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E7AB8]">
@@ -35,40 +37,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F9FAFF] via-white to-[#F7F9FF] text-slate-900">
       <div className="mx-auto max-w-7xl px-4 pb-24 pt-14 md:px-8 md:pt-20">
-        <section className="rounded-3xl border border-[#E4E8FF] bg-white p-8 shadow-[0_20px_80px_rgba(26,35,255,0.08)] md:p-14">
-          <SectionLabel>HERO</SectionLabel>
-          <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight text-slate-950 md:text-6xl">
-            Toute la gestion de votre club. Enfin au même endroit.
-          </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-600">
-            Membres, cotisations, événements, bénévoles, buvette et finances.
-            <br />
-            Obillz centralise toute l’organisation de votre club dans une seule plateforme.
-          </p>
-          <p className="mt-6 text-base text-slate-600">
-            Pensé pour les comités de clubs sportifs et les associations.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-5">
-            <div>
-              <p className="mb-2 text-sm font-medium text-slate-500">CTA principal</p>
-              <button
-                type="button"
-                className="rounded-xl bg-[#1A23FF] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-[#151dd9]"
-              >
-                Découvrir la plateforme
-              </button>
-            </div>
-            <div>
-              <p className="mb-2 text-sm font-medium text-slate-500">CTA secondaire</p>
-              <button
-                type="button"
-                className="rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
-              >
-                Voir comment ça fonctionne
-              </button>
-            </div>
-          </div>
-        </section>
+        <Hero />
 
         <section className="mt-20">
           <SectionLabel>PREUVES</SectionLabel>
