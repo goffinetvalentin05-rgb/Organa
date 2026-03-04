@@ -1,8 +1,14 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
-const navItems = ["Fonctionnalités", "Ressources", "Tarifs"];
+const navItems = [
+  { label: "Fonctionnalités", href: "/#apercu-plateforme" },
+  { label: "Ressources", href: "/#hero-obillz" },
+  { label: "Tarifs", href: "/tarifs" },
+];
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,38 +16,35 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 md:px-8">
-        <a
-          href="/"
-          className="text-2xl font-extrabold tracking-tight text-slate-950 transition hover:text-[#2563EB]"
-        >
-          Obillz
-        </a>
+        <Link href="/" className="transition hover:opacity-90">
+          <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
+        </Link>
 
         <nav className="hidden items-center gap-9 md:flex">
           {navItems.map((item) => (
-            <a
-              key={item}
-              href="#"
+            <Link
+              key={item.label}
+              href={item.href}
               className="text-sm font-medium text-slate-600 transition hover:text-slate-950"
             >
-              {item}
-            </a>
+              {item.label}
+            </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
+          <Link
+            href="/connexion"
             className="rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
           >
             Connexion
-          </button>
-          <button
-            type="button"
+          </Link>
+          <Link
+            href="/connexion?demo=1"
             className="rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(37,99,235,0.35)]"
           >
             Demander une démo
-          </button>
+          </Link>
         </div>
 
         <button
@@ -66,28 +69,31 @@ export default function Header() {
         <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-3 md:hidden">
           <nav className="flex flex-col gap-1">
             {navItems.map((item) => (
-              <a
-                key={item}
-                href="#"
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={() => setIsMenuOpen(false)}
                 className="rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >
-                {item}
-              </a>
+                {item.label}
+              </Link>
             ))}
           </nav>
           <div className="mt-4 space-y-2">
-            <button
-              type="button"
-              className="w-full rounded-full border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+            <Link
+              href="/connexion"
+              onClick={() => setIsMenuOpen(false)}
+              className="block w-full rounded-full border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
               Connexion
-            </button>
-            <button
-              type="button"
-              className="w-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)]"
+            </Link>
+            <Link
+              href="/connexion?demo=1"
+              onClick={() => setIsMenuOpen(false)}
+              className="block w-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)]"
             >
               Demander une démo
-            </button>
+            </Link>
           </div>
         </div>
       )}

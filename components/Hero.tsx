@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
+import Link from "next/link";
 
 function HighlightedWord({ children }: { children: string }) {
   return (
@@ -49,7 +50,7 @@ function CtaIcon() {
 
 function MockupFrame() {
   return (
-    <div className="mx-auto mt-14 w-full max-w-5xl">
+    <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
       <div className="rounded-[1.85rem] border border-slate-800/50 bg-[#030712] p-3 shadow-[0_35px_90px_rgba(2,6,23,0.28)] md:p-5">
         <div className="overflow-hidden rounded-[1.45rem] border border-white/10 bg-gradient-to-br from-[#070E1F] via-[#0B1530] to-[#060C19]">
           <div className="flex items-center gap-2 border-b border-white/10 bg-black/25 px-4 py-3">
@@ -75,7 +76,10 @@ export default function Hero() {
     <>
       <Header />
 
-      <section className="relative isolate overflow-hidden bg-white px-4 pb-8 pt-10 text-slate-950 sm:px-8 md:pb-14 md:pt-16">
+      <section
+        id="hero-obillz"
+        className="relative isolate overflow-hidden bg-white px-4 pb-8 pt-10 text-slate-950 sm:px-8 md:pb-14 md:pt-16"
+      >
         <div className="pointer-events-none absolute -left-44 -top-24 h-[27rem] w-[27rem] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),rgba(59,130,246,0)_68%)] blur-2xl" />
         <div className="pointer-events-none absolute -right-40 top-44 h-[25rem] w-[25rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.14),rgba(37,99,235,0)_68%)] blur-2xl" />
         <div className="pointer-events-none absolute bottom-10 left-1/2 h-56 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(147,197,253,0.35),rgba(147,197,253,0)_70%)] blur-3xl" />
@@ -105,15 +109,15 @@ export default function Hero() {
             </p>
 
             <div className="mt-10">
-              <button
-                type="button"
+              <Link
+                href="/inscription"
                 className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-8 py-4 text-base font-semibold text-white shadow-[0_18px_35px_rgba(37,99,235,0.38)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_24px_44px_rgba(37,99,235,0.44)] sm:w-auto"
               >
                 <span>Démarrer gratuitement</span>
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">
                   <CtaIcon />
                 </span>
-              </button>
+              </Link>
               <p className="mt-3 text-sm text-slate-500">Sans engagement, aucune CB requise</p>
             </div>
           </div>
