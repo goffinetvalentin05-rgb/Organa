@@ -36,15 +36,7 @@ function FeatureIcon({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <main
-      className="relative isolate min-h-screen overflow-hidden text-slate-900"
-      style={{
-        background:
-          "linear-gradient(180deg, #2D33FF 0%, #2931FA 45%, #232CF0 100%)",
-      }}
-    >
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(3,7,18,0.24)_0%,rgba(3,7,18,0.08)_12%,rgba(3,7,18,0)_26%,rgba(3,7,18,0)_74%,rgba(3,7,18,0.08)_88%,rgba(3,7,18,0.24)_100%)]" />
-
+    <main className="relative isolate min-h-screen overflow-hidden text-slate-900">
       <div className="relative z-10">
         <Hero />
       </div>
