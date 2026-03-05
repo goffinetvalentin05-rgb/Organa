@@ -86,15 +86,6 @@ export default function Hero() {
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(15,23,42,0.2)] backdrop-blur-sm sm:text-sm">
-              <span className="inline-flex -space-x-1">
-                <span className="h-5 w-5 rounded-full border border-white bg-blue-300" />
-                <span className="h-5 w-5 rounded-full border border-white bg-blue-400" />
-                <span className="h-5 w-5 rounded-full border border-white bg-blue-500" />
-              </span>
-              <span>+120 clubs utilisent Obillz au quotidien</span>
-            </div>
-
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
               La plateforme pour club sportif
               <br className="hidden sm:block" />
@@ -104,8 +95,6 @@ export default function Hero() {
             <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
               Gérez membres, cotisations, événements, bénévoles, buvette et finances depuis une
               seule plateforme.
-              <br className="hidden sm:block" />
-              Passez moins de temps à gérer et plus de temps à faire vivre votre club.
             </p>
 
             <div className="mt-10">

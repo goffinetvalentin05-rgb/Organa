@@ -4,12 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-const navItems = [
-  { label: "Fonctionnalités", href: "/#apercu-plateforme" },
-  { label: "Ressources", href: "/#hero-obillz" },
-  { label: "Tarifs", href: "/tarifs" },
-];
-
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -20,18 +14,6 @@ export default function Header() {
           <Link href="/" className="transition hover:opacity-90">
             <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
           </Link>
-
-          <nav className="hidden items-center gap-9 md:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="text-sm font-medium text-blue-100 transition hover:text-white"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
 
           <div className="hidden items-center gap-3 md:flex">
             <Link
@@ -68,18 +50,6 @@ export default function Header() {
 
         {isMenuOpen && (
           <div className="border-t border-white/15 bg-[rgba(17,28,214,0.98)] px-4 pb-5 pt-3 md:hidden">
-            <nav className="flex flex-col gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="rounded-xl px-3 py-2 text-sm font-medium text-blue-100 transition hover:bg-white/10 hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
             <div className="mt-4 space-y-2">
               <Link
                 href="/connexion"
