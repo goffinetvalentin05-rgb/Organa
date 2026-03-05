@@ -73,7 +73,7 @@ function MockupFrame() {
 
 export default function Hero() {
   return (
-    <div className="bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)]">
+    <div className="bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] pt-5">
       <Header />
 
       <section
@@ -87,8 +87,8 @@ export default function Hero() {
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
-              <span className="block">Moins d&apos;administratif. Plus de <HighlightedWord>club</HighlightedWord>.</span>
-              <span className="mt-2 block">Gérez votre club sportif depuis un seul outil.</span>
+              La plateforme qui <HighlightedWord>simplifie</HighlightedWord> la gestion des clubs
+              sportifs
             </h1>
 
             <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
@@ -106,7 +106,7 @@ export default function Hero() {
                   <CtaIcon />
                 </span>
               </Link>
-              <p className="mt-3 text-sm text-slate-400">Sans engagement, aucune carte bancaire requise</p>
+              <p className="mt-3 text-sm text-slate-400">Sans engagement • aucune carte bancaire requise</p>
             </div>
           </div>
 
