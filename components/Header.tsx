@@ -14,8 +14,8 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-50 px-2 sm:px-3">
-      <header className="mx-auto w-full max-w-[1200px] overflow-hidden rounded-b-2xl border border-blue-300/25 bg-[rgba(26,35,255,0.92)] shadow-[0_12px_34px_rgba(15,23,42,0.3)] backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-blue-300/25 bg-[rgba(26,35,255,0.92)] backdrop-blur-md">
+      <div className="mx-auto w-full max-w-[1200px]">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
             <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
@@ -98,7 +98,7 @@ export default function Header() {
             </div>
           </div>
         )}
-      </header>
-    </div>
+      </div>
+    </header>
   );
 }
