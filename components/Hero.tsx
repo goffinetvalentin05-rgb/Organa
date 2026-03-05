@@ -73,12 +73,12 @@ function MockupFrame() {
 
 export default function Hero() {
   return (
-    <>
+    <div className="bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)]">
       <Header />
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] px-4 pb-10 pt-10 text-white sm:px-8 md:pb-16 md:pt-16"
+        className="relative isolate overflow-hidden px-4 pb-10 pt-10 text-white sm:px-8 md:pb-16 md:pt-16"
       >
         <div className="pointer-events-none absolute -left-44 -top-24 h-[27rem] w-[27rem] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),rgba(59,130,246,0)_68%)] blur-2xl" />
         <div className="pointer-events-none absolute -right-40 top-44 h-[25rem] w-[25rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.14),rgba(37,99,235,0)_68%)] blur-2xl" />
@@ -87,14 +87,13 @@ export default function Hero() {
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
-              Le logiciel qui
-              <br className="hidden sm:block" />
-              {" "}<HighlightedWord>simplifie</HighlightedWord> la gestion de votre club
+              <span className="block">Moins d&apos;administratif. Plus de <HighlightedWord>club</HighlightedWord>.</span>
+              <span className="mt-2 block">Gérez votre club sportif depuis un seul outil.</span>
             </h1>
 
             <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
               Gérez membres, cotisations, événements, bénévoles et finances depuis une seule
-              plateforme.
+              plateforme simple.
             </p>
 
             <div className="mt-10">
@@ -107,13 +106,13 @@ export default function Hero() {
                   <CtaIcon />
                 </span>
               </Link>
-              <p className="mt-3 text-sm text-slate-400">Sans engagement, aucune CB requise</p>
+              <p className="mt-3 text-sm text-slate-400">Sans engagement, aucune carte bancaire requise</p>
             </div>
           </div>
 
           <MockupFrame />
         </div>
       </section>
-    </>
+    </div>
   );
 }

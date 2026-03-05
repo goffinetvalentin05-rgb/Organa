@@ -8,8 +8,8 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="relative z-50 bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] px-2 pb-2 pt-5 sm:px-3">
-      <header className="mx-auto w-[95%] overflow-hidden rounded-[40px] bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] md:w-[85%]">
+    <div className="sticky top-5 z-[100] mx-auto mt-5 w-[85%]">
+      <header className="overflow-hidden rounded-[40px] bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)]">
         <div className="mx-auto w-full max-w-[1200px]">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
