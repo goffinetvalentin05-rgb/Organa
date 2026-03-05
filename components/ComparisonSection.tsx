@@ -81,8 +81,9 @@ function WithoutObillzMockup({ active }: { active: boolean }) {
       icon: CreditCard,
     },
     {
-      title: "Messages WhatsApp des joueurs",
-      description: "Informations perdues entre les conversations.",
+      title: "Emails, messages et fichiers dispersés",
+      description:
+        "Les informations importantes sont réparties entre plusieurs outils et deviennent difficiles à retrouver.",
       icon: Mail,
     },
     {
@@ -219,8 +220,25 @@ function ContentPanel({ mode }: { mode: ComparisonMode }) {
             <ul className="mt-7 grid gap-4 sm:grid-cols-2">
               {content.bullets.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-slate-600">
-                  <span className="mt-0.5 inline-flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                    <CheckCircle className="h-[18px] w-[18px]" />
+                  <span
+                    className={`mt-0.5 inline-flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full ${
+                      state === "without"
+                        ? "bg-red-50 text-red-600"
+                        : "bg-emerald-50 text-emerald-600"
+                    }`}
+                  >
+                    {state === "without" ? (
+                      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor">
+                        <path
+                          d="M15 9L9 15M9 9l6 6"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      <CheckCircle className="h-[18px] w-[18px]" />
+                    )}
                   </span>
                   <span className="pt-0.5">{item}</span>
                 </li>
