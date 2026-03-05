@@ -10,7 +10,7 @@ import LandingFooter from "@/components/LandingFooter";
 
 export default function LandingPage() {
   return (
-    <main className="relative isolate min-h-screen overflow-hidden bg-white text-slate-900">
+    <main className="relative isolate min-h-screen bg-white text-slate-900">
       <div className="relative z-10">
         <Hero />
       </div>
