@@ -70,10 +70,11 @@ export default function FaqSection() {
     <section className="mx-auto mt-20 w-full max-w-[1000px]">
       <div className="text-center">
         <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3rem]">
-          Les <HighlightWord>questions</HighlightWord> fréquentes
+          Encore des <HighlightWord>questions</HighlightWord> avant de vous lancer ?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
-          Vous avez encore des questions ? Contactez-nous via le chat en bas à droite.
+          Voici les réponses aux questions les plus courantes pour vous aider à démarrer
+          sereinement.
         </p>
       </div>
 
