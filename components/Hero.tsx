@@ -87,14 +87,14 @@ export default function Hero() {
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
-              La plateforme pour club sportif
+              Le logiciel qui
               <br className="hidden sm:block" />
-              {" "}qui <HighlightedWord>simplifie</HighlightedWord> votre comité.
+              {" "}<HighlightedWord>simplifie</HighlightedWord> la gestion de votre club
             </h1>
 
             <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
-              Gérez membres, cotisations, événements, bénévoles, buvette et finances depuis une
-              seule plateforme.
+              Gérez membres, cotisations, événements, bénévoles et finances depuis une seule
+              plateforme.
             </p>
 
             <div className="mt-10">
