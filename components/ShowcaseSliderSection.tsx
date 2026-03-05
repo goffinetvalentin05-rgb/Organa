@@ -11,6 +11,35 @@ type SlideCard = {
   icon: ComponentType<{ className?: string }>;
 };
 
+function HighlightWord({ children }: { children: string }) {
+  return (
+    <span className="relative inline-block px-1 text-[#60A5FA]">
+      <span className="relative z-10">{children}</span>
+      <svg
+        viewBox="0 0 210 52"
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-2 left-0 z-0 h-[0.56em] w-full"
+      >
+        <path
+          d="M6 35C46 22 83 18 121 21C152 23 179 28 203 34"
+          stroke="#93C5FD"
+          strokeWidth="12"
+          strokeLinecap="round"
+          fill="none"
+          strokeOpacity="0.5"
+        />
+        <path
+          d="M8 39C44 28 83 25 125 28C155 30 180 34 201 38"
+          stroke="#60A5FA"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+    </span>
+  );
+}
+
 function SliderCard({ card }: { card: SlideCard }) {
   return (
     <article className="group min-h-[260px] min-w-[300px] snap-start rounded-xl border border-slate-200/90 bg-white p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl md:min-h-[280px] md:min-w-[360px] md:p-6">
@@ -69,21 +98,21 @@ export default function ShowcaseSliderSection() {
       id: "snackbar",
       title: "Gestion de la buvette",
       description:
-        "Suivez facilement les ventes et les revenus de la buvette lors des manifestations.",
+        "Créez un planning de réservation pour votre buvette. Partagez un lien de réservation sur votre site ou vos réseaux afin que les personnes puissent réserver facilement un créneau. Toutes les réservations sont centralisées automatiquement dans votre planning.",
       icon: Wallet,
     },
     {
       id: "qrcode",
       title: "QR codes d'inscription",
       description:
-        "Permettez aux nouveaux membres de rejoindre votre club rapidement grâce à un QR code.",
+        "Générez des QR codes ou des liens d'inscription pour vos événements. Partagez-les facilement sur des flyers, emails ou réseaux sociaux afin de permettre aux participants de s'inscrire rapidement. Toutes les inscriptions sont automatiquement enregistrées dans votre espace.",
       icon: QrCode,
     },
     {
       id: "marketing",
       title: "Campagnes marketing",
       description:
-        "Envoyez des communications ciblées à vos membres pour annoncer événements ou informations.",
+        "Envoyez des communications ciblées à vos membres pour annoncer événements, informations ou nouveautés. Les inscriptions et réservations permettent également de collecter automatiquement les données des participants pour mieux communiquer avec eux.",
       icon: Mail,
     },
     {
@@ -100,7 +129,7 @@ export default function ShowcaseSliderSection() {
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.15rem]">
-            Gérez votre club simplement, sans perdre de temps.
+            Gérez votre club plus simplement en tout <HighlightWord>centralisant</HighlightWord>
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
             Obillz centralise tout ce dont votre comité a besoin pour gérer un club sportif.
@@ -109,7 +138,7 @@ export default function ShowcaseSliderSection() {
             href="/inscription"
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] to-[#60A5FA] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(37,99,235,0.45)] transition hover:-translate-y-0.5"
           >
-            Démarrer gratuitement
+            Découvrir toutes les fonctionnalités
           </Link>
         </div>
 
