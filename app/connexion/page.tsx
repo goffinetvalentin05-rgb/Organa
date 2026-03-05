@@ -232,20 +232,6 @@ export default function ConnexionPage() {
         </div>
       </section>
 
-      {/* Footer minimaliste */}
-      <footer className="bg-white px-4 py-6 md:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 text-sm text-slate-500 sm:flex-row sm:justify-between">
-          <p>© 2024 Obillz — Gestion simplifiée pour les clubs</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <Link href="/mentions-legales" className="hover:text-slate-700 transition-colors">
-              Mentions légales
-            </Link>
-            <Link href="/politique-confidentialite" className="hover:text-slate-700 transition-colors">
-              Confidentialité
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
