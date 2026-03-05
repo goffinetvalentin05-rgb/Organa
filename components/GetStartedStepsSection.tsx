@@ -43,7 +43,7 @@ export default function GetStartedStepsSection() {
   return (
     <section className="mx-auto mt-20 w-full max-w-[1200px]">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-white md:text-[3.1rem]">
+        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.1rem]">
           Démarrez votre club <HandwrittenWord>gratuitement</HandwrittenWord> en 3 étapes
         </h2>
       </div>

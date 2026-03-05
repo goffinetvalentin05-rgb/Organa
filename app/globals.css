@@ -78,7 +78,7 @@ body {
 
 /* Background global */
 body.app-bg {
-  background-color: var(--obillz-hero-blue) !important;
+  background-color: #ffffff !important;
   min-height: 100vh !important;
   position: relative;
 }
@@ -88,20 +88,8 @@ body.app-bg:has(.dashboard-shell) {
   background-color: var(--bg-dashboard) !important;
 }
 
-/* Même effet que la sidebar dashboard (grille subtile) */
 body.app-bg::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.1;
-  background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 body.app-bg::after {

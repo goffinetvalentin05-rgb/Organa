@@ -9,17 +9,19 @@ import FinalLandingCta from "@/components/FinalLandingCta";
 
 export default function LandingPage() {
   return (
-    <main className="relative isolate min-h-screen overflow-hidden text-slate-100">
+    <main className="relative isolate min-h-screen overflow-hidden bg-white text-slate-900">
       <div className="relative z-10">
         <Hero />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-24 md:px-8">
-        <ComparisonSection />
-        <ShowcaseSliderSection />
-        <GetStartedStepsSection />
-        <FaqSection />
-        <FinalLandingCta />
+      <div className="relative z-10 -mt-4 rounded-t-[2.25rem] bg-white pt-10 shadow-[0_-20px_40px_rgba(15,23,42,0.06)]">
+        <div className="mx-auto max-w-7xl px-4 pb-24 md:px-8">
+          <ComparisonSection />
+          <ShowcaseSliderSection />
+          <GetStartedStepsSection />
+          <FaqSection />
+          <FinalLandingCta />
+        </div>
       </div>
     </main>
   );

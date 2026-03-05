@@ -69,10 +69,10 @@ export default function FaqSection() {
   return (
     <section className="mx-auto mt-20 w-full max-w-[1000px]">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-white md:text-[3rem]">
+        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3rem]">
           Les <HighlightWord>questions</HighlightWord> fréquentes
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
+        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
           Vous avez encore des questions ? Contactez-nous via le chat en bas à droite.
         </p>
       </div>
@@ -83,15 +83,15 @@ export default function FaqSection() {
           return (
             <article
               key={item.question}
-              className="overflow-hidden rounded-xl border border-white/15 bg-white/10 backdrop-blur-sm"
+              className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
             >
               <button
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? -1 : index)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               >
-                <span className="text-base font-semibold text-white">{item.question}</span>
-                <span className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full border border-white/20 bg-white/10 text-white">
+                <span className="text-base font-semibold text-slate-900">{item.question}</span>
+                <span className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-700">
                   {isOpen ? "−" : "+"}
                 </span>
               </button>
@@ -101,7 +101,7 @@ export default function FaqSection() {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="border-t border-white/10 px-5 pb-4 pt-3 text-sm leading-relaxed text-slate-300">
+                  <p className="border-t border-slate-200 px-5 pb-4 pt-3 text-sm leading-relaxed text-slate-600">
                     {item.answer}
                   </p>
                 </div>

@@ -78,7 +78,7 @@ export default function Hero() {
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-hidden bg-transparent px-4 pb-8 pt-10 text-white sm:px-8 md:pb-14 md:pt-16"
+        className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] px-4 pb-10 pt-10 text-white sm:px-8 md:pb-16 md:pt-16"
       >
         <div className="pointer-events-none absolute -left-44 -top-24 h-[27rem] w-[27rem] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),rgba(59,130,246,0)_68%)] blur-2xl" />
         <div className="pointer-events-none absolute -right-40 top-44 h-[25rem] w-[25rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.14),rgba(37,99,235,0)_68%)] blur-2xl" />

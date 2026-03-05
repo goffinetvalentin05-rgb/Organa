@@ -14,8 +14,8 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="sticky top-5 z-50 px-3 sm:px-4">
-      <header className="mx-auto w-full max-w-[1200px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_12px_34px_rgba(15,23,42,0.1)] backdrop-blur">
+    <div className="sticky top-0 z-50 px-2 sm:px-3">
+      <header className="mx-auto w-full max-w-[1200px] overflow-hidden rounded-b-2xl border border-blue-300/25 bg-[rgba(26,35,255,0.92)] shadow-[0_12px_34px_rgba(15,23,42,0.3)] backdrop-blur">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
             <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
@@ -26,7 +26,7 @@ export default function Header() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-sm font-medium text-slate-600 transition hover:text-slate-950"
+                className="text-sm font-medium text-blue-100 transition hover:text-white"
               >
                 {item.label}
               </Link>
@@ -36,7 +36,7 @@ export default function Header() {
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/connexion"
-              className="rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
             >
               Connexion
             </Link>
@@ -51,7 +51,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 text-white transition hover:bg-white/15 md:hidden"
             aria-expanded={isMenuOpen}
             aria-label="Ouvrir le menu"
           >
@@ -67,14 +67,14 @@ export default function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-3 md:hidden">
+          <div className="border-t border-white/15 bg-[rgba(17,28,214,0.98)] px-4 pb-5 pt-3 md:hidden">
             <nav className="flex flex-col gap-1">
               {navItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="rounded-xl px-3 py-2 text-sm font-medium text-blue-100 transition hover:bg-white/10 hover:text-white"
                 >
                   {item.label}
                 </Link>
@@ -84,7 +84,7 @@ export default function Header() {
               <Link
                 href="/connexion"
                 onClick={() => setIsMenuOpen(false)}
-                className="block w-full rounded-full border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                className="block w-full rounded-full border border-white/25 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/15"
               >
                 Connexion
               </Link>

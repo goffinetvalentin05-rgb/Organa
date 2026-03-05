@@ -215,10 +215,10 @@ function ContentPanel({ mode }: { mode: ComparisonMode }) {
                 : "pointer-events-none translate-y-3 scale-[0.99] opacity-0"
             }`}
           >
-            <p className="text-xl font-medium text-slate-200">{content.subtitle}</p>
+            <p className="text-xl font-medium text-slate-700">{content.subtitle}</p>
             <ul className="mt-7 grid gap-4 sm:grid-cols-2">
               {content.bullets.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-slate-300">
+                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-slate-600">
                   <span className="mt-0.5 inline-flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                     <CheckCircle className="h-[18px] w-[18px]" />
                   </span>
@@ -238,8 +238,8 @@ export default function ComparisonSection() {
 
   return (
     <section className="relative mx-auto mt-20 w-full max-w-[1200px]">
-      <div className="pointer-events-none absolute -left-24 top-6 h-52 w-52 rounded-full bg-blue-300/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full bg-blue-300/20 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 top-6 h-52 w-52 rounded-full bg-blue-100/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full bg-blue-100/40 blur-3xl" />
 
       <div className="relative grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
         <div className="relative min-h-[420px] md:min-h-[440px]">
@@ -248,18 +248,18 @@ export default function ComparisonSection() {
         </div>
 
         <div>
-          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-white md:text-[3.35rem]">
+          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.35rem]">
             Une seule plateforme pour tout <HighlightWord>centraliser</HighlightWord>
           </h2>
 
-          <div className="mt-7 inline-flex rounded-full border border-white/20 bg-white/10 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_20px_rgba(15,23,42,0.2)] backdrop-blur-sm">
+          <div className="mt-7 inline-flex rounded-full border border-slate-200/90 bg-slate-100/90 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_20px_rgba(15,23,42,0.07)]">
             <button
               type="button"
               onClick={() => setMode("without")}
               className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 mode === "without"
                   ? "bg-white text-slate-900 shadow-[0_8px_18px_rgba(15,23,42,0.18)]"
-                  : "text-slate-200 hover:text-white"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Sans Obillz
@@ -270,7 +270,7 @@ export default function ComparisonSection() {
               className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 mode === "with"
                   ? "bg-white text-[#2563EB] shadow-[0_8px_18px_rgba(15,23,42,0.18)]"
-                  : "text-slate-200 hover:text-white"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Avec Obillz

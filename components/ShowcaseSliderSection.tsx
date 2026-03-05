@@ -99,10 +99,10 @@ export default function ShowcaseSliderSection() {
     <section className="mx-auto mt-20 w-full max-w-[1200px]">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-white md:text-[3.15rem]">
+          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.15rem]">
             Gérez votre club simplement, sans perdre de temps.
           </h2>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-300">
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
             Obillz centralise tout ce dont votre comité a besoin pour gérer un club sportif.
           </p>
           <Link
@@ -117,7 +117,7 @@ export default function ShowcaseSliderSection() {
           <button
             type="button"
             onClick={() => scrollByAmount("left")}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white transition hover:bg-white/25"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
             aria-label="Carte précédente"
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor">
@@ -132,7 +132,7 @@ export default function ShowcaseSliderSection() {
           <button
             type="button"
             onClick={() => scrollByAmount("right")}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white transition hover:bg-white/25"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
             aria-label="Carte suivante"
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor">
