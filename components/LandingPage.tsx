@@ -6,6 +6,7 @@ import ShowcaseSliderSection from "@/components/ShowcaseSliderSection";
 import GetStartedStepsSection from "@/components/GetStartedStepsSection";
 import FaqSection from "@/components/FaqSection";
 import FinalLandingCta from "@/components/FinalLandingCta";
+import LandingFooter from "@/components/LandingFooter";
 
 export default function LandingPage() {
   return (
@@ -22,6 +23,7 @@ export default function LandingPage() {
           <FaqSection />
           <FinalLandingCta />
         </div>
+        <LandingFooter />
       </div>
     </main>
   );
