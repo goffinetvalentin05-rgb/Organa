@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function LandingFooter() {
   return (
-    <footer className="mt-10 bg-[linear-gradient(180deg,#0B1732_0%,#081126_100%)]">
+    <footer className="mt-10 bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)]">
       <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
         <div className="flex items-center justify-between border-b border-white/10 pb-6">
           <Link href="/" className="transition hover:opacity-90">
