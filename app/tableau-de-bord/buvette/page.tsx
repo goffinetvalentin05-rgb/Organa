@@ -38,12 +38,19 @@ export default function BuvettePage() {
   const [days, setDays] = useState<Record<string, DayData>>({});
   const [requests, setRequests] = useState<BuvetteRequest[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [publicUrlPath, setPublicUrlPath] = useState<string>("");
   const [loadingLink, setLoadingLink] = useState(true);
   const [copying, setCopying] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [infoMessageDraft, setInfoMessageDraft] = useState("");
+  const [sendingInfo, setSendingInfo] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceAmount, setInvoiceAmount] = useState("");
+  const [sendingInvoice, setSendingInvoice] = useState(false);
 
   const getErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Erreur";
@@ -118,15 +125,31 @@ export default function BuvettePage() {
   const grid = useMemo(() => buildMonthGrid(month), [month]);
 
   const selectedDayData = selectedDate ? days[selectedDate] : null;
-  const selectedRequest = selectedDate
-    ? requests.find((r) => r.reservation_date === selectedDate && r.status === "pending") || null
+  const selectedRequest = selectedRequestId
+    ? requests.find((r) => r.id === selectedRequestId) || null
+    : selectedDate
+    ? requests.find((r) => r.reservation_date === selectedDate) || null
     : null;
+
+  const formatDateFr = (value: string) =>
+    new Date(value).toLocaleDateString("fr-CH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+  const formatStatus = (status: BuvetteRequest["status"]) => {
+    if (status === "accepted") return "Acceptée";
+    if (status === "refused") return "Refusée";
+    return "En attente";
+  };
 
   const goMonth = (delta: number) => {
     const [year, monthNum] = month.split("-").map(Number);
     const next = new Date(year, monthNum - 1 + delta, 1);
     setMonth(`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`);
     setSelectedDate(null);
+    setSelectedRequestId(null);
   };
 
   const blockDate = async () => {
@@ -181,6 +204,75 @@ export default function BuvettePage() {
       setMessage(getErrorMessage(error));
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const openInfoModal = () => {
+    if (!selectedRequest) return;
+    const defaultText = `Bonjour ${selectedRequest.first_name},
+
+Suite à la validation de ta réservation de la buvette
+pour le ${formatDateFr(selectedRequest.reservation_date)}, voici les informations pratiques :
+
+- Récupération des clés : [à compléter]
+- Règles d'utilisation : [à compléter]
+- Contact en cas de problème : [à compléter]
+
+N'hésite pas à nous contacter si tu as des questions.
+À bientôt !`;
+    setInfoMessageDraft(defaultText);
+    setShowInfoModal(true);
+  };
+
+  const sendPracticalInfo = async () => {
+    if (!selectedRequest) return;
+    if (!infoMessageDraft.trim()) {
+      setMessage("Le message ne peut pas être vide.");
+      return;
+    }
+
+    setSendingInfo(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: infoMessageDraft }),
+      });
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer les infos pratiques"));
+      setShowInfoModal(false);
+      setMessage("Infos pratiques envoyées avec succès.");
+    } catch (error: unknown) {
+      setMessage(getErrorMessage(error));
+    } finally {
+      setSendingInfo(false);
+    }
+  };
+
+  const sendInvoice = async () => {
+    if (!selectedRequest) return;
+    const amount = Number(invoiceAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMessage("Merci de saisir un montant valide.");
+      return;
+    }
+
+    setSendingInvoice(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-invoice`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer la facture"));
+      setShowInvoiceModal(false);
+      setInvoiceAmount("");
+      setMessage("Facture envoyée avec succès.");
+    } catch (error: unknown) {
+      setMessage(getErrorMessage(error));
+    } finally {
+      setSendingInvoice(false);
     }
   };
 
@@ -285,7 +377,10 @@ export default function BuvettePage() {
                       return (
                         <button
                           key={date}
-                          onClick={() => setSelectedDate(date)}
+                          onClick={() => {
+                            setSelectedDate(date);
+                            setSelectedRequestId(days[date]?.request?.id || null);
+                          }}
                           className={`h-14 rounded-lg border text-sm font-medium transition ${color} ${
                             isSelected ? "ring-2 ring-slate-700" : ""
                           }`}
@@ -315,7 +410,7 @@ export default function BuvettePage() {
                   : selectedDayData.status === "reserved"
                   ? "Réservée"
                   : selectedRequest
-                  ? "En attente"
+                  ? formatStatus(selectedRequest.status)
                   : "Occupée"}
               </p>
               {selectedDayData?.reason && (
@@ -344,27 +439,56 @@ export default function BuvettePage() {
 
               {selectedRequest && (
                 <div className="rounded-lg border border-slate-200 p-3 space-y-2">
-                  <p className="font-medium text-sm">Demande en attente</p>
-                  <p className="text-sm">{selectedRequest.first_name} {selectedRequest.last_name}</p>
+                  <p className="font-medium text-sm">Réservation sélectionnée</p>
+                  <p className="text-sm">
+                    {selectedRequest.first_name} {selectedRequest.last_name}
+                  </p>
                   <p className="text-xs text-slate-500">{selectedRequest.email}</p>
-                  <p className="text-sm">Type: {selectedRequest.event_type}</p>
-                  {selectedRequest.message && <p className="text-sm text-slate-600">{selectedRequest.message}</p>}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => decideRequest(selectedRequest.id, "accepted")}
-                      disabled={submitting}
-                      className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
-                    >
-                      Accepter
-                    </button>
-                    <button
-                      onClick={() => decideRequest(selectedRequest.id, "refused")}
-                      disabled={submitting}
-                      className="flex-1 px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
-                    >
-                      Refuser
-                    </button>
-                  </div>
+                  <p className="text-sm">Date : {selectedRequest.reservation_date}</p>
+                  <p className="text-sm">Type : {selectedRequest.event_type}</p>
+                  {selectedRequest.phone && (
+                    <p className="text-sm">Téléphone : {selectedRequest.phone}</p>
+                  )}
+                  <p className="text-sm">Statut : {formatStatus(selectedRequest.status)}</p>
+                  {selectedRequest.message && (
+                    <p className="text-sm text-slate-600">{selectedRequest.message}</p>
+                  )}
+
+                  {selectedRequest.status === "pending" && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => decideRequest(selectedRequest.id, "accepted")}
+                        disabled={submitting}
+                        className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        Accepter
+                      </button>
+                      <button
+                        onClick={() => decideRequest(selectedRequest.id, "refused")}
+                        disabled={submitting}
+                        className="flex-1 px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        Refuser
+                      </button>
+                    </div>
+                  )}
+
+                  {selectedRequest.status === "accepted" && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={openInfoModal}
+                        className="flex-1 px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                      >
+                        Envoyer les infos
+                      </button>
+                      <button
+                        onClick={() => setShowInvoiceModal(true)}
+                        className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
+                      >
+                        Envoyer la facture
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -379,7 +503,10 @@ export default function BuvettePage() {
           {requests.slice(0, 8).map((r) => (
             <button
               key={r.id}
-              onClick={() => setSelectedDate(r.reservation_date)}
+              onClick={() => {
+                setSelectedDate(r.reservation_date);
+                setSelectedRequestId(r.id);
+              }}
               className="w-full text-left rounded-lg border border-slate-200 p-3 hover:bg-slate-50"
             >
               <div className="flex items-center justify-between">
@@ -391,6 +518,87 @@ export default function BuvettePage() {
           ))}
         </div>
       </div>
+
+      {showInfoModal && selectedRequest && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Envoyer les infos pratiques</h3>
+              <button
+                onClick={() => setShowInfoModal(false)}
+                className="px-2 py-1 rounded-md hover:bg-slate-100"
+              >
+                ✕
+              </button>
+            </div>
+            <textarea
+              value={infoMessageDraft}
+              onChange={(e) => setInfoMessageDraft(e.target.value)}
+              rows={14}
+              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowInfoModal(false)}
+                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={sendPracticalInfo}
+                disabled={sendingInfo}
+                className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+              >
+                {sendingInfo ? "Envoi..." : "Envoyer"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInvoiceModal && selectedRequest && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white border border-slate-200 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Envoyer la facture</h3>
+              <button
+                onClick={() => setShowInvoiceModal(false)}
+                className="px-2 py-1 rounded-md hover:bg-slate-100"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-sm text-slate-600">
+              Saisis le montant de la facture pour {selectedRequest.first_name}{" "}
+              {selectedRequest.last_name}.
+            </p>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={invoiceAmount}
+              onChange={(e) => setInvoiceAmount(e.target.value)}
+              placeholder="Montant en CHF"
+              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowInvoiceModal(false)}
+                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={sendInvoice}
+                disabled={sendingInvoice}
+                className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+              >
+                {sendingInvoice ? "Envoi..." : "Envoyer"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
