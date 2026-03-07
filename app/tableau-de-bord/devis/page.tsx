@@ -210,7 +210,7 @@ export default function DevisPage() {
             {/* Footer avec compteur */}
             <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
               <p className="text-sm text-slate-500 text-center">
-                {devis.length} devis au total
+                {devis.length} cotisations au total
               </p>
             </div>
           </>

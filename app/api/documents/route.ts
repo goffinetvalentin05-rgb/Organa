@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, client:clients(id, nom, email, telephone, adresse)"
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
       )
       .eq("user_id", user.id);
 
