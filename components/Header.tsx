@@ -9,7 +9,7 @@ export default function Header() {
 
   return (
     <div className="sticky top-5 z-[100] mx-auto w-[85%]">
-      <header className="overflow-hidden rounded-[40px] bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)]">
+      <header className="overflow-hidden rounded-[40px] bg-white border border-slate-200/80 shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
         <div className="mx-auto w-full max-w-[1200px]">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
@@ -19,7 +19,7 @@ export default function Header() {
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/connexion"
-              className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               Connexion
             </Link>
@@ -34,7 +34,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 text-white transition hover:bg-white/15 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 text-slate-700 transition hover:bg-slate-50 md:hidden"
             aria-expanded={isMenuOpen}
             aria-label="Ouvrir le menu"
           >
@@ -50,12 +50,12 @@ export default function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="border-t border-white/15 bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] px-4 pb-5 pt-3 md:hidden">
+          <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-3 md:hidden">
             <div className="mt-4 space-y-2">
               <Link
                 href="/connexion"
                 onClick={() => setIsMenuOpen(false)}
-                className="block w-full rounded-full border border-white/25 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/15"
+                className="block w-full rounded-full border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 Connexion
               </Link>
