@@ -23,12 +23,12 @@ export default function Header() {
             >
               Connexion
             </Link>
-            <Link
-              href="/connexion?demo=1"
+            <a
+              href="mailto:contact@obillz.com"
               className="rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(37,99,235,0.35)]"
             >
               Demander une démo
-            </Link>
+            </a>
           </div>
 
           <button
@@ -59,13 +59,13 @@ export default function Header() {
               >
                 Connexion
               </Link>
-              <Link
-                href="/connexion?demo=1"
+              <a
+                href="mailto:contact@obillz.com"
                 onClick={() => setIsMenuOpen(false)}
                 className="block w-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)]"
               >
                 Demander une démo
-              </Link>
+              </a>
             </div>
           </div>
         )}
