@@ -13,7 +13,7 @@ export default function Header() {
         <div className="mx-auto w-full max-w-[1200px]">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
-            <Image src="/logo-obillz.png" alt="Obillz" width={145} height={38} priority />
+            <Image src="/logo-obillz-bleu.png" alt="Obillz" width={145} height={38} priority />
           </Link>
 
           <div className="hidden items-center gap-3 md:flex">
