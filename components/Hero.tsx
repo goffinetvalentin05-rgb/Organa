@@ -73,7 +73,7 @@ function MockupFrame() {
 
 export default function Hero() {
   return (
-    <div className="bg-[linear-gradient(180deg,#1A23FF_0%,#1B2CF0_60%,#1A2BE6_100%)] pt-5">
+    <div className="bg-[#1A23FF] pt-5">
       <Header />
 
       <section
