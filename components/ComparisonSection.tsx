@@ -68,7 +68,7 @@ function HighlightWord({ children }: { children: string }) {
   );
 }
 
-function WithoutObillzMockup({ active }: { active: boolean }) {
+function WithoutObillzMockup({ active, mobile = false }: { active: boolean; mobile?: boolean }) {
   const items = [
     {
       title: "Excel",
@@ -95,10 +95,12 @@ function WithoutObillzMockup({ active }: { active: boolean }) {
 
   return (
     <div
-      className={`absolute inset-0 rounded-[1.35rem] border border-slate-200/90 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-500 md:p-6 ${
+      className={`${mobile ? "relative" : "absolute inset-0"} rounded-[1.35rem] border border-slate-200/90 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-500 md:p-6 ${
         active
           ? "translate-y-0 scale-100 opacity-100"
-          : "pointer-events-none translate-y-4 scale-[0.985] opacity-0"
+          : mobile
+            ? "hidden"
+            : "pointer-events-none translate-y-4 scale-[0.985] opacity-0"
       }`}
     >
       <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
@@ -126,23 +128,25 @@ function WithoutObillzMockup({ active }: { active: boolean }) {
   );
 }
 
-function WithObillzMockup({ active }: { active: boolean }) {
+function WithObillzMockup({ active, mobile = false }: { active: boolean; mobile?: boolean }) {
   const nav = ["Dashboard", "Membres", "Cotisations", "Événements", "Buvette", "Finances"];
   const navIcons = [LayoutDashboard, Users, CreditCard, Calendar2, Mail, Wallet];
 
   return (
     <div
-      className={`absolute inset-0 rounded-[1.35rem] border border-[#D8E4FF] bg-white/92 p-4 shadow-[0_16px_40px_rgba(37,99,235,0.15)] backdrop-blur-sm transition-all duration-500 md:p-5 ${
+      className={`${mobile ? "relative" : "absolute inset-0"} rounded-[1.35rem] border border-[#D8E4FF] bg-white/92 p-4 shadow-[0_16px_40px_rgba(37,99,235,0.15)] backdrop-blur-sm transition-all duration-500 md:p-5 ${
         active
           ? "translate-y-0 scale-100 opacity-100"
-          : "pointer-events-none translate-y-4 scale-[0.985] opacity-0"
+          : mobile
+            ? "hidden"
+            : "pointer-events-none translate-y-4 scale-[0.985] opacity-0"
       }`}
     >
       <span className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm">
         Avec Obillz
       </span>
       <div className="mt-4 overflow-hidden rounded-[1.05rem] border border-slate-200 bg-white">
-        <div className="grid min-h-[325px] grid-cols-[170px_1fr] bg-white">
+        <div className="grid min-h-[325px] grid-cols-[125px_1fr] bg-white sm:grid-cols-[170px_1fr]">
           <aside className="border-r border-slate-200 bg-[#F7FAFF] p-3.5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#2563EB]">Obillz</p>
             <nav className="mt-3.5 space-y-1.5">
@@ -203,17 +207,17 @@ function WithObillzMockup({ active }: { active: boolean }) {
 
 function ContentPanel({ mode }: { mode: ComparisonMode }) {
   return (
-    <div className="relative min-h-[360px]">
+    <div className="relative min-h-0 md:min-h-[360px]">
       {(["without", "with"] as const).map((state) => {
         const isActive = state === mode;
         const content = comparisonContent[state];
         return (
           <div
             key={state}
-            className={`absolute inset-0 transition-all duration-500 ${
+            className={`transition-all duration-500 md:absolute md:inset-0 ${
               isActive
                 ? "translate-y-0 scale-100 opacity-100"
-                : "pointer-events-none translate-y-3 scale-[0.99] opacity-0"
+                : "pointer-events-none hidden translate-y-3 scale-[0.99] opacity-0 md:block"
             }`}
           >
             <p className="text-xl font-medium text-slate-700">{content.subtitle}</p>
@@ -260,12 +264,7 @@ export default function ComparisonSection() {
       <div className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full bg-blue-100/40 blur-3xl" />
 
       <div className="relative grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
-        <div className="relative min-h-[420px] md:min-h-[440px]">
-          <WithoutObillzMockup active={mode === "without"} />
-          <WithObillzMockup active={mode === "with"} />
-        </div>
-
-        <div>
+        <div className="order-1 lg:order-2">
           <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.35rem]">
             Une seule plateforme pour tout <HighlightWord>centraliser</HighlightWord>
           </h2>
@@ -295,9 +294,19 @@ export default function ComparisonSection() {
             </button>
           </div>
 
+          <div className="mt-6 lg:hidden">
+            <WithoutObillzMockup active={mode === "without"} mobile />
+            <WithObillzMockup active={mode === "with"} mobile />
+          </div>
+
           <div className="mt-7">
             <ContentPanel mode={mode} />
           </div>
+        </div>
+
+        <div className="order-2 hidden relative min-h-[420px] md:min-h-[440px] lg:order-1 lg:block">
+          <WithoutObillzMockup active={mode === "without"} />
+          <WithObillzMockup active={mode === "with"} />
         </div>
       </div>
     </section>
