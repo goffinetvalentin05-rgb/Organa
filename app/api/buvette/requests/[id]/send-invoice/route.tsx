@@ -133,7 +133,54 @@ export async function POST(
     const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
     const todayIso = new Date().toISOString().split("T")[0];
     const formattedAmount = amount.toFixed(2);
-    const invoiceNumber = `FAC-BUV-${new Date().getFullYear()}-${id.slice(0, 8).toUpperCase()}`;
+
+    // Générer un numéro de facture au même format que le module Factures: FAC-YYYY-XXX
+    const year = new Date().getFullYear();
+    const { count: invoiceCount } = await supabase
+      .from("documents")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("type", "invoice")
+      .gte("created_at", `${year}-01-01`)
+      .lte("created_at", `${year}-12-31`);
+    const invoiceNumber = `FAC-${year}-${String((invoiceCount ?? 0) + 1).padStart(3, "0")}`;
+
+    // Créer/récupérer un client pour rattacher la facture dans le module Factures
+    const fullName = `${reqData.first_name} ${reqData.last_name}`.trim();
+    let clientId: string | null = null;
+
+    const { data: existingClientByEmail } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("email", reqData.email)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingClientByEmail?.id) {
+      clientId = existingClientByEmail.id;
+    } else {
+      const { data: createdClient, error: createClientError } = await supabase
+        .from("clients")
+        .insert({
+          user_id: user.id,
+          name: fullName || reqData.email,
+          email: reqData.email,
+          role: "player",
+        })
+        .select("id")
+        .single();
+
+      if (createClientError || !createdClient?.id) {
+        console.error("[API][buvette][send-invoice] Erreur création client:", createClientError);
+        return NextResponse.json(
+          { error: "Impossible de créer le client pour la facture" },
+          { status: 500 }
+        );
+      }
+
+      clientId = createdClient.id;
+    }
 
     const pdfBuffer = await renderToBuffer(
       <FacturePdf
@@ -189,6 +236,7 @@ N'hésite pas à nous contacter si tu as des questions.
     const finalTextMessage = customMessage || defaultMessage;
     const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
     const filename = `facture-buvette-${invoiceNumber}.pdf`;
+    const lineDescription = `Location buvette - ${reqData.event_type} - ${formattedDate}`;
 
     const { data, error } = await resendInstance.emails.send({
       from: FROM_EMAIL,
@@ -228,11 +276,53 @@ N'hésite pas à nous contacter si tu as des questions.
       );
     }
 
+    // Enregistrer la facture dans la table documents (module Factures)
+    const buvetteLine = {
+      id: `buvette-${id}`,
+      designation: lineDescription,
+      description: `Réservation buvette du ${formattedDate}`,
+      quantite: 1,
+      prixUnitaire: amount,
+      tva: 0,
+    };
+
+    const { data: insertedInvoice, error: insertInvoiceError } = await supabase
+      .from("documents")
+      .insert({
+        user_id: user.id,
+        client_id: clientId,
+        type: "invoice",
+        status: "envoye",
+        date_creation: todayIso,
+        date_echeance: reqData.reservation_date,
+        items: [buvetteLine],
+        total_ht: amount,
+        total_tva: 0,
+        total_ttc: amount,
+        numero: invoiceNumber,
+        notes: `Facture générée depuis Buvette (request_id=${id})`,
+      })
+      .select("id")
+      .single();
+
+    if (insertInvoiceError || !insertedInvoice?.id) {
+      console.error("[API][buvette][send-invoice] Erreur insertion facture:", insertInvoiceError);
+      return NextResponse.json(
+        {
+          error: "Email envoyé mais impossible d'enregistrer la facture en base",
+          details: insertInvoiceError?.message || "Insertion échouée",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       {
         success: true,
         message: "Email envoyé avec succès",
         emailId: data?.id,
+        invoiceId: insertedInvoice.id,
+        invoiceNumber,
       },
       { status: 200 }
     );
