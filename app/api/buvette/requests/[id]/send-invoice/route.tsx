@@ -1,4 +1,3 @@
-import React from "react";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -137,8 +136,8 @@ export async function POST(
     const invoiceNumber = `FAC-BUV-${new Date().getFullYear()}-${id.slice(0, 8).toUpperCase()}`;
 
     const pdfBuffer = await renderToBuffer(
-      React.createElement(FacturePdf, {
-        company: {
+      <FacturePdf
+        company={{
           name: profile?.company_name || "Club",
           address: profile?.company_address || "",
           email: profile?.company_email || "",
@@ -147,13 +146,13 @@ export async function POST(
           iban: profile?.iban || "",
           bankName: profile?.bank_name || "",
           conditionsPaiement: profile?.payment_terms || "",
-        },
-        client: {
+        }}
+        client={{
           name: `${reqData.first_name} ${reqData.last_name}`.trim(),
           email: reqData.email,
           address: "",
-        },
-        document: {
+        }}
+        document={{
           number: invoiceNumber,
           date: todayIso,
           dueDate: reqData.reservation_date,
@@ -161,8 +160,8 @@ export async function POST(
           currencySymbol,
           vatRate: 0,
           notes: `Date de réservation: ${formattedDate}`,
-        },
-        lines: [
+        }}
+        lines={[
           {
             label: `Location buvette - ${reqData.event_type}`,
             qty: 1,
@@ -170,14 +169,14 @@ export async function POST(
             total: amount,
             vat: 0,
           },
-        ],
-        totals: {
+        ]}
+        totals={{
           subtotal: amount,
           vat: 0,
           total: amount,
-        },
-        primaryColor: profile?.primary_color || "#1D4ED8",
-      })
+        }}
+        primaryColor={profile?.primary_color || "#1D4ED8"}
+      />
     );
 
     const defaultMessage = `Bonjour ${reqData.first_name},
