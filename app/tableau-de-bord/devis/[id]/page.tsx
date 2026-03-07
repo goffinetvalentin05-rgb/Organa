@@ -150,7 +150,7 @@ export default function DevisDetailPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: "devis",
+          type: "cotisation",
           documentId: id,
         }),
       });
@@ -278,7 +278,7 @@ export default function DevisDetailPage() {
               console.log("Downloading PDF URL:", url);
               const link = document.createElement("a");
               link.href = url;
-              link.download = `obillz-quote-${devis?.numero || id}.pdf`;
+              link.download = `obillz-cotisation-${devis?.numero || id}.pdf`;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -329,7 +329,7 @@ export default function DevisDetailPage() {
               className="text-2xl font-semibold"
               style={{ color: companySettings?.primary_color || "#1D4ED8" }}
             >
-              Devis
+              Cotisation
             </p>
             <p className="text-sm text-slate-500 mt-1">
               N° {devis.numero}

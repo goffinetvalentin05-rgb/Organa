@@ -3,12 +3,7 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 
-type DocumentLine = {
-  designation?: string;
-  description?: string;
-  quantite?: number;
-  prixUnitaire?: number;
-};
+export const runtime = "nodejs";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -18,6 +13,13 @@ function getErrorMessage(error: unknown): string {
     if (typeof message === "string") return message;
   }
   return "Erreur inconnue";
+}
+
+function getFirstName(fullName: string | null | undefined): string {
+  if (!fullName) return "membre";
+  const trimmed = fullName.trim();
+  if (!trimmed) return "membre";
+  return trimmed.split(/\s+/)[0] || "membre";
 }
 
 /**
@@ -92,9 +94,9 @@ export async function POST(request: NextRequest) {
     let typeDoc: string;
     let expectedType: "quote" | "invoice";
 
-    if (type === "devis") {
+    if (type === "devis" || type === "cotisation") {
       expectedType = "quote";
-      typeDoc = "devis";
+      typeDoc = "cotisation";
     } else if (type === "facture") {
       expectedType = "invoice";
       typeDoc = "facture";
@@ -117,7 +119,10 @@ export async function POST(request: NextRequest) {
     }
 
     const document = documentData;
-    const sujet = `Votre ${typeDoc} Obillz n°${document.numero || ""}`;
+    const sujet =
+      expectedType === "quote"
+        ? `Ta cotisation n°${document.numero || ""} - ${parametres.nomEntreprise || "Obillz"}`
+        : `Votre facture n°${document.numero || ""} - ${parametres.nomEntreprise || "Obillz"}`;
 
     const client = Array.isArray(document.client)
       ? document.client[0]
@@ -128,7 +133,8 @@ export async function POST(request: NextRequest) {
     }
 
     const clientEmail = client.email;
-    const clientNom = client.nom || "Client";
+    const clientNom = client.nom || "Membre";
+    const firstName = getFirstName(clientNom);
     const numero = document.numero || "";
     const montant =
       typeof document.total_ttc === "number"
@@ -156,25 +162,45 @@ export async function POST(request: NextRequest) {
       ? `${parametres.nomExpediteur} <${senderEmail}>`
       : senderEmail;
 
-    // Construire le corps de l'email
-    const lignesHtml = (Array.isArray(document.items) ? document.items : [])
-      .map(
-        (ligne: DocumentLine) => {
-          const sousTotal = (ligne.quantite || 0) * (ligne.prixUnitaire || 0);
-          return `
-      <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">
-          <div style="font-weight: bold;">${ligne.designation || ""}</div>
-          ${ligne.description ? `<div style="font-size: 0.9em; color: #666; margin-top: 4px; white-space: pre-line;">${ligne.description}</div>` : ""}
-        </td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${ligne.quantite || 0}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${(ligne.prixUnitaire || 0).toFixed(2)} CHF</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${sousTotal.toFixed(2)} CHF</td>
-      </tr>
-    `;
-        }
-      )
-      .join("");
+    const clubName = parametres.nomEntreprise || "votre club";
+    const montantFormate = `${montant.toFixed(2)} CHF`;
+    const dueDateLine =
+      dateEcheance !== "Non définie"
+        ? `<p><strong>Date d'échéance :</strong> ${dateEcheance}</p>`
+        : "";
+
+    const baseUrl = new URL(request.url).origin;
+    const pdfPath =
+      expectedType === "quote"
+        ? `/api/pdf/devis/download?id=${documentId}`
+        : `/api/pdf/facture/download?id=${documentId}`;
+    const pdfUrl = `${baseUrl}${pdfPath}`;
+
+    const pdfResponse = await fetch(pdfUrl, {
+      method: "GET",
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+      cache: "no-store",
+    });
+
+    if (!pdfResponse.ok) {
+      const pdfError = await pdfResponse.text();
+      console.error("[API][email] Erreur génération PDF joint:", {
+        status: pdfResponse.status,
+        statusText: pdfResponse.statusText,
+        pdfUrl,
+        error: pdfError,
+      });
+      return NextResponse.json(
+        { error: "Impossible de générer le PDF de la cotisation" },
+        { status: 500 }
+      );
+    }
+
+    const pdfArrayBuffer = await pdfResponse.arrayBuffer();
+    const pdfContentBase64 = Buffer.from(pdfArrayBuffer).toString("base64");
+    const pdfFilename = `${typeDoc}-${numero || documentId}.pdf`;
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -195,35 +221,26 @@ export async function POST(request: NextRequest) {
         <body>
           <div class="container">
             <div class="header">
-              <h1>${parametres.nomEntreprise}</h1>
+              <h1>${clubName}</h1>
             </div>
             <div class="content">
-              <p>Bonjour,</p>
-              <p>Vous trouverez ci-dessous votre ${typeDoc} n°<strong>${numero}</strong>.</p>
-              <p><strong>Client :</strong> ${clientNom}</p>
-              <p><strong>Date d'échéance :</strong> ${dateEcheance}</p>
-              
-              <table>
-                <thead>
-                  <tr>
-                    <th>Désignation</th>
-                    <th style="text-align: right;">Quantité</th>
-                    <th style="text-align: right;">Prix unitaire</th>
-                    <th style="text-align: right;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${lignesHtml}
-                </tbody>
-              </table>
-              
-              <div class="total">
-                Total TTC: ${montant.toFixed(2)} CHF
-              </div>
-              
-              ${document.notes ? `<p><strong>Notes:</strong> ${document.notes}</p>` : ""}
-              
-              <p>Cordialement,<br>${parametres.nomEntreprise}</p>
+              ${
+                expectedType === "quote"
+                  ? `<p>Bonjour ${firstName},</p>
+              <p>Tu trouveras en piece jointe ta cotisation n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
+              <p><strong>Montant total :</strong> ${montantFormate}</p>
+              <p><strong>Membre :</strong> ${clientNom}</p>
+              ${dueDateLine}
+              <p>Si tu as la moindre question, n'hesite pas a nous contacter.</p>
+              <p>A bientot !</p>`
+                  : `<p>Bonjour ${firstName},</p>
+              <p>Tu trouveras en piece jointe ta facture n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
+              <p><strong>Montant total :</strong> ${montantFormate}</p>
+              <p><strong>Membre :</strong> ${clientNom}</p>
+              ${dueDateLine}
+              <p>Si tu as la moindre question, n'hesite pas a nous contacter.</p>
+              <p>A bientot !</p>`
+              }
             </div>
           </div>
         </body>
@@ -236,6 +253,12 @@ export async function POST(request: NextRequest) {
       to: [clientEmail],
       subject: sujet,
       html: emailHtml,
+      attachments: [
+        {
+          filename: pdfFilename,
+          content: pdfContentBase64,
+        },
+      ],
     });
 
     if (error) {
