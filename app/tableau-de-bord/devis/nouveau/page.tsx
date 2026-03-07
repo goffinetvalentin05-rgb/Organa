@@ -19,9 +19,10 @@ interface Client {
   email: string;
   telephone: string;
   adresse: string;
+  role?: string | null;
 }
 
-const ALL_MEMBERS_VALUE = "__all_members__";
+const ALL_PLAYERS_VALUE = "__all_players__";
 
 export default function NouveauDevisPage() {
   const router = useRouter();
@@ -108,6 +109,12 @@ export default function NouveauDevisPage() {
   const getLignesValides = () =>
     lignes.filter((l) => l.designation.trim() !== "");
 
+  const getPlayers = () =>
+    clients.filter((client) => {
+      const role = (client.role || "").toLowerCase().trim();
+      return role === "player" || role === "joueur";
+    });
+
   const createQuoteForClient = async (
     targetClientId: string,
     lignesValides: LigneDocument[]
@@ -168,8 +175,10 @@ export default function NouveauDevisPage() {
   };
 
   const handleBulkSubmit = async (lignesValides: LigneDocument[]) => {
-    if (clients.length === 0) {
-      toast.error("Aucun membre disponible pour l'envoi groupé.");
+    const players = getPlayers();
+
+    if (players.length === 0) {
+      toast.error("Aucun joueur disponible pour l'envoi groupé.");
       return;
     }
 
@@ -177,7 +186,7 @@ export default function NouveauDevisPage() {
     setBulkSummary(null);
     setBulkProgress({
       current: 0,
-      total: clients.length,
+      total: players.length,
       created: 0,
       message: "Initialisation de l'envoi groupé...",
     });
@@ -187,16 +196,16 @@ export default function NouveauDevisPage() {
     let skippedNoEmail = 0;
     let failed = 0;
 
-    for (let index = 0; index < clients.length; index += 1) {
-      const client = clients[index];
+    for (let index = 0; index < players.length; index += 1) {
+      const client = players[index];
       const step = index + 1;
 
       try {
         setBulkProgress({
           current: index,
-          total: clients.length,
+          total: players.length,
           created,
-          message: `${step}/${clients.length} - Création de la cotisation pour ${client.nom}...`,
+          message: `${step}/${players.length} - Création de la cotisation pour ${client.nom}...`,
         });
 
         const createdQuote = await createQuoteForClient(client.id, lignesValides);
@@ -204,9 +213,9 @@ export default function NouveauDevisPage() {
 
         setBulkProgress({
           current: index,
-          total: clients.length,
+          total: players.length,
           created,
-          message: `${step}/${clients.length} - Génération du PDF pour ${client.nom}...`,
+          message: `${step}/${players.length} - Génération du PDF pour ${client.nom}...`,
         });
 
         await generateQuotePdf(createdQuote.id);
@@ -214,9 +223,9 @@ export default function NouveauDevisPage() {
         if (client.email && client.email.trim() !== "") {
           setBulkProgress({
             current: index,
-            total: clients.length,
+            total: players.length,
             created,
-            message: `${step}/${clients.length} - Envoi email à ${client.nom}...`,
+            message: `${step}/${players.length} - Envoi email à ${client.nom}...`,
           });
 
           await sendQuoteEmail(createdQuote.id);
@@ -234,9 +243,9 @@ export default function NouveauDevisPage() {
       } finally {
         setBulkProgress({
           current: step,
-          total: clients.length,
+          total: players.length,
           created,
-          message: `${created}/${clients.length} cotisations créées...`,
+          message: `${created}/${players.length} cotisations créées...`,
         });
       }
     }
@@ -246,7 +255,7 @@ export default function NouveauDevisPage() {
       emailed,
       skippedNoEmail,
       failed,
-      total: clients.length,
+      total: players.length,
     };
 
     setBulkSummary(summary);
@@ -254,7 +263,7 @@ export default function NouveauDevisPage() {
     setBulkProgress(null);
 
     toast.success(
-      `Envoi groupé terminé : ${created} cotisations créées, ${emailed} emails envoyés, ${skippedNoEmail} membres sans email ignorés.`
+      `Envoi groupé terminé : ${created} cotisations créées, ${emailed} emails envoyés, ${skippedNoEmail} joueurs sans email ignorés.`
     );
   };
 
@@ -277,7 +286,7 @@ export default function NouveauDevisPage() {
       return;
     }
 
-    if (clientId === ALL_MEMBERS_VALUE) {
+    if (clientId === ALL_PLAYERS_VALUE) {
       await handleBulkSubmit(lignesValides);
       return;
     }
@@ -302,8 +311,8 @@ export default function NouveauDevisPage() {
       toast.error(t("dashboard.quotes.selectClientError"));
       return;
     }
-    if (clientId === ALL_MEMBERS_VALUE) {
-      toast.error("La prévisualisation/téléchargement PDF est disponible en mode membre individuel.");
+    if (clientId === ALL_PLAYERS_VALUE) {
+      toast.error("La prévisualisation/téléchargement PDF est disponible en mode individuel.");
       return;
     }
 
@@ -429,7 +438,7 @@ export default function NouveauDevisPage() {
               <option value="">
                 {loadingClients ? t("dashboard.quotes.loadingClients") : t("dashboard.quotes.selectClient")}
               </option>
-              <option value={ALL_MEMBERS_VALUE}>Tous les membres (envoi groupé)</option>
+              <option value={ALL_PLAYERS_VALUE}>Tous les joueurs (envoi groupé)</option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
                   {client.nom}
@@ -664,7 +673,7 @@ export default function NouveauDevisPage() {
             <h3 className="text-lg font-semibold text-primary">Résumé de l'envoi groupé</h3>
             <p className="text-secondary">{bulkSummary.created} cotisations créées</p>
             <p className="text-secondary">{bulkSummary.emailed} emails envoyés</p>
-            <p className="text-secondary">{bulkSummary.skippedNoEmail} membres sans email ignorés</p>
+            <p className="text-secondary">{bulkSummary.skippedNoEmail} joueurs sans email ignorés</p>
             {bulkSummary.failed > 0 && (
               <p className="text-red-600">{bulkSummary.failed} traitements en erreur</p>
             )}
