@@ -1,3 +1,4 @@
+import React from "react";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
@@ -67,42 +68,64 @@ export async function POST(
 
     const clubName = profile?.company_name || "Club";
     const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
-    const formattedAmount = `${amount.toFixed(2)} CHF`;
+    const formattedAmount = amount.toFixed(2);
 
     const invoicePdf = await renderToBuffer(
-      <Document>
-        <Page size="A4" style={styles.page}>
-          <Text style={styles.title}>Facture - Réservation buvette</Text>
-          <View style={styles.section}>
-            <Text>
-              <Text style={styles.label}>Client : </Text>
-              {reqData.first_name} {reqData.last_name}
-            </Text>
-          </View>
-          <View style={styles.section}>
-            <Text>
-              <Text style={styles.label}>Date de réservation : </Text>
-              {formattedDate}
-            </Text>
-          </View>
-          <View style={styles.section}>
-            <Text>
-              <Text style={styles.label}>Type de réservation : </Text>
-              {reqData.event_type}
-            </Text>
-          </View>
-          <View style={styles.section}>
-            <Text>
-              <Text style={styles.label}>Club : </Text>
-              {clubName}
-            </Text>
-          </View>
-          <Text style={styles.amount}>Montant total : {formattedAmount}</Text>
-          <Text style={styles.footer}>
-            Merci pour votre réservation. Pour toute question, contactez le club.
-          </Text>
-        </Page>
-      </Document>
+      React.createElement(
+        Document,
+        null,
+        React.createElement(
+          Page,
+          { size: "A4", style: styles.page },
+          React.createElement(Text, { style: styles.title }, "Facture - Réservation buvette"),
+          React.createElement(
+            View,
+            { style: styles.section },
+            React.createElement(
+              Text,
+              null,
+              React.createElement(Text, { style: styles.label }, "Client : "),
+              `${reqData.first_name} ${reqData.last_name}`
+            )
+          ),
+          React.createElement(
+            View,
+            { style: styles.section },
+            React.createElement(
+              Text,
+              null,
+              React.createElement(Text, { style: styles.label }, "Date de réservation : "),
+              formattedDate
+            )
+          ),
+          React.createElement(
+            View,
+            { style: styles.section },
+            React.createElement(
+              Text,
+              null,
+              React.createElement(Text, { style: styles.label }, "Type de réservation : "),
+              reqData.event_type
+            )
+          ),
+          React.createElement(
+            View,
+            { style: styles.section },
+            React.createElement(
+              Text,
+              null,
+              React.createElement(Text, { style: styles.label }, "Club : "),
+              clubName
+            )
+          ),
+          React.createElement(Text, { style: styles.amount }, `Montant total : ${formattedAmount} CHF`),
+          React.createElement(
+            Text,
+            { style: styles.footer },
+            "Merci pour votre réservation. Pour toute question, contactez le club."
+          )
+        )
+      )
     );
 
     const resendApiKey = process.env.RESEND_API_KEY;
@@ -122,11 +145,22 @@ export async function POST(
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <p>Bonjour ${reqData.first_name},</p>
-          <p>Vous trouverez en pièce jointe la facture de votre réservation buvette du ${formattedDate}.</p>
-          <p>Montant : <strong>${formattedAmount}</strong></p>
-          <p>Cordialement,<br/>${clubName}</p>
+          <p>
+            Suite à la validation de ta réservation de la buvette
+            pour le ${formattedDate}, tu trouveras en pièce jointe ta facture
+            d'un montant de ${formattedAmount} CHF.
+          </p>
+          <p>N'hésite pas à nous contacter si tu as des questions.</p>
+          <p>À bientôt !</p>
         </div>
       `,
+      text: `Bonjour ${reqData.first_name},
+
+Suite à la validation de ta réservation de la buvette pour le ${formattedDate},
+tu trouveras en pièce jointe ta facture d'un montant de ${formattedAmount} CHF.
+
+N'hésite pas à nous contacter si tu as des questions.
+À bientôt !`,
       attachments: [
         {
           filename,
@@ -136,6 +170,11 @@ export async function POST(
     });
 
     if (sendError) {
+      console.error("[API][buvette][send-invoice] Erreur Resend:", {
+        requestId: id,
+        email: reqData.email,
+        message: sendError.message,
+      });
       return NextResponse.json(
         { error: `Erreur lors de l'envoi de la facture: ${sendError.message}` },
         { status: 500 }
@@ -144,6 +183,7 @@ export async function POST(
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: unknown) {
+    console.error("[API][buvette][send-invoice] Erreur inattendue:", error);
     return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

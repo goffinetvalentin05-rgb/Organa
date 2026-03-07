@@ -260,16 +260,20 @@ N'hésite pas à nous contacter si tu as des questions.
     setSendingInvoice(true);
     setMessage(null);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-invoice`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount }),
-      });
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer la facture"));
       setShowInvoiceModal(false);
       setInvoiceAmount("");
       setMessage("Facture envoyée avec succès.");
     } catch (error: unknown) {
+      console.error("[Buvette][UI] Erreur envoi facture:", error);
       setMessage(getErrorMessage(error));
     } finally {
       setSendingInvoice(false);
