@@ -69,11 +69,19 @@ export async function POST(
       );
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("company_name")
+      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
       .eq("user_id", user.id)
       .maybeSingle();
+
+    if (profileError) {
+      console.error("[API][buvette][send-invoice] Erreur profil:", profileError);
+      return NextResponse.json(
+        { error: "Erreur lors du chargement des paramètres" },
+        { status: 500 }
+      );
+    }
 
     const clubName = profile?.company_name || "Club";
     const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
@@ -137,16 +145,19 @@ export async function POST(
       )
     );
 
-    const resendApiKey = process.env.RESEND_API_KEY;
-    if (!resendApiKey) {
-      console.error("[API][buvette][send-invoice] RESEND_API_KEY manquante");
+    const parametres = {
+      resendApiKey: profile?.resend_api_key || process.env.RESEND_API_KEY || "",
+    };
+
+    if (!parametres.resendApiKey) {
+      console.error("[API][buvette][send-invoice] Clé Resend absente (profil + env)");
       return NextResponse.json(
         { error: "RESEND_API_KEY non configurée sur le serveur" },
         { status: 500 }
       );
     }
 
-    const resend = new Resend(resendApiKey);
+    const resendInstance = new Resend(parametres.resendApiKey);
     const filename = `facture-buvette-${reqData.reservation_date}.pdf`;
     const defaultMessage = `Bonjour ${reqData.first_name},
 
@@ -160,7 +171,7 @@ N'hésite pas à nous contacter si tu as des questions.
     const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
 
     const sendResult = await Promise.race([
-      resend.emails.send({
+      resendInstance.emails.send({
         from: FROM_EMAIL,
         to: [reqData.email],
         subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
