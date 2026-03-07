@@ -158,7 +158,10 @@ export default function DevisDetailPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || t("dashboard.quotes.detail.sendError"));
+        const apiMessage = data?.details
+          ? `${data?.error || t("dashboard.quotes.detail.sendError")} (${data.details})`
+          : data?.error || t("dashboard.quotes.detail.sendError");
+        throw new Error(apiMessage);
       }
 
       if (typeof toast !== "undefined" && toast.success) {
@@ -168,6 +171,7 @@ export default function DevisDetailPage() {
         handleChangerStatut("envoye");
       }
     } catch (error: any) {
+      console.error("[Devis][Email] Erreur envoi:", error);
       if (typeof toast !== "undefined" && toast.error) {
         const errorMessage = error?.message || t("dashboard.quotes.detail.sendErrorFallback");
         toast.error(String(errorMessage));

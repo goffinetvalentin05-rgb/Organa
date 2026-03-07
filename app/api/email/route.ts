@@ -3,6 +3,23 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 
+type DocumentLine = {
+  designation?: string;
+  description?: string;
+  quantite?: number;
+  prixUnitaire?: number;
+};
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  return "Erreur inconnue";
+}
+
 /**
  * API Email - Envoi de devis et factures par email
  * 
@@ -31,6 +48,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { type, documentId } = body; // type: 'devis' | 'facture', documentId: string
+    if (!documentId || typeof documentId !== "string") {
+      return NextResponse.json({ error: "documentId requis" }, { status: 400 });
+    }
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -55,10 +75,11 @@ export async function POST(request: NextRequest) {
       adresse: profile?.company_address || "",
       nomExpediteur: profile?.email_sender_name || "",
       emailExpediteur: profile?.email_sender_email || "",
-      resendApiKey: profile?.resend_api_key || "",
+      resendApiKey: profile?.resend_api_key || process.env.RESEND_API_KEY || "",
     };
     
     if (!parametres.resendApiKey) {
+      console.error("[API][email] Clé Resend absente (profil + env)");
       return NextResponse.json(
         { error: "Clé API Resend non configurée. Veuillez la configurer dans les paramètres." },
         { status: 400 }
@@ -68,11 +89,6 @@ export async function POST(request: NextRequest) {
     // Initialiser Resend avec la clé API des paramètres
     const resendInstance = new Resend(parametres.resendApiKey);
 
-    let document: any;
-    let clientEmail: string;
-    let numero: string;
-    let montant: number;
-    let sujet: string;
     let typeDoc: string;
     let expectedType: "quote" | "invoice";
 
@@ -89,7 +105,7 @@ export async function POST(request: NextRequest) {
     const { data: documentData, error: documentError } = await supabase
       .from("documents")
       .select(
-        "id, numero, type, items, notes, total_ttc, client:clients(id, nom, email, adresse)"
+        "id, numero, type, items, notes, total_ttc, date_echeance, client:clients(id, nom, email, adresse)"
       )
       .eq("id", documentId)
       .eq("user_id", user.id)
@@ -100,8 +116,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Document ou client introuvable" }, { status: 404 });
     }
 
-    document = documentData;
-    sujet = `Votre ${typeDoc} Obillz n°${document.numero || ""}`;
+    const document = documentData;
+    const sujet = `Votre ${typeDoc} Obillz n°${document.numero || ""}`;
 
     const client = Array.isArray(document.client)
       ? document.client[0]
@@ -111,17 +127,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email du client introuvable" }, { status: 404 });
     }
 
-    clientEmail = client.email;
-    numero = document.numero || "";
-    montant =
+    const clientEmail = client.email;
+    const clientNom = client.nom || "Client";
+    const numero = document.numero || "";
+    const montant =
       typeof document.total_ttc === "number"
         ? document.total_ttc
         : Number(document.total_ttc) || calculerTotalTTC(document.items);
+    const dateEcheance = document.date_echeance
+      ? new Date(document.date_echeance).toLocaleDateString("fr-CH")
+      : "Non définie";
+
+    const senderEmail = (
+      parametres.emailExpediteur ||
+      process.env.RESEND_FROM_EMAIL ||
+      "onboarding@resend.dev"
+    ).trim();
+
+    if (!senderEmail) {
+      console.error("[API][email] Expéditeur manquant");
+      return NextResponse.json(
+        { error: "Email expéditeur manquant. Configurez un expéditeur dans Paramètres." },
+        { status: 400 }
+      );
+    }
+
+    const from = parametres.nomExpediteur
+      ? `${parametres.nomExpediteur} <${senderEmail}>`
+      : senderEmail;
 
     // Construire le corps de l'email
     const lignesHtml = (Array.isArray(document.items) ? document.items : [])
       .map(
-        (ligne: any) => {
+        (ligne: DocumentLine) => {
           const sousTotal = (ligne.quantite || 0) * (ligne.prixUnitaire || 0);
           return `
       <tr>
@@ -162,6 +200,8 @@ export async function POST(request: NextRequest) {
             <div class="content">
               <p>Bonjour,</p>
               <p>Vous trouverez ci-dessous votre ${typeDoc} n°<strong>${numero}</strong>.</p>
+              <p><strong>Client :</strong> ${clientNom}</p>
+              <p><strong>Date d'échéance :</strong> ${dateEcheance}</p>
               
               <table>
                 <thead>
@@ -192,18 +232,31 @@ export async function POST(request: NextRequest) {
 
     // Envoyer l'email via Resend
     const { data, error } = await resendInstance.emails.send({
-      from: parametres.nomExpediteur 
-        ? `${parametres.nomExpediteur} <${parametres.emailExpediteur || parametres.email}>`
-        : parametres.emailExpediteur || parametres.email,
+      from,
       to: [clientEmail],
       subject: sujet,
       html: emailHtml,
     });
 
     if (error) {
-      console.error("Erreur Resend:", error);
+      const resendMessage = getErrorMessage(error);
+      const resendName =
+        error && typeof error === "object" && "name" in error
+          ? String((error as { name?: unknown }).name || "")
+          : "";
+      console.error("[API][email] Erreur Resend:", {
+        message: resendMessage,
+        name: resendName,
+        from,
+        to: clientEmail,
+        documentId,
+        type,
+      });
       return NextResponse.json(
-        { error: "Erreur lors de l'envoi de l'email", details: error },
+        {
+          error: "Erreur lors de l'envoi de l'email",
+          details: resendMessage || "Erreur Resend inconnue",
+        },
         { status: 500 }
       );
     }
@@ -213,10 +266,10 @@ export async function POST(request: NextRequest) {
       message: "Email envoyé avec succès",
       emailId: data?.id 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur API email:", error);
     return NextResponse.json(
-      { error: "Erreur serveur", details: error.message },
+      { error: "Erreur serveur", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
