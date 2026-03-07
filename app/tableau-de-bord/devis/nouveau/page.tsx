@@ -21,6 +21,8 @@ interface Client {
   adresse: string;
 }
 
+const ALL_MEMBERS_VALUE = "__all_members__";
+
 export default function NouveauDevisPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
@@ -35,6 +37,20 @@ export default function NouveauDevisPage() {
   const [notes, setNotes] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{
+    current: number;
+    total: number;
+    created: number;
+    message: string;
+  } | null>(null);
+  const [bulkSummary, setBulkSummary] = useState<{
+    created: number;
+    emailed: number;
+    skippedNoEmail: number;
+    failed: number;
+    total: number;
+  } | null>(null);
 
   // Charger les clients depuis l'API Supabase
   useEffect(() => {
@@ -89,45 +105,185 @@ export default function NouveauDevisPage() {
     );
   };
 
+  const getLignesValides = () =>
+    lignes.filter((l) => l.designation.trim() !== "");
+
+  const createQuoteForClient = async (
+    targetClientId: string,
+    lignesValides: LigneDocument[]
+  ): Promise<{ id: string; numero?: string }> => {
+    const response = await fetch("/api/documents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "quote",
+        clientId: targetClientId,
+        lignes: lignesValides,
+        statut,
+        dateCreation: new Date().toISOString().split("T")[0],
+        ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+        ...(notes && notes.trim() !== "" ? { notes } : {}),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || t("dashboard.quotes.createError"));
+    }
+
+    const data = await response.json();
+    return { id: data.id, numero: data.numero };
+  };
+
+  const generateQuotePdf = async (id: string): Promise<void> => {
+    const response = await fetch(
+      `/api/documents/${id}/pdf?type=quote&download=true`,
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Erreur génération PDF");
+    }
+  };
+
+  const sendQuoteEmail = async (id: string): Promise<void> => {
+    const response = await fetch("/api/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "cotisation",
+        documentId: id,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData?.error || t("dashboard.quotes.detail.sendError"));
+    }
+  };
+
+  const handleBulkSubmit = async (lignesValides: LigneDocument[]) => {
+    if (clients.length === 0) {
+      toast.error("Aucun membre disponible pour l'envoi groupé.");
+      return;
+    }
+
+    setIsBulkProcessing(true);
+    setBulkSummary(null);
+    setBulkProgress({
+      current: 0,
+      total: clients.length,
+      created: 0,
+      message: "Initialisation de l'envoi groupé...",
+    });
+
+    let created = 0;
+    let emailed = 0;
+    let skippedNoEmail = 0;
+    let failed = 0;
+
+    for (let index = 0; index < clients.length; index += 1) {
+      const client = clients[index];
+      const step = index + 1;
+
+      try {
+        setBulkProgress({
+          current: index,
+          total: clients.length,
+          created,
+          message: `${step}/${clients.length} - Création de la cotisation pour ${client.nom}...`,
+        });
+
+        const createdQuote = await createQuoteForClient(client.id, lignesValides);
+        created += 1;
+
+        setBulkProgress({
+          current: index,
+          total: clients.length,
+          created,
+          message: `${step}/${clients.length} - Génération du PDF pour ${client.nom}...`,
+        });
+
+        await generateQuotePdf(createdQuote.id);
+
+        if (client.email && client.email.trim() !== "") {
+          setBulkProgress({
+            current: index,
+            total: clients.length,
+            created,
+            message: `${step}/${clients.length} - Envoi email à ${client.nom}...`,
+          });
+
+          await sendQuoteEmail(createdQuote.id);
+          emailed += 1;
+        } else {
+          skippedNoEmail += 1;
+        }
+      } catch (error) {
+        failed += 1;
+        console.error("[Cotisation][Bulk] Erreur traitement membre:", {
+          memberId: client.id,
+          memberName: client.nom,
+          error,
+        });
+      } finally {
+        setBulkProgress({
+          current: step,
+          total: clients.length,
+          created,
+          message: `${created}/${clients.length} cotisations créées...`,
+        });
+      }
+    }
+
+    const summary = {
+      created,
+      emailed,
+      skippedNoEmail,
+      failed,
+      total: clients.length,
+    };
+
+    setBulkSummary(summary);
+    setIsBulkProcessing(false);
+    setBulkProgress(null);
+
+    toast.success(
+      `Envoi groupé terminé : ${created} cotisations créées, ${emailed} emails envoyés, ${skippedNoEmail} membres sans email ignorés.`
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isBulkProcessing) {
+      return;
+    }
+
     if (!clientId) {
       toast.error(t("dashboard.quotes.selectClientError"));
       return;
     }
 
-    const lignesValides = lignes.filter(
-      (l) => l.designation.trim() !== ""
-    );
+    const lignesValides = getLignesValides();
 
     if (lignesValides.length === 0) {
       toast.error(t("dashboard.quotes.lineRequiredError"));
       return;
     }
 
+    if (clientId === ALL_MEMBERS_VALUE) {
+      await handleBulkSubmit(lignesValides);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "quote",
-          clientId,
-          lignes: lignesValides,
-          statut,
-          dateCreation: new Date().toISOString().split("T")[0],
-          ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-          ...(notes && notes.trim() !== "" ? { notes } : {}),
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("dashboard.quotes.createError"));
-      }
-
-      const data = await response.json();
+      const data = await createQuoteForClient(clientId, lignesValides);
       setDocumentId(data.id);
       console.log("[Devis] Devis créé via API avec ID:", data.id, "Numéro:", data.numero);
       router.push(`/tableau-de-bord/devis/${data.id}`);
@@ -144,6 +300,10 @@ export default function NouveauDevisPage() {
     // Validation
     if (!clientId) {
       toast.error(t("dashboard.quotes.selectClientError"));
+      return;
+    }
+    if (clientId === ALL_MEMBERS_VALUE) {
+      toast.error("La prévisualisation/téléchargement PDF est disponible en mode membre individuel.");
       return;
     }
 
@@ -263,12 +423,13 @@ export default function NouveauDevisPage() {
               required
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              disabled={loadingClients}
+              disabled={loadingClients || isBulkProcessing}
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">
                 {loadingClients ? t("dashboard.quotes.loadingClients") : t("dashboard.quotes.selectClient")}
               </option>
+              <option value={ALL_MEMBERS_VALUE}>Tous les membres (envoi groupé)</option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
                   {client.nom}
@@ -481,6 +642,35 @@ export default function NouveauDevisPage() {
           </div>
         </div>
 
+        {bulkProgress && (
+          <div className="rounded-xl border border-subtle bg-surface p-6 space-y-3">
+            <p className="text-sm font-medium text-primary">{bulkProgress.message}</p>
+            <div className="h-2 w-full rounded-full bg-surface-hover overflow-hidden">
+              <div
+                className="h-full accent-bg transition-all"
+                style={{
+                  width: `${bulkProgress.total > 0 ? (bulkProgress.current / bulkProgress.total) * 100 : 0}%`,
+                }}
+              />
+            </div>
+            <p className="text-xs text-secondary">
+              {bulkProgress.created}/{bulkProgress.total} cotisations créées
+            </p>
+          </div>
+        )}
+
+        {bulkSummary && (
+          <div className="rounded-xl border border-subtle bg-surface p-6 space-y-2">
+            <h3 className="text-lg font-semibold text-primary">Résumé de l'envoi groupé</h3>
+            <p className="text-secondary">{bulkSummary.created} cotisations créées</p>
+            <p className="text-secondary">{bulkSummary.emailed} emails envoyés</p>
+            <p className="text-secondary">{bulkSummary.skippedNoEmail} membres sans email ignorés</p>
+            {bulkSummary.failed > 0 && (
+              <p className="text-red-600">{bulkSummary.failed} traitements en erreur</p>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-3 flex-wrap">
           <button
             type="button"
@@ -492,7 +682,7 @@ export default function NouveauDevisPage() {
           <button
             type="button"
             onClick={() => saveAndOpenPdf(false)}
-            disabled={savingForPdf}
+            disabled={savingForPdf || isBulkProcessing}
             className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
@@ -510,7 +700,7 @@ export default function NouveauDevisPage() {
           <button
             type="button"
             onClick={() => saveAndOpenPdf(true)}
-            disabled={savingForPdf}
+            disabled={savingForPdf || isBulkProcessing}
             className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
           >
             {savingForPdf ? (
@@ -527,9 +717,17 @@ export default function NouveauDevisPage() {
           </button>
           <button
             type="submit"
-            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
+            disabled={isBulkProcessing}
+            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {t("dashboard.quotes.createAction")}
+            {isBulkProcessing ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Envoi groupé en cours...
+              </>
+            ) : (
+              t("dashboard.quotes.createAction")
+            )}
           </button>
         </div>
       </form>
