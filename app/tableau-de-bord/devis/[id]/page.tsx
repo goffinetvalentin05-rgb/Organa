@@ -10,7 +10,7 @@ import {
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Eye, Download, Mail, Trash, ArrowRight } from "@/lib/icons";
+import { Eye, Download, Mail, Trash } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 
@@ -108,40 +108,6 @@ export default function DevisDetailPage() {
       router.push("/tableau-de-bord/devis");
     } catch (error: any) {
       toast.error(error?.message || t("dashboard.quotes.detail.deleteErrorFallback"));
-    }
-  };
-
-  const handleTransformerEnFacture = async () => {
-    if (!devis) return;
-    if (!confirm(t("dashboard.quotes.detail.convertConfirm"))) return;
-    if (!devis.clientId) {
-      toast.error(t("dashboard.quotes.detail.missingClient"));
-      return;
-    }
-    try {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "invoice",
-          clientId: devis.clientId,
-          lignes: devis.lignes,
-          statut: "brouillon",
-          dateCreation: new Date().toISOString().split("T")[0],
-          ...(devis.dateEcheance ? { dateEcheance: devis.dateEcheance } : {}),
-          ...(devis.notes ? { notes: devis.notes } : {}),
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.error || t("dashboard.quotes.detail.convertError"));
-      }
-
-      const data = await response.json();
-      router.push(`/tableau-de-bord/factures/${data.id}`);
-    } catch (error: any) {
-      toast.error(error?.message || t("dashboard.quotes.detail.convertErrorFallback"));
     }
   };
 
@@ -318,13 +284,6 @@ export default function DevisDetailPage() {
           >
             <Download className="w-4 h-4" />
             {t("dashboard.quotes.detail.downloadPdf")}
-          </button>
-          <button
-            onClick={handleTransformerEnFacture}
-            className="px-4 py-2 rounded-lg accent-bg text-white font-medium transition-all flex items-center gap-2"
-          >
-            <ArrowRight className="w-4 h-4" />
-            {t("dashboard.quotes.detail.convertAction")}
           </button>
           <button
             onClick={handleDelete}
