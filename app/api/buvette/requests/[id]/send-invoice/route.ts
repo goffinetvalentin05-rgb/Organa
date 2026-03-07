@@ -7,6 +7,7 @@ import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-p
 export const runtime = "nodejs";
 
 const FROM_EMAIL = "noreply@obillz.com";
+const RESEND_TIMEOUT_MS = 20000;
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Erreur serveur";
@@ -38,6 +39,7 @@ export async function POST(
 
     const body = await request.json();
     const amount = Number(body?.amount);
+    const customMessage = typeof body?.message === "string" ? body.message.trim() : "";
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
@@ -56,6 +58,13 @@ export async function POST(
     if (reqData.status !== "accepted") {
       return NextResponse.json(
         { error: "Action disponible uniquement pour les réservations acceptées" },
+        { status: 400 }
+      );
+    }
+
+    if (!reqData.email) {
+      return NextResponse.json(
+        { error: "Email destinataire introuvable sur la réservation" },
         { status: 400 }
       );
     }
@@ -130,6 +139,7 @@ export async function POST(
 
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
+      console.error("[API][buvette][send-invoice] RESEND_API_KEY manquante");
       return NextResponse.json(
         { error: "RESEND_API_KEY non configurée sur le serveur" },
         { status: 500 }
@@ -138,41 +148,51 @@ export async function POST(
 
     const resend = new Resend(resendApiKey);
     const filename = `facture-buvette-${reqData.reservation_date}.pdf`;
-    const { error: sendError } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [reqData.email],
-      subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <p>Bonjour ${reqData.first_name},</p>
-          <p>
-            Suite à la validation de ta réservation de la buvette
-            pour le ${formattedDate}, tu trouveras en pièce jointe ta facture
-            d'un montant de ${formattedAmount} CHF.
-          </p>
-          <p>N'hésite pas à nous contacter si tu as des questions.</p>
-          <p>À bientôt !</p>
-        </div>
-      `,
-      text: `Bonjour ${reqData.first_name},
+    const defaultMessage = `Bonjour ${reqData.first_name},
 
-Suite à la validation de ta réservation de la buvette pour le ${formattedDate},
-tu trouveras en pièce jointe ta facture d'un montant de ${formattedAmount} CHF.
+Suite à la validation de ta réservation de la buvette
+pour le ${formattedDate}, tu trouveras en pièce jointe ta facture.
 
 N'hésite pas à nous contacter si tu as des questions.
-À bientôt !`,
-      attachments: [
-        {
-          filename,
-          content: Buffer.from(invoicePdf).toString("base64"),
-        },
-      ],
-    });
+À bientôt !`;
+
+    const finalTextMessage = customMessage || defaultMessage;
+    const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
+
+    const sendResult = await Promise.race([
+      resend.emails.send({
+        from: FROM_EMAIL,
+        to: [reqData.email],
+        subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <div>${finalHtmlMessage}</div>
+            <p style="margin-top:12px;"><strong>Montant :</strong> ${formattedAmount} CHF</p>
+          </div>
+        `,
+        text: `${finalTextMessage}\n\nMontant : ${formattedAmount} CHF`,
+        attachments: [
+          {
+            filename,
+            content: Buffer.from(invoicePdf).toString("base64"),
+          },
+        ],
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout envoi email Resend")), RESEND_TIMEOUT_MS)
+      ),
+    ]);
+
+    const sendError =
+      sendResult && typeof sendResult === "object" && "error" in sendResult
+        ? (sendResult as { error?: { message?: string } }).error
+        : undefined;
 
     if (sendError) {
       console.error("[API][buvette][send-invoice] Erreur Resend:", {
         requestId: id,
-        email: reqData.email,
+        to: reqData.email,
+        from: FROM_EMAIL,
         message: sendError.message,
       });
       return NextResponse.json(

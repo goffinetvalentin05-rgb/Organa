@@ -49,6 +49,8 @@ export default function BuvettePage() {
   const [infoMessageDraft, setInfoMessageDraft] = useState("");
   const [sendingInfo, setSendingInfo] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceMessageDraft, setInvoiceMessageDraft] = useState("");
+  const [invoiceStep, setInvoiceStep] = useState<"message" | "amount">("message");
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [sendingInvoice, setSendingInvoice] = useState(false);
 
@@ -224,6 +226,21 @@ N'hésite pas à nous contacter si tu as des questions.
     setShowInfoModal(true);
   };
 
+  const openInvoiceModal = () => {
+    if (!selectedRequest) return;
+    const defaultText = `Bonjour ${selectedRequest.first_name},
+
+Suite à la validation de ta réservation de la buvette
+pour le ${formatDateFr(selectedRequest.reservation_date)}, tu trouveras en pièce jointe ta facture.
+
+N'hésite pas à nous contacter si tu as des questions.
+À bientôt !`;
+    setInvoiceMessageDraft(defaultText);
+    setInvoiceAmount("");
+    setInvoiceStep("message");
+    setShowInvoiceModal(true);
+  };
+
   const sendPracticalInfo = async () => {
     if (!selectedRequest) return;
     if (!infoMessageDraft.trim()) {
@@ -234,15 +251,19 @@ N'hésite pas à nous contacter si tu as des questions.
     setSendingInfo(true);
     setMessage(null);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-info`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: infoMessageDraft }),
-      });
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer les infos pratiques"));
       setShowInfoModal(false);
       setMessage("Infos pratiques envoyées avec succès.");
     } catch (error: unknown) {
+      console.error("[Buvette][UI] Erreur envoi infos pratiques:", error);
       setMessage(getErrorMessage(error));
     } finally {
       setSendingInfo(false);
@@ -251,6 +272,10 @@ N'hésite pas à nous contacter si tu as des questions.
 
   const sendInvoice = async () => {
     if (!selectedRequest) return;
+    if (!invoiceMessageDraft.trim()) {
+      setMessage("Le message ne peut pas être vide.");
+      return;
+    }
     const amount = Number(invoiceAmount);
     if (!Number.isFinite(amount) || amount <= 0) {
       setMessage("Merci de saisir un montant valide.");
@@ -265,7 +290,7 @@ N'hésite pas à nous contacter si tu as des questions.
       const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-invoice`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount, message: invoiceMessageDraft }),
         signal: controller.signal,
       }).finally(() => clearTimeout(timeoutId));
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer la facture"));
@@ -486,7 +511,7 @@ N'hésite pas à nous contacter si tu as des questions.
                         Envoyer les infos
                       </button>
                       <button
-                        onClick={() => setShowInvoiceModal(true)}
+                        onClick={openInvoiceModal}
                         className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
                       >
                         Envoyer la facture
@@ -572,34 +597,64 @@ N'hésite pas à nous contacter si tu as des questions.
                 ✕
               </button>
             </div>
-            <p className="text-sm text-slate-600">
-              Saisis le montant de la facture pour {selectedRequest.first_name}{" "}
-              {selectedRequest.last_name}.
-            </p>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={invoiceAmount}
-              onChange={(e) => setInvoiceAmount(e.target.value)}
-              placeholder="Montant en CHF"
-              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowInvoiceModal(false)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={sendInvoice}
-                disabled={sendingInvoice}
-                className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
-              >
-                {sendingInvoice ? "Envoi..." : "Envoyer"}
-              </button>
-            </div>
+            {invoiceStep === "message" ? (
+              <>
+                <p className="text-sm text-slate-600">
+                  Étape A - Personnalise le message avant envoi.
+                </p>
+                <textarea
+                  value={invoiceMessageDraft}
+                  onChange={(e) => setInvoiceMessageDraft(e.target.value)}
+                  rows={10}
+                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setShowInvoiceModal(false)}
+                    className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={() => setInvoiceStep("amount")}
+                    className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
+                  >
+                    Continuer
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-slate-600">
+                  Étape B - Saisis le montant en CHF pour{" "}
+                  {selectedRequest.first_name} {selectedRequest.last_name}.
+                </p>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={invoiceAmount}
+                  onChange={(e) => setInvoiceAmount(e.target.value)}
+                  placeholder="Montant en CHF"
+                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setInvoiceStep("message")}
+                    className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                  >
+                    Retour
+                  </button>
+                  <button
+                    onClick={sendInvoice}
+                    disabled={sendingInvoice}
+                    className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                  >
+                    {sendingInvoice ? "Envoi..." : "Générer et envoyer la facture"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
