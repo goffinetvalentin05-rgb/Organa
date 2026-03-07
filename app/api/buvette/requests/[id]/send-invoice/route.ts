@@ -1,26 +1,50 @@
 import React from "react";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { renderToBuffer } from "@react-pdf/renderer";
 import { createClient } from "@/lib/supabase/server";
-import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { FacturePdf } from "@/lib/pdf/FacturePdf";
+import { getCurrencySymbol } from "@/lib/utils/currency";
 
 export const runtime = "nodejs";
 
 const FROM_EMAIL = "noreply@obillz.com";
-const RESEND_TIMEOUT_MS = 20000;
 
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "Erreur serveur";
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  return "Erreur inconnue";
 }
 
-const styles = StyleSheet.create({
-  page: { padding: 32, fontSize: 12, fontFamily: "Helvetica" },
-  title: { fontSize: 20, marginBottom: 16, fontWeight: 700 },
-  section: { marginBottom: 10 },
-  label: { fontWeight: 700 },
-  amount: { fontSize: 16, marginTop: 10, fontWeight: 700 },
-  footer: { marginTop: 26, color: "#555" },
-});
+async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
+  try {
+    if (!url.startsWith("https://")) return undefined;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { Accept: "image/*" },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) return undefined;
+    const contentType = response.headers.get("content-type") || "image/png";
+    if (!contentType.startsWith("image/")) return undefined;
+
+    const arrayBuffer = await response.arrayBuffer();
+    if (!arrayBuffer.byteLength) return undefined;
+
+    return `data:${contentType};base64,${Buffer.from(arrayBuffer).toString("base64")}`;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function POST(
   request: NextRequest,
@@ -31,9 +55,10 @@ export async function POST(
     const supabase = await createClient();
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser();
 
-    if (!user) {
+    if (authError || !user || !user.id) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
@@ -54,14 +79,12 @@ export async function POST(
     if (reqError || !reqData) {
       return NextResponse.json({ error: "Réservation introuvable" }, { status: 404 });
     }
-
     if (reqData.status !== "accepted") {
       return NextResponse.json(
         { error: "Action disponible uniquement pour les réservations acceptées" },
         { status: 400 }
       );
     }
-
     if (!reqData.email) {
       return NextResponse.json(
         { error: "Email destinataire introuvable sur la réservation" },
@@ -71,7 +94,9 @@ export async function POST(
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+      .select(
+        "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, resend_api_key"
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -83,82 +108,78 @@ export async function POST(
       );
     }
 
-    const clubName = profile?.company_name || "Club";
-    const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
-    const formattedAmount = amount.toFixed(2);
-
-    const invoicePdf = await renderToBuffer(
-      React.createElement(
-        Document,
-        null,
-        React.createElement(
-          Page,
-          { size: "A4", style: styles.page },
-          React.createElement(Text, { style: styles.title }, "Facture - Réservation buvette"),
-          React.createElement(
-            View,
-            { style: styles.section },
-            React.createElement(
-              Text,
-              null,
-              React.createElement(Text, { style: styles.label }, "Client : "),
-              `${reqData.first_name} ${reqData.last_name}`
-            )
-          ),
-          React.createElement(
-            View,
-            { style: styles.section },
-            React.createElement(
-              Text,
-              null,
-              React.createElement(Text, { style: styles.label }, "Date de réservation : "),
-              formattedDate
-            )
-          ),
-          React.createElement(
-            View,
-            { style: styles.section },
-            React.createElement(
-              Text,
-              null,
-              React.createElement(Text, { style: styles.label }, "Type de réservation : "),
-              reqData.event_type
-            )
-          ),
-          React.createElement(
-            View,
-            { style: styles.section },
-            React.createElement(
-              Text,
-              null,
-              React.createElement(Text, { style: styles.label }, "Club : "),
-              clubName
-            )
-          ),
-          React.createElement(Text, { style: styles.amount }, `Montant total : ${formattedAmount} CHF`),
-          React.createElement(
-            Text,
-            { style: styles.footer },
-            "Merci pour votre réservation. Pour toute question, contactez le club."
-          )
-        )
-      )
-    );
-
-    const parametres = {
-      resendApiKey: profile?.resend_api_key || process.env.RESEND_API_KEY || "",
-    };
-
-    if (!parametres.resendApiKey) {
+    const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
+    if (!resendApiKey) {
       console.error("[API][buvette][send-invoice] Clé Resend absente (profil + env)");
       return NextResponse.json(
-        { error: "RESEND_API_KEY non configurée sur le serveur" },
-        { status: 500 }
+        { error: "Clé API Resend non configurée. Veuillez la configurer dans les paramètres." },
+        { status: 400 }
       );
     }
+    const resendInstance = new Resend(resendApiKey);
 
-    const resendInstance = new Resend(parametres.resendApiKey);
-    const filename = `facture-buvette-${reqData.reservation_date}.pdf`;
+    let logoSourceUrl: string | undefined;
+    if (profile?.logo_url) {
+      logoSourceUrl = profile.logo_url;
+    } else if (profile?.logo_path) {
+      const { data: urlData } = supabase.storage
+        .from("Logos")
+        .getPublicUrl(profile.logo_path);
+      logoSourceUrl = urlData.publicUrl;
+    }
+    const logoUrl = logoSourceUrl ? await fetchImageAsDataUrl(logoSourceUrl) : undefined;
+
+    const currency = profile?.currency || "CHF";
+    const currencySymbol = profile?.currency_symbol || getCurrencySymbol(currency);
+    const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
+    const todayIso = new Date().toISOString().split("T")[0];
+    const formattedAmount = amount.toFixed(2);
+    const invoiceNumber = `FAC-BUV-${new Date().getFullYear()}-${id.slice(0, 8).toUpperCase()}`;
+
+    const pdfBuffer = await renderToBuffer(
+      React.createElement(FacturePdf, {
+        company: {
+          name: profile?.company_name || "Club",
+          address: profile?.company_address || "",
+          email: profile?.company_email || "",
+          phone: profile?.company_phone || "",
+          logoUrl,
+          iban: profile?.iban || "",
+          bankName: profile?.bank_name || "",
+          conditionsPaiement: profile?.payment_terms || "",
+        },
+        client: {
+          name: `${reqData.first_name} ${reqData.last_name}`.trim(),
+          email: reqData.email,
+          address: "",
+        },
+        document: {
+          number: invoiceNumber,
+          date: todayIso,
+          dueDate: reqData.reservation_date,
+          currency,
+          currencySymbol,
+          vatRate: 0,
+          notes: `Date de réservation: ${formattedDate}`,
+        },
+        lines: [
+          {
+            label: `Location buvette - ${reqData.event_type}`,
+            qty: 1,
+            unitPrice: amount,
+            total: amount,
+            vat: 0,
+          },
+        ],
+        totals: {
+          subtotal: amount,
+          vat: 0,
+          total: amount,
+        },
+        primaryColor: profile?.primary_color || "#1D4ED8",
+      })
+    );
+
     const defaultMessage = `Bonjour ${reqData.first_name},
 
 Suite à la validation de ta réservation de la buvette
@@ -166,56 +187,62 @@ pour le ${formattedDate}, tu trouveras en pièce jointe ta facture.
 
 N'hésite pas à nous contacter si tu as des questions.
 À bientôt !`;
-
     const finalTextMessage = customMessage || defaultMessage;
     const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
+    const filename = `facture-buvette-${invoiceNumber}.pdf`;
 
-    const sendResult = await Promise.race([
-      resendInstance.emails.send({
-        from: FROM_EMAIL,
-        to: [reqData.email],
-        subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-            <div>${finalHtmlMessage}</div>
-            <p style="margin-top:12px;"><strong>Montant :</strong> ${formattedAmount} CHF</p>
-          </div>
-        `,
-        text: `${finalTextMessage}\n\nMontant : ${formattedAmount} CHF`,
-        attachments: [
-          {
-            filename,
-            content: Buffer.from(invoicePdf).toString("base64"),
-          },
-        ],
-      }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout envoi email Resend")), RESEND_TIMEOUT_MS)
-      ),
-    ]);
+    const { data, error } = await resendInstance.emails.send({
+      from: FROM_EMAIL,
+      to: [reqData.email],
+      subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <div>${finalHtmlMessage}</div>
+          <p style="margin-top: 12px;"><strong>Montant :</strong> ${formattedAmount} ${currencySymbol}</p>
+        </div>
+      `,
+      text: `${finalTextMessage}\n\nMontant : ${formattedAmount} ${currencySymbol}`,
+      attachments: [
+        {
+          filename,
+          content: Buffer.from(pdfBuffer).toString("base64"),
+        },
+      ],
+    });
 
-    const sendError =
-      sendResult && typeof sendResult === "object" && "error" in sendResult
-        ? (sendResult as { error?: { message?: string } }).error
-        : undefined;
-
-    if (sendError) {
+    if (error) {
+      const resendMessage = getErrorMessage(error);
+      const resendName =
+        error && typeof error === "object" && "name" in error
+          ? String((error as { name?: unknown }).name || "")
+          : "";
       console.error("[API][buvette][send-invoice] Erreur Resend:", {
-        requestId: id,
-        to: reqData.email,
+        message: resendMessage,
+        name: resendName,
         from: FROM_EMAIL,
-        message: sendError.message,
+        to: reqData.email,
+        requestId: id,
       });
       return NextResponse.json(
-        { error: `Erreur lors de l'envoi de la facture: ${sendError.message}` },
+        { error: "Erreur lors de l'envoi de la facture", details: resendMessage },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Email envoyé avec succès",
+        emailId: data?.id,
+      },
+      { status: 200 }
+    );
   } catch (error: unknown) {
     console.error("[API][buvette][send-invoice] Erreur inattendue:", error);
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur serveur", details: getErrorMessage(error) },
+      { status: 500 }
+    );
   }
 }
 

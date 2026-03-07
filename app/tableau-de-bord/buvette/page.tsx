@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
+import toast from "react-hot-toast";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -261,7 +262,7 @@ N'hésite pas à nous contacter si tu as des questions.
       }).finally(() => clearTimeout(timeoutId));
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer les infos pratiques"));
       setShowInfoModal(false);
-      setMessage("Infos pratiques envoyées avec succès.");
+      toast.success("✅ Email envoyé avec succès !");
     } catch (error: unknown) {
       console.error("[Buvette][UI] Erreur envoi infos pratiques:", error);
       setMessage(getErrorMessage(error));
@@ -296,7 +297,7 @@ N'hésite pas à nous contacter si tu as des questions.
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer la facture"));
       setShowInvoiceModal(false);
       setInvoiceAmount("");
-      setMessage("Facture envoyée avec succès.");
+      toast.success("✅ Email envoyé avec succès !");
     } catch (error: unknown) {
       console.error("[Buvette][UI] Erreur envoi facture:", error);
       setMessage(getErrorMessage(error));
