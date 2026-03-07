@@ -4,6 +4,14 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 
 export const runtime = "nodejs";
+const FROM_EMAIL = "noreply@obillz.com";
+
+function getFirstName(fullName: string | null | undefined): string {
+  if (!fullName) return "membre";
+  const trimmed = fullName.trim();
+  if (!trimmed) return "membre";
+  return trimmed.split(/\s+/)[0] || "membre";
+}
 
 /* =========================
    POST : affecter un membre à un créneau
@@ -73,18 +81,47 @@ export async function POST(
     }
 
     // Vérifier que le membre appartient à l'utilisateur
-    const { data: client, error: clientError } = await supabase
+    // Compatibilité schéma: certains environnements utilisent `name`, d'autres `nom`.
+    let memberRecord: { id: string; displayName: string; email: string | null } | null = null;
+    const { data: memberByName, error: memberByNameError } = await supabase
       .from("clients")
-      .select("id, nom, email")
+      .select("id, name, email")
       .eq("id", clientId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (clientError || !client) {
-      return NextResponse.json(
-        { error: "Membre non trouvé" },
-        { status: 404 }
-      );
+    if (memberByName && !memberByNameError) {
+      memberRecord = {
+        id: memberByName.id,
+        displayName: memberByName.name || "Membre",
+        email: memberByName.email || null,
+      };
+    } else {
+      const { data: memberByNom, error: memberByNomError } = await supabase
+        .from("clients")
+        .select("id, nom, email")
+        .eq("id", clientId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (memberByNom && !memberByNomError) {
+        memberRecord = {
+          id: memberByNom.id,
+          displayName: memberByNom.nom || "Membre",
+          email: memberByNom.email || null,
+        };
+      } else {
+        console.error("[API][assignments][POST] Membre introuvable:", {
+          clientId,
+          userId: user.id,
+          memberByNameError: memberByNameError?.message || null,
+          memberByNomError: memberByNomError?.message || null,
+        });
+        return NextResponse.json(
+          { error: "Membre non trouvé" },
+          { status: 404 }
+        );
+      }
     }
 
     // Vérifier que le créneau n'est pas déjà plein
@@ -136,91 +173,95 @@ export async function POST(
 
     // Envoyer la notification par email si demandé et si le membre a un email
     let notificationSent = false;
-    if (sendNotification && client.email) {
+    if (sendNotification) {
       try {
         // Récupérer les paramètres email de l'utilisateur
         const { data: profile } = await supabase
           .from("profiles")
-          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+          .select("resend_api_key")
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (profile?.resend_api_key) {
-          const resend = new Resend(profile.resend_api_key);
-          
-          // Formater la date
-          const dateFormatted = new Date(planning.date).toLocaleDateString("fr-FR", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
+        if (!memberRecord?.email) {
+          console.error("[API][assignments][POST] Notification ignorée: email membre manquant", {
+            clientId,
+            assignmentId: assignment.id,
           });
+        } else {
+          const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
+          if (!resendApiKey) {
+            console.error("[API][assignments][POST] Clé Resend absente (profil + env)", {
+              userId: user.id,
+              assignmentId: assignment.id,
+            });
+          } else {
+            const resendInstance = new Resend(resendApiKey);
+            const firstName = getFirstName(memberRecord.displayName);
+            const dateFormatted = new Date(planning.date).toLocaleDateString("fr-FR", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+            const startTime = slot.start_time.slice(0, 5);
+            const endTime = slot.end_time.slice(0, 5);
 
-          const emailHtml = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="utf-8">
-                <style>
-                  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                  .header { background: linear-gradient(135deg, #7C5CFF 0%, #8B5CF6 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-                  .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
-                  .assignment-box { background: white; border-left: 4px solid #7C5CFF; padding: 15px; margin: 20px 0; border-radius: 4px; }
-                  .info-row { margin: 8px 0; }
-                  .label { font-weight: bold; color: #666; }
-                </style>
-              </head>
-              <body>
-                <div class="container">
-                  <div class="header">
-                    <h1>${profile.company_name || "Votre Club"}</h1>
-                  </div>
-                  <div class="content">
-                    <p>Bonjour ${client.nom},</p>
-                    <p>Vous avez été affecté(e) à un créneau de bénévolat :</p>
-                    
-                    <div class="assignment-box">
-                      <div class="info-row">
-                        <span class="label">Planning :</span> ${planning.name}
-                      </div>
-                      <div class="info-row">
-                        <span class="label">Date :</span> ${dateFormatted}
-                      </div>
-                      <div class="info-row">
-                        <span class="label">Poste :</span> ${slot.location}
-                      </div>
-                      <div class="info-row">
-                        <span class="label">Horaires :</span> ${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}
-                      </div>
-                    </div>
-                    
-                    <p>Merci pour votre participation !</p>
-                    <p>Cordialement,<br>${profile.company_name || "L'équipe"}</p>
-                  </div>
-                </div>
-              </body>
-            </html>
-          `;
+            const emailText = `Bonjour ${firstName},
 
-          const fromEmail = profile.email_sender_name 
-            ? `${profile.email_sender_name} <${profile.email_sender_email || profile.company_email}>`
-            : profile.email_sender_email || profile.company_email;
+Tu as été affecté(e) au planning suivant :
 
-          await resend.emails.send({
-            from: fromEmail,
-            to: [client.email],
-            subject: `Affectation : ${planning.name} - ${slot.location}`,
-            html: emailHtml,
-          });
+📅 Événement : ${planning.name}
+📍 Créneau : ${slot.location}
+🕐 Horaires : ${startTime} - ${endTime}
+📆 Date : ${dateFormatted}
 
-          // Mettre à jour la date de notification
-          await supabase
-            .from("planning_assignments")
-            .update({ notified_at: new Date().toISOString() })
-            .eq("id", assignment.id);
+Merci pour ta disponibilité !
+À bientôt !`;
 
-          notificationSent = true;
+            const emailHtml = `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+                <p>Bonjour ${firstName},</p>
+                <p>Tu as été affecté(e) au planning suivant :</p>
+                <p>
+                  📅 <strong>Événement :</strong> ${planning.name}<br/>
+                  📍 <strong>Créneau :</strong> ${slot.location}<br/>
+                  🕐 <strong>Horaires :</strong> ${startTime} - ${endTime}<br/>
+                  📆 <strong>Date :</strong> ${dateFormatted}
+                </p>
+                <p>Merci pour ta disponibilité !<br/>À bientôt !</p>
+              </div>
+            `;
+
+            const sendResult = await resendInstance.emails.send({
+              from: FROM_EMAIL,
+              to: [memberRecord.email],
+              subject: `Affectation : ${planning.name} - ${slot.location}`,
+              html: emailHtml,
+              text: emailText,
+            });
+
+            const sendError =
+              sendResult && typeof sendResult === "object" && "error" in sendResult
+                ? (sendResult as { error?: { message?: string } }).error
+                : undefined;
+
+            if (sendError) {
+              console.error("[API][assignments][POST] Erreur Resend:", {
+                assignmentId: assignment.id,
+                clientId,
+                to: memberRecord.email,
+                from: FROM_EMAIL,
+                message: sendError.message,
+              });
+            } else {
+              await supabase
+                .from("planning_assignments")
+                .update({ notified_at: new Date().toISOString() })
+                .eq("id", assignment.id);
+
+              notificationSent = true;
+            }
+          }
         }
       } catch (emailError) {
         console.error("[API][assignments][POST] Erreur envoi email:", emailError);
@@ -235,7 +276,11 @@ export async function POST(
         id: assignment.id,
         slotId: assignment.slot_id,
         clientId: assignment.client_id,
-        member: client,
+        member: {
+          id: memberRecord.id,
+          nom: memberRecord.displayName,
+          email: memberRecord.email || undefined,
+        },
         notifiedAt: notificationSent ? new Date().toISOString() : null,
         createdAt: assignment.created_at,
       },
