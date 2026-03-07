@@ -85,7 +85,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select(
-      "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at"
+      "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder"
     )
     .eq("user_id", user.id)
     .maybeSingle();
@@ -125,7 +125,26 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     return createExpiredSubscription();
   }
 
-  // 4. Calculer le statut effectif
+  // 4. Bypass fondateur: accès total sans vérification trial/abonnement
+  if (profile.is_founder === true) {
+    console.log(
+      `[BILLING][getSubscriptionStatus] user_id=${user.id} is_founder=true, bypass des vérifications d'abonnement`
+    );
+
+    return {
+      status: "active",
+      billingCycle: null,
+      trialStartedAt: null,
+      trialDaysRemaining: 0,
+      trialEndsAt: null,
+      isTrialExpired: false,
+      canWrite: true,
+      subscriptionStartedAt: null,
+      subscriptionEndsAt: null,
+    };
+  }
+
+  // 5. Calculer le statut effectif
   const trialStartedAt = profile.trial_started_at
     ? new Date(profile.trial_started_at)
     : profile.created_at
@@ -143,7 +162,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
   const billingCycle = profile.billing_cycle as BillingCycle;
   let status = profile.subscription_status as SubscriptionStatus;
 
-  // 5. Si le statut est 'active', vérifier que l'abonnement n'est pas expiré
+  // 6. Si le statut est 'active', vérifier que l'abonnement n'est pas expiré
   if (status === "active") {
     // TODO: Vérifier avec Stripe si l'abonnement est toujours actif
     return {
@@ -159,7 +178,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     };
   }
 
-  // 6. Si le statut est 'trial', vérifier si le trial n'est pas expiré
+  // 7. Si le statut est 'trial', vérifier si le trial n'est pas expiré
   if (status === "trial" && trialStartedAt) {
     const trialEndsAt = new Date(trialStartedAt);
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
@@ -213,7 +232,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     };
   }
 
-  // 7. Statut 'expired' ou autre
+  // 8. Statut 'expired' ou autre
   console.log(
     `[BILLING][getSubscriptionStatus] user_id=${user.id} status=expired`
   );
