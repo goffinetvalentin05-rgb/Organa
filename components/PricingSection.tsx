@@ -13,26 +13,51 @@ const features = [
   "Support prioritaire",
 ];
 
+function HighlightWord({ children }: { children: string }) {
+  return (
+    <span className="relative inline-block px-1 text-[#60A5FA]">
+      <span className="relative z-10 font-extrabold">{children}</span>
+      <svg
+        viewBox="0 0 210 52"
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-2 left-0 z-0 h-[0.56em] w-full transition-transform duration-300 ease-out"
+      >
+        <path
+          d="M6 35C46 22 83 18 121 21C152 23 179 28 203 34"
+          stroke="#93C5FD"
+          strokeWidth="12"
+          strokeLinecap="round"
+          fill="none"
+          strokeOpacity="0.5"
+        />
+        <path
+          d="M8 39C44 28 83 25 125 28C155 30 180 34 201 38"
+          stroke="#60A5FA"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+    </span>
+  );
+}
+
 function PricingCard({
   title,
   price,
   period,
   subPrice,
-  highlighted,
   badge,
 }: {
   title: string;
   price: string;
   period: string;
   subPrice?: string;
-  highlighted?: boolean;
   badge?: string;
 }) {
   return (
     <article
-      className={`relative rounded-xl bg-white p-8 shadow-lg ${
-        highlighted ? "border-2 border-[#2563eb] md:scale-105" : "border border-slate-200"
-      }`}
+      className="relative rounded-xl border border-gray-200 bg-white p-8 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.03] hover:border-blue-500 hover:shadow-xl"
     >
       {badge ? (
         <div className="mb-4">
@@ -76,9 +101,9 @@ function PricingCard({
 export default function PricingSection() {
   return (
     <section className="mx-auto mt-20 mb-20 w-full max-w-[1000px]">
-      <div className="text-center">
+      <div className="group text-center">
         <h2 className="text-4xl font-extrabold tracking-[-0.025em] text-slate-900 md:text-[3rem]">
-          Un tarif simple et transparent
+          Un tarif <HighlightWord>simple</HighlightWord> et transparent
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
           Essayez Obillz gratuitement pendant 7 jours. Sans engagement.
@@ -90,14 +115,13 @@ export default function PricingSection() {
         </div>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
         <PricingCard title="Mensuel" price="29 CHF" period="/ mois" />
         <PricingCard
           title="Annuel"
           price="299 CHF"
           period="/ an"
           subPrice="≈ 25 CHF / mois"
-          highlighted
           badge="2 mois offerts"
         />
       </div>
