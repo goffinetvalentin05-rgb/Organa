@@ -4,17 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 import { PRICING } from "@/lib/billing/subscription";
 
 export const runtime = "nodejs";
+const PRICE_MONTHLY = "price_1T8mVXHvElMyrvJkcAE9RpfC";
+const PRICE_YEARLY = "price_1T8mX1HvElMyrvJk5IZFEqfD";
 
 /**
  * Créer une session Stripe Checkout pour l'abonnement
  *
  * Body attendu:
- * - billingCycle: "monthly" | "yearly" (obligatoire)
+ * - billingInterval: "monthly" | "yearly" (obligatoire)
  *
  * Variables d'environnement requises:
  * - STRIPE_SECRET_KEY
- * - STRIPE_PRICE_MONTHLY (price_xxx pour 25 CHF/mois)
- * - STRIPE_PRICE_YEARLY (price_xxx pour 270 CHF/an)
  * - NEXT_PUBLIC_APP_URL
  */
 export async function POST(request: NextRequest) {
@@ -27,13 +27,19 @@ export async function POST(request: NextRequest) {
       body = {};
     }
 
-    const billingCycle = body.billingCycle as "monthly" | "yearly";
+    const billingInterval = (body.billingInterval || body.billingCycle) as
+      | "monthly"
+      | "yearly";
 
-    if (!billingCycle || (billingCycle !== "monthly" && billingCycle !== "yearly")) {
+    if (
+      !billingInterval ||
+      (billingInterval !== "monthly" && billingInterval !== "yearly")
+    ) {
       return NextResponse.json(
         {
-          error: "INVALID_BILLING_CYCLE",
-          message: "Le cycle de facturation doit être 'monthly' ou 'yearly'",
+          error: "INVALID_BILLING_INTERVAL",
+          message:
+            "L'intervalle de facturation doit être 'monthly' ou 'yearly'",
         },
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -43,19 +49,13 @@ export async function POST(request: NextRequest) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-    // Sélectionner le price ID selon le cycle
+    // Sélectionner le price ID selon l'intervalle
     const priceId =
-      billingCycle === "yearly"
-        ? process.env.STRIPE_PRICE_YEARLY
-        : process.env.STRIPE_PRICE_MONTHLY;
-
-    // Fallback vers l'ancienne variable si les nouvelles ne sont pas définies
-    const fallbackPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-    const finalPriceId = priceId || fallbackPriceId;
+      billingInterval === "yearly" ? PRICE_YEARLY : PRICE_MONTHLY;
 
     console.log("[API][stripe/checkout] Configuration:", {
-      billingCycle,
-      priceId: finalPriceId ? "✅ Configuré" : "❌ Manquant",
+      billingInterval,
+      priceId,
       appUrl: appUrl ? "✅ Configuré" : "❌ Manquant",
     });
 
@@ -74,7 +74,6 @@ export async function POST(request: NextRequest) {
 
     // Vérifier les autres variables
     const missing: string[] = [];
-    if (!finalPriceId) missing.push(billingCycle === "yearly" ? "STRIPE_PRICE_YEARLY" : "STRIPE_PRICE_MONTHLY");
     if (!appUrl) missing.push("NEXT_PUBLIC_APP_URL");
 
     if (missing.length > 0) {
@@ -118,12 +117,12 @@ export async function POST(request: NextRequest) {
 
     // 5. Créer la session Stripe Checkout
     console.log("[API][stripe/checkout] Création de la session Stripe Checkout...", {
-      billingCycle,
-      price_id: finalPriceId,
+      billingInterval,
+      price_id: priceId,
       user_id: user.id,
       user_email: user.email,
-      amount: PRICING[billingCycle].amount,
-      currency: PRICING[billingCycle].currency,
+      amount: PRICING[billingInterval].amount,
+      currency: PRICING[billingInterval].currency,
     });
 
     let session;
@@ -133,17 +132,17 @@ export async function POST(request: NextRequest) {
         payment_method_types: ["card"],
         line_items: [
           {
-            price: finalPriceId!,
+            price: priceId,
             quantity: 1,
           },
         ],
         customer_email: user.email || undefined,
         client_reference_id: user.id,
-        success_url: `${appUrl}/tableau-de-bord/parametres?checkout=success&cycle=${billingCycle}`,
+        success_url: `${appUrl}/tableau-de-bord/parametres?checkout=success&cycle=${billingInterval}`,
         cancel_url: `${appUrl}/tableau-de-bord/abonnement?checkout=cancelled`,
         metadata: {
           user_id: user.id,
-          billing_cycle: billingCycle,
+          billing_interval: billingInterval,
         },
       });
 
@@ -173,9 +172,9 @@ export async function POST(request: NextRequest) {
       {
         url: session.url,
         sessionId: session.id,
-        billingCycle,
-        amount: PRICING[billingCycle].amount,
-        currency: PRICING[billingCycle].currency,
+        billingInterval,
+        amount: PRICING[billingInterval].amount,
+        currency: PRICING[billingInterval].currency,
       },
       { status: 200, headers: { "Content-Type": "application/json" } }
     );

@@ -58,7 +58,7 @@ export default function AbonnementClient() {
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ billingCycle }),
+        body: JSON.stringify({ billingInterval: billingCycle }),
       });
 
       const data = await response.json();
@@ -78,10 +78,9 @@ export default function AbonnementClient() {
   };
 
   // Calculer le prix
-  const monthlyPrice = pricing?.monthly.amount || 25;
-  const yearlyPrice = pricing?.yearly.amount || 270;
+  const monthlyPrice = pricing?.monthly.amount || 29;
+  const yearlyPrice = pricing?.yearly.amount || 299;
   const yearlyMonthlyEquivalent = Math.round(yearlyPrice / 12);
-  const savings = monthlyPrice * 12 - yearlyPrice;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -194,7 +193,7 @@ export default function AbonnementClient() {
                   </span>
                   {billingCycle === "yearly" && (
                     <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">
-                      -{savings} CHF/an
+                      2 mois offerts
                     </span>
                   )}
                 </div>
@@ -323,7 +322,7 @@ export default function AbonnementClient() {
                   </svg>
                 </summary>
                 <p className="mt-3 text-secondary">
-                  L'abonnement annuel vous fait économiser {savings} CHF par an par rapport au mensuel. C'est idéal pour les clubs qui savent qu'ils utiliseront l'application sur le long terme.
+                  L'abonnement annuel inclut 2 mois offerts. C'est ideal pour les clubs qui savent qu'ils utiliseront l'application sur le long terme.
                 </p>
               </details>
             </div>

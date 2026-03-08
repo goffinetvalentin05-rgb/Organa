@@ -7,8 +7,8 @@
  * - Abonnement actif: accès complet (active)
  *
  * Tarifs:
- * - Mensuel: 25 CHF/mois
- * - Annuel: 270 CHF/an (économie de 10%)
+ * - Mensuel: 29 CHF/mois
+ * - Annuel: 299 CHF/an (2 mois offerts)
  */
 
 import { createClient } from "@/lib/supabase/server";
@@ -40,17 +40,17 @@ export const TRIAL_DURATION_DAYS = 7;
 
 export const PRICING = {
   monthly: {
-    amount: 25,
+    amount: 29,
     currency: "CHF",
     label: "Mensuel",
     period: "mois",
   },
   yearly: {
-    amount: 270,
+    amount: 299,
     currency: "CHF",
     label: "Annuel",
     period: "an",
-    savings: "Économisez 10%",
+    savings: "2 mois offerts",
   },
 } as const;
 

@@ -13,8 +13,9 @@ STRIPE_SECRET_KEY=sk_test_REMPLACEZ_PAR_VOTRE_CLE_SECRETE_STRIPE
 # Obtenez-le après avoir configuré un webhook dans Stripe Dashboard
 STRIPE_WEBHOOK_SECRET=whsec_REMPLACEZ_PAR_VOTRE_WEBHOOK_SECRET
 
-# Price ID pour le plan Pro (29 CHF / mois)
-NEXT_PUBLIC_STRIPE_PRICE_PRO=price_1SgRipHvElMyrvJkrgMDLt2w
+# Les price IDs Stripe sont definis en dur dans l'API checkout:
+# - monthly: price_1T8mVXHvElMyrvJkcAE9RpfC (29 CHF/mois)
+# - yearly:  price_1T8mX1HvElMyrvJk5IZFEqfD (299 CHF/an)
 
 # URL de base de l'application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -83,7 +84,6 @@ Votre fichier `.env.local` doit contenir :
 ```env
 STRIPE_SECRET_KEY=sk_test_VOTRE_CLE_ICI
 STRIPE_WEBHOOK_SECRET=whsec_VOTRE_WEBHOOK_SECRET_ICI
-NEXT_PUBLIC_STRIPE_PRICE_PRO=price_1SgRipHvElMyrvJkrgMDLt2w
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 SUPABASE_SERVICE_ROLE_KEY=votre_service_role_key_ici
 ```
@@ -169,7 +169,6 @@ Si vous voyez une erreur `ENV_MISSING` :
 # Stripe
 STRIPE_SECRET_KEY=sk_test_51AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
 STRIPE_WEBHOOK_SECRET=whsec_1234567890abcdefghijklmnopqrstuvwxyz
-NEXT_PUBLIC_STRIPE_PRICE_PRO=price_1SgRipHvElMyrvJkrgMDLt2w
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Supabase
