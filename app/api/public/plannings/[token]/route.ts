@@ -7,8 +7,9 @@ export const runtime = "nodejs";
 interface PlanningAssignmentRow {
   id: string;
   slot_id: string;
+  client_id?: string | null;
   created_at: string;
-  source: "internal_member" | "public_signup";
+  source: "internal_member" | "member" | "public_signup";
   public_name: string | null;
   public_email: string | null;
   public_phone: string | null;
@@ -116,7 +117,7 @@ function mapAssignment(assignment: PlanningAssignmentRow) {
 
   return {
     id: assignment.id,
-    source: assignment.source || "internal_member",
+    source: assignment.source || "member",
     createdAt: assignment.created_at,
     member: {
       id: client?.id || `public-${assignment.id}`,
@@ -195,8 +196,7 @@ export async function GET(
     }
 
     const clientIds = assignments
-      .filter((assignment) => assignment.source === "internal_member")
-      .map((assignment) => (assignment as PlanningAssignmentRow & { client_id?: string | null }).client_id)
+      .map((assignment) => assignment.client_id)
       .filter((id): id is string => Boolean(id));
     const clientsMap = await loadClientsMap(supabase, clientIds);
 
@@ -209,11 +209,8 @@ export async function GET(
             return mapped;
           }
 
-          const assignmentWithClientId = assignment as PlanningAssignmentRow & {
-            client_id?: string | null;
-          };
-          const client = assignmentWithClientId.client_id
-            ? clientsMap.get(assignmentWithClientId.client_id)
+          const client = assignment.client_id
+            ? clientsMap.get(assignment.client_id)
             : null;
           const fullName = getClientFullName(client);
 
@@ -226,8 +223,7 @@ export async function GET(
               telephone: client?.telephone || client?.phone || mapped.member.telephone,
             },
           };
-        })
-        .filter((assignment) => assignment.member.nom.trim().length > 0);
+        });
 
       return {
         id: slot.id,
