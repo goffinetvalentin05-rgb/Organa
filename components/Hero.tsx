@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
 
@@ -49,6 +50,17 @@ function CtaIcon() {
 }
 
 function MockupFrame() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleSound = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
+
   return (
     <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
       <div className="rounded-[1.85rem] border border-slate-800/50 bg-[#030712] p-3 shadow-[0_35px_90px_rgba(2,6,23,0.28)] md:p-5">
@@ -61,8 +73,9 @@ function MockupFrame() {
           <div className="group relative min-h-[220px] overflow-hidden sm:min-h-[280px] md:min-h-[380px]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(37,99,235,0.28),transparent_52%),radial-gradient(circle_at_80%_82%,rgba(59,130,246,0.24),transparent_58%)]" />
             <video
+              ref={videoRef}
               autoPlay
-              muted
+              muted={isMuted}
               loop
               playsInline
               preload="metadata"
@@ -70,6 +83,14 @@ function MockupFrame() {
             >
               <source src={encodeURI("/Vidéo-obillz-landingpage.MOV")} type="video/mp4" />
             </video>
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-label={isMuted ? "Activer le son" : "Couper le son"}
+              className="absolute bottom-4 right-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-lg text-white backdrop-blur-sm transition hover:bg-black/60"
+            >
+              {isMuted ? "🔇" : "🔊"}
+            </button>
           </div>
         </div>
       </div>
