@@ -239,14 +239,20 @@ export async function GET(
         .map((assignment) => {
           if (assignment.member_id) {
             const member = membersMap.get(assignment.member_id);
-            const displayName = getPersonFullName(member);
+            const memberAsClient = clientsMap.get(assignment.member_id);
+            const displayName =
+              getPersonFullName(member) || getClientFullName(memberAsClient);
             const mapped = mapAssignment(
               assignment,
-              displayName || getPublicVolunteerName(assignment) || "Participant"
+              displayName || getPublicVolunteerName(assignment)
             );
             if (member) {
               mapped.member.email = member.email || undefined;
               mapped.member.telephone = member.telephone || member.phone || undefined;
+            } else if (memberAsClient) {
+              mapped.member.email = memberAsClient.email || undefined;
+              mapped.member.telephone =
+                memberAsClient.telephone || memberAsClient.phone || undefined;
             }
             return mapped;
           }
@@ -254,15 +260,15 @@ export async function GET(
           const client = assignment.client_id
             ? clientsMap.get(assignment.client_id)
             : null;
-          const fullName =
-            getClientFullName(client) || getPublicVolunteerName(assignment) || "Participant";
+          const fullName = getClientFullName(client) || getPublicVolunteerName(assignment);
           const mapped = mapAssignment(assignment, fullName);
           if (client) {
             mapped.member.email = client.email || mapped.member.email;
             mapped.member.telephone = client.telephone || client.phone || mapped.member.telephone;
           }
           return mapped;
-        });
+        })
+        .filter((assignment) => assignment.member.nom.trim().length > 0);
 
       return {
         id: slot.id,
