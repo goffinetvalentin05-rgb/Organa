@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import ComparisonSection from "@/components/ComparisonSection";
 import ShowcaseSliderSection from "@/components/ShowcaseSliderSection";
 import GetStartedStepsSection from "@/components/GetStartedStepsSection";
+import PricingSection from "@/components/PricingSection";
 import FaqSection from "@/components/FaqSection";
 import FinalLandingCta from "@/components/FinalLandingCta";
 import LandingFooter from "@/components/LandingFooter";
@@ -20,6 +21,7 @@ export default function LandingPage() {
           <ComparisonSection />
           <ShowcaseSliderSection />
           <GetStartedStepsSection />
+          <PricingSection />
           <FaqSection />
           <FinalLandingCta />
         </div>
