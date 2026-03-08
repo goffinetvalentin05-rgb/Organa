@@ -11,17 +11,27 @@ interface PlanningAssignmentRow {
   public_name: string | null;
   public_email: string | null;
   public_phone: string | null;
-  clients: {
-    id: string;
-    nom: string;
-    email: string | null;
-    telephone: string | null;
-  } | null;
+  clients:
+    | {
+        id: string;
+        nom: string;
+        email: string | null;
+        telephone: string | null;
+      }
+    | {
+        id: string;
+        nom: string;
+        email: string | null;
+        telephone: string | null;
+      }[]
+    | null;
 }
 
 function mapAssignment(assignment: PlanningAssignmentRow) {
+  const client = Array.isArray(assignment.clients)
+    ? assignment.clients[0] || null
+    : assignment.clients;
   const isPublic = assignment?.source === "public_signup";
-  const client = assignment?.clients;
 
   return {
     id: assignment.id,
