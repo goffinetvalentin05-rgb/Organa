@@ -74,6 +74,8 @@ function CheckoutHandler() {
 
 export default function TableauDeBordPage() {
   const { t, locale } = useI18n();
+  const kpiCardClass =
+    "group relative bg-white/95 rounded-3xl border border-slate-200/90 p-6 shadow-[0_6px_20px_rgba(15,23,42,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--obillz-blue-border)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]";
   const [stats, setStats] = useState({
     totalClients: 0,
     totalDevis: 0,
@@ -329,7 +331,7 @@ export default function TableauDeBordPage() {
         {/* Membres */}
         <Link
           href="/tableau-de-bord/clients"
-          className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
+          className={kpiCardClass}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.clients")}</span>
@@ -350,7 +352,7 @@ export default function TableauDeBordPage() {
         {/* Cotisations */}
         <Link
           href="/tableau-de-bord/devis"
-          className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
+          className={kpiCardClass}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.quotes")}</span>
@@ -388,7 +390,7 @@ export default function TableauDeBordPage() {
         {/* Factures */}
         <Link
           href="/tableau-de-bord/factures"
-          className="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-lg"
+          className={kpiCardClass}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.invoices")}</span>
@@ -411,7 +413,7 @@ export default function TableauDeBordPage() {
         </Link>
 
         {/* Solde du club */}
-        <div className="group relative bg-gradient-to-br from-[var(--obillz-hero-blue)] to-blue-700 rounded-2xl p-6 text-white">
+        <div className="group relative bg-gradient-to-br from-[var(--obillz-hero-blue)] to-blue-700 rounded-3xl p-6 text-white shadow-[0_10px_24px_rgba(37,99,235,0.3)]">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-white/80">Solde du club</span>
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">

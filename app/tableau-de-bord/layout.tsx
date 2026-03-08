@@ -120,7 +120,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell min-h-screen bg-slate-50">
+    <div className="dashboard-shell min-h-screen bg-[#f8faff]">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -134,7 +134,10 @@ export default function DashboardLayout({
         className={`fixed left-0 top-0 h-screen w-72 z-50 transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+        style={{
+          backgroundColor: "var(--obillz-hero-blue)",
+          boxShadow: "4px 0 20px rgba(0,0,0,0.05)",
+        }}
       >
         {/* Grille subtile en arrière-plan */}
         <div
@@ -210,7 +213,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
+        <header className="sticky top-0 z-30 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
             {/* Left: Mobile menu + Page title */}
             <div className="flex items-center gap-4">
@@ -270,7 +273,7 @@ export default function DashboardLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-slate-200 bg-white px-4 py-4 lg:px-8">
+        <footer className="border-t border-slate-200/80 bg-white/95 px-4 py-4 lg:px-8 backdrop-blur">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p>© 2026 Obillz — La gestion du club en deux clics</p>
             <div className="flex items-center gap-4">
