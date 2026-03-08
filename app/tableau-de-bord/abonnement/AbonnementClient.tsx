@@ -165,40 +165,44 @@ export default function AbonnementClient() {
 
           {/* Carte de tarification (visible seulement si pas d'abonnement actif) */}
           {subscription?.status !== "active" && (
-            <div className="bg-surface rounded-2xl border-2 border-subtle overflow-hidden">
-              {/* Toggle Mensuel/Annuel */}
-              <div className="p-6 border-b border-subtle bg-gray-50 dark:bg-gray-800/50">
-                <div className="flex items-center justify-center gap-4">
+            <>
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span
+                  className={`font-medium ${billingCycle === "monthly" ? "text-primary" : "text-secondary"}`}
+                >
+                  Mensuel
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setBillingCycle(
+                      billingCycle === "monthly" ? "yearly" : "monthly"
+                    )
+                  }
+                  className={`rounded-full bg-gray-200 w-14 h-7 relative cursor-pointer transition-colors ${
+                    billingCycle === "yearly" ? "accent-bg" : ""
+                  }`}
+                  aria-label="Choisir la facturation mensuelle ou annuelle"
+                >
                   <span
-                    className={`font-medium ${billingCycle === "monthly" ? "text-primary" : "text-secondary"}`}
-                  >
-                    Mensuel
-                  </span>
-                  <button
-                    onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
-                    className={`relative w-14 h-7 rounded-full transition-colors ${
-                      billingCycle === "yearly" ? "accent-bg" : "bg-gray-300 dark:bg-gray-600"
+                    className={`absolute bg-white rounded-full w-5 h-5 top-1 left-1 transition-transform ${
+                      billingCycle === "yearly" ? "translate-x-7" : "translate-x-0"
                     }`}
-                  >
-                    <span
-                      className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                        billingCycle === "yearly" ? "translate-x-8" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+                  />
+                </button>
+                <div className="flex flex-col items-start leading-tight">
                   <span
                     className={`font-medium ${billingCycle === "yearly" ? "text-primary" : "text-secondary"}`}
                   >
                     Annuel
                   </span>
-                  {billingCycle === "yearly" && (
-                    <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">
-                      2 mois offerts
-                    </span>
-                  )}
+                  <span className="bg-green-500 text-white rounded-full px-2 py-1 text-xs font-medium mt-1">
+                    2 mois offerts
+                  </span>
                 </div>
               </div>
 
+              <div className="bg-surface rounded-2xl border-2 border-subtle">
               {/* Prix et détails */}
               <div className="p-8 text-center">
                 <div className="mb-6">
@@ -285,7 +289,8 @@ export default function AbonnementClient() {
                   Paiement sécurisé par Stripe. Annulation possible à tout moment.
                 </p>
               </div>
-            </div>
+              </div>
+            </>
           )}
 
           {/* FAQ */}
