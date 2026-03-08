@@ -80,6 +80,10 @@ export async function GET(
           client_id,
           notified_at,
           created_at,
+          source,
+          public_name,
+          public_email,
+          public_phone,
           clients (
             id,
             nom,
@@ -101,7 +105,22 @@ export async function GET(
         .map((a: any) => ({
           id: a.id,
           clientId: a.client_id,
-          member: a.clients,
+          source: a.source || "internal_member",
+          member:
+            a.source === "public_signup"
+              ? {
+                  id: `public-${a.id}`,
+                  nom: a.public_name || "Bénévole",
+                  email: a.public_email || null,
+                  telephone: a.public_phone || null,
+                  role: "Bénévole public",
+                  category: "public",
+                  status: "public",
+                }
+              : {
+                  ...(a.clients || {}),
+                  status: "member",
+                },
           notifiedAt: a.notified_at,
           createdAt: a.created_at,
         }));

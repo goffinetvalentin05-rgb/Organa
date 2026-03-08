@@ -29,11 +29,13 @@ interface Member {
   telephone?: string;
   role?: string;
   category?: string;
+  status?: "member" | "public";
 }
 
 interface Assignment {
   id: string;
-  clientId: string;
+  clientId: string | null;
+  source?: "internal_member" | "public_signup";
   member: Member;
   notifiedAt?: string;
   createdAt: string;
@@ -68,6 +70,15 @@ interface Planning {
   fillRate: number;
 }
 
+interface PublicPlanningLink {
+  id: string;
+  token: string;
+  active: boolean;
+  createdAt: string;
+  url: string;
+  path: string;
+}
+
 export default function PlanningDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -96,6 +107,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   });
   const [addingSlot, setAddingSlot] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [publicLink, setPublicLink] = useState<PublicPlanningLink | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -116,6 +130,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   useEffect(() => {
     loadPlanning();
     loadMembers();
+    loadPublicLink();
   }, [id]);
 
   const loadPlanning = async () => {
@@ -146,6 +161,55 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       }
     } catch (error) {
       console.error("[PlanningDetail] Erreur chargement membres:", error);
+    }
+  };
+
+  const loadPublicLink = async () => {
+    try {
+      const response = await fetch(`/api/plannings/${id}/public-link`, { cache: "no-store" });
+      if (!response.ok) return;
+      const data = await response.json();
+      setPublicLink(data?.publicLink || null);
+    } catch (loadError) {
+      console.error("[PlanningDetail] Erreur chargement lien public:", loadError);
+    }
+  };
+
+  const handleGeneratePublicLink = async () => {
+    setSharing(true);
+    try {
+      const response = await fetch(`/api/plannings/${id}/public-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requireName: true, requireEmail: false }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.error || "Erreur lors de la génération du lien");
+      }
+
+      setPublicLink(data?.publicLink || null);
+      toast.success("Lien public généré !");
+    } catch (shareError: any) {
+      console.error("[PlanningDetail] Erreur génération lien public:", shareError);
+      toast.error(shareError?.message || "Impossible de générer le lien");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleCopyPublicLink = async () => {
+    if (!publicLink?.url) return;
+    setCopying(true);
+    try {
+      await navigator.clipboard.writeText(publicLink.url);
+      toast.success("Lien copié !");
+    } catch (copyError) {
+      console.error("[PlanningDetail] Erreur copie lien public:", copyError);
+      toast.error("Impossible de copier le lien");
+    } finally {
+      setCopying(false);
     }
   };
 
@@ -398,6 +462,22 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
         <div className="flex items-center gap-3">
           <button
+            onClick={handleGeneratePublicLink}
+            disabled={sharing}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
+          >
+            {sharing ? "Génération..." : publicLink ? "Mettre à jour le partage" : "Partager le planning"}
+          </button>
+          {publicLink && (
+            <button
+              onClick={handleCopyPublicLink}
+              disabled={copying}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-sm disabled:opacity-50"
+            >
+              {copying ? "Copie..." : "Copier le lien"}
+            </button>
+          )}
+          <button
             onClick={handleDownloadPdf}
             disabled={downloading}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
@@ -445,10 +525,20 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
+      {publicLink && (
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-4">
+          <p className="text-sm text-indigo-900 font-medium">Lien public de recrutement</p>
+          <p className="text-sm text-indigo-700 mt-1 break-all">{publicLink.url}</p>
+          <p className="text-xs text-indigo-600 mt-2">
+            Partagez ce lien (WhatsApp, email, etc.) pour laisser les bénévoles s&apos;inscrire eux-memes.
+          </p>
+        </div>
+      )}
+
       {/* Grille des créneaux */}
       <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
         <div className="flex items-center justify-between p-6 border-b border-subtle">
-          <h2 className="text-xl font-semibold">Grille d'affectation</h2>
+          <h2 className="text-xl font-semibold">Grille d&apos;affectation</h2>
           <button
             onClick={() => setShowSlotModal(true)}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
@@ -540,6 +630,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                           <p className="font-medium text-green-900">{assignment.member.nom}</p>
                           {assignment.member.email && (
                             <p className="text-xs text-green-700">{assignment.member.email}</p>
+                          )}
+                          {assignment.source === "public_signup" && (
+                            <p className="text-xs text-green-700 mt-1">Statut: Bénévole public</p>
                           )}
                           {assignment.notifiedAt && (
                             <p className="text-xs text-green-600 flex items-center gap-1 mt-1">

@@ -159,6 +159,7 @@ export async function POST(
         slot_id: slotId,
         client_id: clientId,
         assigned_by: user.id,
+        source: "internal_member",
       })
       .select()
       .single();

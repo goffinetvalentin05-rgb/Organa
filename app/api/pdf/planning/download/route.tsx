@@ -80,6 +80,9 @@ export async function GET(request: Request) {
           id,
           slot_id,
           client_id,
+          source,
+          public_name,
+          public_email,
           clients (
             id,
             nom,
@@ -105,9 +108,9 @@ export async function GET(request: Request) {
         .map((a: any) => ({
           id: a.id,
           member: {
-            id: a.clients?.id || a.client_id,
-            nom: a.clients?.nom || "Membre",
-            email: a.clients?.email,
+            id: a.clients?.id || a.client_id || `public-${a.id}`,
+            nom: a.source === "public_signup" ? a.public_name || "Bénévole" : a.clients?.nom || "Membre",
+            email: a.source === "public_signup" ? a.public_email || undefined : a.clients?.email,
           },
         }));
 
