@@ -8,28 +8,29 @@ interface PlanningAssignmentRow {
   id: string;
   slot_id: string;
   client_id?: string | null;
+  member_id?: string | null;
   created_at: string;
   source: "internal_member" | "member" | "public_signup";
   public_name: string | null;
+  name?: string | null;
   public_email: string | null;
+  email?: string | null;
   public_phone: string | null;
-  clients:
-    | {
-        id: string;
-        nom: string;
-        email: string | null;
-        telephone: string | null;
-      }
-    | {
-        id: string;
-        nom: string;
-        email: string | null;
-        telephone: string | null;
-      }[]
-    | null;
+  phone?: string | null;
 }
 
 interface ClientRow {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  nom?: string | null;
+  name?: string | null;
+  email?: string | null;
+  telephone?: string | null;
+  phone?: string | null;
+}
+
+interface MemberRow {
   id: string;
   first_name?: string | null;
   last_name?: string | null;
@@ -51,8 +52,22 @@ function getClientFullName(client: ClientRow | null | undefined) {
   return (client.nom || client.name || "").trim();
 }
 
+function getPersonFullName(person: {
+  first_name?: string | null;
+  last_name?: string | null;
+  nom?: string | null;
+  name?: string | null;
+} | null | undefined) {
+  if (!person) return "";
+  const firstName = person.first_name?.trim() || "";
+  const lastName = person.last_name?.trim() || "";
+  const fullName = `${firstName} ${lastName}`.trim();
+  if (fullName) return fullName;
+  return (person.nom || person.name || "").trim();
+}
+
 function getPublicVolunteerName(assignment: PlanningAssignmentRow) {
-  return (assignment.public_name || "").trim();
+  return (assignment.public_name || assignment.name || "").trim();
 }
 
 function getEmailSender(profile: {
@@ -106,24 +121,53 @@ async function loadClientsMap(
   return map;
 }
 
-function mapAssignment(assignment: PlanningAssignmentRow) {
-  const client = Array.isArray(assignment.clients)
-    ? assignment.clients[0] || null
-    : assignment.clients;
-  const isPublic = assignment?.source === "public_signup";
-  const memberName = isPublic
-    ? getPublicVolunteerName(assignment)
-    : getClientFullName(client);
+async function loadMembersMap(
+  supabase: ReturnType<typeof createAdminClient>,
+  memberIds: string[]
+) {
+  const map = new Map<string, MemberRow>();
+  if (memberIds.length === 0) return map;
 
+  const uniqueIds = Array.from(new Set(memberIds));
+  const attempts = [
+    "id, first_name, last_name, email, phone",
+    "id, first_name, last_name, email, telephone",
+    "id, nom, email, telephone",
+    "id, name, email, phone",
+  ];
+
+  for (const selectClause of attempts) {
+    const { data, error } = await supabase
+      .from("members")
+      .select(selectClause)
+      .in("id", uniqueIds);
+
+    if (error || !data) continue;
+
+    for (const row of data) {
+      if (!row || typeof row !== "object") continue;
+      const candidate = row as Partial<MemberRow>;
+      if (!candidate.id || typeof candidate.id !== "string") continue;
+      map.set(candidate.id, candidate as MemberRow);
+    }
+
+    if (map.size > 0) break;
+  }
+
+  return map;
+}
+
+function mapAssignment(assignment: PlanningAssignmentRow, displayName: string) {
+  const isPublic = assignment?.source === "public_signup";
   return {
     id: assignment.id,
     source: assignment.source || "member",
     createdAt: assignment.created_at,
     member: {
-      id: client?.id || `public-${assignment.id}`,
-      nom: memberName,
-      email: isPublic ? assignment.public_email : client?.email || undefined,
-      telephone: isPublic ? assignment.public_phone : client?.telephone || undefined,
+      id: assignment.member_id || assignment.client_id || `public-${assignment.id}`,
+      nom: displayName,
+      email: isPublic ? assignment.public_email || assignment.email || undefined : undefined,
+      telephone: isPublic ? assignment.public_phone || assignment.phone || undefined : undefined,
       status: isPublic ? "public" : "member",
     },
   };
@@ -175,54 +219,49 @@ export async function GET(
     if (slotIds.length > 0) {
       const { data } = await supabase
         .from("planning_assignments")
-        .select(`
-          id,
-          slot_id,
-          client_id,
-          created_at,
-          source,
-          public_name,
-          public_email,
-          public_phone,
-          clients (
-            id,
-            nom,
-            email,
-            telephone
-          )
-        `)
+        .select("*")
         .in("slot_id", slotIds);
-      assignments = data || [];
+      assignments = (data || []) as PlanningAssignmentRow[];
     }
 
     const clientIds = assignments
       .map((assignment) => assignment.client_id)
       .filter((id): id is string => Boolean(id));
+    const memberIds = assignments
+      .map((assignment) => assignment.member_id)
+      .filter((id): id is string => Boolean(id));
     const clientsMap = await loadClientsMap(supabase, clientIds);
+    const membersMap = await loadMembersMap(supabase, memberIds);
 
     const slotsWithAssignments = (slots || []).map((slot) => {
       const slotAssignments = assignments
         .filter((assignment) => assignment.slot_id === slot.id)
         .map((assignment) => {
-          const mapped = mapAssignment(assignment);
-          if (mapped.source === "public_signup") {
+          if (assignment.member_id) {
+            const member = membersMap.get(assignment.member_id);
+            const displayName = getPersonFullName(member);
+            const mapped = mapAssignment(
+              assignment,
+              displayName || getPublicVolunteerName(assignment) || "Participant"
+            );
+            if (member) {
+              mapped.member.email = member.email || undefined;
+              mapped.member.telephone = member.telephone || member.phone || undefined;
+            }
             return mapped;
           }
 
           const client = assignment.client_id
             ? clientsMap.get(assignment.client_id)
             : null;
-          const fullName = getClientFullName(client);
-
-          return {
-            ...mapped,
-            member: {
-              ...mapped.member,
-              nom: fullName || mapped.member.nom,
-              email: client?.email || mapped.member.email,
-              telephone: client?.telephone || client?.phone || mapped.member.telephone,
-            },
-          };
+          const fullName =
+            getClientFullName(client) || getPublicVolunteerName(assignment) || "Participant";
+          const mapped = mapAssignment(assignment, fullName);
+          if (client) {
+            mapped.member.email = client.email || mapped.member.email;
+            mapped.member.telephone = client.telephone || client.phone || mapped.member.telephone;
+          }
+          return mapped;
         });
 
       return {
