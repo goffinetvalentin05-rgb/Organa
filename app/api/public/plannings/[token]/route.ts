@@ -17,6 +17,24 @@ interface PlanningAssignmentRow {
   email?: string | null;
   public_phone: string | null;
   phone?: string | null;
+  clients?:
+    | {
+        id: string;
+        nom?: string | null;
+        name?: string | null;
+        email?: string | null;
+        telephone?: string | null;
+        phone?: string | null;
+      }
+    | {
+        id: string;
+        nom?: string | null;
+        name?: string | null;
+        email?: string | null;
+        telephone?: string | null;
+        phone?: string | null;
+      }[]
+    | null;
 }
 
 interface ClientRow {
@@ -219,7 +237,15 @@ export async function GET(
     if (slotIds.length > 0) {
       const { data } = await supabase
         .from("planning_assignments")
-        .select("*")
+        .select(`
+          *,
+          clients (
+            id,
+            nom,
+            email,
+            telephone
+          )
+        `)
         .in("slot_id", slotIds);
       assignments = (data || []) as PlanningAssignmentRow[];
     }
@@ -257,18 +283,27 @@ export async function GET(
             return mapped;
           }
 
+          const relationClient = Array.isArray(assignment.clients)
+            ? assignment.clients[0] || null
+            : assignment.clients || null;
           const client = assignment.client_id
             ? clientsMap.get(assignment.client_id)
             : null;
-          const fullName = getClientFullName(client) || getPublicVolunteerName(assignment);
+          const fullName =
+            getClientFullName(client) ||
+            getClientFullName(relationClient || undefined) ||
+            getPublicVolunteerName(assignment);
           const mapped = mapAssignment(assignment, fullName);
           if (client) {
             mapped.member.email = client.email || mapped.member.email;
             mapped.member.telephone = client.telephone || client.phone || mapped.member.telephone;
+          } else if (relationClient) {
+            mapped.member.email = relationClient.email || mapped.member.email;
+            mapped.member.telephone =
+              relationClient.telephone || relationClient.phone || mapped.member.telephone;
           }
           return mapped;
-        })
-        .filter((assignment) => assignment.member.nom.trim().length > 0);
+        });
 
       return {
         id: slot.id,
