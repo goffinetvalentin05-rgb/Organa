@@ -75,7 +75,7 @@ function MockupFrame() {
                 className="relative z-10 h-full w-full object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
                 onError={() => setVideoFailed(true)}
               >
-                <source src="/Vidéo-obillz-landingpage.MOV" type="video/quicktime" />
+                <source src={encodeURI("/Vidéo-obillz-landingpage.MOV")} type="video/quicktime" />
                 <source src="/videos/obillz-demo.mp4" type="video/mp4" />
               </video>
             ) : (
