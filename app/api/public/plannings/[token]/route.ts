@@ -130,10 +130,12 @@ async function loadClientsMap(
       if (!row || typeof row !== "object") continue;
       const candidate = row as Partial<ClientRow>;
       if (!candidate.id || typeof candidate.id !== "string") continue;
-      map.set(candidate.id, candidate as ClientRow);
+      const previous = map.get(candidate.id) || ({ id: candidate.id } as ClientRow);
+      map.set(candidate.id, {
+        ...previous,
+        ...candidate,
+      });
     }
-
-    if (map.size > 0) break;
   }
 
   return map;
@@ -166,10 +168,12 @@ async function loadMembersMap(
       if (!row || typeof row !== "object") continue;
       const candidate = row as Partial<MemberRow>;
       if (!candidate.id || typeof candidate.id !== "string") continue;
-      map.set(candidate.id, candidate as MemberRow);
+      const previous = map.get(candidate.id) || ({ id: candidate.id } as MemberRow);
+      map.set(candidate.id, {
+        ...previous,
+        ...candidate,
+      });
     }
-
-    if (map.size > 0) break;
   }
 
   return map;
