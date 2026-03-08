@@ -122,7 +122,7 @@ export async function POST(
 
     const { data: existing } = await supabase
       .from("public_planning_links")
-      .select("id, token")
+      .select("id, token, active, created_at, require_name, require_email")
       .eq("planning_id", planningId)
       .eq("club_id", user.id)
       .maybeSingle();
