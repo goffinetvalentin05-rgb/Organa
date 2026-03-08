@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
+import Image from "next/image";
 
 function HighlightedWord({ children }: { children: string }) {
   return (
@@ -49,6 +51,8 @@ function CtaIcon() {
 }
 
 function MockupFrame() {
+  const [videoFailed, setVideoFailed] = useState(false);
+
   return (
     <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
       <div className="rounded-[1.85rem] border border-slate-800/50 bg-[#030712] p-3 shadow-[0_35px_90px_rgba(2,6,23,0.28)] md:p-5">
@@ -58,12 +62,34 @@ function MockupFrame() {
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-300/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
           </div>
-          <div className="relative flex min-h-[220px] items-center justify-center overflow-hidden p-6 sm:min-h-[280px] md:min-h-[380px]">
+          <div className="group relative min-h-[220px] overflow-hidden sm:min-h-[280px] md:min-h-[380px]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(37,99,235,0.28),transparent_52%),radial-gradient(circle_at_80%_82%,rgba(59,130,246,0.24),transparent_58%)]" />
-            <div className="relative rounded-2xl border border-white/20 bg-white/5 px-8 py-6 text-center backdrop-blur-sm">
-              <p className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Obillz</p>
-              <p className="mt-2 text-sm text-slate-300 sm:text-base">Aperçu de la plateforme</p>
-            </div>
+            {!videoFailed ? (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster="/images/obillz-preview.svg"
+                className="relative z-10 h-full w-full object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
+                onError={() => setVideoFailed(true)}
+              >
+                <source src="/Vidéo-obillz-landingpage.MOV" type="video/quicktime" />
+                <source src="/videos/obillz-demo.mp4" type="video/mp4" />
+              </video>
+            ) : (
+              <div className="relative z-10 h-full w-full">
+                <Image
+                  src="/images/obillz-preview.svg"
+                  alt="Aperçu Obillz"
+                  fill
+                  className="object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
+                  sizes="(max-width: 1024px) 100vw, 1200px"
+                  priority
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

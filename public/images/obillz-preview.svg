@@ -1,0 +1,35 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="110" x2="1420" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1530"/>
+      <stop offset="1" stop-color="#060C19"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(380 250) rotate(35) scale(460 340)">
+      <stop stop-color="#2563EB" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1230 650) rotate(35) scale(440 320)">
+      <stop stop-color="#3B82F6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+  <rect width="1600" height="900" rx="28" fill="url(#glow1)"/>
+  <rect width="1600" height="900" rx="28" fill="url(#glow2)"/>
+
+  <g opacity="0.9">
+    <rect x="250" y="180" width="1100" height="530" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)"/>
+    <rect x="290" y="240" width="330" height="150" rx="14" fill="rgba(255,255,255,0.1)"/>
+    <rect x="650" y="240" width="310" height="150" rx="14" fill="rgba(96,165,250,0.22)"/>
+    <rect x="990" y="240" width="270" height="150" rx="14" fill="rgba(255,255,255,0.08)"/>
+    <rect x="290" y="425" width="970" height="240" rx="14" fill="rgba(255,255,255,0.05)"/>
+    <rect x="320" y="460" width="300" height="24" rx="12" fill="rgba(255,255,255,0.35)"/>
+    <rect x="320" y="500" width="860" height="14" rx="7" fill="rgba(255,255,255,0.18)"/>
+    <rect x="320" y="530" width="780" height="14" rx="7" fill="rgba(255,255,255,0.14)"/>
+  </g>
+
+  <text x="800" y="120" text-anchor="middle" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="700">
+    Obillz
+  </text>
+</svg>
