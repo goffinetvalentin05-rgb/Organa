@@ -51,7 +51,21 @@ function CtaIcon() {
 
 function MockupFrame() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      void video.play();
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
 
   const toggleSound = () => {
     const video = videoRef.current;
@@ -63,8 +77,8 @@ function MockupFrame() {
 
   return (
     <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
-      <div className="rounded-[1.85rem] border border-slate-800/50 bg-[#030712] p-3 shadow-[0_35px_90px_rgba(2,6,23,0.28)] md:p-5">
-        <div className="overflow-hidden rounded-[1.45rem] border border-white/10 bg-gradient-to-br from-[#070E1F] via-[#0B1530] to-[#060C19]">
+      <div className="rounded-[1.85rem] border border-white/15 bg-white/5 p-3 shadow-xl backdrop-blur-[1px] md:p-5">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0C1836] via-[#0D1C40] to-[#08152F]">
           <div className="flex items-center gap-2 border-b border-white/10 bg-black/25 px-4 py-3">
             <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-300/80" />
@@ -79,18 +93,30 @@ function MockupFrame() {
               loop
               playsInline
               preload="metadata"
-              className="relative z-10 h-full w-full rounded-xl object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              className="relative z-10 h-full w-full object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
             >
               <source src={encodeURI("/Vidéo-obillz-landingpage.MOV")} type="video/mp4" />
             </video>
-            <button
-              type="button"
-              onClick={toggleSound}
-              aria-label={isMuted ? "Activer le son" : "Couper le son"}
-              className="absolute bottom-4 right-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-lg text-white backdrop-blur-sm transition hover:bg-black/60"
-            >
-              {isMuted ? "🔇" : "🔊"}
-            </button>
+            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
+              <button
+                type="button"
+                onClick={togglePlay}
+                aria-label={isPlaying ? "Mettre en pause" : "Lire la vidéo"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 p-2 text-lg text-white backdrop-blur transition hover:bg-white/30"
+              >
+                {isPlaying ? "⏸️" : "▶️"}
+              </button>
+              <button
+                type="button"
+                onClick={toggleSound}
+                aria-label={isMuted ? "Activer le son" : "Couper le son"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 p-2 text-lg text-white backdrop-blur transition hover:bg-white/30"
+              >
+                {isMuted ? "🔇" : "🔊"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
