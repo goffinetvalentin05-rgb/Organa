@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { Resend } from "resend";
 
 export const runtime = "nodejs";
 
@@ -27,11 +28,91 @@ interface PlanningAssignmentRow {
     | null;
 }
 
+interface ClientRow {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  nom?: string | null;
+  name?: string | null;
+  email?: string | null;
+  telephone?: string | null;
+  phone?: string | null;
+}
+
+const FROM_EMAIL_DEFAULT = "noreply@obillz.com";
+
+function getClientFullName(client: ClientRow | null | undefined) {
+  if (!client) return "";
+  const firstName = client.first_name?.trim() || "";
+  const lastName = client.last_name?.trim() || "";
+  const joined = `${firstName} ${lastName}`.trim();
+  if (joined) return joined;
+  return (client.nom || client.name || "").trim();
+}
+
+function getPublicVolunteerName(assignment: PlanningAssignmentRow) {
+  return (assignment.public_name || "").trim();
+}
+
+function getEmailSender(profile: {
+  company_email?: string | null;
+  email_sender_name?: string | null;
+  email_sender_email?: string | null;
+}) {
+  const senderEmail =
+    profile.email_sender_email ||
+    profile.company_email ||
+    FROM_EMAIL_DEFAULT;
+  if (profile.email_sender_name) {
+    return `${profile.email_sender_name} <${senderEmail}>`;
+  }
+  return senderEmail;
+}
+
+async function loadClientsMap(
+  supabase: ReturnType<typeof createAdminClient>,
+  clientIds: string[]
+) {
+  const map = new Map<string, ClientRow>();
+  if (clientIds.length === 0) return map;
+
+  const baseIds = Array.from(new Set(clientIds));
+  const attempts = [
+    "id, first_name, last_name, nom, email, telephone",
+    "id, first_name, last_name, name, email, phone",
+    "id, nom, email, telephone",
+    "id, name, email, phone",
+  ];
+
+  for (const selectClause of attempts) {
+    const { data, error } = await supabase
+      .from("clients")
+      .select(selectClause)
+      .in("id", baseIds);
+
+    if (error || !data) continue;
+
+    for (const row of data) {
+      if (!row || typeof row !== "object") continue;
+      const candidate = row as Partial<ClientRow>;
+      if (!candidate.id || typeof candidate.id !== "string") continue;
+      map.set(candidate.id, candidate as ClientRow);
+    }
+
+    if (map.size > 0) break;
+  }
+
+  return map;
+}
+
 function mapAssignment(assignment: PlanningAssignmentRow) {
   const client = Array.isArray(assignment.clients)
     ? assignment.clients[0] || null
     : assignment.clients;
   const isPublic = assignment?.source === "public_signup";
+  const memberName = isPublic
+    ? getPublicVolunteerName(assignment)
+    : getClientFullName(client);
 
   return {
     id: assignment.id,
@@ -39,7 +120,7 @@ function mapAssignment(assignment: PlanningAssignmentRow) {
     createdAt: assignment.created_at,
     member: {
       id: client?.id || `public-${assignment.id}`,
-      nom: isPublic ? assignment.public_name : client?.nom || "Membre",
+      nom: memberName,
       email: isPublic ? assignment.public_email : client?.email || undefined,
       telephone: isPublic ? assignment.public_phone : client?.telephone || undefined,
       status: isPublic ? "public" : "member",
@@ -96,6 +177,7 @@ export async function GET(
         .select(`
           id,
           slot_id,
+          client_id,
           created_at,
           source,
           public_name,
@@ -112,10 +194,40 @@ export async function GET(
       assignments = data || [];
     }
 
+    const clientIds = assignments
+      .filter((assignment) => assignment.source === "internal_member")
+      .map((assignment) => (assignment as PlanningAssignmentRow & { client_id?: string | null }).client_id)
+      .filter((id): id is string => Boolean(id));
+    const clientsMap = await loadClientsMap(supabase, clientIds);
+
     const slotsWithAssignments = (slots || []).map((slot) => {
       const slotAssignments = assignments
         .filter((assignment) => assignment.slot_id === slot.id)
-        .map(mapAssignment);
+        .map((assignment) => {
+          const mapped = mapAssignment(assignment);
+          if (mapped.source === "public_signup") {
+            return mapped;
+          }
+
+          const assignmentWithClientId = assignment as PlanningAssignmentRow & {
+            client_id?: string | null;
+          };
+          const client = assignmentWithClientId.client_id
+            ? clientsMap.get(assignmentWithClientId.client_id)
+            : null;
+          const fullName = getClientFullName(client);
+
+          return {
+            ...mapped,
+            member: {
+              ...mapped.member,
+              nom: fullName || mapped.member.nom,
+              email: client?.email || mapped.member.email,
+              telephone: client?.telephone || client?.phone || mapped.member.telephone,
+            },
+          };
+        })
+        .filter((assignment) => assignment.member.nom.trim().length > 0);
 
       return {
         id: slot.id,
@@ -203,7 +315,7 @@ export async function POST(
 
     const { data: slot } = await supabase
       .from("planning_slots")
-      .select("id, planning_id, required_people")
+      .select("id, planning_id, location, start_time, end_time, required_people")
       .eq("id", slotId)
       .eq("planning_id", link.planning_id)
       .maybeSingle();
@@ -240,6 +352,73 @@ export async function POST(
         { error: "Impossible de finaliser l'inscription" },
         { status: 500 }
       );
+    }
+
+    if (email) {
+      try {
+        const { data: planning } = await supabase
+          .from("plannings")
+          .select("name")
+          .eq("id", link.planning_id)
+          .maybeSingle();
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+          .eq("user_id", link.club_id)
+          .maybeSingle();
+
+        const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
+        if (resendApiKey) {
+          const resend = new Resend(resendApiKey);
+          const subject = "Confirmation - inscription benevole";
+          const clubName = profile?.company_name || "Club";
+          const eventName = planning?.name || "Evenement";
+          const slotName = slot.location || "Poste";
+          const startTime = (slot.start_time || "").slice(0, 5);
+          const endTime = (slot.end_time || "").slice(0, 5);
+          const volunteerName = name || "benevole";
+
+          const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
+              <p>Bonjour ${volunteerName},</p>
+              <p>Votre inscription est confirmee pour l'evenement suivant :</p>
+              <p>
+                <strong>Evenement :</strong> ${eventName}<br/>
+                <strong>Poste :</strong> ${slotName}<br/>
+                <strong>Horaire :</strong> ${startTime} - ${endTime}
+              </p>
+              <p>Merci pour votre aide !</p>
+              <p>${clubName}</p>
+              <p style="font-size: 12px; color: #6b7280;">Si vous avez une question, contactez le club.</p>
+            </div>
+          `;
+
+          const text = `Bonjour ${volunteerName},
+
+Votre inscription est confirmee pour l'evenement suivant :
+
+Evenement : ${eventName}
+Poste : ${slotName}
+Horaire : ${startTime} - ${endTime}
+
+Merci pour votre aide !
+
+${clubName}
+
+Si vous avez une question, contactez le club.`;
+
+          await resend.emails.send({
+            from: getEmailSender(profile || {}),
+            to: [email],
+            subject,
+            html,
+            text,
+          });
+        }
+      } catch (emailError) {
+        console.error("[API][public-plannings][POST] Erreur envoi email confirmation:", emailError);
+      }
     }
 
     return NextResponse.json(

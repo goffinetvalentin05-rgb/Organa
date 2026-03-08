@@ -179,6 +179,9 @@ export default function PublicPlanningPage({
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{planning.name}</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Cliquez sur un créneau libre pour vous inscrire.
+          </p>
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
@@ -216,7 +219,7 @@ export default function PublicPlanningPage({
                     <Clock className="w-4 h-4" />
                     {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                   </span>
-                  <span>{slot.assignedCount} / {slot.requiredPeople} remplis</span>
+                  <span>{slot.assignedCount} / {slot.requiredPeople} bénévoles</span>
                   {slot.isFull && (
                     <span className="px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-semibold">
                       Complet
@@ -241,10 +244,11 @@ export default function PublicPlanningPage({
                   <button
                     key={`${slot.id}-empty-${index}`}
                     onClick={() => openSignupModal(slot)}
-                    className="px-4 py-2.5 rounded-lg border-2 border-dashed border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 text-sm inline-flex items-center gap-2"
+                    disabled={slot.isFull}
+                    className="px-4 py-2.5 rounded-lg border-2 border-dashed border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 text-sm inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4" />
-                    Free slot
+                    Créneau libre
                   </button>
                 ))}
               </div>
