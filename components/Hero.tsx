@@ -158,16 +158,19 @@ function MockupFrame() {
 
 export default function Hero() {
   return (
-    <div className="bg-[#1A23FF] pt-5">
+    <div className="bg-white pt-5">
       <Header />
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-hidden px-4 pb-10 pt-10 text-white sm:px-8 md:pb-16 md:pt-16"
+        className="relative isolate overflow-hidden px-4 pb-10 pt-10 text-slate-900 sm:px-8 md:pb-16 md:pt-16"
       >
-        <div className="pointer-events-none absolute -left-44 -top-24 h-[27rem] w-[27rem] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.18),rgba(59,130,246,0)_68%)] blur-2xl" />
-        <div className="pointer-events-none absolute -right-40 top-44 h-[25rem] w-[25rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.14),rgba(37,99,235,0)_68%)] blur-2xl" />
-        <div className="pointer-events-none absolute bottom-10 left-1/2 h-56 w-[34rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(147,197,253,0.35),rgba(147,197,253,0)_70%)] blur-3xl" />
+        <div className="pointer-events-none absolute -top-36 left-[-12%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(22,163,74,0.1),rgba(22,163,74,0)_70%)] blur-3xl" />
+        <div className="pointer-events-none absolute right-[-14%] top-8 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.08),rgba(37,99,235,0)_72%)] blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.07),rgba(16,185,129,0)_72%)] blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 top-16 h-[38rem] w-[38rem] rounded-full border border-emerald-100/70" />
+        <div className="pointer-events-none absolute right-[-8rem] top-24 h-[34rem] w-[34rem] rounded-full border border-slate-200/70" />
+        <div className="pointer-events-none absolute left-1/2 top-6 h-[26rem] w-[58rem] -translate-x-1/2 rounded-[999px] border border-slate-100/80" />
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
@@ -176,7 +179,7 @@ export default function Hero() {
               sportifs
             </h1>
 
-            <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg">
+            <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
               Gérez membres, cotisations, événements, bénévoles et finances depuis une seule
               plateforme simple.
             </p>
@@ -191,7 +194,7 @@ export default function Hero() {
                   <CtaIcon />
                 </span>
               </Link>
-              <p className="mt-3 text-sm text-slate-400">Sans engagement • aucune carte bancaire requise</p>
+              <p className="mt-3 text-sm text-slate-500">Sans engagement • aucune carte bancaire requise</p>
             </div>
           </div>
 
