@@ -16,7 +16,7 @@ export default function LandingPage() {
         <Hero />
       </div>
 
-      <div className="relative z-10 -mt-4 rounded-t-[2.25rem] bg-white pt-10 shadow-[0_-20px_40px_rgba(15,23,42,0.06)]">
+      <div className="relative z-10 bg-white pt-10">
         <div className="mx-auto max-w-7xl px-4 pb-24 md:px-8">
           <ComparisonSection />
           <ShowcaseSliderSection />

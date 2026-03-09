@@ -165,13 +165,6 @@ export default function Hero() {
         id="hero-obillz"
         className="relative isolate overflow-hidden px-4 pb-10 pt-10 text-slate-900 sm:px-8 md:pb-16 md:pt-16"
       >
-        <div className="pointer-events-none absolute -top-36 left-[-12%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(22,163,74,0.1),rgba(22,163,74,0)_70%)] blur-3xl" />
-        <div className="pointer-events-none absolute right-[-14%] top-8 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.08),rgba(37,99,235,0)_72%)] blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.07),rgba(16,185,129,0)_72%)] blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 top-16 h-[38rem] w-[38rem] rounded-full border border-emerald-100/70" />
-        <div className="pointer-events-none absolute right-[-8rem] top-24 h-[34rem] w-[34rem] rounded-full border border-slate-200/70" />
-        <div className="pointer-events-none absolute left-1/2 top-6 h-[26rem] w-[58rem] -translate-x-1/2 rounded-[999px] border border-slate-100/80" />
-
         <div className="relative mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
