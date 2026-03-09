@@ -34,7 +34,7 @@ function HighlightWord({ children }: { children: string }) {
 export default function FinalLandingCta() {
   return (
     <section className="mx-auto mt-20 w-full max-w-[1100px] pb-10">
-      <div className="rounded-[1.8rem] border border-white/10 bg-[linear-gradient(145deg,#071126_0%,#0B1732_55%,#091327_100%)] p-8 text-center shadow-[0_28px_70px_rgba(2,6,23,0.5)] md:p-12">
+      <div className="rounded-[1.8rem] border border-blue-300/35 bg-[linear-gradient(145deg,#1D4ED8_0%,#2563EB_55%,#1E40AF_100%)] p-8 text-center shadow-[0_22px_50px_rgba(37,99,235,0.28)] md:p-12">
         <h2 className="mx-auto mt-6 max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl">
           Prêt à <HighlightWord>simplifier</HighlightWord> la gestion de votre club ?
         </h2>
