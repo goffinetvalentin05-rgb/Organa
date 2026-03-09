@@ -77,15 +77,18 @@ function MockupFrame() {
 
   return (
     <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
-      <div className="rounded-[1.85rem] border border-white/15 bg-white/5 p-3 shadow-xl backdrop-blur-[1px] md:p-5">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0C1836] via-[#0D1C40] to-[#08152F]">
-          <div className="flex items-center gap-2 border-b border-white/10 bg-black/25 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-yellow-300/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+      <div className="rounded-[1.9rem] border border-white/20 bg-white/10 p-2 shadow-[0_34px_80px_rgba(2,6,23,0.35)] backdrop-blur-sm sm:p-3 md:p-4">
+        <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#0A1128] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+          <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-400/90" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-300/90" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
+            </div>
+            <div className="h-2 w-24 rounded-full bg-white/10" />
           </div>
-          <div className="group relative min-h-[220px] overflow-hidden sm:min-h-[280px] md:min-h-[380px]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(37,99,235,0.28),transparent_52%),radial-gradient(circle_at_80%_82%,rgba(59,130,246,0.24),transparent_58%)]" />
+          <div className="group relative aspect-video overflow-hidden">
+            <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_22%_18%,rgba(37,99,235,0.3),transparent_52%),radial-gradient(circle_at_80%_82%,rgba(59,130,246,0.22),transparent_58%)]" />
             <video
               ref={videoRef}
               autoPlay
@@ -95,26 +98,55 @@ function MockupFrame() {
               preload="metadata"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              className="relative z-10 h-full w-full object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
+              className="relative z-10 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]"
             >
+              <source src="/video-obillz-landingpage.mov" type="video/mp4" />
               <source src={encodeURI("/Vidéo-obillz-landingpage.MOV")} type="video/mp4" />
             </video>
-            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
+            <div className="absolute bottom-4 right-4 z-20 flex gap-2 sm:bottom-5 sm:right-5">
               <button
                 type="button"
                 onClick={togglePlay}
                 aria-label={isPlaying ? "Mettre en pause" : "Lire la vidéo"}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 p-2 text-lg text-white backdrop-blur transition hover:bg-white/30"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white shadow-[0_8px_20px_rgba(2,6,23,0.35)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 sm:h-11 sm:w-11"
               >
-                {isPlaying ? "⏸️" : "▶️"}
+                {isPlaying ? (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="5" width="4" height="14" rx="1" />
+                    <rect x="14" y="5" width="4" height="14" rx="1" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 translate-x-[1px]" fill="currentColor" aria-hidden="true">
+                    <path d="M8 6.5a1 1 0 0 1 1.54-.84l8.2 5.5a1 1 0 0 1 0 1.68l-8.2 5.5A1 1 0 0 1 8 17.5v-11z" />
+                  </svg>
+                )}
               </button>
               <button
                 type="button"
                 onClick={toggleSound}
                 aria-label={isMuted ? "Activer le son" : "Couper le son"}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 p-2 text-lg text-white backdrop-blur transition hover:bg-white/30"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white shadow-[0_8px_20px_rgba(2,6,23,0.35)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 sm:h-11 sm:w-11"
               >
-                {isMuted ? "🔇" : "🔊"}
+                {isMuted ? (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" aria-hidden="true">
+                    <path
+                      d="M14 8.5v7a.5.5 0 0 1-.85.35L10.3 13H7.5A1.5 1.5 0 0 1 6 11.5v-1A1.5 1.5 0 0 1 7.5 9h2.8l2.85-2.85A.5.5 0 0 1 14 6.5z"
+                      strokeWidth="1.8"
+                      strokeLinejoin="round"
+                    />
+                    <path d="M17 10l4 4M21 10l-4 4" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" aria-hidden="true">
+                    <path
+                      d="M14 8.5v7a.5.5 0 0 1-.85.35L10.3 13H7.5A1.5 1.5 0 0 1 6 11.5v-1A1.5 1.5 0 0 1 7.5 9h2.8l2.85-2.85A.5.5 0 0 1 14 6.5z"
+                      strokeWidth="1.8"
+                      strokeLinejoin="round"
+                    />
+                    <path d="M17 9.5a4.5 4.5 0 0 1 0 5" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M19.5 7a8 8 0 0 1 0 10" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
