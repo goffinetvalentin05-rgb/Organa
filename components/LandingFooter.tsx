@@ -10,7 +10,7 @@ export default function LandingFooter() {
         <div className="flex items-center justify-between border-b border-slate-200 pb-6">
           <Link
             href="/"
-            className="rounded-lg bg-slate-900 px-3 py-2 shadow-sm transition hover:opacity-90"
+            className="rounded-lg bg-[linear-gradient(145deg,#1D4ED8_0%,#2563EB_55%,#1E40AF_100%)] px-3 py-2 shadow-sm transition hover:opacity-90"
           >
             <Image src="/logo-obillz.png" alt="Obillz" width={130} height={34} />
           </Link>
