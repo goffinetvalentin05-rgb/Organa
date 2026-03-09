@@ -76,7 +76,8 @@ function MockupFrame() {
   };
 
   return (
-    <div id="apercu-plateforme" className="mx-auto mt-14 w-full max-w-5xl">
+    <div id="apercu-plateforme" className="relative mx-auto mt-14 w-full max-w-5xl" data-reveal>
+      <div className="pointer-events-none absolute inset-x-[12%] top-[18%] -z-10 h-[60%] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.22),rgba(37,99,235,0)_70%)] blur-3xl" />
       <div className="rounded-[1.9rem] border border-white/20 bg-white/10 p-2 shadow-[0_34px_80px_rgba(2,6,23,0.35)] backdrop-blur-sm sm:p-3 md:p-4">
         <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#0A1128] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-3">
@@ -180,7 +181,7 @@ export default function Hero() {
             <div className="mt-10">
               <Link
                 href="/inscription"
-                className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-8 py-4 text-base font-semibold text-white shadow-[0_18px_35px_rgba(37,99,235,0.38)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_24px_44px_rgba(37,99,235,0.44)] sm:w-auto"
+                className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-8 py-4 text-base font-semibold text-white shadow-[0_18px_35px_rgba(37,99,235,0.38)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_26px_50px_rgba(37,99,235,0.48)] sm:w-auto"
               >
                 <span>Démarrer gratuitement</span>
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">

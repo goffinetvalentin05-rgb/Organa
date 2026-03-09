@@ -57,6 +57,7 @@ function PricingCard({
 }) {
   return (
     <article
+      data-reveal
       className="relative rounded-xl border border-gray-200 bg-white p-8 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.03] hover:border-blue-500 hover:shadow-xl"
     >
       {badge ? (
@@ -102,7 +103,10 @@ export default function PricingSection() {
   return (
     <section className="mx-auto mt-20 mb-20 w-full max-w-[1000px]">
       <div className="group text-center">
-        <h2 className="text-4xl font-extrabold tracking-[-0.025em] text-slate-900 md:text-[3rem]">
+        <h2
+          data-reveal
+          className="text-4xl font-extrabold tracking-[-0.025em] text-slate-900 md:text-[3rem]"
+        >
           Un tarif <HighlightWord>simple</HighlightWord> et transparent
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">

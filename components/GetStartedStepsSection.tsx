@@ -43,13 +43,19 @@ export default function GetStartedStepsSection() {
   return (
     <section className="mx-auto mb-12 mt-28 w-full max-w-[1200px] py-6 md:py-10">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.1rem]">
+        <h2
+          data-reveal
+          className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.1rem]"
+        >
           Démarrez votre club <HandwrittenWord>gratuitement</HandwrittenWord> en 3 étapes
         </h2>
       </div>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
-        <article className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-[0_14px_34px_rgba(15,23,42,0.12)]">
+        <article
+          data-reveal
+          className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-[0_14px_34px_rgba(15,23,42,0.12)]"
+        >
           <div className="flex items-center gap-3">
             <StepBadge number={1} />
             <h3 className="text-lg font-semibold text-slate-900">Créez votre espace club</h3>
@@ -78,7 +84,10 @@ export default function GetStartedStepsSection() {
           </p>
         </article>
 
-        <article className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-[0_14px_34px_rgba(15,23,42,0.12)]">
+        <article
+          data-reveal
+          className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-[0_14px_34px_rgba(15,23,42,0.12)]"
+        >
           <div className="flex items-center gap-3">
             <StepBadge number={2} />
             <h3 className="text-lg font-semibold text-slate-900">Configurez votre organisation</h3>
@@ -129,7 +138,10 @@ export default function GetStartedStepsSection() {
           </p>
         </article>
 
-        <article className="rounded-xl border border-blue-200 bg-white p-6 shadow-[0_18px_42px_rgba(37,99,235,0.2)] ring-1 ring-blue-100">
+        <article
+          data-reveal
+          className="rounded-xl border border-blue-200 bg-white p-6 shadow-[0_18px_42px_rgba(37,99,235,0.2)] ring-1 ring-blue-100"
+        >
           <div className="flex items-center gap-3">
             <StepBadge number={3} />
             <h3 className="text-lg font-semibold text-slate-900">

@@ -69,7 +69,10 @@ export default function FaqSection() {
   return (
     <section className="mx-auto mt-20 w-full max-w-[1000px]">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3rem]">
+        <h2
+          data-reveal
+          className="text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3rem]"
+        >
           Encore des <HighlightWord>questions</HighlightWord> avant de vous lancer ?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
@@ -84,6 +87,7 @@ export default function FaqSection() {
           return (
             <article
               key={item.question}
+              data-reveal
               className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
             >
               <button

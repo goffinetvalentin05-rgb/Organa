@@ -265,7 +265,10 @@ export default function ComparisonSection() {
 
       <div className="relative grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
         <div className="order-1 lg:order-2">
-          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.35rem]">
+          <h2
+            data-reveal
+            className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.35rem]"
+          >
             Une seule plateforme pour tout <HighlightWord>centraliser</HighlightWord>
           </h2>
 
@@ -304,7 +307,10 @@ export default function ComparisonSection() {
           </div>
         </div>
 
-        <div className="order-2 hidden relative min-h-[420px] md:min-h-[440px] lg:order-1 lg:block">
+        <div
+          data-reveal
+          className="order-2 hidden relative min-h-[420px] md:min-h-[440px] lg:order-1 lg:block"
+        >
           <WithoutObillzMockup active={mode === "without"} />
           <WithObillzMockup active={mode === "with"} />
         </div>

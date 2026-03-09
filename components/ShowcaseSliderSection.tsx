@@ -42,7 +42,10 @@ function HighlightWord({ children }: { children: string }) {
 
 function SliderCard({ card }: { card: SlideCard }) {
   return (
-    <article className="group min-h-[260px] min-w-[300px] snap-start rounded-xl border border-slate-200/90 bg-white p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl md:min-h-[280px] md:min-w-[360px] md:p-6">
+    <article
+      data-reveal
+      className="group min-h-[260px] min-w-[300px] snap-start rounded-xl border border-slate-200/90 bg-white p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl md:min-h-[280px] md:min-w-[360px] md:p-6"
+    >
       <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[#2563EB]">
         <card.icon className="h-5 w-5" />
       </div>
@@ -128,7 +131,10 @@ export default function ShowcaseSliderSection() {
     <section className="mx-auto mt-20 w-full max-w-[1200px]">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.15rem]">
+          <h2
+            data-reveal
+            className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] text-slate-900 md:text-[3.15rem]"
+          >
             Gérez votre club plus simplement en tout <HighlightWord>centralisant</HighlightWord>
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
