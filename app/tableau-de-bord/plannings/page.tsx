@@ -151,7 +151,7 @@ export default function PlanningsPage() {
         <LimitReachedAlert message="Limite de plannings atteinte. Passez au plan Pro pour en créer plus." />
       )}
 
-      <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
+      <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
         {loading ? (
           <div className="p-12 text-center">
             <p className="text-secondary">Chargement...</p>
@@ -177,7 +177,7 @@ export default function PlanningsPage() {
             {filteredPlannings.map((planning) => (
               <div
                 key={planning.id}
-                className="rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className="rounded-2xl border border-subtle bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap items-start justify-between gap-4">

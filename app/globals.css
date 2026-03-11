@@ -214,6 +214,18 @@ h3 {
   border: 1px solid var(--accent-border);
 }
 
+/* Forcer des cartes de contenu blanches sur fond dashboard bleu */
+.dashboard-shell .bg-surface\/80,
+.dashboard-shell .bg-surface\/60,
+.dashboard-shell .bg-white\/95 {
+  background-color: #ffffff !important;
+}
+
+/* Contraste lisible des cartes sur fond bleu */
+.dashboard-shell .shadow-premium {
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+}
+
 .border-subtle {
   border-color: var(--border);
 }

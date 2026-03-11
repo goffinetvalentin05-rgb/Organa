@@ -136,7 +136,7 @@ export default function EvenementsPage() {
         <LimitReachedAlert message={t("dashboard.events.limitReached")} />
       )}
 
-      <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
+      <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
         {loading ? (
           <div className="p-12 text-center">
             <p className="text-secondary">{t("dashboard.common.loading")}</p>
@@ -162,7 +162,7 @@ export default function EvenementsPage() {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="rounded-2xl border border-subtle bg-surface/60 p-5 transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className="rounded-2xl border border-subtle bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap items-start justify-between gap-4">
