@@ -5,55 +5,79 @@ import Image from "next/image";
 import Link from "next/link";
 
 type ComparisonView = "without" | "with";
+type FeatureTabId =
+  | "membres"
+  | "cotisations"
+  | "manifestations"
+  | "buvette"
+  | "finances"
+  | "factures"
+  | "inscriptions"
+  | "communication";
 
-const features = [
+const featureTabs: Array<{
+  id: FeatureTabId;
+  title: string;
+  description: string;
+  details: string;
+}> = [
   {
+    id: "membres",
     title: "Membres",
-    icon: "M",
     description:
       "Centralisez les fiches membres, les équipes et toutes les informations importantes dans une seule base claire et organisée.",
+    details:
+      "Créez des équipes et accédez rapidement aux informations importantes.",
   },
   {
+    id: "cotisations",
     title: "Cotisations",
-    icon: "C",
     description:
       "Générez les cotisations et envoyez-les automatiquement aux membres par email en quelques secondes.",
+    details: "Générez les cotisations en un clic et envoyez-les automatiquement aux membres par email.",
   },
   {
+    id: "manifestations",
     title: "Manifestations",
-    icon: "E",
     description:
       "Créez des événements et gérez les bénévoles avec un système d'inscription simple à partager.",
+    details:
+      "Organisez les événements du club et gérez les bénévoles avec un système d'inscription simple.",
   },
   {
+    id: "buvette",
     title: "Buvette",
-    icon: "B",
     description:
       "Gérez les réservations de la buvette et générez automatiquement les factures pour les locations.",
+    details: "Gérez les réservations de la buvette et générez automatiquement les factures.",
   },
   {
+    id: "finances",
     title: "Finances",
-    icon: "F",
     description:
       "Suivez facilement les cotisations, les paiements et les dépenses du club.",
+    details: "Suivez les paiements et les finances du club avec une vue claire.",
   },
   {
-    title: "Campagnes marketing",
-    icon: "M",
-    description:
-      "Envoyez facilement des communications aux membres ou aux participants d'événements.",
-  },
-  {
-    title: "QR codes & inscriptions",
-    icon: "Q",
-    description:
-      "Créez des liens ou QR codes pour permettre aux personnes de s'inscrire rapidement.",
-  },
-  {
+    id: "factures",
     title: "Factures",
-    icon: "€",
     description:
-      "Générez et envoyez des factures professionnelles en quelques secondes.",
+      "Créez et envoyez des factures professionnelles en quelques secondes.",
+    details: "Créez et envoyez des factures professionnelles en quelques secondes.",
+  },
+  {
+    id: "inscriptions",
+    title: "Inscriptions",
+    description:
+      "Partagez un lien ou un QR code pour permettre aux gens de s'inscrire facilement.",
+    details: "Partagez un lien ou un QR code pour permettre aux gens de s'inscrire facilement.",
+  },
+  {
+    id: "communication",
+    title: "Communication",
+    description:
+      "Envoyez facilement des informations importantes aux membres du club.",
+    details: "Envoyez facilement des informations importantes aux membres du club.",
   },
 ];
 
@@ -104,9 +128,72 @@ function HeroFloatingCard({
   );
 }
 
+function FeatureTabIcon({ id }: { id: FeatureTabId }) {
+  if (id === "membres") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M16 19a4 4 0 0 0-8 0M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (id === "cotisations") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M4 7h16M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" strokeWidth="1.8" />
+      </svg>
+    );
+  }
+  if (id === "manifestations") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M8 3v3M16 3v3M4 9h16M6 6h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (id === "buvette") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M7 4h10v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V4Z" strokeWidth="1.8" />
+        <path d="M9 11v8h6v-8" strokeWidth="1.8" />
+      </svg>
+    );
+  }
+  if (id === "finances") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M4 12h4l2-3 3 6 2-3h5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (id === "factures") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M7 3h8l3 3v15H7z" strokeWidth="1.8" />
+        <path d="M10 11h5M10 15h5" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (id === "inscriptions") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+        <path d="M4 12l8-8 8 8-8 8-8-8Z" strokeWidth="1.8" />
+        <path d="M12 8v8M8 12h8" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+      <path d="M4 6h16v12H4z" strokeWidth="1.8" />
+      <path d="m5 7 7 6 7-6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function LandingPage() {
   const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
+  const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabId>("membres");
   const [openFaq, setOpenFaq] = useState(0);
+  const currentFeature = featureTabs.find((item) => item.id === activeFeatureTab) ?? featureTabs[0];
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[var(--obillz-hero-blue)] text-white">
@@ -420,29 +507,48 @@ export default function LandingPage() {
 
         <section id="fonctionnalites" className="mx-auto mt-20 w-[94%] max-w-[1180px]">
           <h2 className="text-center text-3xl font-black md:text-5xl">
-            Tous les outils pour gérer votre club au même endroit
+            Tous les outils pour gérer votre club
           </h2>
           <p className="mx-auto mt-4 max-w-4xl text-center text-base text-blue-100 md:text-lg">
-            Membres, cotisations, événements, buvette, finances et communication.
-            Tout est centralisé dans une seule plateforme simple à utiliser.
+            Tout est centralisé dans une seule plateforme :
+            membres, cotisations, manifestations, finances et communication.
           </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {features.map((feature) => (
-              <article
-                key={feature.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_46px_rgba(15,23,42,0.2)]"
-              >
-                <div className="flex items-start gap-4">
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/10 text-sm font-black text-[#1A23FF]">
-                    {feature.icon}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-black">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
-                  </div>
+          <div className="mx-auto mt-10 max-w-[980px]">
+            <div className="overflow-x-auto pb-2">
+              <div className="mx-auto flex w-max min-w-full items-center justify-start gap-2 rounded-2xl border border-white/25 bg-white/10 p-2 backdrop-blur-sm md:justify-center">
+                {featureTabs.map((feature) => {
+                  const isActive = activeFeatureTab === feature.id;
+                  return (
+                    <button
+                      key={feature.id}
+                      type="button"
+                      onClick={() => setActiveFeatureTab(feature.id)}
+                      className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-[#1A23FF] text-white shadow-[0_12px_22px_rgba(26,35,255,0.35)]"
+                          : "bg-white/90 text-slate-500 hover:bg-white hover:text-slate-700"
+                      }`}
+                    >
+                      <FeatureTabIcon id={feature.id} />
+                      <span>{feature.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <article className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] animate-fade-in">
+              <div className="flex items-start gap-4">
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/10 text-[#1A23FF]">
+                  <FeatureTabIcon id={currentFeature.id} />
+                </span>
+                <div>
+                  <h3 className="text-xl font-black">{currentFeature.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-700">{currentFeature.description}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{currentFeature.details}</p>
                 </div>
-              </article>
-            ))}
+              </div>
+            </article>
           </div>
         </section>
 
