@@ -8,64 +8,52 @@ type ComparisonView = "without" | "with";
 
 const features = [
   {
-    title: "Dashboard du club",
-    description:
-      "Visualisez en un coup d'oeil les indicateurs importants et les actions à traiter par le comité.",
-  },
-  {
     title: "Membres",
+    icon: "M",
     description:
-      "Centralisez les fiches membres, les statuts et les informations utiles dans une base claire et fiable.",
+      "Centralisez les fiches membres, les équipes et toutes les informations importantes dans une seule base claire et organisée.",
   },
   {
     title: "Cotisations",
+    icon: "C",
     description:
-      "Suivez les cotisations payées ou en attente avec une vue immédiate pour relancer au bon moment.",
+      "Générez les cotisations et envoyez-les automatiquement aux membres par email en quelques secondes.",
   },
   {
-    title: "Factures",
+    title: "Manifestations",
+    icon: "E",
     description:
-      "Créez rapidement des factures propres pour vos partenaires, sponsors ou activités du club.",
-  },
-  {
-    title: "Produits",
-    description:
-      "Pilotez vos ventes et produits du club avec une organisation simple et un suivi des revenus.",
-  },
-  {
-    title: "Charges",
-    description:
-      "Enregistrez toutes les dépenses pour garder une vision nette des coûts et de la trésorerie.",
-  },
-  {
-    title: "Événements",
-    description:
-      "Préparez les matchs et manifestations avec des informations structurées et partageables.",
+      "Créez des événements et gérez les bénévoles avec un système d'inscription simple à partager.",
   },
   {
     title: "Buvette",
+    icon: "B",
     description:
-      "Organisez les tours de presence et les besoins buvette avec une gestion pratique et centralisee.",
+      "Gérez les réservations de la buvette et générez automatiquement les factures pour les locations.",
   },
   {
-    title: "Plannings",
+    title: "Finances",
+    icon: "F",
     description:
-      "Construisez les plannings de bénévoles et de permanences sans multiplication de tableaux externes.",
-  },
-  {
-    title: "QR Codes",
-    description:
-      "Generez des QR codes pour simplifier les inscriptions, les reservations ou les parcours de paiement.",
+      "Suivez facilement les cotisations, les paiements et les dépenses du club.",
   },
   {
     title: "Campagnes marketing",
+    icon: "M",
     description:
-      "Communiquez avec vos membres et supporters grâce à des campagnes ciblées et faciles à envoyer.",
+      "Envoyez facilement des communications aux membres ou aux participants d'événements.",
   },
   {
-    title: "Paramètres du club",
+    title: "QR codes & inscriptions",
+    icon: "Q",
     description:
-      "Personnalisez les règles et les informations du club pour adapter la plateforme à votre fonctionnement.",
+      "Créez des liens ou QR codes pour permettre aux personnes de s'inscrire rapidement.",
+  },
+  {
+    title: "Factures",
+    icon: "€",
+    description:
+      "Générez et envoyez des factures professionnelles en quelques secondes.",
   },
 ];
 
@@ -430,28 +418,29 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-20 w-[94%] max-w-[1160px]">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
-            <h2 className="text-3xl font-black md:text-5xl">
-              Une seule plateforme pour gérer tout votre club.
-            </h2>
-            <p className="mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
-              Obillz centralise les opérations quotidiennes du club dans une interface moderne.
-              Votre comité gagne en clarté, en coordination et en rapidité d&apos;exécution.
-            </p>
-          </div>
-        </section>
-
         <section id="fonctionnalites" className="mx-auto mt-20 w-[94%] max-w-[1180px]">
-          <h2 className="text-center text-3xl font-black md:text-5xl">Fonctionnalités</h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-center text-3xl font-black md:text-5xl">
+            Tous les outils pour gérer votre club au même endroit
+          </h2>
+          <p className="mx-auto mt-4 max-w-4xl text-center text-base text-blue-100 md:text-lg">
+            Membres, cotisations, événements, buvette, finances et communication.
+            Tout est centralisé dans une seule plateforme simple à utiliser.
+          </p>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
             {features.map((feature) => (
               <article
                 key={feature.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] transition hover:-translate-y-1 hover:shadow-[0_24px_46px_rgba(15,23,42,0.2)]"
+                className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_46px_rgba(15,23,42,0.2)]"
               >
-                <h3 className="text-lg font-black">{feature.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
+                <div className="flex items-start gap-4">
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/10 text-sm font-black text-[#1A23FF]">
+                    {feature.icon}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-black">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
