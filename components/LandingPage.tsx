@@ -150,15 +150,7 @@ export default function LandingPage() {
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
 
               <div className="relative z-10">
-                <p className="text-center text-[2.2rem] font-black uppercase leading-[0.92] tracking-[-0.03em] text-white sm:text-[4.4rem] lg:text-[6.5rem]">
-                  CLUB
-                  <br />
-                  SPORTIF
-                  <br />
-                  MODERNE
-                </p>
-
-                <div className="mt-6 text-center">
+                <div className="mt-6 text-center md:mt-10">
                   <h1 className="text-balance text-2xl font-black leading-tight md:text-4xl">
                     Gerer un club sportif ne devrait pas etre complique.
                   </h1>
@@ -183,15 +175,8 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="pointer-events-none absolute left-[8%] top-[18%] hidden -rotate-12 text-[84px] font-black leading-none text-lime-300 md:block">
-                #
-              </div>
-              <div className="pointer-events-none absolute right-[10%] top-[20%] hidden text-6xl text-lime-300 md:block">
-                ↻
-              </div>
-
-              <FloatingCard className="left-[22%] top-[50%] -rotate-12 animate-float !block md:!block" title="Membres" value="baseclub.eth" />
-              <FloatingCard className="right-[24%] top-[38%] rotate-12 animate-float !block md:!block" title="Score global" value="520 pts" />
+              <FloatingCard className="-left-6 top-[44%] -rotate-12 animate-float !block md:!block" title="Membres" value="baseclub.eth" />
+              <FloatingCard className="-right-6 top-[42%] rotate-12 animate-float !block md:!block" title="Score global" value="520 pts" />
             </div>
 
             <div className="mx-auto mt-6 max-w-5xl rounded-[28px] border border-white/35 bg-white p-3 shadow-[0_28px_80px_rgba(2,6,23,0.38)] md:p-5">
