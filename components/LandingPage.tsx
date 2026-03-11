@@ -151,8 +151,9 @@ export default function LandingPage() {
               </Link>
             </header>
 
-            <div className="relative mt-8 min-h-[360px] overflow-hidden p-5 md:min-h-[430px] md:p-10">
+            <div className="relative mt-8 min-h-[390px] overflow-visible p-5 md:min-h-[460px] md:p-10">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
+              <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
               <div className="relative z-10">
                 <div className="mt-12 text-center md:mt-20">
