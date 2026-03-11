@@ -71,24 +71,23 @@ const features = [
 
 const faqItems = [
   {
-    question: "Obillz est-il adapte a un petit club ?",
+    question: "Est-ce facile a utiliser ?",
     answer:
-      "Oui. Obillz convient autant aux petits clubs qu'aux structures plus importantes grace a une organisation flexible.",
+      "Oui. Obillz est concu pour etre simple et rapide a prendre en main par les comites de clubs.",
   },
   {
-    question: "Combien de temps faut-il pour demarrer ?",
+    question: "Est-ce accessible sur telephone ?",
     answer:
-      "La mise en place est rapide. Vous pouvez creer votre club et commencer a structurer votre gestion en quelques minutes.",
+      "Oui. La plateforme fonctionne sur ordinateur, tablette et telephone.",
   },
   {
-    question: "Peut-on travailler a plusieurs dans le comite ?",
+    question: "Est-ce que plusieurs personnes peuvent gerer le club ?",
     answer:
-      "Oui, plusieurs membres peuvent acceder a la plateforme pour collaborer sur les membres, les finances et les evenements.",
+      "Oui. Plusieurs membres du comite peuvent acceder a la plateforme et collaborer.",
   },
   {
-    question: "Faut-il installer un logiciel ?",
-    answer:
-      "Non. Obillz est en ligne et accessible depuis un navigateur, sur ordinateur, tablette et mobile.",
+    question: "Combien de temps faut-il pour commencer ?",
+    answer: "La mise en place du club prend seulement quelques minutes.",
   },
 ];
 
@@ -122,71 +121,115 @@ export default function LandingPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(129,140,248,0.36),transparent_44%),radial-gradient(circle_at_88%_10%,rgba(96,165,250,0.25),transparent_36%),radial-gradient(circle_at_50%_80%,rgba(191,219,254,0.18),transparent_40%)]" />
 
       <div className="relative z-10 pb-20">
-        <header className="mx-auto flex w-[94%] max-w-[1220px] items-center justify-between pt-6">
-          <Link href="/" className="transition hover:opacity-95">
-            <Image src="/logo-obillz.png" alt="Obillz" width={142} height={34} priority />
-          </Link>
-          <nav className="hidden items-center gap-3 md:flex">
-            <a href="#probleme" className="rounded-full border border-white/35 px-4 py-2 text-sm font-semibold hover:bg-white/10">
-              Probleme
-            </a>
-            <a href="#comparaison" className="rounded-full border border-white/35 px-4 py-2 text-sm font-semibold hover:bg-white/10">
-              Comparaison
-            </a>
-            <a href="#faq" className="rounded-full border border-white/35 px-4 py-2 text-sm font-semibold hover:bg-white/10">
-              FAQ
-            </a>
-          </nav>
-          <Link
-            href="/inscription"
-            className="inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-[#1A23FF] shadow-[0_12px_28px_rgba(15,23,42,0.24)] transition hover:-translate-y-0.5"
-          >
-            Creer mon club gratuitement
-          </Link>
-        </header>
+        <section className="mx-auto mt-4 w-[95%] max-w-[1240px]">
+          <div className="rounded-[34px] border border-white/25 bg-[#1230ff]/80 p-4 shadow-[0_30px_90px_rgba(2,6,23,0.4)] backdrop-blur-sm md:p-6">
+            <header className="mx-auto flex max-w-[1140px] items-center justify-between gap-4">
+              <Link href="/" className="transition hover:opacity-95">
+                <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
+              </Link>
+              <nav className="hidden items-center gap-2 md:flex">
+                {["A propos", "Fonctions", "Tarifs", "Aide"].map((item) => (
+                  <a
+                    key={item}
+                    href="#fonctionnalites"
+                    className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
+                  >
+                    {item}
+                  </a>
+                ))}
+              </nav>
+              <Link
+                href="/inscription"
+                className="rounded-full border border-white/60 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                Creer mon club gratuitement
+              </Link>
+            </header>
 
-        <section className="mx-auto mt-10 w-[94%] max-w-[1220px]">
-          <div className="rounded-[34px] border border-white/25 bg-white/10 p-6 shadow-[0_30px_80px_rgba(2,6,23,0.32)] backdrop-blur-md md:p-10">
-            <div className="mx-auto max-w-4xl text-center">
-              <h1 className="text-balance text-[2.15rem] font-black leading-[1.05] tracking-[-0.04em] sm:text-5xl md:text-6xl">
-                Gerer un club sportif ne devrait pas etre complique.
-              </h1>
-              <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-blue-100 md:text-lg">
-                Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
-                organisation claire et professionnelle a votre comite.
-              </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link
-                  href="/inscription"
-                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-3.5 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
-                >
-                  Creer mon club gratuitement
-                </Link>
-                <a
-                  href="#comparaison"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-7 py-3.5 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
-                >
-                  Voir comment ca fonctionne
-                </a>
+            <div className="relative mt-8 overflow-hidden rounded-[26px] border border-white/20 p-5 md:p-10">
+              <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
+
+              <div className="relative z-10">
+                <p className="text-center text-[2.2rem] font-black uppercase leading-[0.92] tracking-[-0.03em] text-white sm:text-[4.4rem] lg:text-[6.5rem]">
+                  CLUB
+                  <br />
+                  SPORTIF
+                  <br />
+                  MODERNE
+                </p>
+
+                <div className="mt-6 text-center">
+                  <h1 className="text-balance text-2xl font-black leading-tight md:text-4xl">
+                    Gerer un club sportif ne devrait pas etre complique.
+                  </h1>
+                  <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-blue-100 md:text-lg">
+                    Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
+                    organisation claire et professionnelle a votre comite.
+                  </p>
+                  <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                    <Link
+                      href="/inscription"
+                      className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-3 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
+                    >
+                      Creer mon club gratuitement
+                    </Link>
+                    <a
+                      href="#comparaison"
+                      className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-7 py-3 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
+                    >
+                      Voir comment ca fonctionne
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pointer-events-none absolute left-[8%] top-[18%] hidden -rotate-12 text-[84px] font-black leading-none text-lime-300 md:block">
+                #
+              </div>
+              <div className="pointer-events-none absolute right-[10%] top-[20%] hidden text-6xl text-lime-300 md:block">
+                ↻
+              </div>
+
+              <FloatingCard className="left-[22%] top-[50%] -rotate-12 animate-float !block md:!block" title="Membres" value="baseclub.eth" />
+              <FloatingCard className="right-[24%] top-[38%] rotate-12 animate-float !block md:!block" title="Score global" value="520 pts" />
+            </div>
+
+            <div className="mx-auto mt-6 max-w-5xl rounded-[28px] border border-white/35 bg-white p-3 shadow-[0_28px_80px_rgba(2,6,23,0.38)] md:p-5">
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#F8FAFF]">
+                <Image
+                  src="/images/obillz-preview.svg"
+                  alt="Dashboard Obillz"
+                  width={1600}
+                  height={900}
+                  className="h-auto w-full"
+                />
               </div>
             </div>
 
-            <div className="relative mx-auto mt-12 max-w-6xl pb-4">
-              <FloatingCard className="-left-6 top-10 -rotate-6 animate-float" title="Membres actifs" value="248" />
-              <FloatingCard className="-right-6 top-12 rotate-6 animate-float" title="Cotisations payees" value="91%" />
-              <FloatingCard className="left-10 bottom-3 -rotate-3 animate-float" title="Evenements a venir" value="7" />
-              <FloatingCard className="right-12 bottom-2 rotate-3 animate-float" title="Charges suivies" value="100%" />
-
-              <div className="rounded-[30px] border border-white/35 bg-white p-4 shadow-[0_35px_90px_rgba(2,6,23,0.38)] md:p-6">
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#F8FAFF]">
-                  <Image
-                    src="/images/obillz-preview.svg"
-                    alt="Mockup dashboard Obillz"
-                    width={1600}
-                    height={900}
-                    className="h-auto w-full"
-                  />
-                </div>
+            <div className="relative mt-6 rounded-[30px] border border-white/30 bg-[#eef2ff] p-4 shadow-[0_25px_70px_rgba(2,6,23,0.35)] md:p-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                {[
+                  {
+                    t: "Dashboard du club",
+                    d: "Toutes les infos importantes dans une seule vue claire.",
+                  },
+                  {
+                    t: "Cotisations et finances",
+                    d: "Suivi simple des paiements, factures et charges du club.",
+                  },
+                  {
+                    t: "Planning et evenements",
+                    d: "Organisez les activites et les benevoles sans friction.",
+                  },
+                ].map((item) => (
+                  <article
+                    key={item.t}
+                    className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.1)]"
+                  >
+                    <h3 className="text-xl font-black">{item.t}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.d}</p>
+                  </article>
+                ))}
               </div>
             </div>
           </div>
@@ -339,10 +382,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-20 w-[94%] max-w-[1040px]">
+        <section id="tarifs" className="mx-auto mt-20 w-[94%] max-w-[1040px]">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12">
             <h2 className="text-3xl font-black md:text-5xl">
-              Simplifiez la gestion de votre club des aujourd&apos;hui.
+              Simplifiez la gestion de votre club d aujourd hui.
             </h2>
             <div className="mt-8">
               <Link
