@@ -2,58 +2,26 @@
 
 import Link from "next/link";
 
-function HighlightWord({ children }: { children: string }) {
-  return (
-    <span className="relative inline-block px-1 text-[#60A5FA]">
-      <span className="relative z-10">{children}</span>
-      <svg
-        viewBox="0 0 210 52"
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-2 left-0 z-0 h-[0.56em] w-full"
-      >
-        <path
-          d="M6 35C46 22 83 18 121 21C152 23 179 28 203 34"
-          stroke="#93C5FD"
-          strokeWidth="12"
-          strokeLinecap="round"
-          fill="none"
-          strokeOpacity="0.5"
-        />
-        <path
-          d="M8 39C44 28 83 25 125 28C155 30 180 34 201 38"
-          stroke="#60A5FA"
-          strokeWidth="4"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </svg>
-    </span>
-  );
-}
-
 export default function FinalLandingCta() {
   return (
-    <section className="mx-auto mt-20 w-full max-w-[1100px] pb-10">
-      <div className="rounded-[1.8rem] border border-blue-300/35 bg-[linear-gradient(145deg,#1D4ED8_0%,#2563EB_55%,#1E40AF_100%)] p-8 text-center shadow-[0_22px_50px_rgba(37,99,235,0.28)] md:p-12">
+    <section id="tarifs" className="mx-auto mt-20 w-full max-w-[1100px] pb-10" data-reveal>
+      <div className="rounded-[1.8rem] border border-blue-200/60 bg-[linear-gradient(145deg,#DBEAFE_0%,#BFDBFE_50%,#DBEAFE_100%)] p-8 text-center shadow-[0_20px_45px_rgba(37,99,235,0.14)] md:p-12">
         <h2 className="mx-auto mt-6 max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl">
-          Prêt à <HighlightWord>simplifier</HighlightWord> la gestion de votre club ?
+          <span className="text-[#0F172A]">
+            Simplifiez la gestion de votre club dès aujourd&apos;hui.
+          </span>
         </h2>
-
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">
-          Créez votre espace club en quelques secondes et commencez à gérer vos membres,
-          cotisations et événements depuis un seul endroit.
-        </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3">
           <Link
             href="/inscription"
             className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#2563EB] to-[#60A5FA] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(37,99,235,0.4)] transition hover:-translate-y-0.5"
           >
-            Démarrer gratuitement
+            Créer mon club gratuitement
           </Link>
         </div>
 
-        <p className="mt-4 text-sm text-slate-400">Sans engagement • Aucune carte bancaire requise</p>
+        <p className="mt-4 text-sm text-[#475569]">Configuration en quelques minutes • sans engagement.</p>
       </div>
     </section>
   );

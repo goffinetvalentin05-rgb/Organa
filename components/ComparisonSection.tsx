@@ -20,20 +20,19 @@ const comparisonContent = {
     bullets: [
       "Informations dispersées entre Excel, WhatsApp et papiers",
       "Cotisations à relancer manuellement",
-      "Difficulté à suivre les membres et bénévoles",
+      "Difficulté à suivre les membres",
       "Organisation des événements compliquée",
-      "Perte de temps sur des tâches répétitives",
       "Manque de visibilité sur les finances du club",
     ],
   },
   with: {
-    subtitle: "Toute l'organisation du club au même endroit",
+    subtitle: "Toute l'organisation du club au même endroit.",
     bullets: [
       "Membres et équipes centralisés",
       "Cotisations envoyées automatiquement",
-      "Organisation simple des événements et bénévoles",
-      "Suivi clair des finances et des revenus",
+      "Organisation simple des événements",
       "Communication facilitée avec les membres",
+      "Suivi clair des finances",
       "Gain de temps énorme pour le comité",
     ],
   },
@@ -81,9 +80,9 @@ function WithoutObillzMockup({ active, mobile = false }: { active: boolean; mobi
       icon: CreditCard,
     },
     {
-      title: "Emails, messages et fichiers dispersés",
+      title: "Emails et messages dispersés",
       description:
-        "Les informations importantes sont réparties entre plusieurs outils et deviennent difficiles à retrouver.",
+        "Les informations importantes sont réparties entre plusieurs outils.",
       icon: Mail,
     },
     {
@@ -259,7 +258,7 @@ export default function ComparisonSection() {
   const [mode, setMode] = useState<ComparisonMode>("with");
 
   return (
-    <section className="relative mx-auto mt-20 w-full max-w-[1200px]">
+    <section id="comment-ca-marche" className="relative mx-auto mt-20 w-full max-w-[1200px]">
       <div className="pointer-events-none absolute -left-24 top-6 h-52 w-52 rounded-full bg-blue-100/40 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full bg-blue-100/40 blur-3xl" />
 

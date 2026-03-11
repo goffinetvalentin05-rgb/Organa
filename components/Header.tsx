@@ -8,13 +8,25 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="sticky top-5 z-[100] mx-auto w-[85%]">
-      <header className="overflow-hidden rounded-[40px] bg-white border border-slate-200/80 shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
-        <div className="mx-auto w-full max-w-[1200px]">
+    <div className="sticky top-5 z-[100] mx-auto w-[92%] max-w-[1240px]">
+      <header className="overflow-hidden rounded-[38px] border border-white/35 bg-white/80 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur-md">
+        <div className="mx-auto w-full max-w-[1220px]">
         <div className="relative flex h-20 items-center justify-between px-4 md:px-7">
           <Link href="/" className="transition hover:opacity-90">
             <Image src="/logo-obillz-bleu.png" alt="Obillz" width={145} height={38} priority />
           </Link>
+
+          <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 lg:flex">
+            <a href="#fonctionnalites" className="transition hover:text-slate-900">
+              Fonctionnalités
+            </a>
+            <a href="#comment-ca-marche" className="transition hover:text-slate-900">
+              Comment ça marche
+            </a>
+            <a href="#tarifs" className="transition hover:text-slate-900">
+              Tarifs
+            </a>
+          </nav>
 
           <div className="hidden items-center gap-3 md:flex">
             <Link
@@ -24,10 +36,10 @@ export default function Header() {
               Connexion
             </Link>
             <a
-              href="mailto:contact@obillz.com"
+              href="/inscription"
               className="rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(37,99,235,0.35)]"
             >
-              Demander une démo
+              Créer mon club gratuitement
             </a>
           </div>
 
@@ -51,6 +63,17 @@ export default function Header() {
 
         {isMenuOpen && (
           <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-3 md:hidden">
+            <div className="mt-2 space-y-1 text-sm font-medium text-slate-700">
+              <a href="#fonctionnalites" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+                Fonctionnalités
+              </a>
+              <a href="#comment-ca-marche" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+                Comment ça marche
+              </a>
+              <a href="#tarifs" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+                Tarifs
+              </a>
+            </div>
             <div className="mt-4 space-y-2">
               <Link
                 href="/connexion"
@@ -60,11 +83,11 @@ export default function Header() {
                 Connexion
               </Link>
               <a
-                href="mailto:contact@obillz.com"
+                href="/inscription"
                 onClick={() => setIsMenuOpen(false)}
                 className="block w-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)]"
               >
-                Demander une démo
+                Créer mon club gratuitement
               </a>
             </div>
           </div>
