@@ -214,91 +214,141 @@ export default function LandingPage() {
         </section>
 
         <section id="comparaison" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
-          <div className="rounded-3xl border border-white/20 bg-white p-6 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_1.15fr]">
-              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFF] p-4 shadow-[0_12px_28px_rgba(15,23,42,0.08)] md:p-5">
-                <p className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-600 shadow-sm">
-                  Sans Obillz
-                </p>
-                <div className="mt-4 space-y-3">
-                  {[
-                    {
-                      title: "Excel",
-                      description: "Listes membres et suivis eparpilles dans plusieurs fichiers.",
-                    },
-                    {
-                      title: "Gestion manuelle des paiements",
-                      description: "Relances et verification des cotisations a la main.",
-                    },
-                    {
-                      title: "Emails et messages disperses",
-                      description: "Les informations importantes sont reparties entre plusieurs outils.",
-                    },
-                    {
-                      title: "Organisation compliquee",
-                      description: "Les evenements et benevoles sont difficiles a gerer.",
-                    },
-                  ].map((item) => (
-                    <article
-                      key={item.title}
-                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_6px_20px_rgba(15,23,42,0.06)]"
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
-                            <path d="M7 7h10v10H7z" strokeWidth="2" />
-                          </svg>
-                        </span>
-                        <div>
-                          <p className="text-sm font-black text-slate-900">{item.title}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.description}</p>
+          <div className="text-center">
+            <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
+              Une seule plateforme pour tout centraliser
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-base text-blue-100 md:text-lg">
+              Toute l&apos;organisation du club au meme endroit.
+            </p>
+            <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
+              <button
+                type="button"
+                onClick={() => setMode("without")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  mode === "without" ? "bg-white text-[#1A23FF] shadow-sm" : "text-white/85"
+                }`}
+              >
+                Sans Obillz
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("with")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  mode === "with" ? "bg-white text-[#1A23FF] shadow-sm" : "text-white/85"
+                }`}
+              >
+                Avec Obillz
+              </button>
+            </div>
+          </div>
+
+          <div className="relative mt-8 min-h-[540px] md:min-h-[510px]">
+            <div
+              className={`absolute inset-0 transition-all duration-500 ${
+                mode === "without"
+                  ? "translate-y-0 scale-100 opacity-100"
+                  : "pointer-events-none translate-y-2 scale-[0.98] opacity-0"
+              }`}
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  {
+                    title: "Excel",
+                    description: "Listes membres et cotisations dans plusieurs fichiers.",
+                  },
+                  {
+                    title: "Gestion manuelle des paiements",
+                    description: "Relances et suivi faits a la main.",
+                  },
+                  {
+                    title: "Messages disperses",
+                    description: "WhatsApp, emails et papiers.",
+                  },
+                  {
+                    title: "Organisation compliquee",
+                    description: "Les evenements et benevoles sont difficiles a gerer.",
+                  },
+                ].map((item) => (
+                  <article
+                    key={item.title}
+                    className="rounded-2xl border border-slate-200 bg-[#EEF2FF] p-5 text-left shadow-[0_14px_30px_rgba(2,6,23,0.16)]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor">
+                          <path d="M5 12h14M12 5v14" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-black text-slate-900">{item.title}</h3>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className={`absolute inset-0 transition-all duration-500 ${
+                mode === "with"
+                  ? "translate-y-0 scale-100 opacity-100"
+                  : "pointer-events-none -translate-y-2 scale-[0.98] opacity-0"
+              }`}
+            >
+              <div className="grid gap-5 lg:grid-cols-[1.08fr_1fr]">
+                <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_18px_45px_rgba(2,6,23,0.2)]">
+                  <div className="grid grid-cols-[190px_1fr]">
+                    <aside className="border-r border-slate-200 bg-[#F7FAFF] p-4">
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2563EB]">Obillz</p>
+                      <div className="mt-4 space-y-2">
+                        {["Dashboard", "Membres", "Cotisations", "Evenements", "Buvette", "Finances"].map((label, idx) => (
+                          <div
+                            key={label}
+                            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+                              idx === 0
+                                ? "bg-[#2563EB] text-white shadow-[0_8px_18px_rgba(37,99,235,0.35)]"
+                                : "text-slate-600"
+                            }`}
+                          >
+                            {label}
+                          </div>
+                        ))}
+                      </div>
+                    </aside>
+                    <div className="bg-white p-4">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-bold text-slate-700">Bienvenue au club</p>
+                          <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
+                            En ligne
+                          </span>
+                        </div>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          <div className="rounded-lg border border-slate-200 bg-white p-2.5">
+                            <p className="text-[11px] text-slate-500">Membres</p>
+                            <p className="text-lg font-black text-slate-800">284</p>
+                          </div>
+                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
+                            <p className="text-[11px] text-slate-500">Cotisations</p>
+                            <p className="text-lg font-black text-[#2563EB]">92%</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 rounded-lg border border-slate-200 bg-white p-2.5">
+                          <div className="h-2.5 w-2/3 rounded-full bg-[#2563EB]" />
+                          <div className="mt-2 grid grid-cols-3 gap-2">
+                            <div className="h-9 rounded-md bg-slate-100" />
+                            <div className="h-9 rounded-md bg-slate-100" />
+                            <div className="h-9 rounded-md bg-slate-100" />
+                          </div>
                         </div>
                       </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-[0_8px_18px_rgba(15,23,42,0.12)]">
-                  <button
-                    type="button"
-                    onClick={() => setMode("without")}
-                    className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                      mode === "without" ? "bg-white text-slate-700 shadow-sm" : "text-slate-500"
-                    }`}
-                  >
-                    Sans Obillz
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMode("with")}
-                    className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                      mode === "with" ? "bg-white text-[#2563EB] shadow-sm" : "text-slate-500"
-                    }`}
-                  >
-                    Avec Obillz
-                  </button>
+                    </div>
+                  </div>
                 </div>
 
-                <h2 className="mt-5 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
-                  Une seule plateforme pour tout centraliser
-                </h2>
-                <p className="mt-4 text-lg font-semibold text-slate-700">
-                  Toute l&apos;organisation du club au meme endroit.
-                </p>
-
-                <div className="mt-6 rounded-2xl border border-slate-200 bg-[#F8FAFF] p-3 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
-                  <Image
-                    src="/images/obillz-preview.svg"
-                    alt="Mockup dashboard Obillz"
-                    width={1000}
-                    height={600}
-                    className="h-auto w-full rounded-xl"
-                  />
-                </div>
-
-                <ul className="mt-6 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
+                <ul className="grid content-start gap-3 rounded-2xl border border-white/20 bg-white/90 p-5 text-left text-sm text-slate-700 shadow-[0_16px_36px_rgba(2,6,23,0.16)]">
                   {[
                     "Membres et equipes centralises",
                     "Cotisations envoyees automatiquement",
