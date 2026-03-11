@@ -127,7 +127,7 @@ export default function LandingPage() {
 
       <div className="relative z-10 pb-20">
         <section className="mt-0 w-full">
-          <div className="w-full border border-white/25 bg-[#1230ff]/80 px-3 pb-6 pt-4 shadow-[0_30px_90px_rgba(2,6,23,0.4)] backdrop-blur-sm md:px-8 md:pb-8 md:pt-6 lg:px-12">
+          <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-12">
             <header className="mx-auto flex max-w-[1140px] items-center justify-between gap-4">
               <Link href="/" className="transition hover:opacity-95">
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
@@ -151,7 +151,7 @@ export default function LandingPage() {
               </Link>
             </header>
 
-            <div className="relative mt-8 min-h-[360px] overflow-hidden rounded-[26px] border border-white/20 p-5 md:min-h-[430px] md:p-10">
+            <div className="relative mt-8 min-h-[360px] overflow-hidden p-5 md:min-h-[430px] md:p-10">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
 
               <div className="relative z-10">
@@ -181,21 +181,21 @@ export default function LandingPage() {
               </div>
 
               <HeroFloatingCard
-                className="left-6 top-[46%] -rotate-6 animate-float [animation-delay:120ms]"
+                className="left-6 top-[58%] -rotate-6 animate-float [animation-delay:120ms]"
                 title="Inscriptions ouvertes"
                 line1="Repas apres match"
                 line2="42 participants"
                 secondary="Lien ou QR code partage au club"
               />
               <HeroFloatingCard
-                className="right-6 top-[40%] rotate-6 animate-float [animation-delay:260ms]"
+                className="right-6 top-[56%] rotate-6 animate-float [animation-delay:260ms]"
                 title="Planning manifestation"
                 line1="Soiree du club"
                 line2="8 benevoles inscrits"
                 secondary="Organisation simple des benevoles"
               />
               <HeroFloatingCard
-                className="left-1/2 top-[73%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
+                className="left-1/2 top-[84%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
                 title="Cotisation annuelle"
                 line1="Envoyee aux membres"
                 line2="Equipe 1"
