@@ -320,7 +320,7 @@ export default function TableauDeBordPage() {
             {t("dashboard.overview.subtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-2 text-sm text-white/80">
           <CheckCircle className="w-4 h-4 text-emerald-500" />
           <span>{t("dashboard.overview.statusNote")}</span>
         </div>
@@ -413,17 +413,17 @@ export default function TableauDeBordPage() {
         </Link>
 
         {/* Solde du club */}
-        <div className="group relative bg-gradient-to-br from-[var(--obillz-hero-blue)] to-blue-700 rounded-3xl p-6 text-white shadow-[0_10px_24px_rgba(37,99,235,0.3)]">
+        <div className="group relative bg-white rounded-3xl border border-slate-200/90 p-6 text-slate-900 shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--obillz-blue-border)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)]">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-white/80">Solde du club</span>
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-white" />
+            <span className="text-sm font-medium text-slate-500">Solde du club</span>
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+              <Receipt className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
             </div>
           </div>
-          <div className="text-3xl font-bold">
+          <div className="text-3xl font-bold text-slate-900">
             {loading ? "-" : formatMontant(stats.soldeClub)}
           </div>
-          <p className="mt-2 text-sm text-white/70">
+          <p className="mt-2 text-sm text-slate-500">
             Cotisations + Factures - Charges
           </p>
         </div>
@@ -431,7 +431,7 @@ export default function TableauDeBordPage() {
 
       {/* À traiter maintenant */}
       {aTraiterMaintenant.length > 0 && (
-        <div className="bg-gradient-to-br from-white via-slate-50 to-blue-50 rounded-2xl border border-slate-200 p-6 md:p-8">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-[0_6px_20px_rgba(15,23,42,0.05)]">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-6">
             <h2 className="text-xl font-bold text-slate-900">
               {t("dashboard.overview.now.title")}
@@ -477,14 +477,14 @@ export default function TableauDeBordPage() {
 
       {/* Empty state si rien à traiter */}
       {!loading && aTraiterMaintenant.length === 0 && (
-        <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-6">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_6px_20px_rgba(15,23,42,0.05)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="font-medium text-emerald-900">{t("dashboard.overview.now.empty")}</p>
-              <p className="text-sm text-emerald-700">Toutes les cotisations et factures sont à jour</p>
+              <p className="font-medium text-slate-900">{t("dashboard.overview.now.empty")}</p>
+              <p className="text-sm text-slate-600">Toutes les cotisations et factures sont à jour</p>
             </div>
           </div>
         </div>
