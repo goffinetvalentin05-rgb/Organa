@@ -121,8 +121,8 @@ export default function LandingPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(129,140,248,0.36),transparent_44%),radial-gradient(circle_at_88%_10%,rgba(96,165,250,0.25),transparent_36%),radial-gradient(circle_at_50%_80%,rgba(191,219,254,0.18),transparent_40%)]" />
 
       <div className="relative z-10 pb-20">
-        <section className="mx-auto mt-4 w-[95%] max-w-[1240px]">
-          <div className="rounded-[34px] border border-white/25 bg-[#1230ff]/80 p-4 shadow-[0_30px_90px_rgba(2,6,23,0.4)] backdrop-blur-sm md:p-6">
+        <section className="mt-0 w-full">
+          <div className="w-full border border-white/25 bg-[#1230ff]/80 px-3 pb-6 pt-4 shadow-[0_30px_90px_rgba(2,6,23,0.4)] backdrop-blur-sm md:px-8 md:pb-8 md:pt-6 lg:px-12">
             <header className="mx-auto flex max-w-[1140px] items-center justify-between gap-4">
               <Link href="/" className="transition hover:opacity-95">
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
