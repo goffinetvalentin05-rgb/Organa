@@ -10,7 +10,7 @@ const features = [
   {
     title: "Dashboard du club",
     description:
-      "Visualisez en un coup d'oeil les indicateurs importants et les actions a traiter par le comite.",
+      "Visualisez en un coup d'oeil les indicateurs importants et les actions à traiter par le comité.",
   },
   {
     title: "Membres",
@@ -20,12 +20,12 @@ const features = [
   {
     title: "Cotisations",
     description:
-      "Suivez les cotisations payees ou en attente avec une vue immediate pour relancer au bon moment.",
+      "Suivez les cotisations payées ou en attente avec une vue immédiate pour relancer au bon moment.",
   },
   {
     title: "Factures",
     description:
-      "Creez rapidement des factures propres pour vos partenaires, sponsors ou activites du club.",
+      "Créez rapidement des factures propres pour vos partenaires, sponsors ou activités du club.",
   },
   {
     title: "Produits",
@@ -35,12 +35,12 @@ const features = [
   {
     title: "Charges",
     description:
-      "Enregistrez toutes les depenses pour garder une vision nette des couts et de la tresorerie.",
+      "Enregistrez toutes les dépenses pour garder une vision nette des coûts et de la trésorerie.",
   },
   {
-    title: "Evenements",
+    title: "Événements",
     description:
-      "Preparez les matchs et manifestations avec des informations structurees et partageables.",
+      "Préparez les matchs et manifestations avec des informations structurées et partageables.",
   },
   {
     title: "Buvette",
@@ -50,7 +50,7 @@ const features = [
   {
     title: "Plannings",
     description:
-      "Construisez les plannings de benevoles et de permanences sans multiplication de tableaux externes.",
+      "Construisez les plannings de bénévoles et de permanences sans multiplication de tableaux externes.",
   },
   {
     title: "QR Codes",
@@ -60,30 +60,30 @@ const features = [
   {
     title: "Campagnes marketing",
     description:
-      "Communiquez avec vos membres et supporters grace a des campagnes ciblees et faciles a envoyer.",
+      "Communiquez avec vos membres et supporters grâce à des campagnes ciblées et faciles à envoyer.",
   },
   {
-    title: "Parametres du club",
+    title: "Paramètres du club",
     description:
-      "Personnalisez les regles et les informations du club pour adapter la plateforme a votre fonctionnement.",
+      "Personnalisez les règles et les informations du club pour adapter la plateforme à votre fonctionnement.",
   },
 ];
 
 const faqItems = [
   {
-    question: "Est-ce facile a utiliser ?",
+    question: "Est-ce facile à utiliser ?",
     answer:
-      "Oui. Obillz est concu pour etre simple et rapide a prendre en main par les comites de clubs.",
+      "Oui. Obillz est conçu pour être simple et rapide à prendre en main par les comités de clubs.",
   },
   {
-    question: "Est-ce accessible sur telephone ?",
+    question: "Est-ce accessible sur téléphone ?",
     answer:
-      "Oui. La plateforme fonctionne sur ordinateur, tablette et telephone.",
+      "Oui. La plateforme fonctionne sur ordinateur, tablette et téléphone.",
   },
   {
-    question: "Est-ce que plusieurs personnes peuvent gerer le club ?",
+    question: "Est-ce que plusieurs personnes peuvent gérer le club ?",
     answer:
-      "Oui. Plusieurs membres du comite peuvent acceder a la plateforme et collaborer.",
+      "Oui. Plusieurs membres du comité peuvent accéder à la plateforme et collaborer.",
   },
   {
     question: "Combien de temps faut-il pour commencer ?",
@@ -132,7 +132,7 @@ export default function LandingPage() {
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
               </Link>
               <nav className="hidden items-center gap-2 md:flex">
-                {["A propos", "Fonctions", "Tarifs", "Aide"].map((item) => (
+                {["À propos", "Fonctions", "Tarifs", "Aide"].map((item) => (
                   <a
                     key={item}
                     href="#fonctionnalites"
@@ -153,7 +153,7 @@ export default function LandingPage() {
                   href="/inscription"
                   className="rounded-full border border-white/60 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
                 >
-                  Creer mon club gratuitement
+                  Créer mon club gratuitement
                 </Link>
               </div>
             </header>
@@ -164,25 +164,27 @@ export default function LandingPage() {
 
               <div className="relative z-10">
                 <div className="mt-12 text-center md:mt-20">
-                  <h1 className="text-balance text-2xl font-black leading-tight md:text-4xl">
-                    Gerer un club sportif ne devrait pas etre complique.
+                  <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
+                    GÉRER UN CLUB SPORTIF
+                    <br />
+                    NE DEVRAIT PAS ÊTRE COMPLIQUÉ.
                   </h1>
                   <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-blue-100 md:text-lg">
                     Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
-                    organisation claire et professionnelle a votre comite.
+                    organisation claire et professionnelle à votre comité.
                   </p>
                   <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                     <Link
                       href="/inscription"
                       className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-3 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
                     >
-                      Creer mon club gratuitement
+                      Créer mon club gratuitement
                     </Link>
                     <a
                       href="#comparaison"
                       className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-7 py-3 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
                     >
-                      Voir comment ca fonctionne
+                      Voir comment ça fonctionne
                     </a>
                   </div>
                 </div>
@@ -191,35 +193,48 @@ export default function LandingPage() {
               <HeroFloatingCard
                 className="left-6 top-[58%] -rotate-6 animate-float [animation-delay:120ms]"
                 title="Inscriptions ouvertes"
-                line1="Repas apres match"
+                line1="Repas après match"
                 line2="42 participants"
-                secondary="Lien ou QR code partage au club"
+                secondary="Lien ou QR code partagé au club"
               />
               <HeroFloatingCard
                 className="right-6 top-[56%] rotate-6 animate-float [animation-delay:260ms]"
                 title="Planning manifestation"
-                line1="Soiree du club"
-                line2="8 benevoles inscrits"
-                secondary="Organisation simple des benevoles"
+                line1="Soirée du club"
+                line2="8 bénévoles inscrits"
+                secondary="Organisation simple des bénévoles"
               />
               <HeroFloatingCard
                 className="left-1/2 top-[84%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
                 title="Cotisation annuelle"
-                line1="Envoyee aux membres"
-                line2="Equipe 1"
+                line1="Envoyée aux membres"
+                line2="Équipe 1"
                 secondary="Envoi en 2 clics"
               />
             </div>
           </div>
         </section>
 
-        <section id="comparaison" className="mx-auto mt-32 w-[94%] max-w-[1160px]">
+        <section id="probleme" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
+          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
+            <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
+              Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
+            </h2>
+            <p className="mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
+              Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
+              emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
+              et le suivi des membres devient difficile.
+            </p>
+          </div>
+        </section>
+
+        <section id="comparaison" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
           <div className="text-center">
             <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
               Une seule plateforme pour tout centraliser
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-base text-blue-100 md:text-lg">
-              Toute l&apos;organisation du club au meme endroit.
+              Toute l&apos;organisation du club au même endroit.
             </p>
             <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
               <button
@@ -256,32 +271,32 @@ export default function LandingPage() {
                     {
                       title: "Excel partout",
                       description:
-                        "Les listes de membres et les cotisations sont dispersees dans plusieurs fichiers Excel differents.",
+                        "Les listes de membres et les cotisations sont dispersées dans plusieurs fichiers Excel différents.",
                     },
                     {
-                      title: "Cotisations compliquees",
+                      title: "Cotisations compliquées",
                       description:
-                        "Les cotisations doivent etre calculees et envoyees manuellement une par une.",
+                        "Les cotisations doivent être calculées et envoyées manuellement une par une.",
                     },
                     {
-                      title: "Factures bricolees",
+                      title: "Factures bricolées",
                       description:
-                        "Creer une facture propre prend du temps et se fait souvent dans Word ou Excel.",
+                        "Créer une facture propre prend du temps et se fait souvent dans Word ou Excel.",
                     },
                     {
-                      title: "Organisation des evenements compliquee",
+                      title: "Organisation des événements compliquée",
                       description:
-                        "Les benevoles et les inscriptions aux manifestations sont geres dans des messages WhatsApp ou sur papier.",
+                        "Les bénévoles et les inscriptions aux manifestations sont gérés dans des messages WhatsApp ou sur papier.",
                     },
                     {
-                      title: "Communication dispersee",
+                      title: "Communication dispersée",
                       description:
                         "Les informations importantes se perdent entre WhatsApp, emails et papiers.",
                     },
                     {
-                      title: "Manque de visibilite",
+                      title: "Manque de visibilité",
                       description:
-                        "Le comite n'a aucune vue claire sur les finances et l'organisation du club.",
+                        "Le comité n&apos;a aucune vue claire sur les finances et l&apos;organisation du club.",
                     },
                   ].map((item) => (
                     <article
@@ -330,7 +345,9 @@ export default function LandingPage() {
                       </aside>
                       <div className="bg-white p-4">
                         <h4 className="text-3xl font-black text-slate-900">Dashboard du club</h4>
-                        <p className="mt-1 text-sm text-slate-500">Vue d&apos;ensemble du club : membres, cotisations, finances.</p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          Vue d&apos;ensemble du club : membres, cotisations, finances.
+                        </p>
                         <div className="mt-4 grid gap-2 sm:grid-cols-3">
                           <div className="rounded-lg border border-slate-200 bg-white p-2.5">
                             <p className="text-[11px] text-slate-500">Membres</p>
@@ -346,7 +363,7 @@ export default function LandingPage() {
                           </div>
                         </div>
                         <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs font-semibold text-emerald-700">
-                          Rien d&apos;urgence pour le moment. Le club est a jour.
+                          Rien d&apos;urgence pour le moment. Le club est à jour.
                         </div>
                         <div className="mt-3 grid grid-cols-3 gap-2">
                           <div className="h-9 rounded-md bg-slate-100" />
@@ -360,38 +377,38 @@ export default function LandingPage() {
                   <ul className="grid content-start gap-3 rounded-2xl border border-white/20 bg-white/90 p-5 text-left text-sm text-slate-700 shadow-[0_16px_36px_rgba(2,6,23,0.16)]">
                     {[
                       {
-                        title: "Membres et equipes centralises",
-                        description: "Toutes les informations du club sont regroupees dans une seule plateforme.",
+                        title: "Membres et équipes centralisés",
+                        description: "Toutes les informations du club sont regroupées dans une seule plateforme.",
                       },
                       {
-                        title: "Cotisations envoyees en un clic",
+                        title: "Cotisations envoyées en un clic",
                         description:
-                          "Generez les cotisations et envoyez-les automatiquement a tous les membres par email.",
+                          "Générez les cotisations et envoyez-les automatiquement à tous les membres par email.",
                       },
                       {
                         title: "Factures professionnelles",
-                        description: "Creez et envoyez des factures propres en quelques secondes.",
+                        description: "Créez et envoyez des factures propres en quelques secondes.",
                       },
                       {
-                        title: "Organisation des manifestations simplifiee",
-                        description: "Creez un planning d'evenement et partagez simplement le lien d'inscription.",
+                        title: "Organisation des manifestations simplifiée",
+                        description: "Créez un planning d&apos;événement et partagez simplement le lien d&apos;inscription.",
                       },
                       {
                         title: "Inscriptions en ligne",
                         description:
-                          "Les benevoles et participants peuvent s'inscrire directement via un lien partage dans WhatsApp.",
+                          "Les bénévoles et participants peuvent s&apos;inscrire directement via un lien partagé dans WhatsApp.",
                       },
                       {
                         title: "Suivi clair des finances",
-                        description: "Toutes les cotisations et paiements sont visibles en temps reel.",
+                        description: "Toutes les cotisations et paiements sont visibles en temps réel.",
                       },
                       {
-                        title: "Communication facilitee",
-                        description: "Envoyez facilement des informations a vos membres.",
+                        title: "Communication facilitée",
+                        description: "Envoyez facilement des informations à vos membres.",
                       },
                       {
-                        title: "Gain de temps enorme pour le comite",
-                        description: "Moins d'administration, plus de temps pour le club.",
+                        title: "Gain de temps énorme pour le comité",
+                        description: "Moins d&apos;administration, plus de temps pour le club.",
                       },
                     ].map((item) => (
                       <li key={item.title} className="flex gap-2.5">
@@ -416,17 +433,17 @@ export default function LandingPage() {
         <section className="mx-auto mt-20 w-[94%] max-w-[1160px]">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
             <h2 className="text-3xl font-black md:text-5xl">
-              Une seule plateforme pour gerer tout votre club.
+              Une seule plateforme pour gérer tout votre club.
             </h2>
             <p className="mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
-              Obillz centralise les operations quotidiennes du club dans une interface moderne.
-              Votre comite gagne en clarte, en coordination et en rapidite d&apos;execution.
+              Obillz centralise les opérations quotidiennes du club dans une interface moderne.
+              Votre comité gagne en clarté, en coordination et en rapidité d&apos;exécution.
             </p>
           </div>
         </section>
 
         <section id="fonctionnalites" className="mx-auto mt-20 w-[94%] max-w-[1180px]">
-          <h2 className="text-center text-3xl font-black md:text-5xl">Fonctionnalites</h2>
+          <h2 className="text-center text-3xl font-black md:text-5xl">Fonctionnalités</h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
               <article
@@ -446,8 +463,8 @@ export default function LandingPage() {
               Moins d&apos;administratif. Plus de temps pour votre club.
             </h2>
             <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
-              Automatisez l&apos;essentiel, structurez vos donnees et concentrez l&apos;energie du
-              comite sur la vie sportive et les projets du club.
+              Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
+              comité sur la vie sportive et les projets du club.
             </p>
           </div>
         </section>
@@ -479,14 +496,14 @@ export default function LandingPage() {
         <section id="tarifs" className="mx-auto mt-20 w-[94%] max-w-[1040px]">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12">
             <h2 className="text-3xl font-black md:text-5xl">
-              Simplifiez la gestion de votre club d aujourd hui.
+              Simplifiez la gestion de votre club dès aujourd&apos;hui.
             </h2>
             <div className="mt-8">
               <Link
                 href="/inscription"
                 className="inline-flex items-center justify-center rounded-full bg-[#1A23FF] px-8 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(26,35,255,0.32)] transition hover:-translate-y-0.5"
               >
-                Creer mon club gratuitement
+                Créer mon club gratuitement
               </Link>
             </div>
           </div>
