@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+type ComparisonView = "without" | "with";
+
 const features = [
   {
     title: "Dashboard du club",
@@ -115,6 +117,7 @@ function HeroFloatingCard({
 }
 
 export default function LandingPage() {
+  const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
@@ -219,17 +222,41 @@ export default function LandingPage() {
               Toute l&apos;organisation du club au meme endroit.
             </p>
             <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
-              <span className="rounded-full bg-white px-5 py-2 text-sm font-bold text-[#1A23FF] shadow-sm">
+              <button
+                type="button"
+                onClick={() => setComparisonView("without")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  comparisonView === "without"
+                    ? "bg-white text-[#1A23FF] shadow-sm"
+                    : "text-white/85 hover:bg-white/10"
+                }`}
+              >
                 Sans Obillz
-              </span>
-              <span className="rounded-full px-5 py-2 text-sm font-bold text-white/85">Avec Obillz</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setComparisonView("with")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  comparisonView === "with"
+                    ? "bg-white text-[#1A23FF] shadow-sm"
+                    : "text-white/85 hover:bg-white/10"
+                }`}
+              >
+                Avec Obillz
+              </button>
             </div>
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.15fr]">
-            <div>
+          <div className="relative mx-auto mt-10 max-w-[1080px]">
+            <div
+              className={`transition-all duration-400 ${
+                comparisonView === "without"
+                  ? "translate-y-0 opacity-100"
+                  : "pointer-events-none absolute inset-0 translate-y-2 opacity-0"
+              }`}
+            >
               <h3 className="mb-4 text-left text-2xl font-black text-white">Sans Obillz</h3>
-              <div className="grid gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 {[
                   {
                     title: "Excel",
@@ -268,7 +295,13 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div>
+            <div
+              className={`transition-all duration-400 ${
+                comparisonView === "with"
+                  ? "translate-y-0 opacity-100"
+                  : "pointer-events-none absolute inset-0 -translate-y-2 opacity-0"
+              }`}
+            >
               <h3 className="mb-4 text-left text-2xl font-black text-white">Avec Obillz</h3>
               <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_18px_45px_rgba(2,6,23,0.2)]">
                 <div className="grid grid-cols-[190px_1fr]">
