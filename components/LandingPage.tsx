@@ -4,8 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-type ComparisonMode = "without" | "with";
-
 const features = [
   {
     title: "Dashboard du club",
@@ -117,7 +115,6 @@ function HeroFloatingCard({
 }
 
 export default function LandingPage() {
-  const [mode, setMode] = useState<ComparisonMode>("with");
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
@@ -222,36 +219,17 @@ export default function LandingPage() {
               Toute l&apos;organisation du club au meme endroit.
             </p>
             <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
-              <button
-                type="button"
-                onClick={() => setMode("without")}
-                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                  mode === "without" ? "bg-white text-[#1A23FF] shadow-sm" : "text-white/85"
-                }`}
-              >
+              <span className="rounded-full bg-white px-5 py-2 text-sm font-bold text-[#1A23FF] shadow-sm">
                 Sans Obillz
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("with")}
-                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                  mode === "with" ? "bg-white text-[#1A23FF] shadow-sm" : "text-white/85"
-                }`}
-              >
-                Avec Obillz
-              </button>
+              </span>
+              <span className="rounded-full px-5 py-2 text-sm font-bold text-white/85">Avec Obillz</span>
             </div>
           </div>
 
-          <div className="relative mt-8 min-h-[540px] md:min-h-[510px]">
-            <div
-              className={`absolute inset-0 transition-all duration-500 ${
-                mode === "without"
-                  ? "translate-y-0 scale-100 opacity-100"
-                  : "pointer-events-none translate-y-2 scale-[0.98] opacity-0"
-              }`}
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
+          <div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.15fr]">
+            <div>
+              <h3 className="mb-4 text-left text-2xl font-black text-white">Sans Obillz</h3>
+              <div className="grid gap-4">
                 {[
                   {
                     title: "Excel",
@@ -281,7 +259,7 @@ export default function LandingPage() {
                         </svg>
                       </span>
                       <div>
-                        <h3 className="text-lg font-black text-slate-900">{item.title}</h3>
+                        <h4 className="text-lg font-black text-slate-900">{item.title}</h4>
                         <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
                       </div>
                     </div>
@@ -290,84 +268,72 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div
-              className={`absolute inset-0 transition-all duration-500 ${
-                mode === "with"
-                  ? "translate-y-0 scale-100 opacity-100"
-                  : "pointer-events-none -translate-y-2 scale-[0.98] opacity-0"
-              }`}
-            >
-              <div className="grid gap-5 lg:grid-cols-[1.08fr_1fr]">
-                <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_18px_45px_rgba(2,6,23,0.2)]">
-                  <div className="grid grid-cols-[190px_1fr]">
-                    <aside className="border-r border-slate-200 bg-[#F7FAFF] p-4">
-                      <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2563EB]">Obillz</p>
-                      <div className="mt-4 space-y-2">
-                        {["Dashboard", "Membres", "Cotisations", "Evenements", "Buvette", "Finances"].map((label, idx) => (
-                          <div
-                            key={label}
-                            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
-                              idx === 0
-                                ? "bg-[#2563EB] text-white shadow-[0_8px_18px_rgba(37,99,235,0.35)]"
-                                : "text-slate-600"
-                            }`}
-                          >
-                            {label}
-                          </div>
-                        ))}
+            <div>
+              <h3 className="mb-4 text-left text-2xl font-black text-white">Avec Obillz</h3>
+              <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_18px_45px_rgba(2,6,23,0.2)]">
+                <div className="grid grid-cols-[190px_1fr]">
+                  <aside className="border-r border-slate-200 bg-[#F7FAFF] p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2563EB]">Obillz</p>
+                    <div className="mt-4 space-y-2">
+                      {["Dashboard du club", "Membres", "Cotisations", "Factures", "Evenements", "Plannings"].map((label, idx) => (
+                        <div
+                          key={label}
+                          className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+                            idx === 0
+                              ? "bg-[#2563EB] text-white shadow-[0_8px_18px_rgba(37,99,235,0.35)]"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          {label}
+                        </div>
+                      ))}
+                    </div>
+                  </aside>
+                  <div className="bg-white p-4">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <h4 className="text-3xl font-black text-slate-900">Dashboard du club</h4>
+                      <p className="mt-1 text-sm text-slate-500">Vue d&apos;ensemble du club : membres, cotisations, finances.</p>
+                      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                        <div className="rounded-lg border border-slate-200 bg-white p-2.5">
+                          <p className="text-[11px] text-slate-500">Membres</p>
+                          <p className="text-lg font-black text-slate-800">0</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white p-2.5">
+                          <p className="text-[11px] text-slate-500">Cotisations</p>
+                          <p className="text-lg font-black text-slate-800">0</p>
+                        </div>
+                        <div className="rounded-lg border border-blue-200 bg-[#2563EB] p-2.5 text-white">
+                          <p className="text-[11px] text-white/80">Solde du club</p>
+                          <p className="text-lg font-black">0.00 CHF</p>
+                        </div>
                       </div>
-                    </aside>
-                    <div className="bg-white p-4">
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-bold text-slate-700">Bienvenue au club</p>
-                          <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
-                            En ligne
-                          </span>
-                        </div>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                          <div className="rounded-lg border border-slate-200 bg-white p-2.5">
-                            <p className="text-[11px] text-slate-500">Membres</p>
-                            <p className="text-lg font-black text-slate-800">284</p>
-                          </div>
-                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
-                            <p className="text-[11px] text-slate-500">Cotisations</p>
-                            <p className="text-lg font-black text-[#2563EB]">92%</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 rounded-lg border border-slate-200 bg-white p-2.5">
-                          <div className="h-2.5 w-2/3 rounded-full bg-[#2563EB]" />
-                          <div className="mt-2 grid grid-cols-3 gap-2">
-                            <div className="h-9 rounded-md bg-slate-100" />
-                            <div className="h-9 rounded-md bg-slate-100" />
-                            <div className="h-9 rounded-md bg-slate-100" />
-                          </div>
-                        </div>
+                      <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs font-semibold text-emerald-700">
+                        Rien d&apos;urgence pour le moment. Le club est a jour.
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <ul className="grid content-start gap-3 rounded-2xl border border-white/20 bg-white/90 p-5 text-left text-sm text-slate-700 shadow-[0_16px_36px_rgba(2,6,23,0.16)]">
-                  {[
-                    "Membres et equipes centralises",
-                    "Cotisations envoyees automatiquement",
-                    "Organisation simple des evenements et benevoles",
-                    "Communication facilitee avec les membres",
-                    "Suivi clair des finances",
-                    "Gain de temps enorme pour le comite",
-                  ].map((item) => (
-                    <li key={item} className="flex gap-2.5">
-                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
-                          <path d="M5 13l4 4L19 7" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
+
+              <ul className="mt-5 grid content-start gap-3 rounded-2xl border border-white/20 bg-white/90 p-5 text-left text-sm text-slate-700 shadow-[0_16px_36px_rgba(2,6,23,0.16)] sm:grid-cols-2">
+                {[
+                  "Membres et equipes centralises",
+                  "Cotisations envoyees automatiquement",
+                  "Organisation simple des evenements et benevoles",
+                  "Communication facilitee avec les membres",
+                  "Suivi clair des finances",
+                  "Gain de temps enorme pour le comite",
+                ].map((item) => (
+                  <li key={item} className="flex gap-2.5">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
+                        <path d="M5 13l4 4L19 7" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>
