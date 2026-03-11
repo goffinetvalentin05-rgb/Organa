@@ -91,22 +91,27 @@ const faqItems = [
   },
 ];
 
-function FloatingCard({
+function HeroFloatingCard({
   className,
   title,
-  value,
+  line1,
+  line2,
+  secondary,
 }: {
   className: string;
   title: string;
-  value: string;
+  line1: string;
+  line2: string;
+  secondary: string;
 }) {
   return (
     <div
       className={`pointer-events-none absolute hidden rounded-2xl border border-slate-200/90 bg-white p-4 text-slate-900 shadow-[0_20px_40px_rgba(15,23,42,0.18)] backdrop-blur-sm md:block ${className}`}
     >
       <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{title}</p>
-      <p className="mt-2 text-xl font-black text-[#1A23FF]">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">Mise a jour en temps reel</p>
+      <p className="mt-2 text-sm font-black leading-tight text-[#1A23FF]">{line1}</p>
+      <p className="mt-1 text-sm font-bold leading-tight text-slate-800">{line2}</p>
+      <p className="mt-2 text-xs text-slate-500">{secondary}</p>
     </div>
   );
 }
@@ -175,35 +180,27 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <FloatingCard className="left-4 top-[53%] -rotate-12 animate-float" title="Membres" value="baseclub.eth" />
-              <FloatingCard className="right-4 top-[46%] rotate-12 animate-float" title="Score global" value="520 pts" />
-            </div>
-
-            <div className="relative mt-6 rounded-[30px] border border-white/30 bg-[#eef2ff] p-4 shadow-[0_25px_70px_rgba(2,6,23,0.35)] md:p-6">
-              <div className="grid gap-4 md:grid-cols-3">
-                {[
-                  {
-                    t: "Dashboard du club",
-                    d: "Toutes les infos importantes dans une seule vue claire.",
-                  },
-                  {
-                    t: "Cotisations et finances",
-                    d: "Suivi simple des paiements, factures et charges du club.",
-                  },
-                  {
-                    t: "Planning et evenements",
-                    d: "Organisez les activites et les benevoles sans friction.",
-                  },
-                ].map((item) => (
-                  <article
-                    key={item.t}
-                    className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.1)]"
-                  >
-                    <h3 className="text-xl font-black">{item.t}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.d}</p>
-                  </article>
-                ))}
-              </div>
+              <HeroFloatingCard
+                className="left-6 top-[46%] -rotate-6 animate-float [animation-delay:120ms]"
+                title="Inscriptions ouvertes"
+                line1="Repas apres match"
+                line2="42 participants"
+                secondary="Lien ou QR code partage au club"
+              />
+              <HeroFloatingCard
+                className="right-6 top-[40%] rotate-6 animate-float [animation-delay:260ms]"
+                title="Planning manifestation"
+                line1="Soiree du club"
+                line2="8 benevoles inscrits"
+                secondary="Organisation simple des benevoles"
+              />
+              <HeroFloatingCard
+                className="left-1/2 top-[73%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
+                title="Cotisation annuelle"
+                line1="Envoyee aux membres"
+                line2="Equipe 1"
+                secondary="Envoi en 2 clics"
+              />
             </div>
           </div>
         </section>
