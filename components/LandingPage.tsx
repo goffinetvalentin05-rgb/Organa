@@ -195,56 +195,62 @@ export default function LandingPage() {
         <LandingHeader />
 
         <section className="mx-auto mt-12 w-[94%] max-w-[1240px]">
-          <div className="mx-auto max-w-4xl text-center" data-reveal>
-            <h1 className="text-balance text-[2rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
-              Gerer un club sportif ne devrait pas etre complique.
-            </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-blue-50 sm:text-lg">
-              Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
-              organisation claire et professionnelle a votre comite.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/inscription"
-                className="inline-flex w-full items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-[#2563EB] shadow-[0_14px_32px_rgba(2,6,23,0.25)] transition hover:-translate-y-0.5 hover:scale-[1.02] sm:w-auto"
-              >
-                Creer mon club gratuitement
-              </Link>
-              <a
-                href="#comment-ca-marche"
-                className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
-              >
-                Voir comment ca fonctionne
-              </a>
+          <div className="relative overflow-hidden rounded-[38px] border border-white/20 bg-white/8 p-6 shadow-[0_25px_80px_rgba(2,6,23,0.28)] backdrop-blur-md md:p-10" data-reveal>
+            <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:38px_38px]" />
+            <div className="relative mx-auto max-w-4xl text-center">
+              <h1 className="text-balance text-[2rem] font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
+                Gerer un club sportif ne devrait pas etre complique.
+              </h1>
+              <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-blue-50 sm:text-lg">
+                Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
+                organisation claire et professionnelle a votre comite.
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/inscription"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-[#2563EB] shadow-[0_14px_32px_rgba(2,6,23,0.25)] transition hover:-translate-y-0.5 hover:scale-[1.02] sm:w-auto"
+                >
+                  Creer mon club gratuitement
+                </Link>
+                <a
+                  href="#comment-ca-marche"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+                >
+                  Voir comment ca fonctionne
+                </a>
+              </div>
+              <p className="mt-3 text-sm text-blue-100">
+                Sans engagement • mise en place en quelques minutes
+              </p>
             </div>
-            <p className="mt-3 text-sm text-blue-100">
-              Sans engagement • mise en place en quelques minutes
-            </p>
-          </div>
+            <div className="relative mx-auto mt-12 max-w-6xl">
+              <div className="pointer-events-none absolute -left-4 top-20 hidden rounded-2xl border border-white/35 bg-white/20 px-4 py-3 text-sm shadow-[0_12px_30px_rgba(2,6,23,0.24)] backdrop-blur md:block animate-float [transform:rotate(-7deg)]">
+                Membres du club
+                <p className="mt-1 text-xs text-blue-50">+284 actifs</p>
+              </div>
+              <div className="pointer-events-none absolute -right-4 top-14 hidden rounded-2xl border border-white/35 bg-white/20 px-4 py-3 text-sm shadow-[0_12px_30px_rgba(2,6,23,0.24)] backdrop-blur md:block animate-float [transform:rotate(6deg)]">
+                Cotisations payees
+                <p className="mt-1 text-xs text-blue-50">92% ce mois</p>
+              </div>
+              <div className="pointer-events-none absolute left-[8%] top-[72%] hidden rounded-2xl border border-white/35 bg-white/20 px-4 py-3 text-sm shadow-[0_12px_30px_rgba(2,6,23,0.24)] backdrop-blur lg:block animate-float [transform:rotate(-4deg)]">
+                Evenements
+                <p className="mt-1 text-xs text-blue-50">4 a venir</p>
+              </div>
+              <div className="pointer-events-none absolute right-[8%] top-[75%] hidden rounded-2xl border border-white/35 bg-white/20 px-4 py-3 text-sm shadow-[0_12px_30px_rgba(2,6,23,0.24)] backdrop-blur lg:block animate-float [transform:rotate(4deg)]">
+                Finances
+                <p className="mt-1 text-xs text-blue-50">vision claire</p>
+              </div>
 
-          <div className="relative mx-auto mt-12 max-w-6xl" data-reveal>
-            <div className="pointer-events-none absolute -left-4 top-20 hidden rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm backdrop-blur md:block animate-float">
-              Membres du club
-            </div>
-            <div className="pointer-events-none absolute -right-4 top-14 hidden rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm backdrop-blur md:block animate-float">
-              Cotisations payees
-            </div>
-            <div className="pointer-events-none absolute left-[8%] top-[72%] hidden rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm backdrop-blur lg:block animate-float">
-              Evenements
-            </div>
-            <div className="pointer-events-none absolute right-[8%] top-[75%] hidden rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm backdrop-blur lg:block animate-float">
-              Finances
-            </div>
-
-            <div className="rounded-[1.9rem] border border-white/25 bg-white/12 p-3 shadow-[0_34px_90px_rgba(2,6,23,0.35)] backdrop-blur-sm [transform:perspective(1200px)_rotateX(3deg)] md:p-5">
-              <div className="overflow-hidden rounded-2xl border border-white/15 bg-white">
-                <Image
-                  src="/images/obillz-preview.svg"
-                  alt="Mockup dashboard Obillz"
-                  width={1600}
-                  height={900}
-                  className="h-auto w-full"
-                />
+              <div className="rounded-[1.9rem] border border-white/25 bg-white/12 p-3 shadow-[0_34px_90px_rgba(2,6,23,0.35)] backdrop-blur-sm [transform:perspective(1200px)_rotateX(3deg)] md:p-5">
+                <div className="overflow-hidden rounded-2xl border border-white/15 bg-white">
+                  <Image
+                    src="/images/obillz-preview.svg"
+                    alt="Mockup dashboard Obillz"
+                    width={1600}
+                    height={900}
+                    className="h-auto w-full"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -292,12 +298,12 @@ export default function LandingPage() {
                 </button>
               </div>
 
-              <div className="relative mt-6 min-h-[260px] overflow-hidden rounded-2xl border border-white/20 bg-white/90 p-5 text-slate-800">
+            <div className="relative mt-6 min-h-[260px] overflow-hidden rounded-2xl border border-white/20 bg-white/95 p-5 text-slate-800 shadow-[0_22px_45px_rgba(2,6,23,0.16)]">
                 <div
                   className={`absolute inset-0 p-5 transition-all duration-500 ${
                     mode === "without"
-                      ? "translate-x-0 opacity-100"
-                      : "-translate-x-6 pointer-events-none opacity-0"
+                      ? "translate-x-0 scale-100 opacity-100"
+                      : "-translate-x-6 scale-[0.98] pointer-events-none opacity-0"
                   }`}
                 >
                   <p className="mb-4 text-sm font-semibold text-slate-500">Sans Obillz</p>
@@ -318,8 +324,8 @@ export default function LandingPage() {
                 <div
                   className={`absolute inset-0 p-5 transition-all duration-500 ${
                     mode === "with"
-                      ? "translate-x-0 opacity-100"
-                      : "translate-x-6 pointer-events-none opacity-0"
+                      ? "translate-x-0 scale-100 opacity-100"
+                      : "translate-x-6 scale-[0.98] pointer-events-none opacity-0"
                   }`}
                 >
                   <p className="mb-4 text-sm font-semibold text-[#2563EB]">Avec Obillz</p>
@@ -329,7 +335,7 @@ export default function LandingPage() {
                       alt="Dashboard Obillz"
                       width={900}
                       height={500}
-                      className="h-auto w-full"
+                    className="h-auto w-full [transform:rotate(-1deg)_scale(1.02)]"
                     />
                   </div>
                 </div>
@@ -392,7 +398,11 @@ export default function LandingPage() {
               <article
                 key={feature.title}
                 data-reveal
-                className="rounded-2xl border border-white/20 bg-white p-6 text-[#0F172A] shadow-[0_16px_35px_rgba(2,6,23,0.14)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_40px_rgba(2,6,23,0.2)]"
+                className={`rounded-2xl border border-white/20 bg-white p-6 text-[#0F172A] shadow-[0_16px_35px_rgba(2,6,23,0.14)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_40px_rgba(2,6,23,0.2)] ${
+                  Number((feature.title.charCodeAt(0) + feature.title.length) % 2) === 0
+                    ? "[transform:rotate(-0.8deg)] hover:[transform:rotate(-0.2deg)_translateY(-4px)]"
+                    : "[transform:rotate(0.8deg)] hover:[transform:rotate(0.2deg)_translateY(-4px)]"
+                }`}
               >
                 <h3 className="text-lg font-bold">{feature.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#64748B]">{feature.description}</p>
