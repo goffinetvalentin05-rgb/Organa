@@ -223,26 +223,14 @@ export default function DashboardLayout({
         {/* Topbar */}
         <header className="sticky top-0 z-30 border-b border-white/20 bg-[var(--obillz-hero-blue)]/85 shadow-sm backdrop-blur">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
-            {/* Left: Mobile menu + Page title */}
-            <div className="flex items-center gap-4">
+            {/* Left: Mobile menu only */}
+            <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden p-2 -ml-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="hidden sm:block">
-                <h1 className="text-lg font-semibold text-white">
-                  {getPageTitle()}
-                </h1>
-              </div>
-            </div>
-
-            {/* Center: Page title (mobile) */}
-            <div className="sm:hidden">
-              <span className="text-sm font-semibold text-white">
-                {getPageTitle()}
-              </span>
             </div>
 
             {/* Right: Actions */}

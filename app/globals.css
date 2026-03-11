@@ -196,6 +196,16 @@ h3 {
   letter-spacing: -0.01em;
 }
 
+/* Titres principaux des pages dashboard sur fond bleu */
+.dashboard-shell main h1 {
+  color: #ffffff !important;
+}
+
+/* Sous-titre directement sous le titre principal */
+.dashboard-shell main h1 + p {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
 .dashboard-shell .accent-bg:hover {
   background: var(--accent-hover);
 }
