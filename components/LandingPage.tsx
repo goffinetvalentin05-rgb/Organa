@@ -267,21 +267,21 @@ export default function LandingPage() {
               </div>
 
               <HeroFloatingCard
-                className="left-6 top-[58%] -rotate-6 animate-float [animation-delay:120ms]"
+                className="left-[14%] top-[58%] -rotate-6 animate-float [animation-delay:120ms]"
                 title="Inscriptions ouvertes"
                 line1="Repas après match"
                 line2="42 participants"
                 secondary="Lien ou QR code partagé au club"
               />
               <HeroFloatingCard
-                className="right-6 top-[56%] rotate-6 animate-float [animation-delay:260ms]"
+                className="right-[14%] top-[56%] rotate-6 animate-float [animation-delay:260ms]"
                 title="Planning manifestation"
                 line1="Soirée du club"
                 line2="8 bénévoles inscrits"
                 secondary="Organisation simple des bénévoles"
               />
               <HeroFloatingCard
-                className="left-1/2 top-[84%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
+                className="left-1/2 top-[90%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
                 title="Cotisation annuelle"
                 line1="Envoyée aux membres"
                 line2="Équipe 1"
@@ -291,7 +291,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
+        <section id="probleme" className="mx-auto mt-28 w-[94%] max-w-[1160px]">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
             <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
               Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
