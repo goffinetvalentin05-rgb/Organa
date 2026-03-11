@@ -146,11 +146,11 @@ export default function LandingPage() {
               </Link>
             </header>
 
-            <div className="relative mt-8 overflow-hidden rounded-[26px] border border-white/20 p-5 md:p-10">
+            <div className="relative mt-8 min-h-[360px] overflow-hidden rounded-[26px] border border-white/20 p-5 md:min-h-[430px] md:p-10">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
 
               <div className="relative z-10">
-                <div className="mt-6 text-center md:mt-10">
+                <div className="mt-12 text-center md:mt-20">
                   <h1 className="text-balance text-2xl font-black leading-tight md:text-4xl">
                     Gerer un club sportif ne devrait pas etre complique.
                   </h1>
@@ -175,20 +175,8 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <FloatingCard className="-left-6 top-[44%] -rotate-12 animate-float !block md:!block" title="Membres" value="baseclub.eth" />
-              <FloatingCard className="-right-6 top-[42%] rotate-12 animate-float !block md:!block" title="Score global" value="520 pts" />
-            </div>
-
-            <div className="mx-auto mt-6 max-w-5xl rounded-[28px] border border-white/35 bg-white p-3 shadow-[0_28px_80px_rgba(2,6,23,0.38)] md:p-5">
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#F8FAFF]">
-                <Image
-                  src="/images/obillz-preview.svg"
-                  alt="Dashboard Obillz"
-                  width={1600}
-                  height={900}
-                  className="h-auto w-full"
-                />
-              </div>
+              <FloatingCard className="left-4 top-[53%] -rotate-12 animate-float" title="Membres" value="baseclub.eth" />
+              <FloatingCard className="right-4 top-[46%] rotate-12 animate-float" title="Score global" value="520 pts" />
             </div>
 
             <div className="relative mt-6 rounded-[30px] border border-white/30 bg-[#eef2ff] p-4 shadow-[0_25px_70px_rgba(2,6,23,0.35)] md:p-6">
