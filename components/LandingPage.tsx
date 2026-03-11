@@ -213,85 +213,110 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
-            <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
-              Aujourd&apos;hui, gerer un club sportif peut vite devenir un casse-tete.
-            </h2>
-            <p className="mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
-              Dans beaucoup de clubs, les taches sont eparpillees entre Excel, messages, emails et
-              gestion manuelle. Le comite perd du temps, les infos se dispersent, et le suivi des
-              membres comme des cotisations devient vite difficile a maintenir.
-            </p>
-          </div>
-        </section>
-
         <section id="comparaison" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
           <div className="rounded-3xl border border-white/20 bg-white p-6 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-10">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-3xl font-black md:text-4xl">Sans Obillz / Avec Obillz</h2>
-              <div className="inline-flex rounded-full bg-[#E9EDFF] p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("without")}
-                  className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                    mode === "without" ? "bg-[#1A23FF] text-white" : "text-[#1A23FF]"
-                  }`}
-                >
+            <div className="grid gap-8 lg:grid-cols-[1fr_1.15fr]">
+              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFF] p-4 shadow-[0_12px_28px_rgba(15,23,42,0.08)] md:p-5">
+                <p className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-600 shadow-sm">
                   Sans Obillz
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("with")}
-                  className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-                    mode === "with" ? "bg-[#1A23FF] text-white" : "text-[#1A23FF]"
-                  }`}
-                >
-                  Avec Obillz
-                </button>
-              </div>
-            </div>
-
-            <div className="relative mt-8 min-h-[310px] overflow-hidden rounded-2xl border border-slate-200 bg-[#F7F9FF] p-5 md:min-h-[280px]">
-              <div
-                className={`absolute inset-0 p-5 transition-all duration-500 md:p-7 ${
-                  mode === "without"
-                    ? "translate-x-0 scale-100 opacity-100"
-                    : "-translate-x-8 scale-[0.98] pointer-events-none opacity-0"
-                }`}
-              >
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-slate-500">Sans Obillz</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                </p>
+                <div className="mt-4 space-y-3">
                   {[
-                    "Fichiers Excel disperses",
-                    "Relances de paiement manuelles",
-                    "Informations perdues dans les messages",
-                    "Organisation evenementielle complexe",
+                    {
+                      title: "Excel",
+                      description: "Listes membres et suivis eparpilles dans plusieurs fichiers.",
+                    },
+                    {
+                      title: "Gestion manuelle des paiements",
+                      description: "Relances et verification des cotisations a la main.",
+                    },
+                    {
+                      title: "Emails et messages disperses",
+                      description: "Les informations importantes sont reparties entre plusieurs outils.",
+                    },
+                    {
+                      title: "Organisation compliquee",
+                      description: "Les evenements et benevoles sont difficiles a gerer.",
+                    },
                   ].map((item) => (
-                    <div key={item} className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700 shadow-sm">
-                      {item}
-                    </div>
+                    <article
+                      key={item.title}
+                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_6px_20px_rgba(15,23,42,0.06)]"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
+                            <path d="M7 7h10v10H7z" strokeWidth="2" />
+                          </svg>
+                        </span>
+                        <div>
+                          <p className="text-sm font-black text-slate-900">{item.title}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.description}</p>
+                        </div>
+                      </div>
+                    </article>
                   ))}
                 </div>
               </div>
 
-              <div
-                className={`absolute inset-0 p-5 transition-all duration-500 md:p-7 ${
-                  mode === "with"
-                    ? "translate-x-0 scale-100 opacity-100"
-                    : "translate-x-8 scale-[0.98] pointer-events-none opacity-0"
-                }`}
-              >
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-[#1A23FF]">Avec Obillz</p>
-                <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_16px_30px_rgba(15,23,42,0.12)]">
+              <div>
+                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-[0_8px_18px_rgba(15,23,42,0.12)]">
+                  <button
+                    type="button"
+                    onClick={() => setMode("without")}
+                    className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                      mode === "without" ? "bg-white text-slate-700 shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    Sans Obillz
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("with")}
+                    className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                      mode === "with" ? "bg-white text-[#2563EB] shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    Avec Obillz
+                  </button>
+                </div>
+
+                <h2 className="mt-5 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
+                  Une seule plateforme pour tout centraliser
+                </h2>
+                <p className="mt-4 text-lg font-semibold text-slate-700">
+                  Toute l&apos;organisation du club au meme endroit.
+                </p>
+
+                <div className="mt-6 rounded-2xl border border-slate-200 bg-[#F8FAFF] p-3 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
                   <Image
                     src="/images/obillz-preview.svg"
-                    alt="Vue unifiee de la gestion dans Obillz"
-                    width={900}
-                    height={500}
+                    alt="Mockup dashboard Obillz"
+                    width={1000}
+                    height={600}
                     className="h-auto w-full rounded-xl"
                   />
                 </div>
+
+                <ul className="mt-6 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
+                  {[
+                    "Membres et equipes centralises",
+                    "Cotisations envoyees automatiquement",
+                    "Organisation simple des evenements et benevoles",
+                    "Communication facilitee avec les membres",
+                    "Suivi clair des finances",
+                    "Gain de temps enorme pour le comite",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-2.5">
+                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
+                          <path d="M5 13l4 4L19 7" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
