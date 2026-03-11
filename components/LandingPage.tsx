@@ -121,9 +121,8 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#1A23FF] text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-35 [background-image:linear-gradient(to_right,rgba(255,255,255,0.09)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.09)_1px,transparent_1px)] [background-size:36px_36px]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_8%,rgba(129,140,248,0.36),transparent_44%),radial-gradient(circle_at_88%_10%,rgba(96,165,250,0.25),transparent_36%),radial-gradient(circle_at_50%_80%,rgba(191,219,254,0.18),transparent_40%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[var(--obillz-hero-blue)] text-white">
+      <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]" />
 
       <div className="relative z-10 pb-20">
         <section className="mt-0 w-full">
@@ -143,12 +142,20 @@ export default function LandingPage() {
                   </a>
                 ))}
               </nav>
-              <Link
-                href="/inscription"
-                className="rounded-full border border-white/60 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
-              >
-                Creer mon club gratuitement
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/connexion"
+                  className="rounded-full border border-white/45 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/inscription"
+                  className="rounded-full border border-white/60 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
+                >
+                  Creer mon club gratuitement
+                </Link>
+              </div>
             </header>
 
             <div className="relative mt-8 min-h-[390px] overflow-visible p-5 md:min-h-[460px] md:p-10">
