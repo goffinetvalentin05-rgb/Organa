@@ -307,10 +307,10 @@ export default function LandingPage() {
         <section id="comparaison" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
           <div className="text-center">
             <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
-              Une seule plateforme pour tout centraliser
+              Passez d&apos;une gestion compliquée à une organisation claire
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-base text-blue-100 md:text-lg">
-              Toute l&apos;organisation du club au même endroit.
+              Découvrez comment Obillz simplifie l&apos;organisation de votre club.
             </p>
             <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
               <button
@@ -552,11 +552,11 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto mt-20 w-[94%] max-w-[1160px]">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
+          <div className="p-2 text-center text-white md:p-4">
             <h2 className="text-3xl font-black md:text-5xl">
               Moins d&apos;administratif. Plus de temps pour votre club.
             </h2>
-            <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
+            <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-blue-100 md:text-lg">
               Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
               comité sur la vie sportive et les projets du club.
             </p>
