@@ -17,8 +17,8 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Colors - Dashboard (fond clair moderne) */
-  --bg-dashboard: #F8FAFC;
+  /* Colors - Dashboard (fond bleu produit) */
+  --bg-dashboard: var(--obillz-hero-blue);
   --bg-surface: #FFFFFF;
   --bg-surface-hover: #F1F5F9;
   --border: rgba(15, 23, 42, 0.08);
@@ -85,7 +85,7 @@ body.app-bg {
 
 /* Pages SaaS - fond sobre */
 body.app-bg:has(.dashboard-shell) {
-  background-color: var(--bg-dashboard) !important;
+  background-color: var(--obillz-hero-blue) !important;
 }
 
 body.app-bg::before {

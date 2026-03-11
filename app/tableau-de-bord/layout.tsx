@@ -120,7 +120,15 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell min-h-screen bg-[#f8faff]">
+    <div className="dashboard-shell relative min-h-screen bg-[var(--obillz-hero-blue)]">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-10"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -211,20 +219,20 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="lg:ml-72 min-h-screen flex flex-col">
+      <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-white/95 border-b border-slate-200/80 shadow-sm backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-white/20 bg-[var(--obillz-hero-blue)]/85 shadow-sm backdrop-blur">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
             {/* Left: Mobile menu + Page title */}
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 -ml-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                className="lg:hidden p-2 -ml-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <Menu className="w-5 h-5" />
               </button>
               <div className="hidden sm:block">
-                <h1 className="text-lg font-semibold text-slate-900">
+                <h1 className="text-lg font-semibold text-white">
                   {getPageTitle()}
                 </h1>
               </div>
@@ -232,7 +240,7 @@ export default function DashboardLayout({
 
             {/* Center: Page title (mobile) */}
             <div className="sm:hidden">
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-white">
                 {getPageTitle()}
               </span>
             </div>
@@ -243,14 +251,14 @@ export default function DashboardLayout({
               
               {!loadingUser && (
                 <div className="hidden md:flex items-center gap-2">
-                  <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5">
+                  <div className="flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5">
                     <div 
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                      style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                      style={{ backgroundColor: "rgba(255,255,255,0.28)" }}
                     >
                       {(companyName || userEmail || "U").charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-white max-w-[120px] truncate">
                       {companyName || userEmail || t("dashboard.topbar.userFallback")}
                     </span>
                   </div>
@@ -259,7 +267,7 @@ export default function DashboardLayout({
 
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white/85 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
               >
                 {t("dashboard.topbar.logout")}
               </button>
@@ -273,14 +281,14 @@ export default function DashboardLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-slate-200/80 bg-white/95 px-4 py-4 lg:px-8 backdrop-blur">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+        <footer className="border-t border-white/20 bg-[var(--obillz-hero-blue)]/85 px-4 py-4 lg:px-8 backdrop-blur">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/75">
             <p>© 2026 Obillz — La gestion du club en deux clics</p>
             <div className="flex items-center gap-4">
-              <Link href="/mentions-legales" className="hover:text-slate-700 transition-colors">
+              <Link href="/mentions-legales" className="hover:text-white transition-colors">
                 Mentions légales
               </Link>
-              <Link href="/politique-confidentialite" className="hover:text-slate-700 transition-colors">
+              <Link href="/politique-confidentialite" className="hover:text-white transition-colors">
                 Confidentialité
               </Link>
             </div>
