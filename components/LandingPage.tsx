@@ -25,59 +25,60 @@ const featureTabs: Array<{
     id: "membres",
     title: "Membres",
     description:
-      "Centralisez les fiches membres, les équipes et toutes les informations importantes dans une seule base claire et organisée.",
+      "Centralisez les fiches membres, les équipes et toutes les informations utiles dans une seule base claire et organisée.",
     details:
-      "Créez des équipes et accédez rapidement aux informations importantes.",
+      "Retrouvez rapidement les bonnes informations sans devoir jongler entre plusieurs fichiers.",
   },
   {
     id: "cotisations",
     title: "Cotisations",
     description:
-      "Générez les cotisations et envoyez-les automatiquement aux membres par email en quelques secondes.",
-    details: "Générez les cotisations en un clic et envoyez-les automatiquement aux membres par email.",
+      "Générez les cotisations en quelques clics et envoyez-les automatiquement aux membres par email.",
+    details:
+      "Suivez facilement les paiements en attente pour garder une vue claire sur les encaissements du club.",
   },
   {
     id: "manifestations",
     title: "Manifestations",
     description:
-      "Créez des événements et gérez les bénévoles avec un système d'inscription simple à partager.",
+      "Créez les événements du club et organisez les bénévoles simplement depuis une seule interface.",
     details:
-      "Organisez les événements du club et gérez les bénévoles avec un système d'inscription simple.",
+      "Partagez un lien d'inscription pour permettre aux personnes de se positionner rapidement.",
   },
   {
     id: "buvette",
     title: "Buvette",
     description:
-      "Gérez les réservations de la buvette et générez automatiquement les factures pour les locations.",
-    details: "Gérez les réservations de la buvette et générez automatiquement les factures.",
+      "Gérez les réservations de la buvette avec un calendrier simple et lisible.",
+    details: "Créez automatiquement une facture lorsque la location est validée.",
   },
   {
     id: "finances",
     title: "Finances",
     description:
-      "Suivez facilement les cotisations, les paiements et les dépenses du club.",
-    details: "Suivez les paiements et les finances du club avec une vue claire.",
+      "Suivez les entrées et sorties d'argent du club dans une vue claire et structurée.",
+    details: "Gardez en permanence une vision précise de la situation financière.",
   },
   {
     id: "factures",
     title: "Factures",
     description:
-      "Créez et envoyez des factures professionnelles en quelques secondes.",
-    details: "Créez et envoyez des factures professionnelles en quelques secondes.",
+      "Créez des factures propres et professionnelles en quelques secondes.",
+    details: "Envoyez-les immédiatement par email sans devoir passer par un autre outil.",
   },
   {
     id: "inscriptions",
     title: "Inscriptions",
     description:
-      "Partagez un lien ou un QR code pour permettre aux gens de s'inscrire facilement.",
-    details: "Partagez un lien ou un QR code pour permettre aux gens de s'inscrire facilement.",
+      "Créez un lien ou un QR code pour permettre aux participants de s'inscrire facilement à un repas, un événement ou une activité.",
+    details: "Les réponses sont centralisées et plus simples à gérer pour le comité.",
   },
   {
     id: "communication",
     title: "Communication",
     description:
-      "Envoyez facilement des informations importantes aux membres du club.",
-    details: "Envoyez facilement des informations importantes aux membres du club.",
+      "Envoyez facilement des informations importantes aux membres ou aux participants d'un événement.",
+    details: "Le club communique plus clairement sans dépendre uniquement de groupes WhatsApp.",
   },
 ];
 
@@ -514,27 +515,25 @@ export default function LandingPage() {
             membres, cotisations, manifestations, finances et communication.
           </p>
           <div className="mx-auto mt-10 max-w-[980px]">
-            <div className="overflow-x-auto pb-2">
-              <div className="mx-auto flex w-max min-w-full items-center justify-start gap-2 rounded-2xl border border-white/25 bg-white/10 p-2 backdrop-blur-sm md:justify-center">
-                {featureTabs.map((feature) => {
-                  const isActive = activeFeatureTab === feature.id;
-                  return (
-                    <button
-                      key={feature.id}
-                      type="button"
-                      onClick={() => setActiveFeatureTab(feature.id)}
-                      className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                        isActive
-                          ? "bg-[#1A23FF] text-white shadow-[0_12px_22px_rgba(26,35,255,0.35)]"
-                          : "bg-white/90 text-slate-500 hover:bg-white hover:text-slate-700"
-                      }`}
-                    >
-                      <FeatureTabIcon id={feature.id} />
-                      <span>{feature.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="mx-auto flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 p-2 backdrop-blur-sm">
+              {featureTabs.map((feature) => {
+                const isActive = activeFeatureTab === feature.id;
+                return (
+                  <button
+                    key={feature.id}
+                    type="button"
+                    onClick={() => setActiveFeatureTab(feature.id)}
+                    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                      isActive
+                        ? "bg-[#1A23FF] text-white shadow-[0_12px_22px_rgba(26,35,255,0.35)]"
+                        : "bg-white/90 text-slate-500 hover:bg-white hover:text-slate-700"
+                    }`}
+                  >
+                    <FeatureTabIcon id={feature.id} />
+                    <span>{feature.title}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <article className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] animate-fade-in">
@@ -544,8 +543,8 @@ export default function LandingPage() {
                 </span>
                 <div>
                   <h3 className="text-xl font-black">{currentFeature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-700">{currentFeature.description}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{currentFeature.details}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{currentFeature.description}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{currentFeature.details}</p>
                 </div>
               </div>
             </article>
