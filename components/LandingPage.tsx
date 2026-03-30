@@ -6,11 +6,14 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
+  CheckCircle2,
   Coffee,
   FileText,
   LineChart,
   Mail,
+  MessageCircle,
   QrCode,
+  TrendingUp,
   Users,
   Wallet,
 } from "lucide-react";
@@ -379,22 +382,30 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="comparaison" className="mx-auto mt-20 w-[94%] max-w-[1160px]">
+        <section
+          id="comparaison"
+          className="mx-auto mt-20 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden"
+        >
           <div className="text-center">
             <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
               Passez d&apos;une gestion compliquée à une organisation claire
             </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-base text-blue-100 md:text-lg">
-              Découvrez comment Obillz simplifie l&apos;organisation de votre club.
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-blue-100/95 md:text-lg">
+              Trop d&apos;outils, trop de tâches manuelles, trop de flou — puis une seule plateforme pour
+              piloter votre club avec une vue nette et une vraie tranquillité d&apos;esprit.
             </p>
-            <div className="mt-6 inline-flex rounded-full border border-white/25 bg-white/15 p-1 shadow-[0_12px_30px_rgba(2,6,23,0.28)] backdrop-blur-sm">
+            <div
+              className="mt-8 inline-flex rounded-full border border-white/30 bg-white/[0.12] p-1.5 shadow-[0_16px_40px_rgba(2,6,23,0.35)] backdrop-blur-md"
+              role="group"
+              aria-label="Comparer sans et avec Obillz"
+            >
               <button
                 type="button"
                 onClick={() => setComparisonView("without")}
-                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                className={`rounded-full px-6 py-2.5 text-sm font-bold transition-all duration-200 md:px-8 md:py-3 md:text-[0.9375rem] ${
                   comparisonView === "without"
-                    ? "bg-white text-[#1A23FF] shadow-sm"
-                    : "text-white/85 hover:bg-white/10"
+                    ? "bg-white text-[#1A23FF] shadow-[0_4px_20px_rgba(26,35,255,0.35)] ring-2 ring-white/25"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 Sans Obillz
@@ -402,10 +413,10 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => setComparisonView("with")}
-                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                className={`rounded-full px-6 py-2.5 text-sm font-bold transition-all duration-200 md:px-8 md:py-3 md:text-[0.9375rem] ${
                   comparisonView === "with"
-                    ? "bg-white text-[#1A23FF] shadow-sm"
-                    : "text-white/85 hover:bg-white/10"
+                    ? "bg-white text-[#1A23FF] shadow-[0_4px_20px_rgba(26,35,255,0.35)] ring-2 ring-white/25"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 Avec Obillz
@@ -413,171 +424,194 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mx-auto mt-10 max-w-[1080px]">
-            {comparisonView === "without" ? (
-              <div className="animate-fade-in">
-                <h3 className="mb-5 text-left text-2xl font-black text-white">Sans Obillz</h3>
-                <div className="grid gap-4">
-                  {[
-                    {
-                      title: "Excel partout",
-                      description:
-                        "Les listes de membres et les cotisations sont dispersées dans plusieurs fichiers Excel différents.",
-                    },
-                    {
-                      title: "Cotisations compliquées",
-                      description:
-                        "Les cotisations doivent être calculées et envoyées manuellement une par une.",
-                    },
-                    {
-                      title: "Factures bricolées",
-                      description:
-                        "Créer une facture propre prend du temps et se fait souvent dans Word ou Excel.",
-                    },
-                    {
-                      title: "Organisation des événements compliquée",
-                      description:
-                        "Les bénévoles et les inscriptions aux manifestations sont gérés dans des messages WhatsApp ou sur papier.",
-                    },
-                    {
-                      title: "Communication dispersée",
-                      description:
-                        "Les informations importantes se perdent entre WhatsApp, emails et papiers.",
-                    },
-                    {
-                      title: "Manque de visibilité",
-                      description:
-                        "Le comité n&apos;a aucune vue claire sur les finances et l&apos;organisation du club.",
-                    },
-                  ].map((item) => (
-                    <article
-                      key={item.title}
-                      className="rounded-2xl border border-slate-200 bg-[#EEF2FF] p-5 text-left shadow-[0_14px_30px_rgba(2,6,23,0.16)]"
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
-                          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor">
-                            <path d="M5 5h14v14H5z" strokeWidth="2" />
-                          </svg>
+          <div className="relative mx-auto mt-10 max-w-[1080px] md:mt-12">
+            <AnimatePresence mode="wait">
+              {comparisonView === "without" ? (
+                <motion.div
+                  key="without"
+                  role="tabpanel"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="space-y-8"
+                >
+                  <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
+                    Le quotidien sans outil centralisé
+                  </p>
+                  <div className="relative mx-auto min-h-[380px] max-w-4xl md:min-h-[340px]">
+                    <div className="absolute left-0 top-0 z-[3] w-[92%] max-w-[340px] rotate-[-2deg] rounded-xl border border-slate-300/90 bg-white p-3 shadow-[0_12px_30px_rgba(2,6,23,0.18)] md:left-1 md:top-2">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span className="truncate text-[10px] font-semibold text-slate-500 md:text-xs">
+                          membres_2024_FINAL_v2.xlsx
                         </span>
-                        <div>
-                          <h4 className="text-lg font-black text-slate-900">{item.title}</h4>
-                          <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                        <span className="text-[9px] text-amber-600">Non enregistré</span>
+                      </div>
+                      <div className="mt-2 grid grid-cols-4 gap-2 font-mono text-[9px] text-slate-600 md:text-[10px]">
+                        <span className="text-slate-400">Nom</span>
+                        <span className="text-slate-400">Cotis.</span>
+                        <span className="text-slate-400">Tel.</span>
+                        <span className="text-slate-400">?</span>
+                        <span className="col-span-4 border-t border-dashed border-slate-200 pt-1 text-red-500">
+                          #REF!
+                        </span>
+                      </div>
+                    </div>
+                    <div className="absolute right-0 top-24 z-[2] w-[88%] max-w-[300px] rotate-[3deg] rounded-2xl border border-emerald-600/20 bg-[#E7FCE3] p-3 shadow-[0_12px_28px_rgba(2,6,23,0.2)] md:right-2 md:top-20">
+                      <div className="flex items-center gap-2 border-b border-emerald-100/80 pb-2">
+                        <MessageCircle className="h-4 w-4 text-emerald-700" strokeWidth={1.75} />
+                        <span className="text-[10px] font-bold text-emerald-900">Groupe WhatsApp</span>
+                      </div>
+                      <p className="mt-2 text-[10px] leading-snug text-emerald-900/90">
+                        &quot;Qui peut tenir le bar samedi ???&quot;
+                      </p>
+                      <p className="mt-1 text-[9px] text-emerald-700/80">+12 messages non lus</p>
+                    </div>
+                    <div className="absolute left-4 top-[200px] z-[4] w-[75%] max-w-[260px] rotate-[1deg] rounded-lg border border-amber-200 bg-amber-50 p-3 shadow-md md:left-8 md:top-[180px]">
+                      <p className="text-[10px] font-bold text-amber-900">Post-it</p>
+                      <p className="mt-1 text-[10px] leading-snug text-amber-800">
+                        Relancer M. Dupont — cotisation pas reçue
+                      </p>
+                    </div>
+                    <div className="absolute right-6 top-[8px] z-[1] w-[70%] max-w-[220px] rotate-[-4deg] rounded-lg border border-slate-200 bg-slate-50 p-2.5 opacity-90 md:right-10">
+                      <p className="text-[9px] font-semibold text-slate-500">Facture buvette</p>
+                      <p className="text-[10px] text-slate-500">brouillon.pdf — à envoyer</p>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 z-[2] w-[90%] max-w-[320px] -translate-x-1/2 rotate-[-1deg] rounded-xl border border-slate-200 bg-white p-3 shadow-lg md:bottom-2">
+                      <p className="text-[10px] font-bold text-slate-800">Match samedi 18h</p>
+                      <p className="mt-1 text-[9px] text-slate-500">Bénévoles : 3 non confirmés</p>
+                      <p className="mt-1 text-[9px] text-amber-700">Sponsor : paiement non suivi</p>
+                    </div>
+                  </div>
+                  <ul className="mx-auto flex max-w-3xl flex-wrap justify-center gap-x-4 gap-y-2 text-center text-xs text-blue-100/95 md:text-sm">
+                    {[
+                      "Temps perdu à chercher l’information",
+                      "Cotisations suivies à la main",
+                      "Événements compliqués à organiser",
+                      "Communication éparpillée",
+                      "Risque d’oubli et d’erreurs",
+                    ].map((line) => (
+                      <li key={line} className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                        <span className="h-1 w-1 shrink-0 rounded-full bg-amber-300/90" aria-hidden />
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="with"
+                  role="tabpanel"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="space-y-6"
+                >
+                  <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
+                    Une seule plateforme — tout est visible
+                  </p>
+                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)]">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3 md:px-6">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1A23FF] text-[10px] font-black text-white">
+                          O
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Tableau de bord</p>
+                          <p className="text-sm font-bold text-slate-900">FC Les Bleus</p>
                         </div>
                       </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="animate-fade-in">
-                <h3 className="mb-5 text-left text-2xl font-black text-white">Avec Obillz</h3>
-                <div className="grid gap-5 lg:grid-cols-[1.12fr_1fr]">
-                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_18px_45px_rgba(2,6,23,0.2)]">
-                    <div className="grid grid-cols-[190px_1fr]">
-                      <aside className="border-r border-slate-200 bg-[#F7FAFF] p-4">
-                        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2563EB]">Obillz</p>
-                        <div className="mt-4 space-y-2">
-                          {["Dashboard du club", "Membres", "Cotisations", "Factures", "Produits", "Evenements", "Plannings", "QR Codes"].map(
-                            (label, idx) => (
-                              <div
-                                key={label}
-                                className={`rounded-lg px-3 py-2 text-xs font-semibold ${
-                                  idx === 0
-                                    ? "bg-[#2563EB] text-white shadow-[0_8px_18px_rgba(37,99,235,0.35)]"
-                                    : "text-slate-600"
-                                }`}
-                              >
-                                {label}
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </aside>
-                      <div className="bg-white p-4">
-                        <h4 className="text-3xl font-black text-slate-900">Dashboard du club</h4>
-                        <p className="mt-1 text-sm text-slate-500">
-                          Vue d&apos;ensemble du club : membres, cotisations, finances.
-                        </p>
-                        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                          <div className="rounded-lg border border-slate-200 bg-white p-2.5">
-                            <p className="text-[11px] text-slate-500">Membres</p>
-                            <p className="text-lg font-black text-slate-800">284</p>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500 md:text-xs">
+                        <span className="hidden rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 sm:inline">
+                          À jour
+                        </span>
+                        <span className="text-slate-400">Vue du jour</span>
+                      </div>
+                    </div>
+                    <div className="p-4 md:p-6">
+                      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:p-4">
+                          <div className="flex items-center gap-2 text-slate-500">
+                            <Users className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                            <span className="text-[11px] font-medium md:text-xs">Membres actifs</span>
                           </div>
-                          <div className="rounded-lg border border-slate-200 bg-white p-2.5">
-                            <p className="text-[11px] text-slate-500">Cotisations</p>
-                            <p className="text-lg font-black text-slate-800">92%</p>
-                          </div>
-                          <div className="rounded-lg border border-blue-200 bg-[#2563EB] p-2.5 text-white">
-                            <p className="text-[11px] text-white/80">Solde du club</p>
-                            <p className="text-lg font-black">0.00 CHF</p>
-                          </div>
+                          <p className="mt-2 text-2xl font-black tabular-nums text-slate-900 md:text-3xl">284</p>
+                          <p className="mt-0.5 text-[10px] text-emerald-600">+12 cette saison</p>
                         </div>
-                        <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs font-semibold text-emerald-700">
-                          Rien d&apos;urgence pour le moment. Le club est à jour.
+                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:p-4">
+                          <div className="flex items-center gap-2 text-slate-500">
+                            <Wallet className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                            <span className="text-[11px] font-medium md:text-xs">Cotisations</span>
+                          </div>
+                          <p className="mt-2 text-2xl font-black tabular-nums text-slate-900 md:text-3xl">94%</p>
+                          <p className="mt-0.5 text-[10px] text-slate-500">6 en attente</p>
                         </div>
-                        <div className="mt-3 grid grid-cols-3 gap-2">
-                          <div className="h-9 rounded-md bg-slate-100" />
-                          <div className="h-9 rounded-md bg-slate-100" />
-                          <div className="h-9 rounded-md bg-slate-100" />
+                        <div className="rounded-xl border border-blue-100 bg-[#1A23FF]/[0.06] p-3 md:p-4">
+                          <div className="flex items-center gap-2 text-[#1A23FF]">
+                            <TrendingUp className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                            <span className="text-[11px] font-medium md:text-xs">Trésorerie</span>
+                          </div>
+                          <p className="mt-2 text-xl font-black tabular-nums text-slate-900 md:text-2xl">12 480 €</p>
+                          <p className="mt-0.5 text-[10px] text-slate-500">Solde du mois</p>
+                        </div>
+                        <div className="col-span-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:col-span-1 md:p-4">
+                          <div className="flex items-center gap-2 text-slate-500">
+                            <CalendarDays className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                            <span className="text-[11px] font-medium md:text-xs">À venir</span>
+                          </div>
+                          <p className="mt-2 text-sm font-bold text-slate-900">3 événements</p>
+                          <p className="mt-0.5 text-[10px] text-slate-500">Prochain : dim. 14h</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                        <div className="rounded-xl border border-slate-100 bg-white p-3 md:p-4">
+                          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Activité récente</p>
+                          <ul className="mt-3 space-y-2.5">
+                            {(
+                              [
+                                ["Cotisation reçue", "Martin D.", "il y a 2 h"],
+                                ["Inscription repas", "32 participants", "hier"],
+                                ["Bénévole confirmé", "Bar — samedi", "hier"],
+                              ] as const
+                            ).map(([a, b, c]) => (
+                              <li key={a} className="flex items-start justify-between gap-2 text-[11px] md:text-xs">
+                                <span className="font-medium text-slate-800">{a}</span>
+                                <span className="text-right text-slate-500">
+                                  {b}
+                                  <br />
+                                  <span className="text-[10px] text-slate-400">{c}</span>
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col justify-between rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 md:p-4">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" strokeWidth={1.75} />
+                            <div>
+                              <p className="text-sm font-bold text-emerald-900">Rien d&apos;urgence</p>
+                              <p className="mt-1 text-[11px] leading-relaxed text-emerald-800/90 md:text-xs">
+                                Cotisations, événements et messages : tout est suivi. Vous gardez le contrôle sans
+                                courir après chaque détail.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-2 border-t border-emerald-100/80 pt-3">
+                            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
+                              Inscriptions ouvertes
+                            </span>
+                            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
+                              8 bénévoles OK
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  <ul className="grid content-start gap-3 rounded-2xl border border-white/20 bg-white/90 p-5 text-left text-sm text-slate-700 shadow-[0_16px_36px_rgba(2,6,23,0.16)]">
-                    {[
-                      {
-                        title: "Membres et équipes centralisés",
-                        description: "Toutes les informations du club sont regroupées dans une seule plateforme.",
-                      },
-                      {
-                        title: "Cotisations envoyées en un clic",
-                        description:
-                          "Générez les cotisations et envoyez-les automatiquement à tous les membres par email.",
-                      },
-                      {
-                        title: "Factures professionnelles",
-                        description: "Créez et envoyez des factures propres en quelques secondes.",
-                      },
-                      {
-                        title: "Organisation des manifestations simplifiée",
-                        description: "Créez un planning d&apos;événement et partagez simplement le lien d&apos;inscription.",
-                      },
-                      {
-                        title: "Inscriptions en ligne",
-                        description:
-                          "Les bénévoles et participants peuvent s&apos;inscrire directement via un lien partagé dans WhatsApp.",
-                      },
-                      {
-                        title: "Suivi clair des finances",
-                        description: "Toutes les cotisations et paiements sont visibles en temps réel.",
-                      },
-                      {
-                        title: "Communication facilitée",
-                        description: "Envoyez facilement des informations à vos membres.",
-                      },
-                      {
-                        title: "Gain de temps énorme pour le comité",
-                        description: "Moins d&apos;administration, plus de temps pour le club.",
-                      },
-                    ].map((item) => (
-                      <li key={item.title} className="flex gap-2.5">
-                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor">
-                            <path d="M5 13l4 4L19 7" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </span>
-                        <div>
-                          <p className="font-semibold text-slate-900">{item.title}</p>
-                          <p className="mt-0.5 text-xs leading-relaxed text-slate-600">{item.description}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
 
