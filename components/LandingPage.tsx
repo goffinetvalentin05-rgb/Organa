@@ -3,6 +3,18 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CalendarDays,
+  Coffee,
+  FileText,
+  LineChart,
+  Mail,
+  QrCode,
+  Users,
+  Wallet,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type ComparisonView = "without" | "with";
 type FeatureTabId =
@@ -15,11 +27,23 @@ type FeatureTabId =
   | "inscriptions"
   | "communication";
 
+const featureIconById: Record<FeatureTabId, LucideIcon> = {
+  membres: Users,
+  cotisations: Wallet,
+  manifestations: CalendarDays,
+  buvette: Coffee,
+  finances: LineChart,
+  factures: FileText,
+  inscriptions: QrCode,
+  communication: Mail,
+};
+
 const featureTabs: Array<{
   id: FeatureTabId;
   title: string;
   description: string;
   details: string;
+  highlights: [string, string, string];
 }> = [
   {
     id: "membres",
@@ -28,6 +52,11 @@ const featureTabs: Array<{
       "Centralisez les fiches membres, les équipes et toutes les informations utiles dans une seule base claire et organisée.",
     details:
       "Retrouvez rapidement les bonnes informations sans devoir jongler entre plusieurs fichiers.",
+    highlights: [
+      "Fiches et équipes au même endroit",
+      "Coordonnées toujours à jour",
+      "Recherche rapide dans la base",
+    ],
   },
   {
     id: "cotisations",
@@ -36,6 +65,11 @@ const featureTabs: Array<{
       "Générez les cotisations en quelques clics et envoyez-les automatiquement aux membres par email.",
     details:
       "Suivez facilement les paiements en attente pour garder une vue claire sur les encaissements du club.",
+    highlights: [
+      "Génération en un clic",
+      "Envoi automatique par email",
+      "Suivi des paiements en temps réel",
+    ],
   },
   {
     id: "manifestations",
@@ -44,6 +78,11 @@ const featureTabs: Array<{
       "Créez les événements du club et organisez les bénévoles simplement depuis une seule interface.",
     details:
       "Partagez un lien d'inscription pour permettre aux personnes de se positionner rapidement.",
+    highlights: [
+      "Calendrier et événements unifiés",
+      "Inscription des bénévoles simplifiée",
+      "Lien partageable en quelques secondes",
+    ],
   },
   {
     id: "buvette",
@@ -51,6 +90,11 @@ const featureTabs: Array<{
     description:
       "Gérez les réservations de la buvette avec un calendrier simple et lisible.",
     details: "Créez automatiquement une facture lorsque la location est validée.",
+    highlights: [
+      "Calendrier clair des créneaux",
+      "Facturation automatique à la validation",
+      "Moins de gestion manuelle",
+    ],
   },
   {
     id: "finances",
@@ -58,6 +102,11 @@ const featureTabs: Array<{
     description:
       "Suivez les entrées et sorties d'argent du club dans une vue claire et structurée.",
     details: "Gardez en permanence une vision précise de la situation financière.",
+    highlights: [
+      "Entrées et sorties structurées",
+      "Vue d'ensemble du club",
+      "Situation lisible en un coup d’œil",
+    ],
   },
   {
     id: "factures",
@@ -65,6 +114,11 @@ const featureTabs: Array<{
     description:
       "Créez des factures propres et professionnelles en quelques secondes.",
     details: "Envoyez-les immédiatement par email sans devoir passer par un autre outil.",
+    highlights: [
+      "Modèles propres et professionnels",
+      "Envoi par email intégré",
+      "Création en quelques secondes",
+    ],
   },
   {
     id: "inscriptions",
@@ -72,6 +126,11 @@ const featureTabs: Array<{
     description:
       "Créez un lien ou un QR code pour permettre aux participants de s'inscrire facilement à un repas, un événement ou une activité.",
     details: "Les réponses sont centralisées et plus simples à gérer pour le comité.",
+    highlights: [
+      "Lien ou QR code pour s'inscrire",
+      "Réponses centralisées automatiquement",
+      "Moins de relances pour le comité",
+    ],
   },
   {
     id: "communication",
@@ -79,6 +138,11 @@ const featureTabs: Array<{
     description:
       "Envoyez facilement des informations importantes aux membres ou aux participants d'un événement.",
     details: "Le club communique plus clairement sans dépendre uniquement de groupes WhatsApp.",
+    highlights: [
+      "Messages ciblés aux bons groupes",
+      "Moins de dispersion sur WhatsApp",
+      "Informations structurées pour le club",
+    ],
   },
 ];
 
@@ -188,65 +252,9 @@ function HeroFloatingCard({
   );
 }
 
-function FeatureTabIcon({ id }: { id: FeatureTabId }) {
-  if (id === "membres") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M16 19a4 4 0 0 0-8 0M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  if (id === "cotisations") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M4 7h16M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" strokeWidth="1.8" />
-      </svg>
-    );
-  }
-  if (id === "manifestations") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M8 3v3M16 3v3M4 9h16M6 6h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  if (id === "buvette") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M7 4h10v3a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V4Z" strokeWidth="1.8" />
-        <path d="M9 11v8h6v-8" strokeWidth="1.8" />
-      </svg>
-    );
-  }
-  if (id === "finances") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M4 12h4l2-3 3 6 2-3h5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  if (id === "factures") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M7 3h8l3 3v15H7z" strokeWidth="1.8" />
-        <path d="M10 11h5M10 15h5" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  if (id === "inscriptions") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-        <path d="M4 12l8-8 8 8-8 8-8-8Z" strokeWidth="1.8" />
-        <path d="M12 8v8M8 12h8" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-      <path d="M4 6h16v12H4z" strokeWidth="1.8" />
-      <path d="m5 7 7 6 7-6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+function FeatureTabIcon({ id, className }: { id: FeatureTabId; className?: string }) {
+  const Icon = featureIconById[id];
+  return <Icon className={className ?? "h-[1.125rem] w-[1.125rem] shrink-0"} strokeWidth={1.75} aria-hidden />;
 }
 
 export default function LandingPage() {
@@ -573,67 +581,91 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="fonctionnalites" className="mx-auto mt-20 w-[94%] max-w-[1180px]">
-          <h2 className="text-center text-3xl font-black md:text-5xl">
-            Tous les outils pour gérer votre club
-          </h2>
-          <p className="mx-auto mt-4 max-w-4xl text-center text-base text-blue-100 md:text-lg">
-            Tout est centralisé dans une seule plateforme :
-            membres, cotisations, manifestations, finances et communication.
-          </p>
-          <div className="mx-auto mt-10 max-w-[980px]">
-            <div className="mx-auto flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 p-2 backdrop-blur-sm">
-              {featureTabs.map((feature) => {
-                const isActive = activeFeatureTab === feature.id;
-                return (
-                  <button
-                    key={feature.id}
-                    type="button"
-                    onClick={() => setActiveFeatureTab(feature.id)}
-                    className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                      isActive
-                        ? "bg-[#1A23FF] text-white shadow-[0_12px_22px_rgba(26,35,255,0.35)]"
-                        : "bg-white/90 text-slate-500 hover:bg-white hover:text-slate-700"
-                    }`}
-                  >
-                    <FeatureTabIcon id={feature.id} />
-                    <span>{feature.title}</span>
-                  </button>
-                );
-              })}
+        <section
+          id="fonctionnalites"
+          className="relative mx-auto mt-20 w-[94%] max-w-[1180px] scroll-mt-24 pb-4 pt-6 md:pb-10 md:pt-10"
+        >
+          <div
+            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,255,255,0.1),transparent_55%)]"
+            aria-hidden
+          />
+          <div className="relative z-10">
+            <h2 className="text-center text-3xl font-black md:text-5xl">
+              Tous les outils pour gérer votre club
+            </h2>
+            <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-relaxed text-blue-100 md:mt-6 md:text-lg">
+              Tout est centralisé dans une seule plateforme : membres, cotisations, manifestations,
+              finances et communication.
+            </p>
+
+            {/* Navigation : une grille responsive (2 → 4 → 8 colonnes), un seul jeu de boutons */}
+            <div className="mx-auto mt-12 max-w-[1040px] md:mt-14 lg:mt-16" role="tablist" aria-label="Fonctionnalités">
+              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:grid-cols-4 xl:grid-cols-8">
+                {featureTabs.map((feature) => {
+                  const isActive = activeFeatureTab === feature.id;
+                  return (
+                    <button
+                      key={feature.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => setActiveFeatureTab(feature.id)}
+                      className={`group flex min-h-[3.25rem] w-full flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2.5 text-center text-[0.65rem] font-semibold uppercase leading-tight tracking-wide transition duration-200 sm:text-xs md:flex-row md:gap-2 md:px-3 md:text-sm md:normal-case md:tracking-normal ${
+                        isActive
+                          ? "border-white/40 bg-[#1A23FF] text-white shadow-[0_10px_28px_rgba(26,35,255,0.45)] ring-2 ring-white/25"
+                          : "border-white/20 bg-white/10 text-blue-50 backdrop-blur-md hover:border-white/35 hover:bg-white/18 hover:shadow-[0_6px_20px_rgba(2,6,23,0.15)]"
+                      }`}
+                    >
+                      <FeatureTabIcon
+                        id={feature.id}
+                        className={`h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-105 md:h-[1.125rem] md:w-[1.125rem] ${isActive ? "text-white" : "text-blue-100"}`}
+                      />
+                      <span className="line-clamp-2 md:truncate">{feature.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <article className="mt-5 rounded-2xl border border-slate-200 bg-[#F7FAFF] p-6 text-slate-900 shadow-[0_16px_35px_rgba(15,23,42,0.14)] animate-fade-in">
-              <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                <div className="grid grid-cols-[72px_1fr]">
-                  <div className="bg-[var(--obillz-hero-blue)] p-2.5">
-                    <div className="space-y-2">
-                      <div className="h-1.5 rounded bg-white/75" />
-                      <div className="h-1.5 rounded bg-white/55" />
-                      <div className="h-1.5 rounded bg-white/40" />
+            {/* Carte contenu */}
+            <div className="mx-auto mt-8 max-w-[980px] md:mt-10">
+              <AnimatePresence mode="wait">
+                <motion.article
+                  key={activeFeatureTab}
+                  role="tabpanel"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  className="rounded-2xl border border-white/20 bg-white/95 p-6 text-slate-900 shadow-[0_16px_48px_rgba(2,6,23,0.2)] backdrop-blur-sm md:p-8"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+                    <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#1A23FF]/10 text-[#1A23FF] ring-1 ring-[#1A23FF]/15">
+                      <FeatureTabIcon id={currentFeature.id} className="h-6 w-6 text-[#1A23FF]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-xl font-black tracking-tight text-slate-900 md:text-2xl">
+                        {currentFeature.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
+                        {currentFeature.description}
+                      </p>
+                      <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5">
+                        {currentFeature.highlights.map((line) => (
+                          <li key={line} className="flex gap-3 text-sm text-slate-600 md:text-[0.9375rem]">
+                            <span
+                              className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#1A23FF]"
+                              aria-hidden
+                            />
+                            <span className="leading-relaxed">{line}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                  <div className="p-3">
-                    <div className="h-2 rounded bg-slate-200" />
-                    <div className="mt-2 grid grid-cols-3 gap-2">
-                      <div className="h-6 rounded-md bg-slate-100" />
-                      <div className="h-6 rounded-md bg-slate-100" />
-                      <div className="h-6 rounded-md bg-slate-100" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/10 text-[#1A23FF]">
-                  <FeatureTabIcon id={currentFeature.id} />
-                </span>
-                <div>
-                  <h3 className="text-xl font-black">{currentFeature.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{currentFeature.description}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{currentFeature.details}</p>
-                </div>
-              </div>
-            </article>
+                </motion.article>
+              </AnimatePresence>
+            </div>
           </div>
         </section>
 
