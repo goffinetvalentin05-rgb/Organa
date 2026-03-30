@@ -19,6 +19,33 @@ function CtaIcon() {
   );
 }
 
+const heroSideCards = [
+  {
+    title: "Membres du club",
+    line: "+284 membres actifs",
+    floatClass:
+      "-left-1 top-[48%] md:-left-1 md:top-[50%] lg:-left-2 lg:top-[46%] animate-float",
+  },
+  {
+    title: "Cotisations payées",
+    line: "92% ce mois",
+    floatClass:
+      "-right-1 top-[46%] md:-right-1 md:top-[48%] lg:-right-2 lg:top-[44%] animate-float",
+  },
+  {
+    title: "Événements",
+    line: "4 à venir",
+    floatClass:
+      "left-[4%] top-[76%] md:left-[5%] md:top-[74%] lg:left-[8%] lg:top-[70%] animate-float",
+  },
+  {
+    title: "Finances",
+    line: "Vue claire du solde",
+    floatClass:
+      "right-[4%] top-[78%] md:right-[5%] md:top-[76%] lg:right-[8%] lg:top-[72%] animate-float",
+  },
+] as const;
+
 function MockupFrame() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -134,14 +161,14 @@ export default function Hero() {
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-hidden px-4 pb-12 pt-10 sm:px-8 md:pb-20 md:pt-16"
+        className="relative isolate overflow-x-hidden overflow-y-visible px-4 pb-12 pt-10 sm:px-8 md:pb-20 md:pt-16"
       >
         <div className="pointer-events-none absolute -left-20 top-12 h-[18rem] w-[18rem] rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute right-0 top-24 h-[22rem] w-[22rem] rounded-full bg-[#60A5FA]/30 blur-3xl" />
         <div className="pointer-events-none absolute left-1/2 top-[35%] h-[18rem] w-[36rem] -translate-x-1/2 rounded-full bg-[#1D4ED8]/60 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl">
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="relative z-20 mx-auto max-w-4xl text-center">
             <h1 className="mx-auto mt-8 max-w-5xl text-balance text-[2rem] font-extrabold leading-[1.03] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-[4.1rem]">
               Gérer un club sportif ne devrait pas être un casse-tête administratif.
             </h1>
@@ -187,24 +214,30 @@ export default function Hero() {
               </div>
               <p className="mt-3 text-sm text-blue-100">Sans engagement • aucune carte bancaire requise</p>
             </div>
+
+            {/* Mobile : cartes sous le texte, hors positionnement absolu */}
+            <div className="mx-auto mt-10 grid max-w-lg grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2 md:hidden">
+              {heroSideCards.map((card) => (
+                <div
+                  key={card.title}
+                  className="rounded-xl border border-white/25 bg-white/12 px-4 py-3 text-left text-sm text-white shadow-[0_14px_30px_rgba(2,6,23,0.22)] backdrop-blur-sm"
+                >
+                  <p className="font-semibold">{card.title}</p>
+                  <p className="text-xs text-blue-100 sm:text-sm">{card.line}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="pointer-events-none absolute -left-2 top-[46%] hidden rounded-xl border border-white/25 bg-white/12 px-4 py-3 text-sm text-white shadow-[0_14px_30px_rgba(2,6,23,0.22)] backdrop-blur-sm md:block animate-float">
-            <p className="font-semibold">Membres du club</p>
-            <p className="text-blue-100">+284 membres actifs</p>
-          </div>
-          <div className="pointer-events-none absolute -right-2 top-[44%] hidden rounded-xl border border-white/25 bg-white/12 px-4 py-3 text-sm text-white shadow-[0_14px_30px_rgba(2,6,23,0.22)] backdrop-blur-sm md:block animate-float">
-            <p className="font-semibold">Cotisations payées</p>
-            <p className="text-blue-100">92% ce mois</p>
-          </div>
-          <div className="pointer-events-none absolute left-[8%] top-[70%] hidden rounded-xl border border-white/25 bg-white/12 px-4 py-3 text-sm text-white shadow-[0_14px_30px_rgba(2,6,23,0.22)] backdrop-blur-sm lg:block animate-float">
-            <p className="font-semibold">Événements</p>
-            <p className="text-blue-100">4 à venir</p>
-          </div>
-          <div className="pointer-events-none absolute right-[8%] top-[72%] hidden rounded-xl border border-white/25 bg-white/12 px-4 py-3 text-sm text-white shadow-[0_14px_30px_rgba(2,6,23,0.22)] backdrop-blur-sm lg:block animate-float">
-            <p className="font-semibold">Finances</p>
-            <p className="text-blue-100">Vue claire du solde</p>
-          </div>
+          {heroSideCards.map((card, i) => (
+            <div
+              key={`float-${card.title}`}
+              className={`pointer-events-none absolute z-[1] rounded-xl border border-white/25 bg-white/12 px-3 py-2.5 text-sm text-white shadow-[0_12px_26px_rgba(2,6,23,0.2)] backdrop-blur-sm md:scale-[0.94] md:px-3.5 md:py-3 md:text-[0.8125rem] lg:scale-100 lg:px-4 lg:py-3 lg:text-sm ${i < 2 ? "hidden md:block" : "hidden lg:block"} ${card.floatClass}`}
+            >
+              <p className="font-semibold">{card.title}</p>
+              <p className="text-blue-100">{card.line}</p>
+            </div>
+          ))}
 
           <MockupFrame />
         </div>

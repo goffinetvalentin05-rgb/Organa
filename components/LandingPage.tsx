@@ -104,6 +104,68 @@ const faqItems = [
   },
 ];
 
+const heroFloatingCardsData = [
+  {
+    title: "Inscriptions ouvertes",
+    line1: "Repas après match",
+    line2: "42 participants",
+    secondary: "Lien ou QR code partagé au club",
+    floatClass:
+      "left-[6%] top-[74%] -rotate-6 md:left-[8%] md:top-[72%] lg:left-[14%] lg:top-[64%] animate-float [animation-delay:120ms]",
+  },
+  {
+    title: "Planning manifestation",
+    line1: "Soirée du club",
+    line2: "8 bénévoles inscrits",
+    secondary: "Organisation simple des bénévoles",
+    floatClass:
+      "right-[6%] top-[72%] rotate-6 md:right-[8%] md:top-[70%] lg:right-[14%] lg:top-[62%] animate-float [animation-delay:260ms]",
+  },
+  {
+    title: "Cotisation annuelle",
+    line1: "Envoyée aux membres",
+    line2: "Équipe 1",
+    secondary: "Envoi en 2 clics",
+    floatClass:
+      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[88%] lg:top-[96%] animate-float [animation-delay:400ms]",
+  },
+] as const;
+
+function HeroCardInner({
+  title,
+  line1,
+  line2,
+  secondary,
+  compact,
+}: {
+  title: string;
+  line1: string;
+  line2: string;
+  secondary: string;
+  compact?: boolean;
+}) {
+  return (
+    <>
+      <p
+        className={`font-semibold uppercase tracking-[0.08em] text-slate-500 ${compact ? "text-[0.65rem]" : "text-xs"}`}
+      >
+        {title}
+      </p>
+      <p
+        className={`font-black leading-tight text-[#1A23FF] ${compact ? "mt-1.5 text-xs" : "mt-2 text-sm"}`}
+      >
+        {line1}
+      </p>
+      <p className={`font-bold leading-tight text-slate-800 ${compact ? "mt-1 text-xs" : "mt-1 text-sm"}`}>
+        {line2}
+      </p>
+      <p className={`mt-2 text-slate-500 ${compact ? "text-[0.65rem] leading-snug" : "text-xs"}`}>
+        {secondary}
+      </p>
+    </>
+  );
+}
+
 function HeroFloatingCard({
   className,
   title,
@@ -119,12 +181,9 @@ function HeroFloatingCard({
 }) {
   return (
     <div
-      className={`pointer-events-none absolute hidden rounded-2xl border border-slate-200/90 bg-white p-4 text-slate-900 shadow-[0_20px_40px_rgba(15,23,42,0.18)] backdrop-blur-sm md:block ${className}`}
+      className={`pointer-events-none absolute z-[1] hidden max-w-[min(220px,42vw)] rounded-2xl border border-slate-200/90 bg-white p-3 text-slate-900 shadow-[0_16px_32px_rgba(15,23,42,0.16)] backdrop-blur-sm md:block md:scale-[0.94] md:p-3.5 lg:max-w-[260px] lg:scale-100 lg:p-4 lg:shadow-[0_20px_40px_rgba(15,23,42,0.18)] ${className}`}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{title}</p>
-      <p className="mt-2 text-sm font-black leading-tight text-[#1A23FF]">{line1}</p>
-      <p className="mt-1 text-sm font-bold leading-tight text-slate-800">{line2}</p>
-      <p className="mt-2 text-xs text-slate-500">{secondary}</p>
+      <HeroCardInner title={title} line1={line1} line2={line2} secondary={secondary} />
     </div>
   );
 }
@@ -234,11 +293,11 @@ export default function LandingPage() {
               </div>
             </header>
 
-            <div className="relative mt-8 min-h-[390px] overflow-visible p-5 md:min-h-[460px] md:p-10">
+            <div className="relative mt-8 min-h-0 overflow-x-hidden overflow-y-visible p-5 pb-8 md:min-h-[500px] md:pb-12 lg:min-h-[460px] lg:pb-10">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
-              <div className="relative z-10">
+              <div className="relative z-20">
                 <div className="mt-12 text-center md:mt-20">
                   <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
                     GÉRER UN CLUB SPORTIF
@@ -252,41 +311,49 @@ export default function LandingPage() {
                   <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                     <Link
                       href="/inscription"
-                      className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-3 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
+                      className="inline-flex w-full max-w-md items-center justify-center rounded-full bg-white px-7 py-3 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
                     >
                       Créer mon club gratuitement
                     </Link>
                     <a
                       href="#comparaison"
-                      className="inline-flex w-full items-center justify-center rounded-full border border-white/45 px-7 py-3 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
+                      className="inline-flex w-full max-w-md items-center justify-center rounded-full border border-white/45 px-7 py-3 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
                     >
                       Voir comment ça fonctionne
                     </a>
                   </div>
                 </div>
+
+                {/* Mobile : cartes en flux sous le texte (aucun chevauchement) */}
+                <div className="mx-auto mt-10 grid max-w-lg grid-cols-1 gap-4 sm:max-w-2xl sm:grid-cols-2 md:hidden">
+                  {heroFloatingCardsData.map((card, i) => (
+                    <div
+                      key={card.title}
+                      className={`rounded-2xl border border-slate-200/90 bg-white p-4 text-left text-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.14)] ${i === 2 ? "sm:col-span-2 sm:mx-auto sm:max-w-md" : ""}`}
+                    >
+                      <HeroCardInner
+                        title={card.title}
+                        line1={card.line1}
+                        line2={card.line2}
+                        secondary={card.secondary}
+                        compact
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <HeroFloatingCard
-                className="left-[14%] top-[64%] -rotate-6 animate-float [animation-delay:120ms]"
-                title="Inscriptions ouvertes"
-                line1="Repas après match"
-                line2="42 participants"
-                secondary="Lien ou QR code partagé au club"
-              />
-              <HeroFloatingCard
-                className="right-[14%] top-[62%] rotate-6 animate-float [animation-delay:260ms]"
-                title="Planning manifestation"
-                line1="Soirée du club"
-                line2="8 bénévoles inscrits"
-                secondary="Organisation simple des bénévoles"
-              />
-              <HeroFloatingCard
-                className="left-1/2 top-[96%] -translate-x-1/2 rotate-[-2deg] animate-float [animation-delay:400ms]"
-                title="Cotisation annuelle"
-                line1="Envoyée aux membres"
-                line2="Équipe 1"
-                secondary="Envoi en 2 clics"
-              />
+              {/* Tablette + desktop : cartes flottantes (md+ uniquement, positions md vs lg) */}
+              {heroFloatingCardsData.map((card) => (
+                <HeroFloatingCard
+                  key={`float-${card.title}`}
+                  className={card.floatClass}
+                  title={card.title}
+                  line1={card.line1}
+                  line2={card.line2}
+                  secondary={card.secondary}
+                />
+              ))}
             </div>
           </div>
         </section>
