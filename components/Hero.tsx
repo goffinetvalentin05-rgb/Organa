@@ -162,7 +162,7 @@ export default function Hero() {
 
       <section
         id="hero-obillz"
-        className="relative isolate overflow-x-hidden overflow-y-visible px-4 pb-12 pt-10 sm:px-8 md:pb-20 md:pt-16"
+        className="relative isolate overflow-visible px-4 pb-12 pt-10 sm:px-8 md:pb-20 md:pt-16"
       >
         <div className="pointer-events-none absolute -left-20 top-12 h-[18rem] w-[18rem] rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute right-0 top-24 h-[22rem] w-[22rem] rounded-full bg-[#60A5FA]/30 blur-3xl" />

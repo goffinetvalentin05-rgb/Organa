@@ -264,7 +264,7 @@ export default function LandingPage() {
   const currentFeature = featureTabs.find((item) => item.id === activeFeatureTab) ?? featureTabs[0];
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[var(--obillz-hero-blue)] text-white">
+    <main className="relative min-h-screen bg-[var(--obillz-hero-blue)] text-white">
       <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]" />
 
       <div className="relative z-10 pb-20">
@@ -301,7 +301,7 @@ export default function LandingPage() {
               </div>
             </header>
 
-            <div className="relative mt-8 min-h-0 overflow-x-hidden overflow-y-visible p-5 pb-8 md:min-h-[500px] md:pb-12 lg:min-h-[460px] lg:pb-10">
+            <div className="relative mt-8 p-5 pb-32 md:pb-44 lg:pb-40">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
