@@ -435,69 +435,146 @@ export default function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="space-y-8"
+                  className="space-y-6 md:space-y-8"
                 >
                   <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
                     Le quotidien sans outil centralisé
                   </p>
-                  <div className="relative mx-auto min-h-[380px] max-w-4xl md:min-h-[340px]">
-                    <div className="absolute left-0 top-0 z-[3] w-[92%] max-w-[340px] rotate-[-2deg] rounded-xl border border-slate-300/90 bg-white p-3 shadow-[0_12px_30px_rgba(2,6,23,0.18)] md:left-1 md:top-2">
-                      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span className="truncate text-[10px] font-semibold text-slate-500 md:text-xs">
-                          membres_2024_FINAL_v2.xlsx
+
+                  {/* Mobile : pile verticale lisible (pas de chaos) */}
+                  <div className="mx-auto max-w-md space-y-4 md:hidden">
+                    <div className="rounded-[20px] bg-[#0B141A] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+                      <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366]/20">
+                          <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" strokeWidth={2} />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-semibold text-white">Comité du club</p>
+                          <p className="text-[9px] text-white/45">Groupe WhatsApp</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2 rounded-lg bg-[#202C33] p-2.5">
+                        <div className="ml-4 max-w-[92%] rounded-lg rounded-tr-sm bg-[#005C4B] px-2.5 py-2 text-[11px] leading-snug text-white/95">
+                          Qui peut tenir la buvette samedi ?
+                        </div>
+                        <div className="ml-4 max-w-[92%] rounded-lg rounded-tr-sm bg-[#005C4B] px-2.5 py-2 text-[11px] leading-snug text-white/95">
+                          On n&apos;a pas la liste des bénévoles <span aria-hidden>😅</span>
+                        </div>
+                        <p className="pr-1 text-right text-[9px] text-[#8696A0]">+12 messages non lus</p>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden rounded-sm border border-slate-400/60 bg-white shadow-[0_6px_24px_rgba(2,6,23,0.18)]">
+                      <div className="flex items-center gap-1.5 bg-[#217346] px-2 py-1.5">
+                        <span className="text-[9px] text-white/90">●●●</span>
+                        <span className="flex-1 truncate text-center text-[10px] font-medium text-white">
+                          membres_2024_FINAL_v3.xlsx
                         </span>
-                        <span className="text-[9px] text-amber-600">Non enregistré</span>
                       </div>
-                      <div className="mt-2 grid grid-cols-4 gap-2 font-mono text-[9px] text-slate-600 md:text-[10px]">
-                        <span className="text-slate-400">Nom</span>
-                        <span className="text-slate-400">Cotis.</span>
-                        <span className="text-slate-400">Tel.</span>
-                        <span className="text-slate-400">?</span>
-                        <span className="col-span-4 border-t border-dashed border-slate-200 pt-1 text-red-500">
-                          #REF!
-                        </span>
+                      <div className="border-b border-slate-200 bg-slate-100 px-2 py-1 font-mono text-[9px] text-slate-600">
+                        A1: Nom <span className="text-slate-300">|</span> B1: Cotis.
+                      </div>
+                      <div className="bg-white p-2 font-mono text-[9px] leading-relaxed text-slate-700">
+                        <div className="grid grid-cols-[1fr_1fr] gap-x-3 border-b border-slate-100 pb-1">
+                          <span>Dupont</span>
+                          <span className="text-right text-slate-400">?</span>
+                        </div>
+                        <p className="mt-2 text-red-600">#REF!</p>
+                        <p className="text-[9px] text-amber-700">Fichier non enregistré</p>
                       </div>
                     </div>
-                    <div className="absolute right-0 top-24 z-[2] w-[88%] max-w-[300px] rotate-[3deg] rounded-2xl border border-emerald-600/20 bg-[#E7FCE3] p-3 shadow-[0_12px_28px_rgba(2,6,23,0.2)] md:right-2 md:top-20">
-                      <div className="flex items-center gap-2 border-b border-emerald-100/80 pb-2">
-                        <MessageCircle className="h-4 w-4 text-emerald-700" strokeWidth={1.75} />
-                        <span className="text-[10px] font-bold text-emerald-900">Groupe WhatsApp</span>
-                      </div>
-                      <p className="mt-2 text-[10px] leading-snug text-emerald-900/90">
-                        &quot;Qui peut tenir le bar samedi ???&quot;
-                      </p>
-                      <p className="mt-1 text-[9px] text-emerald-700/80">+12 messages non lus</p>
-                    </div>
-                    <div className="absolute left-4 top-[200px] z-[4] w-[75%] max-w-[260px] rotate-[1deg] rounded-lg border border-amber-200 bg-amber-50 p-3 shadow-md md:left-8 md:top-[180px]">
-                      <p className="text-[10px] font-bold text-amber-900">Post-it</p>
-                      <p className="mt-1 text-[10px] leading-snug text-amber-800">
-                        Relancer M. Dupont — cotisation pas reçue
+                    <div className="relative -rotate-[0.5deg] border border-amber-200/80 bg-[#FFF8D6] px-3 py-3 shadow-[4px_5px_0_rgba(15,23,42,0.12)]">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-amber-900/70">Note</p>
+                      <p className="mt-1 text-sm font-medium leading-snug text-amber-950">
+                        Relancer Dupont — cotisation pas reçue
                       </p>
                     </div>
-                    <div className="absolute right-6 top-[8px] z-[1] w-[70%] max-w-[220px] rotate-[-4deg] rounded-lg border border-slate-200 bg-slate-50 p-2.5 opacity-90 md:right-10">
-                      <p className="text-[9px] font-semibold text-slate-500">Facture buvette</p>
-                      <p className="text-[10px] text-slate-500">brouillon.pdf — à envoyer</p>
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 z-[2] w-[90%] max-w-[320px] -translate-x-1/2 rotate-[-1deg] rounded-xl border border-slate-200 bg-white p-3 shadow-lg md:bottom-2">
-                      <p className="text-[10px] font-bold text-slate-800">Match samedi 18h</p>
-                      <p className="mt-1 text-[9px] text-slate-500">Bénévoles : 3 non confirmés</p>
-                      <p className="mt-1 text-[9px] text-amber-700">Sponsor : paiement non suivi</p>
+                    <div className="border-l-4 border-slate-500 bg-[#FAFAF9] px-3 py-3 shadow-[0_4px_20px_rgba(2,6,23,0.12)]">
+                      <p className="text-[11px] font-semibold text-slate-600">Facture buvette — non envoyée</p>
+                      <p className="mt-3 text-sm font-bold text-slate-900">Match samedi 18h</p>
+                      <p className="mt-1 text-[11px] text-slate-600">3 bénévoles non confirmés</p>
+                      <p className="mt-1 text-[11px] text-amber-800">Sponsor : paiement non suivi</p>
                     </div>
                   </div>
-                  <ul className="mx-auto flex max-w-3xl flex-wrap justify-center gap-x-4 gap-y-2 text-center text-xs text-blue-100/95 md:text-sm">
-                    {[
-                      "Temps perdu à chercher l’information",
-                      "Cotisations suivies à la main",
-                      "Événements compliqués à organiser",
-                      "Communication éparpillée",
-                      "Risque d’oubli et d’erreurs",
-                    ].map((line) => (
-                      <li key={line} className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                        <span className="h-1 w-1 shrink-0 rounded-full bg-amber-300/90" aria-hidden />
-                        {line}
-                      </li>
-                    ))}
-                  </ul>
+
+                  {/* Desktop : scène bureau — styles variés, chaos maîtrisé */}
+                  <div className="relative mx-auto hidden min-h-[460px] max-w-[900px] md:block lg:min-h-[480px]">
+                    <div
+                      className="absolute left-0 top-2 z-[3] w-[min(100%,340px)] shadow-[0_14px_40px_rgba(2,6,23,0.22)]"
+                      style={{ transform: "rotate(-2.5deg)" }}
+                    >
+                      <div className="overflow-hidden rounded-sm border border-slate-500/40 bg-white">
+                        <div className="flex items-center gap-2 bg-[#217346] px-2.5 py-2">
+                          <span className="text-[10px] text-white/80">● ● ●</span>
+                          <span className="flex-1 truncate text-center text-[11px] font-medium text-white">
+                            membres_2024_FINAL_v3.xlsx
+                          </span>
+                        </div>
+                        <div className="border-b border-slate-200 bg-[#F3F3F3] px-2 py-1.5 font-mono text-[10px] text-slate-600">
+                          Feuille1
+                        </div>
+                        <div className="p-3 font-mono text-[10px] text-slate-800">
+                          <div className="grid grid-cols-4 gap-2 border-b border-slate-200 pb-1 text-slate-400">
+                            <span>A</span>
+                            <span>B</span>
+                            <span>C</span>
+                            <span>D</span>
+                          </div>
+                          <p className="mt-2 font-bold text-red-600">#REF!</p>
+                          <p className="mt-1 text-[9px] text-amber-700">Non enregistré · dernière modif ?</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="absolute right-0 top-6 z-[4] w-[min(100%,300px)] shadow-[0_16px_44px_rgba(0,0,0,0.28)]"
+                      style={{ transform: "rotate(3.5deg)" }}
+                    >
+                      <div className="rounded-[22px] bg-[#0B141A] p-3">
+                        <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366]/25 text-xs">
+                            <MessageCircle className="h-4 w-4 text-[#25D366]" strokeWidth={2} />
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-semibold text-white">Comité du club</p>
+                            <p className="text-[9px] text-white/45">en ligne</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2 rounded-xl bg-[#202C33] p-2.5">
+                          <div className="ml-6 max-w-[94%] rounded-2xl rounded-tr-md bg-[#005C4B] px-3 py-2 text-[11px] leading-snug text-white">
+                            Qui peut tenir la buvette samedi ?
+                          </div>
+                          <div className="ml-6 max-w-[94%] rounded-2xl rounded-tr-md bg-[#005C4B] px-3 py-2 text-[11px] leading-snug text-white">
+                            On n&apos;a pas la liste des bénévoles <span aria-hidden>😅</span>
+                          </div>
+                          <p className="pr-1 text-right text-[10px] font-medium text-[#8696A0]">+12 messages non lus</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="absolute left-[8%] top-[210px] z-[5] w-[min(88%,260px)] border border-amber-300/90 bg-[#FFFACD] px-3 py-3 shadow-[5px_6px_0_rgba(15,23,42,0.14)]"
+                      style={{ transform: "rotate(4deg)" }}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-amber-900/55">Post-it</p>
+                      <p className="mt-1.5 text-[12px] font-semibold leading-snug text-amber-950">
+                        Relancer Dupont — cotisation pas reçue
+                      </p>
+                    </div>
+                    <div
+                      className="absolute right-[12%] top-0 z-[2] w-[min(72%,200px)] border border-slate-300 bg-[#F4F4F3] px-2.5 py-2 shadow-[0_8px_20px_rgba(2,6,23,0.15)]"
+                      style={{ transform: "rotate(-4deg)" }}
+                    >
+                      <p className="text-[9px] uppercase tracking-wide text-slate-500">Brouillon</p>
+                      <p className="mt-1 text-[11px] font-semibold text-slate-800">Facture buvette</p>
+                      <p className="text-[10px] text-slate-500">Non envoyée</p>
+                    </div>
+                    <div
+                      className="absolute bottom-4 left-1/2 z-[3] w-[min(94%,360px)] border-l-[5px] border-l-rose-500 bg-white px-4 py-3 shadow-[0_12px_36px_rgba(2,6,23,0.2)]"
+                      style={{ transform: "translateX(-50%) rotate(-1.5deg)" }}
+                    >
+                      <p className="text-[12px] font-black text-slate-900">Match samedi · 18h</p>
+                      <p className="mt-1.5 text-[11px] text-slate-600">3 bénévoles non confirmés</p>
+                      <p className="mt-1 text-[11px] font-medium text-amber-800">Sponsor : paiement non suivi</p>
+                    </div>
+                  </div>
                 </motion.div>
               ) : (
                 <motion.div
