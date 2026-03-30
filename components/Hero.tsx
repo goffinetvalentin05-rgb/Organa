@@ -19,30 +19,31 @@ function CtaIcon() {
   );
 }
 
+/** Positions relatives au bloc mockup (pas au hero entier) : md = tablette, lg+ = desktop premium */
 const heroSideCards = [
   {
     title: "Membres du club",
     line: "+284 membres actifs",
     floatClass:
-      "-left-1 top-[48%] md:-left-1 md:top-[50%] lg:-left-2 lg:top-[46%] animate-float",
+      "-left-1 top-[14%] -translate-x-1 -rotate-6 md:-left-0.5 md:top-[16%] md:scale-[0.92] md:-translate-x-1 md:-rotate-5 lg:-left-2 lg:top-[18%] lg:scale-100 lg:-translate-x-3 lg:-rotate-6 animate-float [animation-delay:80ms]",
   },
   {
     title: "Cotisations payées",
     line: "92% ce mois",
     floatClass:
-      "-right-1 top-[46%] md:-right-1 md:top-[48%] lg:-right-2 lg:top-[44%] animate-float",
+      "-right-1 top-[12%] translate-x-1 rotate-6 md:-right-0.5 md:top-[14%] md:scale-[0.92] md:translate-x-1 md:rotate-5 lg:-right-2 lg:top-[16%] lg:scale-100 lg:translate-x-3 lg:rotate-6 animate-float [animation-delay:160ms]",
   },
   {
     title: "Événements",
     line: "4 à venir",
     floatClass:
-      "left-[4%] top-[76%] md:left-[5%] md:top-[74%] lg:left-[8%] lg:top-[70%] animate-float",
+      "left-[2%] bottom-[18%] -rotate-3 md:left-[3%] md:bottom-[16%] md:scale-[0.92] md:-rotate-2 lg:left-[5%] lg:bottom-[14%] lg:scale-100 lg:-rotate-3 animate-float [animation-delay:240ms]",
   },
   {
     title: "Finances",
     line: "Vue claire du solde",
     floatClass:
-      "right-[4%] top-[78%] md:right-[5%] md:top-[76%] lg:right-[8%] lg:top-[72%] animate-float",
+      "right-[2%] bottom-[16%] rotate-3 md:right-[3%] md:bottom-[14%] md:scale-[0.92] md:rotate-2 lg:right-[5%] lg:bottom-[12%] lg:scale-100 lg:rotate-3 animate-float [animation-delay:320ms]",
   },
 ] as const;
 
@@ -73,7 +74,7 @@ function MockupFrame() {
   };
 
   return (
-    <div id="apercu-plateforme" className="relative mx-auto mt-14 w-full max-w-6xl" data-reveal>
+    <div id="apercu-plateforme" className="relative mx-auto w-full max-w-6xl" data-reveal>
       <div className="pointer-events-none absolute inset-x-[12%] top-[18%] -z-10 h-[62%] rounded-full bg-[radial-gradient(circle,rgba(147,197,253,0.32),rgba(147,197,253,0)_70%)] blur-3xl" />
       <div className="rounded-[1.9rem] border border-white/20 bg-white/10 p-2 shadow-[0_34px_80px_rgba(2,6,23,0.35)] backdrop-blur-sm sm:p-3 md:p-4 [transform:perspective(1100px)_rotateX(3deg)]">
         <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-[#0A1128] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
@@ -215,8 +216,8 @@ export default function Hero() {
               <p className="mt-3 text-sm text-blue-100">Sans engagement • aucune carte bancaire requise</p>
             </div>
 
-            {/* Mobile : cartes sous le texte, hors positionnement absolu */}
-            <div className="mx-auto mt-10 grid max-w-lg grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2 md:hidden">
+            {/* < md : cartes dans le flux (alternative responsive). ≥ md : même infos en flottant autour du mockup. */}
+            <div className="mx-auto mt-10 grid w-full max-w-lg grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2 md:hidden">
               {heroSideCards.map((card) => (
                 <div
                   key={card.title}
@@ -229,17 +230,21 @@ export default function Hero() {
             </div>
           </div>
 
-          {heroSideCards.map((card, i) => (
-            <div
-              key={`float-${card.title}`}
-              className={`pointer-events-none absolute z-[1] rounded-xl border border-white/25 bg-white/12 px-3 py-2.5 text-sm text-white shadow-[0_12px_26px_rgba(2,6,23,0.2)] backdrop-blur-sm md:scale-[0.94] md:px-3.5 md:py-3 md:text-[0.8125rem] lg:scale-100 lg:px-4 lg:py-3 lg:text-sm ${i < 2 ? "hidden md:block" : "hidden lg:block"} ${card.floatClass}`}
-            >
-              <p className="font-semibold">{card.title}</p>
-              <p className="text-blue-100">{card.line}</p>
+          {/* Tablette + desktop : cartes flottantes au-dessus du mockup (ancrage sur la zone visuelle) */}
+          <div className="relative mx-auto mt-14 w-full max-w-6xl max-md:mt-10">
+            <MockupFrame />
+            <div className="pointer-events-none absolute inset-0 z-10 hidden md:block">
+              {heroSideCards.map((card) => (
+                <div
+                  key={`float-${card.title}`}
+                  className={`absolute rounded-xl border border-white/25 bg-white/12 px-3 py-2.5 text-sm text-white shadow-[0_12px_26px_rgba(2,6,23,0.2)] backdrop-blur-sm md:px-3.5 md:py-3 md:text-[0.8125rem] lg:px-4 lg:py-3 lg:text-sm ${card.floatClass}`}
+                >
+                  <p className="font-semibold">{card.title}</p>
+                  <p className="text-blue-100">{card.line}</p>
+                </div>
+              ))}
             </div>
-          ))}
-
-          <MockupFrame />
+          </div>
         </div>
       </section>
     </div>
