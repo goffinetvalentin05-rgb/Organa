@@ -6,14 +6,15 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
-  CheckCircle2,
   Coffee,
   FileText,
+  LayoutDashboard,
   LineChart,
   Mail,
   MessageCircle,
+  Plus,
   QrCode,
-  TrendingUp,
+  Receipt,
   Users,
   Wallet,
 } from "lucide-react";
@@ -511,99 +512,169 @@ export default function LandingPage() {
                   <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
                     Une seule plateforme — tout est visible
                   </p>
-                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)]">
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3 md:px-6">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1A23FF] text-[10px] font-black text-white">
-                          O
+
+                  {/* Mobile : pile verticale, lisible, sans dispersion */}
+                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_20px_50px_rgba(2,6,23,0.22)] md:hidden">
+                    <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-4 text-center">
+                      <p className="text-lg font-black text-slate-900">Dashboard du club</p>
+                      <p className="mt-1 text-xs leading-snug text-slate-500">
+                        Vue d&apos;ensemble : membres, cotisations, finances
+                      </p>
+                    </div>
+                    <div className="space-y-4 p-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                          <p className="text-[11px] font-semibold text-slate-500">Membres</p>
+                          <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">284</p>
+                          <p className="mt-1 text-[10px] text-emerald-600">+12 ce mois</p>
                         </div>
-                        <div className="text-left">
-                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Tableau de bord</p>
-                          <p className="text-sm font-bold text-slate-900">FC Les Bleus</p>
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                          <p className="text-[11px] font-semibold text-slate-500">Cotisations</p>
+                          <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">92%</p>
+                          <p className="mt-1 text-[10px] text-slate-500">En attente : 8%</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500 md:text-xs">
-                        <span className="hidden rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 sm:inline">
-                          À jour
-                        </span>
-                        <span className="text-slate-400">Vue du jour</span>
+                      <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-4">
+                        <p className="text-[11px] font-semibold text-[#1A23FF]">Solde du club</p>
+                        <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">2&apos;070 CHF</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">À traiter</p>
+                        <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/90 p-4">
+                          <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
+                          <p className="mt-1 text-lg font-black text-slate-800">300 CHF</p>
+                          <p className="mt-2 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800">
+                            À relancer
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Action rapide</p>
+                        <div className="mt-2 flex flex-col gap-2">
+                          <span className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-800">
+                            <Plus className="h-4 w-4 text-[#1A23FF]" strokeWidth={2} />
+                            Ajouter un membre
+                          </span>
+                          <span className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-800">
+                            <Plus className="h-4 w-4 text-[#1A23FF]" strokeWidth={2} />
+                            Envoyer cotisation
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-4 md:p-6">
-                      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:p-4">
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <Users className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                            <span className="text-[11px] font-medium md:text-xs">Membres actifs</span>
+                  </div>
+
+                  {/* Desktop : sidebar + zone principale type produit */}
+                  <div className="hidden overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)] md:block">
+                    <div className="flex">
+                      <aside className="w-[168px] shrink-0 border-r border-slate-200 bg-[#F4F7FB] px-3 py-4 lg:w-[188px]">
+                        <div className="mb-4 flex items-center gap-2 px-1">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1A23FF] text-[11px] font-black text-white">
+                            O
                           </div>
-                          <p className="mt-2 text-2xl font-black tabular-nums text-slate-900 md:text-3xl">284</p>
-                          <p className="mt-0.5 text-[10px] text-emerald-600">+12 cette saison</p>
+                          <span className="truncate text-xs font-bold text-slate-800">Obillz</span>
                         </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:p-4">
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <Wallet className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                            <span className="text-[11px] font-medium md:text-xs">Cotisations</span>
+                        <nav className="space-y-1" aria-label="Navigation">
+                          <div className="flex items-center gap-2 rounded-lg bg-[#1A23FF] px-2.5 py-2 text-xs font-semibold text-white shadow-sm">
+                            <LayoutDashboard className="h-3.5 w-3.5 shrink-0 opacity-95" strokeWidth={2} />
+                            <span className="truncate">Dashboard du club</span>
                           </div>
-                          <p className="mt-2 text-2xl font-black tabular-nums text-slate-900 md:text-3xl">94%</p>
-                          <p className="mt-0.5 text-[10px] text-slate-500">6 en attente</p>
-                        </div>
-                        <div className="rounded-xl border border-blue-100 bg-[#1A23FF]/[0.06] p-3 md:p-4">
-                          <div className="flex items-center gap-2 text-[#1A23FF]">
-                            <TrendingUp className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                            <span className="text-[11px] font-medium md:text-xs">Trésorerie</span>
+                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
+                            <Users className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            <span className="truncate">Membres</span>
                           </div>
-                          <p className="mt-2 text-xl font-black tabular-nums text-slate-900 md:text-2xl">12 480 €</p>
-                          <p className="mt-0.5 text-[10px] text-slate-500">Solde du mois</p>
-                        </div>
-                        <div className="col-span-2 rounded-xl border border-slate-100 bg-slate-50/80 p-3 md:col-span-1 md:p-4">
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <CalendarDays className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                            <span className="text-[11px] font-medium md:text-xs">À venir</span>
+                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
+                            <Wallet className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            <span className="truncate">Cotisations</span>
                           </div>
-                          <p className="mt-2 text-sm font-bold text-slate-900">3 événements</p>
-                          <p className="mt-0.5 text-[10px] text-slate-500">Prochain : dim. 14h</p>
+                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
+                            <Receipt className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            <span className="truncate">Factures</span>
+                          </div>
+                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
+                            <CalendarDays className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            <span className="truncate">Événements</span>
+                          </div>
+                        </nav>
+                      </aside>
+                      <div className="min-w-0 flex-1">
+                        <div className="border-b border-slate-100 bg-white px-5 py-4 lg:px-6">
+                          <h4 className="text-lg font-black tracking-tight text-slate-900 lg:text-xl">
+                            Dashboard du club
+                          </h4>
+                          <p className="mt-1 text-xs text-slate-500 lg:text-sm">
+                            Vue d&apos;ensemble : membres, cotisations, finances
+                          </p>
                         </div>
-                      </div>
-                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                        <div className="rounded-xl border border-slate-100 bg-white p-3 md:p-4">
-                          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Activité récente</p>
-                          <ul className="mt-3 space-y-2.5">
-                            {(
-                              [
-                                ["Cotisation reçue", "Martin D.", "il y a 2 h"],
-                                ["Inscription repas", "32 participants", "hier"],
-                                ["Bénévole confirmé", "Bar — samedi", "hier"],
-                              ] as const
-                            ).map(([a, b, c]) => (
-                              <li key={a} className="flex items-start justify-between gap-2 text-[11px] md:text-xs">
-                                <span className="font-medium text-slate-800">{a}</span>
-                                <span className="text-right text-slate-500">
-                                  {b}
-                                  <br />
-                                  <span className="text-[10px] text-slate-400">{c}</span>
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="flex flex-col justify-between rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 md:p-4">
-                          <div className="flex items-start gap-2">
-                            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" strokeWidth={1.75} />
-                            <div>
-                              <p className="text-sm font-bold text-emerald-900">Rien d&apos;urgence</p>
-                              <p className="mt-1 text-[11px] leading-relaxed text-emerald-800/90 md:text-xs">
-                                Cotisations, événements et messages : tout est suivi. Vous gardez le contrôle sans
-                                courir après chaque détail.
+                        <div className="space-y-6 p-5 lg:p-6">
+                          <div className="grid grid-cols-4 gap-3 lg:gap-4">
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                <Users className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
+                                <span className="text-[10px] font-semibold lg:text-[11px]">Membres</span>
+                              </div>
+                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">284</p>
+                              <p className="mt-1 text-[10px] text-emerald-600">+12 ce mois</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                <Wallet className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
+                                <span className="text-[10px] font-semibold lg:text-[11px]">Cotisations</span>
+                              </div>
+                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">92%</p>
+                              <p className="mt-1 text-[10px] text-slate-500">En attente : 8%</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                <FileText className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
+                                <span className="text-[10px] font-semibold lg:text-[11px]">Factures</span>
+                              </div>
+                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">4</p>
+                              <p className="mt-1 text-[10px] text-amber-700">En retard</p>
+                            </div>
+                            <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-3 lg:p-4">
+                              <p className="text-[10px] font-semibold text-[#1A23FF] lg:text-[11px]">Solde du club</p>
+                              <p className="mt-2 text-lg font-black tabular-nums text-slate-900 lg:text-xl">
+                                2&apos;070 CHF
                               </p>
                             </div>
                           </div>
-                          <div className="mt-3 flex flex-wrap gap-2 border-t border-emerald-100/80 pt-3">
-                            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
-                              Inscriptions ouvertes
-                            </span>
-                            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
-                              8 bénévoles OK
-                            </span>
+                          <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                                À traiter maintenant
+                              </p>
+                              <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/90 p-4">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
+                                    <p className="mt-1 text-lg font-black text-slate-800">300 CHF</p>
+                                  </div>
+                                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                                    À relancer
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                                Actions rapides
+                              </p>
+                              <div className="mt-2 flex flex-col gap-2">
+                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
+                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
+                                  Nouvelle cotisation
+                                </span>
+                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
+                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
+                                  Nouvelle facture
+                                </span>
+                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
+                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
+                                  Ajouter un membre
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
