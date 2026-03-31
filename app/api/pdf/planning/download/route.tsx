@@ -54,8 +54,8 @@ export async function GET(request: Request) {
       );
     }
 
-    // Récupérer les slots
-    const { data: slots } = await supabase
+    // Récupérer les slots (fallback si colonne slot_date absente)
+    const { data: slots, error: slotsError } = await supabase
       .from("planning_slots")
       .select(`
         id,
@@ -71,8 +71,22 @@ export async function GET(request: Request) {
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
+    let slotsRows: any[] | null = slots;
+    if (slotsError || !slotsRows) {
+      const { data: legacySlots, error: legacyError } = await supabase
+        .from("planning_slots")
+        .select("id, location, start_time, end_time, required_people, notes, ordre")
+        .eq("planning_id", id)
+        .order("ordre", { ascending: true });
+      if (!legacyError) {
+        slotsRows = legacySlots || [];
+      } else {
+        slotsRows = [];
+      }
+    }
+
     // Récupérer les affectations avec les infos membres
-    const slotIds = (slots || []).map((s: any) => s.id);
+    const slotIds = (slotsRows || []).map((s: any) => s.id);
     let assignments: any[] = [];
 
     if (slotIds.length > 0) {
@@ -119,7 +133,10 @@ export async function GET(request: Request) {
       return {
         id: slot.id,
         location: slot.location,
-        slotDate: slot.slot_date ?? planning.date,
+        slotDate:
+          slot.slot_date != null && String(slot.slot_date).trim() !== ""
+            ? slot.slot_date
+            : planning.date,
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,

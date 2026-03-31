@@ -133,9 +133,14 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   const slotGroups = useMemo(() => {
     if (!planning) return [] as [string, Slot[]][];
+    const rawSlots = Array.isArray(planning.slots) ? planning.slots : [];
     const m = new Map<string, Slot[]>();
-    for (const s of planning.slots) {
-      const d = s.slotDate || planning.date;
+    const fallbackDay = planning.date || "";
+    for (const s of rawSlots) {
+      const d =
+        (s.slotDate != null && String(s.slotDate).trim() !== "")
+          ? String(s.slotDate).trim()
+          : fallbackDay;
       if (!m.has(d)) m.set(d, []);
       m.get(d)!.push(s);
     }
@@ -582,7 +587,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-subtle bg-surface/80 p-4">
           <p className="text-sm text-tertiary mb-1">Créneaux</p>
-          <p className="text-2xl font-bold">{planning.slots.length}</p>
+          <p className="text-2xl font-bold">{planning.slots?.length ?? 0}</p>
         </div>
         <div className="rounded-xl border border-subtle bg-surface/80 p-4">
           <p className="text-sm text-tertiary mb-1">Personnes requises</p>
@@ -624,7 +629,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
           </button>
         </div>
 
-        {planning.slots.length === 0 ? (
+        {(planning.slots?.length ?? 0) === 0 ? (
           <div className="p-12 text-center">
             <p className="text-secondary mb-4">Aucun créneau défini</p>
             <button

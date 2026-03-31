@@ -52,7 +52,7 @@ export async function GET(
       );
     }
 
-    // Récupérer les slots
+    // Récupérer les slots (avec slot_date si la migration est appliquée)
     const { data: slots, error: slotsError } = await supabase
       .from("planning_slots")
       .select(`
@@ -69,12 +69,27 @@ export async function GET(
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
-    if (slotsError) {
-      console.warn("[API][plannings][GET] slots:", slotsError.message);
+    let slotsRows: any[] | null = slots;
+
+    // Si la colonne slot_date n'existe pas encore ou autre erreur schéma : requête compatible ancienne base
+    if (slotsError || !slotsRows) {
+      console.warn("[API][plannings][GET] slots (avec slot_date):", slotsError?.message || "no data");
+      const { data: legacySlots, error: legacyError } = await supabase
+        .from("planning_slots")
+        .select("id, location, start_time, end_time, required_people, notes, ordre")
+        .eq("planning_id", id)
+        .order("ordre", { ascending: true });
+
+      if (legacyError) {
+        console.error("[API][plannings][GET] slots (fallback):", legacyError.message);
+        slotsRows = [];
+      } else {
+        slotsRows = legacySlots || [];
+      }
     }
 
     // Récupérer les affectations avec les infos membres
-    const slotIds = (slots || []).map((s: any) => s.id);
+    const slotIds = (slotsRows || []).map((s: any) => s.id);
     let assignments: any[] = [];
 
     if (slotIds.length > 0) {
@@ -104,10 +119,7 @@ export async function GET(
       assignments = assignmentsData || [];
     }
 
-    // Structurer les slots avec leurs affectations
-    const safeSlots = slotsError ? [] : slots || [];
-
-    const slotsWithAssignments = safeSlots.map((slot: any) => {
+    const slotsWithAssignments = (slotsRows || []).map((slot: any) => {
       const slotAssignments = assignments
         .filter((a: any) => a.slot_id === slot.id)
         .map((a: any) => ({
@@ -136,7 +148,9 @@ export async function GET(
       return {
         id: slot.id,
         location: slot.location,
-        slotDate: slot.slot_date ?? planning.date,
+        slotDate: slot.slot_date != null && String(slot.slot_date).trim() !== ""
+          ? slot.slot_date
+          : planning.date,
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,

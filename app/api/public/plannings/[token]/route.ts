@@ -59,6 +59,17 @@ interface MemberRow {
   phone?: string | null;
 }
 
+/** Ligne planning_slots : slot_date peut être absent si migration non appliquée. */
+interface PublicPlanningSlotRow {
+  id: string;
+  location: string | null;
+  slot_date?: string | null;
+  start_time: string;
+  end_time: string;
+  required_people: number;
+  ordre: number;
+}
+
 const FROM_EMAIL_DEFAULT = "noreply@obillz.com";
 
 function getClientFullName(client: ClientRow | null | undefined) {
@@ -229,14 +240,27 @@ export async function GET(
       .eq("user_id", link.club_id)
       .maybeSingle();
 
-    const { data: slots } = await supabase
+    const { data: slots, error: slotsError } = await supabase
       .from("planning_slots")
       .select("id, location, slot_date, start_time, end_time, required_people, ordre")
       .eq("planning_id", planning.id)
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
-    const slotIds = (slots || []).map((slot) => slot.id);
+    let slotsRows: PublicPlanningSlotRow[];
+    if (!slotsError && Array.isArray(slots)) {
+      slotsRows = slots as PublicPlanningSlotRow[];
+    } else {
+      const { data: legacySlots, error: legacyError } = await supabase
+        .from("planning_slots")
+        .select("id, location, start_time, end_time, required_people, ordre")
+        .eq("planning_id", planning.id)
+        .order("ordre", { ascending: true });
+      slotsRows =
+        !legacyError && legacySlots ? (legacySlots as PublicPlanningSlotRow[]) : [];
+    }
+
+    const slotIds = slotsRows.map((slot) => slot.id);
     let assignments: PlanningAssignmentRow[] = [];
 
     if (slotIds.length > 0) {
@@ -264,7 +288,7 @@ export async function GET(
     const clientsMap = await loadClientsMap(supabase, clientIds);
     const membersMap = await loadMembersMap(supabase, memberIds);
 
-    const slotsWithAssignments = (slots || []).map((slot) => {
+    const slotsWithAssignments = (slotsRows || []).map((slot) => {
       const slotAssignments = assignments
         .filter((assignment) => assignment.slot_id === slot.id)
         .map((assignment) => {
@@ -313,7 +337,7 @@ export async function GET(
       return {
         id: slot.id,
         location: slot.location,
-        slotDate: (slot as { slot_date?: string }).slot_date ?? planning.date,
+        slotDate: slot.slot_date ?? planning.date,
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
