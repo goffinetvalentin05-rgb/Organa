@@ -139,18 +139,21 @@ const styles = StyleSheet.create({
   tableCell: {
     fontSize: 9,
   },
+  colDate: {
+    width: "14%",
+  },
   colLocation: {
-    width: "22%",
+    width: "18%",
   },
   colTime: {
-    width: "18%",
+    width: "16%",
   },
   colRequired: {
     width: "12%",
     textAlign: "center",
   },
   colMembers: {
-    width: "48%",
+    width: "40%",
   },
   locationName: {
     fontSize: 10,
@@ -234,6 +237,8 @@ interface Assignment {
 interface Slot {
   id: string;
   location: string;
+  /** Date du créneau (peut différer de la date principale du planning) */
+  slotDate?: string;
   startTime: string;
   endTime: string;
   requiredPeople: number;
@@ -278,6 +283,17 @@ const formatDate = (dateString: string) => {
 // Fonction pour formater l'heure
 const formatTime = (time: string) => {
   return time?.slice(0, 5) || time;
+};
+
+const formatSlotDateShort = (dateString: string | undefined) => {
+  if (!dateString) return "—";
+  const date = new Date(`${dateString}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString("fr-FR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
 };
 
 export const PlanningPdf: React.FC<PlanningPdfProps> = ({
@@ -351,6 +367,9 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
           <View style={styles.table}>
             {/* Table Header */}
             <View style={styles.tableHeader}>
+              <Text style={[styles.tableHeaderCell, styles.colDate]}>
+                Date
+              </Text>
               <Text style={[styles.tableHeaderCell, styles.colLocation]}>
                 Poste
               </Text>
@@ -374,6 +393,10 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
                   index % 2 === 1 ? styles.tableRowAlt : {}
                 ]}
               >
+                <View style={styles.colDate}>
+                  <Text style={styles.tableCell}>{formatSlotDateShort(slot.slotDate)}</Text>
+                </View>
+
                 {/* Location */}
                 <View style={styles.colLocation}>
                   <Text style={styles.locationName}>{slot.location}</Text>

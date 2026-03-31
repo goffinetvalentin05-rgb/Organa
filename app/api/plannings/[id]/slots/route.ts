@@ -39,12 +39,19 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { location, startTime, endTime, requiredPeople, notes } = body || {};
+    const { location, slotDate, startTime, endTime, requiredPeople, notes } = body || {};
 
     // Validation
     if (!location || typeof location !== "string" || location.trim().length === 0) {
       return NextResponse.json(
         { error: "Le lieu/rôle est requis" },
+        { status: 400 }
+      );
+    }
+
+    if (!slotDate || typeof slotDate !== "string") {
+      return NextResponse.json(
+        { error: "La date du créneau est requise" },
         { status: 400 }
       );
     }
@@ -69,6 +76,7 @@ export async function POST(
     const payload = {
       planning_id: planningId,
       location: location.trim(),
+      slot_date: slotDate,
       start_time: startTime,
       end_time: endTime,
       required_people: requiredPeople || 1,
@@ -96,6 +104,7 @@ export async function POST(
       slot: {
         id: newSlot.id,
         location: newSlot.location,
+        slotDate: newSlot.slot_date,
         startTime: newSlot.start_time,
         endTime: newSlot.end_time,
         requiredPeople: newSlot.required_people,
@@ -150,7 +159,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { slotId, location, startTime, endTime, requiredPeople, notes } = body || {};
+    const { slotId, location, slotDate, startTime, endTime, requiredPeople, notes } = body || {};
 
     if (!slotId) {
       return NextResponse.json(
@@ -161,6 +170,7 @@ export async function PUT(
 
     const updatePayload: any = {};
     if (location !== undefined) updatePayload.location = location.trim();
+    if (slotDate !== undefined) updatePayload.slot_date = slotDate;
     if (startTime !== undefined) updatePayload.start_time = startTime;
     if (endTime !== undefined) updatePayload.end_time = endTime;
     if (requiredPeople !== undefined) updatePayload.required_people = requiredPeople;
@@ -188,6 +198,7 @@ export async function PUT(
       slot: {
         id: updatedSlot.id,
         location: updatedSlot.location,
+        slotDate: updatedSlot.slot_date,
         startTime: updatedSlot.start_time,
         endTime: updatedSlot.end_time,
         requiredPeople: updatedSlot.required_people,

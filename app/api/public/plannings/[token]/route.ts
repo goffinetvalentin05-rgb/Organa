@@ -231,8 +231,9 @@ export async function GET(
 
     const { data: slots } = await supabase
       .from("planning_slots")
-      .select("id, location, start_time, end_time, required_people, ordre")
+      .select("id, location, slot_date, start_time, end_time, required_people, ordre")
       .eq("planning_id", planning.id)
+      .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
     const slotIds = (slots || []).map((slot) => slot.id);
@@ -312,6 +313,7 @@ export async function GET(
       return {
         id: slot.id,
         location: slot.location,
+        slotDate: (slot as { slot_date?: string }).slot_date ?? planning.date,
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
@@ -395,7 +397,7 @@ export async function POST(
 
     const { data: slot } = await supabase
       .from("planning_slots")
-      .select("id, planning_id, location, start_time, end_time, required_people")
+      .select("id, planning_id, location, slot_date, start_time, end_time, required_people")
       .eq("id", slotId)
       .eq("planning_id", link.planning_id)
       .maybeSingle();
@@ -438,7 +440,7 @@ export async function POST(
       try {
         const { data: planning } = await supabase
           .from("plannings")
-          .select("name")
+          .select("name, date")
           .eq("id", link.planning_id)
           .maybeSingle();
 
@@ -458,6 +460,15 @@ export async function POST(
           const startTime = (slot.start_time || "").slice(0, 5);
           const endTime = (slot.end_time || "").slice(0, 5);
           const volunteerName = name || "benevole";
+          const slotDateRaw = (slot as { slot_date?: string }).slot_date || planning?.date;
+          const slotDateLabel = slotDateRaw
+            ? new Date(`${slotDateRaw}T12:00:00`).toLocaleDateString("fr-FR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : "";
 
           const html = `
             <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
@@ -466,6 +477,7 @@ export async function POST(
               <p>
                 <strong>Evenement :</strong> ${eventName}<br/>
                 <strong>Poste :</strong> ${slotName}<br/>
+                ${slotDateLabel ? `<strong>Date :</strong> ${slotDateLabel}<br/>` : ""}
                 <strong>Horaire :</strong> ${startTime} - ${endTime}
               </p>
               <p>Merci pour votre aide !</p>
@@ -480,7 +492,7 @@ Votre inscription est confirmee pour l'evenement suivant :
 
 Evenement : ${eventName}
 Poste : ${slotName}
-Horaire : ${startTime} - ${endTime}
+${slotDateLabel ? `Date : ${slotDateLabel}\n` : ""}Horaire : ${startTime} - ${endTime}
 
 Merci pour votre aide !
 

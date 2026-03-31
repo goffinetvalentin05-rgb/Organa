@@ -17,6 +17,7 @@ interface PublicAssignment {
 interface PublicSlot {
   id: string;
   location: string;
+  slotDate: string;
   startTime: string;
   endTime: string;
   requiredPeople: number;
@@ -84,6 +85,17 @@ export default function PublicPlanningPage({
   }, [loadPlanning]);
 
   const formatTime = (value: string) => value?.slice(0, 5) || value;
+
+  const formatSlotDateShort = (value: string) => {
+    if (!value) return "";
+    const d = new Date(`${value}T12:00:00`);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  };
 
   const formattedDate = useMemo(() => {
     if (!planning?.date) return "-";
@@ -216,6 +228,10 @@ export default function PublicPlanningPage({
                 <h2 className="text-lg font-semibold text-slate-900">{slot.location}</h2>
                 <div className="mt-1 text-sm text-slate-600 flex flex-wrap items-center gap-4">
                   <span className="inline-flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4" />
+                    {formatSlotDateShort(slot.slotDate)}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
                     {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                   </span>
@@ -264,8 +280,8 @@ export default function PublicPlanningPage({
               <div>
                 <h3 className="font-semibold text-slate-900">Inscription bénévole</h3>
                 <p className="text-sm text-slate-600">
-                  {selectedSlot.location} • {formatTime(selectedSlot.startTime)} -{" "}
-                  {formatTime(selectedSlot.endTime)}
+                  {selectedSlot.location} • {formatSlotDateShort(selectedSlot.slotDate)} •{" "}
+                  {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                 </p>
               </div>
               <button onClick={closeSignupModal} className="p-1.5 rounded hover:bg-slate-100">

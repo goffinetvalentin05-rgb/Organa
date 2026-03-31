@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useMemo, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -44,6 +44,8 @@ interface Assignment {
 interface Slot {
   id: string;
   location: string;
+  /** Date du créneau (YYYY-MM-DD), indépendante de la date principale du planning si besoin */
+  slotDate: string;
   startTime: string;
   endTime: string;
   requiredPeople: number;
@@ -96,16 +98,18 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   const [assigning, setAssigning] = useState(false);
   const [sendNotification, setSendNotification] = useState(true);
 
-  // Modal ajout créneau
+  // Modal ajout / édition créneau
   const [showSlotModal, setShowSlotModal] = useState(false);
-  const [newSlot, setNewSlot] = useState({
+  const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
+  const [slotForm, setSlotForm] = useState({
     location: "",
+    slotDate: "",
     startTime: "08:00",
     endTime: "10:00",
     requiredPeople: 1,
     notes: "",
   });
-  const [addingSlot, setAddingSlot] = useState(false);
+  const [savingSlot, setSavingSlot] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [publicLink, setPublicLink] = useState<PublicPlanningLink | null>(null);
   const [sharing, setSharing] = useState(false);
@@ -125,6 +129,44 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   const formatTime = (time: string) => {
     return time?.slice(0, 5) || time;
+  };
+
+  const slotGroups = useMemo(() => {
+    if (!planning) return [] as [string, Slot[]][];
+    const m = new Map<string, Slot[]>();
+    for (const s of planning.slots) {
+      const d = s.slotDate || planning.date;
+      if (!m.has(d)) m.set(d, []);
+      m.get(d)!.push(s);
+    }
+    return [...m.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [planning]);
+
+  const openAddSlotModal = () => {
+    if (!planning) return;
+    setEditingSlotId(null);
+    setSlotForm({
+      location: "",
+      slotDate: planning.date,
+      startTime: "08:00",
+      endTime: "10:00",
+      requiredPeople: 1,
+      notes: "",
+    });
+    setShowSlotModal(true);
+  };
+
+  const openEditSlotModal = (slot: Slot) => {
+    setEditingSlotId(slot.id);
+    setSlotForm({
+      location: slot.location,
+      slotDate: slot.slotDate || planning?.date || "",
+      startTime: formatTime(slot.startTime),
+      endTime: formatTime(slot.endTime),
+      requiredPeople: slot.requiredPeople,
+      notes: slot.notes || "",
+    });
+    setShowSlotModal(true);
   };
 
   useEffect(() => {
@@ -278,34 +320,58 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const handleAddSlot = async () => {
-    if (!newSlot.location.trim()) {
+  const handleSaveSlot = async () => {
+    if (!slotForm.location.trim()) {
       toast.error("Le lieu/poste est requis");
       return;
     }
-    
-    setAddingSlot(true);
+    if (!slotForm.slotDate) {
+      toast.error("La date du créneau est requise");
+      return;
+    }
+
+    setSavingSlot(true);
     try {
+      const isEdit = Boolean(editingSlotId);
       const response = await fetch(`/api/plannings/${id}/slots`, {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSlot),
+        body: JSON.stringify(
+          isEdit
+            ? {
+                slotId: editingSlotId,
+                location: slotForm.location,
+                slotDate: slotForm.slotDate,
+                startTime: slotForm.startTime,
+                endTime: slotForm.endTime,
+                requiredPeople: slotForm.requiredPeople,
+                notes: slotForm.notes.trim() || null,
+              }
+            : {
+                location: slotForm.location,
+                slotDate: slotForm.slotDate,
+                startTime: slotForm.startTime,
+                endTime: slotForm.endTime,
+                requiredPeople: slotForm.requiredPeople,
+                notes: slotForm.notes.trim() || null,
+              }
+        ),
       });
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || "Erreur lors de l'ajout");
+        throw new Error(data?.error || "Erreur lors de l'enregistrement");
       }
 
-      toast.success("Créneau ajouté !");
+      toast.success(isEdit ? "Créneau mis à jour !" : "Créneau ajouté !");
       setShowSlotModal(false);
-      setNewSlot({ location: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" });
+      setEditingSlotId(null);
       await loadPlanning();
     } catch (error: any) {
-      console.error("[PlanningDetail] Erreur ajout slot:", error);
+      console.error("[PlanningDetail] Erreur enregistrement slot:", error);
       toast.error(error.message || "Erreur");
     } finally {
-      setAddingSlot(false);
+      setSavingSlot(false);
     }
   };
 
@@ -540,7 +606,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         <div className="flex items-center justify-between p-6 border-b border-subtle">
           <h2 className="text-xl font-semibold">Grille d&apos;affectation</h2>
           <button
-            onClick={() => setShowSlotModal(true)}
+            type="button"
+            onClick={openAddSlotModal}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -552,15 +619,25 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
           <div className="p-12 text-center">
             <p className="text-secondary mb-4">Aucun créneau défini</p>
             <button
-              onClick={() => setShowSlotModal(true)}
+              type="button"
+              onClick={openAddSlotModal}
               className="px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
             >
               Créer votre premier créneau
             </button>
           </div>
         ) : (
-          <div className="p-6 space-y-6">
-            {planning.slots.map((slot) => (
+          <div className="p-6 space-y-8">
+            {slotGroups.map(([dayKey, slotsForDay]) => (
+              <div key={dayKey} className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-subtle pb-2">
+                  <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span className="text-sm font-semibold text-slate-800">
+                    {formatDate(dayKey)}
+                  </span>
+                </div>
+                <div className="space-y-4">
+            {slotsForDay.map((slot) => (
               <div
                 key={slot.id}
                 className="rounded-xl border border-subtle bg-surface/60 overflow-hidden"
@@ -573,7 +650,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary">{slot.location}</h3>
-                      <div className="flex items-center gap-3 text-sm text-secondary">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
+                        <span className="flex items-center gap-1 md:hidden">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {formatDate(slot.slotDate || dayKey)}
+                        </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5" />
                           {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
@@ -593,6 +674,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   <div className="flex items-center gap-2">
                     {!slot.isFull && (
                       <button
+                        type="button"
                         onClick={() => openAssignModal(slot)}
                         className="px-4 py-2 accent-bg text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
                       >
@@ -601,6 +683,15 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       </button>
                     )}
                     <button
+                      type="button"
+                      onClick={() => openEditSlotModal(slot)}
+                      className="p-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                      title="Modifier ce créneau"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleDeleteSlot(slot.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       title="Supprimer ce créneau"
@@ -670,6 +761,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
             ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -683,7 +777,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 <div>
                   <h3 className="text-xl font-semibold">Affecter un membre</h3>
                   <p className="text-secondary text-sm mt-1">
-                    {selectedSlot.location} • {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
+                    {selectedSlot.location} • {formatDate(selectedSlot.slotDate || planning.date)} •{" "}
+                    {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                   </p>
                 </div>
                 <button
@@ -755,15 +850,21 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         </div>
       )}
 
-      {/* Modal ajout créneau */}
+      {/* Modal ajout / édition créneau */}
       {showSlotModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-subtle">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">Ajouter un créneau</h3>
+                <h3 className="text-xl font-semibold">
+                  {editingSlotId ? "Modifier le créneau" : "Ajouter un créneau"}
+                </h3>
                 <button
-                  onClick={() => setShowSlotModal(false)}
+                  type="button"
+                  onClick={() => {
+                    setShowSlotModal(false);
+                    setEditingSlotId(null);
+                  }}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
@@ -778,11 +879,26 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </label>
                 <input
                   type="text"
-                  value={newSlot.location}
-                  onChange={(e) => setNewSlot({ ...newSlot, location: e.target.value })}
+                  value={slotForm.location}
+                  onChange={(e) => setSlotForm({ ...slotForm, location: e.target.value })}
                   placeholder="Ex: Bar, Entrée, Cuisine..."
                   className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-secondary mb-2">
+                  Date *
+                </label>
+                <input
+                  type="date"
+                  value={slotForm.slotDate}
+                  onChange={(e) => setSlotForm({ ...slotForm, slotDate: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                />
+                <p className="text-xs text-secondary mt-1.5">
+                  Peut être différente de la date principale du planning (préparation, rangement…).
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -792,8 +908,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   </label>
                   <input
                     type="time"
-                    value={newSlot.startTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
+                    value={slotForm.startTime}
+                    onChange={(e) => setSlotForm({ ...slotForm, startTime: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
                   />
                 </div>
@@ -803,8 +919,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   </label>
                   <input
                     type="time"
-                    value={newSlot.endTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
+                    value={slotForm.endTime}
+                    onChange={(e) => setSlotForm({ ...slotForm, endTime: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
                   />
                 </div>
@@ -818,8 +934,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   type="number"
                   min={1}
                   max={50}
-                  value={newSlot.requiredPeople}
-                  onChange={(e) => setNewSlot({ ...newSlot, requiredPeople: parseInt(e.target.value) || 1 })}
+                  value={slotForm.requiredPeople}
+                  onChange={(e) => setSlotForm({ ...slotForm, requiredPeople: parseInt(e.target.value, 10) || 1 })}
                   className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
                 />
               </div>
@@ -830,8 +946,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </label>
                 <input
                   type="text"
-                  value={newSlot.notes}
-                  onChange={(e) => setNewSlot({ ...newSlot, notes: e.target.value })}
+                  value={slotForm.notes}
+                  onChange={(e) => setSlotForm({ ...slotForm, notes: e.target.value })}
                   placeholder="Instructions particulières..."
                   className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
                 />
@@ -840,17 +956,22 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
             <div className="p-6 border-t border-subtle flex justify-end gap-3">
               <button
-                onClick={() => setShowSlotModal(false)}
+                type="button"
+                onClick={() => {
+                  setShowSlotModal(false);
+                  setEditingSlotId(null);
+                }}
                 className="px-6 py-2.5 text-secondary hover:text-primary transition-colors"
               >
                 Annuler
               </button>
               <button
-                onClick={handleAddSlot}
-                disabled={addingSlot}
+                type="button"
+                onClick={handleSaveSlot}
+                disabled={savingSlot}
                 className="px-6 py-2.5 accent-bg text-white font-medium rounded-lg transition-all disabled:opacity-50"
               >
-                {addingSlot ? "Ajout..." : "Ajouter"}
+                {savingSlot ? "Enregistrement..." : editingSlotId ? "Enregistrer" : "Ajouter"}
               </button>
             </div>
           </div>

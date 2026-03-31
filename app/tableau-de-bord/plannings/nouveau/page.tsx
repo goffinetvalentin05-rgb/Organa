@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Plus, Trash, Clock, MapPin } from "@/lib/icons";
+import { ArrowRight, Plus, Trash, Clock, MapPin, Calendar } from "@/lib/icons";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -17,6 +17,7 @@ interface Event {
 interface SlotForm {
   id: string;
   location: string;
+  slotDate: string;
   startTime: string;
   endTime: string;
   requiredPeople: number;
@@ -38,7 +39,7 @@ export default function NouveauPlanningPage() {
 
   // Créneaux
   const [slots, setSlots] = useState<SlotForm[]>([
-    { id: "1", location: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" },
+    { id: "1", location: "", slotDate: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" },
   ]);
 
   useEffect(() => {
@@ -61,9 +62,18 @@ export default function NouveauPlanningPage() {
 
   const addSlot = () => {
     const newId = String(Date.now());
+    const defaultDate = date || "";
     setSlots([
       ...slots,
-      { id: newId, location: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" },
+      {
+        id: newId,
+        location: "",
+        slotDate: defaultDate,
+        startTime: "08:00",
+        endTime: "10:00",
+        requiredPeople: 1,
+        notes: "",
+      },
     ]);
   };
 
@@ -98,6 +108,10 @@ export default function NouveauPlanningPage() {
         toast.error("Chaque créneau doit avoir un lieu/poste");
         return;
       }
+      if (!slot.slotDate) {
+        toast.error("Chaque créneau doit avoir une date");
+        return;
+      }
       if (!slot.startTime || !slot.endTime) {
         toast.error("Chaque créneau doit avoir des horaires");
         return;
@@ -120,6 +134,7 @@ export default function NouveauPlanningPage() {
           eventId: eventId || null,
           slots: slots.map((s) => ({
             location: s.location.trim(),
+            slotDate: s.slotDate,
             startTime: s.startTime,
             endTime: s.endTime,
             requiredPeople: s.requiredPeople,
@@ -155,10 +170,21 @@ export default function NouveauPlanningPage() {
     if (value) {
       const selectedEvent = events.find((e) => e.id === value);
       if (selectedEvent && !date) {
-        setDate(selectedEvent.start_date);
+        const evDate = selectedEvent.start_date.slice(0, 10);
+        setDate(evDate);
+        setSlots((prev) =>
+          prev.map((s) => (!s.slotDate ? { ...s, slotDate: evDate } : s))
+        );
       }
     }
   };
+
+  useEffect(() => {
+    if (!date) return;
+    setSlots((prev) =>
+      prev.map((s) => (!s.slotDate ? { ...s, slotDate: date } : s))
+    );
+  }, [date]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -276,7 +302,7 @@ export default function NouveauPlanningPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                   <div className="lg:col-span-2">
                     <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
@@ -287,6 +313,20 @@ export default function NouveauPlanningPage() {
                       value={slot.location}
                       onChange={(e) => updateSlot(slot.id, "location", e.target.value)}
                       placeholder="Ex: Bar, Entrée, Cuisine..."
+                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={slot.slotDate}
+                      onChange={(e) => updateSlot(slot.id, "slotDate", e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
                       required
                     />

@@ -182,6 +182,7 @@ export async function POST(request: NextRequest) {
       const slotsPayload = slots.map((slot: any, index: number) => ({
         planning_id: newPlanning.id,
         location: slot.location || "Poste",
+        slot_date: slot.slotDate || date,
         start_time: slot.startTime,
         end_time: slot.endTime,
         required_people: slot.requiredPeople || 1,

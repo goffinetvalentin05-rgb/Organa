@@ -60,6 +60,7 @@ export async function GET(request: Request) {
       .select(`
         id,
         location,
+        slot_date,
         start_time,
         end_time,
         required_people,
@@ -67,6 +68,7 @@ export async function GET(request: Request) {
         ordre
       `)
       .eq("planning_id", id)
+      .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
     // Récupérer les affectations avec les infos membres
@@ -117,6 +119,7 @@ export async function GET(request: Request) {
       return {
         id: slot.id,
         location: slot.location,
+        slotDate: slot.slot_date ?? planning.date,
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
