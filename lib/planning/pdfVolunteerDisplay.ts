@@ -1,5 +1,5 @@
 /**
- * Données clients renvoyées par Supabase (colonnes françaises et/ou anglaises selon migrations).
+ * Lignes clients : schémas possibles (nom FR après migration, name côté API JS, prénom/nom si ajoutés).
  */
 export type PlanningClientRow = {
   id?: string;
@@ -21,35 +21,76 @@ export function unwrapPlanningClient(
   return clients;
 }
 
+/** Extrait un libellé depuis une ligne client (toutes colonnes possibles). */
+export function displayNameFromClientRow(
+  row: PlanningClientRow | Record<string, unknown> | null | undefined
+): string {
+  if (!row || typeof row !== "object") return "";
+  const r = row as Record<string, unknown>;
+  const first = String(r.first_name ?? "").trim();
+  const last = String(r.last_name ?? "").trim();
+  const fromParts = `${first} ${last}`.trim();
+  if (fromParts) return fromParts;
+
+  const nom = String(r.nom ?? "").trim();
+  if (nom) return nom;
+
+  const name = String(r.name ?? "").trim();
+  if (name) return name;
+
+  return "";
+}
+
+function normalizePublicDisplayName(raw: string | null | undefined): string {
+  return (raw ?? "").trim();
+}
+
 /**
- * Libellé lisible pour le PDF : prénom + nom si disponibles, sinon nom complet stocké.
+ * Détermine si l’affectation est une inscription publique (sans membre club lié).
+ */
+function isPublicAssignment(input: {
+  source?: string | null;
+  client_id?: string | null;
+  public_name?: string | null;
+}): boolean {
+  if (input.source === "public_signup") return true;
+  if (!input.client_id && normalizePublicDisplayName(input.public_name)) return true;
+  return false;
+}
+
+/**
+ * Libellé PDF pour une affectation : même logique métier que l’API affectations (name vs nom).
+ *
+ * Priorité :
+ * 1) Inscription publique → public_name (ou « Bénévole » si vide)
+ * 2) Membre club (ligne résolue par requête directe clients.*) → prénom+nom, sinon nom/name
+ * 3) Ancienne relation embed `clients` si fournie
+ * 4) public_name en secours si source incohérent
+ * 5) « Membre inconnu » uniquement si aucune donnée exploitable
  */
 export function formatVolunteerDisplayNameForPdf(input: {
   source?: string | null;
   public_name?: string | null;
+  client_id?: string | null;
+  /** Ligne issue de `clients` chargée en batch (`select('*')`) — source de vérité pour le SaaS */
+  clientRow?: PlanningClientRow | Record<string, unknown> | null;
+  /** Ancien chemin : relation PostgREST (souvent vide si mauvais champs dans le select) */
   clients?: PlanningClientRow | PlanningClientRow[] | null;
 }): string {
-  if (input.source === "public_signup") {
-    const n = (input.public_name || "").trim();
-    return n || "Bénévole";
+  const publicLabel = normalizePublicDisplayName(input.public_name);
+
+  if (isPublicAssignment(input)) {
+    if (publicLabel) return publicLabel;
+    return "Bénévole";
   }
 
-  const c = unwrapPlanningClient(input.clients);
-  if (!c) {
-    return "Membre inconnu";
-  }
+  const fromBatch = displayNameFromClientRow(input.clientRow ?? null);
+  if (fromBatch) return fromBatch;
 
-  const first = (c.first_name || "").trim();
-  const last = (c.last_name || "").trim();
-  const fromParts = `${first} ${last}`.trim();
-  if (fromParts) {
-    return fromParts;
-  }
+  const fromEmbed = displayNameFromClientRow(unwrapPlanningClient(input.clients ?? null));
+  if (fromEmbed) return fromEmbed;
 
-  const single = (c.nom ?? c.name ?? "").trim();
-  if (single) {
-    return single;
-  }
+  if (publicLabel) return publicLabel;
 
   return "Membre inconnu";
 }

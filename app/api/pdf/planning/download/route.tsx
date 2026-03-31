@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import {
   formatVolunteerDisplayNameForPdf,
   sortPlanningSlotsForPdf,
-  unwrapPlanningClient,
 } from "@/lib/planning/pdfVolunteerDisplay";
 
 export const runtime = "nodejs";
@@ -76,8 +75,10 @@ export async function GET(request: Request) {
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
-    let slotsRows: any[] | null = slots;
-    if (slotsError || !slotsRows) {
+    let slotsRows: any[];
+    if (!slotsError && Array.isArray(slots)) {
+      slotsRows = slots;
+    } else {
       const { data: legacySlots, error: legacyError } = await supabase
         .from("planning_slots")
         .select("id, location, start_time, end_time, required_people, notes, ordre")
@@ -90,32 +91,44 @@ export async function GET(request: Request) {
       }
     }
 
-    // Récupérer les affectations avec les infos membres
+    // Affectations sans embed clients : le select `clients(nom)` échoue ou renvoie vide
+    // quand la colonne réelle est `name` (API JS) — on charge les membres en batch avec *.
     const slotIds = (slotsRows || []).map((s: any) => s.id);
     let assignments: any[] = [];
 
     if (slotIds.length > 0) {
-      const { data: assignmentsData } = await supabase
+      const { data: assignmentsData, error: assignmentsError } = await supabase
         .from("planning_assignments")
-        .select(`
-          id,
-          slot_id,
-          client_id,
-          source,
-          public_name,
-          public_email,
-          clients (
-            id,
-            nom,
-            email,
-            telephone,
-            role,
-            category
-          )
-        `)
+        .select("id, slot_id, client_id, source, public_name, public_email")
         .in("slot_id", slotIds);
 
+      if (assignmentsError) {
+        console.error("[PDF][planning] planning_assignments:", assignmentsError.message);
+      }
       assignments = assignmentsData || [];
+    }
+
+    const clientIds = [
+      ...new Set(
+        assignments
+          .map((a: { client_id?: string | null }) => a.client_id)
+          .filter((cid): cid is string => Boolean(cid))
+      ),
+    ];
+    const clientById = new Map<string, Record<string, unknown>>();
+    if (clientIds.length > 0) {
+      const { data: clientRows, error: clientsErr } = await supabase
+        .from("clients")
+        .select("*")
+        .in("id", clientIds)
+        .eq("user_id", user.id);
+
+      if (clientsErr) {
+        console.error("[PDF][planning] clients batch:", clientsErr.message);
+      }
+      for (const row of clientRows || []) {
+        if (row?.id) clientById.set(String(row.id), row as Record<string, unknown>);
+      }
     }
 
     // Récupérer les infos du club (profil)
@@ -132,14 +145,12 @@ export async function GET(request: Request) {
         .map((a: any) => ({
           id: a.id,
           member: {
-            id:
-              unwrapPlanningClient(a.clients)?.id ||
-              a.client_id ||
-              `public-${a.id}`,
+            id: a.client_id || `public-${a.id}`,
             displayName: formatVolunteerDisplayNameForPdf({
               source: a.source,
               public_name: a.public_name,
-              clients: a.clients,
+              client_id: a.client_id,
+              clientRow: a.client_id ? clientById.get(a.client_id) ?? null : null,
             }),
           },
         }))
