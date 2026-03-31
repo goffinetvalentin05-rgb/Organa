@@ -1,16 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Trash, Loader } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 
 interface DeleteClientButtonProps {
   clientId: string;
+  /** Appelé après suppression réussie pour mettre à jour la liste (page client-side). */
+  onDeleted?: (clientId: string) => void;
 }
 
-export default function DeleteClientButton({ clientId }: DeleteClientButtonProps) {
-  const router = useRouter();
+export default function DeleteClientButton({
+  clientId,
+  onDeleted,
+}: DeleteClientButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { t } = useI18n();
 
@@ -36,8 +39,7 @@ export default function DeleteClientButton({ clientId }: DeleteClientButtonProps
         throw new Error(errorData.error || t("dashboard.clients.deleteError"));
       }
 
-      // Rafraîchir pour recharger les données depuis la DB
-      router.refresh();
+      onDeleted?.(clientId);
     } catch (err: any) {
       console.error("[DeleteClientButton] Erreur lors de la suppression", err);
       alert(err.message || t("dashboard.clients.deleteErrorDetail"));

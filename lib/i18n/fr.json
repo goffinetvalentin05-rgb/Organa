@@ -676,6 +676,7 @@
       "deleteError": "Erreur lors de la suppression",
       "deleteErrorDetail": "Erreur lors de la suppression du membre",
       "deleteAction": "Supprimer",
+      "editAction": "Modifier",
       "limitReached": "Limite du plan gratuit atteinte.",
       "createError": "Erreur lors de la création du membre",
       "newTitle": "Nouveau membre",

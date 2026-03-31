@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import DeleteClientButton from "./components/DeleteClientButton";
-import { Info, Users, Filter } from "@/lib/icons";
+import { Edit, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
@@ -166,23 +166,6 @@ export default function ClientsPage() {
         </div>
       )}
 
-      {/* Message informatif */}
-      <div className="bg-amber-50 rounded-xl border border-amber-200 p-5">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-            <Info className="w-4 h-4 text-amber-600" />
-          </div>
-          <div>
-            <p className="font-medium text-amber-900">
-              {t("dashboard.clients.editDisabledTitle")}
-            </p>
-            <p className="text-sm text-amber-700 mt-1">
-              {t("dashboard.clients.editDisabledText")}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Liste des clients */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {filteredClients.length === 0 ? (
@@ -256,8 +239,20 @@ export default function ClientsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 md:ml-4">
-                    <DeleteClientButton clientId={client.id} />
+                  <div className="flex flex-wrap items-center gap-2 md:ml-4">
+                    <Link
+                      href={`/tableau-de-bord/clients/${client.id}/edit`}
+                      className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all text-sm flex items-center gap-2 border border-slate-200 shadow-sm"
+                    >
+                      <Edit className="w-4 h-4" />
+                      {t("dashboard.clients.editAction")}
+                    </Link>
+                    <DeleteClientButton
+                      clientId={client.id}
+                      onDeleted={(removedId) =>
+                        setClients((prev) => prev.filter((c) => c.id !== removedId))
+                      }
+                    />
                   </div>
                 </div>
               </div>

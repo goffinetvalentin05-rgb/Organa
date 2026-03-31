@@ -133,7 +133,7 @@ export async function PUT(
 
   // Mise à jour dans Supabase
   // Note: Les colonnes BD sont en anglais (name, phone, address)
-  const { error: updateError } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("clients")
     .update({
       name: nom.trim(),
@@ -143,10 +143,12 @@ export async function PUT(
       postal_code: postal_code || null,
       city: city || null,
       role: role || "player",
-      category: category || null,
+      category: category ?? null,
     })
     .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
+    .maybeSingle();
 
   if (updateError) {
     console.error("[API][clients][PUT] Erreur Supabase", updateError);
@@ -156,10 +158,30 @@ export async function PUT(
     );
   }
 
+  if (!updated) {
+    return NextResponse.json(
+      { error: "Client introuvable ou non autorisé" },
+      { status: 404 }
+    );
+  }
+
   // Invalider le cache
   revalidatePath("/tableau-de-bord/clients");
 
-  return NextResponse.json({ success: true });
+  const clientResponse = {
+    id: updated.id,
+    nom: updated.name,
+    email: updated.email,
+    telephone: updated.phone,
+    adresse: updated.address,
+    postal_code: updated.postal_code,
+    city: updated.city,
+    user_id: updated.user_id,
+    role: updated.role,
+    category: updated.category,
+  };
+
+  return NextResponse.json({ success: true, client: clientResponse });
 }
 
 /* =========================
@@ -201,18 +223,26 @@ export async function DELETE(
     return accessCheck.response;
   }
 
-  // Suppression dans Supabase
-  const { error: deleteError } = await supabase
+  // Suppression dans Supabase (vérifier qu’une ligne a bien été supprimée)
+  const { data: deletedRows, error: deleteError } = await supabase
     .from("clients")
     .delete()
     .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id");
 
   if (deleteError) {
     console.error("[API][clients][DELETE] Erreur Supabase", deleteError);
     return NextResponse.json(
       { error: deleteError.message },
       { status: 500 }
+    );
+  }
+
+  if (!deletedRows || deletedRows.length === 0) {
+    return NextResponse.json(
+      { error: "Client introuvable ou déjà supprimé" },
+      { status: 404 }
     );
   }
 

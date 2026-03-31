@@ -794,6 +794,7 @@
       "deleteError": "Fehler beim Löschen",
       "deleteErrorDetail": "Fehler beim Löschen des Kunden",
       "deleteAction": "Löschen",
+      "editAction": "Bearbeiten",
       "limitReached": "Limit des Gratisplans erreicht.",
       "createError": "Fehler beim Erstellen des Kunden",
       "newTitle": "Neuer Kunde",

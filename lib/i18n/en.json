@@ -796,6 +796,7 @@
       "deleteError": "Error deleting",
       "deleteErrorDetail": "Error deleting the member",
       "deleteAction": "Delete",
+      "editAction": "Edit",
       "limitReached": "Free plan limit reached.",
       "createError": "Error creating the member",
       "newTitle": "New member",
