@@ -374,7 +374,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || "Erreur lors de l'enregistrement");
+        const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
+        throw new Error(msg || "Erreur lors de l'enregistrement");
       }
 
       toast.success(isEdit ? "Créneau mis à jour !" : "Créneau ajouté !");

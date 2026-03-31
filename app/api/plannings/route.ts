@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 
 export const runtime = "nodejs";
@@ -190,9 +191,23 @@ export async function POST(request: NextRequest) {
         ordre: index,
       }));
 
-      const { error: slotsError } = await supabase
+      let { error: slotsError } = await supabase
         .from("planning_slots")
         .insert(slotsPayload);
+
+      if (slotsError && isMissingSlotDateColumnError(slotsError)) {
+        const legacyPayload = slots.map((slot: any, index: number) => ({
+          planning_id: newPlanning.id,
+          location: slot.location || "Poste",
+          start_time: slot.startTime,
+          end_time: slot.endTime,
+          required_people: slot.requiredPeople || 1,
+          notes: slot.notes || null,
+          ordre: index,
+        }));
+        const retry = await supabase.from("planning_slots").insert(legacyPayload);
+        slotsError = retry.error;
+      }
 
       if (slotsError) {
         console.error("[API][plannings][POST] Erreur création slots:", slotsError);

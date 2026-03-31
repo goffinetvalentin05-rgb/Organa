@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
 
 export const runtime = "nodejs";
 
@@ -23,10 +24,10 @@ export async function POST(
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    // Vérifier que le planning appartient à l'utilisateur
+    // Vérifier que le planning appartient à l'utilisateur (date pour réponse si pas de slot_date en base)
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
-      .select("id")
+      .select("id, date")
       .eq("id", planningId)
       .eq("user_id", user.id)
       .single();
@@ -37,6 +38,8 @@ export async function POST(
         { status: 404 }
       );
     }
+
+    const planningDate = planning.date as string;
 
     const body = await request.json();
     const { location, slotDate, startTime, endTime, requiredPeople, notes } = body || {};
@@ -84,19 +87,49 @@ export async function POST(
       ordre: maxOrdre + 1,
     };
 
-    const { data: newSlot, error } = await supabase
+    let newSlot: Record<string, unknown> | null = null;
+    let insertError = null as { message?: string; code?: string } | null;
+
+    const insertResult = await supabase
       .from("planning_slots")
       .insert(payload)
       .select()
       .single();
 
-    if (error) {
-      console.error("[API][slots][POST] Erreur Supabase:", error);
+    newSlot = insertResult.data as Record<string, unknown> | null;
+    insertError = insertResult.error;
+
+    if (insertError && isMissingSlotDateColumnError(insertError)) {
+      const legacyPayload = {
+        planning_id: planningId,
+        location: location.trim(),
+        start_time: startTime,
+        end_time: endTime,
+        required_people: requiredPeople || 1,
+        notes: notes?.trim() || null,
+        ordre: maxOrdre + 1,
+      };
+      const legacy = await supabase
+        .from("planning_slots")
+        .insert(legacyPayload)
+        .select()
+        .single();
+      newSlot = legacy.data as Record<string, unknown> | null;
+      insertError = legacy.error;
+    }
+
+    if (insertError || !newSlot) {
+      console.error("[API][slots][POST] Erreur Supabase:", insertError);
       return NextResponse.json(
-        { error: "Erreur lors de la création du créneau", details: error.message },
+        { error: "Erreur lors de la création du créneau", details: insertError?.message },
         { status: 500 }
       );
     }
+
+    const slotDateOut =
+      newSlot.slot_date != null && String(newSlot.slot_date).trim() !== ""
+        ? String(newSlot.slot_date)
+        : slotDate || planningDate;
 
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
 
@@ -104,7 +137,7 @@ export async function POST(
       slot: {
         id: newSlot.id,
         location: newSlot.location,
-        slotDate: newSlot.slot_date,
+        slotDate: slotDateOut,
         startTime: newSlot.start_time,
         endTime: newSlot.end_time,
         requiredPeople: newSlot.required_people,
@@ -146,7 +179,7 @@ export async function PUT(
     // Vérifier que le planning appartient à l'utilisateur
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
-      .select("id")
+      .select("id, date")
       .eq("id", planningId)
       .eq("user_id", user.id)
       .single();
@@ -158,6 +191,8 @@ export async function PUT(
       );
     }
 
+    const planningDate = planning.date as string;
+
     const body = await request.json();
     const { slotId, location, slotDate, startTime, endTime, requiredPeople, notes } = body || {};
 
@@ -168,7 +203,7 @@ export async function PUT(
       );
     }
 
-    const updatePayload: any = {};
+    const updatePayload: Record<string, unknown> = {};
     if (location !== undefined) updatePayload.location = location.trim();
     if (slotDate !== undefined) updatePayload.slot_date = slotDate;
     if (startTime !== undefined) updatePayload.start_time = startTime;
@@ -176,7 +211,7 @@ export async function PUT(
     if (requiredPeople !== undefined) updatePayload.required_people = requiredPeople;
     if (notes !== undefined) updatePayload.notes = notes?.trim() || null;
 
-    const { data: updatedSlot, error } = await supabase
+    let { data: updatedSlot, error } = await supabase
       .from("planning_slots")
       .update(updatePayload)
       .eq("id", slotId)
@@ -184,26 +219,72 @@ export async function PUT(
       .select()
       .single();
 
-    if (error) {
+    if (
+      error &&
+      isMissingSlotDateColumnError(error) &&
+      updatePayload.slot_date !== undefined
+    ) {
+      const { slot_date: _omit, ...rest } = updatePayload;
+      if (Object.keys(rest).length > 0) {
+        const retry = await supabase
+          .from("planning_slots")
+          .update(rest)
+          .eq("id", slotId)
+          .eq("planning_id", planningId)
+          .select()
+          .single();
+        updatedSlot = retry.data;
+        error = retry.error;
+      } else {
+        const current = await supabase
+          .from("planning_slots")
+          .select("*")
+          .eq("id", slotId)
+          .eq("planning_id", planningId)
+          .single();
+        updatedSlot = current.data;
+        error = current.error;
+      }
+    }
+
+    if (error || !updatedSlot) {
       console.error("[API][slots][PUT] Erreur Supabase:", error);
       return NextResponse.json(
-        { error: "Erreur lors de la mise à jour", details: error.message },
+        { error: "Erreur lors de la mise à jour", details: error?.message },
         { status: 500 }
       );
     }
+
+    const row = updatedSlot as {
+      id: string;
+      location: string;
+      slot_date?: string | null;
+      start_time: string;
+      end_time: string;
+      required_people: number;
+      notes?: string | null;
+      ordre: number;
+    };
+
+    const slotDateOut =
+      row.slot_date != null && String(row.slot_date).trim() !== ""
+        ? String(row.slot_date)
+        : typeof slotDate === "string" && slotDate.trim() !== ""
+          ? slotDate.trim()
+          : planningDate;
 
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
 
     return NextResponse.json({
       slot: {
-        id: updatedSlot.id,
-        location: updatedSlot.location,
-        slotDate: updatedSlot.slot_date,
-        startTime: updatedSlot.start_time,
-        endTime: updatedSlot.end_time,
-        requiredPeople: updatedSlot.required_people,
-        notes: updatedSlot.notes,
-        ordre: updatedSlot.ordre,
+        id: row.id,
+        location: row.location,
+        slotDate: slotDateOut,
+        startTime: row.start_time,
+        endTime: row.end_time,
+        requiredPeople: row.required_people,
+        notes: row.notes,
+        ordre: row.ordre,
       },
     }, { status: 200 });
   } catch (error: any) {

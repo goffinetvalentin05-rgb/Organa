@@ -69,10 +69,12 @@ export async function GET(
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
 
-    let slotsRows: any[] | null = slots;
+    let slotsRows: any[];
 
     // Si la colonne slot_date n'existe pas encore ou autre erreur schéma : requête compatible ancienne base
-    if (slotsError || !slotsRows) {
+    if (!slotsError && Array.isArray(slots)) {
+      slotsRows = slots;
+    } else {
       console.warn("[API][plannings][GET] slots (avec slot_date):", slotsError?.message || "no data");
       const { data: legacySlots, error: legacyError } = await supabase
         .from("planning_slots")
