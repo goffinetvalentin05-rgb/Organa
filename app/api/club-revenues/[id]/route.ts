@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
 
 export const runtime = "nodejs";
 
@@ -50,11 +51,7 @@ export async function GET(
         description,
         event_id,
         created_at,
-        updated_at,
-        events (
-          id,
-          name
-        )
+        updated_at
       `
       )
       .eq("id", id)
@@ -66,6 +63,7 @@ export async function GET(
     }
 
     const row: any = data;
+    const event = await fetchEventLabelForRevenue(supabase, row.event_id);
     return NextResponse.json({
       revenue: {
         id: row.id,
@@ -74,7 +72,7 @@ export async function GET(
         revenue_date: row.revenue_date,
         description: row.description,
         event_id: row.event_id,
-        event: row.events ? { id: row.events.id, name: row.events.name } : null,
+        event,
         created_at: row.created_at,
         updated_at: row.updated_at,
       },
@@ -129,7 +127,7 @@ export async function PUT(
       .eq("user_id", user.id)
       .maybeSingle();
 
-    const { data, error } = await supabase
+    const { data: updated, error } = await supabase
       .from("club_revenues")
       .update({
         name: name.trim(),
@@ -149,28 +147,36 @@ export async function PUT(
         description,
         event_id,
         created_at,
-        updated_at,
-        events (
-          id,
-          name
-        )
+        updated_at
       `
       )
       .single();
 
-    if (error || !data) {
-      console.error("[API][club-revenues][PUT]", error);
-      return NextResponse.json({ error: "Erreur lors de la mise à jour" }, { status: 500 });
+    if (error || !updated) {
+      console.error("[API][club-revenues][PUT]", {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+      });
+      return NextResponse.json(
+        {
+          error: "Erreur lors de la mise à jour",
+          details: error?.message,
+          code: error?.code,
+        },
+        { status: 500 }
+      );
     }
 
     revalidatePath("/tableau-de-bord/produits");
     revalidatePath("/tableau-de-bord/evenements");
     const oldEventId = (existing as { event_id?: string } | null)?.event_id;
-    const newEventId = (data as { event_id?: string }).event_id;
+    const newEventId = (updated as { event_id?: string }).event_id;
     if (oldEventId) revalidatePath(`/tableau-de-bord/evenements/${oldEventId}`);
     if (newEventId) revalidatePath(`/tableau-de-bord/evenements/${newEventId}`);
 
-    const row: any = data;
+    const event = await fetchEventLabelForRevenue(supabase, updated.event_id);
+    const row: any = updated;
     return NextResponse.json({
       revenue: {
         id: row.id,
@@ -179,7 +185,7 @@ export async function PUT(
         revenue_date: row.revenue_date,
         description: row.description,
         event_id: row.event_id,
-        event: row.events ? { id: row.events.id, name: row.events.name } : null,
+        event,
         created_at: row.created_at,
         updated_at: row.updated_at,
       },
@@ -220,7 +226,11 @@ export async function DELETE(
     const { error } = await supabase.from("club_revenues").delete().eq("id", id).eq("user_id", user.id);
 
     if (error) {
-      return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
+      console.error("[API][club-revenues][DELETE]", error.message, error.code);
+      return NextResponse.json(
+        { error: "Erreur lors de la suppression", details: error.message },
+        { status: 500 }
+      );
     }
 
     revalidatePath("/tableau-de-bord/produits");

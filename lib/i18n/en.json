@@ -479,7 +479,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payments",
-      "productRevenues": "Products",
+      "productRevenues": "Revenue",
       "events": "Events",
       "buvette": "Club Bar",
       "plannings": "Plannings",
@@ -1427,7 +1427,7 @@
         "revenueFromProducts": "Other revenue (products)",
         "linkedDocuments": "Linked invoices",
         "linkedDocumentsHint": "Formal invoices: sponsorship, partners, grants…",
-        "linkedProducts": "Linked products",
+        "linkedProducts": "Linked revenue",
         "linkedProductsHint": "Simple revenue without a formal invoice: bar, tickets, meals, registrations…",
         "linkedExpenses": "Linked expenses",
         "noDocuments": "No linked invoices",
@@ -1449,8 +1449,8 @@
       }
     },
     "productRevenues": {
-      "title": "Products & revenue",
-      "subtitle": "Record simple club sales and revenue (bar, tickets, etc.), optionally linked to an event.",
+      "title": "Revenue",
+      "subtitle": "Simple club receipts (bar, tickets, raffle, etc.), optionally linked to an event — separate from formal invoices and membership payment history.",
       "loadError": "Error loading data",
       "emptyState": "No revenue recorded yet",
       "emptyHint": "Add your first sales or cash-ins (bar, meals, tickets…).",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
 
 export const runtime = "nodejs";
 
@@ -37,7 +38,8 @@ export async function GET() {
 
     const { data: rows, error } = await supabase
       .from("club_revenues")
-      .select(`
+      .select(
+        `
         id,
         name,
         amount,
@@ -45,18 +47,43 @@ export async function GET() {
         description,
         event_id,
         created_at,
-        updated_at,
-        events (
-          id,
-          name
-        )
-      `)
+        updated_at
+      `
+      )
       .eq("user_id", user.id)
       .order("revenue_date", { ascending: false });
 
     if (error) {
-      console.error("[API][club-revenues][GET]", error);
-      return NextResponse.json({ error: "Erreur lors du chargement" }, { status: 500 });
+      console.error("[API][club-revenues][GET]", error.message, error.code, error.details);
+      return NextResponse.json(
+        {
+          error: "Erreur lors du chargement",
+          details: error.message,
+          code: error.code,
+        },
+        { status: 500 }
+      );
+    }
+
+    const eventIds = [
+      ...new Set(
+        (rows || [])
+          .map((r: { event_id?: string | null }) => r.event_id)
+          .filter((id): id is string => Boolean(id))
+      ),
+    ];
+    const eventsById = new Map<string, { id: string; name: string }>();
+    if (eventIds.length > 0) {
+      const { data: evRows, error: evErr } = await supabase
+        .from("events")
+        .select("id, name")
+        .in("id", eventIds);
+      if (evErr) {
+        console.warn("[API][club-revenues][GET] events batch:", evErr.message);
+      }
+      for (const ev of evRows || []) {
+        eventsById.set(ev.id, { id: ev.id, name: ev.name });
+      }
     }
 
     const revenues = (rows || []).map((row: any) => ({
@@ -66,9 +93,7 @@ export async function GET() {
       revenue_date: row.revenue_date,
       description: row.description,
       event_id: row.event_id,
-      event: row.events
-        ? { id: row.events.id, name: row.events.name }
-        : null,
+      event: row.event_id ? eventsById.get(row.event_id) ?? null : null,
       created_at: row.created_at,
       updated_at: row.updated_at,
     }));
@@ -114,7 +139,7 @@ export async function POST(request: NextRequest) {
     const eventCheck = await assertEventOwnedByUser(supabase, user.id, eventId ?? null);
     if (!eventCheck.ok) return eventCheck.response;
 
-    const { data, error } = await supabase
+    const { data: inserted, error } = await supabase
       .from("club_revenues")
       .insert({
         user_id: user.id,
@@ -133,27 +158,36 @@ export async function POST(request: NextRequest) {
         description,
         event_id,
         created_at,
-        updated_at,
-        events (
-          id,
-          name
-        )
+        updated_at
       `
       )
       .single();
 
-    if (error || !data) {
-      console.error("[API][club-revenues][POST]", error);
-      return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
+    if (error || !inserted) {
+      console.error("[API][club-revenues][POST] insert failed", {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+      });
+      return NextResponse.json(
+        {
+          error: "Impossible d'enregistrer le revenu.",
+          details: error?.message ?? "Erreur inconnue",
+          code: error?.code,
+        },
+        { status: 500 }
+      );
     }
 
     revalidatePath("/tableau-de-bord/produits");
     revalidatePath("/tableau-de-bord/evenements");
-    if (data.event_id) {
-      revalidatePath(`/tableau-de-bord/evenements/${data.event_id}`);
+    if (inserted.event_id) {
+      revalidatePath(`/tableau-de-bord/evenements/${inserted.event_id}`);
     }
 
-    const row: any = data;
+    const event = await fetchEventLabelForRevenue(supabase, inserted.event_id);
+    const row: any = inserted;
     return NextResponse.json(
       {
         revenue: {
@@ -163,7 +197,7 @@ export async function POST(request: NextRequest) {
           revenue_date: row.revenue_date,
           description: row.description,
           event_id: row.event_id,
-          event: row.events ? { id: row.events.id, name: row.events.name } : null,
+          event,
           created_at: row.created_at,
           updated_at: row.updated_at,
         },

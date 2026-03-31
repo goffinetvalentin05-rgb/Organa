@@ -156,7 +156,8 @@ function ProduitsPageInner() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || t("dashboard.productRevenues.saveError"));
+        const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
+        throw new Error(msg || t("dashboard.productRevenues.saveError"));
       }
       await loadRevenues();
       closeForm();

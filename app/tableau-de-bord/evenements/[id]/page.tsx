@@ -240,12 +240,13 @@ export default function EventDetailPage() {
           amount,
           revenueDate: revenueForm.revenueDate,
           description: revenueForm.description.trim() || null,
-          eventId,
+          eventId: eventId ?? null,
         }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || t("dashboard.productRevenues.saveError"));
+        const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
+        throw new Error(msg || t("dashboard.productRevenues.saveError"));
       }
       setShowAddRevenueModal(false);
       await loadEvent();

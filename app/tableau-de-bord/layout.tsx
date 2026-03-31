@@ -84,6 +84,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
     { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
+    { name: t("dashboard.nav.productRevenues"), href: "/tableau-de-bord/produits", icon: ShoppingBag },
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
     { name: t("dashboard.nav.buvette"), href: "/tableau-de-bord/buvette", icon: Calendar },
     { name: t("dashboard.nav.plannings"), href: "/tableau-de-bord/plannings", icon: ClipboardList },
