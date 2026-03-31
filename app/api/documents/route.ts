@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
       )
       .eq("user_id", user.id);
 
@@ -47,8 +47,21 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      let linkedEvent: { id: string; name: string } | null = null;
+      if (data.event_id) {
+        const { data: ev } = await supabase
+          .from("events")
+          .select("id, name")
+          .eq("id", data.event_id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (ev) {
+          linkedEvent = { id: ev.id, name: ev.name };
+        }
+      }
+
       return NextResponse.json(
-        { document: formatDocument(data) },
+        { document: formatDocument(data, linkedEvent) },
         { status: 200 }
       );
     }
@@ -66,7 +79,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { documents: (data || []).map(formatDocument) },
+      { documents: (data || []).map((doc) => formatDocument(doc)) },
       { status: 200 }
     );
   } catch (error: any) {
@@ -339,7 +352,10 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-function formatDocument(doc: any) {
+function formatDocument(
+  doc: any,
+  linkedEvent?: { id: string; name: string } | null
+) {
   const toNumber = (value: any) =>
     typeof value === "number" ? value : Number(value) || 0;
 
@@ -359,6 +375,9 @@ function formatDocument(doc: any) {
     totalTTC: toNumber(doc.total_ttc),
     notes: doc.notes || "",
     clientId: doc.client_id || null,
+    eventId: doc.event_id ?? null,
+    linkedEvent:
+      linkedEvent !== undefined ? linkedEvent : null,
     client: client
       ? {
           id: client.id,
@@ -415,7 +434,7 @@ export async function PATCH(request: NextRequest) {
     // Vérifier que le document appartient à l'utilisateur
     const { data: existingDoc, error: fetchError } = await supabase
       .from("documents")
-      .select("id, numero")
+      .select("id, numero, event_id")
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
@@ -428,11 +447,13 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Préparer les données de mise à jour
-    // Ne jamais envoyer de champs undefined/null si non fournis
-    const updateData: any = {
-      status: statut,
-    };
+    const previousEventId = existingDoc.event_id as string | null;
+
+    // Préparer les données de mise à jour (ne pas écraser le statut si non fourni)
+    const updateData: any = {};
+    if (statut !== undefined) {
+      updateData.status = statut;
+    }
 
     // Ajouter date_echeance uniquement si fourni et non vide
     if (dateEcheance && dateEcheance.trim() !== "") {
@@ -468,9 +489,26 @@ export async function PATCH(request: NextRequest) {
       updateData.total_ttc = calculerTotalTTC(lignes);
     }
 
-    // Ajouter event_id si fourni
+    // Ajouter event_id si fourni — vérifier que l'événement appartient au club
     if (eventId !== undefined) {
-      updateData.event_id = eventId || null;
+      const nextEventId = eventId ? String(eventId).trim() : null;
+      if (nextEventId) {
+        const { data: ev, error: evErr } = await supabase
+          .from("events")
+          .select("id")
+          .eq("id", nextEventId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (evErr || !ev) {
+          return NextResponse.json(
+            { error: "Événement introuvable ou non autorisé" },
+            { status: 400 }
+          );
+        }
+        updateData.event_id = nextEventId;
+      } else {
+        updateData.event_id = null;
+      }
     }
 
     if (clientId) {
@@ -493,13 +531,20 @@ export async function PATCH(request: NextRequest) {
       updateData.client_id = clientId;
     }
 
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "Aucun champ à mettre à jour" },
+        { status: 400 }
+      );
+    }
+
     // Mettre à jour le document
     const { data: updatedDoc, error: updateError } = await supabase
       .from("documents")
       .update(updateData)
       .eq("id", id)
       .eq("user_id", user.id)
-      .select("id, numero, type")
+      .select("id, numero, type, event_id")
       .single();
 
     if (updateError) {
@@ -524,10 +569,23 @@ export async function PATCH(request: NextRequest) {
       type: updatedDoc.type,
     });
 
+    revalidatePath("/tableau-de-bord");
+    revalidatePath("/tableau-de-bord/devis");
+    revalidatePath("/tableau-de-bord/factures");
+    revalidatePath(`/tableau-de-bord/factures/${id}`);
+    revalidatePath("/tableau-de-bord/evenements");
+    if (previousEventId) {
+      revalidatePath(`/tableau-de-bord/evenements/${previousEventId}`);
+    }
+    if (updatedDoc.event_id && updatedDoc.event_id !== previousEventId) {
+      revalidatePath(`/tableau-de-bord/evenements/${updatedDoc.event_id}`);
+    }
+
     return NextResponse.json({
       id: updatedDoc.id.toString(),
       numero: updatedDoc.numero,
       type: updatedDoc.type,
+      eventId: updatedDoc.event_id ?? null,
     });
   } catch (error: any) {
     console.error("[API][documents][PATCH] Erreur inattendue:", error);

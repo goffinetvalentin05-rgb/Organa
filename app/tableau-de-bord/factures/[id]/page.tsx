@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Eye, Download, Mail, Trash } from "@/lib/icons";
+import { Eye, Download, Mail, Trash, Calendar } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import LinkInvoiceToEventModal, {
+  type EventListItem,
+} from "./LinkInvoiceToEventModal";
 
 interface Facture {
   id: string;
@@ -22,6 +25,8 @@ interface Facture {
   datePaiement?: string | null;
   notes?: string | null;
   type?: string;
+  eventId?: string | null;
+  linkedEvent?: { id: string; name: string } | null;
 }
 
 interface CompanySettings {
@@ -47,32 +52,39 @@ export default function FactureDetailPage() {
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
 
+  const [eventModalOpen, setEventModalOpen] = useState(false);
+  const [eventsList, setEventsList] = useState<EventListItem[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState("");
+  const [linkSaving, setLinkSaving] = useState(false);
+
+  const loadFacture = useCallback(async () => {
+    if (!id) return;
+    try {
+      const response = await fetch(`/api/documents?id=${id}`, {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        router.push("/tableau-de-bord/factures");
+        return;
+      }
+      const data = await response.json();
+      if (!data.document || data.document.type !== "invoice") {
+        router.push("/tableau-de-bord/factures");
+        return;
+      }
+      setFacture(data.document);
+    } catch (error) {
+      console.error("[Facture] Erreur chargement:", error);
+      router.push("/tableau-de-bord/factures");
+    }
+  }, [id, router]);
+
   useEffect(() => {
     if (!id) {
       router.push("/tableau-de-bord/factures");
       return;
     }
-
-    const loadFacture = async () => {
-      try {
-        const response = await fetch(`/api/documents?id=${id}`, {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          router.push("/tableau-de-bord/factures");
-          return;
-        }
-        const data = await response.json();
-        if (!data.document || data.document.type !== "invoice") {
-          router.push("/tableau-de-bord/factures");
-          return;
-        }
-        setFacture(data.document);
-      } catch (error) {
-        console.error("[Facture] Erreur chargement:", error);
-        router.push("/tableau-de-bord/factures");
-      }
-    };
 
     const loadCurrency = async () => {
       try {
@@ -91,7 +103,99 @@ export default function FactureDetailPage() {
 
     void loadFacture();
     void loadCurrency();
-  }, [id, router]);
+  }, [id, router, loadFacture]);
+
+  const loadEventsForModal = useCallback(async () => {
+    setEventsLoading(true);
+    try {
+      const res = await fetch("/api/events", { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error("events");
+      }
+      const data = await res.json();
+      const raw = (data.events || []) as {
+        id: string;
+        name: string;
+        start_date?: string;
+      }[];
+      setEventsList(
+        raw.map((e) => ({
+          id: e.id,
+          name: e.name,
+          start_date: e.start_date,
+        }))
+      );
+    } catch {
+      toast.error(t("dashboard.invoices.detail.loadEventsError"));
+      setEventsList([]);
+    } finally {
+      setEventsLoading(false);
+    }
+  }, [t]);
+
+  const openEventModal = useCallback(() => {
+    setSelectedEventId(facture?.linkedEvent?.id || facture?.eventId || "");
+    setEventModalOpen(true);
+    void loadEventsForModal();
+  }, [facture?.eventId, facture?.linkedEvent?.id, loadEventsForModal]);
+
+  const handleConfirmEventLink = async () => {
+    if (!selectedEventId || !facture || !id) return;
+    setLinkSaving(true);
+    try {
+      const res = await fetch("/api/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          type: "invoice",
+          eventId: selectedEventId,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || t("dashboard.invoices.detail.linkError"));
+      }
+      toast.success(t("dashboard.invoices.detail.linkSuccess"));
+      setEventModalOpen(false);
+      await loadFacture();
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : t("dashboard.invoices.detail.linkError");
+      toast.error(message);
+    } finally {
+      setLinkSaving(false);
+    }
+  };
+
+  const handleUnlinkEvent = async () => {
+    if (!facture?.eventId || !id) return;
+    if (!confirm(t("dashboard.invoices.detail.unlinkConfirm"))) return;
+    setLinkSaving(true);
+    try {
+      const res = await fetch("/api/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          type: "invoice",
+          eventId: null,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || t("dashboard.invoices.detail.linkError"));
+      }
+      toast.success(t("dashboard.invoices.detail.unlinkSuccess"));
+      await loadFacture();
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : t("dashboard.invoices.detail.linkError");
+      toast.error(message);
+    } finally {
+      setLinkSaving(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!confirm(t("dashboard.invoices.detail.deleteConfirm"))) return;
@@ -456,6 +560,95 @@ export default function FactureDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Événement lié */}
+      <div className="rounded-xl border border-subtle bg-surface p-6">
+        <div className="flex items-start gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{ backgroundColor: "var(--obillz-blue-light)" }}
+          >
+            <Calendar className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-semibold text-slate-900">
+              {t("dashboard.invoices.detail.eventSectionTitle")}
+            </h2>
+            {facture.linkedEvent ? (
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    {t("dashboard.invoices.detail.eventLinkedLabel")}
+                  </p>
+                  <Link
+                    href={`/tableau-de-bord/evenements/${facture.linkedEvent.id}`}
+                    className="mt-1 inline-block text-lg font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+                  >
+                    {facture.linkedEvent.name}
+                  </Link>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={openEventModal}
+                    disabled={linkSaving}
+                    className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {t("dashboard.invoices.detail.changeEvent")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUnlinkEvent}
+                    disabled={linkSaving}
+                    className="px-4 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 border border-red-200 transition-colors disabled:opacity-50"
+                  >
+                    {t("dashboard.invoices.detail.unlinkEvent")}
+                  </button>
+                </div>
+              </div>
+            ) : facture.eventId ? (
+              <div className="mt-3 space-y-3">
+                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  {t("dashboard.invoices.detail.eventOrphan")}
+                </p>
+                <button
+                  type="button"
+                  onClick={openEventModal}
+                  disabled={linkSaving}
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-[var(--obillz-hero-blue,#1d4ed8)] hover:opacity-95 disabled:opacity-50 transition-colors"
+                >
+                  {t("dashboard.invoices.detail.linkToEvent")}
+                </button>
+              </div>
+            ) : (
+              <div className="mt-3">
+                <p className="text-sm text-slate-500 mb-3">
+                  {t("dashboard.invoices.detail.eventNone")}
+                </p>
+                <button
+                  type="button"
+                  onClick={openEventModal}
+                  disabled={linkSaving}
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-[var(--obillz-hero-blue,#1d4ed8)] hover:opacity-95 disabled:opacity-50 transition-colors"
+                >
+                  {t("dashboard.invoices.detail.linkToEvent")}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <LinkInvoiceToEventModal
+        open={eventModalOpen}
+        onClose={() => setEventModalOpen(false)}
+        events={eventsList}
+        eventsLoading={eventsLoading}
+        selectedEventId={selectedEventId}
+        onSelectedEventIdChange={setSelectedEventId}
+        onConfirm={handleConfirmEventLink}
+        saving={linkSaving}
+      />
 
       {/* Statut et notes */}
       <div className="rounded-xl border border-subtle bg-surface p-6">
