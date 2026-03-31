@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PlanningPdf } from "@/lib/pdf/PlanningPdf";
 import { createClient } from "@/lib/supabase/server";
+import {
+  formatVolunteerDisplayNameForPdf,
+  sortPlanningSlotsForPdf,
+  unwrapPlanningClient,
+} from "@/lib/planning/pdfVolunteerDisplay";
 
 export const runtime = "nodejs";
 
@@ -77,7 +82,7 @@ export async function GET(request: Request) {
         .from("planning_slots")
         .select("id, location, start_time, end_time, required_people, notes, ordre")
         .eq("planning_id", id)
-        .order("ordre", { ascending: true });
+        .order("start_time", { ascending: true });
       if (!legacyError) {
         slotsRows = legacySlots || [];
       } else {
@@ -102,7 +107,10 @@ export async function GET(request: Request) {
           clients (
             id,
             nom,
-            email
+            email,
+            telephone,
+            role,
+            category
           )
         `)
         .in("slot_id", slotIds);
@@ -117,18 +125,29 @@ export async function GET(request: Request) {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    // Structurer les données pour le PDF
-    const slotsWithAssignments = (slots || []).map((slot: any) => {
+    // Structurer les données pour le PDF (toujours depuis slotsRows, pas slots — cohérent avec le fallback sans slot_date)
+    const slotsWithAssignments = (slotsRows || []).map((slot: any) => {
       const slotAssignments = assignments
         .filter((a: any) => a.slot_id === slot.id)
         .map((a: any) => ({
           id: a.id,
           member: {
-            id: a.clients?.id || a.client_id || `public-${a.id}`,
-            nom: a.source === "public_signup" ? a.public_name || "Bénévole" : a.clients?.nom || "Membre",
-            email: a.source === "public_signup" ? a.public_email || undefined : a.clients?.email,
+            id:
+              unwrapPlanningClient(a.clients)?.id ||
+              a.client_id ||
+              `public-${a.id}`,
+            displayName: formatVolunteerDisplayNameForPdf({
+              source: a.source,
+              public_name: a.public_name,
+              clients: a.clients,
+            }),
           },
-        }));
+        }))
+        .sort((x: any, y: any) =>
+          x.member.displayName.localeCompare(y.member.displayName, "fr", {
+            sensitivity: "base",
+          })
+        );
 
       return {
         id: slot.id,
@@ -144,6 +163,8 @@ export async function GET(request: Request) {
         assignments: slotAssignments,
       };
     });
+
+    const slotsSorted = sortPlanningSlotsForPdf(slotsWithAssignments);
 
     const totalRequired = slotsWithAssignments.reduce((sum: number, s: any) => sum + s.requiredPeople, 0);
     const totalAssigned = slotsWithAssignments.reduce((sum: number, s: any) => sum + s.assignments.length, 0);
@@ -162,9 +183,9 @@ export async function GET(request: Request) {
         description: planning.description,
         eventName: (planning.events as any)?.name,
       },
-      slots: slotsWithAssignments,
+      slots: slotsSorted,
       summary: {
-        totalSlots: slotsWithAssignments.length,
+        totalSlots: slotsSorted.length,
         totalRequired,
         totalAssigned,
         fillRate: totalRequired > 0 ? Math.round((totalAssigned / totalRequired) * 100) : 0,

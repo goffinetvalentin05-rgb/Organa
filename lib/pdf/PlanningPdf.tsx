@@ -184,11 +184,6 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 9,
   },
-  memberEmail: {
-    fontSize: 7,
-    color: "#666666",
-    marginLeft: 10,
-  },
   emptySlot: {
     fontSize: 8,
     color: "#999999",
@@ -225,8 +220,8 @@ const styles = StyleSheet.create({
 // Types pour les données
 interface Member {
   id: string;
-  nom: string;
-  email?: string;
+  /** Libellé final (pas d’email dans le PDF) */
+  displayName: string;
 }
 
 interface Assignment {
@@ -431,13 +426,8 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
                       <View key={assignment.id} style={styles.memberItem}>
                         <Text style={styles.memberBullet}>•</Text>
                         <Text style={styles.memberName}>
-                          {assignment.member.nom}
+                          {assignment.member.displayName}
                         </Text>
-                        {assignment.member.email && (
-                          <Text style={styles.memberEmail}>
-                            ({assignment.member.email})
-                          </Text>
-                        )}
                       </View>
                     ))
                   ) : (
