@@ -22,6 +22,7 @@ import {
   Calendar,
   ClipboardList,
   Mail,
+  ShoppingBag,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -109,6 +110,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
     if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
+    if (pathname.startsWith("/tableau-de-bord/produits")) return t("dashboard.pageTitles.productRevenues");
     if (pathname.startsWith("/tableau-de-bord/evenements")) return t("dashboard.pageTitles.events");
     if (pathname.startsWith("/tableau-de-bord/buvette")) return t("dashboard.pageTitles.buvette");
     if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings");

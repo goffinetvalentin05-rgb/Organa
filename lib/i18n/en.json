@@ -479,6 +479,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payments",
+      "productRevenues": "Products",
       "events": "Events",
       "buvette": "Club Bar",
       "plannings": "Plannings",
@@ -497,6 +498,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "payments": "Payment History",
+      "productRevenues": "Products & revenue",
       "events": "Events",
       "buvette": "Club Bar",
       "plannings": "Plannings",
@@ -1421,11 +1423,18 @@
         "netResult": "Net result",
         "profit": "Profit",
         "loss": "Loss",
+        "revenueFromInvoices": "Invoices",
+        "revenueFromProducts": "Other revenue (products)",
         "linkedDocuments": "Linked invoices",
+        "linkedDocumentsHint": "Formal invoices: sponsorship, partners, grants…",
+        "linkedProducts": "Linked products",
+        "linkedProductsHint": "Simple revenue without a formal invoice: bar, tickets, meals, registrations…",
         "linkedExpenses": "Linked expenses",
         "noDocuments": "No linked invoices",
+        "noProducts": "No linked products",
         "noExpenses": "No linked expenses",
         "linkDocument": "Link an invoice",
+        "linkProduct": "Add revenue",
         "linkExpense": "Link an expense",
         "chart": {
           "title": "Revenue vs Expenses",
@@ -1437,6 +1446,41 @@
         "noType": "No type",
         "period": "Period",
         "singleDay": "On"
+      }
+    },
+    "productRevenues": {
+      "title": "Products & revenue",
+      "subtitle": "Record simple club sales and revenue (bar, tickets, etc.), optionally linked to an event.",
+      "loadError": "Error loading data",
+      "emptyState": "No revenue recorded yet",
+      "emptyHint": "Add your first sales or cash-ins (bar, meals, tickets…).",
+      "addButton": "Add revenue",
+      "editButton": "Edit",
+      "deleteConfirm": "Delete this revenue entry?",
+      "deleteError": "Could not delete",
+      "saveError": "Could not save",
+      "saveSuccess": "Saved",
+      "columns": {
+        "name": "Name",
+        "amount": "Amount",
+        "date": "Date",
+        "event": "Event",
+        "noEvent": "None"
+      },
+      "form": {
+        "titleNew": "New revenue",
+        "titleEdit": "Edit revenue",
+        "name": "Name *",
+        "namePlaceholder": "E.g. Bar, Tickets, Meals",
+        "amount": "Amount (CHF) *",
+        "date": "Date *",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Details…",
+        "event": "Event",
+        "eventPlaceholder": "None (club-wide revenue)",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving…"
       }
     }
   }

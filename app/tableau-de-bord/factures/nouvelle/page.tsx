@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   LigneDocument,
@@ -26,8 +26,9 @@ interface Event {
   name: string;
 }
 
-export default function NouvelleFacturePage() {
+function NouvelleFacturePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t, locale } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -81,6 +82,13 @@ export default function NouvelleFacturePage() {
     loadClients();
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    const fromUrl = searchParams.get("eventId");
+    if (fromUrl) {
+      setEventId(fromUrl);
+    }
+  }, [searchParams]);
 
   const ajouterLigne = () => {
     setLignes([
@@ -596,7 +604,13 @@ export default function NouvelleFacturePage() {
   );
 }
 
-
+export default function NouvelleFacturePage() {
+  return (
+    <Suspense fallback={<div className="max-w-4xl mx-auto p-8 text-secondary">…</div>}>
+      <NouvelleFacturePageContent />
+    </Suspense>
+  );
+}
 
 
 

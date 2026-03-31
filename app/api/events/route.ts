@@ -49,12 +49,23 @@ export async function GET() {
       );
     }
 
-    // Récupérer les totaux des revenus (documents liés)
+    // Revenus factures (invoices) liés aux événements
     const { data: documentsData } = await supabase
       .from("documents")
-      .select("event_id, total_ttc")
+      .select("event_id, total_ttc, type")
+      .eq("user_id", user.id)
+      .eq("type", "invoice")
+      .not("event_id", "is", null);
+
+    // Revenus simples (club_revenues) liés aux événements
+    const { data: clubRevenuesData, error: clubRevenuesError } = await supabase
+      .from("club_revenues")
+      .select("event_id, amount")
       .eq("user_id", user.id)
       .not("event_id", "is", null);
+    if (clubRevenuesError) {
+      console.warn("[API][events][GET] club_revenues:", clubRevenuesError.message);
+    }
 
     // Récupérer les totaux des dépenses (expenses liées)
     const { data: expensesData } = await supabase
@@ -68,10 +79,18 @@ export async function GET() {
     const expensesByEvent: Record<string, number> = {};
 
     (documentsData || []).forEach((doc: any) => {
-      if (doc.event_id) {
+      if (doc.event_id && doc.type === "invoice") {
         revenueByEvent[doc.event_id] = (revenueByEvent[doc.event_id] || 0) + (Number(doc.total_ttc) || 0);
       }
     });
+
+    if (!clubRevenuesError) {
+      (clubRevenuesData || []).forEach((row: any) => {
+        if (row.event_id) {
+          revenueByEvent[row.event_id] = (revenueByEvent[row.event_id] || 0) + (Number(row.amount) || 0);
+        }
+      });
+    }
 
     (expensesData || []).forEach((exp: any) => {
       if (exp.event_id) {

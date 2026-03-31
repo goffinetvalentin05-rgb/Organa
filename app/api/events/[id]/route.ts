@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { sumClubRevenues, sumInvoiceRevenueFromDocuments, totalEventRevenue } from "@/lib/financial/eventFinancials";
 
 export const runtime = "nodejs";
 
@@ -58,7 +59,7 @@ export async function GET(
       );
     }
 
-    // Récupérer les documents (revenus) liés
+    // Factures (documents type invoice) liées à l'événement
     const { data: documents } = await supabase
       .from("documents")
       .select(`
@@ -76,7 +77,19 @@ export async function GET(
       `)
       .eq("user_id", user.id)
       .eq("event_id", id)
+      .eq("type", "invoice")
       .order("date_creation", { ascending: false });
+
+    // Revenus simples (buvette, entrées, etc.) liés à l'événement
+    const { data: clubRevenuesRows, error: clubRevenuesError } = await supabase
+      .from("club_revenues")
+      .select("id, name, amount, revenue_date, description")
+      .eq("user_id", user.id)
+      .eq("event_id", id)
+      .order("revenue_date", { ascending: false });
+    if (clubRevenuesError) {
+      console.warn("[API][events][GET] club_revenues:", clubRevenuesError.message);
+    }
 
     // Récupérer les dépenses liées
     const { data: expenses } = await supabase
@@ -86,11 +99,10 @@ export async function GET(
       .eq("event_id", id)
       .order("date", { ascending: false });
 
-    // Calculer les totaux
-    const totalRevenue = (documents || []).reduce(
-      (sum: number, doc: any) => sum + (Number(doc.total_ttc) || 0),
-      0
-    );
+    const safeClubRevenues = clubRevenuesError ? [] : clubRevenuesRows || [];
+    const revenueFromInvoices = sumInvoiceRevenueFromDocuments(documents || []);
+    const revenueFromProducts = sumClubRevenues(safeClubRevenues);
+    const totalRevenue = totalEventRevenue(documents || [], safeClubRevenues);
     const totalExpenses = (expenses || []).reduce(
       (sum: number, exp: any) => sum + (Number(exp.amount) || 0),
       0
@@ -101,11 +113,20 @@ export async function GET(
         ...event,
         eventType: event.event_types,
         totalRevenue,
+        revenueFromInvoices,
+        revenueFromProducts,
         totalExpenses,
         netResult: totalRevenue - totalExpenses,
         documents: (documents || []).map((doc: any) => ({
           ...doc,
           client: doc.clients,
+        })),
+        clubRevenues: safeClubRevenues.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          amount: Number(r.amount) || 0,
+          revenue_date: r.revenue_date,
+          description: r.description,
         })),
         expenses: expenses || [],
       },

@@ -34,6 +34,14 @@ interface LinkedExpense {
   status: string;
 }
 
+interface LinkedClubRevenue {
+  id: string;
+  name: string;
+  amount: number;
+  revenue_date: string;
+  description?: string | null;
+}
+
 interface EventDetail {
   id: string;
   name: string;
@@ -41,11 +49,15 @@ interface EventDetail {
   start_date: string;
   end_date?: string;
   status: "planned" | "completed";
+  event_type_id?: string | null;
   eventType?: EventType;
   totalRevenue: number;
+  revenueFromInvoices: number;
+  revenueFromProducts: number;
   totalExpenses: number;
   netResult: number;
   documents: LinkedDocument[];
+  clubRevenues: LinkedClubRevenue[];
   expenses: LinkedExpense[];
 }
 
@@ -68,6 +80,15 @@ export default function EventDetailPage() {
     description: "",
     status: "planned" as "planned" | "completed",
   });
+  const [showAddRevenueModal, setShowAddRevenueModal] = useState(false);
+  const [revenueForm, setRevenueForm] = useState({
+    name: "",
+    amount: "",
+    revenueDate: "",
+    description: "",
+  });
+  const [savingRevenue, setSavingRevenue] = useState(false);
+  const [revenueModalError, setRevenueModalError] = useState<string | null>(null);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -99,14 +120,20 @@ export default function EventDetailPage() {
         throw new Error(t("dashboard.events.loadError"));
       }
       const data = await response.json();
-      setEvent(data.event);
+      const ev = data.event;
+      setEvent({
+        ...ev,
+        revenueFromInvoices: ev.revenueFromInvoices ?? 0,
+        revenueFromProducts: ev.revenueFromProducts ?? 0,
+        clubRevenues: ev.clubRevenues ?? [],
+      });
       setFormData({
-        name: data.event.name,
-        eventTypeId: data.event.event_type_id || "",
-        startDate: data.event.start_date,
-        endDate: data.event.end_date || "",
-        description: data.event.description || "",
-        status: data.event.status,
+        name: ev.name,
+        eventTypeId: ev.event_type_id || "",
+        startDate: ev.start_date,
+        endDate: ev.end_date || "",
+        description: ev.description || "",
+        status: ev.status,
       });
     } catch (error: any) {
       console.error("[Event] Load error:", error);
@@ -178,6 +205,55 @@ export default function EventDetailPage() {
     if (result > 0) return "text-green-600";
     if (result < 0) return "text-red-600";
     return "text-slate-600";
+  };
+
+  const openAddRevenueModal = () => {
+    setRevenueModalError(null);
+    setRevenueForm({
+      name: "",
+      amount: "",
+      revenueDate: new Date().toISOString().slice(0, 10),
+      description: "",
+    });
+    setShowAddRevenueModal(true);
+  };
+
+  const handleAddRevenue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingRevenue(true);
+    setRevenueModalError(null);
+    try {
+      const amount = Number(revenueForm.amount.replace(",", "."));
+      if (!revenueForm.name.trim()) {
+        setRevenueModalError(t("dashboard.productRevenues.saveError"));
+        return;
+      }
+      if (Number.isNaN(amount) || amount < 0) {
+        setRevenueModalError(t("dashboard.productRevenues.saveError"));
+        return;
+      }
+      const response = await fetch("/api/club-revenues", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: revenueForm.name.trim(),
+          amount,
+          revenueDate: revenueForm.revenueDate,
+          description: revenueForm.description.trim() || null,
+          eventId,
+        }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || t("dashboard.productRevenues.saveError"));
+      }
+      setShowAddRevenueModal(false);
+      await loadEvent();
+    } catch (err: any) {
+      setRevenueModalError(err.message);
+    } finally {
+      setSavingRevenue(false);
+    }
   };
 
   if (loading) {
@@ -374,6 +450,14 @@ export default function EventDetailPage() {
               <div className="rounded-xl bg-green-50 p-5">
                 <p className="text-sm text-green-600 font-medium mb-1">{t("dashboard.events.detail.totalRevenue")}</p>
                 <p className="text-3xl font-bold text-green-700">{formatMontant(event.totalRevenue)}</p>
+                <div className="mt-3 space-y-1 text-xs text-green-800/90">
+                  <p>
+                    {t("dashboard.events.detail.revenueFromInvoices")} : {formatMontant(event.revenueFromInvoices)}
+                  </p>
+                  <p>
+                    {t("dashboard.events.detail.revenueFromProducts")} : {formatMontant(event.revenueFromProducts)}
+                  </p>
+                </div>
               </div>
               <div className="rounded-xl bg-red-50 p-5">
                 <p className="text-sm text-red-600 font-medium mb-1">{t("dashboard.events.detail.totalExpenses")}</p>
@@ -401,13 +485,16 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          {/* Linked Documents */}
+          {/* Factures (documents facture) */}
           <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedDocuments")}</h2>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedDocuments")}</h2>
+                <p className="text-sm text-secondary mt-1">{t("dashboard.events.detail.linkedDocumentsHint")}</p>
+              </div>
               <Link
-                href="/tableau-de-bord/factures/nouvelle"
-                className="text-sm text-secondary hover:text-primary transition-colors"
+                href={`/tableau-de-bord/factures/nouvelle?eventId=${eventId}`}
+                className="text-sm text-secondary hover:text-primary transition-colors shrink-0"
               >
                 + {t("dashboard.events.detail.linkDocument")}
               </Link>
@@ -438,7 +525,7 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          {/* Linked Expenses */}
+          {/* Charges */}
           <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedExpenses")}</h2>
@@ -465,6 +552,122 @@ export default function EventDetailPage() {
               </div>
             )}
           </div>
+
+          {/* Produits / revenus simples */}
+          <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedProducts")}</h2>
+                <p className="text-sm text-secondary mt-1">{t("dashboard.events.detail.linkedProductsHint")}</p>
+              </div>
+              <div className="flex flex-wrap gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={openAddRevenueModal}
+                  className="text-sm text-secondary hover:text-primary transition-colors"
+                >
+                  + {t("dashboard.events.detail.linkProduct")}
+                </button>
+                <Link
+                  href={`/tableau-de-bord/produits?eventId=${eventId}`}
+                  className="text-sm text-secondary hover:text-primary transition-colors"
+                >
+                  {t("dashboard.productRevenues.title")} →
+                </Link>
+              </div>
+            </div>
+            {event.clubRevenues.length === 0 ? (
+              <p className="text-secondary text-center py-8">{t("dashboard.events.detail.noProducts")}</p>
+            ) : (
+              <div className="space-y-3">
+                {event.clubRevenues.map((row) => (
+                  <div
+                    key={row.id}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 rounded-lg bg-surface border border-subtle"
+                  >
+                    <div>
+                      <p className="font-medium">{row.name}</p>
+                      {row.description ? (
+                        <p className="text-sm text-secondary line-clamp-2">{row.description}</p>
+                      ) : null}
+                      <p className="text-sm text-secondary">{formatDate(row.revenue_date)}</p>
+                    </div>
+                    <p className="font-semibold text-green-600 sm:text-right">{formatMontant(Number(row.amount))}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {showAddRevenueModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+              <div className="w-full max-w-md rounded-2xl border border-subtle bg-surface p-6 shadow-premium">
+                <h3 className="text-lg font-semibold mb-4">{t("dashboard.productRevenues.form.titleNew")}</h3>
+                {revenueModalError && (
+                  <p className="text-sm text-red-600 mb-3">{revenueModalError}</p>
+                )}
+                <form onSubmit={handleAddRevenue} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.name")}</label>
+                    <input
+                      required
+                      value={revenueForm.name}
+                      onChange={(e) => setRevenueForm({ ...revenueForm, name: e.target.value })}
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.amount")}</label>
+                      <input
+                        required
+                        type="text"
+                        inputMode="decimal"
+                        value={revenueForm.amount}
+                        onChange={(e) => setRevenueForm({ ...revenueForm, amount: e.target.value })}
+                        className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.date")}</label>
+                      <input
+                        required
+                        type="date"
+                        value={revenueForm.revenueDate}
+                        onChange={(e) => setRevenueForm({ ...revenueForm, revenueDate: e.target.value })}
+                        className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.description")}</label>
+                    <textarea
+                      rows={2}
+                      value={revenueForm.description}
+                      onChange={(e) => setRevenueForm({ ...revenueForm, description: e.target.value })}
+                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddRevenueModal(false)}
+                      className="flex-1 px-4 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
+                    >
+                      {t("dashboard.productRevenues.form.cancel")}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingRevenue}
+                      className="flex-1 px-4 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50"
+                    >
+                      {savingRevenue ? t("dashboard.productRevenues.form.saving") : t("dashboard.productRevenues.form.save")}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
