@@ -139,7 +139,16 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       if (!m.has(d)) m.set(d, []);
       m.get(d)!.push(s);
     }
-    return [...m.entries()].sort(([a], [b]) => a.localeCompare(b));
+    const sortByStartTime = (slots: Slot[]) =>
+      [...slots].sort((a, b) => {
+        const ta = (a.startTime || "00:00:00").slice(0, 8);
+        const tb = (b.startTime || "00:00:00").slice(0, 8);
+        if (ta !== tb) return ta.localeCompare(tb);
+        return (a.ordre ?? 0) - (b.ordre ?? 0);
+      });
+    return [...m.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([dateKey, slots]) => [dateKey, sortByStartTime(slots)] as [string, Slot[]]);
   }, [planning]);
 
   const openAddSlotModal = () => {
@@ -627,37 +636,46 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             </button>
           </div>
         ) : (
-          <div className="p-6 space-y-8">
+          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
             {slotGroups.map(([dayKey, slotsForDay]) => (
-              <div key={dayKey} className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-subtle pb-2">
-                  <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span className="text-sm font-semibold text-slate-800">
-                    {formatDate(dayKey)}
-                  </span>
-                </div>
-                <div className="space-y-4">
+              <section
+                key={dayKey}
+                className="rounded-2xl border border-subtle bg-surface/90 shadow-[0_1px_3px_rgba(15,23,42,0.06)] overflow-hidden"
+              >
+                <header className="px-4 py-3.5 sm:px-5 sm:py-4 border-b border-subtle bg-gradient-to-r from-slate-50/95 via-white to-slate-50/40">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div
+                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-subtle bg-white shadow-sm"
+                      aria-hidden
+                    >
+                      <Calendar className="w-5 h-5 text-[var(--obillz-hero-blue)] opacity-90" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-primary leading-snug">
+                        {formatDate(dayKey)}
+                      </h3>
+                    </div>
+                  </div>
+                </header>
+
+                <div className="space-y-4 p-4 sm:p-5">
             {slotsForDay.map((slot) => (
               <div
                 key={slot.id}
-                className="rounded-xl border border-subtle bg-surface/60 overflow-hidden"
+                className="rounded-xl border border-subtle bg-white/70 overflow-hidden shadow-sm"
               >
                 {/* Header du créneau */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-50 border-b border-subtle">
+                <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-50/80 border-b border-subtle">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-lg bg-accent-bg/10 flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-primary">{slot.location}</h3>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
-                        <span className="flex items-center gap-1 md:hidden">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {formatDate(slot.slotDate || dayKey)}
-                        </span>
+                      <h3 className="font-semibold text-primary text-[15px] sm:text-base">{slot.location}</h3>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary mt-0.5">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                          <Clock className="w-3.5 h-3.5 shrink-0" />
+                          {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
                         </span>
                         <span className="flex items-center gap-1">
                           <Users className="w-3.5 h-3.5" />
@@ -762,7 +780,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               </div>
             ))}
                 </div>
-              </div>
+            </section>
             ))}
           </div>
         )}
