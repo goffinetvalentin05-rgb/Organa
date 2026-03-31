@@ -9,6 +9,7 @@ import { Parametres } from "@/lib/mock-data";
 import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 // Types pour les infos d'abonnement
 interface SubscriptionInfo {
@@ -1043,12 +1044,9 @@ export default function ParametresPage() {
 
         {/* Bouton sauvegarder */}
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="btn-obillz"
-          >
+          <DashboardPrimaryButton type="submit" icon="none">
             {t("dashboard.settings.saveButton")}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
     </div>

@@ -484,7 +484,7 @@ export default function TableauDeBordPage() {
             </div>
             <div>
               <p className="font-medium text-slate-900">{t("dashboard.overview.now.empty")}</p>
-              <p className="text-sm text-slate-600">Toutes les cotisations et factures sont à jour</p>
+              <p className="text-sm text-slate-600">{t("dashboard.overview.now.subtitleAllClear")}</p>
             </div>
           </div>
         </div>
@@ -543,7 +543,7 @@ export default function TableauDeBordPage() {
           {t("dashboard.overview.lastDocuments.title")}
         </h2>
         {loading ? (
-          <div className="text-center py-8 text-slate-400">Chargement...</div>
+          <div className="text-center py-8 text-slate-400">{t("dashboard.overview.lastDocuments.loading")}</div>
         ) : derniersDocuments.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-slate-500">{t("dashboard.overview.lastDocuments.empty")}</p>

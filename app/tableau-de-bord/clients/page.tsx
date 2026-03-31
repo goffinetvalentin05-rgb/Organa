@@ -3,8 +3,9 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import DeleteClientButton from "./components/DeleteClientButton";
-import { Info, Plus, Users, Filter } from "@/lib/icons";
+import { Info, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface Client {
   id: string;
@@ -110,13 +111,9 @@ export default function ClientsPage() {
             {t("dashboard.clients.subtitle")}
           </p>
         </div>
-        <Link
-          href="/tableau-de-bord/clients/nouveau"
-          className="btn-obillz"
-        >
-          <Plus className="w-5 h-5" />
+        <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau">
           {t("dashboard.clients.newClient")}
-        </Link>
+        </DashboardPrimaryButton>
       </div>
 
       {/* Filtres */}
@@ -124,7 +121,7 @@ export default function ClientsPage() {
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-4 h-4 text-slate-500" />
-            <span className="text-sm font-medium text-slate-700">Filtres</span>
+            <span className="text-sm font-medium text-slate-700">{t("dashboard.clients.filtersLabel")}</span>
           </div>
           <div className="flex flex-wrap gap-3">
             <select
@@ -162,7 +159,7 @@ export default function ClientsPage() {
                 }}
                 className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
               >
-                Réinitialiser
+                {t("dashboard.clients.filters.resetFilters")}
               </button>
             )}
           </div>
@@ -200,13 +197,9 @@ export default function ClientsPage() {
               }
             </p>
             {clients.length === 0 && (
-              <Link
-                href="/tableau-de-bord/clients/nouveau"
-                className="btn-obillz inline-flex"
-              >
-                <Plus className="w-5 h-5" />
+              <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau" className="inline-flex">
                 {t("dashboard.clients.emptyCta")}
-              </Link>
+              </DashboardPrimaryButton>
             )}
           </div>
         ) : (

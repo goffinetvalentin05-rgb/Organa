@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
 import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { ArrowRight, Users } from "@/lib/icons";
 
 export default function NouveauClientPage() {
@@ -260,10 +261,11 @@ export default function NouveauClientPage() {
           >
             {t("dashboard.common.cancel")}
           </button>
-          <button
+          <DashboardPrimaryButton
             type="submit"
             disabled={loading}
-            className="flex-1 btn-obillz justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            icon="none"
+            className="flex-1 justify-center"
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -279,7 +281,7 @@ export default function NouveauClientPage() {
                 <ArrowRight className="w-5 h-5" />
               </span>
             )}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
     </div>

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, Plus, FileText, ArrowRight } from "@/lib/icons";
+import { Eye, Trash, FileText, ArrowRight } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { localeToIntl } from "@/lib/i18n";
 
 interface Devis {
@@ -103,13 +104,9 @@ export default function DevisPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.quotes.title")}</h1>
           <p className="mt-1 text-slate-500">{t("dashboard.quotes.subtitle")}</p>
         </div>
-        <Link
-          href="/tableau-de-bord/devis/nouveau"
-          className="btn-obillz"
-        >
-          <Plus className="w-5 h-5" />
+        <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau">
           {t("dashboard.quotes.newAction")}
-        </Link>
+        </DashboardPrimaryButton>
       </div>
 
       {/* Contenu */}
@@ -135,13 +132,9 @@ export default function DevisPage() {
               <FileText className="w-8 h-8 text-slate-400" />
             </div>
             <p className="text-slate-600 mb-4">{t("dashboard.quotes.emptyState")}</p>
-            <Link
-              href="/tableau-de-bord/devis/nouveau"
-              className="btn-obillz inline-flex"
-            >
-              <Plus className="w-5 h-5" />
+            <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau" className="inline-flex">
               {t("dashboard.quotes.emptyCta")}
-            </Link>
+            </DashboardPrimaryButton>
           </div>
         ) : (
           <>
@@ -173,7 +166,7 @@ export default function DevisPage() {
                             {devisItem.client?.nom || t("dashboard.common.unknownClient")}
                           </p>
                           <p className="text-xs text-slate-400 mt-1">
-                            Créé le {formatDate(devisItem.dateCreation)}
+                            {t("dashboard.quotes.createdOn")} {formatDate(devisItem.dateCreation)}
                           </p>
                         </div>
                       </div>
@@ -210,7 +203,7 @@ export default function DevisPage() {
             {/* Footer avec compteur */}
             <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
               <p className="text-sm text-slate-500 text-center">
-                {devis.length} cotisations au total
+                {t("dashboard.quotes.totalCount", { count: devis.length })}
               </p>
             </div>
           </>

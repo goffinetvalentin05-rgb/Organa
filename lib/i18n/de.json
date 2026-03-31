@@ -781,6 +781,7 @@
       "editDisabledTitle": "Bearbeitung vorübergehend deaktiviert",
       "editDisabledText": "Um einen Kunden zu ändern, löschen Sie ihn und legen Sie ihn neu an. So bleiben die Daten zuverlässig.",
       "emptyState": "Noch keine Kunden.",
+      "noMatchFilter": "Keine Mitglieder entsprechen den gewählten Filtern.",
       "emptyCta": "Ersten Kunden anlegen",
       "cardLabel": "Kunde",
       "noName": "Ohne Namen",
@@ -829,9 +830,11 @@
         "secretary": "Sekretär",
         "other": "Sonstiges"
       },
+      "filtersLabel": "Filter",
       "filters": {
         "allRoles": "Alle Rollen",
-        "allCategories": "Alle Kategorien"
+        "allCategories": "Alle Kategorien",
+        "resetFilters": "Zurücksetzen"
       },
       "errors": {
         "missingId": "Kunden-ID fehlt",
@@ -842,6 +845,8 @@
     "quotes": {
       "title": "Angebote",
       "subtitle": "Angebote und Offerten verwalten",
+      "totalCount": "{count} Beiträge insgesamt",
+      "createdOn": "Erstellt am",
       "newAction": "Angebot erstellen",
       "newTitle": "Neues Angebot",
       "newSubtitle": "Neues Angebot erstellen",
@@ -1050,7 +1055,8 @@
       "lastDocuments": {
         "title": "Letzte Dokumente",
         "empty": "Noch keine Dokumente.",
-        "created": "Erstellt am"
+        "created": "Erstellt am",
+        "loading": "Wird geladen..."
       }
     },
     "expenses": {
@@ -1253,6 +1259,107 @@
         "submitError": "Anmeldefehler",
         "notFound": "QR-Code nicht gefunden",
         "expired": "Diese Veranstaltung nimmt keine Anmeldungen mehr an"
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 Obillz — Vereinsverwaltung in zwei Klicks",
+      "legal": "Impressum",
+      "privacy": "Datenschutz"
+    },
+    "plannings": {
+      "title": "Pläne",
+      "subtitle": "Organisieren Sie Veranstaltungen und teilen Sie Mitglieder auf Zeitfenster ein",
+      "newPlanning": "Neuer Plan",
+      "emptyState": "Keine Pläne gefunden",
+      "emptyCta": "Ersten Plan anlegen",
+      "loading": "Wird geladen...",
+      "loadErrorTitle": "Ladefehler",
+      "loadError": "Fehler beim Laden der Pläne",
+      "deleteConfirm": "Diesen Plan wirklich löschen?",
+      "limitReached": "Planlimit erreicht. Wechseln Sie zu Pro, um mehr zu erstellen.",
+      "filters": {
+        "all": "Alle Status",
+        "draft": "Entwurf",
+        "published": "Veröffentlicht",
+        "archived": "Archiviert"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "published": "Veröffentlicht",
+        "archived": "Archiviert"
+      },
+      "assignments": "Zuweisungen",
+      "complete": "voll",
+      "slot": "Slot",
+      "slots": "Slots",
+      "viewManage": "Ansehen / verwalten",
+      "form": {
+        "newTitle": "Neuer Plan",
+        "newSubtitle": "Erstellen Sie einen Plan und definieren Sie Ihre Zeitfenster",
+        "backToList": "Zurück zu den Plänen",
+        "cancel": "Abbrechen",
+        "creating": "Wird erstellt...",
+        "createAction": "Plan erstellen",
+        "slotsSection": "Zeitfenster",
+        "addSlot": "Zeitfenster hinzufügen",
+        "slotNumber": "Slot {n}",
+        "removeSlotTitle": "Dieses Zeitfenster entfernen"
+      }
+    },
+    "buvette": {
+      "title": "Vereinskiosk",
+      "subtitle": "Verfügbarkeiten und externe Reservierungsanfragen.",
+      "publicLink": "Öffentlicher Link",
+      "loadingLink": "Wird geladen...",
+      "unavailable": "Nicht verfügbar",
+      "open": "Öffnen",
+      "copy": "Kopieren",
+      "copying": "Kopie...",
+      "legendAvailable": "Verfügbar",
+      "legendOccupied": "Belegt",
+      "legendReserved": "Reserviert",
+      "calendarLoading": "Kalender wird geladen...",
+      "weekdays": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+    },
+    "marketing": {
+      "loading": "Wird geladen...",
+      "loadError": "Ladefehler",
+      "tabs": {
+        "contacts": "Kontakte",
+        "campaigns": "Kampagnen"
+      },
+      "contacts": {
+        "searchPlaceholder": "Per E-Mail suchen",
+        "allSources": "Alle Quellen",
+        "addContact": "Kontakt hinzufügen",
+        "columns": {
+          "lastName": "Name",
+          "firstName": "Vorname",
+          "email": "E-Mail",
+          "phone": "Telefon",
+          "source": "Quelle",
+          "actions": "Aktionen"
+        },
+        "empty": "Noch keine Kontakte.",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "deleteConfirm": "Diesen Kontakt löschen?",
+        "modalAddTitle": "Kontakt hinzufügen",
+        "modalEditTitle": "Kontakt bearbeiten",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      },
+      "campaigns": {
+        "createTitle": "Kampagne erstellen",
+        "nameLabel": "Interner Name",
+        "subjectLabel": "Betreff",
+        "audienceLabel": "Zielgruppe",
+        "audienceAll": "Alle Kontakte",
+        "audienceSource": "Nach Quelle",
+        "audienceManual": "Manuelle Auswahl",
+        "send": "Kampagne senden",
+        "sending": "Wird gesendet...",
+        "empty": "Noch keine Kampagnen."
       }
     }
   }

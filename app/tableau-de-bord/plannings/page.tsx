@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Eye, Trash, ClipboardList, Calendar, Users } from "@/lib/icons";
+import { Eye, Trash, ClipboardList, Calendar, Users } from "@/lib/icons";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -60,7 +61,7 @@ export default function PlanningsPage() {
       setPlannings(data?.plannings || []);
     } catch (error: any) {
       console.error("[Plannings] Error:", error);
-      setErrorMessage(error.message || "Erreur lors du chargement");
+      setErrorMessage(error.message || t("dashboard.plannings.loadError"));
       setPlannings([]);
     } finally {
       setLoading(false);
@@ -101,14 +102,9 @@ export default function PlanningsPage() {
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "published":
-        return "Publié";
-      case "archived":
-        return "Archivé";
-      default:
-        return "Brouillon";
-    }
+    if (status === "published") return t("dashboard.plannings.status.published");
+    if (status === "archived") return t("dashboard.plannings.status.archived");
+    return t("dashboard.plannings.status.draft");
   };
 
   const getFillRateColor = (rate: number) => {
@@ -121,29 +117,23 @@ export default function PlanningsPage() {
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Plannings</h1>
-          <p className="mt-2 text-secondary">
-            Organisez vos événements et affectez vos membres aux créneaux
-          </p>
+          <h1 className="text-3xl font-bold">{t("dashboard.plannings.title")}</h1>
+          <p className="mt-2 text-secondary">{t("dashboard.plannings.subtitle")}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 rounded-lg border border-subtle bg-white text-secondary"
           >
-            <option value="all">Tous les statuts</option>
-            <option value="draft">Brouillon</option>
-            <option value="published">Publié</option>
-            <option value="archived">Archivé</option>
+            <option value="all">{t("dashboard.plannings.filters.all")}</option>
+            <option value="draft">{t("dashboard.plannings.filters.draft")}</option>
+            <option value="published">{t("dashboard.plannings.filters.published")}</option>
+            <option value="archived">{t("dashboard.plannings.filters.archived")}</option>
           </select>
-          <Link
-            href="/tableau-de-bord/plannings/nouveau"
-            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Nouveau planning
-          </Link>
+          <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau">
+            {t("dashboard.plannings.newPlanning")}
+          </DashboardPrimaryButton>
         </div>
       </div>
 
@@ -154,7 +144,7 @@ export default function PlanningsPage() {
       <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">Chargement...</p>
+            <p className="text-secondary">{t("dashboard.plannings.loading")}</p>
           </div>
         ) : errorMessage ? (
           <div className="p-12 text-center">
@@ -164,13 +154,10 @@ export default function PlanningsPage() {
         ) : filteredPlannings.length === 0 ? (
           <div className="p-12 text-center">
             <ClipboardList className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <p className="text-secondary mb-4">Aucun planning trouvé</p>
-            <Link
-              href="/tableau-de-bord/plannings/nouveau"
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
-            >
-              Créer votre premier planning
-            </Link>
+            <p className="text-secondary mb-4">{t("dashboard.plannings.emptyState")}</p>
+            <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau" className="inline-flex rounded-full">
+              {t("dashboard.plannings.emptyCta")}
+            </DashboardPrimaryButton>
           </div>
         ) : (
           <div className="p-6 space-y-4">
@@ -200,7 +187,10 @@ export default function PlanningsPage() {
                         )}
                         <span className="flex items-center gap-1.5">
                           <ClipboardList className="w-4 h-4" />
-                          {planning.slotsCount} créneau{planning.slotsCount > 1 ? "x" : ""}
+                          {planning.slotsCount}{" "}
+                          {planning.slotsCount > 1
+                            ? t("dashboard.plannings.slots")
+                            : t("dashboard.plannings.slot")}
                         </span>
                       </div>
                       {planning.description && (
@@ -210,7 +200,7 @@ export default function PlanningsPage() {
                     <div className="text-right">
                       <div className="flex items-center gap-4">
                         <div className="text-center">
-                          <p className="text-xs uppercase text-tertiary mb-1">Affectations</p>
+                          <p className="text-xs uppercase text-tertiary mb-1">{t("dashboard.plannings.assignments")}</p>
                           <div className="flex items-center gap-2">
                             <Users className="w-4 h-4 text-secondary" />
                             <span className="font-semibold">
@@ -231,7 +221,7 @@ export default function PlanningsPage() {
                       className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
-                      Voir / Gérer
+                      {t("dashboard.plannings.viewManage")}
                     </Link>
                     <button
                       onClick={() => handleDelete(planning.id)}

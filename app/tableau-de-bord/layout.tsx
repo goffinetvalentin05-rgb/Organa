@@ -85,7 +85,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
     { name: t("dashboard.nav.buvette"), href: "/tableau-de-bord/buvette", icon: Calendar },
-    { name: t("dashboard.nav.plannings") || "Plannings", href: "/tableau-de-bord/plannings", icon: ClipboardList },
+    { name: t("dashboard.nav.plannings"), href: "/tableau-de-bord/plannings", icon: ClipboardList },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
     { name: t("dashboard.nav.marketing"), href: "/tableau-de-bord/campagnes-marketing", icon: Mail },
     { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Wallet },
@@ -111,7 +111,7 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
     if (pathname.startsWith("/tableau-de-bord/evenements")) return t("dashboard.pageTitles.events");
     if (pathname.startsWith("/tableau-de-bord/buvette")) return t("dashboard.pageTitles.buvette");
-    if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings") || "Plannings";
+    if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings");
     if (pathname.startsWith("/tableau-de-bord/qrcodes")) return t("dashboard.pageTitles.qrcodes");
     if (pathname.startsWith("/tableau-de-bord/campagnes-marketing")) return t("dashboard.pageTitles.marketing");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
@@ -271,13 +271,13 @@ export default function DashboardLayout({
         {/* Footer */}
         <footer className="border-t border-white/20 bg-[var(--obillz-hero-blue)]/85 px-4 py-4 lg:px-8 backdrop-blur">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/75">
-            <p>© 2026 Obillz — La gestion du club en deux clics</p>
+            <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
               <Link href="/mentions-legales" className="hover:text-white transition-colors">
-                Mentions légales
+                {t("dashboard.footer.legal")}
               </Link>
               <Link href="/politique-confidentialite" className="hover:text-white transition-colors">
-                Confidentialité
+                {t("dashboard.footer.privacy")}
               </Link>
             </div>
           </div>

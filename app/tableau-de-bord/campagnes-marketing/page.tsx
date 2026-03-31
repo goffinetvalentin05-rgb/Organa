@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 type MarketingContact = {
   id: string;
@@ -32,6 +34,7 @@ const formatDate = (value: string | null) => {
 };
 
 export default function MarketingCampaignsPage() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<"contacts" | "campaigns">("contacts");
   const [loading, setLoading] = useState(true);
 
@@ -254,7 +257,11 @@ export default function MarketingCampaignsPage() {
   };
 
   if (loading) {
-    return <div className="max-w-6xl mx-auto p-8 text-center text-slate-500">Chargement...</div>;
+    return (
+      <div className="max-w-6xl mx-auto p-8 text-center text-slate-500">
+        {t("dashboard.marketing.loading")}
+      </div>
+    );
   }
 
   return (
@@ -268,7 +275,7 @@ export default function MarketingCampaignsPage() {
           }`}
           onClick={() => setActiveTab("contacts")}
         >
-          Contacts
+          {t("dashboard.marketing.tabs.contacts")}
         </button>
         <button
           className={`px-4 py-2 rounded-xl text-sm font-medium ${
@@ -278,7 +285,7 @@ export default function MarketingCampaignsPage() {
           }`}
           onClick={() => setActiveTab("campaigns")}
         >
-          Campagnes
+          {t("dashboard.marketing.tabs.campaigns")}
         </button>
       </div>
 
@@ -290,7 +297,7 @@ export default function MarketingCampaignsPage() {
                 type="text"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
-                placeholder="Rechercher par email"
+                placeholder={t("dashboard.marketing.contacts.searchPlaceholder")}
                 className="rounded-lg border border-slate-300 px-3 py-2"
               />
               <select
@@ -298,7 +305,7 @@ export default function MarketingCampaignsPage() {
                 onChange={(e) => setSourceFilter(e.target.value)}
                 className="rounded-lg border border-slate-300 px-3 py-2"
               >
-                <option value="">Toutes les sources</option>
+                <option value="">{t("dashboard.marketing.contacts.allSources")}</option>
                 {sources.map((source) => (
                   <option key={source} value={source}>
                     {source}
@@ -307,14 +314,9 @@ export default function MarketingCampaignsPage() {
               </select>
             </div>
 
-            <button
-              type="button"
-              onClick={openCreateContactModal}
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-white font-medium whitespace-nowrap"
-              style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-            >
-              ➕ Ajouter un contact
-            </button>
+            <DashboardPrimaryButton type="button" onClick={openCreateContactModal} className="whitespace-nowrap">
+              {t("dashboard.marketing.contacts.addContact")}
+            </DashboardPrimaryButton>
           </div>
 
           <div className="overflow-x-auto">

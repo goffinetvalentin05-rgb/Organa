@@ -781,6 +781,7 @@
       "editDisabledTitle": "Editing temporarily disabled",
       "editDisabledText": "To edit a member, delete and recreate them. This keeps data clean.",
       "emptyState": "No members yet.",
+      "noMatchFilter": "No members match the selected filters.",
       "emptyCta": "Add your first member",
       "cardLabel": "Member",
       "noName": "No name",
@@ -829,9 +830,11 @@
         "secretary": "Secretary",
         "other": "Other"
       },
+      "filtersLabel": "Filters",
       "filters": {
         "allRoles": "All roles",
-        "allCategories": "All categories"
+        "allCategories": "All categories",
+        "resetFilters": "Reset"
       },
       "errors": {
         "missingId": "Client ID missing",
@@ -842,6 +845,8 @@
     "quotes": {
       "title": "Memberships",
       "subtitle": "Manage club membership fees",
+      "totalCount": "{count} memberships in total",
+      "createdOn": "Created on",
       "newAction": "Create membership",
       "newTitle": "New membership",
       "newSubtitle": "Create a membership fee for a member",
@@ -1022,6 +1027,7 @@
         "title": "Handle now",
         "badge": "Priority zone",
         "empty": "Nothing urgent for now. Your club is up to date.",
+        "subtitleAllClear": "All memberships and invoices are up to date",
         "dueLabel": "Due:",
         "viewDetail": "View details"
       },
@@ -1052,7 +1058,8 @@
       "lastDocuments": {
         "title": "Recent activity",
         "empty": "No activity yet.",
-        "created": "Created on"
+        "created": "Created on",
+        "loading": "Loading..."
       }
     },
     "expenses": {
@@ -1255,6 +1262,107 @@
         "submitError": "Registration error",
         "notFound": "QR code not found",
         "expired": "This event is no longer accepting registrations"
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 Obillz — Club management in two clicks",
+      "legal": "Legal notice",
+      "privacy": "Privacy"
+    },
+    "plannings": {
+      "title": "Schedules",
+      "subtitle": "Organise events and assign members to slots",
+      "newPlanning": "New schedule",
+      "emptyState": "No schedules found",
+      "emptyCta": "Create your first schedule",
+      "loading": "Loading...",
+      "loadErrorTitle": "Loading error",
+      "loadError": "Error loading schedules",
+      "deleteConfirm": "Delete this schedule?",
+      "limitReached": "Schedule limit reached. Upgrade to Pro to create more.",
+      "filters": {
+        "all": "All statuses",
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "assignments": "Assignments",
+      "complete": "complete",
+      "slot": "slot",
+      "slots": "slots",
+      "viewManage": "View / manage",
+      "form": {
+        "newTitle": "New schedule",
+        "newSubtitle": "Create a schedule and define your time slots",
+        "backToList": "Back to schedules",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "createAction": "Create schedule",
+        "slotsSection": "Time slots",
+        "addSlot": "Add a slot",
+        "slotNumber": "Slot {n}",
+        "removeSlotTitle": "Remove this slot"
+      }
+    },
+    "buvette": {
+      "title": "Club bar",
+      "subtitle": "Availability and external booking requests.",
+      "publicLink": "Public link",
+      "loadingLink": "Loading...",
+      "unavailable": "Unavailable",
+      "open": "Open",
+      "copy": "Copy",
+      "copying": "Copying...",
+      "legendAvailable": "Available",
+      "legendOccupied": "Occupied",
+      "legendReserved": "Reserved",
+      "calendarLoading": "Loading calendar...",
+      "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    },
+    "marketing": {
+      "loading": "Loading...",
+      "loadError": "Loading error",
+      "tabs": {
+        "contacts": "Contacts",
+        "campaigns": "Campaigns"
+      },
+      "contacts": {
+        "searchPlaceholder": "Search by email",
+        "allSources": "All sources",
+        "addContact": "Add contact",
+        "columns": {
+          "lastName": "Last name",
+          "firstName": "First name",
+          "email": "Email",
+          "phone": "Phone",
+          "source": "Source",
+          "actions": "Actions"
+        },
+        "empty": "No contacts yet.",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Delete this contact?",
+        "modalAddTitle": "Add contact",
+        "modalEditTitle": "Edit contact",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "campaigns": {
+        "createTitle": "Create a campaign",
+        "nameLabel": "Internal name",
+        "subjectLabel": "Subject",
+        "audienceLabel": "Audience",
+        "audienceAll": "All contacts",
+        "audienceSource": "By source",
+        "audienceManual": "Manual selection",
+        "send": "Send campaign",
+        "sending": "Sending...",
+        "empty": "No campaigns yet."
       }
     },
     "events": {

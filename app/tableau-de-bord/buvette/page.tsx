@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
+import { useI18n } from "@/components/I18nProvider";
+import { localeToIntl } from "@/lib/i18n";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -35,6 +37,8 @@ function currentMonthKey() {
 }
 
 export default function BuvettePage() {
+  const { t, tList, locale } = useI18n();
+  const weekdayLabels = tList("dashboard.buvette.weekdays");
   const [month, setMonth] = useState(currentMonthKey());
   const [days, setDays] = useState<Record<string, DayData>>({});
   const [requests, setRequests] = useState<BuvetteRequest[]>([]);
@@ -135,7 +139,7 @@ export default function BuvettePage() {
     : null;
 
   const formatDateFr = (value: string) =>
-    new Date(value).toLocaleDateString("fr-CH", {
+    new Date(value).toLocaleDateString(localeToIntl[locale], {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -368,9 +372,15 @@ N'hésite pas à nous contacter si tu as des questions.
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <span className="inline-flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-500" /> Disponible</span>
-        <span className="inline-flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500" /> Occupée</span>
-        <span className="inline-flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500" /> Réservée</span>
+        <span className="inline-flex items-center gap-1">
+          <span className="w-3 h-3 rounded-full bg-green-500" /> {t("dashboard.buvette.legendAvailable")}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="w-3 h-3 rounded-full bg-red-500" /> {t("dashboard.buvette.legendOccupied")}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="w-3 h-3 rounded-full bg-amber-500" /> {t("dashboard.buvette.legendReserved")}
+        </span>
       </div>
 
       {message && <div className="rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-700">{message}</div>}
@@ -384,11 +394,11 @@ N'hésite pas à nous contacter si tu as des questions.
           </div>
 
           {loading ? (
-            <p className="text-slate-500">Chargement du calendrier...</p>
+            <p className="text-slate-500">{t("dashboard.buvette.calendarLoading")}</p>
           ) : (
             <>
               <div className="grid grid-cols-7 gap-2 mb-2 text-xs text-slate-500">
-                {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => (
+                {(weekdayLabels.length ? weekdayLabels : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]).map((d) => (
                   <div key={d} className="text-center">{d}</div>
                 ))}
               </div>

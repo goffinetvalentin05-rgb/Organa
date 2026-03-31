@@ -661,6 +661,7 @@
       "editDisabledTitle": "Modification temporairement désactivée",
       "editDisabledText": "Pour modifier un membre, supprimez-le puis recréez-le. Cela garantit des données propres.",
       "emptyState": "Aucun membre pour le moment.",
+      "noMatchFilter": "Aucun membre ne correspond aux filtres sélectionnés.",
       "emptyCta": "Ajouter votre premier membre",
       "cardLabel": "Membre",
       "noName": "Sans nom",
@@ -709,9 +710,11 @@
         "secretary": "Secrétaire",
         "other": "Autre"
       },
+      "filtersLabel": "Filtres",
       "filters": {
         "allRoles": "Tous les rôles",
-        "allCategories": "Toutes les catégories"
+        "allCategories": "Toutes les catégories",
+        "resetFilters": "Réinitialiser"
       },
       "errors": {
         "missingId": "ID du membre manquant",
@@ -722,6 +725,8 @@
     "quotes": {
       "title": "Cotisations",
       "subtitle": "Gérez les cotisations des membres du club",
+      "totalCount": "{count} cotisations au total",
+      "createdOn": "Créé le",
       "newAction": "Créer une cotisation",
       "newTitle": "Nouvelle cotisation",
       "newSubtitle": "Créer une cotisation pour un membre",
@@ -908,6 +913,7 @@
         "title": "À traiter maintenant",
         "badge": "Zone prioritaire",
         "empty": "Rien d'urgence pour le moment. Le club est à jour.",
+        "subtitleAllClear": "Toutes les cotisations et factures sont à jour",
         "dueLabel": "Échéance :",
         "viewDetail": "Voir le détail"
       },
@@ -928,7 +934,8 @@
       "lastDocuments": {
         "title": "Activité récente",
         "empty": "Aucune activité pour le moment.",
-        "created": "Créé le"
+        "created": "Créé le",
+        "loading": "Chargement..."
       }
     },
     "expenses": {
@@ -1108,6 +1115,107 @@
         "submitError": "Erreur lors de l'inscription",
         "notFound": "QR code introuvable",
         "expired": "Cet événement n'accepte plus d'inscriptions"
+      }
+    },
+    "footer": {
+      "copyright": "© 2026 Obillz — La gestion du club en deux clics",
+      "legal": "Mentions légales",
+      "privacy": "Confidentialité"
+    },
+    "plannings": {
+      "title": "Plannings",
+      "subtitle": "Organisez vos événements et affectez vos membres aux créneaux",
+      "newPlanning": "Nouveau planning",
+      "emptyState": "Aucun planning trouvé",
+      "emptyCta": "Créer votre premier planning",
+      "loading": "Chargement...",
+      "loadErrorTitle": "Erreur de chargement",
+      "loadError": "Erreur lors du chargement des plannings",
+      "deleteConfirm": "Voulez-vous vraiment supprimer ce planning ?",
+      "limitReached": "Limite de plannings atteinte. Passez au plan Pro pour en créer plus.",
+      "filters": {
+        "all": "Tous les statuts",
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Archivé"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Archivé"
+      },
+      "assignments": "Affectations",
+      "complete": "complet",
+      "slot": "créneau",
+      "slots": "créneaux",
+      "viewManage": "Voir / Gérer",
+      "form": {
+        "newTitle": "Nouveau planning",
+        "newSubtitle": "Créez un planning et définissez vos créneaux horaires",
+        "backToList": "Retour aux plannings",
+        "cancel": "Annuler",
+        "creating": "Création...",
+        "createAction": "Créer le planning",
+        "slotsSection": "Créneaux horaires",
+        "addSlot": "Ajouter un créneau",
+        "slotNumber": "Créneau {n}",
+        "removeSlotTitle": "Supprimer ce créneau"
+      }
+    },
+    "buvette": {
+      "title": "Buvette",
+      "subtitle": "Gestion des disponibilités et demandes externes.",
+      "publicLink": "Lien public",
+      "loadingLink": "Chargement...",
+      "unavailable": "Indisponible",
+      "open": "Ouvrir",
+      "copy": "Copier",
+      "copying": "Copie...",
+      "legendAvailable": "Disponible",
+      "legendOccupied": "Occupée",
+      "legendReserved": "Réservée",
+      "calendarLoading": "Chargement du calendrier...",
+      "weekdays": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+    },
+    "marketing": {
+      "loading": "Chargement...",
+      "loadError": "Erreur de chargement",
+      "tabs": {
+        "contacts": "Contacts",
+        "campaigns": "Campagnes"
+      },
+      "contacts": {
+        "searchPlaceholder": "Rechercher par email",
+        "allSources": "Toutes les sources",
+        "addContact": "Ajouter un contact",
+        "columns": {
+          "lastName": "Nom",
+          "firstName": "Prénom",
+          "email": "Email",
+          "phone": "Téléphone",
+          "source": "Source",
+          "actions": "Actions"
+        },
+        "empty": "Aucun contact pour le moment.",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteConfirm": "Supprimer ce contact ?",
+        "modalAddTitle": "Ajouter un contact",
+        "modalEditTitle": "Modifier un contact",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      },
+      "campaigns": {
+        "createTitle": "Créer une campagne",
+        "nameLabel": "Nom interne",
+        "subjectLabel": "Objet",
+        "audienceLabel": "Audience",
+        "audienceAll": "Tous les contacts",
+        "audienceSource": "Par source",
+        "audienceManual": "Sélection manuelle",
+        "send": "Envoyer la campagne",
+        "sending": "Envoi...",
+        "empty": "Aucune campagne pour le moment."
       }
     },
     "events": {

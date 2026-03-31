@@ -17,18 +17,6 @@ const STORAGE_KEY = "organa_locale";
 const isLocale = (value: string | null | undefined): value is Locale =>
   value === "fr" || value === "en" || value === "de";
 
-const getLocaleFromNavigator = (): Locale | null => {
-  if (typeof navigator === "undefined") return null;
-  const candidates = [navigator.language, ...(navigator.languages || [])].filter(Boolean);
-  for (const candidate of candidates) {
-    const lower = candidate.toLowerCase();
-    if (lower.startsWith("fr")) return "fr";
-    if (lower.startsWith("en")) return "en";
-    if (lower.startsWith("de")) return "de";
-  }
-  return null;
-};
-
 const getLocaleFromCookie = (): Locale | null => {
   if (typeof document === "undefined") return null;
   const match = document.cookie
@@ -47,8 +35,8 @@ const resolveInitialLocale = (): Locale => {
   }
   const cookieLocale = getLocaleFromCookie();
   if (cookieLocale) return cookieLocale;
-  const navigatorLocale = getLocaleFromNavigator();
-  return navigatorLocale ?? defaultLocale;
+  /* Français par défaut si aucune préférence enregistrée (pas d’inférence navigateur). */
+  return defaultLocale;
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {

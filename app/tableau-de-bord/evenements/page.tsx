@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Eye, Trash, Calendar } from "@/lib/icons";
+import { Eye, Trash, Calendar } from "@/lib/icons";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -118,17 +119,13 @@ export default function EvenementsPage() {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 rounded-lg border border-subtle bg-white text-secondary"
           >
-            <option value="all">Tous les statuts</option>
+            <option value="all">{t("dashboard.plannings.filters.all")}</option>
             <option value="planned">{t("dashboard.events.status.planned")}</option>
             <option value="completed">{t("dashboard.events.status.completed")}</option>
           </select>
-          <Link
-            href="/tableau-de-bord/evenements/nouveau"
-            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
+          <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau">
             {t("dashboard.events.newEvent")}
-          </Link>
+          </DashboardPrimaryButton>
         </div>
       </div>
 
@@ -150,12 +147,9 @@ export default function EvenementsPage() {
           <div className="p-12 text-center">
             <Calendar className="w-16 h-16 mx-auto text-slate-300 mb-4" />
             <p className="text-secondary mb-4">{t("dashboard.events.emptyState")}</p>
-            <Link
-              href="/tableau-de-bord/evenements/nouveau"
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
-            >
+            <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau" className="inline-flex rounded-full">
               {t("dashboard.events.emptyCta")}
-            </Link>
+            </DashboardPrimaryButton>
           </div>
         ) : (
           <div className="p-6 space-y-4">

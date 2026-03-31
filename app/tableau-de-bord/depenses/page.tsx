@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Eye, Plus, Trash, Download } from "@/lib/icons";
+import { Eye, Trash, Download } from "@/lib/icons";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -535,17 +536,16 @@ export default function DepensesPage() {
               </div>
             )}
           </div>
-          <button
+          <DashboardPrimaryButton
+            type="button"
             onClick={() => {
-              console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
               setShowForm((value) => !value);
             }}
-            className="px-6 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2"
-            style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+            className="relative z-50"
+            style={{ pointerEvents: "auto" }}
           >
-            <Plus className="w-5 h-5" />
             {t("dashboard.expenses.newExpense")}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </div>
 
@@ -691,13 +691,14 @@ export default function DepensesPage() {
             >
               {t("dashboard.common.cancel")}
             </button>
-            <button
+            <DashboardPrimaryButton
               type="submit"
-              className="flex-1 px-6 py-3 rounded-full accent-bg text-white font-medium transition-all"
-              style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+              icon="none"
+              className="relative z-50 flex-1 justify-center rounded-full"
+              style={{ pointerEvents: "auto" }}
             >
               {t("dashboard.expenses.addAction")}
-            </button>
+            </DashboardPrimaryButton>
           </div>
         </form>
       )}
@@ -998,14 +999,15 @@ export default function DepensesPage() {
                 >
                   {t("dashboard.common.cancel")}
                 </button>
-                <button
+                <DashboardPrimaryButton
                   type="button"
                   onClick={onUpdateExpense}
-                  style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-                  className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
+                  icon="none"
+                  className="relative z-50 flex-1 justify-center"
+                  style={{ pointerEvents: "auto" }}
                 >
                   {t("dashboard.expenses.saveAction")}
-                </button>
+                </DashboardPrimaryButton>
               </div>
             </div>
           </div>

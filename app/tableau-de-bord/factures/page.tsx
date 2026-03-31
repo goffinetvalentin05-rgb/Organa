@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, Plus, Download, Receipt } from "@/lib/icons";
+import { Eye, Trash, Download, Receipt } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { localeToIntl } from "@/lib/i18n";
 
 interface Facture {
@@ -156,23 +157,21 @@ export default function FacturesPage() {
                     </option>
                   ))}
                 </select>
-                <button
+                <DashboardPrimaryButton
                   type="button"
                   onClick={handleExportAccounting}
-                  className="mt-4 w-full btn-obillz justify-center text-sm"
+                  icon="none"
+                  className="mt-4 w-full justify-center text-sm"
+                  size="sm"
                 >
                   {t("dashboard.invoices.exportAccountingDownload")}
-                </button>
+                </DashboardPrimaryButton>
               </div>
             )}
           </div>
-          <Link
-            href="/tableau-de-bord/factures/nouvelle"
-            className="btn-obillz"
-          >
-            <Plus className="w-5 h-5" />
+          <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle">
             {t("dashboard.invoices.newAction")}
-          </Link>
+          </DashboardPrimaryButton>
         </div>
       </div>
 
@@ -199,13 +198,9 @@ export default function FacturesPage() {
               <Receipt className="w-8 h-8 text-slate-400" />
             </div>
             <p className="text-slate-600 mb-4">{t("dashboard.invoices.emptyState")}</p>
-            <Link
-              href="/tableau-de-bord/factures/nouvelle"
-              className="btn-obillz inline-flex"
-            >
-              <Plus className="w-5 h-5" />
+            <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle" className="inline-flex">
               {t("dashboard.invoices.emptyCta")}
-            </Link>
+            </DashboardPrimaryButton>
           </div>
         ) : (
           <>

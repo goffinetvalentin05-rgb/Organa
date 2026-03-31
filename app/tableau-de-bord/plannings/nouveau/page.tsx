@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Plus, Trash, Clock, MapPin } from "@/lib/icons";
 import toast from "react-hot-toast";
+import { useI18n } from "@/components/I18nProvider";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface Event {
   id: string;
@@ -22,6 +24,7 @@ interface SlotForm {
 }
 
 export default function NouveauPlanningPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
@@ -244,14 +247,14 @@ export default function NouveauPlanningPage() {
         {/* Créneaux horaires */}
         <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Créneaux horaires</h2>
+            <h2 className="text-xl font-semibold">{t("dashboard.plannings.form.slotsSection")}</h2>
             <button
               type="button"
               onClick={addSlot}
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Ajouter un créneau
+              {t("dashboard.plannings.form.addSlot")}
             </button>
           </div>
 
@@ -368,22 +371,23 @@ export default function NouveauPlanningPage() {
             href="/tableau-de-bord/plannings"
             className="px-6 py-3 text-secondary hover:text-primary transition-colors"
           >
-            Annuler
+            {t("dashboard.plannings.form.cancel")}
           </Link>
-          <button
+          <DashboardPrimaryButton
             type="submit"
             disabled={loading}
-            className="px-8 py-3 accent-bg text-white font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            icon="none"
+            className="px-8 disabled:cursor-not-allowed"
           >
             {loading ? (
-              "Création..."
+              t("dashboard.plannings.form.creating")
             ) : (
-              <>
-                Créer le planning
+              <span className="flex items-center gap-2">
+                {t("dashboard.plannings.form.createAction")}
                 <ArrowRight className="w-5 h-5" />
-              </>
+              </span>
             )}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
     </div>
