@@ -279,15 +279,18 @@ export default function LandingPage() {
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
               </Link>
               <nav className="hidden items-center gap-2 md:flex">
-                {["À propos", "Fonctions", "Tarifs", "Aide"].map((item) => (
-                  <a
-                    key={item}
-                    href="#fonctionnalites"
-                    className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
-                  >
-                    {item}
-                  </a>
-                ))}
+                <a
+                  href="/#fonctionnalites"
+                  className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
+                >
+                  Fonctions
+                </a>
+                <Link
+                  href="/tarifs"
+                  className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
+                >
+                  Tarifs
+                </Link>
               </nav>
               <div className="flex items-center gap-2">
                 <Link

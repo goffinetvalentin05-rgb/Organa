@@ -17,15 +17,15 @@ export default function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 lg:flex">
-            <a href="#fonctionnalites" className="transition hover:text-slate-900">
+            <a href="/#fonctionnalites" className="transition hover:text-slate-900">
               Fonctionnalités
             </a>
-            <a href="#comment-ca-marche" className="transition hover:text-slate-900">
+            <a href="/#comparaison" className="transition hover:text-slate-900">
               Comment ça marche
             </a>
-            <a href="#tarifs" className="transition hover:text-slate-900">
+            <Link href="/tarifs" className="transition hover:text-slate-900">
               Tarifs
-            </a>
+            </Link>
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -64,15 +64,15 @@ export default function Header() {
         {isMenuOpen && (
           <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-3 md:hidden">
             <div className="mt-2 space-y-1 text-sm font-medium text-slate-700">
-              <a href="#fonctionnalites" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+              <a href="/#fonctionnalites" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
                 Fonctionnalités
               </a>
-              <a href="#comment-ca-marche" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+              <a href="/#comparaison" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
                 Comment ça marche
               </a>
-              <a href="#tarifs" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
+              <Link href="/tarifs" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
                 Tarifs
-              </a>
+              </Link>
             </div>
             <div className="mt-4 space-y-2">
               <Link
