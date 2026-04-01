@@ -285,12 +285,6 @@ export default function LandingPage() {
                 >
                   Fonctions
                 </a>
-                <Link
-                  href="/tarifs"
-                  className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
-                >
-                  Tarifs
-                </Link>
               </nav>
               <div className="flex items-center gap-2">
                 <Link

@@ -23,9 +23,6 @@ export default function Header() {
             <a href="/#comparaison" className="transition hover:text-slate-900">
               Comment ça marche
             </a>
-            <Link href="/tarifs" className="transition hover:text-slate-900">
-              Tarifs
-            </Link>
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -70,9 +67,6 @@ export default function Header() {
               <a href="/#comparaison" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
                 Comment ça marche
               </a>
-              <Link href="/tarifs" onClick={() => setIsMenuOpen(false)} className="block px-2 py-2">
-                Tarifs
-              </Link>
             </div>
             <div className="mt-4 space-y-2">
               <Link
