@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { PRICING } from "@/lib/billing/subscription";
 
 export const runtime = "nodejs";
-const PRICE_MONTHLY = "price_1T8mVXHvElMyrvJkcAE9RpfC";
-const PRICE_YEARLY = "price_1T8mX1HvElMyrvJk5IZFEqfD";
+const PRICE_MONTHLY = "price_1TQTaxHvElMyrvJkVltPcQUp";
+const PRICE_YEARLY = "price_1TQTbbHvElMyrvJkmsJXnHKW";
 
 /**
  * Créer une session Stripe Checkout pour l'abonnement

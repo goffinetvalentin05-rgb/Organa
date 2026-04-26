@@ -101,7 +101,10 @@ function PricingCard({
 
 export default function PricingSection() {
   return (
-    <section className="mx-auto mt-20 mb-20 w-full max-w-[1000px]">
+    <section
+      id="tarifs"
+      className="mx-auto mt-20 mb-20 w-full max-w-[1000px]"
+    >
       <div className="group text-center">
         <h2
           data-reveal
@@ -120,12 +123,12 @@ export default function PricingSection() {
       </div>
 
       <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-        <PricingCard title="Mensuel" price="29 CHF" period="/ mois" />
+        <PricingCard title="Mensuel" price="39 CHF" period="/ mois" />
         <PricingCard
           title="Annuel"
-          price="299 CHF"
+          price="390 CHF"
           period="/ an"
-          subPrice="≈ 25 CHF / mois"
+          subPrice="≈ 33 CHF / mois"
           badge="2 mois offerts"
         />
       </div>

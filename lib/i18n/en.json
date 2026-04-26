@@ -155,7 +155,7 @@
       "pro": {
         "badge": "Recommended",
         "title": "Pro",
-        "subtitle": "€29 / month (provisional price)",
+        "subtitle": "39 CHF / month",
         "features": [
           "Unlimited invoicing",
           "Expenses + deadlines",
@@ -452,7 +452,7 @@
     "pro": {
       "badge": "Recommended",
       "title": "Pro Plan",
-      "subtitle": "29 CHF / month",
+      "subtitle": "39 CHF / month",
       "features": [
         "Unlimited clients",
         "Unlimited documents",
@@ -678,7 +678,7 @@
         "unlimitedAccess": "Unlimited access to all features",
         "upgrade": "🚀 Upgrade to Pro",
         "proBadge": "✓ Pro subscriber",
-        "proOfferTitle": "Pro plan - 29 CHF / month",
+        "proOfferTitle": "Pro plan - 39 CHF / month",
         "proFeatures": [
           "Unlimited members",
           "Unlimited documents",

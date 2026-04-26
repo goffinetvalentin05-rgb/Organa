@@ -14,8 +14,8 @@ STRIPE_SECRET_KEY=sk_test_REMPLACEZ_PAR_VOTRE_CLE_SECRETE_STRIPE
 STRIPE_WEBHOOK_SECRET=whsec_REMPLACEZ_PAR_VOTRE_WEBHOOK_SECRET
 
 # Les price IDs Stripe sont definis en dur dans l'API checkout:
-# - monthly: price_1T8mVXHvElMyrvJkcAE9RpfC (29 CHF/mois)
-# - yearly:  price_1T8mX1HvElMyrvJk5IZFEqfD (299 CHF/an)
+# - monthly: price_1TQTaxHvElMyrvJkVltPcQUp (39 CHF/mois)
+# - yearly:  price_1TQTbbHvElMyrvJkmsJXnHKW (390 CHF/an)
 
 # URL de base de l'application
 NEXT_PUBLIC_APP_URL=http://localhost:3000

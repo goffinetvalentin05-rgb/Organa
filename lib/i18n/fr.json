@@ -155,7 +155,7 @@
       "pro": {
         "badge": "Recommandé",
         "title": "Pro",
-        "subtitle": "29€ / mois (prix provisoire)",
+        "subtitle": "39 CHF / mois",
         "features": [
           "Cotisations et membres illimités",
           "Dépenses du club + échéances",
@@ -452,7 +452,7 @@
     "pro": {
       "badge": "Recommandé",
       "title": "Plan Pro",
-      "subtitle": "29 CHF / mois",
+      "subtitle": "39 CHF / mois",
       "features": [
         "Clients illimités",
         "Documents illimités",
@@ -558,7 +558,7 @@
         "unlimitedAccess": "Accès illimité à toutes les fonctionnalités",
         "upgrade": "🚀 Passer à Pro",
         "proBadge": "✓ Abonné Pro",
-        "proOfferTitle": "Plan Pro - 29 CHF / mois",
+        "proOfferTitle": "Plan Pro - 39 CHF / mois",
         "proFeatures": [
           "Membres illimités",
           "Documents illimités",

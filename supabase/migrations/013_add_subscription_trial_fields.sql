@@ -104,7 +104,7 @@ WHERE plan = 'pro' AND billing_cycle IS NULL;
 -- ============================================
 COMMENT ON COLUMN public.profiles.subscription_status IS 'Statut de l''abonnement: trial (essai 7 jours), active (abonnement actif), expired (essai terminé sans abonnement)';
 COMMENT ON COLUMN public.profiles.trial_started_at IS 'Date de début de la période d''essai (7 jours)';
-COMMENT ON COLUMN public.profiles.billing_cycle IS 'Cycle de facturation: monthly (29 CHF/mois) ou yearly (299 CHF/an)';
+COMMENT ON COLUMN public.profiles.billing_cycle IS 'Cycle de facturation: monthly (39 CHF/mois) ou yearly (390 CHF/an)';
 COMMENT ON COLUMN public.profiles.subscription_started_at IS 'Date de début de l''abonnement payant';
 COMMENT ON COLUMN public.profiles.subscription_ends_at IS 'Date de fin/renouvellement de l''abonnement';
 

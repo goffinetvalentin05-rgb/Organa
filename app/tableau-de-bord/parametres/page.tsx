@@ -271,6 +271,8 @@ export default function ParametresPage() {
       
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ billingInterval: "yearly" }),
       });
 
       // Lire d'abord le texte brut pour debug
@@ -658,14 +660,14 @@ export default function ParametresPage() {
                 <div className="flex gap-4">
                   <div className="flex-1 p-3 rounded-lg bg-white border border-slate-200">
                     <p className="text-xs text-slate-500 mb-1">Mensuel</p>
-                    <p className="text-lg font-bold text-slate-900">29 CHF<span className="text-sm font-normal text-slate-500">/mois</span></p>
+                    <p className="text-lg font-bold text-slate-900">39 CHF<span className="text-sm font-normal text-slate-500">/mois</span></p>
                   </div>
                   <div className="flex-1 p-3 rounded-lg bg-white border-2 border-indigo-500 relative">
                     <span className="absolute -top-2 right-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                       2 mois offerts
                     </span>
                     <p className="text-xs text-slate-500 mb-1">Annuel</p>
-                    <p className="text-lg font-bold text-slate-900">299 CHF<span className="text-sm font-normal text-slate-500">/an</span></p>
+                    <p className="text-lg font-bold text-slate-900">390 CHF<span className="text-sm font-normal text-slate-500">/an</span></p>
                   </div>
                 </div>
               </div>

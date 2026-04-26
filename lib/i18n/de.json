@@ -155,7 +155,7 @@
       "pro": {
         "badge": "Empfohlen",
         "title": "Pro",
-        "subtitle": "29€ / Monat (provisorischer Preis)",
+        "subtitle": "39 CHF / Monat",
         "features": [
           "Unbegrenzte Fakturierung",
           "Ausgaben + Fristen",
@@ -452,7 +452,7 @@
     "pro": {
       "badge": "Empfohlen",
       "title": "Pro-Plan",
-      "subtitle": "29 CHF / Monat",
+      "subtitle": "39 CHF / Monat",
       "features": [
         "Unbegrenzte Kunden",
         "Unbegrenzte Dokumente",
@@ -676,7 +676,7 @@
         "unlimitedAccess": "Uneingeschränkter Zugriff auf alle Funktionen",
         "upgrade": "🚀 Auf Pro upgraden",
         "proBadge": "✓ Pro-Abo",
-        "proOfferTitle": "Pro-Plan – 29 CHF / Monat",
+        "proOfferTitle": "Pro-Plan – 39 CHF / Monat",
         "proFeatures": [
           "Unbegrenzte Kunden",
           "Unbegrenzte Dokumente",

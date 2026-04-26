@@ -19,6 +19,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import PricingSection from "@/components/PricingSection";
 
 type ComparisonView = "without" | "with";
 type FeatureTabId =
@@ -884,7 +885,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="tarifs" className="mx-auto mt-20 w-[94%] max-w-[1040px]">
+        <PricingSection />
+
+        <section className="mx-auto mt-10 w-[94%] max-w-[1040px]">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12">
             <h2 className="text-3xl font-black md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd&apos;hui.

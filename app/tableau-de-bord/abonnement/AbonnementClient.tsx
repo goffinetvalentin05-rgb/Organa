@@ -78,8 +78,8 @@ export default function AbonnementClient() {
   };
 
   // Calculer le prix
-  const monthlyPrice = pricing?.monthly.amount || 29;
-  const yearlyPrice = pricing?.yearly.amount || 299;
+  const monthlyPrice = pricing?.monthly.amount || 39;
+  const yearlyPrice = pricing?.yearly.amount || 390;
   const yearlyMonthlyEquivalent = Math.round(yearlyPrice / 12);
 
   return (
