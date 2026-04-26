@@ -19,7 +19,6 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import PricingSection from "@/components/PricingSection";
 
 type ComparisonView = "without" | "with";
 type FeatureTabId =
@@ -303,12 +302,12 @@ export default function LandingPage() {
               </div>
             </header>
 
-            <div className="relative mt-8 p-5 pb-32 md:pb-44 lg:pb-40">
+            <div className="relative mt-4 p-4 pb-10 sm:p-5 md:mt-6 md:pb-40 lg:pb-40">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
               <div className="relative z-20">
-                <div className="mt-12 text-center md:mt-20">
+                <div className="mt-6 text-center md:mt-10">
                   <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
                     GÉRER UN CLUB SPORTIF
                     <br />
@@ -368,7 +367,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="mx-auto mt-28 w-[94%] max-w-[1160px]">
+        <section id="probleme" className="mx-auto mt-16 w-[94%] max-w-[1160px] md:mt-20">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
             <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
               Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
@@ -611,13 +610,14 @@ export default function LandingPage() {
                       </div>
                       <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-4">
                         <p className="text-[11px] font-semibold text-[#1A23FF]">Solde du club</p>
-                        <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">2&apos;070 CHF</p>
+                        <p className="mt-1 text-2xl font-black text-slate-900">À jour</p>
+                        <p className="mt-0.5 text-[10px] text-slate-500">Vue consolidée en temps réel</p>
                       </div>
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">À traiter</p>
                         <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/90 p-4">
                           <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
-                          <p className="mt-1 text-lg font-black text-slate-800">300 CHF</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-700">Paiement en attente</p>
                           <p className="mt-2 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800">
                             À relancer
                           </p>
@@ -709,9 +709,8 @@ export default function LandingPage() {
                             </div>
                             <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-3 lg:p-4">
                               <p className="text-[10px] font-semibold text-[#1A23FF] lg:text-[11px]">Solde du club</p>
-                              <p className="mt-2 text-lg font-black tabular-nums text-slate-900 lg:text-xl">
-                                2&apos;070 CHF
-                              </p>
+                              <p className="mt-2 text-lg font-black text-slate-900 lg:text-xl">À jour</p>
+                              <p className="mt-0.5 text-[9px] text-slate-500">Vue consolidée</p>
                             </div>
                           </div>
                           <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
@@ -723,7 +722,7 @@ export default function LandingPage() {
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
                                     <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
-                                    <p className="mt-1 text-lg font-black text-slate-800">300 CHF</p>
+                                    <p className="mt-1 text-sm font-semibold text-slate-700">Paiement en attente</p>
                                   </div>
                                   <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
                                     À relancer
@@ -885,9 +884,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <PricingSection />
-
-        <section className="mx-auto mt-10 w-[94%] max-w-[1040px]">
+        <section className="mx-auto mt-12 w-[94%] max-w-[1040px] md:mt-16">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12">
             <h2 className="text-3xl font-black md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd&apos;hui.
