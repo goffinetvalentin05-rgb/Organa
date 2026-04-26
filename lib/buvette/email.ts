@@ -1,11 +1,12 @@
-import { Resend } from "resend";
+import { resolveResendFromProfile, type ClubResendProfile } from "@/lib/email/resend-delivery";
 
-type ClubEmailConfig = {
+export type ClubEmailConfig = {
   clubName: string;
   clubEmail: string;
   senderName?: string | null;
   senderEmail?: string | null;
   resendApiKey?: string | null;
+  emailCustomEnabled?: boolean | null;
 };
 
 type RequestPayload = {
@@ -18,19 +19,15 @@ type RequestPayload = {
   message?: string | null;
 };
 
-function getFromAddress(config: ClubEmailConfig) {
-  const senderEmail = config.senderEmail || config.clubEmail;
-  if (config.senderName) return `${config.senderName} <${senderEmail}>`;
-  return senderEmail;
-}
-
-function canSend(config: ClubEmailConfig) {
-  return Boolean(config.resendApiKey && getFromAddress(config));
-}
-
-function getResendClient(config: ClubEmailConfig): Resend | null {
-  if (!canSend(config) || !config.resendApiKey) return null;
-  return new Resend(config.resendApiKey);
+function toResendProfile(config: ClubEmailConfig): ClubResendProfile {
+  return {
+    company_name: config.clubName,
+    company_email: config.clubEmail,
+    email_sender_name: config.senderName,
+    email_sender_email: config.senderEmail,
+    resend_api_key: config.resendApiKey,
+    email_custom_enabled: config.emailCustomEnabled,
+  };
 }
 
 export async function sendRequestReceivedToClub(
@@ -38,8 +35,8 @@ export async function sendRequestReceivedToClub(
   payload: RequestPayload,
   manageUrl: string
 ) {
-  const resend = getResendClient(config);
-  if (!resend) return;
+  const delivery = resolveResendFromProfile(toResendProfile(config));
+  if (!delivery) return;
   const subject = `Nouvelle demande buvette - ${payload.date}`;
 
   const html = `
@@ -60,8 +57,8 @@ export async function sendRequestReceivedToClub(
     </div>
   `;
 
-  await resend.emails.send({
-    from: getFromAddress(config),
+  await delivery.resend.emails.send({
+    from: delivery.from,
     to: [config.clubEmail],
     subject,
     html,
@@ -72,8 +69,8 @@ export async function sendPendingConfirmationToRequester(
   config: ClubEmailConfig,
   payload: RequestPayload
 ) {
-  const resend = getResendClient(config);
-  if (!resend) return;
+  const delivery = resolveResendFromProfile(toResendProfile(config));
+  if (!delivery) return;
   const subject = `Votre demande buvette est en cours de validation`;
 
   const html = `
@@ -85,8 +82,8 @@ export async function sendPendingConfirmationToRequester(
     </div>
   `;
 
-  await resend.emails.send({
-    from: getFromAddress(config),
+  await delivery.resend.emails.send({
+    from: delivery.from,
     to: [payload.email],
     subject,
     html,
@@ -98,8 +95,8 @@ export async function sendDecisionToRequester(
   payload: Pick<RequestPayload, "firstName" | "email" | "date">,
   decision: "accepted" | "refused"
 ) {
-  const resend = getResendClient(config);
-  if (!resend) return;
+  const delivery = resolveResendFromProfile(toResendProfile(config));
+  if (!delivery) return;
   const accepted = decision === "accepted";
   const subject = accepted
     ? "Votre réservation buvette est confirmée"
@@ -119,8 +116,8 @@ export async function sendDecisionToRequester(
     </div>
   `;
 
-  await resend.emails.send({
-    from: getFromAddress(config),
+  await delivery.resend.emails.send({
+    from: delivery.from,
     to: [payload.email],
     subject,
     html,

@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { createClient } from "@/lib/supabase/server";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getCurrencySymbol } from "@/lib/utils/currency";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
-
-const FROM_EMAIL = "noreply@obillz.com";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -94,7 +92,7 @@ export async function POST(
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, resend_api_key"
+        "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, resend_api_key, email_custom_enabled, email_sender_name, email_sender_email"
       )
       .eq("user_id", user.id)
       .maybeSingle();
@@ -107,15 +105,26 @@ export async function POST(
       );
     }
 
-    const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
-    if (!resendApiKey) {
-      console.error("[API][buvette][send-invoice] Clé Resend absente (profil + env)");
+    const delivery = resolveResendFromProfile({
+      company_name: profile?.company_name,
+      company_email: profile?.company_email,
+      email_sender_name: profile?.email_sender_name,
+      email_sender_email: profile?.email_sender_email,
+      resend_api_key: profile?.resend_api_key,
+      email_custom_enabled: profile?.email_custom_enabled,
+    });
+    if (!delivery) {
+      console.error("[API][buvette][send-invoice] Aucune configuration Resend utilisable");
       return NextResponse.json(
-        { error: "Clé API Resend non configurée. Veuillez la configurer dans les paramètres." },
-        { status: 400 }
+        {
+          error:
+            "L'envoi d'emails n'est pas disponible. Vérifiez la clé Resend côté serveur ou le mode expéditeur avancé.",
+        },
+        { status: 503 }
       );
     }
-    const resendInstance = new Resend(resendApiKey);
+    const resendInstance = delivery.resend;
+    const fromEmail = delivery.from;
 
     let logoSourceUrl: string | undefined;
     if (profile?.logo_url) {
@@ -239,7 +248,7 @@ N'hésite pas à nous contacter si tu as des questions.
     const lineDescription = `Location buvette - ${reqData.event_type} - ${formattedDate}`;
 
     const { data, error } = await resendInstance.emails.send({
-      from: FROM_EMAIL,
+      from: fromEmail,
       to: [reqData.email],
       subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
       html: `
@@ -266,7 +275,7 @@ N'hésite pas à nous contacter si tu as des questions.
       console.error("[API][buvette][send-invoice] Erreur Resend:", {
         message: resendMessage,
         name: resendName,
-        from: FROM_EMAIL,
+        mode: delivery.mode,
         to: reqData.email,
         requestId: id,
       });

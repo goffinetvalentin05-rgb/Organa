@@ -39,7 +39,7 @@ export async function POST(
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "user_id, company_name, company_email, email_sender_name, email_sender_email, resend_api_key"
+        "user_id, company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
       )
       .eq("buvette_slug", slug)
       .maybeSingle();
@@ -119,6 +119,7 @@ export async function POST(
       senderName: profile.email_sender_name,
       senderEmail: profile.email_sender_email,
       resendApiKey: profile.resend_api_key,
+      emailCustomEnabled: profile.email_custom_enabled,
     };
 
     await sendRequestReceivedToClub(

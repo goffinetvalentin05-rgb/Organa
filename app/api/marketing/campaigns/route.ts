@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
 
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -83,10 +83,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erreur chargement paramètres email" }, { status: 500 });
     }
 
-    if (!profile?.resend_api_key) {
+    const delivery = resolveResendFromProfile({
+      company_name: profile?.company_name,
+      company_email: profile?.company_email,
+      email_sender_name: profile?.email_sender_name,
+      email_sender_email: profile?.email_sender_email,
+      resend_api_key: profile?.resend_api_key,
+      email_custom_enabled: profile?.email_custom_enabled,
+    });
+
+    if (!delivery) {
       return NextResponse.json(
-        { error: "Clé API Resend non configurée dans Paramètres du club" },
-        { status: 400 }
+        {
+          error:
+            "L'envoi d'emails n'est pas disponible. Vérifiez la configuration du serveur ou le mode expéditeur avancé dans les paramètres.",
+        },
+        { status: 503 }
       );
     }
 
@@ -154,22 +166,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const resend = new Resend(profile.resend_api_key);
-    const sender = profile.email_sender_email || profile.company_email;
-    if (!sender) {
-      await supabase
-        .from("marketing_campaigns")
-        .update({ status: "failed", recipient_count: 0 })
-        .eq("id", campaign.id)
-        .eq("club_id", user.id);
-      return NextResponse.json(
-        { error: "Email expéditeur manquant dans les paramètres du club" },
-        { status: 400 }
-      );
-    }
-    const from = profile.email_sender_name
-      ? `${profile.email_sender_name} <${sender}>`
-      : sender;
+    const { resend, from } = delivery;
 
     const baseUrl = new URL(request.url).origin;
     let successCount = 0;

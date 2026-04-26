@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
     // Récupérer les paramètres depuis profiles - TOUTES les colonnes nécessaires
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
-      .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+      .select(
+        "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -49,7 +51,9 @@ export async function GET(request: NextRequest) {
           currency: DEFAULT_COMPANY_SETTINGS.currency,
           currency_symbol: defaultCurrencySymbol,
         })
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+        .select(
+          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+        )
         .single();
 
       if (createError) {
@@ -103,6 +107,9 @@ export async function GET(request: NextRequest) {
     
     const companySettings = getCompanySettings(rawSettings);
 
+    const hasResendKey = Boolean(
+      profile?.resend_api_key && String(profile.resend_api_key).trim()
+    );
     const settings = {
       company_name: profile?.company_name || "",
       company_email: profile?.company_email || "",
@@ -118,7 +125,8 @@ export async function GET(request: NextRequest) {
       payment_terms: profile?.payment_terms || "",
       email_sender_email: profile?.email_sender_email || "",
       email_sender_name: profile?.email_sender_name || "",
-      resend_api_key: profile?.resend_api_key || "",
+      email_custom_enabled: profile?.email_custom_enabled === true,
+      resend_key_configured: hasResendKey,
     };
 
     console.log("[API][settings] GET - Settings récupérés avec succès");
@@ -184,7 +192,7 @@ export async function PUT(request: NextRequest) {
     //                      created_at, updated_at, company_name, company_email, company_phone,
     //                      company_address, logo_path, logo_url, primary_color, currency,
     //                      iban, bank_name, payment_terms,
-    //                      email_sender_name, email_sender_email, resend_api_key
+    //                      email_sender_name, email_sender_email, resend_api_key, email_custom_enabled
     const allowedFields = [
       'user_id',
       'plan',
@@ -201,13 +209,16 @@ export async function PUT(request: NextRequest) {
       'email_sender_name',
       'email_sender_email',
       'resend_api_key',
+      'email_custom_enabled',
       'updated_at'
     ] as const;
 
     // Récupérer le profil existant avec TOUS les champs nécessaires AVANT de construire le payload
     const { data: existingProfile, error: checkError } = await supabase
       .from("profiles")
-      .select("user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+      .select(
+        "user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -312,11 +323,29 @@ export async function PUT(request: NextRequest) {
       ? (body.email_sender_name !== null ? String(body.email_sender_name).trim() : "")
       : (existingProfile?.email_sender_name || "");
     
-    profilePayload.resend_api_key = body.resend_api_key !== undefined
-      ? (body.resend_api_key?.trim() || null)
-      : (existingProfile?.resend_api_key || null);
-    
-    console.log("[API][settings] PUT - Payload complet (UN SEUL update):", profilePayload);
+    if (body.resend_api_key !== undefined) {
+      const v = body.resend_api_key;
+      if (v === null || v === "") {
+        profilePayload.resend_api_key = null;
+      } else if (typeof v === "string") {
+        profilePayload.resend_api_key = v.trim() || null;
+      } else {
+        profilePayload.resend_api_key = existingProfile?.resend_api_key || null;
+      }
+    } else {
+      profilePayload.resend_api_key = existingProfile?.resend_api_key || null;
+    }
+
+    profilePayload.email_custom_enabled =
+      body.email_custom_enabled !== undefined
+        ? Boolean(body.email_custom_enabled)
+        : Boolean(existingProfile?.email_custom_enabled);
+
+    const { resend_api_key: _omit, ...logSafePayload } = profilePayload;
+    console.log("[API][settings] PUT - Payload (hors clé Resend):", {
+      ...logSafePayload,
+      resend_api_key: profilePayload.resend_api_key ? "[présent]" : null,
+    });
     console.log("[API][settings] PUT - Vérification champs spécifiques:", {
       payment_terms: profilePayload.payment_terms,
       email_sender_email: profilePayload.email_sender_email,
@@ -339,7 +368,9 @@ export async function PUT(request: NextRequest) {
         .from("profiles")
         .update(updateData)
         .eq("user_id", user.id)
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+        .select(
+          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+        )
         .single();
 
       dbError = updateError;
@@ -350,7 +381,9 @@ export async function PUT(request: NextRequest) {
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert(profilePayload)
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
+        .select(
+          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+        )
         .single();
 
       dbError = createError;
@@ -360,12 +393,13 @@ export async function PUT(request: NextRequest) {
     if (dbError) {
       // LOGS DÉVELOPPEUR COMPLETS
       // Logger TOUTES les infos Supabase
+      const { resend_api_key: _e, ...safePayload } = profilePayload;
       console.error("[API][settings] PUT - Erreur DB complète:", {
         code: dbError.code,
         message: dbError.message,
         details: dbError.details,
         hint: dbError.hint,
-        profilePayload: profilePayload,
+        profilePayload: { ...safePayload, resend_api_key: profilePayload.resend_api_key ? "[présent]" : null },
         allowedFields: allowedFields,
         operation: existingProfile ? "UPDATE" : "INSERT",
       });
@@ -419,6 +453,10 @@ export async function PUT(request: NextRequest) {
     
     const companySettings = getCompanySettings(rawSettings);
 
+    const putHasResendKey = Boolean(
+      (updatedProfile as { resend_api_key?: string | null })?.resend_api_key &&
+        String((updatedProfile as { resend_api_key?: string | null }).resend_api_key).trim()
+    );
     const settings = {
       company_name: updatedProfile?.company_name || "",
       company_email: updatedProfile?.company_email || "",
@@ -434,7 +472,9 @@ export async function PUT(request: NextRequest) {
       payment_terms: updatedProfile?.payment_terms || "",
       email_sender_email: updatedProfile?.email_sender_email || "",
       email_sender_name: updatedProfile?.email_sender_name || "",
-      resend_api_key: updatedProfile?.resend_api_key || "",
+      email_custom_enabled: (updatedProfile as { email_custom_enabled?: boolean | null })
+        ?.email_custom_enabled === true,
+      resend_key_configured: putHasResendKey,
     };
 
     console.log("[API][settings] PUT - Settings sauvegardés avec succès");

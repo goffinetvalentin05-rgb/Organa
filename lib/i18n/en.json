@@ -735,19 +735,19 @@
         "paymentTermsHelp": "Terms shown in the PDF footer"
       },
       "email": {
-        "title": "Email configuration",
-        "subtitleBefore": "Configure email sending for quotes and invoices. Use",
-        "subtitleAfter": "to send emails.",
-        "senderNameLabel": "Sender name",
-        "senderNamePlaceholder": "Obillz",
-        "senderNameHelp": "Name shown in sent emails",
-        "senderEmailLabel": "Sender email *",
-        "senderEmailPlaceholder": "noreply@yourdomain.com",
-        "senderEmailHelp": "Must be a verified domain in Resend",
-        "apiKeyLabel": "Resend API key *",
+        "title": "Email settings",
+        "introDefault": "By default, all emails (quotes, invoices, planning, club bar, etc.) are sent through Obillz. No setup required.",
+        "customToggle": "Use my own email setup (advanced)",
+        "customToggleHelp": "Verified domain in Resend and your own API key.",
+        "obillzInfo": "Emails are sent via Obillz. Your club name appears in the sender (e.g. “My club via Obillz”).",
+        "resendDomainHelp": "Your sending domain must be verified in the Resend dashboard.",
+        "customSenderLabel": "Sender email",
+        "senderEmailPlaceholder": "contact@yourdomain.com",
+        "apiKeyLabel": "Resend API key",
         "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
-        "apiKeyHelpBefore": "Get your API key at",
-        "apiKeyHelpAfter": "."
+        "apiKeyUnchangedHint": "Leave blank to keep the saved key",
+        "apiKeyHelpBefore": "Create a key at",
+        "apiKeyHelpAfter": " (it is never shown again after saving)."
       },
       "validation": {
         "companyNameRequired": "Company name is required"

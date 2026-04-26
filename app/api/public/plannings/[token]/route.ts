@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { Resend } from "resend";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
 
@@ -70,8 +70,6 @@ interface PublicPlanningSlotRow {
   ordre: number;
 }
 
-const FROM_EMAIL_DEFAULT = "noreply@obillz.com";
-
 function getClientFullName(client: ClientRow | null | undefined) {
   if (!client) return "";
   const firstName = client.first_name?.trim() || "";
@@ -97,21 +95,6 @@ function getPersonFullName(person: {
 
 function getPublicVolunteerName(assignment: PlanningAssignmentRow) {
   return (assignment.public_name || assignment.name || "").trim();
-}
-
-function getEmailSender(profile: {
-  company_email?: string | null;
-  email_sender_name?: string | null;
-  email_sender_email?: string | null;
-}) {
-  const senderEmail =
-    profile.email_sender_email ||
-    profile.company_email ||
-    FROM_EMAIL_DEFAULT;
-  if (profile.email_sender_name) {
-    return `${profile.email_sender_name} <${senderEmail}>`;
-  }
-  return senderEmail;
 }
 
 async function loadClientsMap(
@@ -470,13 +453,20 @@ export async function POST(
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
           .eq("user_id", link.club_id)
           .maybeSingle();
 
-        const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
-        if (resendApiKey) {
-          const resend = new Resend(resendApiKey);
+        const delivery = resolveResendFromProfile({
+          company_name: profile?.company_name,
+          company_email: profile?.company_email,
+          email_sender_name: profile?.email_sender_name,
+          email_sender_email: profile?.email_sender_email,
+          resend_api_key: profile?.resend_api_key,
+          email_custom_enabled: profile?.email_custom_enabled,
+        });
+        if (delivery) {
+          const resend = delivery.resend;
           const subject = "Confirmation - inscription benevole";
           const clubName = profile?.company_name || "Club";
           const eventName = planning?.name || "Evenement";
@@ -525,7 +515,7 @@ ${clubName}
 Si vous avez une question, contactez le club.`;
 
           await resend.emails.send({
-            from: getEmailSender(profile || {}),
+            from: delivery.from,
             to: [email],
             subject,
             html,

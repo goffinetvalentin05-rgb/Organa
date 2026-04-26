@@ -83,7 +83,7 @@ export async function POST(
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -94,6 +94,7 @@ export async function POST(
         senderName: profile?.email_sender_name,
         senderEmail: profile?.email_sender_email,
         resendApiKey: profile?.resend_api_key,
+        emailCustomEnabled: profile?.email_custom_enabled,
       },
       {
         firstName: reqData.first_name,

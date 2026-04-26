@@ -733,19 +733,19 @@
         "paymentTermsHelp": "Bedingungen im Footer der PDFs"
       },
       "email": {
-        "title": "E-Mail-Konfiguration",
-        "subtitleBefore": "Richten Sie den E-Mail-Versand für Angebote und Rechnungen ein. Nutzen Sie",
-        "subtitleAfter": "um E-Mails zu versenden.",
-        "senderNameLabel": "Absendername",
-        "senderNamePlaceholder": "Obillz",
-        "senderNameHelp": "Name, der in versendeten E-Mails angezeigt wird",
-        "senderEmailLabel": "Absender-E-Mail *",
-        "senderEmailPlaceholder": "noreply@ihredomain.com",
-        "senderEmailHelp": "Muss in Resend als Domain verifiziert sein",
-        "apiKeyLabel": "Resend-API-Schlüssel *",
+        "title": "E-Mail-Einstellungen",
+        "introDefault": "Standardmäßig werden alle E-Mails (Angebote, Rechnungen, Planung, Buvette usw.) über Obillz versendet. Keine Einrichtung nötig.",
+        "customToggle": "Eigenes E-Mail-Setup verwenden (fortgeschritten)",
+        "customToggleHelp": "Verifizierte Domain in Resend und eigener API-Schlüssel.",
+        "obillzInfo": "E-Mails werden über Obillz versendet. Ihr Vereinsname erscheint beim Absender (z. B. « Mein Verein via Obillz »).",
+        "resendDomainHelp": "Ihre Absender-Domain muss im Resend-Dashboard verifiziert sein.",
+        "customSenderLabel": "Absender-E-Mail",
+        "senderEmailPlaceholder": "kontakt@ihredomain.ch",
+        "apiKeyLabel": "Resend-API-Schlüssel",
         "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
-        "apiKeyHelpBefore": "Holen Sie Ihren API-Schlüssel unter",
-        "apiKeyHelpAfter": "."
+        "apiKeyUnchangedHint": "Leer lassen, um den gespeicherten Schlüssel zu behalten",
+        "apiKeyHelpBefore": "Schlüssel anlegen unter",
+        "apiKeyHelpAfter": " (nach dem Speichern nicht mehr sichtbar)."
       },
       "validation": {
         "companyNameRequired": "Firmenname ist erforderlich"

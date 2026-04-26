@@ -615,19 +615,19 @@
         "paymentTermsHelp": "Conditions affichées dans le footer des PDF"
       },
       "email": {
-        "title": "Configuration Email",
-        "subtitleBefore": "Configurez l'envoi d'emails pour les cotisations et factures. Utilisez",
-        "subtitleAfter": "pour envoyer des emails.",
-        "senderNameLabel": "Nom de l'expéditeur",
-        "senderNamePlaceholder": "Mon Club",
-        "senderNameHelp": "Nom affiché dans les emails envoyés",
-        "senderEmailLabel": "Email de l'expéditeur *",
-        "senderEmailPlaceholder": "noreply@votredomaine.com",
-        "senderEmailHelp": "Doit être un domaine vérifié dans Resend",
-        "apiKeyLabel": "Clé API Resend *",
+        "title": "Configuration email",
+        "introDefault": "Par défaut, les emails (cotisations, factures, plannings, buvette, etc.) partent automatiquement via Obillz. Aucune configuration n'est requise.",
+        "customToggle": "Utiliser mon propre système d'email (avancé)",
+        "customToggleHelp": "Domaine vérifié dans Resend et clé API à votre charge.",
+        "obillzInfo": "Les emails sont envoyés automatiquement via Obillz. Le nom de votre club apparaît dans l'expéditeur (ex. « Mon club via Obillz »).",
+        "resendDomainHelp": "Votre domaine d'envoi doit être vérifié dans le tableau de bord Resend.",
+        "customSenderLabel": "Email expéditeur",
+        "senderEmailPlaceholder": "contact@mondomaine.ch",
+        "apiKeyLabel": "Clé API Resend",
         "apiKeyPlaceholder": "re_xxxxxxxxxxxxx",
-        "apiKeyHelpBefore": "Obtenez votre clé API sur",
-        "apiKeyHelpAfter": "."
+        "apiKeyUnchangedHint": "Laisser vide pour conserver la clé enregistrée",
+        "apiKeyHelpBefore": "Créez une clé sur",
+        "apiKeyHelpAfter": " (elle n'est jamais affichée après enregistrement)."
       },
       "validation": {
         "companyNameRequired": "Le nom du club est obligatoire"

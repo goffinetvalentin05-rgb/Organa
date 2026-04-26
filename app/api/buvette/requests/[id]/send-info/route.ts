@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
 
-const FROM_EMAIL = "noreply@obillz.com";
 const RESEND_TIMEOUT_MS = 20000;
 
 function getErrorMessage(error: unknown) {
@@ -59,7 +58,7 @@ export async function POST(
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key")
+      .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -71,27 +70,33 @@ export async function POST(
       );
     }
 
-    const parametres = {
-      clubName: profile?.company_name || "Club",
-      resendApiKey: profile?.resend_api_key || process.env.RESEND_API_KEY || "",
-    };
+    const clubName = profile?.company_name || "Club";
+    const delivery = resolveResendFromProfile({
+      company_name: profile?.company_name,
+      company_email: profile?.company_email,
+      email_sender_name: profile?.email_sender_name,
+      email_sender_email: profile?.email_sender_email,
+      resend_api_key: profile?.resend_api_key,
+      email_custom_enabled: profile?.email_custom_enabled,
+    });
 
-    if (!parametres.resendApiKey) {
-      console.error("[API][buvette][send-info] Clé Resend absente (profil + env)");
+    if (!delivery) {
+      console.error("[API][buvette][send-info] Aucune configuration Resend utilisable");
       return NextResponse.json(
-        { error: "RESEND_API_KEY non configurée sur le serveur" },
-        { status: 500 }
+        { error: "L'envoi d'emails n'est pas disponible (configuration serveur ou paramètres expéditeur)." },
+        { status: 503 }
       );
     }
 
-    const resendInstance = new Resend(parametres.resendApiKey);
+    const resendInstance = delivery.resend;
+    const from = delivery.from;
     const html = message.replace(/\n/g, "<br/>");
 
     const sendResult = await Promise.race([
       resendInstance.emails.send({
-        from: FROM_EMAIL,
+        from,
         to: [reqData.email],
-        subject: `Infos pratiques - Réservation buvette du ${reqData.reservation_date} (${parametres.clubName})`,
+        subject: `Infos pratiques - Réservation buvette du ${reqData.reservation_date} (${clubName})`,
         html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${html}</div>`,
         text: message,
       }),
@@ -109,7 +114,7 @@ export async function POST(
       console.error("[API][buvette][send-info] Erreur Resend:", {
         requestId: id,
         to: reqData.email,
-        from: FROM_EMAIL,
+        mode: delivery.mode,
         message: sendError.message,
       });
       return NextResponse.json(

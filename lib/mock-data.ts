@@ -80,6 +80,8 @@ export interface Parametres {
   emailExpediteur?: string;
   nomExpediteur?: string;
   resendApiKey?: string;
+  emailCustomEnabled?: boolean;
+  resendKeyConfigured?: boolean;
   // Paramètres bancaires
   iban?: string;
   bankName?: string;

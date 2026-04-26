@@ -66,6 +66,9 @@ export default function ParametresPage() {
     emailExpediteur: "",
     nomExpediteur: "",
     resendApiKey: "",
+    emailCustomEnabled: false,
+    resendKeyConfigured: false,
+    resendApiKeyTouched: false,
     iban: "",
     bankName: "",
     conditionsPaiement: "",
@@ -106,17 +109,16 @@ export default function ParametresPage() {
     }
   };
 
-  // Fonction pour charger les paramètres directement depuis Supabase
+  /** Chargement via l’API (pas de clé Resend côté client). */
   const loadSettingsFromDB = async () => {
     try {
       setLoadingSettings(true);
-      console.log("[PARAMETRES] Chargement direct depuis Supabase profiles");
-      
       const supabase = createClient();
-      
-      // 1. Vérifier l'authentification
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
       if (authError || !user) {
         console.error("[PARAMETRES] Erreur auth:", authError);
         toast.error(t("dashboard.settings.notifications.authReconnect"));
@@ -124,64 +126,42 @@ export default function ParametresPage() {
         return;
       }
 
-      console.log("[PARAMETRES] User authentifié:", user.id);
-
-      // 2. Charger le profil depuis la table profiles - SELECT EXPLICITE pour garantir tous les champs
-      const { data: profile, error: fetchError } = await supabase
-        .from("profiles")
-        .select("user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key")
-        .eq("user_id", user.id)
-        .single();
-
-      if (fetchError) {
-        // Si le profil n'existe pas, ce n'est pas une erreur critique
-        if (fetchError.code === "PGRST116") {
-          console.log("[PARAMETRES] Profil inexistant, utilisation des valeurs par défaut");
-        } else {
-          console.error("[PARAMETRES] Erreur chargement profil:", {
-            code: fetchError.code,
-            message: fetchError.message,
-            details: fetchError.details,
-            hint: fetchError.hint,
-          });
-          toast.error(`Erreur lors du chargement: ${fetchError.message}`);
-          return;
-        }
+      const response = await fetch("/api/settings");
+      const data = await parseResponseBody(response);
+      if (!response.ok) {
+        toast.error(
+          (data as { error?: string })?.error ||
+            t("dashboard.settings.notifications.loadError", { message: "" })
+        );
+        return;
       }
 
-      console.log("[PARAMETRES] Profil chargé depuis DB:", profile);
-
-      // 3. Construire l'URL du logo si logo_path existe mais pas logo_url
-      let logoUrl: string | null = null;
-      if (profile?.logo_url) {
-        logoUrl = profile.logo_url;
-      } else if (profile?.logo_path) {
-        const { data: urlData } = supabase.storage
-          .from("Logos")
-          .getPublicUrl(profile.logo_path);
-        logoUrl = urlData.publicUrl;
+      const s = (data as { settings: Record<string, unknown> }).settings;
+      if (!s) {
+        toast.error(t("dashboard.settings.notifications.loadError", { message: "settings" }));
+        return;
       }
 
-      // 4. Hydrater le state avec les données DB (PAS de valeurs par défaut qui écrasent)
+      const primaryColor = (s.primary_color as string) || "#6D5EF8";
+      const logoUrl = (s.logo_url as string | null) || null;
+      const emailCustom = s.email_custom_enabled === true;
+      const resendConfigured = s.resend_key_configured === true;
+
       const normalizedSettings = {
-        company_name: profile?.company_name ?? "",
-        company_address: profile?.company_address ?? "",
-        company_email: profile?.company_email ?? "",
-        company_phone: profile?.company_phone ?? "",
-        primary_color: profile?.primary_color ?? "#6D5EF8",
-        currency: profile?.currency ?? "CHF",
-        logo_url: logoUrl ?? null,
-        // Champs bancaires
-        iban: profile?.iban ?? "",
-        bank_name: profile?.bank_name ?? "",
-        payment_terms: profile?.payment_terms ?? "",
-        // Champs email
-        email_sender_email: profile?.email_sender_email ?? "",
-        email_sender_name: profile?.email_sender_name ?? "",
-        resend_api_key: profile?.resend_api_key ?? "",
+        company_name: (s.company_name as string) ?? "",
+        company_address: (s.company_address as string) ?? "",
+        company_email: (s.company_email as string) ?? "",
+        company_phone: (s.company_phone as string) ?? "",
+        primary_color: primaryColor,
+        currency: (s.currency as string) ?? "CHF",
+        logo_url: logoUrl,
+        iban: (s.iban as string) ?? "",
+        bank_name: (s.bank_name as string) ?? "",
+        payment_terms: (s.payment_terms as string) ?? "",
+        email_sender_email: (s.email_sender_email as string) ?? "",
+        email_sender_name: (s.email_sender_name as string) ?? "",
       };
 
-      // Formater les données pour correspondre à l'interface Parametres
       const params: Parametres = {
         nomEntreprise: normalizedSettings.company_name,
         adresse: normalizedSettings.company_address,
@@ -191,15 +171,15 @@ export default function ParametresPage() {
         styleEnTete: "moderne",
         emailExpediteur: normalizedSettings.email_sender_email,
         nomExpediteur: normalizedSettings.email_sender_name,
-        resendApiKey: normalizedSettings.resend_api_key,
+        resendApiKey: "",
+        emailCustomEnabled: emailCustom,
+        resendKeyConfigured: resendConfigured,
         iban: normalizedSettings.iban,
         bankName: normalizedSettings.bank_name,
         conditionsPaiement: normalizedSettings.payment_terms,
       };
 
       setParametres(params);
-      
-      // Hydrater formData avec les données DB (PAS de valeurs par défaut qui écrasent)
       setFormData({
         nomEntreprise: normalizedSettings.company_name,
         adresse: normalizedSettings.company_address,
@@ -208,34 +188,30 @@ export default function ParametresPage() {
         styleEnTete: "moderne",
         emailExpediteur: normalizedSettings.email_sender_email,
         nomExpediteur: normalizedSettings.email_sender_name,
-        resendApiKey: normalizedSettings.resend_api_key,
+        resendApiKey: "",
+        emailCustomEnabled: emailCustom,
+        resendKeyConfigured: resendConfigured,
+        resendApiKeyTouched: false,
         iban: normalizedSettings.iban,
         bankName: normalizedSettings.bank_name,
         conditionsPaiement: normalizedSettings.payment_terms,
-        primaryColor: normalizedSettings.primary_color,
+        primaryColor,
         currency: normalizedSettings.currency,
-        invoiceColor: normalizedSettings.primary_color,
+        invoiceColor: primaryColor,
         branding: "",
       });
 
-      // Charger le logo
-      if (normalizedSettings.logo_url) {
-        setLogoPreview(normalizedSettings.logo_url);
+      if (logoUrl) {
+        setLogoPreview(logoUrl);
       } else {
         setLogoPreview(null);
       }
-
-      console.log("[PARAMETRES] State hydraté avec données DB:", {
-        nomEntreprise: normalizedSettings.company_name,
-        email: normalizedSettings.company_email,
-        primary_color: normalizedSettings.primary_color,
-        currency: normalizedSettings.currency,
-      });
-    } catch (error: any) {
-      console.error("[PARAMETRES] Erreur catch loadSettingsFromDB:", error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("dashboard.common.unknownError");
+      console.error("[PARAMETRES] loadSettingsFromDB:", error);
       toast.error(
         t("dashboard.settings.notifications.loadError", {
-          message: error.message || t("dashboard.common.unknownError"),
+          message,
         })
       );
     } finally {
@@ -331,7 +307,7 @@ export default function ParametresPage() {
       //                      email_sender_name, email_sender_email, resend_api_key
       // Ne JAMAIS envoyer : created_at, updated_at, id, user_id, undefined, null
       
-      const payload: Record<string, string> = {};
+      const payload: Record<string, string | boolean> = {};
 
       // company_name
       if (formData.nomEntreprise && formData.nomEntreprise.trim()) {
@@ -382,37 +358,33 @@ export default function ParametresPage() {
         payload.payment_terms = formData.conditionsPaiement.trim();
       }
 
-      // Champs email
-      // IMPORTANT: Toujours inclure email_sender_email même si vide
+      // Champs email (clé Resend uniquement si l’utilisateur la saisit ou l’efface explicitement)
+      payload.email_custom_enabled = formData.emailCustomEnabled;
       if (formData.emailExpediteur !== undefined) {
         payload.email_sender_email = formData.emailExpediteur.trim();
       }
-      // IMPORTANT: Toujours inclure email_sender_name même si vide
       if (formData.nomExpediteur !== undefined) {
         payload.email_sender_name = formData.nomExpediteur.trim();
       }
-      if (formData.resendApiKey !== undefined) {
-        payload.resend_api_key = formData.resendApiKey.trim();
+      if (formData.resendApiKeyTouched) {
+        const v = formData.resendApiKey.trim();
+        payload.resend_api_key = v.length > 0 ? v : "";
       }
 
       // Protection finale : garder toutes les valeurs (y compris chaînes vides)
       // pour permettre la mise à jour des champs même s'ils sont vides
-      const cleanPayload: Record<string, string> = {};
+      const cleanPayload: Record<string, string | boolean> = {};
       for (const [key, value] of Object.entries(payload)) {
-        // Accepter toutes les valeurs sauf undefined et null explicites
         if (value !== undefined && value !== null) {
           cleanPayload[key] = value;
         }
       }
-      
-      console.log("[PARAMETRES] Payload final avec champs spécifiques:", {
-        payment_terms: cleanPayload.payment_terms,
-        email_sender_email: cleanPayload.email_sender_email,
-        email_sender_name: cleanPayload.email_sender_name,
-        fullPayload: cleanPayload
-      });
 
-      console.log("[PARAMETRES] Envoi du payload (champs existants uniquement):", cleanPayload);
+      const logSafe = { ...cleanPayload };
+      if (typeof logSafe.resend_api_key === "string" && logSafe.resend_api_key.length > 0) {
+        logSafe.resend_api_key = "[nouvelle clé]";
+      }
+      console.log("[PARAMETRES] Payload (paramètres email, clé masquée):", logSafe);
 
       const response = await fetch("/api/settings", {
         method: "PUT",
@@ -961,87 +933,103 @@ export default function ParametresPage() {
 
         {/* Section Email */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.email.title")}</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">{t("dashboard.settings.email.title")}</h2>
           <p className="text-sm text-slate-500 mb-4">
-            {t("dashboard.settings.email.subtitleBefore")}{" "}
-            <a
-              href="https://resend.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-              style={{ color: "var(--obillz-hero-blue)" }}
-            >
-              Resend
-            </a>{" "}
-            {t("dashboard.settings.email.subtitleAfter")}
+            {t("dashboard.settings.email.introDefault")}
           </p>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.email.senderNameLabel")}
-              </label>
-              <input
-                type="text"
-                value={formData.nomExpediteur ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, nomExpediteur: e.target.value })
-                }
-                placeholder={t("dashboard.settings.email.senderNamePlaceholder")}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-              <p className="text-xs text-tertiary mt-1">
-                {t("dashboard.settings.email.senderNameHelp")}
-              </p>
-            </div>
 
+          <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 mb-4">
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.email.senderEmailLabel")}
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.emailExpediteur ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, emailExpediteur: e.target.value })
-                }
-                placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-              <p className="text-xs text-tertiary mt-1">
-                {t("dashboard.settings.email.senderEmailHelp")}
+              <p className="text-sm font-medium text-slate-900">
+                {t("dashboard.settings.email.customToggle")}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {t("dashboard.settings.email.customToggleHelp")}
               </p>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.email.apiKeyLabel")}
-              </label>
+            <label className="inline-flex cursor-pointer items-center">
               <input
-                type="password"
-                required
-                value={formData.resendApiKey ?? ""}
+                type="checkbox"
+                className="sr-only"
+                checked={formData.emailCustomEnabled}
                 onChange={(e) =>
-                  setFormData({ ...formData, resendApiKey: e.target.value })
+                  setFormData({ ...formData, emailCustomEnabled: e.target.checked, resendApiKeyTouched: false })
                 }
-                placeholder={t("dashboard.settings.email.apiKeyPlaceholder")}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               />
-              <p className="text-xs text-tertiary mt-1">
-                {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
-                <a
-                  href="https://resend.com/api-keys"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="accent hover:underline"
-                >
-                  resend.com/api-keys
-                </a>
-                {t("dashboard.settings.email.apiKeyHelpAfter")}
-              </p>
-            </div>
+              <span
+                className={`h-6 w-11 rounded-full relative transition-colors ${
+                  formData.emailCustomEnabled ? "bg-[#7C5CFF]" : "bg-slate-300"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    formData.emailCustomEnabled ? "right-0.5" : "left-0.5"
+                  }`}
+                />
+              </span>
+            </label>
           </div>
+
+          {!formData.emailCustomEnabled ? (
+            <p className="text-sm text-slate-600 rounded-lg bg-emerald-50 border border-emerald-100 px-4 py-3">
+              {t("dashboard.settings.email.obillzInfo")}
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                {t("dashboard.settings.email.resendDomainHelp")}
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.settings.email.customSenderLabel")}
+                </label>
+                <input
+                  type="email"
+                  value={formData.emailExpediteur ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, emailExpediteur: e.target.value })
+                  }
+                  placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.settings.email.apiKeyLabel")}
+                </label>
+                <input
+                  type="password"
+                  value={formData.resendApiKey ?? ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      resendApiKey: e.target.value,
+                      resendApiKeyTouched: true,
+                    })
+                  }
+                  placeholder={
+                    formData.resendKeyConfigured
+                      ? t("dashboard.settings.email.apiKeyUnchangedHint")
+                      : t("dashboard.settings.email.apiKeyPlaceholder")
+                  }
+                  autoComplete="off"
+                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                />
+                <p className="text-xs text-tertiary mt-1">
+                  {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
+                  <a
+                    href="https://resend.com/api-keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="accent hover:underline"
+                  >
+                    resend.com/api-keys
+                  </a>
+                  {t("dashboard.settings.email.apiKeyHelpAfter")}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Bouton sauvegarder */}

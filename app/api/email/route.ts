@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
 
@@ -23,17 +23,9 @@ function getFirstName(fullName: string | null | undefined): string {
 }
 
 /**
- * API Email - Envoi de devis et factures par email
- * 
- * CONFIGURATION REQUISE :
- * 1. Installer les dépendances : npm install resend
- * 2. Créer un compte sur https://resend.com
- * 3. Vérifier votre domaine dans Resend
- * 4. Obtenir votre clé API sur https://resend.com/api-keys
- * 5. Configurer la clé API dans Paramètres → Email → Clé API Resend
- * 
- * La clé API est stockée dans les paramètres de l'application (mock pour l'instant).
- * En production, vous devriez la stocker de manière sécurisée (variables d'environnement, base de données chiffrée).
+ * API Email - Envoi de cotisations et factures.
+ * Par défaut : compte Resend Obillz (RESEND_API_KEY, RESEND_FROM_EMAIL).
+ * Option : mode avancé activé côté club (clé + domaine Resend).
  */
 
 export async function POST(request: NextRequest) {
@@ -57,7 +49,7 @@ export async function POST(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "company_name, company_email, company_phone, company_address, email_sender_name, email_sender_email, resend_api_key"
+        "company_name, company_email, company_phone, company_address, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
       )
       .eq("user_id", user.id)
       .maybeSingle();
@@ -69,27 +61,34 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
+    const delivery = resolveResendFromProfile({
+      company_name: profile?.company_name,
+      company_email: profile?.company_email,
+      email_sender_name: profile?.email_sender_name,
+      email_sender_email: profile?.email_sender_email,
+      resend_api_key: profile?.resend_api_key,
+      email_custom_enabled: profile?.email_custom_enabled,
+    });
+
+    if (!delivery) {
+      console.error("[API][email] Aucune configuration Resend utilisable (env serveur + mode club)");
+      return NextResponse.json(
+        {
+          error:
+            "L'envoi d'emails n'est pas disponible. La configuration du serveur est incomplète (RESEND_API_KEY).",
+        },
+        { status: 503 }
+      );
+    }
+    const resendInstance = delivery.resend;
+    const from = delivery.from;
     const parametres = {
       nomEntreprise: profile?.company_name || "",
       email: profile?.company_email || "",
       telephone: profile?.company_phone || "",
       adresse: profile?.company_address || "",
-      nomExpediteur: profile?.email_sender_name || "",
-      emailExpediteur: profile?.email_sender_email || "",
-      resendApiKey: profile?.resend_api_key || process.env.RESEND_API_KEY || "",
     };
-    
-    if (!parametres.resendApiKey) {
-      console.error("[API][email] Clé Resend absente (profil + env)");
-      return NextResponse.json(
-        { error: "Clé API Resend non configurée. Veuillez la configurer dans les paramètres." },
-        { status: 400 }
-      );
-    }
-
-    // Initialiser Resend avec la clé API des paramètres
-    const resendInstance = new Resend(parametres.resendApiKey);
 
     let typeDoc: string;
     let expectedType: "quote" | "invoice";
@@ -143,24 +142,6 @@ export async function POST(request: NextRequest) {
     const dateEcheance = document.date_echeance
       ? new Date(document.date_echeance).toLocaleDateString("fr-CH")
       : "Non définie";
-
-    const senderEmail = (
-      parametres.emailExpediteur ||
-      process.env.RESEND_FROM_EMAIL ||
-      "onboarding@resend.dev"
-    ).trim();
-
-    if (!senderEmail) {
-      console.error("[API][email] Expéditeur manquant");
-      return NextResponse.json(
-        { error: "Email expéditeur manquant. Configurez un expéditeur dans Paramètres." },
-        { status: 400 }
-      );
-    }
-
-    const from = parametres.nomExpediteur
-      ? `${parametres.nomExpediteur} <${senderEmail}>`
-      : senderEmail;
 
     const clubName = parametres.nomEntreprise || "votre club";
     const montantFormate = `${montant.toFixed(2)} CHF`;

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { Resend } from "resend";
+import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 
 export const runtime = "nodejs";
-const FROM_EMAIL = "noreply@obillz.com";
 
 function getFirstName(fullName: string | null | undefined): string {
   if (!fullName) return "membre";
@@ -179,7 +178,7 @@ export async function POST(
         // Récupérer les paramètres email de l'utilisateur
         const { data: profile } = await supabase
           .from("profiles")
-          .select("resend_api_key")
+          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
           .eq("user_id", user.id)
           .maybeSingle();
 
@@ -189,14 +188,22 @@ export async function POST(
             assignmentId: assignment.id,
           });
         } else {
-          const resendApiKey = profile?.resend_api_key || process.env.RESEND_API_KEY || "";
-          if (!resendApiKey) {
-            console.error("[API][assignments][POST] Clé Resend absente (profil + env)", {
+          const delivery = resolveResendFromProfile({
+            company_name: profile?.company_name,
+            company_email: profile?.company_email,
+            email_sender_name: profile?.email_sender_name,
+            email_sender_email: profile?.email_sender_email,
+            resend_api_key: profile?.resend_api_key,
+            email_custom_enabled: profile?.email_custom_enabled,
+          });
+          if (!delivery) {
+            console.error("[API][assignments][POST] Envoi email impossible (Resend non configuré)", {
               userId: user.id,
               assignmentId: assignment.id,
             });
           } else {
-            const resendInstance = new Resend(resendApiKey);
+            const resendInstance = delivery.resend;
+            const fromAddress = delivery.from;
             const firstName = getFirstName(memberRecord.displayName);
             const dateFormatted = new Date(planning.date).toLocaleDateString("fr-FR", {
               weekday: "long",
@@ -234,7 +241,7 @@ Merci pour ta disponibilité !
             `;
 
             const sendResult = await resendInstance.emails.send({
-              from: FROM_EMAIL,
+              from: fromAddress,
               to: [memberRecord.email],
               subject: `Affectation : ${planning.name} - ${slot.location}`,
               html: emailHtml,
@@ -251,7 +258,7 @@ Merci pour ta disponibilité !
                 assignmentId: assignment.id,
                 clientId,
                 to: memberRecord.email,
-                from: FROM_EMAIL,
+                mode: delivery.mode,
                 message: sendError.message,
               });
             } else {
