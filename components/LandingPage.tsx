@@ -382,98 +382,91 @@ export default function LandingPage() {
 
         <section
           id="probleme"
-          className="relative mx-auto mt-24 w-[94%] max-w-[1200px] md:mt-36 lg:mt-44"
+          className="relative mx-auto mt-24 w-[94%] max-w-[920px] md:mt-36 lg:mt-44"
         >
+          {/* Décor abstrait : halos + lignes SVG pointillées désordonnées + icônes en filigrane */}
           <div
-            className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[80%] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.10),transparent_60%)]"
+            className="pointer-events-none absolute inset-x-[-12%] -top-24 -bottom-16 -z-10 overflow-hidden"
             aria-hidden
-          />
-          <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 backdrop-blur-md"
-                aria-hidden
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-                <span className="h-1.5 w-12 rounded-full bg-white/30" />
-              </div>
-              <h2 className="mt-5 text-3xl font-black leading-tight text-white md:text-5xl">
-                Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
-              </h2>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-blue-100/85 md:text-lg">
-                Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
-                emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
-                et le suivi des membres devient difficile.
-              </p>
-            </motion.div>
+          >
+            <div className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.10),transparent_60%)]" />
+            <div className="absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[#1A23FF]/30 blur-3xl" />
+            <div className="absolute right-[6%] bottom-[8%] h-48 w-48 rounded-full bg-white/[0.06] blur-3xl" />
 
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mx-auto h-[360px] w-full max-w-md sm:h-[400px] lg:h-[420px] lg:max-w-none"
+            {/* Lignes pointillées désordonnées */}
+            <svg
+              viewBox="0 0 800 500"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full opacity-[0.18]"
+              fill="none"
+              stroke="white"
+              strokeWidth="1"
+              strokeDasharray="3 6"
+            >
+              <path d="M40 80 C 180 60, 260 220, 420 160 S 700 380, 760 280" />
+              <path d="M80 420 C 200 340, 320 460, 480 380 S 660 220, 740 320" />
+              <path d="M60 240 C 240 220, 360 120, 540 260 S 680 460, 760 420" />
+              <path d="M140 60 C 220 180, 360 140, 460 280" />
+              <path d="M120 380 C 260 300, 340 200, 520 200" />
+            </svg>
+
+            {/* Icônes en filigrane, dispersées et de tailles variables */}
+            <div className="absolute left-[6%] top-[18%] text-white/15 animate-float [animation-delay:120ms]">
+              <Mail className="h-9 w-9" strokeWidth={1.4} />
+            </div>
+            <div className="absolute left-[18%] top-[68%] text-white/10 animate-float [animation-delay:300ms]">
+              <FileText className="h-12 w-12" strokeWidth={1.3} />
+            </div>
+            <div className="absolute right-[10%] top-[22%] text-white/12 animate-float [animation-delay:200ms]">
+              <CalendarDays className="h-10 w-10" strokeWidth={1.4} />
+            </div>
+            <div className="absolute right-[22%] top-[68%] text-white/10 animate-float [animation-delay:420ms]">
+              <Wallet className="h-11 w-11" strokeWidth={1.3} />
+            </div>
+            <div className="absolute left-[44%] top-[8%] text-white/12 animate-float [animation-delay:520ms]">
+              <Users className="h-8 w-8" strokeWidth={1.4} />
+            </div>
+            <div className="absolute right-[40%] bottom-[10%] text-white/10 animate-float [animation-delay:640ms]">
+              <MessageCircle className="h-9 w-9" strokeWidth={1.4} />
+            </div>
+          </div>
+
+          {/* Contenu éditorial centré */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex flex-col items-center text-center"
+          >
+            <div
+              className="mb-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 backdrop-blur-md"
               aria-hidden
             >
-              <div
-                className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.10),transparent_60%)]"
-              />
-              {/* Excel */}
-              <div className="absolute left-2 top-2 w-[58%] -rotate-[5deg] overflow-hidden rounded-xl border border-slate-300/40 bg-white shadow-[0_18px_40px_rgba(2,6,23,0.25)] animate-float [animation-delay:120ms]">
-                <div className="flex items-center gap-1.5 bg-[#217346] px-2.5 py-1.5">
-                  <span className="text-[9px] text-white/85">●●●</span>
-                  <span className="flex-1 truncate text-center text-[10px] font-medium text-white">
-                    membres_2024_FINAL_v3.xlsx
-                  </span>
-                </div>
-                <div className="px-3 py-2 font-mono text-[10px] text-slate-700">
-                  <p className="font-bold text-red-600">#REF!</p>
-                  <p className="text-amber-700">Non enregistré</p>
-                </div>
-              </div>
-              {/* WhatsApp */}
-              <div className="absolute right-0 top-14 w-[56%] rotate-[6deg] overflow-hidden rounded-2xl bg-[#0B141A] p-2 shadow-[0_18px_40px_rgba(0,0,0,0.35)] animate-float [animation-delay:260ms]">
-                <div className="flex items-center gap-1.5 border-b border-white/10 pb-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]/25">
-                    <MessageCircle className="h-3 w-3 text-[#25D366]" strokeWidth={2.2} />
-                  </div>
-                  <span className="text-[10px] font-semibold text-white">Comité du club</span>
-                </div>
-                <div className="mt-1.5 rounded-lg bg-[#202C33] p-1.5">
-                  <div className="ml-2 max-w-[92%] rounded-md bg-[#005C4B] px-1.5 py-1 text-[9px] leading-snug text-white">
-                    Qui peut tenir samedi ?
-                  </div>
-                  <p className="mt-1 pr-1 text-right text-[8px] text-[#8696A0]">+12 messages</p>
-                </div>
-              </div>
-              {/* Post-it */}
-              <div className="absolute bottom-16 left-4 w-[44%] rotate-[4deg] border border-amber-300/80 bg-[#FFF8D6] px-3 py-2.5 shadow-[5px_6px_0_rgba(15,23,42,0.18)] animate-float [animation-delay:400ms]">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-900/55">Note</p>
-                <p className="mt-1 text-[11px] font-semibold leading-snug text-amber-950">
-                  Relancer Dupont
-                </p>
-              </div>
-              {/* Email / facture */}
-              <div className="absolute bottom-2 right-2 w-[52%] -rotate-[3deg] rounded-xl border-l-[3px] border-l-rose-500 bg-white px-3 py-2.5 shadow-[0_14px_36px_rgba(2,6,23,0.22)] animate-float [animation-delay:540ms]">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                  Brouillon
-                </p>
-                <p className="mt-1 text-[12px] font-bold text-slate-900">Facture buvette</p>
-                <p className="text-[10px] font-medium text-rose-600">Non envoyée</p>
-              </div>
-            </motion.div>
-          </div>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+              <span className="h-px w-12 bg-white/40" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+            </div>
+            <h2 className="text-balance text-3xl font-black leading-tight text-white md:text-5xl">
+              Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-blue-100/85 md:text-lg">
+              Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
+              emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
+              et le suivi des membres devient difficile.
+            </p>
+          </motion.div>
         </section>
 
         <section
           id="comparaison"
-          className="relative mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-32"
+          className="relative mx-auto mt-32 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-44 lg:mt-52"
         >
+          {/* Séparateur visuel doux entre les deux sections */}
+          <div
+            className="pointer-events-none mx-auto mb-10 h-px w-32 bg-gradient-to-r from-transparent via-white/20 to-transparent md:mb-14"
+            aria-hidden
+          />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
