@@ -152,23 +152,54 @@ const featureTabs: Array<{
 
 const faqItems = [
   {
-    question: "Est-ce facile à utiliser ?",
+    question: "À qui s'adresse Obillz ?",
     answer:
-      "Oui. Obillz est conçu pour être simple et rapide à prendre en main par les comités de clubs.",
+      "Obillz est pensé pour les clubs sportifs locaux et leurs comités. La plateforme s'adapte aussi bien aux petits clubs qu'aux structures avec plusieurs équipes.",
   },
   {
-    question: "Est-ce accessible sur téléphone ?",
+    question: "Combien de temps faut-il pour commencer ?",
     answer:
-      "Oui. La plateforme fonctionne sur ordinateur, tablette et téléphone.",
+      "La mise en place du club prend seulement quelques minutes. Vous créez votre espace, importez vos membres et vous êtes prêts à gérer votre première cotisation ou votre premier événement.",
+  },
+  {
+    question: "Est-ce facile à utiliser ?",
+    answer:
+      "Oui. Obillz est conçu pour être simple et rapide à prendre en main par les comités de clubs, même sans compétences techniques particulières.",
   },
   {
     question: "Est-ce que plusieurs personnes peuvent gérer le club ?",
     answer:
-      "Oui. Plusieurs membres du comité peuvent accéder à la plateforme et collaborer.",
+      "Oui. Plusieurs membres du comité peuvent accéder à la plateforme et collaborer sur la gestion des membres, des cotisations, des événements ou des factures.",
   },
   {
-    question: "Combien de temps faut-il pour commencer ?",
-    answer: "La mise en place du club prend seulement quelques minutes.",
+    question: "Comment fonctionnent les cotisations ?",
+    answer:
+      "Vous générez les cotisations en quelques clics et elles sont envoyées automatiquement aux membres par email. Vous suivez les paiements en temps réel depuis votre tableau de bord.",
+  },
+  {
+    question: "Comment se passent les inscriptions aux événements ?",
+    answer:
+      "Vous créez un lien ou un QR code à partager au club. Les membres et participants s'inscrivent en quelques secondes, et toutes les réponses sont centralisées au même endroit.",
+  },
+  {
+    question: "Puis-je créer des factures depuis la plateforme ?",
+    answer:
+      "Oui. Vous créez des factures propres et professionnelles en quelques secondes et vous pouvez les envoyer directement par email, sans passer par un autre outil.",
+  },
+  {
+    question: "Est-ce accessible sur téléphone ?",
+    answer:
+      "Oui. La plateforme fonctionne sur ordinateur, tablette et téléphone, pour gérer le club aussi bien depuis le bureau que depuis les vestiaires.",
+  },
+  {
+    question: "Mes données sont-elles en sécurité ?",
+    answer:
+      "Vos données sont stockées de manière sécurisée. Obillz est un logiciel suisse, développé et hébergé en Suisse, pensé pour respecter la confidentialité des clubs.",
+  },
+  {
+    question: "Y a-t-il un accompagnement si j'ai besoin d'aide ?",
+    answer:
+      "Oui. Notre équipe répond aux comités qui ont besoin d'un coup de main pour démarrer ou pour configurer leur club au quotidien.",
   },
 ];
 
@@ -422,14 +453,6 @@ export default function LandingPage() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="relative flex flex-col items-center text-center"
           >
-            <div
-              className="mb-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 backdrop-blur-md"
-              aria-hidden
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-              <span className="h-px w-12 bg-white/40" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-            </div>
             <h2 className="text-balance text-3xl font-black leading-tight text-white md:text-5xl">
               Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
             </h2>
@@ -443,13 +466,8 @@ export default function LandingPage() {
 
         <section
           id="comparaison"
-          className="relative mx-auto mt-32 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-44 lg:mt-52"
+          className="relative mx-auto mt-32 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-clip md:mt-44 lg:mt-52"
         >
-          {/* Séparateur visuel doux entre les deux sections */}
-          <div
-            className="pointer-events-none mx-auto mb-10 h-px w-32 bg-gradient-to-r from-transparent via-white/20 to-transparent md:mb-14"
-            aria-hidden
-          />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -949,69 +967,95 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        <section id="faq" className="mx-auto mt-24 w-[94%] max-w-[860px] md:mt-32">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center text-3xl font-black text-white md:text-5xl"
-          >
-            FAQ
-          </motion.h2>
-          <div className="mt-10 space-y-3">
-            {faqItems.map((faq, index) => {
-              const isOpen = openFaq === index;
-              return (
-                <motion.article
-                  key={faq.question}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{
-                    duration: 0.45,
-                    delay: index * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className={`overflow-hidden rounded-xl border backdrop-blur-md transition-colors duration-200 ${
-                    isOpen
-                      ? "border-white/25 bg-white/[0.08]"
-                      : "border-white/15 bg-white/[0.05] hover:border-white/25 hover:bg-white/[0.07]"
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-white"
+        <section id="faq" className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
+          <div className="grid gap-10 md:grid-cols-[0.85fr_1.15fr] md:gap-14 lg:gap-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="md:sticky md:top-28 md:self-start"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-100 backdrop-blur-md">
+                FAQ
+              </span>
+              <h2 className="mt-5 text-balance text-3xl font-black leading-tight text-white md:text-5xl">
+                Encore des questions ?
+                <br />
+                <span className="text-blue-100/80">On a les réponses</span>
+              </h2>
+              <p className="mt-5 max-w-md text-base leading-relaxed text-blue-100/85">
+                Vous n&apos;avez pas trouvé votre réponse&nbsp;? Contactez-nous, on est là pour vous
+                accompagner dans la mise en place de votre club.
+              </p>
+              <Link
+                href="/inscription"
+                className="mt-6 inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur-md transition hover:border-white/50 hover:bg-white/15"
+              >
+                Créer mon club gratuitement
+              </Link>
+            </motion.div>
+
+            <div className="space-y-2.5">
+              {faqItems.map((faq, index) => {
+                const isOpen = openFaq === index;
+                return (
+                  <motion.article
+                    key={faq.question}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{
+                      duration: 0.4,
+                      delay: Math.min(index * 0.04, 0.24),
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className={`group overflow-hidden rounded-2xl border backdrop-blur-md transition-colors duration-200 ${
+                      isOpen
+                        ? "border-white/30 bg-white/[0.08]"
+                        : "border-white/12 bg-white/[0.04] hover:border-white/25 hover:bg-white/[0.06]"
+                    }`}
                   >
-                    <span className="font-bold">{faq.question}</span>
-                    <span
-                      className={`text-2xl font-light text-white/85 transition-transform duration-300 ${
-                        isOpen ? "rotate-180" : "rotate-0"
-                      }`}
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                      className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left text-white md:px-7 md:py-6"
+                      aria-expanded={isOpen}
                     >
-                      {isOpen ? "−" : "+"}
-                    </span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen ? (
-                      <motion.div
-                        key="content"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                        className="overflow-hidden"
+                      <span className="text-[0.95rem] font-semibold leading-snug md:text-base">
+                        {faq.question}
+                      </span>
+                      <span
+                        aria-hidden
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                          isOpen
+                            ? "border-white/40 bg-white text-[#1A23FF] rotate-45"
+                            : "border-white/25 bg-white/5 text-white group-hover:border-white/40 group-hover:bg-white/10"
+                        }`}
                       >
-                        <p className="border-t border-white/10 px-5 py-4 text-sm leading-relaxed text-blue-100/90">
-                          {faq.answer}
-                        </p>
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
-                </motion.article>
-              );
-            })}
+                        <Plus className="h-4 w-4" strokeWidth={2.2} />
+                      </span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {isOpen ? (
+                        <motion.div
+                          key="content"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <p className="border-t border-white/10 px-5 py-5 text-[0.9375rem] leading-relaxed text-blue-100/90 md:px-7 md:py-6">
+                            {faq.answer}
+                          </p>
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
+                  </motion.article>
+                );
+              })}
+            </div>
           </div>
         </section>
 
