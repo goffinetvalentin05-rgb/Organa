@@ -383,11 +383,19 @@ export default function LandingPage() {
         </section>
 
         <section id="probleme" className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-36 lg:mt-44">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
-            <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
+          <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-white/[0.02] p-8 shadow-[0_20px_50px_rgba(2,6,23,0.18)] backdrop-blur-xl md:p-12">
+            <div
+              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/[0.06] blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#1A23FF]/20 blur-3xl"
+              aria-hidden
+            />
+            <h2 className="relative text-3xl font-black leading-tight text-white md:text-5xl">
               Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
             </h2>
-            <p className="mt-5 max-w-4xl text-base leading-relaxed text-slate-600 md:text-lg">
+            <p className="relative mt-5 max-w-4xl text-base leading-relaxed text-blue-100/90 md:text-lg">
               Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
               emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
               et le suivi des membres devient difficile.
@@ -397,7 +405,7 @@ export default function LandingPage() {
 
         <section
           id="comparaison"
-          className="mx-auto mt-20 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden"
+          className="mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-32"
         >
           <div className="text-center">
             <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
@@ -777,7 +785,7 @@ export default function LandingPage() {
 
         <section
           id="fonctionnalites"
-          className="relative mx-auto mt-20 w-[94%] max-w-[1180px] scroll-mt-24 pb-4 pt-6 md:pb-10 md:pt-10"
+          className="relative mx-auto mt-24 w-[94%] max-w-[1180px] scroll-mt-24 pb-4 pt-6 md:mt-32 md:pb-10 md:pt-10"
         >
           <div
             className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,255,255,0.1),transparent_55%)]"
@@ -831,24 +839,28 @@ export default function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  className="rounded-2xl border border-white/20 bg-white/95 p-6 text-slate-900 shadow-[0_16px_48px_rgba(2,6,23,0.2)] backdrop-blur-sm md:p-8"
+                  className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-white/[0.03] p-6 text-white shadow-[0_16px_48px_rgba(2,6,23,0.18)] backdrop-blur-xl md:p-8"
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                    <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#1A23FF]/10 text-[#1A23FF] ring-1 ring-[#1A23FF]/15">
-                      <FeatureTabIcon id={currentFeature.id} className="h-6 w-6 text-[#1A23FF]" />
+                  <div
+                    className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/[0.06] blur-3xl"
+                    aria-hidden
+                  />
+                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+                    <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md">
+                      <FeatureTabIcon id={currentFeature.id} className="h-6 w-6 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-xl font-black tracking-tight text-slate-900 md:text-2xl">
+                      <h3 className="text-xl font-black tracking-tight text-white md:text-2xl">
                         {currentFeature.title}
                       </h3>
-                      <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
+                      <p className="mt-3 text-sm leading-relaxed text-blue-100/90 md:text-base">
                         {currentFeature.description}
                       </p>
-                      <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5">
+                      <ul className="mt-5 space-y-2.5 border-t border-white/10 pt-5">
                         {currentFeature.highlights.map((line) => (
-                          <li key={line} className="flex gap-3 text-sm text-slate-600 md:text-[0.9375rem]">
+                          <li key={line} className="flex gap-3 text-sm text-blue-50/95 md:text-[0.9375rem]">
                             <span
-                              className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#1A23FF]"
+                              className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-white/80"
                               aria-hidden
                             />
                             <span className="leading-relaxed">{line}</span>
@@ -863,7 +875,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-20 w-[94%] max-w-[1160px]">
+        <section className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
           <div className="p-2 text-center text-white md:p-4">
             <h2 className="text-3xl font-black md:text-5xl">
               Moins d&apos;administratif. Plus de temps pour votre club.
@@ -875,36 +887,53 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="faq" className="mx-auto mt-20 w-[94%] max-w-[1040px]">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
-            <h2 className="text-center text-3xl font-black md:text-5xl">FAQ</h2>
-            <div className="mt-8 space-y-3">
-              {faqItems.map((faq, index) => {
-                const isOpen = openFaq === index;
-                return (
-                  <article key={faq.question} className="overflow-hidden rounded-xl border border-slate-200 bg-[#F8FAFF]">
-                    <button
-                      type="button"
-                      onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                      className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                    >
-                      <span className="font-bold">{faq.question}</span>
-                      <span className="text-2xl font-light text-[#1A23FF]">{isOpen ? "−" : "+"}</span>
-                    </button>
-                    {isOpen ? <p className="border-t border-slate-200 px-5 py-4 text-sm text-slate-600">{faq.answer}</p> : null}
-                  </article>
-                );
-              })}
-            </div>
+        <section id="faq" className="mx-auto mt-24 w-[94%] max-w-[860px] md:mt-32">
+          <h2 className="text-center text-3xl font-black text-white md:text-5xl">FAQ</h2>
+          <div className="mt-10 space-y-3">
+            {faqItems.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <article
+                  key={faq.question}
+                  className={`overflow-hidden rounded-xl border backdrop-blur-md transition-colors duration-200 ${
+                    isOpen
+                      ? "border-white/25 bg-white/[0.08]"
+                      : "border-white/15 bg-white/[0.05] hover:border-white/25 hover:bg-white/[0.07]"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                    className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-white"
+                  >
+                    <span className="font-bold">{faq.question}</span>
+                    <span className="text-2xl font-light text-white/85">{isOpen ? "−" : "+"}</span>
+                  </button>
+                  {isOpen ? (
+                    <p className="border-t border-white/10 px-5 py-4 text-sm leading-relaxed text-blue-100/90">
+                      {faq.answer}
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </section>
 
-        <section className="mx-auto mt-12 w-[94%] max-w-[1040px] md:mt-16">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12">
-            <h2 className="text-3xl font-black md:text-5xl">
+        <section className="mx-auto mt-20 w-[94%] max-w-[1040px] md:mt-24">
+          <div className="relative overflow-hidden rounded-3xl border border-white/30 bg-white p-8 text-center text-slate-900 shadow-[0_30px_70px_rgba(2,6,23,0.28)] md:p-14">
+            <div
+              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#1A23FF]/[0.08] blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#1A23FF]/[0.06] blur-3xl"
+              aria-hidden
+            />
+            <h2 className="relative text-3xl font-black md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd&apos;hui.
             </h2>
-            <div className="mt-8">
+            <div className="relative mt-8">
               <Link
                 href="/inscription"
                 className="inline-flex items-center justify-center rounded-full bg-[#1A23FF] px-8 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(26,35,255,0.32)] transition hover:-translate-y-0.5"
@@ -915,8 +944,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <footer className="mx-auto mt-16 w-[94%] max-w-[1160px] md:mt-20">
-          <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12 lg:p-14">
+        <footer className="mx-auto mt-14 w-[94%] max-w-[1160px] md:mt-16">
+          <div className="rounded-3xl border border-white/25 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12 lg:p-14">
             <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr] md:gap-12">
               <div>
                 <Link href="/" className="inline-flex transition hover:opacity-90">
@@ -999,11 +1028,11 @@ export default function LandingPage() {
               </nav>
             </div>
 
-            <div className="mt-10 flex flex-col items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-5 sm:flex-row sm:items-center sm:gap-5 md:mt-12">
-              <SwissFlag className="h-10 w-10 shrink-0 rounded-md shadow-[0_2px_6px_rgba(15,23,42,0.12)]" />
+            <div className="mt-10 flex flex-col items-start gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 md:mt-12">
+              <SwissFlag className="h-6 w-6 shrink-0 rounded-[4px]" />
               <div className="min-w-0">
-                <p className="text-sm font-bold text-slate-900">Conçu en Suisse</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-600 md:text-[0.8125rem]">
+                <p className="text-sm font-semibold text-slate-900">Conçu en Suisse</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-slate-500 md:text-[0.8125rem]">
                   Obillz est un logiciel suisse, développé et hébergé en Suisse, pensé pour les
                   clubs locaux.
                 </p>
