@@ -134,7 +134,9 @@ async function evaluateMfaForRequest(
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    const roles = (memberships || []).map((m) => m.role as string);
+    const roles = ((memberships ?? []) as Array<{ role: string }>).map(
+      (m) => m.role
+    );
     const sensitive =
       roles.includes("owner") ||
       roles.includes("admin") ||
@@ -151,7 +153,7 @@ async function evaluateMfaForRequest(
 
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
     const verifiedTotps = (factorsData?.totp ?? []).filter(
-      (f) => f.status === "verified"
+      (f: { status: string }) => f.status === "verified"
     );
 
     if (verifiedTotps.length > 0) {
