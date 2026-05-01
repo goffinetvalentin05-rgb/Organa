@@ -8,13 +8,16 @@ import {
   CalendarDays,
   Coffee,
   FileText,
+  Heart,
   LayoutDashboard,
   LineChart,
   Mail,
+  MapPin,
   MessageCircle,
   Plus,
   QrCode,
   Receipt,
+  ShieldCheck,
   Users,
   Wallet,
 } from "lucide-react";
@@ -261,6 +264,22 @@ function FeatureTabIcon({ id, className }: { id: FeatureTabId; className?: strin
   return <Icon className={className ?? "h-[1.125rem] w-[1.125rem] shrink-0"} strokeWidth={1.75} aria-hidden />;
 }
 
+function SwissCross({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden
+    >
+      <path
+        d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export default function LandingPage() {
   const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabId>("membres");
@@ -273,7 +292,7 @@ export default function LandingPage() {
 
       <div className="relative z-10 pb-20">
         <section className="mt-0 w-full">
-          <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-12">
+          <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-8 lg:px-12 lg:pt-10">
             <header className="mx-auto flex max-w-[1140px] items-center justify-between gap-4">
               <Link href="/" className="transition hover:opacity-95">
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
@@ -302,12 +321,12 @@ export default function LandingPage() {
               </div>
             </header>
 
-            <div className="relative mt-4 p-4 pb-10 sm:p-5 md:mt-6 md:pb-40 lg:pb-40">
+            <div className="relative mt-6 p-4 pb-16 sm:p-5 md:mt-12 md:pb-48 lg:mt-16 lg:pb-56">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
               <div className="relative z-20">
-                <div className="mt-6 text-center md:mt-10">
+                <div className="mt-8 text-center md:mt-16 lg:mt-20">
                   <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
                     GÉRER UN CLUB SPORTIF
                     <br />
@@ -367,7 +386,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="mx-auto mt-16 w-[94%] max-w-[1160px] md:mt-20">
+        <section id="probleme" className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-36 lg:mt-44">
           <div className="rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.2)] md:p-12">
             <h2 className="text-3xl font-black leading-tight text-slate-900 md:text-5xl">
               Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
@@ -880,6 +899,71 @@ export default function LandingPage() {
                   </article>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section id="swiss-made" className="mx-auto mt-20 w-[94%] max-w-[1160px] md:mt-24">
+          <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12 lg:p-14">
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 opacity-[0.04] md:block"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 80% 50%, #DA291C 0%, transparent 55%)",
+              }}
+              aria-hidden
+            />
+            <div className="pointer-events-none absolute -right-16 -top-16 hidden h-56 w-56 lg:block" aria-hidden>
+              <SwissCross className="h-full w-full text-[#DA291C]/[0.06]" />
+            </div>
+
+            <div className="relative grid items-center gap-10 md:grid-cols-[1.15fr_1fr] md:gap-12 lg:gap-16">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#DA291C]/15 bg-[#DA291C]/[0.06] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9C1B12]">
+                  <SwissCross className="h-3.5 w-3.5 text-[#DA291C]" />
+                  Swiss made
+                </div>
+                <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-slate-900 md:text-[2.75rem] md:leading-[1.1]">
+                  Conçu en Suisse pour les clubs d&apos;ici
+                </h2>
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
+                  Obillz est développé avec une attention particulière portée à la stabilité, à la
+                  protection des données et à une utilisation simple sur le long terme.
+                </p>
+                <ul className="mt-8 space-y-3">
+                  {[
+                    { icon: MapPin, label: "Développé en Suisse" },
+                    { icon: Heart, label: "Pensé pour les clubs locaux" },
+                    { icon: ShieldCheck, label: "Données et stabilité au cœur du produit" },
+                  ].map(({ icon: Icon, label }) => (
+                    <li key={label} className="flex items-center gap-3">
+                      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#DA291C]/15 bg-[#DA291C]/[0.06] text-[#DA291C]">
+                        <Icon className="h-4 w-4" strokeWidth={2} />
+                      </span>
+                      <span className="text-sm font-semibold text-slate-800 md:text-[0.95rem]">
+                        {label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="relative flex items-center justify-center md:justify-end">
+                <div className="relative">
+                  <div
+                    className="absolute -inset-6 rounded-[2rem] bg-[radial-gradient(circle_at_50%_50%,rgba(218,41,28,0.12),transparent_70%)] blur-xl"
+                    aria-hidden
+                  />
+                  <div className="relative flex h-56 w-56 items-center justify-center rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_18px_44px_rgba(2,6,23,0.12)] md:h-64 md:w-64">
+                    <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-[#DA291C] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_24px_rgba(218,41,28,0.35)] md:h-36 md:w-36">
+                      <SwissCross className="h-14 w-14 text-white md:h-16 md:w-16" />
+                    </div>
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700 shadow-sm">
+                      Swiss made
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
