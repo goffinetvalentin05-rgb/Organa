@@ -317,7 +317,7 @@ export default function LandingPage() {
               </div>
             </header>
 
-            <div className="relative mt-6 p-4 pb-16 sm:p-5 md:mt-12 md:pb-48 lg:mt-16 lg:pb-56">
+            <div className="relative mt-4 p-4 pb-16 sm:p-5 md:mt-6 md:pb-48 lg:pb-56">
               <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
