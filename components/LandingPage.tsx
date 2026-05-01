@@ -278,9 +278,7 @@ function SwissFlag({ className }: { className?: string }) {
 
 export default function LandingPage() {
   const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
-  const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabId>("membres");
   const [openFaq, setOpenFaq] = useState(0);
-  const currentFeature = featureTabs.find((item) => item.id === activeFeatureTab) ?? featureTabs[0];
 
   return (
     <main className="relative min-h-screen bg-[var(--obillz-hero-blue)] text-white">
@@ -382,32 +380,107 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="probleme" className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-36 lg:mt-44">
-          <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-white/[0.02] p-8 shadow-[0_20px_50px_rgba(2,6,23,0.18)] backdrop-blur-xl md:p-12">
-            <div
-              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/[0.06] blur-3xl"
+        <section
+          id="probleme"
+          className="relative mx-auto mt-24 w-[94%] max-w-[1200px] md:mt-36 lg:mt-44"
+        >
+          <div
+            className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[80%] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.10),transparent_60%)]"
+            aria-hidden
+          />
+          <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 backdrop-blur-md"
+                aria-hidden
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                <span className="h-1.5 w-12 rounded-full bg-white/30" />
+              </div>
+              <h2 className="mt-5 text-3xl font-black leading-tight text-white md:text-5xl">
+                Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-blue-100/85 md:text-lg">
+                Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
+                emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
+                et le suivi des membres devient difficile.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mx-auto h-[360px] w-full max-w-md sm:h-[400px] lg:h-[420px] lg:max-w-none"
               aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#1A23FF]/20 blur-3xl"
-              aria-hidden
-            />
-            <h2 className="relative text-3xl font-black leading-tight text-white md:text-5xl">
-              Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
-            </h2>
-            <p className="relative mt-5 max-w-4xl text-base leading-relaxed text-blue-100/90 md:text-lg">
-              Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
-              emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
-              et le suivi des membres devient difficile.
-            </p>
+            >
+              <div
+                className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.10),transparent_60%)]"
+              />
+              {/* Excel */}
+              <div className="absolute left-2 top-2 w-[58%] -rotate-[5deg] overflow-hidden rounded-xl border border-slate-300/40 bg-white shadow-[0_18px_40px_rgba(2,6,23,0.25)] animate-float [animation-delay:120ms]">
+                <div className="flex items-center gap-1.5 bg-[#217346] px-2.5 py-1.5">
+                  <span className="text-[9px] text-white/85">●●●</span>
+                  <span className="flex-1 truncate text-center text-[10px] font-medium text-white">
+                    membres_2024_FINAL_v3.xlsx
+                  </span>
+                </div>
+                <div className="px-3 py-2 font-mono text-[10px] text-slate-700">
+                  <p className="font-bold text-red-600">#REF!</p>
+                  <p className="text-amber-700">Non enregistré</p>
+                </div>
+              </div>
+              {/* WhatsApp */}
+              <div className="absolute right-0 top-14 w-[56%] rotate-[6deg] overflow-hidden rounded-2xl bg-[#0B141A] p-2 shadow-[0_18px_40px_rgba(0,0,0,0.35)] animate-float [animation-delay:260ms]">
+                <div className="flex items-center gap-1.5 border-b border-white/10 pb-1.5">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]/25">
+                    <MessageCircle className="h-3 w-3 text-[#25D366]" strokeWidth={2.2} />
+                  </div>
+                  <span className="text-[10px] font-semibold text-white">Comité du club</span>
+                </div>
+                <div className="mt-1.5 rounded-lg bg-[#202C33] p-1.5">
+                  <div className="ml-2 max-w-[92%] rounded-md bg-[#005C4B] px-1.5 py-1 text-[9px] leading-snug text-white">
+                    Qui peut tenir samedi ?
+                  </div>
+                  <p className="mt-1 pr-1 text-right text-[8px] text-[#8696A0]">+12 messages</p>
+                </div>
+              </div>
+              {/* Post-it */}
+              <div className="absolute bottom-16 left-4 w-[44%] rotate-[4deg] border border-amber-300/80 bg-[#FFF8D6] px-3 py-2.5 shadow-[5px_6px_0_rgba(15,23,42,0.18)] animate-float [animation-delay:400ms]">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-900/55">Note</p>
+                <p className="mt-1 text-[11px] font-semibold leading-snug text-amber-950">
+                  Relancer Dupont
+                </p>
+              </div>
+              {/* Email / facture */}
+              <div className="absolute bottom-2 right-2 w-[52%] -rotate-[3deg] rounded-xl border-l-[3px] border-l-rose-500 bg-white px-3 py-2.5 shadow-[0_14px_36px_rgba(2,6,23,0.22)] animate-float [animation-delay:540ms]">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                  Brouillon
+                </p>
+                <p className="mt-1 text-[12px] font-bold text-slate-900">Facture buvette</p>
+                <p className="text-[10px] font-medium text-rose-600">Non envoyée</p>
+              </div>
+            </motion.div>
           </div>
         </section>
 
         <section
           id="comparaison"
-          className="mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-32"
+          className="relative mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-hidden md:mt-32"
         >
-          <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center"
+          >
             <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
               Passez d&apos;une gestion compliquée à une organisation claire
             </h2>
@@ -443,9 +516,21 @@ export default function LandingPage() {
                 Avec Obillz
               </button>
             </div>
-          </div>
+          </motion.div>
 
           <div className="relative mx-auto mt-10 max-w-[1080px] md:mt-12">
+            <div
+              className="pointer-events-none absolute inset-x-[-4%] -top-10 -bottom-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.08),transparent_60%)]"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -left-6 top-12 hidden h-32 w-32 rounded-full bg-[#1A23FF]/30 blur-3xl md:block"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -right-8 bottom-8 hidden h-40 w-40 rounded-full bg-white/10 blur-3xl md:block"
+              aria-hidden
+            />
             <AnimatePresence mode="wait">
               {comparisonView === "without" ? (
                 <motion.div
@@ -611,7 +696,8 @@ export default function LandingPage() {
                   </p>
 
                   {/* Mobile : pile verticale, lisible, sans dispersion */}
-                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_20px_50px_rgba(2,6,23,0.22)] md:hidden">
+                  <div className="relative rounded-[20px] bg-gradient-to-br from-white/[0.10] to-white/[0.02] p-1.5 ring-1 ring-white/15 backdrop-blur-md md:hidden">
+                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_20px_50px_rgba(2,6,23,0.22)]">
                     <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-4 text-center">
                       <p className="text-lg font-black text-slate-900">Dashboard du club</p>
                       <p className="mt-1 text-xs leading-snug text-slate-500">
@@ -661,9 +747,11 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
+                  </div>
 
                   {/* Desktop : sidebar + zone principale type produit */}
-                  <div className="hidden overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)] md:block">
+                  <div className="relative hidden rounded-[22px] bg-gradient-to-br from-white/[0.10] to-white/[0.02] p-2 ring-1 ring-white/15 backdrop-blur-md md:block">
+                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)]">
                     <div className="flex">
                       <aside className="w-[168px] shrink-0 border-r border-slate-200 bg-[#F4F7FB] px-3 py-4 lg:w-[188px]">
                         <div className="mb-4 flex items-center gap-2 px-1">
@@ -777,6 +865,7 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -785,116 +874,129 @@ export default function LandingPage() {
 
         <section
           id="fonctionnalites"
-          className="relative mx-auto mt-24 w-[94%] max-w-[1180px] scroll-mt-24 pb-4 pt-6 md:mt-32 md:pb-10 md:pt-10"
+          className="relative mx-auto mt-24 w-[94%] max-w-[1200px] scroll-mt-24 pb-4 pt-6 md:mt-32 md:pb-10 md:pt-10"
         >
           <div
-            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,255,255,0.1),transparent_55%)]"
+            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,255,255,0.10),transparent_55%)]"
             aria-hidden
           />
           <div className="relative z-10">
-            <h2 className="text-center text-3xl font-black md:text-5xl">
-              Tous les outils pour gérer votre club
-            </h2>
-            <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-relaxed text-blue-100 md:mt-6 md:text-lg">
-              Tout est centralisé dans une seule plateforme : membres, cotisations, manifestations,
-              finances et communication.
-            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2 className="text-center text-3xl font-black md:text-5xl">
+                Tous les outils pour gérer votre club
+              </h2>
+              <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-relaxed text-blue-100 md:mt-6 md:text-lg">
+                Tout est centralisé dans une seule plateforme : membres, cotisations, manifestations,
+                finances et communication.
+              </p>
+            </motion.div>
 
-            {/* Navigation : une grille responsive (2 → 4 → 8 colonnes), un seul jeu de boutons */}
-            <div className="mx-auto mt-12 max-w-[1040px] md:mt-14 lg:mt-16" role="tablist" aria-label="Fonctionnalités">
-              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:grid-cols-4 xl:grid-cols-8">
-                {featureTabs.map((feature) => {
-                  const isActive = activeFeatureTab === feature.id;
-                  return (
-                    <button
-                      key={feature.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={isActive}
-                      onClick={() => setActiveFeatureTab(feature.id)}
-                      className={`group flex min-h-[3.25rem] w-full flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2.5 text-center text-[0.65rem] font-semibold uppercase leading-tight tracking-wide transition duration-200 sm:text-xs md:flex-row md:gap-2 md:px-3 md:text-sm md:normal-case md:tracking-normal ${
-                        isActive
-                          ? "border-white/40 bg-[#1A23FF] text-white shadow-[0_10px_28px_rgba(26,35,255,0.45)] ring-2 ring-white/25"
-                          : "border-white/20 bg-white/10 text-blue-50 backdrop-blur-md hover:border-white/35 hover:bg-white/18 hover:shadow-[0_6px_20px_rgba(2,6,23,0.15)]"
-                      }`}
-                    >
-                      <FeatureTabIcon
-                        id={feature.id}
-                        className={`h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-105 md:h-[1.125rem] md:w-[1.125rem] ${isActive ? "text-white" : "text-blue-100"}`}
-                      />
-                      <span className="line-clamp-2 md:truncate">{feature.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Carte contenu */}
-            <div className="mx-auto mt-8 max-w-[980px] md:mt-10">
-              <AnimatePresence mode="wait">
+            <div className="mx-auto mt-12 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 md:mt-14 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+              {featureTabs.map((feature, index) => (
                 <motion.article
-                  key={activeFeatureTab}
-                  role="tabpanel"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-white/[0.03] p-6 text-white shadow-[0_16px_48px_rgba(2,6,23,0.18)] backdrop-blur-xl md:p-8"
+                  key={feature.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{
+                    duration: 0.5,
+                    delay: (index % 4) * 0.06,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="group relative overflow-hidden rounded-2xl border border-white/12 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-white/[0.02] p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.08] hover:shadow-[0_22px_50px_rgba(2,6,23,0.30)] md:p-6"
                 >
                   <div
-                    className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/[0.06] blur-3xl"
+                    className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/[0.06] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
                     aria-hidden
                   />
-                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                    <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md">
-                      <FeatureTabIcon id={currentFeature.id} className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-xl font-black tracking-tight text-white md:text-2xl">
-                        {currentFeature.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-relaxed text-blue-100/90 md:text-base">
-                        {currentFeature.description}
-                      </p>
-                      <ul className="mt-5 space-y-2.5 border-t border-white/10 pt-5">
-                        {currentFeature.highlights.map((line) => (
-                          <li key={line} className="flex gap-3 text-sm text-blue-50/95 md:text-[0.9375rem]">
-                            <span
-                              className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-white/80"
-                              aria-hidden
-                            />
-                            <span className="leading-relaxed">{line}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15 group-hover:ring-white/25">
+                    <FeatureTabIcon id={feature.id} className="h-5 w-5 text-white" />
                   </div>
+                  <h3 className="relative mt-4 text-lg font-black tracking-tight text-white md:text-[1.15rem]">
+                    {feature.title}
+                  </h3>
+                  <p className="relative mt-2 text-sm leading-relaxed text-blue-100/85">
+                    {feature.description}
+                  </p>
+                  <ul className="relative mt-4 space-y-1.5 border-t border-white/10 pt-4">
+                    {feature.highlights.map((line) => (
+                      <li
+                        key={line}
+                        className="flex gap-2 text-[0.8125rem] leading-snug text-blue-100/85"
+                      >
+                        <span
+                          className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-white/70"
+                          aria-hidden
+                        />
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </motion.article>
-              </AnimatePresence>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
-          <div className="p-2 text-center text-white md:p-4">
+        <section className="relative mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
+          <div
+            className="pointer-events-none absolute inset-x-0 -top-10 -bottom-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(255,255,255,0.10),transparent_60%)]"
+            aria-hidden
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative mx-auto flex max-w-[820px] flex-col items-center px-2 text-center text-white md:px-4"
+          >
+            <div
+              className="mb-6 flex items-center gap-2"
+              aria-hidden
+            >
+              <span className="h-px w-10 bg-white/30" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+              <span className="h-px w-10 bg-white/30" />
+            </div>
             <h2 className="text-3xl font-black md:text-5xl">
               Moins d&apos;administratif. Plus de temps pour votre club.
             </h2>
-            <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-blue-100 md:text-lg">
+            <p className="mt-5 max-w-3xl text-base leading-relaxed text-blue-100 md:text-lg">
               Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
               comité sur la vie sportive et les projets du club.
             </p>
-          </div>
+          </motion.div>
         </section>
 
         <section id="faq" className="mx-auto mt-24 w-[94%] max-w-[860px] md:mt-32">
-          <h2 className="text-center text-3xl font-black text-white md:text-5xl">FAQ</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center text-3xl font-black text-white md:text-5xl"
+          >
+            FAQ
+          </motion.h2>
           <div className="mt-10 space-y-3">
             {faqItems.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
-                <article
+                <motion.article
                   key={faq.question}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{
+                    duration: 0.45,
+                    delay: index * 0.05,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                   className={`overflow-hidden rounded-xl border backdrop-blur-md transition-colors duration-200 ${
                     isOpen
                       ? "border-white/25 bg-white/[0.08]"
@@ -907,41 +1009,76 @@ export default function LandingPage() {
                     className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-white"
                   >
                     <span className="font-bold">{faq.question}</span>
-                    <span className="text-2xl font-light text-white/85">{isOpen ? "−" : "+"}</span>
+                    <span
+                      className={`text-2xl font-light text-white/85 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                    >
+                      {isOpen ? "−" : "+"}
+                    </span>
                   </button>
-                  {isOpen ? (
-                    <p className="border-t border-white/10 px-5 py-4 text-sm leading-relaxed text-blue-100/90">
-                      {faq.answer}
-                    </p>
-                  ) : null}
-                </article>
+                  <AnimatePresence initial={false}>
+                    {isOpen ? (
+                      <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <p className="border-t border-white/10 px-5 py-4 text-sm leading-relaxed text-blue-100/90">
+                          {faq.answer}
+                        </p>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </motion.article>
               );
             })}
           </div>
         </section>
 
-        <section className="mx-auto mt-20 w-[94%] max-w-[1040px] md:mt-24">
-          <div className="relative overflow-hidden rounded-3xl border border-white/30 bg-white p-8 text-center text-slate-900 shadow-[0_30px_70px_rgba(2,6,23,0.28)] md:p-14">
+        <section className="mx-auto mt-24 w-[94%] max-w-[1080px] md:mt-32">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-white/[0.02] p-8 text-center backdrop-blur-xl md:p-16"
+          >
             <div
-              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#1A23FF]/[0.08] blur-3xl"
+              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.10] blur-3xl"
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#1A23FF]/[0.06] blur-3xl"
+              className="pointer-events-none absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-white/[0.07] blur-3xl"
               aria-hidden
             />
-            <h2 className="relative text-3xl font-black md:text-5xl">
+            <div
+              className="pointer-events-none absolute inset-x-1/4 -top-px h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              aria-hidden
+            />
+            <div
+              className="relative mx-auto mb-6 inline-flex items-center gap-2"
+              aria-hidden
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+            </div>
+            <h2 className="relative text-3xl font-black text-white md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd&apos;hui.
             </h2>
             <div className="relative mt-8">
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center rounded-full bg-[#1A23FF] px-8 py-4 text-base font-bold text-white shadow-[0_14px_30px_rgba(26,35,255,0.32)] transition hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-base font-bold text-[#1A23FF] shadow-[0_18px_40px_rgba(2,6,23,0.30)] transition hover:-translate-y-0.5"
               >
                 Créer mon club gratuitement
               </Link>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         <footer className="mx-auto mt-14 w-[94%] max-w-[1160px] md:mt-16">
