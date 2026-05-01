@@ -249,9 +249,11 @@ export default function DepensesPage() {
     userId: string,
     file: File
   ) => {
-    // Le bucket "expenses" est désormais PRIVÉ (migration 025).
+    // Bucket "expenses" = PRIVÉ. On stocke uniquement le PATH dans la base
+    // (`attachment_url` = misnomer historique, contient désormais le path).
+    // L'affichage/téléchargement passe par /api/storage/sign qui re-signe
+    // une URL fraîche à chaque clic.
     // Convention de chemin : <userId>/<timestamp>-<safeName>
-    // RLS storage.objects vérifie que userId == 1er segment du chemin.
     const safeName = file.name
       .replace(/\\/g, "/")
       .split("/")
@@ -265,31 +267,30 @@ export default function DepensesPage() {
       .upload(filePath, file, { upsert: false });
 
     if (uploadError) {
-      console.error("[Depenses][upload] Erreur upload:", {
-        message: uploadError.message,
-        statusCode: (uploadError as any).statusCode,
-        error: uploadError,
-      });
+      console.error("[Depenses][upload] Erreur upload:", uploadError.message);
       throw new Error(
         uploadError.message || t("dashboard.expenses.uploadError")
       );
     }
 
-    // URL signée à durée limitée (24h). À ré-signer au-delà.
-    // Note : on stocke aussi le path dans `notes` (champ libre) en attendant
-    // d'ajouter une colonne `attachment_path` dédiée à la table depenses.
-    const { data: signed, error: signError } = await supabase.storage
-      .from("expenses")
-      .createSignedUrl(filePath, 60 * 60 * 24);
+    return filePath;
+  };
 
-    if (signError || !signed?.signedUrl) {
-      console.error("[Depenses][upload] Signature URL échouée:", signError);
-      // Cleanup
-      await supabase.storage.from("expenses").remove([filePath]);
-      throw new Error(t("dashboard.expenses.uploadError"));
+  /**
+   * Construit l'URL `<a href>` pour télécharger une pièce jointe.
+   * - Si la valeur stockée est déjà une URL (ancien format), on la renvoie telle quelle.
+   * - Sinon on construit l'URL d'API qui redirige vers une signed URL fraîche.
+   */
+  const buildAttachmentHref = (stored: string | null | undefined) => {
+    if (!stored) return null;
+    if (stored.startsWith("http://") || stored.startsWith("https://")) {
+      return stored;
     }
-
-    return signed.signedUrl;
+    const params = new URLSearchParams({
+      bucket: "expenses",
+      path: stored,
+    });
+    return `/api/storage/sign?${params.toString()}`;
   };
 
   // Cause du bug: les boutons dépendaient du submit HTML et étaient recouverts par un overlay,
@@ -349,9 +350,6 @@ export default function DepensesPage() {
         attachmentUrl: attachmentUrl || null,
         eventId: formData.eventId || null,
       };
-
-      console.log("[Depenses][create] user:", user);
-      console.log("[Depenses][create] payload:", payload);
 
       const response = await fetch("/api/depenses", {
         method: "POST",
@@ -870,7 +868,7 @@ export default function DepensesPage() {
             {selectedDepense.attachmentUrl && (
               <div className="flex justify-end">
                 <a
-                  href={selectedDepense.attachmentUrl}
+                  href={buildAttachmentHref(selectedDepense.attachmentUrl) ?? "#"}
                   target="_blank"
                   rel="noreferrer"
                   className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"

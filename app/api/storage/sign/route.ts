@@ -107,3 +107,98 @@ export async function POST(request: NextRequest) {
     expiresIn,
   });
 }
+
+/**
+ * GET /api/storage/sign?bucket=expenses&path=<clubId>/<file>&download=1
+ *
+ * Variante GET qui RENVOIE UN REDIRECT 302 vers l'URL signée fraîche.
+ * Pratique pour brancher directement sur une balise `<a href="...">` sans
+ * code JS supplémentaire. Sécurité identique à la variante POST.
+ */
+export async function GET(request: NextRequest) {
+  const meta = extractRequestMetadata(request);
+
+  const ctx = await getAuthContext();
+  if (!ctx) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  const url = new URL(request.url);
+  const bucket = url.searchParams.get("bucket");
+  const path = url.searchParams.get("path");
+  const downloadParam = url.searchParams.get("download");
+  const expiresInParam = url.searchParams.get("expiresIn");
+  const expiresIn = Math.max(
+    30,
+    Math.min(Number(expiresInParam) || 300, 60 * 60)
+  );
+
+  if (!bucket || !path) {
+    return NextResponse.json(
+      { error: "bucket et path requis" },
+      { status: 400 }
+    );
+  }
+  if (!ALLOWED_BUCKETS.has(bucket as StorageBucket)) {
+    return NextResponse.json({ error: "Bucket non autorisé" }, { status: 400 });
+  }
+
+  const pathClubId = extractClubIdFromPath(path);
+  if (!pathClubId) {
+    return NextResponse.json(
+      { error: "Chemin invalide (club_id manquant)" },
+      { status: 400 }
+    );
+  }
+
+  const membership = findMembership(ctx, pathClubId);
+  if (!membership) {
+    await logAudit({
+      clubId: pathClubId,
+      action: AuditAction.FILE_DOWNLOAD,
+      resourceType: bucket,
+      resourceId: path,
+      outcome: "denied",
+      metadata: { reason: "not_a_member", method: "GET" },
+      ...meta,
+    });
+    return NextResponse.json(
+      { error: "Accès refusé : non membre du club" },
+      { status: 403 }
+    );
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, expiresIn, {
+      download: downloadParam ? true : undefined,
+    });
+
+  if (error || !data?.signedUrl) {
+    console.error("[STORAGE][sign][GET] Erreur:", error);
+    return NextResponse.json(
+      { error: "Impossible de générer l'URL signée" },
+      { status: 500 }
+    );
+  }
+
+  await logAudit({
+    clubId: pathClubId,
+    action: AuditAction.FILE_DOWNLOAD,
+    resourceType: bucket,
+    resourceId: path,
+    outcome: "success",
+    metadata: { expiresIn, method: "GET" },
+    ...meta,
+  });
+
+  // 302 vers l'URL signée fraîche. Cache désactivé pour ne pas conserver
+  // l'URL dans l'historique du navigateur au-delà de sa validité.
+  return NextResponse.redirect(data.signedUrl, {
+    status: 302,
+    headers: {
+      "Cache-Control": "private, no-store",
+    },
+  });
+}

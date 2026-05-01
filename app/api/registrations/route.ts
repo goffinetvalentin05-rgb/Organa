@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         action: AuditAction.CREATE,
         resourceType: "registrations",
         outcome: "denied",
-        metadata: { reason: "qrcode_not_found", qrcodeId, email },
+        metadata: { reason: "qrcode_not_found", qrcodeId },
         ...meta,
       });
       return NextResponse.json({ error: "QR code non trouvé" }, { status: 404 });

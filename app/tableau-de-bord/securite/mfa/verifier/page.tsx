@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 
-export const dynamic = "force-dynamic";
-
 function MfaVerifyForm() {
   const router = useRouter();
   const search = useSearchParams();

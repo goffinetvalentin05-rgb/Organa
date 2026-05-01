@@ -108,23 +108,18 @@ export async function POST(request: NextRequest) {
       event_id: event_id ?? eventId ?? null,
     };
 
-    console.log("[API][depenses][POST] user:", user);
-    console.log("[API][depenses][POST] payload:", payload);
-
     const { data, error } = await supabase
       .from("expenses")
       .insert(payload)
       .select("id, description, amount, date, status, notes, attachment_url")
       .single();
 
-    console.log("[API][depenses][POST] data:", data);
-    console.log("[API][depenses][POST] error:", error);
     if (error) {
-      console.error("[API][depenses][POST] error.message:", error.message);
-      console.error("[API][depenses][POST] error.code:", error.code);
-      if ("details" in error) {
-        console.error("[API][depenses][POST] error.details:", error.details);
-      }
+      console.error(
+        "[API][depenses][POST] insert failed:",
+        error.code,
+        error.message
+      );
     }
 
     if (error) {
