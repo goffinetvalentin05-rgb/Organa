@@ -179,7 +179,7 @@ const heroFloatingCardsData = [
     line2: "42 participants",
     secondary: "Lien ou QR code partagé au club",
     floatClass:
-      "left-[6%] top-[74%] -rotate-6 md:left-[3%] md:top-[78%] lg:left-[3%] lg:top-[78%] animate-float [animation-delay:120ms]",
+      "left-[6%] top-[74%] -rotate-6 md:left-[6%] md:top-[68%] lg:left-[8%] lg:top-[66%] animate-float [animation-delay:120ms]",
   },
   {
     title: "Planning manifestation",
@@ -187,7 +187,7 @@ const heroFloatingCardsData = [
     line2: "8 bénévoles inscrits",
     secondary: "Organisation simple des bénévoles",
     floatClass:
-      "right-[6%] top-[72%] rotate-6 md:right-[3%] md:top-[78%] lg:right-[3%] lg:top-[78%] animate-float [animation-delay:260ms]",
+      "right-[6%] top-[72%] rotate-6 md:right-[6%] md:top-[68%] lg:right-[8%] lg:top-[66%] animate-float [animation-delay:260ms]",
   },
   {
     title: "Cotisation annuelle",
@@ -195,7 +195,7 @@ const heroFloatingCardsData = [
     line2: "Équipe 1",
     secondary: "Envoi en 2 clics",
     floatClass:
-      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[92%] lg:top-[96%] animate-float [animation-delay:400ms]",
+      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[86%] lg:top-[88%] animate-float [animation-delay:400ms]",
   },
 ] as const;
 
