@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAuthContext } from "@/lib/auth/rbac";
-import { getMfaStatus, evaluateMfaPolicy } from "@/lib/auth/mfa";
+import { getMfaStatus } from "@/lib/auth/mfa";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -12,17 +12,7 @@ export default async function SecuritePage() {
   // L'utilisateur peut être membre de plusieurs clubs ; on prend le current.
   const current = ctx.current;
 
-  // État MFA
   const mfaStatus = await getMfaStatus();
-
-  // Récupérer auth.users.created_at pour la grâce
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-
-  const policy = current
-    ? evaluateMfaPolicy(current.role, authUser?.created_at, mfaStatus)
-    : null;
 
   // Compter les membres du club
   const memberCounts: Record<string, number> = {};
@@ -78,47 +68,17 @@ export default async function SecuritePage() {
           </div>
         </div>
 
-        {policy && policy.required && policy.reason !== "ok" && (
-          <div
-            className={`mt-4 rounded-lg p-4 text-sm ${
-              policy.blocking
-                ? "border border-red-200 bg-red-50 text-red-800"
-                : "border border-amber-200 bg-amber-50 text-amber-800"
-            }`}
-          >
-            {policy.reason === "needs_aal2" && (
-              <>
-                Votre compte a un facteur TOTP enrôlé mais cette session n'est pas
-                vérifiée. Veuillez{" "}
-                <Link href="/tableau-de-bord/securite/mfa/verifier" className="underline">
-                  saisir un code TOTP
-                </Link>{" "}
-                pour continuer.
-              </>
-            )}
-            {policy.reason === "totp_missing" && (
-              <>
-                ⚠ Votre rôle ({current?.role}) impose la double authentification.
-                Activez-la maintenant pour conserver l'accès au tableau de bord.
-              </>
-            )}
-            {policy.reason === "grace_period_active" && (
-              <>
-                Votre compte est en période de grâce.{" "}
-                <strong>{policy.graceDaysRemaining} jour(s)</strong> restants pour
-                activer la double authentification (obligatoire pour le rôle{" "}
-                {current?.role}).
-              </>
-            )}
-          </div>
-        )}
+        <p className="mt-4 text-sm text-slate-600">
+          Pour protéger les données du club, la double authentification est
+          obligatoire pour tout accès au tableau de bord.
+        </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             href="/tableau-de-bord/securite/mfa"
             className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
           >
-            {mfaStatus.hasVerifiedTotp ? "Gérer la 2FA" : "Activer la 2FA"}
+            Gérer la 2FA
           </Link>
         </div>
       </section>
