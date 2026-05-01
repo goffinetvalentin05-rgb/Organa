@@ -322,7 +322,7 @@ export default function LandingPage() {
               <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
 
               <div className="relative z-20">
-                <div className="mt-8 text-center md:mt-16 lg:mt-20">
+                <div className="mt-10 text-center md:mt-20 lg:mt-24">
                   <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
                     GÉRER UN CLUB SPORTIF
                     <br />
