@@ -315,7 +315,7 @@ export default function LandingPage() {
     <main className="relative min-h-screen bg-[var(--obillz-hero-blue)] text-white">
       <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]" />
 
-      <div className="relative z-10 pb-20">
+      <div className="relative z-10">
         <section className="mt-0 w-full">
           <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-12">
             <header className="mx-auto flex max-w-[1040px] items-center justify-between gap-4">
@@ -976,10 +976,7 @@ export default function LandingPage() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="md:sticky md:top-28 md:self-start"
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-100 backdrop-blur-md">
-                FAQ
-              </span>
-              <h2 className="mt-5 text-balance text-3xl font-black leading-tight text-white md:text-5xl">
+              <h2 className="text-balance text-3xl font-black leading-tight text-white md:text-5xl">
                 Encore des questions ?
                 <br />
                 <span className="text-blue-100/80">On a les réponses</span>
@@ -988,12 +985,6 @@ export default function LandingPage() {
                 Vous n&apos;avez pas trouvé votre réponse&nbsp;? Contactez-nous, on est là pour vous
                 accompagner dans la mise en place de votre club.
               </p>
-              <Link
-                href="/inscription"
-                className="mt-6 inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur-md transition hover:border-white/50 hover:bg-white/15"
-              >
-                Créer mon club gratuitement
-              </Link>
             </motion.div>
 
             <div className="space-y-2.5">
@@ -1059,7 +1050,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-24 w-[94%] max-w-[1080px] md:mt-32">
+        <section className="mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1101,8 +1092,10 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        <footer className="mx-auto mt-14 w-[94%] max-w-[1160px] md:mt-16">
-          <div className="rounded-3xl border border-white/25 bg-white p-8 text-slate-900 shadow-[0_24px_60px_rgba(2,6,23,0.22)] md:p-12 lg:p-14">
+        </div>
+
+        <footer className="mt-24 w-full rounded-t-[2.5rem] border-t border-white/25 bg-white text-slate-900 shadow-[0_-12px_40px_rgba(2,6,23,0.20)] md:mt-32 md:rounded-t-[3rem]">
+          <div className="mx-auto max-w-[1240px] px-6 pb-10 pt-12 md:px-10 md:pb-14 md:pt-16 lg:px-14 lg:pt-20">
             <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr] md:gap-12">
               <div>
                 <Link href="/" className="inline-flex transition hover:opacity-90">
@@ -1202,7 +1195,6 @@ export default function LandingPage() {
             </div>
           </div>
         </footer>
-      </div>
     </main>
   );
 }
