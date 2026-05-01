@@ -384,7 +384,7 @@ export default function LandingPage() {
           id="probleme"
           className="relative mx-auto mt-24 w-[94%] max-w-[920px] md:mt-36 lg:mt-44"
         >
-          {/* Décor abstrait : halos + lignes SVG pointillées désordonnées + icônes en filigrane */}
+          {/* Décor abstrait : halos + icônes en filigrane */}
           <div
             className="pointer-events-none absolute inset-x-[-12%] -top-24 -bottom-16 -z-10 overflow-hidden"
             aria-hidden
@@ -392,23 +392,6 @@ export default function LandingPage() {
             <div className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.10),transparent_60%)]" />
             <div className="absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[#1A23FF]/30 blur-3xl" />
             <div className="absolute right-[6%] bottom-[8%] h-48 w-48 rounded-full bg-white/[0.06] blur-3xl" />
-
-            {/* Lignes pointillées désordonnées */}
-            <svg
-              viewBox="0 0 800 500"
-              preserveAspectRatio="none"
-              className="absolute inset-0 h-full w-full opacity-[0.18]"
-              fill="none"
-              stroke="white"
-              strokeWidth="1"
-              strokeDasharray="3 6"
-            >
-              <path d="M40 80 C 180 60, 260 220, 420 160 S 700 380, 760 280" />
-              <path d="M80 420 C 200 340, 320 460, 480 380 S 660 220, 740 320" />
-              <path d="M60 240 C 240 220, 360 120, 540 260 S 680 460, 760 420" />
-              <path d="M140 60 C 220 180, 360 140, 460 280" />
-              <path d="M120 380 C 260 300, 340 200, 520 200" />
-            </svg>
 
             {/* Icônes en filigrane, dispersées et de tailles variables */}
             <div className="absolute left-[6%] top-[18%] text-white/15 animate-float [animation-delay:120ms]">
