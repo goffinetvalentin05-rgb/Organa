@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 
-export default function MfaVerifyPage() {
+export const dynamic = "force-dynamic";
+
+function MfaVerifyForm() {
   const router = useRouter();
   const search = useSearchParams();
   const supabase = useMemo(() => createClient(), []);
@@ -23,7 +25,9 @@ export default function MfaVerifyPage() {
         setError(lfErr.message);
         return;
       }
-      const verifiedTotp = data?.totp?.find((f) => f.status === "verified");
+      const verifiedTotp = data?.totp?.find(
+        (f: { status: string }) => f.status === "verified"
+      );
       if (!verifiedTotp) {
         setError("Aucun facteur TOTP vérifié. Activez la 2FA d'abord.");
         return;
@@ -51,8 +55,9 @@ export default function MfaVerifyPage() {
       toast.success("Authentification renforcée OK");
       router.replace(next);
       router.refresh();
-    } catch (err: any) {
-      const msg = err?.message || "Code invalide";
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Code invalide";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -61,48 +66,65 @@ export default function MfaVerifyPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md p-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900">
-          Vérification de sécurité
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Saisissez le code à 6 chiffres généré par votre application
-          d'authentification.
-        </p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h1 className="text-xl font-bold text-slate-900">
+        Vérification de sécurité
+      </h1>
+      <p className="mt-1 text-sm text-slate-600">
+        Saisissez le code à 6 chiffres généré par votre application
+        d&apos;authentification.
+      </p>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-          <div>
-            <label
-              htmlFor="code"
-              className="block text-sm font-medium text-slate-700"
-            >
-              Code TOTP
-            </label>
-            <input
-              id="code"
-              inputMode="numeric"
-              autoFocus
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="123456"
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-lg tracking-widest"
-            />
+      <form onSubmit={submit} className="mt-6 space-y-4">
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
           </div>
-          <button
-            type="submit"
-            disabled={loading || code.length < 6 || !factorId}
-            className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        )}
+        <div>
+          <label
+            htmlFor="code"
+            className="block text-sm font-medium text-slate-700"
           >
-            {loading ? "Vérification…" : "Valider"}
-          </button>
-        </form>
-      </div>
+            Code TOTP
+          </label>
+          <input
+            id="code"
+            inputMode="numeric"
+            autoFocus
+            value={code}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
+            placeholder="123456"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-lg tracking-widest"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={loading || code.length < 6 || !factorId}
+          className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        >
+          {loading ? "Vérification…" : "Valider"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function MfaVerifyPage() {
+  return (
+    <div className="mx-auto max-w-md p-6">
+      <Suspense
+        fallback={
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
+            <div className="mt-4 h-4 w-full animate-pulse rounded bg-slate-100" />
+          </div>
+        }
+      >
+        <MfaVerifyForm />
+      </Suspense>
     </div>
   );
 }
