@@ -126,15 +126,19 @@ export async function POST(request: NextRequest) {
 
     console.log("[API][upload-logo] POST - Fichier uploadé avec succès");
 
-    // Générer l'URL publique
-    const { data: urlData } = supabase.storage
+    // Le bucket Logos est désormais PRIVÉ (migration 025).
+    // On génère une URL signée à durée longue pour l'affichage UI courant.
+    // Les flux PDF/email re-signeront leurs propres URLs au moment de l'envoi.
+    const { data: signed } = await supabase.storage
       .from("Logos")
-      .getPublicUrl(fileName);
+      .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 jours
 
-    const logoUrl = urlData.publicUrl;
-    console.log("[API][upload-logo] POST - URL publique générée:", logoUrl);
+    const logoUrl = signed?.signedUrl ?? null;
+    console.log("[API][upload-logo] POST - URL signée générée");
 
     // Sauvegarder logo_path ET logo_url dans profiles
+    // Note : logo_url est maintenant temporaire (URL signée). Le code consommateur
+    // doit re-signer périodiquement via createSecureSignedUrl().
     const { error: updateError } = await supabase
       .from("profiles")
       .update({

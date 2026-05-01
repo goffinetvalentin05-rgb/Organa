@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { rateLimitGuard } from "@/lib/security/rateLimit";
+import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 
 export const runtime = "nodejs";
 
@@ -195,6 +197,9 @@ export async function GET(
 ) {
   try {
     const { token } = await params;
+    if (!token || token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
+      return NextResponse.json({ error: "Token invalide" }, { status: 400 });
+    }
     const supabase = createAdminClient();
 
     const { data: link } = await supabase
@@ -370,15 +375,34 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
+  const meta = extractRequestMetadata(request);
+  // Anti-spam : 10 inscriptions max par IP toutes les 15 minutes
+  const rl = rateLimitGuard(
+    request,
+    "plannings:public-signup",
+    { limit: 10, windowMs: 15 * 60 * 1000 }
+  );
+  if (!rl.ok) return rl.response;
+
   try {
     const { token } = await params;
+    if (!token || token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
+      return NextResponse.json({ error: "Token invalide" }, { status: 400 });
+    }
     const supabase = createAdminClient();
     const body: { slotId?: string; name?: string; email?: string; phone?: string } =
       await request.json();
     const slotId = body?.slotId;
-    const name = typeof body?.name === "string" ? body.name.trim() : "";
-    const email = typeof body?.email === "string" ? body.email.trim() : "";
-    const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
+    const name = typeof body?.name === "string" ? body.name.trim().slice(0, 200) : "";
+    const email = typeof body?.email === "string" ? body.email.trim().slice(0, 255) : "";
+    const phone = typeof body?.phone === "string" ? body.phone.trim().slice(0, 50) : "";
+
+    if (slotId && !/^[0-9a-f-]{36}$/i.test(slotId)) {
+      return NextResponse.json({ error: "Slot invalide" }, { status: 400 });
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
 
     const { data: link } = await supabase
       .from("public_planning_links")
@@ -527,6 +551,18 @@ Si vous avez une question, contactez le club.`;
       }
     }
 
+    await logAudit({
+      clubId: link.club_id,
+      actorId: null,
+      actorEmail: email || null,
+      action: AuditAction.CREATE,
+      resourceType: "planning_assignments",
+      resourceId: assignment.id,
+      outcome: "success",
+      metadata: { source: "public_signup", token, slot_id: slotId },
+      ...meta,
+    });
+
     return NextResponse.json(
       {
         assignment: {
@@ -546,8 +582,9 @@ Si vous avez une question, contactez le club.`;
     );
   } catch (error: unknown) {
     const details = error instanceof Error ? error.message : undefined;
+    console.error("[API][public-plannings][POST] Erreur:", details);
     return NextResponse.json(
-      { error: "Erreur lors de l'inscription", details },
+      { error: "Erreur lors de l'inscription" },
       { status: 500 }
     );
   }

@@ -249,7 +249,15 @@ export default function DepensesPage() {
     userId: string,
     file: File
   ) => {
-    const safeName = file.name.replace(/\s+/g, "_");
+    // Le bucket "expenses" est désormais PRIVÉ (migration 025).
+    // Convention de chemin : <userId>/<timestamp>-<safeName>
+    // RLS storage.objects vérifie que userId == 1er segment du chemin.
+    const safeName = file.name
+      .replace(/\\/g, "/")
+      .split("/")
+      .pop()!
+      .replace(/[^A-Za-z0-9._-]+/g, "_")
+      .slice(0, 200);
     const filePath = `${userId}/${Date.now()}-${safeName}`;
 
     const { error: uploadError } = await supabase.storage
@@ -267,16 +275,21 @@ export default function DepensesPage() {
       );
     }
 
-    const { data: publicUrlData } = supabase.storage
+    // URL signée à durée limitée (24h). À ré-signer au-delà.
+    // Note : on stocke aussi le path dans `notes` (champ libre) en attendant
+    // d'ajouter une colonne `attachment_path` dédiée à la table depenses.
+    const { data: signed, error: signError } = await supabase.storage
       .from("expenses")
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 60 * 60 * 24);
 
-    if (!publicUrlData?.publicUrl) {
-      console.error("[Depenses][upload] URL publique manquante:", publicUrlData);
+    if (signError || !signed?.signedUrl) {
+      console.error("[Depenses][upload] Signature URL échouée:", signError);
+      // Cleanup
+      await supabase.storage.from("expenses").remove([filePath]);
       throw new Error(t("dashboard.expenses.uploadError"));
     }
 
-    return publicUrlData.publicUrl;
+    return signed.signedUrl;
   };
 
   // Cause du bug: les boutons dépendaient du submit HTML et étaient recouverts par un overlay,

@@ -5,6 +5,8 @@ import {
   sendRequestReceivedToClub,
 } from "@/lib/buvette/email";
 import { upsertMarketingContact } from "@/lib/marketing/contacts";
+import { rateLimitGuard } from "@/lib/security/rateLimit";
+import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
@@ -13,8 +15,20 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const meta = extractRequestMetadata(request);
+  // Anti-spam : 3 demandes max par IP toutes les 30 minutes
+  const rl = rateLimitGuard(
+    request,
+    "buvette:requests",
+    { limit: 3, windowMs: 30 * 60 * 1000 }
+  );
+  if (!rl.ok) return rl.response;
+
   try {
     const { slug } = await params;
+    if (!slug || slug.length > 64 || !/^[a-z0-9-]+$/i.test(slug)) {
+      return NextResponse.json({ error: "Slug invalide" }, { status: 400 });
+    }
     const supabase = createAdminClient();
     const body = await request.json();
 
@@ -137,8 +151,25 @@ export async function POST(
       message,
     });
 
+    await logAudit({
+      clubId: profile.user_id,
+      actorId: null,
+      actorEmail: email,
+      action: AuditAction.CREATE,
+      resourceType: "buvette_requests",
+      resourceId: created.id,
+      outcome: "success",
+      metadata: { source: "public_form", slug, date, eventType },
+      ...meta,
+    });
+
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    console.error("[API][buvette][public-request] Erreur:", error);
+    // Pas de fuite de message d'erreur SQL au public
+    return NextResponse.json(
+      { error: "Impossible de traiter la demande", details: getErrorMessage(error) },
+      { status: 500 }
+    );
   }
 }
