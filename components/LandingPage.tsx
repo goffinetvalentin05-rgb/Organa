@@ -179,7 +179,7 @@ const heroFloatingCardsData = [
     line2: "42 participants",
     secondary: "Lien ou QR code partagé au club",
     floatClass:
-      "left-[6%] top-[74%] -rotate-6 md:left-[8%] md:top-[72%] lg:left-[14%] lg:top-[64%] animate-float [animation-delay:120ms]",
+      "left-[6%] top-[74%] -rotate-6 md:left-[3%] md:top-[78%] lg:left-[3%] lg:top-[78%] animate-float [animation-delay:120ms]",
   },
   {
     title: "Planning manifestation",
@@ -187,7 +187,7 @@ const heroFloatingCardsData = [
     line2: "8 bénévoles inscrits",
     secondary: "Organisation simple des bénévoles",
     floatClass:
-      "right-[6%] top-[72%] rotate-6 md:right-[8%] md:top-[70%] lg:right-[14%] lg:top-[62%] animate-float [animation-delay:260ms]",
+      "right-[6%] top-[72%] rotate-6 md:right-[3%] md:top-[78%] lg:right-[3%] lg:top-[78%] animate-float [animation-delay:260ms]",
   },
   {
     title: "Cotisation annuelle",
@@ -195,7 +195,7 @@ const heroFloatingCardsData = [
     line2: "Équipe 1",
     secondary: "Envoi en 2 clics",
     floatClass:
-      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[88%] lg:top-[96%] animate-float [animation-delay:400ms]",
+      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[92%] lg:top-[96%] animate-float [animation-delay:400ms]",
   },
 ] as const;
 
@@ -261,6 +261,21 @@ function FeatureTabIcon({ id, className }: { id: FeatureTabId; className?: strin
   return <Icon className={className ?? "h-[1.125rem] w-[1.125rem] shrink-0"} strokeWidth={1.75} aria-hidden />;
 }
 
+function SwissFlag({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-label="Drapeau suisse"
+      role="img"
+    >
+      <rect width="32" height="32" fill="#DA291C" />
+      <path d="M13.5 7h5v5.5H24v5h-5.5V23h-5v-5.5H8v-5h5.5z" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
 export default function LandingPage() {
   const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
   const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabId>("membres");
@@ -274,7 +289,7 @@ export default function LandingPage() {
       <div className="relative z-10 pb-20">
         <section className="mt-0 w-full">
           <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-12">
-            <header className="mx-auto flex max-w-[1140px] items-center justify-between gap-4">
+            <header className="mx-auto flex max-w-[1040px] items-center justify-between gap-4">
               <Link href="/" className="transition hover:opacity-95">
                 <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
               </Link>
@@ -984,12 +999,20 @@ export default function LandingPage() {
               </nav>
             </div>
 
-            <div className="mt-10 flex flex-col items-center gap-3 border-t border-slate-100 pt-6 text-xs text-slate-500 sm:flex-row sm:justify-between md:mt-12">
-              <span className="inline-flex items-center gap-1.5 font-semibold text-slate-600">
-                <span aria-hidden>🇨🇭</span>
-                Conçu en Suisse
-              </span>
-              <span className="text-slate-500">Obillz · Gestion de clubs sportifs</span>
+            <div className="mt-10 flex flex-col items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-5 sm:flex-row sm:items-center sm:gap-5 md:mt-12">
+              <SwissFlag className="h-10 w-10 shrink-0 rounded-md shadow-[0_2px_6px_rgba(15,23,42,0.12)]" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-900">Conçu en Suisse</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-600 md:text-[0.8125rem]">
+                  Obillz est un logiciel suisse, développé et hébergé en Suisse, pensé pour les
+                  clubs locaux.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col items-center gap-2 border-t border-slate-100 pt-5 text-xs text-slate-500 sm:flex-row sm:justify-between">
+              <span>Obillz · Gestion de clubs sportifs</span>
+              <span>© {new Date().getFullYear()} Obillz</span>
             </div>
           </div>
         </footer>
