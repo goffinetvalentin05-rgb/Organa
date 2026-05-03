@@ -3,7 +3,6 @@ import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/render
 import {
   clubDocumentPdfStyles as styles,
   formatPdfDateLong,
-  formatPdfIban,
   pdfHyphenationCallback,
 } from "@/lib/pdf/clubPdfLayout";
 import type { SponsorContractPdfLocale } from "@/lib/utils/pdf-data";
@@ -226,20 +225,6 @@ export const SponsorContractPdf: React.FC<SponsorContractPdfProps> = ({
             </View>
           </View>
         </View>
-
-        {(company.iban || company.bankName || company.conditionsPaiement) && (
-          <View style={styles.footer} fixed>
-            {(company.iban || company.bankName) && (
-              <Text style={styles.footerText}>
-                {company.bankName ? `${company.bankName} • ` : ""}
-                {company.iban ? `IBAN ${formatPdfIban(company.iban)}` : ""}
-              </Text>
-            )}
-            {company.conditionsPaiement ? (
-              <Text style={styles.footerText}>{company.conditionsPaiement}</Text>
-            ) : null}
-          </View>
-        )}
       </Page>
     </Document>
   );
