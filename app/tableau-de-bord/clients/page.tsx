@@ -7,6 +7,15 @@ import { Edit, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
+import {
+  PageHeader,
+  GlassCard,
+  DataTableCard,
+  EmptyState,
+  ActionButton,
+  glassCardClass,
+  cn,
+} from "@/components/dashboard-ui";
 
 interface Client {
   id: string;
@@ -92,10 +101,10 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         <div className="animate-pulse space-y-6">
-          <div className="h-10 bg-slate-200 rounded w-1/3"></div>
-          <div className="h-64 bg-slate-200 rounded-2xl"></div>
+          <div className="h-10 w-1/3 rounded-xl bg-slate-200/80" />
+          <div className={cn("h-64 animate-pulse rounded-2xl bg-slate-200/50", glassCardClass)} />
         </div>
       </div>
     );
@@ -103,39 +112,31 @@ export default function ClientsPage() {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
-          <p className="text-red-600 font-medium mb-2">
-            {t("dashboard.clients.loadError")}
-          </p>
-          <p className="text-red-500 text-sm">{error}</p>
-        </div>
+      <div className="mx-auto max-w-7xl">
+        <GlassCard className="border-red-200/90 bg-gradient-to-br from-red-50/90 to-white text-center">
+          <p className="font-medium text-red-700">{t("dashboard.clients.loadError")}</p>
+          <p className="mt-2 text-sm text-red-600/90">{error}</p>
+        </GlassCard>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            {t("dashboard.clients.title")}
-          </h1>
-          <p className="mt-1 text-slate-500">
-            {t("dashboard.clients.subtitle")}
-          </p>
-        </div>
-        <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau">
-          {t("dashboard.clients.newClient")}
-        </DashboardPrimaryButton>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-6 pb-10">
+      <PageHeader
+        title={t("dashboard.clients.title")}
+        subtitle={t("dashboard.clients.subtitle")}
+        actions={
+          <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau">
+            {t("dashboard.clients.newClient")}
+          </DashboardPrimaryButton>
+        }
+      />
 
-      {/* Filtres */}
       {clients.length > 0 && (vis.role.enabled || vis.category.enabled) && (
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-slate-500" />
+        <GlassCard padding="sm" className="border-slate-200/80">
+          <div className="mb-3 flex items-center gap-2">
+            <Filter className="h-4 w-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-700">{t("dashboard.clients.filtersLabel")}</span>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -143,7 +144,7 @@ export default function ClientsPage() {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="rounded-lg border border-slate-200/90 bg-white/90 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
               >
                 <option value="">{t("dashboard.clients.filters.allRoles")}</option>
                 <option value="player">{t("dashboard.clients.roles.player")}</option>
@@ -157,7 +158,7 @@ export default function ClientsPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="rounded-lg border border-slate-200/90 bg-white/90 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
               >
                 <option value="">{t("dashboard.clients.filters.allCategories")}</option>
                 <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
@@ -177,40 +178,38 @@ export default function ClientsPage() {
                   setRoleFilter("");
                   setCategoryFilter("");
                 }}
-                className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                className="rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100/80 hover:text-slate-900"
               >
                 {t("dashboard.clients.filters.resetFilters")}
               </button>
             )}
           </div>
-        </div>
+        </GlassCard>
       )}
 
-      {/* Liste des clients */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        {filteredClients.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-600 mb-4">
-              {clients.length === 0 
-                ? t("dashboard.clients.emptyState")
-                : "Aucun membre ne correspond aux filtres sélectionnés."
-              }
-            </p>
-            {clients.length === 0 && (
+      {filteredClients.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title={
+            clients.length === 0
+              ? t("dashboard.clients.emptyState")
+              : t("dashboard.clients.noMatchFilter")
+          }
+          action={
+            clients.length === 0 ? (
               <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau" className="inline-flex">
                 {t("dashboard.clients.emptyCta")}
               </DashboardPrimaryButton>
-            )}
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-100">
+            ) : null
+          }
+        />
+      ) : (
+        <DataTableCard bodyClassName="overflow-hidden">
+          <div className="divide-y divide-slate-100/90">
             {filteredClients.map((client) => (
               <div
                 key={client.id}
-                className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
+                className="p-5 transition-colors hover:bg-blue-50/20 md:p-6"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <Link
@@ -276,15 +275,15 @@ export default function ClientsPage() {
                       </div>
                     </div>
                   </Link>
-                  <div className="flex flex-wrap items-center gap-2 md:ml-4 shrink-0">
-                    <Link
+                  <div className="flex shrink-0 flex-wrap items-center gap-2 md:ml-4">
+                    <ActionButton
                       href={`/tableau-de-bord/clients/${client.id}/edit`}
                       onClick={(e) => e.stopPropagation()}
-                      className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all text-sm flex items-center gap-2 border border-slate-200 shadow-sm"
+                      className="inline-flex items-center gap-2"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="h-4 w-4" />
                       {t("dashboard.clients.editAction")}
-                    </Link>
+                    </ActionButton>
                     <DeleteClientButton
                       clientId={client.id}
                       onDeleted={(removedId) =>
@@ -296,8 +295,8 @@ export default function ClientsPage() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </DataTableCard>
+      )}
 
       {/* Footer avec compteur */}
       {clients.length > 0 && (

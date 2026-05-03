@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Edit } from "@/lib/icons";
+import { ArrowLeft, Edit, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
+import { GlassCard, SectionCard, ActionButton } from "@/components/dashboard-ui";
 import CreatedByBadge from "@/components/CreatedByBadge";
 import type { MemberFieldsMerged } from "@/lib/member-fields/types";
 import {
@@ -101,27 +102,30 @@ export default function MemberDetailView({
     .join(", ");
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-3xl space-y-6 pb-10">
+      <GlassCard
+        padding="sm"
+        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <Link
           href="/tableau-de-bord/clients"
-          className="inline-flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition-colors hover:text-[#2563EB]"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4 shrink-0" />
           {t("dashboard.clients.memberDetail.back")}
         </Link>
-        {canManageMembers && (
-          <Link
+        {canManageMembers ? (
+          <ActionButton
             href={`/tableau-de-bord/clients/${member.id}/edit`}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2"
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="h-4 w-4" />
             {t("dashboard.clients.memberDetail.editAction")}
-          </Link>
-        )}
-      </div>
+          </ActionButton>
+        ) : null}
+      </GlassCard>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <GlassCard padding="none" className="shadow-md shadow-slate-200/40">
         <div
           className="px-6 py-8 sm:px-8 sm:py-10 text-white"
           style={{ backgroundColor: "var(--obillz-hero-blue)" }}
@@ -276,40 +280,28 @@ export default function MemberDetailView({
             />
           </div>
         )}
-      </div>
+      </GlassCard>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div
-          className="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
-          style={{ background: "linear-gradient(135deg, rgba(124, 92, 255, 0.08) 0%, rgba(15, 23, 42, 0.03) 100%)" }}
-        >
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Participations</h2>
-            <p className="text-sm text-slate-600 mt-1 max-w-xl">
-              Historique des plannings / événements (inscription interne, publique reconnue ou
-              rattachement admin).
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
+      <SectionCard
+        icon={ClipboardList}
+        title="Participations"
+        description="Historique des plannings / événements (inscription interne, publique reconnue ou rattachement admin)."
+        headerRight={
+          <div className="flex items-center gap-2">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Total</span>
-            <span
-              className="inline-flex min-w-[2.25rem] justify-center rounded-full px-2.5 py-1 text-sm font-semibold text-white shadow-sm"
-              style={{ backgroundColor: "var(--obillz-hero-blue, #4f46e5)" }}
-            >
+            <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-2.5 py-1 text-sm font-semibold text-white shadow-sm shadow-blue-600/20">
               {planningParticipations.length}
             </span>
           </div>
-        </div>
-
+        }
+      >
         {planningParticipations.length === 0 ? (
-          <div className="px-5 sm:px-6 py-10 sm:py-12 text-center">
-            <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
-              Aucune participation enregistrée pour ce membre. Les inscriptions liées à un planning
-              apparaîtront ici automatiquement.
-            </p>
-          </div>
+          <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-slate-600">
+            Aucune participation enregistrée pour ce membre. Les inscriptions liées à un planning
+            apparaîtront ici automatiquement.
+          </p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-100/90 bg-white/50">
             {planningParticipations.map((p) => {
               const status = p.participationStatus;
               const badgeClass =
@@ -323,20 +315,20 @@ export default function MemberDetailView({
               return (
                 <li
                   key={p.id}
-                  className="px-4 sm:px-6 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                 >
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/tableau-de-bord/plannings/${p.planningId}`}
-                      className="font-medium text-violet-700 hover:text-violet-900 hover:underline break-words"
+                      className="break-words font-medium text-[#2563EB] hover:text-[#1d4ed8] hover:underline"
                     >
                       {p.eventTitle}
                     </Link>
-                    <p className="text-sm text-slate-600 mt-1">
+                    <p className="mt-1 text-sm text-slate-600">
                       {p.eventDate ? formatDateOnly(p.eventDate, loc) : "—"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                  <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
                     <span
                       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}
                     >
@@ -348,7 +340,7 @@ export default function MemberDetailView({
             })}
           </ul>
         )}
-      </div>
+      </SectionCard>
     </div>
   );
 }

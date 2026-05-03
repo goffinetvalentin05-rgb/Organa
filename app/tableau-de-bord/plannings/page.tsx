@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { Eye, Trash, ClipboardList, Calendar, Users } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
+import {
+  PageHeader,
+  DataTableCard,
+  GlassCard,
+  EmptyState,
+  ActionButton,
+  glassCardClass,
+} from "@/components/dashboard-ui";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
 
@@ -114,57 +121,57 @@ export default function PlanningsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.plannings.title")}</h1>
-          <p className="mt-2 text-secondary">{t("dashboard.plannings.subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-subtle bg-white text-secondary"
-          >
-            <option value="all">{t("dashboard.plannings.filters.all")}</option>
-            <option value="draft">{t("dashboard.plannings.filters.draft")}</option>
-            <option value="published">{t("dashboard.plannings.filters.published")}</option>
-            <option value="archived">{t("dashboard.plannings.filters.archived")}</option>
-          </select>
-          <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau">
-            {t("dashboard.plannings.newPlanning")}
-          </DashboardPrimaryButton>
-        </div>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-8 pb-10">
+      <PageHeader
+        title={t("dashboard.plannings.title")}
+        subtitle={t("dashboard.plannings.subtitle")}
+        actions={
+          <>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/35"
+            >
+              <option value="all">{t("dashboard.plannings.filters.all")}</option>
+              <option value="draft">{t("dashboard.plannings.filters.draft")}</option>
+              <option value="published">{t("dashboard.plannings.filters.published")}</option>
+              <option value="archived">{t("dashboard.plannings.filters.archived")}</option>
+            </select>
+            <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau">
+              {t("dashboard.plannings.newPlanning")}
+            </DashboardPrimaryButton>
+          </>
+        }
+      />
 
       {limitReached && (
         <LimitReachedAlert message="Limite de plannings atteinte. Passez au plan Pro pour en créer plus." />
       )}
 
-      <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
+      <DataTableCard bodyClassName="p-0">
         {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-secondary">{t("dashboard.plannings.loading")}</p>
-          </div>
+          <div className="p-12 text-center text-slate-500">{t("dashboard.plannings.loading")}</div>
         ) : errorMessage ? (
-          <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">Erreur de chargement</p>
-            <p className="text-secondary text-sm">{errorMessage}</p>
-          </div>
+          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
+            <p className="font-medium text-red-700">Erreur de chargement</p>
+            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+          </GlassCard>
         ) : filteredPlannings.length === 0 ? (
-          <div className="p-12 text-center">
-            <ClipboardList className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <p className="text-secondary mb-4">{t("dashboard.plannings.emptyState")}</p>
-            <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau" className="inline-flex rounded-full">
-              {t("dashboard.plannings.emptyCta")}
-            </DashboardPrimaryButton>
-          </div>
+          <EmptyState
+            icon={ClipboardList}
+            title={t("dashboard.plannings.emptyState")}
+            action={
+              <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau" className="inline-flex">
+                {t("dashboard.plannings.emptyCta")}
+              </DashboardPrimaryButton>
+            }
+          />
         ) : (
-          <div className="p-6 space-y-4">
+          <div className="space-y-4 p-5 sm:p-6">
             {filteredPlannings.map((planning) => (
               <div
                 key={planning.id}
-                className="rounded-2xl border border-subtle bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                className={`${glassCardClass} p-5 transition-all duration-200 hover:border-blue-200/90 hover:shadow-md`}
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -215,28 +222,30 @@ export default function PlanningsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-subtle">
-                    <Link
+                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100/90 pt-3">
+                    <ActionButton
                       href={`/tableau-de-bord/plannings/${planning.id}`}
-                      className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
+                      className="inline-flex items-center gap-2"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="h-4 w-4" />
                       {t("dashboard.plannings.viewManage")}
-                    </Link>
-                    <button
+                    </ActionButton>
+                    <ActionButton
+                      type="button"
+                      variant="dangerSoft"
                       onClick={() => handleDelete(planning.id)}
-                      className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                       title="Supprimer"
+                      className="inline-flex items-center justify-center"
                     >
-                      <Trash className="w-4 h-4" />
-                    </button>
+                      <Trash className="h-4 w-4" />
+                    </ActionButton>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </DataTableCard>
     </div>
   );
 }

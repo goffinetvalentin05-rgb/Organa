@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import SettingsSectionCard from "./SettingsSectionCard";
+import { SectionCard } from "@/components/dashboard-ui";
 import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
@@ -578,7 +578,7 @@ export default function ParametresPage() {
           </div>
         </Link>
 
-        <SettingsSectionCard
+        <SectionCard
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}
           description={t("dashboard.settings.layout.sectionDescriptions.members")}
@@ -594,10 +594,10 @@ export default function ParametresPage() {
               {t("dashboard.settings.layout.memberCategories.body")}
             </p>
           </SettingsAccordion>
-        </SettingsSectionCard>
+        </SectionCard>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <SettingsSectionCard
+          <SectionCard
             icon={Building2}
             title={t("dashboard.settings.layout.sections.clubInfo")}
             description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
@@ -781,9 +781,9 @@ export default function ParametresPage() {
                 </div>
               </div>
             </SettingsAccordion>
-          </SettingsSectionCard>
+          </SectionCard>
 
-          <SettingsSectionCard
+          <SectionCard
             icon={Wallet}
             title={t("dashboard.settings.layout.sections.finances")}
             description={t("dashboard.settings.layout.sectionDescriptions.finances")}
@@ -941,9 +941,9 @@ export default function ParametresPage() {
                 </div>
               </div>
             </SettingsAccordion>
-          </SettingsSectionCard>
+          </SectionCard>
 
-          <SettingsSectionCard
+          <SectionCard
             icon={Shield}
             title={t("dashboard.settings.layout.sections.security")}
             description={t("dashboard.settings.layout.sectionDescriptions.security")}
@@ -1042,9 +1042,9 @@ export default function ParametresPage() {
                 </div>
               )}
             </SettingsAccordion>
-          </SettingsSectionCard>
+          </SectionCard>
 
-          <SettingsSectionCard
+          <SectionCard
             icon={Settings}
             title={t("dashboard.settings.layout.sections.advanced")}
             description={t("dashboard.settings.layout.sectionDescriptions.advanced")}
@@ -1071,7 +1071,7 @@ export default function ParametresPage() {
                 <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.headerStyleHelp")}</p>
               </div>
             </SettingsAccordion>
-          </SettingsSectionCard>
+          </SectionCard>
 
           <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50/90 via-white to-blue-50/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>

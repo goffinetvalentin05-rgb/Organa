@@ -16,6 +16,14 @@ import {
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageHeader,
+  StatCard,
+  SectionCard,
+  EmptyState,
+  DataTableCard,
+  glassCardClass,
+} from "@/components/dashboard-ui";
 
 interface Client {
   id: string;
@@ -74,8 +82,6 @@ function CheckoutHandler() {
 
 export default function TableauDeBordPage() {
   const { t, locale } = useI18n();
-  const kpiCardClass =
-    "group relative bg-white/95 rounded-3xl border border-slate-200/90 p-6 shadow-[0_6px_20px_rgba(15,23,42,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--obillz-blue-border)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]";
   const [stats, setStats] = useState({
     totalClients: 0,
     totalDevis: 0,
@@ -304,158 +310,121 @@ export default function TableauDeBordPage() {
   };
 
 
+  const quickTile =
+    "group flex items-center gap-4 rounded-xl border border-slate-200/90 bg-white/60 p-5 shadow-sm transition-all duration-200 hover:border-blue-200/90 hover:bg-white hover:shadow-md";
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 pb-10">
       <Suspense fallback={null}>
         <CheckoutHandler />
       </Suspense>
 
-      {/* En-tête */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            {t("dashboard.overview.title")}
-          </h1>
-          <p className="mt-1 text-slate-500">
-            {t("dashboard.overview.subtitle")}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-white/80">
-          <CheckCircle className="w-4 h-4 text-emerald-500" />
-          <span>{t("dashboard.overview.statusNote")}</span>
-        </div>
-      </div>
+      <PageHeader
+        title={t("dashboard.overview.title")}
+        subtitle={t("dashboard.overview.subtitle")}
+        actions={
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2 text-sm text-emerald-900 shadow-sm">
+            <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600" />
+            <span>{t("dashboard.overview.statusNote")}</span>
+          </div>
+        }
+      />
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Membres */}
-        <Link
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
           href="/tableau-de-bord/clients"
-          className={kpiCardClass}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.clients")}</span>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-[var(--obillz-blue-light)] transition-colors">
-              <Users className="w-5 h-5 text-slate-600 group-hover:text-[var(--obillz-hero-blue)]" />
-            </div>
-          </div>
-          <div className="text-4xl font-bold text-slate-900">
-            {loading ? "-" : stats.totalClients}
-          </div>
-          {!loading && stats.totalClients === 0 && (
-            <p className="mt-2 text-sm text-slate-400">
-              {t("dashboard.overview.kpis.clientsEmpty")}
-            </p>
-          )}
-        </Link>
+          label={t("dashboard.overview.kpis.clients")}
+          icon={Users}
+          value={loading ? "-" : stats.totalClients}
+          footer={
+            !loading && stats.totalClients === 0 ? (
+              <p className="text-sm text-slate-400">{t("dashboard.overview.kpis.clientsEmpty")}</p>
+            ) : null
+          }
+        />
 
-        {/* Cotisations */}
-        <Link
+        <StatCard
           href="/tableau-de-bord/devis"
-          className={kpiCardClass}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.quotes")}</span>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-[var(--obillz-blue-light)] transition-colors">
-              <FileText className="w-5 h-5 text-slate-600 group-hover:text-[var(--obillz-hero-blue)]" />
-            </div>
-          </div>
-          <div className="text-4xl font-bold text-slate-900">
-            {loading ? "-" : stats.totalDevis}
-          </div>
-          {!loading && (
-            <div className="mt-2 flex flex-wrap gap-2 text-sm">
-              {stats.devisPayes > 0 && (
-                <span className="text-emerald-600 font-medium">
-                  {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
-                </span>
-              )}
-              {stats.devisEnRetard > 0 && (
-                <span className="text-red-500 font-medium">
-                  {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
-                </span>
-              )}
-              {stats.devisEnAttente > 0 && (
-                <span className="font-medium" style={{ color: "var(--obillz-hero-blue)" }}>
-                  {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
-                </span>
-              )}
-              {stats.totalDevis === 0 && (
-                <span className="text-slate-400">{t("dashboard.overview.kpis.allClear")}</span>
-              )}
-            </div>
-          )}
-        </Link>
+          label={t("dashboard.overview.kpis.quotes")}
+          icon={FileText}
+          value={loading ? "-" : stats.totalDevis}
+          footer={
+            !loading ? (
+              <div className="flex flex-wrap gap-2 text-sm">
+                {stats.devisPayes > 0 ? (
+                  <span className="font-medium text-emerald-600">
+                    {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
+                  </span>
+                ) : null}
+                {stats.devisEnRetard > 0 ? (
+                  <span className="font-medium text-red-500">
+                    {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
+                  </span>
+                ) : null}
+                {stats.devisEnAttente > 0 ? (
+                  <span className="font-medium text-[#2563EB]">
+                    {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
+                  </span>
+                ) : null}
+                {stats.totalDevis === 0 ? (
+                  <span className="text-slate-400">{t("dashboard.overview.kpis.allClear")}</span>
+                ) : null}
+              </div>
+            ) : null
+          }
+        />
 
-        {/* Factures */}
-        <Link
+        <StatCard
           href="/tableau-de-bord/factures"
-          className={kpiCardClass}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-slate-500">{t("dashboard.overview.kpis.invoices")}</span>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-[var(--obillz-blue-light)] transition-colors">
-              <Receipt className="w-5 h-5 text-slate-600 group-hover:text-[var(--obillz-hero-blue)]" />
-            </div>
-          </div>
-          <div className="text-4xl font-bold text-slate-900">
-            {loading ? "-" : stats.totalFactures}
-          </div>
-          {!loading && stats.facturesNonPayees > 0 ? (
-            <p className="mt-2 text-sm font-medium text-red-500">
-              {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
-            </p>
-          ) : (
-            <p className="mt-2 text-sm text-slate-400">
-              {t("dashboard.overview.kpis.allClear")}
-            </p>
-          )}
-        </Link>
+          label={t("dashboard.overview.kpis.invoices")}
+          icon={Receipt}
+          value={loading ? "-" : stats.totalFactures}
+          footer={
+            !loading ? (
+              stats.facturesNonPayees > 0 ? (
+                <p className="text-sm font-medium text-red-500">
+                  {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
+                </p>
+              ) : (
+                <p className="text-sm text-slate-400">{t("dashboard.overview.kpis.allClear")}</p>
+              )
+            ) : null
+          }
+        />
 
-        {/* Solde du club */}
-        <div className="group relative bg-white rounded-3xl border border-slate-200/90 p-6 text-slate-900 shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--obillz-blue-border)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)]">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-slate-500">Solde du club</span>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
-            </div>
-          </div>
-          <div className="text-3xl font-bold text-slate-900">
-            {loading ? "-" : formatMontant(stats.soldeClub)}
-          </div>
-          <p className="mt-2 text-sm text-slate-500">
-            Cotisations + Factures - Charges
-          </p>
-        </div>
+        <StatCard
+          label="Solde du club"
+          icon={Receipt}
+          value={loading ? "-" : formatMontant(stats.soldeClub)}
+          footer={<p className="text-sm text-slate-500">Cotisations + Factures - Charges</p>}
+        />
       </div>
 
-      {/* À traiter maintenant */}
-      {aTraiterMaintenant.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-[0_6px_20px_rgba(15,23,42,0.05)]">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900">
-              {t("dashboard.overview.now.title")}
-            </h2>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      {aTraiterMaintenant.length > 0 ? (
+        <SectionCard
+          icon={Receipt}
+          title={t("dashboard.overview.now.title")}
+          headerRight={
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               {t("dashboard.overview.now.badge")}
             </span>
-          </div>
-
-          <div className="space-y-4">
+          }
+        >
+          <div className="space-y-3">
             {aTraiterMaintenant.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white rounded-xl border border-slate-200 p-5 transition-all hover:border-[var(--obillz-blue-border)] hover:shadow-md"
+                className={`${glassCardClass} flex flex-col gap-4 p-4 transition-all hover:border-blue-200/90 hover:shadow-md md:flex-row md:items-center md:justify-between`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                    <Receipt className="w-5 h-5 text-slate-500" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                    <Receipt className="h-5 w-5 text-slate-500" />
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900">{item.numero}</p>
                     <p className="text-sm text-slate-500">{item.client}</p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="mt-1 text-xs text-slate-400">
                       {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
                     </p>
                   </div>
@@ -463,90 +432,64 @@ export default function TableauDeBordPage() {
                 <div className="flex items-center gap-4 md:text-right">
                   <div>
                     <p className="font-bold text-slate-900">{formatMontant(item.montant)}</p>
-                    <span className={`badge-obillz ${item.statutColor}`}>
-                      {item.statutLabel}
-                    </span>
+                    <span className={`badge-obillz ${item.statutColor}`}>{item.statutLabel}</span>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400" />
+                  <ArrowRight className="h-5 w-5 text-slate-400" />
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-      )}
+        </SectionCard>
+      ) : null}
 
-      {/* Empty state si rien à traiter */}
-      {!loading && aTraiterMaintenant.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_6px_20px_rgba(15,23,42,0.05)]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <p className="font-medium text-slate-900">{t("dashboard.overview.now.empty")}</p>
-              <p className="text-sm text-slate-600">{t("dashboard.overview.now.subtitleAllClear")}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {!loading && aTraiterMaintenant.length === 0 ? (
+        <EmptyState
+          icon={CheckCircle}
+          title={t("dashboard.overview.now.empty")}
+          description={t("dashboard.overview.now.subtitleAllClear")}
+        />
+      ) : null}
 
-      {/* Actions rapides */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">
-          {t("dashboard.overview.quickActions.title")}
-        </h2>
+      <SectionCard icon={FilePlus} title={t("dashboard.overview.quickActions.title")}>
         <div className="grid gap-4 md:grid-cols-3">
-          <Link
-            href="/tableau-de-bord/devis/nouveau"
-            className="group flex items-center gap-4 p-5 rounded-xl border border-slate-200 transition-all hover:border-[var(--obillz-blue-border)] hover:bg-slate-50"
-          >
-            <div className="w-12 h-12 rounded-xl bg-[var(--obillz-blue-light)] flex items-center justify-center group-hover:bg-[var(--obillz-hero-blue)] transition-colors">
-              <FilePlus className="w-6 h-6 text-[var(--obillz-hero-blue)] group-hover:text-white" />
+          <Link href="/tableau-de-bord/devis/nouveau" className={quickTile}>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 transition-colors group-hover:from-[#2563EB] group-hover:to-[#1d4ed8]">
+              <FilePlus className="h-6 w-6 text-[#2563EB] transition-colors group-hover:text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold text-slate-900">{t("dashboard.overview.quickActions.newQuote")}</p>
               <p className="text-sm text-slate-500">{t("dashboard.overview.quickActions.newQuoteText")}</p>
             </div>
           </Link>
 
-          <Link
-            href="/tableau-de-bord/factures/nouvelle"
-            className="group flex items-center gap-4 p-5 rounded-xl border border-slate-200 transition-all hover:border-[var(--obillz-blue-border)] hover:bg-slate-50"
-          >
-            <div className="w-12 h-12 rounded-xl bg-[var(--obillz-blue-light)] flex items-center justify-center group-hover:bg-[var(--obillz-hero-blue)] transition-colors">
-              <FilePlus className="w-6 h-6 text-[var(--obillz-hero-blue)] group-hover:text-white" />
+          <Link href="/tableau-de-bord/factures/nouvelle" className={quickTile}>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 transition-colors group-hover:from-[#2563EB] group-hover:to-[#1d4ed8]">
+              <FilePlus className="h-6 w-6 text-[#2563EB] transition-colors group-hover:text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold text-slate-900">{t("dashboard.overview.quickActions.newInvoice")}</p>
               <p className="text-sm text-slate-500">{t("dashboard.overview.quickActions.newInvoiceText")}</p>
             </div>
           </Link>
 
-          <Link
-            href="/tableau-de-bord/clients/nouveau"
-            className="group flex items-center gap-4 p-5 rounded-xl border border-slate-200 transition-all hover:border-[var(--obillz-blue-border)] hover:bg-slate-50"
-          >
-            <div className="w-12 h-12 rounded-xl bg-[var(--obillz-blue-light)] flex items-center justify-center group-hover:bg-[var(--obillz-hero-blue)] transition-colors">
-              <UserPlus className="w-6 h-6 text-[var(--obillz-hero-blue)] group-hover:text-white" />
+          <Link href="/tableau-de-bord/clients/nouveau" className={quickTile}>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 transition-colors group-hover:from-[#2563EB] group-hover:to-[#1d4ed8]">
+              <UserPlus className="h-6 w-6 text-[#2563EB] transition-colors group-hover:text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold text-slate-900">{t("dashboard.overview.quickActions.newClient")}</p>
               <p className="text-sm text-slate-500">{t("dashboard.overview.quickActions.newClientText")}</p>
             </div>
           </Link>
         </div>
-      </div>
+      </SectionCard>
 
-      {/* Derniers documents */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">
-          {t("dashboard.overview.lastDocuments.title")}
-        </h2>
+      <DataTableCard title={t("dashboard.overview.lastDocuments.title")} bodyClassName="p-5 sm:p-6 md:p-8">
         {loading ? (
-          <div className="text-center py-8 text-slate-400">{t("dashboard.overview.lastDocuments.loading")}</div>
+          <div className="py-10 text-center text-slate-500">{t("dashboard.overview.lastDocuments.loading")}</div>
         ) : derniersDocuments.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-slate-500">{t("dashboard.overview.lastDocuments.empty")}</p>
+          <div className="py-10 text-center text-sm text-slate-500">
+            {t("dashboard.overview.lastDocuments.empty")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -554,14 +497,14 @@ export default function TableauDeBordPage() {
               <Link
                 key={`${doc.type}-${doc.id}`}
                 href={`/tableau-de-bord/${doc.type === "devis" ? "devis" : "factures"}/${doc.id}`}
-                className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all"
+                className={`${glassCardClass} flex items-center justify-between border-slate-100/90 p-4 transition-all hover:border-blue-200/80 hover:shadow-sm`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
                     {doc.type === "devis" ? (
-                      <FileText className="w-5 h-5 text-slate-500" />
+                      <FileText className="h-5 w-5 text-slate-500" />
                     ) : (
-                      <Receipt className="w-5 h-5 text-slate-500" />
+                      <Receipt className="h-5 w-5 text-slate-500" />
                     )}
                   </div>
                   <div>
@@ -576,15 +519,13 @@ export default function TableauDeBordPage() {
                     <p className="font-semibold text-slate-900">{formatMontant(doc.montant)}</p>
                     <p className="text-xs text-slate-400">{formatDate(doc.dateCreation)}</p>
                   </div>
-                  <span className={`badge-obillz ${getStatutColor(doc.statut)}`}>
-                    {getStatutLabel(doc.statut)}
-                  </span>
+                  <span className={`badge-obillz ${getStatutColor(doc.statut)}`}>{getStatutLabel(doc.statut)}</span>
                 </div>
               </Link>
             ))}
           </div>
         )}
-      </div>
+      </DataTableCard>
     </div>
   );
 }
