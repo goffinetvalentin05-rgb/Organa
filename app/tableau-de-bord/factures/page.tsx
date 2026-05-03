@@ -127,7 +127,7 @@ export default function FacturesPage() {
               <button
                 type="button"
                 onClick={() => setShowAccountingExport((value) => !value)}
-                className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900"
+                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-all hover:bg-white/18"
               >
                 <Download className="h-4 w-4" />
                 {t("dashboard.invoices.exportAccountingAction")}
@@ -168,18 +168,14 @@ export default function FacturesPage() {
       />
 
       <div className="flex flex-wrap gap-2">
-        <span className="inline-flex items-center rounded-full bg-blue-50/90 px-3 py-1 text-xs font-medium text-blue-800 backdrop-blur-sm">
-          Sponsors
-        </span>
-        <span className="inline-flex items-center rounded-full bg-purple-50/90 px-3 py-1 text-xs font-medium text-purple-800 backdrop-blur-sm">
-          Locations de salle
-        </span>
-        <span className="inline-flex items-center rounded-full bg-emerald-50/90 px-3 py-1 text-xs font-medium text-emerald-800 backdrop-blur-sm">
-          Événements
-        </span>
-        <span className="inline-flex items-center rounded-full bg-amber-50/90 px-3 py-1 text-xs font-medium text-amber-900 backdrop-blur-sm">
-          Buvette
-        </span>
+        {["Sponsors", "Locations de salle", "Événements", "Buvette"].map((label) => (
+          <span
+            key={label}
+            className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm"
+          >
+            {label}
+          </span>
+        ))}
       </div>
 
       <TableCard bodyClassName="p-0">
@@ -273,8 +269,8 @@ export default function FacturesPage() {
             </div>
 
             {/* Footer avec compteur */}
-            <div className="border-t border-slate-100/90 bg-slate-50/80 px-6 py-4 backdrop-blur-sm">
-              <p className="text-center text-sm text-slate-500">
+            <div className="border-t border-slate-100 bg-slate-50 px-6 py-4">
+              <p className="text-center text-sm text-slate-600">
                 {factures.length} facture{factures.length > 1 ? "s" : ""} au total
               </p>
             </div>

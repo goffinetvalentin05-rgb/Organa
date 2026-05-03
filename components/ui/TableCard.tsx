@@ -13,6 +13,10 @@ export type TableCardProps = {
   bodyClassName?: string;
 };
 
+/** Liste / tableau sans bandeau : panneau blanc lisible (pas du contenu sur le bleu à travers le verre). */
+const tablePanelSolidClass =
+  "overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-16px_rgba(15,23,42,0.14)]";
+
 export default function TableCard({
   children,
   title,
@@ -24,7 +28,7 @@ export default function TableCard({
   const hasHeader = Boolean(title || description || toolbar);
 
   return (
-    <div className={cn(glassCardClass, "flex flex-col", className)}>
+    <div className={cn(hasHeader ? glassCardClass : tablePanelSolidClass, "flex flex-col", className)}>
       {hasHeader ? (
         <header
           className={cn(
@@ -43,7 +47,8 @@ export default function TableCard({
       ) : null}
       <div
         className={cn(
-          hasHeader ? "rounded-b-3xl border-t border-white/[0.1] bg-white text-slate-900" : "overflow-hidden",
+          hasHeader ? "rounded-b-3xl border-t border-slate-100 bg-white text-slate-900" : "min-h-0 flex-1 text-slate-900",
+          !hasHeader && "overflow-hidden",
           bodyClassName
         )}
       >

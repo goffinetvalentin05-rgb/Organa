@@ -128,9 +128,9 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell relative min-h-screen bg-[var(--obillz-hero-blue)]">
+    <div className="dashboard-shell relative min-h-screen bg-gradient-to-br from-[#12172e] via-[#1a2768] to-[#0a0e1c]">
       <div
-        className="pointer-events-none absolute inset-0 opacity-10"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
@@ -146,14 +146,10 @@ export default function DashboardLayout({
       )}
 
       {/* Sidebar */}
-      <aside 
-        className={`fixed left-0 top-0 z-50 h-screen w-72 transition-transform duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-black/[0.12] lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <aside
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/[0.08] bg-slate-950/35 shadow-[4px_0_32px_rgba(0,0,0,0.25)] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{
-          backgroundColor: "var(--obillz-hero-blue)",
-          boxShadow: "4px 0 20px rgba(0,0,0,0.08)",
-        }}
       >
         {/* Grille subtile en arrière-plan */}
         <div
@@ -229,7 +225,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 border-b border-white/20 bg-[var(--obillz-hero-blue)]/85 shadow-sm backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/25 shadow-sm backdrop-blur-md">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
             {/* Left: Mobile menu only */}
             <div className="flex items-center">
@@ -278,7 +274,7 @@ export default function DashboardLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-white/20 bg-[var(--obillz-hero-blue)]/85 px-4 py-4 lg:px-8 backdrop-blur">
+        <footer className="border-t border-white/10 bg-slate-950/25 px-4 py-4 backdrop-blur-md lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/75">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">

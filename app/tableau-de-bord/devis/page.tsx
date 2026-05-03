@@ -206,7 +206,7 @@ export default function DevisPage() {
             </div>
 
             {/* Footer avec compteur */}
-            <div className="border-t border-slate-100/90 bg-slate-50/80 px-6 py-4 backdrop-blur-sm">
+            <div className="border-t border-slate-100 bg-slate-50 px-6 py-4">
               <p className="text-center text-sm text-slate-500">
                 {t("dashboard.quotes.totalCount", { count: devis.length })}
               </p>
