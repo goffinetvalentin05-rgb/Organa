@@ -478,6 +478,7 @@
       "clients": "Mitglieder",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
+      "sponsoring": "Sponsoring",
       "payments": "Zahlungen",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
@@ -498,6 +499,10 @@
       "clients": "Mitglieder",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
+      "sponsoring": "Sponsoring",
+      "sponsoringNew": "Neuer Vertrag",
+      "sponsoringEdit": "Vertrag bearbeiten",
+      "sponsoringContract": "Sponsorvertrag",
       "payments": "Zahlungsverlauf",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
@@ -641,6 +646,7 @@
       "date": "Datum",
       "actions": "Aktionen",
       "view": "Ansehen",
+      "edit": "Bearbeiten",
       "delete": "Löschen",
       "unknownClient": "Unbekannter Kunde",
       "cancel": "Abbrechen",
@@ -1055,6 +1061,69 @@
       "emptyState": "Noch keine Rechnungen",
       "emptyCta": "Erste Rechnung erstellen"
     },
+    "sponsoring": {
+      "title": "Sponsoring",
+      "subtitle": "Sponsorverträge: Termine, Beträge und Verlängerungen.",
+      "newAction": "Neuer Vertrag",
+      "createSuccess": "Vertrag gespeichert",
+      "loadError": "Fehler beim Laden der Verträge",
+      "deleteConfirm": "Diesen Vertrag löschen?",
+      "deleteError": "Fehler beim Löschen",
+      "emptyState": "Keine Sponsorverträge",
+      "emptyCta": "Vertrag anlegen",
+      "backToList": "Zurück zur Liste",
+      "backToDetail": "Zurück zum Vertrag",
+      "columns": {
+        "sponsor": "Sponsor",
+        "contractName": "Vertragsname",
+        "amount": "Betrag",
+        "start": "Beginn",
+        "end": "Ende",
+        "type": "Typ"
+      },
+      "status": {
+        "active": "Aktiv",
+        "pending": "Bevorstehend",
+        "expired": "Abgelaufen"
+      },
+      "sponsorTypes": {
+        "none": "—",
+        "gold": "Gold",
+        "silver": "Silber",
+        "bronze": "Bronze"
+      },
+      "form": {
+        "titleNew": "Neuer Vertrag",
+        "titleEdit": "Vertrag bearbeiten",
+        "subtitle": "Partnerschaftsdaten erfassen.",
+        "sponsorName": "Sponsorname",
+        "contractTitle": "Vertragsname",
+        "amount": "Betrag (optional)",
+        "amountHint": "Leer lassen, falls nicht zutreffend.",
+        "startDate": "Startdatum",
+        "endModeFixed": "Festes Enddatum",
+        "endModeDuration": "Laufzeit in Monaten",
+        "endDate": "Enddatum",
+        "durationMonths": "Anzahl Monate",
+        "content": "Vertragstext",
+        "contentPlaceholder": "Vertragstext schreiben oder einfügen…",
+        "insertTemplate": "Vorlage einfügen",
+        "sponsorType": "Sponsorstufe",
+        "sponsorTypeNone": "Nicht gesetzt",
+        "createAction": "Vertrag speichern",
+        "saveAction": "Änderungen speichern",
+        "createError": "Fehler beim Speichern",
+        "validationDates": "Daten prüfen (Ende ≥ Start).",
+        "validationSponsor": "Sponsorname und Vertragsname angeben."
+      },
+      "detail": {
+        "title": "Vertrag",
+        "downloadPdf": "PDF herunterladen",
+        "period": "Zeitraum",
+        "contentTitle": "Vertragstext",
+        "edit": "Bearbeiten"
+      }
+    },
     "status": {
       "quote": {
         "draft": "Entwurf",
@@ -1124,6 +1193,15 @@
         "empty": "Noch keine Dokumente.",
         "created": "Erstellt am",
         "loading": "Wird geladen..."
+      },
+      "sponsoringWatch": {
+        "title": "Verträge im Blick",
+        "badge": "Sponsoring",
+        "empty": "Keine Verträge in den nächsten 30 Tagen fällig oder kürzlich abgelaufen.",
+        "summary": "⚠️ {count} Vertrag/Verträge zu verlängern oder abgelaufen",
+        "expired": "Abgelaufen",
+        "expiresIn": "Endet in {days} Tag(en)",
+        "cta": "Alle Verträge ansehen"
       }
     },
     "expenses": {

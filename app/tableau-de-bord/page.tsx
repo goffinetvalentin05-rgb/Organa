@@ -12,6 +12,7 @@ import {
   FilePlus,
   CheckCircle,
   ArrowRight,
+  Handshake,
 } from "@/lib/icons";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
@@ -64,6 +65,15 @@ type ATraiterItem = {
   href: string;
 };
 
+type SponsorRenewalItem = {
+  id: string;
+  sponsorName: string;
+  title: string;
+  endDate: string;
+  isExpired: boolean;
+  daysUntilEnd: number | null;
+};
+
 function CheckoutHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -98,20 +108,28 @@ export default function TableauDeBordPage() {
 
   const [derniersDocuments, setDerniersDocuments] = useState<any[]>([]);
   const [aTraiterMaintenant, setATraiterMaintenant] = useState<ATraiterItem[]>([]);
+  const [sponsorRenewals, setSponsorRenewals] = useState<{
+    items: SponsorRenewalItem[];
+    totalWatch: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [clientsRes, documentsRes, depensesRes] = await Promise.all([
+        const [clientsRes, documentsRes, depensesRes, renewalsRes] = await Promise.all([
           fetch("/api/clients", { cache: "no-store" }),
           fetch("/api/documents", { cache: "no-store" }),
           fetch("/api/depenses", { cache: "no-store" }),
+          fetch("/api/sponsor-contracts/renewals", { cache: "no-store" }),
         ]);
 
         const clientsData = clientsRes.ok ? await clientsRes.json() : { clients: [] };
         const documentsData = documentsRes.ok ? await documentsRes.json() : { documents: [] };
         const depensesData = depensesRes.ok ? await depensesRes.json() : { depenses: [] };
+        const renewalsData = renewalsRes.ok
+          ? await renewalsRes.json()
+          : { items: [], totalWatch: 0 };
 
         const clients: Client[] = clientsData.clients || [];
         const documents: DocumentItem[] = documentsData.documents || [];
@@ -188,6 +206,11 @@ export default function TableauDeBordPage() {
         const aTraiter = buildATraiterMaintenant(factures);
         setATraiterMaintenant(aTraiter);
 
+        setSponsorRenewals({
+          items: (renewalsData.items || []) as SponsorRenewalItem[],
+          totalWatch: Number(renewalsData.totalWatch) || 0,
+        });
+
       } catch (error) {
         console.error("[TableauDeBord] Erreur chargement:", error);
         setStats({
@@ -205,6 +228,7 @@ export default function TableauDeBordPage() {
         });
         setDerniersDocuments([]);
         setATraiterMaintenant([]);
+        setSponsorRenewals({ items: [], totalWatch: 0 });
       } finally {
         setLoading(false);
       }
@@ -399,6 +423,66 @@ export default function TableauDeBordPage() {
           footer={<p className="text-sm text-white/65">Cotisations + Factures - Charges</p>}
         />
       </div>
+
+      {!loading && sponsorRenewals ? (
+        <SectionCard
+          icon={Handshake}
+          title={t("dashboard.overview.sponsoringWatch.title")}
+          headerRight={
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
+              {t("dashboard.overview.sponsoringWatch.badge")}
+            </span>
+          }
+        >
+          {sponsorRenewals.totalWatch === 0 ? (
+            <p className="text-sm text-slate-600">{t("dashboard.overview.sponsoringWatch.empty")}</p>
+          ) : (
+            <>
+              <p className="mb-4 text-sm font-medium text-amber-950">
+                {t("dashboard.overview.sponsoringWatch.summary").replace(
+                  "{count}",
+                  String(sponsorRenewals.totalWatch)
+                )}
+              </p>
+              <div className="space-y-2">
+                {sponsorRenewals.items.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/tableau-de-bord/sponsoring/${item.id}`}
+                    className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-amber-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900">{item.sponsorName}</p>
+                      <p className="truncate text-sm text-slate-500">{item.title}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3 sm:justify-end">
+                      <span
+                        className={`badge-obillz ${item.isExpired ? "badge-error" : "badge-warning"}`}
+                      >
+                        {item.isExpired
+                          ? t("dashboard.overview.sponsoringWatch.expired")
+                          : t("dashboard.overview.sponsoringWatch.expiresIn").replace(
+                              "{days}",
+                              String(Math.max(0, item.daysUntilEnd ?? 0))
+                            )}
+                      </span>
+                      <ArrowRight className="h-5 w-5 text-slate-400" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-4 text-right">
+                <Link
+                  href="/tableau-de-bord/sponsoring"
+                  className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+                >
+                  {t("dashboard.overview.sponsoringWatch.cta")}
+                </Link>
+              </div>
+            </>
+          )}
+        </SectionCard>
+      ) : null}
 
       {aTraiterMaintenant.length > 0 ? (
         <SectionCard

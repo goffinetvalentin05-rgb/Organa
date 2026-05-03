@@ -232,6 +232,18 @@ export const UserCheck = ({ className = "w-5 h-5" }: { className?: string }) => 
   </svg>
 );
 
+/** Partenariats / sponsoring — navigation */
+export const Handshake = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M11 17l2 2a1 1 0 001.414 0l2.5-2.5a1 1 0 000-1.414L13.5 9.5a1 1 0 00-1.414 0L11 10.586M11 17l-1.5 1.5a1 1 0 01-1.414 0L5.5 14.914a1 1 0 010-1.414l2.5-2.5a1 1 0 011.414 0L11 12.414M11 17V12.414m0 0L9.5 10.914m1.5 1.5l5.086-5.086a1 1 0 011.414 0l2.5 2.5a1 1 0 010 1.414L16 14.5"
+    />
+  </svg>
+);
+
 /** Icône panier / ventes — navigation « Produits » (revenus simples) */
 export const ShoppingBag = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -477,6 +477,7 @@
       "clients": "Membres",
       "quotes": "Cotisations",
       "invoices": "Factures",
+      "sponsoring": "Sponsoring",
       "payments": "Paiements",
       "productRevenues": "Revenus",
       "events": "Événements",
@@ -495,6 +496,10 @@
       "clients": "Membres",
       "quotes": "Cotisations",
       "invoices": "Factures",
+      "sponsoring": "Sponsoring",
+      "sponsoringNew": "Nouveau contrat",
+      "sponsoringEdit": "Modifier le contrat",
+      "sponsoringContract": "Contrat sponsor",
       "payments": "Paiements",
       "productRevenues": "Produits & revenus",
       "events": "Événements",
@@ -521,6 +526,7 @@
       "date": "Date",
       "actions": "Actions",
       "view": "Voir",
+      "edit": "Modifier",
       "delete": "Supprimer",
       "unknownClient": "Membre inconnu",
       "cancel": "Annuler",
@@ -977,6 +983,69 @@
       "emptyState": "Aucune facture pour le moment",
       "emptyCta": "Créer votre première facture"
     },
+    "sponsoring": {
+      "title": "Sponsoring",
+      "subtitle": "Contrats avec vos sponsors : dates, montants et renouvellements.",
+      "newAction": "Nouveau contrat",
+      "createSuccess": "Contrat enregistré",
+      "loadError": "Erreur lors du chargement des contrats",
+      "deleteConfirm": "Supprimer ce contrat ?",
+      "deleteError": "Erreur lors de la suppression",
+      "emptyState": "Aucun contrat de sponsoring",
+      "emptyCta": "Créer un contrat",
+      "backToList": "Retour à la liste",
+      "backToDetail": "Retour au contrat",
+      "columns": {
+        "sponsor": "Sponsor",
+        "contractName": "Nom du contrat",
+        "amount": "Montant",
+        "start": "Début",
+        "end": "Fin",
+        "type": "Type"
+      },
+      "status": {
+        "active": "Actif",
+        "pending": "À venir",
+        "expired": "Expiré"
+      },
+      "sponsorTypes": {
+        "none": "—",
+        "gold": "Or",
+        "silver": "Argent",
+        "bronze": "Bronze"
+      },
+      "form": {
+        "titleNew": "Nouveau contrat",
+        "titleEdit": "Modifier le contrat",
+        "subtitle": "Renseignez les informations du partenariat.",
+        "sponsorName": "Nom du sponsor",
+        "contractTitle": "Nom du contrat",
+        "amount": "Montant (optionnel)",
+        "amountHint": "Laisser vide si non applicable.",
+        "startDate": "Date de début",
+        "endModeFixed": "Date de fin fixe",
+        "endModeDuration": "Durée en mois",
+        "endDate": "Date de fin",
+        "durationMonths": "Nombre de mois",
+        "content": "Texte du contrat",
+        "contentPlaceholder": "Rédigez ou collez le texte du contrat…",
+        "insertTemplate": "Insérer un modèle",
+        "sponsorType": "Type de sponsor",
+        "sponsorTypeNone": "Non défini",
+        "createAction": "Enregistrer le contrat",
+        "saveAction": "Enregistrer les modifications",
+        "createError": "Erreur lors de l'enregistrement",
+        "validationDates": "Vérifiez les dates (fin ≥ début).",
+        "validationSponsor": "Indiquez le nom du sponsor et le nom du contrat."
+      },
+      "detail": {
+        "title": "Contrat",
+        "downloadPdf": "Télécharger PDF",
+        "period": "Période",
+        "contentTitle": "Texte du contrat",
+        "edit": "Modifier"
+      }
+    },
     "status": {
       "quote": {
         "draft": "Brouillon",
@@ -1038,6 +1107,15 @@
         "empty": "Aucune activité pour le moment.",
         "created": "Créé le",
         "loading": "Chargement..."
+      },
+      "sponsoringWatch": {
+        "title": "Contrats à surveiller",
+        "badge": "Sponsoring",
+        "empty": "Aucun contrat à renouveler dans les 30 prochains jours ni expiré récemment.",
+        "summary": "⚠️ {count} contrat(s) à renouveler ou expiré(s)",
+        "expired": "Expiré",
+        "expiresIn": "Expire dans {days} jour(s)",
+        "cta": "Voir tous les contrats"
       }
     },
     "expenses": {

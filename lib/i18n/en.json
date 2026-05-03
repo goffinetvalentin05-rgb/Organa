@@ -478,6 +478,7 @@
       "clients": "Members",
       "quotes": "Memberships",
       "invoices": "Invoices",
+      "sponsoring": "Sponsoring",
       "payments": "Payments",
       "productRevenues": "Revenue",
       "events": "Events",
@@ -499,6 +500,10 @@
       "clients": "Members",
       "quotes": "Memberships",
       "invoices": "Invoices",
+      "sponsoring": "Sponsoring",
+      "sponsoringNew": "New contract",
+      "sponsoringEdit": "Edit contract",
+      "sponsoringContract": "Sponsor contract",
       "payments": "Payment History",
       "productRevenues": "Products & revenue",
       "events": "Events",
@@ -643,6 +648,7 @@
       "date": "Date",
       "actions": "Actions",
       "view": "View",
+      "edit": "Edit",
       "delete": "Delete",
       "unknownClient": "Unknown member",
       "cancel": "Cancel",
@@ -1092,6 +1098,69 @@
       "emptyState": "No invoices yet",
       "emptyCta": "Create your first invoice"
     },
+    "sponsoring": {
+      "title": "Sponsoring",
+      "subtitle": "Sponsor contracts: dates, amounts, and renewals.",
+      "newAction": "New contract",
+      "createSuccess": "Contract saved",
+      "loadError": "Error loading contracts",
+      "deleteConfirm": "Delete this contract?",
+      "deleteError": "Error deleting contract",
+      "emptyState": "No sponsor contracts yet",
+      "emptyCta": "Create a contract",
+      "backToList": "Back to list",
+      "backToDetail": "Back to contract",
+      "columns": {
+        "sponsor": "Sponsor",
+        "contractName": "Contract name",
+        "amount": "Amount",
+        "start": "Start",
+        "end": "End",
+        "type": "Type"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Upcoming",
+        "expired": "Expired"
+      },
+      "sponsorTypes": {
+        "none": "—",
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "form": {
+        "titleNew": "New contract",
+        "titleEdit": "Edit contract",
+        "subtitle": "Enter partnership details.",
+        "sponsorName": "Sponsor name",
+        "contractTitle": "Contract name",
+        "amount": "Amount (optional)",
+        "amountHint": "Leave empty if not applicable.",
+        "startDate": "Start date",
+        "endModeFixed": "Fixed end date",
+        "endModeDuration": "Duration in months",
+        "endDate": "End date",
+        "durationMonths": "Number of months",
+        "content": "Contract text",
+        "contentPlaceholder": "Write or paste the contract text…",
+        "insertTemplate": "Insert template",
+        "sponsorType": "Sponsor tier",
+        "sponsorTypeNone": "Not set",
+        "createAction": "Save contract",
+        "saveAction": "Save changes",
+        "createError": "Error saving",
+        "validationDates": "Check dates (end must be on or after start).",
+        "validationSponsor": "Enter sponsor name and contract title."
+      },
+      "detail": {
+        "title": "Contract",
+        "downloadPdf": "Download PDF",
+        "period": "Period",
+        "contentTitle": "Contract text",
+        "edit": "Edit"
+      }
+    },
     "status": {
       "quote": {
         "draft": "Draft",
@@ -1164,6 +1233,15 @@
         "empty": "No activity yet.",
         "created": "Created on",
         "loading": "Loading..."
+      },
+      "sponsoringWatch": {
+        "title": "Contracts to watch",
+        "badge": "Sponsoring",
+        "empty": "No contracts expiring in the next 30 days or recently expired.",
+        "summary": "⚠️ {count} contract(s) to renew or expired",
+        "expired": "Expired",
+        "expiresIn": "Expires in {days} day(s)",
+        "cta": "View all contracts"
       }
     },
     "expenses": {

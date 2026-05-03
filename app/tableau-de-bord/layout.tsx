@@ -24,6 +24,7 @@ import {
   ClipboardList,
   Mail,
   ShoppingBag,
+  Handshake,
 } from "@/lib/icons";
 
 export default function DashboardLayout({
@@ -84,6 +85,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
+    { name: t("dashboard.nav.sponsoring"), href: "/tableau-de-bord/sponsoring", icon: Handshake },
     { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
     { name: t("dashboard.nav.productRevenues"), href: "/tableau-de-bord/produits", icon: ShoppingBag },
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
@@ -115,6 +117,17 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/clients")) return t("dashboard.pageTitles.clients");
     if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
+    if (pathname.startsWith("/tableau-de-bord/sponsoring/nouveau")) {
+      return t("dashboard.pageTitles.sponsoringNew");
+    }
+    if (pathname.includes("/tableau-de-bord/sponsoring/") && pathname.includes("/modifier")) {
+      return t("dashboard.pageTitles.sponsoringEdit");
+    }
+    const sponsorDetailMatch = pathname?.match(/^\/tableau-de-bord\/sponsoring\/([^/]+)$/);
+    if (sponsorDetailMatch && sponsorDetailMatch[1] !== "nouveau") {
+      return t("dashboard.pageTitles.sponsoringContract");
+    }
+    if (pathname.startsWith("/tableau-de-bord/sponsoring")) return t("dashboard.pageTitles.sponsoring");
     if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
     if (pathname.startsWith("/tableau-de-bord/produits")) return t("dashboard.pageTitles.productRevenues");
     if (pathname.startsWith("/tableau-de-bord/evenements")) return t("dashboard.pageTitles.events");
