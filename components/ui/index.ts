@@ -3,6 +3,8 @@ export {
   glassCardClass,
   glassCardHeaderClass,
   iconBadgeClass,
+  innerContentClass,
+  dashboardSecondaryButtonClass,
   obillzLandingRootClass,
   obillzLandingGridOverlayClass,
 } from "./styles";

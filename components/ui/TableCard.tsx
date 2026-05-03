@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass, glassCardHeaderClass } from "./styles";
+import { glassCardClass, glassCardHeaderClass, innerContentClass } from "./styles";
 
 export type TableCardProps = {
   children: ReactNode;
@@ -12,10 +12,6 @@ export type TableCardProps = {
   className?: string;
   bodyClassName?: string;
 };
-
-/** Liste / tableau sans bandeau : panneau blanc lisible (pas du contenu sur le bleu à travers le verre). */
-const tablePanelSolidClass =
-  "overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_24px_60px_-16px_rgba(15,23,42,0.14)]";
 
 export default function TableCard({
   children,
@@ -28,7 +24,7 @@ export default function TableCard({
   const hasHeader = Boolean(title || description || toolbar);
 
   return (
-    <div className={cn(hasHeader ? glassCardClass : tablePanelSolidClass, "flex flex-col", className)}>
+    <div className={cn(glassCardClass, "flex flex-col overflow-hidden", className)}>
       {hasHeader ? (
         <header
           className={cn(
@@ -45,14 +41,18 @@ export default function TableCard({
           {toolbar ? <div className="flex shrink-0 flex-wrap items-center gap-2">{toolbar}</div> : null}
         </header>
       ) : null}
-      <div
-        className={cn(
-          hasHeader ? "rounded-b-3xl border-t border-slate-100 bg-white text-slate-900" : "min-h-0 flex-1 text-slate-900",
-          !hasHeader && "overflow-hidden",
-          bodyClassName
-        )}
-      >
-        {children}
+
+      <div className={cn(hasHeader ? "p-2 pt-0" : "p-2", "min-h-0 flex-1")}>
+        <div
+          className={cn(
+            innerContentClass,
+            hasHeader && "rounded-t-none border-t-0",
+            !hasHeader && "min-h-0 overflow-hidden",
+            bodyClassName
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -259,7 +259,7 @@ export default function MarketingCampaignsPage() {
 
   if (loading) {
     return (
-      <PageLayout maxWidth="6xl" className="py-10 text-center text-slate-600">
+      <PageLayout maxWidth="6xl" className="py-10 text-center text-white/70">
         {t("dashboard.marketing.loading")}
       </PageLayout>
     );
@@ -272,10 +272,10 @@ export default function MarketingCampaignsPage() {
       <GlassCard padding="sm" className="inline-flex w-fit max-w-full flex-wrap gap-2">
         <button
           type="button"
-          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
             activeTab === "contacts"
-              ? "bg-[var(--obillz-hero-blue)] text-white shadow-sm"
-              : "text-slate-600 hover:bg-white/70"
+              ? "bg-slate-900 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-100"
           }`}
           onClick={() => setActiveTab("contacts")}
         >
@@ -283,10 +283,10 @@ export default function MarketingCampaignsPage() {
         </button>
         <button
           type="button"
-          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
             activeTab === "campaigns"
-              ? "bg-[var(--obillz-hero-blue)] text-white shadow-sm"
-              : "text-slate-600 hover:bg-white/70"
+              ? "bg-slate-900 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-100"
           }`}
           onClick={() => setActiveTab("campaigns")}
         >
@@ -303,12 +303,12 @@ export default function MarketingCampaignsPage() {
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
                 placeholder={t("dashboard.marketing.contacts.searchPlaceholder")}
-                className="rounded-lg border border-slate-300 px-3 py-2"
+                className="rounded-lg border px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
               />
               <select
                 value={sourceFilter}
                 onChange={(e) => setSourceFilter(e.target.value)}
-                className="rounded-lg border border-slate-300 px-3 py-2"
+                className="rounded-lg border px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
               >
                 <option value="">{t("dashboard.marketing.contacts.allSources")}</option>
                 {sources.map((source) => (
@@ -327,7 +327,7 @@ export default function MarketingCampaignsPage() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-500">
+                <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                   <th className="py-3 pr-4">Nom</th>
                   <th className="py-3 pr-4">Prénom</th>
                   <th className="py-3 pr-4">Email</th>
@@ -351,19 +351,23 @@ export default function MarketingCampaignsPage() {
                       <td className="py-3 pr-4">{contact.email}</td>
                       <td className="py-3 pr-4">{contact.phone || "-"}</td>
                       <td className="py-3 pr-4">{contact.source}</td>
-                      <td className="py-3 pr-0 flex items-center gap-3">
-                        <button
-                          className="text-slate-700 hover:text-slate-900"
-                          onClick={() => openEditContactModal(contact)}
-                        >
-                          ✏️ Modifier
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteContact(contact.id)}
-                        >
-                          🗑 Supprimer
-                        </button>
+                      <td className="py-3 pr-0">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            type="button"
+                            className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-[var(--obillz-hero-blue)]"
+                            onClick={() => openEditContactModal(contact)}
+                          >
+                            Modifier
+                          </button>
+                          <button
+                            type="button"
+                            className="text-sm font-medium text-red-700 hover:text-red-800"
+                            onClick={() => handleDeleteContact(contact.id)}
+                          >
+                            Supprimer
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -388,7 +392,7 @@ export default function MarketingCampaignsPage() {
                 value={contactForm.lastName}
                 onChange={(e) => setContactForm((prev) => ({ ...prev, lastName: e.target.value }))}
                 placeholder="Nom *"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                 required
               />
               <input
@@ -396,7 +400,7 @@ export default function MarketingCampaignsPage() {
                 value={contactForm.firstName}
                 onChange={(e) => setContactForm((prev) => ({ ...prev, firstName: e.target.value }))}
                 placeholder="Prénom *"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                 required
               />
               <input
@@ -404,7 +408,7 @@ export default function MarketingCampaignsPage() {
                 value={contactForm.email}
                 onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
                 placeholder="Email *"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                 required
               />
               <input
@@ -412,32 +416,27 @@ export default function MarketingCampaignsPage() {
                 value={contactForm.phone}
                 onChange={(e) => setContactForm((prev) => ({ ...prev, phone: e.target.value }))}
                 placeholder="Téléphone"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
               />
               <input
                 type="text"
                 value={contactForm.source}
                 onChange={(e) => setContactForm((prev) => ({ ...prev, source: e.target.value }))}
                 placeholder="Source"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
               />
 
-              <div className="pt-2 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeContactModal}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                  className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
                 >
                   Annuler
                 </button>
-                <button
-                  type="submit"
-                  disabled={savingContact}
-                  className="px-4 py-2 rounded-lg text-white font-medium disabled:opacity-60"
-                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-                >
+                <DashboardPrimaryButton type="submit" icon="none" disabled={savingContact} className="justify-center">
                   {savingContact ? "Enregistrement..." : "Enregistrer"}
-                </button>
+                </DashboardPrimaryButton>
               </div>
             </form>
           </GlassCard>
@@ -456,7 +455,7 @@ export default function MarketingCampaignsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nom interne de la campagne"
-                className="rounded-lg border border-slate-300 px-3 py-2"
+                className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                 required
               />
               <input
@@ -464,7 +463,7 @@ export default function MarketingCampaignsPage() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Objet de l'email"
-                className="rounded-lg border border-slate-300 px-3 py-2"
+                className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                 required
               />
             </div>
@@ -505,7 +504,7 @@ export default function MarketingCampaignsPage() {
 
             <div className="space-y-3">
               <p className="text-sm font-medium text-slate-700">Envoyer à</p>
-              <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex flex-wrap gap-4 text-sm text-slate-800">
                 <label className="inline-flex items-center gap-2">
                   <input
                     type="radio"
@@ -536,7 +535,7 @@ export default function MarketingCampaignsPage() {
                 <select
                   value={audienceSource}
                   onChange={(e) => setAudienceSource(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-3 py-2"
+                  className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
                   required
                 >
                   <option value="">Choisir une source</option>
@@ -570,14 +569,9 @@ export default function MarketingCampaignsPage() {
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={sending}
-              className="rounded-lg px-5 py-2.5 font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-            >
+            <DashboardPrimaryButton type="submit" icon="none" disabled={sending} className="justify-center">
               {sending ? t("dashboard.marketing.campaigns.sending") : t("dashboard.marketing.campaigns.send")}
-            </button>
+            </DashboardPrimaryButton>
           </form>
           </GlassCard>
 
@@ -585,7 +579,7 @@ export default function MarketingCampaignsPage() {
             <div className="overflow-x-auto p-6 pt-0">
               <table className="min-w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-slate-500">
+                  <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                     <th className="py-3 pr-4">Campagne</th>
                     <th className="py-3 pr-4">Objet</th>
                     <th className="py-3 pr-4">Date d&apos;envoi</th>

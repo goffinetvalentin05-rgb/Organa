@@ -226,6 +226,21 @@ h3 {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
 }
 
+/* Champs formulaires : fond clair + texte foncé (îlots inner-content / tableaux) */
+.dashboard-shell input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
+.dashboard-shell select,
+.dashboard-shell textarea {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #111111;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-shell [contenteditable="true"] {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #111111;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
 .border-subtle {
   border-color: var(--border);
 }

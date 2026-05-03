@@ -24,7 +24,7 @@ export default function SettingsAccordion({
 
   return (
     <div
-      className={`rounded-xl border border-white/[0.22] bg-white/[0.14] shadow-sm backdrop-blur-md ${className}`.trim()}
+      className={`rounded-xl border border-slate-200/90 bg-slate-50/90 shadow-sm ${className}`.trim()}
     >
       <button
         id={btnId}
@@ -32,13 +32,11 @@ export default function SettingsAccordion({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full min-h-[52px] touch-manipulation items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/[0.08] sm:min-h-[48px] sm:py-3"
+        className="flex w-full min-h-[52px] touch-manipulation items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-slate-100/90 sm:min-h-[48px] sm:py-3"
       >
-        <span className="text-[15px] font-semibold leading-snug text-white/95 sm:text-sm">
-          {title}
-        </span>
+        <span className="text-[15px] font-semibold leading-snug text-slate-900 sm:text-sm">{title}</span>
         <ChevronDown
-          className={`h-5 w-5 shrink-0 text-white/55 transition-transform duration-200 ${
+          className={`h-5 w-5 shrink-0 text-slate-500 transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
           aria-hidden
@@ -49,7 +47,7 @@ export default function SettingsAccordion({
         role="region"
         aria-labelledby={btnId}
         hidden={!open}
-        className="border-t border-white/[0.12]"
+        className="border-t border-slate-200/80 bg-white"
       >
         <div className="px-4 pb-4 pt-3">{children}</div>
       </div>

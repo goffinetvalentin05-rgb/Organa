@@ -288,7 +288,7 @@ export default function MemberDetailView({
         description="Historique des plannings / événements (inscription interne, publique reconnue ou rattachement admin)."
         headerRight={
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Total</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-white/70">Total</span>
             <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-2.5 py-1 text-sm font-semibold text-white shadow-sm shadow-blue-600/20">
               {planningParticipations.length}
             </span>

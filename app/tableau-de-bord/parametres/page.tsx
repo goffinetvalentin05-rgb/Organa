@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import { PageLayout, PageHeader, SectionCard, GlassCard } from "@/components/ui";
+import { PageLayout, PageHeader, SectionCard, GlassCard, cn, glassCardClass, innerContentClass } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
@@ -573,7 +573,6 @@ export default function ParametresPage() {
         </Link>
 
         <SectionCard
-          bodySurface="glass"
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}
           description={t("dashboard.settings.layout.sectionDescriptions.members")}
@@ -585,7 +584,7 @@ export default function ParametresPage() {
             <MemberFieldsSettingsCard embedded />
           </SettingsAccordion>
           <SettingsAccordion title={t("dashboard.settings.layout.accordions.memberCategories")}>
-            <p className="text-sm leading-relaxed text-white/70">
+            <p className="text-sm leading-relaxed text-slate-600">
               {t("dashboard.settings.layout.memberCategories.body")}
             </p>
           </SettingsAccordion>
@@ -593,18 +592,17 @@ export default function ParametresPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <SectionCard
-            bodySurface="glass"
             icon={Building2}
             title={t("dashboard.settings.layout.sections.clubInfo")}
             description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.visualIdentity")}>
               <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-white/88">
+                <label className="mb-2 block text-sm font-medium text-slate-800">
                   {t("dashboard.settings.branding.logoLabel")}
                 </label>
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
+                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                     {logoPreview ? (
                       <Image
                         src={logoPreview}
@@ -615,7 +613,7 @@ export default function ParametresPage() {
                         unoptimized={logoPreview.includes("supabase.co")}
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-white/50">
+                      <div className="flex flex-col items-center justify-center p-4 text-slate-400">
                         <Building2 className="mb-2 h-12 w-12" />
                         <span className="text-center text-xs">{t("dashboard.settings.branding.noLogo")}</span>
                       </div>
@@ -624,8 +622,7 @@ export default function ParametresPage() {
                   <div className="min-w-0 flex-1 space-y-3">
                     <div>
                       <label
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white transition-all"
-                        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[var(--obillz-hero-blue)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
                       >
                         {uploading ? (
                           <>
@@ -780,14 +777,13 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
-            bodySurface="glass"
             icon={Wallet}
             title={t("dashboard.settings.layout.sections.finances")}
             description={t("dashboard.settings.layout.sectionDescriptions.finances")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.subscription")}>
               {loadingPlan ? (
-                <p className="text-sm text-white/65">{t("dashboard.common.loading")}</p>
+                <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
               ) : (
                 <div className="space-y-4">
                   {subscription ? (
@@ -941,18 +937,17 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
-            bodySurface="glass"
             icon={Shield}
             title={t("dashboard.settings.layout.sections.security")}
             description={t("dashboard.settings.layout.sectionDescriptions.security")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.email")}>
-              <p className="mb-4 text-sm text-white/65">{t("dashboard.settings.email.introDefault")}</p>
+              <p className="mb-4 text-sm text-slate-600">{t("dashboard.settings.email.introDefault")}</p>
 
-              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white/95">{t("dashboard.settings.email.customToggle")}</p>
-                  <p className="mt-0.5 text-xs text-white/60">{t("dashboard.settings.email.customToggleHelp")}</p>
+                  <p className="text-sm font-medium text-slate-900">{t("dashboard.settings.email.customToggle")}</p>
+                  <p className="mt-0.5 text-xs text-slate-600">{t("dashboard.settings.email.customToggleHelp")}</p>
                 </div>
                 <label className="inline-flex shrink-0 cursor-pointer items-center self-start sm:self-center">
                   <input
@@ -1043,7 +1038,6 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
-            bodySurface="glass"
             icon={Settings}
             title={t("dashboard.settings.layout.sections.advanced")}
             description={t("dashboard.settings.layout.sectionDescriptions.advanced")}
@@ -1072,11 +1066,18 @@ export default function ParametresPage() {
             </SettingsAccordion>
           </SectionCard>
 
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50/90 via-white to-blue-50/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p className="text-sm text-white/70">{t("dashboard.settings.layout.saveBarHint")}</p>
-            <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
-              {t("dashboard.settings.saveButton")}
-            </DashboardPrimaryButton>
+          <div className={cn(glassCardClass, "p-2")}>
+            <div
+              className={cn(
+                innerContentClass,
+                "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
+              )}
+            >
+              <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
+              <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
+                {t("dashboard.settings.saveButton")}
+              </DashboardPrimaryButton>
+            </div>
           </div>
       </form>
     </PageLayout>

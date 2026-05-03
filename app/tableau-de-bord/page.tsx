@@ -23,7 +23,6 @@ import {
   SectionCard,
   EmptyState,
   TableCard,
-  glassCardClass,
 } from "@/components/ui";
 
 interface Client {
@@ -416,7 +415,7 @@ export default function TableauDeBordPage() {
               <Link
                 key={item.id}
                 href={item.href}
-                className={`${glassCardClass} flex flex-col gap-4 p-4 transition-all hover:border-blue-200/90 hover:shadow-md md:flex-row md:items-center md:justify-between`}
+                className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md md:flex-row md:items-center md:justify-between"
               >
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
@@ -498,7 +497,7 @@ export default function TableauDeBordPage() {
               <Link
                 key={`${doc.type}-${doc.id}`}
                 href={`/tableau-de-bord/${doc.type === "devis" ? "devis" : "factures"}/${doc.id}`}
-                className={`${glassCardClass} flex items-center justify-between border-slate-100/90 p-4 transition-all hover:border-blue-200/80 hover:shadow-sm`}
+                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-sm"
               >
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
