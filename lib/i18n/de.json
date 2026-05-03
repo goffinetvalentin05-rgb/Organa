@@ -1118,6 +1118,8 @@
       },
       "detail": {
         "title": "Vertrag",
+        "previewPdf": "Vertragsvorschau",
+        "downloadRequiresPreview": "Bitte zuerst die Vorschau öffnen, dann das PDF herunterladen.",
         "downloadPdf": "PDF herunterladen",
         "period": "Zeitraum",
         "contentTitle": "Vertragstext",

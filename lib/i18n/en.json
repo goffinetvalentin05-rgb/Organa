@@ -1155,6 +1155,8 @@
       },
       "detail": {
         "title": "Contract",
+        "previewPdf": "Contract preview",
+        "downloadRequiresPreview": "Open the preview first, then download the PDF.",
         "downloadPdf": "Download PDF",
         "period": "Period",
         "contentTitle": "Contract text",

@@ -1040,7 +1040,9 @@
       },
       "detail": {
         "title": "Contrat",
-        "downloadPdf": "Télécharger PDF",
+        "previewPdf": "Aperçu du contrat",
+        "downloadRequiresPreview": "Consultez d’abord l’aperçu du contrat, puis téléchargez le PDF.",
+        "downloadPdf": "Télécharger le PDF",
         "period": "Période",
         "contentTitle": "Texte du contrat",
         "edit": "Modifier"

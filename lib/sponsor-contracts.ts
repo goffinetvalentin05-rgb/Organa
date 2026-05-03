@@ -102,6 +102,19 @@ export function getContractsToRenew<T extends { end_date: string }>(
   });
 }
 
+const STATUS_LABELS: Record<"fr" | "en" | "de", Record<SponsorContractStatus, string>> = {
+  fr: { pending: "À venir", active: "Actif", expired: "Expiré" },
+  en: { pending: "Upcoming", active: "Active", expired: "Expired" },
+  de: { pending: "Bevorstehend", active: "Aktiv", expired: "Abgelaufen" },
+};
+
+export function sponsorContractStatusLabel(
+  status: SponsorContractStatus,
+  locale: "fr" | "en" | "de" = "fr"
+): string {
+  return STATUS_LABELS[locale]?.[status] ?? STATUS_LABELS.fr[status];
+}
+
 export function buildDefaultContractTemplate(params: {
   clubName: string;
   sponsorName: string;

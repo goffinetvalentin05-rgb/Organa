@@ -1,7 +1,10 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
+import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
+import { formatPdfCurrency } from "@/lib/pdf/clubPdfLayout";
 
 type DocumentType = "quote" | "invoice";
 
@@ -10,10 +13,89 @@ export type GetDocumentPdfDataOptions = {
   dataUserId?: string;
 };
 
+export type SponsorContractPdfLocale = "fr" | "en" | "de";
+
+export type ClubCompanyPdfPayload = {
+  company: {
+    name: string;
+    address: string;
+    email: string;
+    phone: string;
+    logoUrl?: string;
+    iban: string;
+    bankName: string;
+    conditionsPaiement: string;
+  };
+  primaryColor: string;
+  currency: string;
+  currencySymbol: string;
+};
+
 /**
- * Convertit une URL d'image en Data URL (base64)
- * Cela permet à @react-pdf/renderer de charger l'image de manière fiable
- * L'URL doit être absolue et publique (bucket Supabase public)
+ * Profil club + logo pour tous les PDF documents (facture, cotisation, contrat sponsor).
+ */
+export async function getClubCompanyPdfData(
+  supabase: SupabaseClient,
+  scopeUserId: string
+): Promise<ClubCompanyPdfPayload> {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select(
+      "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms"
+    )
+    .eq("user_id", scopeUserId)
+    .maybeSingle();
+
+  let logoSourceUrl: string | undefined;
+  if (profile?.logo_url) {
+    logoSourceUrl = profile.logo_url;
+  } else if (profile?.logo_path) {
+    const { data: urlData } = supabase.storage.from("Logos").getPublicUrl(profile.logo_path);
+    logoSourceUrl = urlData.publicUrl;
+  }
+
+  if (logoSourceUrl && !logoSourceUrl.startsWith("https://")) {
+    console.warn("[pdf-data] Logo URL n'est pas HTTPS, ignorée:", logoSourceUrl);
+    logoSourceUrl = undefined;
+  }
+
+  let logoUrl: string | undefined;
+  if (logoSourceUrl) {
+    logoUrl = await fetchImageAsDataUrl(logoSourceUrl);
+    if (!logoUrl) {
+      console.warn("[pdf-data] Impossible de charger le logo, PDF généré sans logo");
+    }
+  }
+
+  const currency = profile?.currency || "CHF";
+  const currencySymbol =
+    profile?.currency_symbol || getCurrencySymbol(currency);
+
+  const companySettings = getCompanySettings({
+    primary_color: profile?.primary_color,
+    currency,
+    currency_symbol: currencySymbol,
+  });
+
+  return {
+    company: {
+      name: profile?.company_name || "",
+      address: profile?.company_address || "",
+      email: profile?.company_email || "",
+      phone: profile?.company_phone || "",
+      logoUrl,
+      iban: profile?.iban || "",
+      bankName: profile?.bank_name || "",
+      conditionsPaiement: profile?.payment_terms || "",
+    },
+    primaryColor: companySettings.primary_color,
+    currency,
+    currencySymbol,
+  };
+}
+
+/**
+ * Convertit une URL d'image en Data URL (base64) pour @react-pdf/renderer.
  */
 async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
   try {
@@ -92,53 +174,10 @@ export async function getDocumentPdfData(
 
   const scopeUserId = options?.dataUserId ?? user.id;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms"
-    )
-    .eq("user_id", scopeUserId)
-    .maybeSingle();
-
-  // Récupérer l'URL du logo depuis le profil
-  let logoSourceUrl: string | undefined;
-  if (profile?.logo_url) {
-    // Utiliser l'URL stockée directement (déjà absolue depuis l'upload)
-    logoSourceUrl = profile.logo_url;
-  } else if (profile?.logo_path) {
-    // Générer l'URL publique depuis le path (fallback)
-    const { data: urlData } = supabase.storage
-      .from("Logos")
-      .getPublicUrl(profile.logo_path);
-    logoSourceUrl = urlData.publicUrl;
-  }
-  
-  // Vérifier que l'URL est absolue et sécurisée (https://)
-  // Les buckets Supabase publics utilisent toujours HTTPS
-  if (logoSourceUrl && !logoSourceUrl.startsWith("https://")) {
-    console.warn("[pdf-data] Logo URL n'est pas HTTPS, ignorée:", logoSourceUrl);
-    logoSourceUrl = undefined;
-  }
-
-  // Convertir le logo en base64 pour un affichage fiable dans le PDF
-  // @react-pdf/renderer a des difficultés avec les URLs externes en server-side
-  let logoUrl: string | undefined;
-  if (logoSourceUrl) {
-    logoUrl = await fetchImageAsDataUrl(logoSourceUrl);
-    if (!logoUrl) {
-      console.warn("[pdf-data] Impossible de charger le logo, PDF généré sans logo");
-    }
-  }
-
-  const currency = profile?.currency || "CHF";
-  const currencySymbol =
-    profile?.currency_symbol || getCurrencySymbol(currency);
-
-  const companySettings = getCompanySettings({
-    primary_color: profile?.primary_color,
-    currency,
-    currency_symbol: currencySymbol,
-  });
+  const { company, primaryColor, currency, currencySymbol } = await getClubCompanyPdfData(
+    supabase,
+    scopeUserId
+  );
 
   const { data: document, error: docError } = await supabase
     .from("documents")
@@ -158,8 +197,7 @@ export async function getDocumentPdfData(
     ? document.client[0]
     : document.client;
   
-  // Debug logo URL
-  console.log("[pdf-data] Logo URL finale:", logoUrl || "aucun logo défini");
+  console.log("[pdf-data] Logo URL finale:", company.logoUrl || "aucun logo défini");
   const lines = items.map((ligne: any) => {
     const qty = Number(ligne.quantite || 0);
     const unitPrice = Number(ligne.prixUnitaire || 0);
@@ -199,16 +237,7 @@ export async function getDocumentPdfData(
     : { title: "DEVIS", clientLabel: "Client", numberLabel: "Numéro" };
 
   return {
-    company: {
-      name: profile?.company_name || "",
-      address: profile?.company_address || "",
-      email: profile?.company_email || "",
-      phone: profile?.company_phone || "",
-      logoUrl,
-      iban: profile?.iban || "",
-      bankName: profile?.bank_name || "",
-      conditionsPaiement: profile?.payment_terms || "",
-    },
+    company,
     client: {
       name:
         (client as { nom?: string; name?: string } | null | undefined)?.nom ||
@@ -242,8 +271,82 @@ export async function getDocumentPdfData(
     },
     lines,
     totals,
-    primaryColor: companySettings.primary_color,
+    primaryColor,
     documentLabel,
+  };
+}
+
+export async function getSponsorContractPdfData(
+  contractId: string,
+  options?: GetDocumentPdfDataOptions & { locale?: SponsorContractPdfLocale }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user || !user.id) {
+    throw new Error("Non authentifié");
+  }
+
+  const scopeUserId = options?.dataUserId ?? user.id;
+  const locale: SponsorContractPdfLocale = options?.locale ?? "fr";
+
+  const { company, primaryColor, currencySymbol } = await getClubCompanyPdfData(
+    supabase,
+    scopeUserId
+  );
+
+  const { data: row, error } = await supabase
+    .from("sponsor_contracts")
+    .select(
+      "id, sponsor_name, title, content, amount, start_date, end_date, sponsor_type, created_at"
+    )
+    .eq("id", contractId)
+    .eq("club_id", scopeUserId)
+    .maybeSingle();
+
+  if (error || !row) {
+    throw new Error("Contrat introuvable");
+  }
+
+  const startDate = String(row.start_date ?? "");
+  const endDate = String(row.end_date ?? "");
+  const status = deriveContractStatus(startDate, endDate);
+  const statusLabel = sponsorContractStatusLabel(status, locale);
+
+  let amountFormatted: string | null = null;
+  if (row.amount != null && row.amount !== "") {
+    const n = Number(row.amount);
+    if (Number.isFinite(n)) {
+      amountFormatted = formatPdfCurrency(n, currencySymbol);
+    }
+  }
+
+  const emissionDate = row.created_at
+    ? new Date(row.created_at as string).toISOString().slice(0, 10)
+    : startDate;
+
+  const sponsorType = (row.sponsor_type as string | null) || null;
+
+  return {
+    company,
+    primaryColor,
+    currencySymbol,
+    contract: {
+      id: row.id as string,
+      sponsorName: String(row.sponsor_name ?? ""),
+      title: String(row.title ?? ""),
+      content: String(row.content ?? ""),
+      startDate,
+      endDate,
+      status,
+      statusLabel,
+      amountFormatted,
+      sponsorType,
+      emissionDate,
+    },
   };
 }
 

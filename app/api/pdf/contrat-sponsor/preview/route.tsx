@@ -42,23 +42,16 @@ export async function GET(request: Request) {
       />
     );
 
-    const safeTitle = data.contract.title
-      .replace(/[^\w\u00C0-\u024f\s-]+/gi, "")
-      .trim()
-      .slice(0, 40)
-      .replace(/\s+/g, "-");
-    const filename = `contrat-sponsor-${safeTitle || id}-${data.contract.endDate}.pdf`;
-
     return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": "inline; filename=contrat-sponsor-preview.pdf",
       },
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("[pdf/contrat-sponsor/download]", error);
+    console.error("[pdf/contrat-sponsor/preview]", error);
     return new Response(JSON.stringify({ error: "Erreur lors de la génération du PDF", details: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

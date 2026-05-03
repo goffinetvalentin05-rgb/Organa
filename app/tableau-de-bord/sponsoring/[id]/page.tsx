@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ArrowLeft, Edit, Download } from "@/lib/icons";
+import { ArrowLeft, Edit, Download, Eye } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
@@ -30,6 +30,8 @@ export default function ContratSponsorDetailPage() {
 
   const [contract, setContract] = useState<Contract | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
+  const previewAnchorRef = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -108,7 +110,8 @@ export default function ContratSponsorDetailPage() {
     );
   }
 
-  const pdfHref = `/api/pdf/contrat-sponsor/download?id=${contract.id}&locale=${locale}`;
+  const previewPdfUrl = `/api/pdf/contrat-sponsor/preview?id=${contract.id}&locale=${locale}`;
+  const downloadPdfUrl = `/api/pdf/contrat-sponsor/download?id=${contract.id}&locale=${locale}`;
 
   return (
     <PageLayout maxWidth="3xl" className="space-y-6">
@@ -125,13 +128,38 @@ export default function ContratSponsorDetailPage() {
           subtitle={contract.sponsorName}
           actions={
             <div className="flex flex-wrap gap-2">
-              <a
-                href={pdfHref}
+              <button
+                type="button"
+                onClick={() => {
+                  setPdfPreviewOpen(true);
+                  requestAnimationFrame(() => {
+                    previewAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-all hover:bg-white/18"
+              >
+                <Eye className="h-4 w-4" />
+                {t("dashboard.sponsoring.detail.previewPdf")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!pdfPreviewOpen) {
+                    toast.error(t("dashboard.sponsoring.detail.downloadRequiresPreview"));
+                    return;
+                  }
+                  const link = document.createElement("a");
+                  link.href = downloadPdfUrl;
+                  link.download = `contrat-sponsor-${contract.title.replace(/\s+/g, "-").slice(0, 40)}.pdf`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
                 className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-all hover:bg-white/18"
               >
                 <Download className="h-4 w-4" />
                 {t("dashboard.sponsoring.detail.downloadPdf")}
-              </a>
+              </button>
               <DashboardPrimaryButton
                 href={`/tableau-de-bord/sponsoring/${contract.id}/modifier`}
                 icon="none"
@@ -144,6 +172,21 @@ export default function ContratSponsorDetailPage() {
           }
         />
       </div>
+
+      {pdfPreviewOpen ? (
+        <div ref={previewAnchorRef}>
+          <GlassCard className="overflow-hidden p-0 ring-1 ring-slate-200/90">
+            <p className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+              {t("dashboard.sponsoring.detail.previewPdf")}
+            </p>
+            <iframe
+              title={t("dashboard.sponsoring.detail.previewPdf")}
+              src={previewPdfUrl}
+              className="h-[min(78vh,920px)] w-full min-h-[420px] border-0 bg-white"
+            />
+          </GlassCard>
+        </div>
+      ) : null}
 
       <GlassCard className="p-6 sm:p-8">
         <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
