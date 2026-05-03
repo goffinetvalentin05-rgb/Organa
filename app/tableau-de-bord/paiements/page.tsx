@@ -5,7 +5,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
-import { PageLayout, PageHeader, TableCard, EmptyState, DataCard } from "@/components/ui";
+import { PageLayout, PageHeader, TableCard, EmptyState, DataCard, dashboardListRowClass, cn } from "@/components/ui";
 
 interface DocumentClient {
   nom?: string;
@@ -101,7 +101,7 @@ export default function PaiementsPage() {
   const invoicePayments = payments.filter((p) => p.type === "invoice");
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-8">
+    <PageLayout maxWidth="7xl" className="space-y-6">
       <PageHeader title={t("dashboard.payments.title")} subtitle={t("dashboard.payments.subtitle")} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -110,7 +110,7 @@ export default function PaiementsPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100/90">
               <CreditCard className="h-5 w-5 text-emerald-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Chiffre généré</span>
+            <span className="text-sm font-medium text-slate-500">{t("dashboard.payments.stats.totalReceived")}</span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : formatMontant(totalPayments)}
@@ -122,7 +122,7 @@ export default function PaiementsPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100/90">
               <FileText className="h-5 w-5 text-blue-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Cotisations vendues</span>
+            <span className="text-sm font-medium text-slate-500">{t("dashboard.payments.stats.membershipsCount")}</span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : membershipPayments.length}
@@ -134,7 +134,7 @@ export default function PaiementsPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100/90">
               <Receipt className="h-5 w-5 text-purple-600" />
             </div>
-            <span className="text-sm font-medium text-slate-500">Produits facturés</span>
+            <span className="text-sm font-medium text-slate-500">{t("dashboard.payments.stats.invoicesCount")}</span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : invoicePayments.length}
@@ -142,7 +142,7 @@ export default function PaiementsPage() {
         </DataCard>
       </div>
 
-      <TableCard title="Produits" bodyClassName="p-0">
+      <TableCard bodyClassName="p-0">
         {loading ? (
           <div className="p-8 text-center text-slate-500">
             {t("dashboard.common.loading")}
@@ -152,12 +152,12 @@ export default function PaiementsPage() {
             <EmptyState embedded icon={CreditCard} title={t("dashboard.payments.emptyState")} />
           </div>
         ) : (
-          <div className="divide-y divide-slate-100/90">
+          <div className="divide-y divide-slate-100">
             {payments.map((payment) => (
               <a
                 key={payment.id}
                 href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
-                className="flex items-center justify-between p-5 transition-colors hover:bg-blue-50/25"
+                className={cn(dashboardListRowClass, "flex items-center justify-between gap-4")}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${

@@ -11,6 +11,7 @@ import {
   EmptyState,
   GlassCard,
   ActionButton,
+  dashboardTableHeadRowClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
@@ -134,7 +135,7 @@ export default function SponsoringPage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr className={dashboardTableHeadRowClass}>
                   <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.sponsor")}</th>
                   <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.contractName")}</th>
                   <th className="hidden px-4 py-3 md:table-cell sm:px-6">

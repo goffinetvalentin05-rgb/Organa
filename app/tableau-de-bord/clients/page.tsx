@@ -15,6 +15,7 @@ import {
   EmptyState,
   ActionButton,
   glassCardClass,
+  dashboardListRowClass,
   cn,
 } from "@/components/ui";
 
@@ -205,13 +206,10 @@ export default function ClientsPage() {
           }
         />
       ) : (
-        <TableCard bodyClassName="overflow-hidden">
-          <div className="divide-y divide-slate-100/90">
+        <TableCard bodyClassName="overflow-hidden p-0">
+          <div className="divide-y divide-slate-100">
             {filteredClients.map((client) => (
-              <div
-                key={client.id}
-                className="p-5 transition-colors hover:bg-blue-50/20 md:p-6"
-              >
+              <div key={client.id} className={dashboardListRowClass}>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <Link
                     href={`/tableau-de-bord/clients/${client.id}`}

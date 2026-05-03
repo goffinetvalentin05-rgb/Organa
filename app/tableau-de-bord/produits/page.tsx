@@ -7,7 +7,15 @@ import { Edit, Trash } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, TableCard, EmptyState, GlassCard, ActionButton } from "@/components/ui";
+import {
+  PageLayout,
+  PageHeader,
+  TableCard,
+  EmptyState,
+  GlassCard,
+  ActionButton,
+  dashboardTableHeadRowClass,
+} from "@/components/ui";
 
 interface EventOption {
   id: string;
@@ -181,7 +189,7 @@ function ProduitsPageInner() {
   };
 
   return (
-    <PageLayout maxWidth="5xl" className="space-y-8">
+    <PageLayout maxWidth="7xl" className="space-y-6">
       <PageHeader
         title={t("dashboard.productRevenues.title")}
         subtitle={t("dashboard.productRevenues.subtitle")}
@@ -213,23 +221,23 @@ function ProduitsPageInner() {
       ) : (
         <TableCard bodyClassName="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100/90 bg-slate-50/60 backdrop-blur-sm">
-                  <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.name")}</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.date")}</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.amount")}</th>
-                  <th className="hidden px-4 py-3 text-sm font-semibold text-secondary md:table-cell">{t("dashboard.productRevenues.columns.event")}</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-secondary">{t("dashboard.common.actions")}</th>
+                <tr className={dashboardTableHeadRowClass}>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.name")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.date")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.amount")}</th>
+                  <th className="hidden px-4 py-3 md:table-cell sm:px-6">{t("dashboard.productRevenues.columns.event")}</th>
+                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {revenues.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-100/80 transition-colors hover:bg-blue-50/20">
-                    <td className="px-4 py-3 font-medium">{r.name}</td>
-                    <td className="px-4 py-3 text-secondary text-sm">{formatDate(r.revenue_date)}</td>
-                    <td className="px-4 py-3 font-semibold text-green-600">{formatMontant(r.amount)}</td>
-                    <td className="px-4 py-3 text-sm text-secondary hidden md:table-cell">
+                  <tr key={r.id} className="bg-white transition-colors hover:bg-blue-50/30">
+                    <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{r.name}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600 sm:px-6">{formatDate(r.revenue_date)}</td>
+                    <td className="px-4 py-3 font-semibold text-emerald-700 sm:px-6">{formatMontant(r.amount)}</td>
+                    <td className="hidden px-4 py-3 text-sm text-slate-600 md:table-cell sm:px-6">
                       {r.event ? (
                         <Link href={`/tableau-de-bord/evenements/${r.event.id}`} className="text-secondary hover:text-primary">
                           {r.event.name}
@@ -238,15 +246,15 @@ function ProduitsPageInner() {
                         t("dashboard.productRevenues.columns.noEvent")
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-right sm:px-6">
                       <ActionButton
                         type="button"
-                        variant="ghost"
                         onClick={() => openEdit(r)}
                         title={t("dashboard.productRevenues.editButton")}
-                        className="mr-1 inline-flex p-2"
+                        className="mr-1 inline-flex items-center gap-1.5 p-2"
                       >
                         <Edit className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
                       </ActionButton>
                       <ActionButton
                         type="button"

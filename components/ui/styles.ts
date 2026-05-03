@@ -19,11 +19,19 @@ export const glassCardHeaderClass =
   "border-b border-white/[0.15] bg-gradient-to-r from-white/[0.1] via-white/[0.05] to-transparent";
 
 /**
- * Contenu interne (tableaux, formulaires, listes) — fond blanc quasi opaque + texte foncé.
- * À placer **à l’intérieur** d’un `glassCardClass`.
+ * Contenu interne (tableaux, formulaires, listes) — fond blanc lisible + texte foncé.
+ * Référence visuelle alignée avec le tableau Sponsoring (contraste, ombre légère).
+ * À placer **à l’intérieur** d’un `glassCardClass` (ex. `TableCard`, `GlassCard`).
  */
 export const innerContentClass =
-  "rounded-xl border border-black/10 bg-white/90 text-slate-900 shadow-sm";
+  "rounded-xl border border-slate-200/90 bg-white text-slate-900 shadow-premium ring-1 ring-slate-100/80";
+
+/** En-tête de tableau type dashboard (Sponsoring, listes homogènes). */
+export const dashboardTableHeadRowClass =
+  "border-b border-slate-200 bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-500";
+
+/** Ligne de liste dans un conteneur `divide-y` (factures, dépenses, plannings). */
+export const dashboardListRowClass = "p-5 transition-colors hover:bg-blue-50/25 md:p-6";
 
 /** Bouton secondaire sur fond bleu (toolbar, annuler sur overlay). */
 export const dashboardSecondaryButtonClass =

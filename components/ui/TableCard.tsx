@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { cn } from "./cn";
 import { glassCardClass, glassCardHeaderClass, innerContentClass } from "./styles";
 
+const tableCardBodyPaddingClass = "p-1.5 sm:p-2";
+
 export type TableCardProps = {
   children: ReactNode;
   title?: string;
@@ -42,7 +44,7 @@ export default function TableCard({
         </header>
       ) : null}
 
-      <div className={cn(hasHeader ? "p-2 pt-0" : "p-2", "min-h-0 flex-1")}>
+      <div className={cn(hasHeader ? `${tableCardBodyPaddingClass} pt-0` : tableCardBodyPaddingClass, "min-h-0 flex-1")}>
         <div
           className={cn(
             innerContentClass,

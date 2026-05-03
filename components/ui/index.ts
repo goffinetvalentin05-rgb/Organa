@@ -4,6 +4,8 @@ export {
   glassCardHeaderClass,
   iconBadgeClass,
   innerContentClass,
+  dashboardTableHeadRowClass,
+  dashboardListRowClass,
   dashboardSecondaryButtonClass,
   obillzLandingRootClass,
   obillzLandingGridOverlayClass,

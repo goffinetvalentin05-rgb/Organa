@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Trash, Calendar } from "@/lib/icons";
+import { Eye, Edit, Trash, Calendar } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
-import { PageLayout, PageHeader, GlassCard, EmptyState, ActionButton } from "@/components/ui";
+import {
+  PageLayout,
+  PageHeader,
+  TableCard,
+  EmptyState,
+  GlassCard,
+  ActionButton,
+  dashboardTableHeadRowClass,
+} from "@/components/ui";
 
 interface EventType {
   id: string;
@@ -63,9 +71,9 @@ export default function EvenementsPage() {
       }
       const data = await response.json();
       setEvents(data?.events || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[Events] Error:", error);
-      setErrorMessage(error.message || t("dashboard.events.loadError"));
+      setErrorMessage(error instanceof Error ? error.message : t("dashboard.events.loadError"));
       setEvents([]);
     } finally {
       setLoading(false);
@@ -80,9 +88,9 @@ export default function EvenementsPage() {
         throw new Error(t("dashboard.events.deleteError"));
       }
       await loadEvents();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[Events] Delete error:", error);
-      setErrorMessage(error.message);
+      setErrorMessage(error instanceof Error ? error.message : t("dashboard.events.deleteError"));
     }
   };
 
@@ -94,20 +102,27 @@ export default function EvenementsPage() {
     return result.sort((a, b) => b.start_date.localeCompare(a.start_date));
   }, [events, filterStatus]);
 
-  const getStatusColor = (status: string) => {
+  const statusBadgeClass = (status: string) => {
     return status === "completed"
       ? "bg-green-100 text-green-700"
       : "bg-blue-100 text-blue-700";
   };
 
-  const getResultColor = (result: number) => {
-    if (result > 0) return "text-emerald-300";
-    if (result < 0) return "text-rose-300";
-    return "text-white/80";
+  const netAmountClass = (result: number) => {
+    if (result > 0) return "font-semibold text-emerald-700";
+    if (result < 0) return "font-semibold text-rose-700";
+    return "font-semibold text-slate-700";
+  };
+
+  const dateLabel = (event: Event) => {
+    if (event.end_date && event.end_date !== event.start_date) {
+      return `${formatDate(event.start_date)} → ${formatDate(event.end_date)}`;
+    }
+    return formatDate(event.start_date);
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-8">
+    <PageLayout maxWidth="7xl" className="space-y-6">
       <PageHeader
         title={t("dashboard.events.title")}
         subtitle={t("dashboard.events.subtitle")}
@@ -131,101 +146,108 @@ export default function EvenementsPage() {
 
       {limitReached ? <LimitReachedAlert message={t("dashboard.events.limitReached")} /> : null}
 
-      <GlassCard padding="none" className="overflow-hidden">
+      <TableCard bodyClassName="p-0">
         {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-white/80">{t("dashboard.common.loading")}</p>
-          </div>
+          <div className="p-12 text-center text-slate-500">{t("dashboard.common.loading")}</div>
         ) : errorMessage ? (
-          <GlassCard padding="lg" className="m-5 border-red-200/80 bg-red-50/40 text-center">
+          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
             <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
             <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
           </GlassCard>
         ) : filteredEvents.length === 0 ? (
-          <div className="p-8">
-            <EmptyState
-              icon={Calendar}
-              title={t("dashboard.events.emptyState")}
-              action={
-                <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau" className="inline-flex rounded-full">
-                  {t("dashboard.events.emptyCta")}
-                </DashboardPrimaryButton>
-              }
-            />
-          </div>
+          <EmptyState
+            embedded
+            icon={Calendar}
+            title={t("dashboard.events.emptyState")}
+            action={
+              <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau" className="inline-flex rounded-full">
+                {t("dashboard.events.emptyCta")}
+              </DashboardPrimaryButton>
+            }
+          />
         ) : (
-          <div className="space-y-4 p-6">
-            {filteredEvents.map((event) => (
-              <GlassCard
-                key={event.id}
-                padding="md"
-                className="transition-all duration-200 hover:border-blue-200/80 hover:shadow-md"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white drop-shadow-sm">{event.name}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(event.status)}`}>
-                          {t(`dashboard.events.status.${event.status}`)}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left text-sm">
+              <thead>
+                <tr className={dashboardTableHeadRowClass}>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.events.list.columns.name")}</th>
+                  <th className="hidden px-4 py-3 md:table-cell sm:px-6">{t("dashboard.events.fields.type")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.events.list.columns.date")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
+                  <th className="hidden px-4 py-3 text-right lg:table-cell sm:px-6">
+                    {t("dashboard.events.detail.totalRevenue")}
+                  </th>
+                  <th className="hidden px-4 py-3 text-right xl:table-cell sm:px-6">
+                    {t("dashboard.events.detail.totalExpenses")}
+                  </th>
+                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.events.detail.netResult")}</th>
+                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredEvents.map((event) => (
+                  <tr key={event.id} className="bg-white transition-colors hover:bg-blue-50/30">
+                    <td className="px-4 py-3 align-top sm:px-6">
+                      <div className="font-medium text-slate-900">{event.name}</div>
+                      {event.description ? (
+                        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{event.description}</p>
+                      ) : null}
+                    </td>
+                    <td className="hidden px-4 py-3 align-top text-slate-600 md:table-cell sm:px-6">
+                      {event.eventType ? (
+                        <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                          {event.eventType.name}
                         </span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-white/75">
-                        {event.eventType && (
-                          <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white">
-                            {event.eventType.name}
-                          </span>
-                        )}
-                        <span>
-                          {event.end_date && event.end_date !== event.start_date
-                            ? `${formatDate(event.start_date)} → ${formatDate(event.end_date)}`
-                            : formatDate(event.start_date)}
-                        </span>
-                      </div>
-                      {event.description && (
-                        <p className="mt-2 line-clamp-2 text-sm text-white/70">{event.description}</p>
+                      ) : (
+                        <span className="text-slate-400">—</span>
                       )}
-                    </div>
-                    <div className="text-right">
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.totalRevenue")}</p>
-                          <p className="font-semibold text-emerald-300">{formatMontant(event.totalRevenue)}</p>
-                        </div>
-                        <div>
-                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.totalExpenses")}</p>
-                          <p className="font-semibold text-rose-300">{formatMontant(event.totalExpenses)}</p>
-                        </div>
-                        <div>
-                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.netResult")}</p>
-                          <p className={`font-bold text-lg ${getResultColor(event.netResult)}`}>
-                            {formatMontant(event.netResult)}
-                          </p>
-                        </div>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-600 sm:px-6">{dateLabel(event)}</td>
+                    <td className="px-4 py-3 sm:px-6">
+                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(event.status)}`}>
+                        {t(`dashboard.events.status.${event.status}`)}
+                      </span>
+                    </td>
+                    <td className="hidden px-4 py-3 text-right font-medium text-emerald-700 lg:table-cell sm:px-6">
+                      {formatMontant(event.totalRevenue)}
+                    </td>
+                    <td className="hidden px-4 py-3 text-right font-medium text-rose-700 xl:table-cell sm:px-6">
+                      {formatMontant(event.totalExpenses)}
+                    </td>
+                    <td className={`px-4 py-3 text-right sm:px-6 ${netAmountClass(event.netResult)}`}>
+                      {formatMontant(event.netResult)}
+                    </td>
+                    <td className="px-4 py-3 sm:px-6">
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        <ActionButton href={`/tableau-de-bord/evenements/${event.id}`} className="inline-flex items-center gap-1.5 p-2">
+                          <Eye className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
+                        </ActionButton>
+                        <ActionButton
+                          href={`/tableau-de-bord/evenements/${event.id}`}
+                          className="inline-flex items-center gap-1.5 p-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+                        </ActionButton>
+                        <ActionButton
+                          type="button"
+                          variant="dangerSoft"
+                          className="inline-flex p-2"
+                          title={t("dashboard.common.delete")}
+                          onClick={() => void handleDelete(event.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </ActionButton>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-white/15 pt-3">
-                    <ActionButton href={`/tableau-de-bord/evenements/${event.id}`} variant="ghostLight" className="inline-flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      {t("dashboard.common.view")}
-                    </ActionButton>
-                    <ActionButton
-                      type="button"
-                      variant="dangerSoft"
-                      onClick={() => handleDelete(event.id)}
-                      title={t("dashboard.common.delete")}
-                      className="inline-flex items-center justify-center gap-2"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </ActionButton>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </GlassCard>
+      </TableCard>
     </PageLayout>
   );
 }

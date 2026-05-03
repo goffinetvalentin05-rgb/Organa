@@ -1300,6 +1300,11 @@
       "title": "Zahlungsverlauf",
       "subtitle": "Übersicht über eingegangene Zahlungen",
       "emptyState": "Noch keine Zahlungen erfasst.",
+      "stats": {
+        "totalReceived": "Summe eingegangen",
+        "membershipsCount": "Bezahlte Mitgliedsbeiträge",
+        "invoicesCount": "Bezahlte Rechnungen"
+      },
       "columns": {
         "date": "Datum",
         "member": "Mitglied",

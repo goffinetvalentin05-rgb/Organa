@@ -2,8 +2,16 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Eye, Trash, Download, Receipt } from "@/lib/icons";
-import { PageLayout, PageHeader, TableCard, EmptyState, GlassCard } from "@/components/ui";
+import { Eye, Edit, Trash, Download, Receipt } from "@/lib/icons";
+import {
+  PageLayout,
+  PageHeader,
+  TableCard,
+  EmptyState,
+  GlassCard,
+  ActionButton,
+  dashboardListRowClass,
+} from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
@@ -504,7 +512,7 @@ export default function DepensesPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-8">
+    <PageLayout maxWidth="7xl" className="space-y-6">
       <PageHeader
         title={t("dashboard.expenses.title")}
         subtitle={t("dashboard.expenses.subtitle")}
@@ -741,41 +749,37 @@ export default function DepensesPage() {
             />
           </div>
         ) : (
-          <div className="space-y-4 p-6">
+          <div className="divide-y divide-slate-100">
             {depensesTriees.map((depense) => {
               const statutAffiche = getStatutAffiche(depense);
               const besoinAction =
                 depense.status === "a_payer" &&
                 (isDatePassee(depense.date) || isDateProche(depense.date, 7));
               return (
-                <GlassCard
-                  key={depense.id}
-                  padding="md"
-                  className="transition-all duration-200 hover:border-blue-200/80 hover:shadow-md"
-                >
+                <div key={depense.id} className={dashboardListRowClass}>
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-tertiary">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                           {t("dashboard.expenses.fields.supplier")}
                         </p>
-                        <p className="mt-2 text-lg font-semibold text-primary">{depense.label}</p>
-                        <p className="mt-1 text-sm text-secondary">
+                        <p className="mt-2 text-lg font-semibold text-slate-900">{depense.label}</p>
+                        <p className="mt-1 text-sm text-slate-600">
                           {t("dashboard.expenses.dueLabel")} {formatDate(depense.date)}
                         </p>
-                        {besoinAction && (
-                          <p className="mt-2 text-sm text-yellow-600">
+                        {besoinAction ? (
+                          <p className="mt-2 text-sm text-amber-700">
                             Une action est recommandée pour sécuriser ce paiement.
                           </p>
-                        )}
+                        ) : null}
                       </div>
                       <div className="text-right">
-                        <p className="text-xs uppercase tracking-wide text-tertiary">{t("dashboard.common.amount")}</p>
-                        <p className="mt-2 text-2xl font-semibold text-primary">
-                          {formatMontant(depense.amount)}
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          {t("dashboard.common.amount")}
                         </p>
+                        <p className="mt-2 text-2xl font-semibold text-slate-900">{formatMontant(depense.amount)}</p>
                         <span
-                          className={`mt-3 inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getStatutColor(
+                          className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatutColor(
                             statutAffiche
                           )}`}
                         >
@@ -783,37 +787,42 @@ export default function DepensesPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="text-sm text-secondary">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-3">
+                      <div className="text-sm text-slate-600">
                         {depense.attachmentUrl
                           ? t("dashboard.expenses.attachmentAvailable")
                           : t("dashboard.expenses.noAttachment")}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        <ActionButton
+                          type="button"
+                          className="inline-flex items-center gap-1.5 p-2"
                           onClick={() => handleVoir(depense)}
-                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
                         >
-                          <Eye className="w-4 h-4" />
-                          {t("dashboard.common.view")}
-                        </button>
-                        <button
+                          <Eye className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
+                        </ActionButton>
+                        <ActionButton
+                          type="button"
+                          className="inline-flex items-center gap-1.5 p-2"
                           onClick={() => handleModifier(depense)}
-                          className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm"
                         >
-                          {t("dashboard.expenses.editAction")}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(depense.id)}
-                          className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
+                          <Edit className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+                        </ActionButton>
+                        <ActionButton
+                          type="button"
+                          variant="dangerSoft"
+                          className="inline-flex p-2"
                           title={t("dashboard.common.delete")}
+                          onClick={() => handleDelete(depense.id)}
                         >
-                          <Trash className="w-4 h-4" />
-                        </button>
+                          <Trash className="h-4 w-4" />
+                        </ActionButton>
                       </div>
                     </div>
                   </div>
-                </GlassCard>
+                </div>
               );
             })}
           </div>

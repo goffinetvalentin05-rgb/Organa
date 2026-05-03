@@ -1188,9 +1188,14 @@
       }
     },
     "payments": {
-      "title": "Produits",
+      "title": "Paiements",
       "subtitle": "Consultez les revenus générés par votre club",
-      "emptyState": "Aucun produit enregistré pour le moment.",
+      "emptyState": "Aucun paiement enregistré pour le moment.",
+      "stats": {
+        "totalReceived": "Total encaissé",
+        "membershipsCount": "Cotisations payées",
+        "invoicesCount": "Factures payées"
+      },
       "columns": {
         "date": "Date",
         "member": "Membre",
@@ -1404,6 +1409,12 @@
     "events": {
       "title": "Événements",
       "subtitle": "Gérez les événements du club et leur bilan financier",
+      "list": {
+        "columns": {
+          "name": "Événement",
+          "date": "Période"
+        }
+      },
       "newEvent": "Nouvel événement",
       "emptyState": "Aucun événement pour le moment",
       "emptyCta": "Créer votre premier événement",

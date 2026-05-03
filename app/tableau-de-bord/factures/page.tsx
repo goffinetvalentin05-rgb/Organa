@@ -14,6 +14,7 @@ import {
   EmptyState,
   ActionButton,
   GlassCard,
+  dashboardListRowClass,
 } from "@/components/ui";
 
 interface Facture {
@@ -214,7 +215,7 @@ export default function FacturesPage() {
                 return (
                   <div
                     key={facture.id}
-                    className="p-5 transition-colors hover:bg-blue-50/25 md:p-6"
+                    className={dashboardListRowClass}
                   >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div className="flex items-start gap-4">

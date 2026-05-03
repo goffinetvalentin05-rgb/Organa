@@ -1340,6 +1340,11 @@
       "title": "Payment History",
       "subtitle": "View received payments history",
       "emptyState": "No payments recorded yet.",
+      "stats": {
+        "totalReceived": "Total received",
+        "membershipsCount": "Memberships paid",
+        "invoicesCount": "Invoices paid"
+      },
       "columns": {
         "date": "Date",
         "member": "Member",
@@ -1553,6 +1558,12 @@
     "events": {
       "title": "Events",
       "subtitle": "Manage club events and their financial overview",
+      "list": {
+        "columns": {
+          "name": "Event",
+          "date": "Period"
+        }
+      },
       "newEvent": "New event",
       "emptyState": "No events yet",
       "emptyCta": "Create your first event",
