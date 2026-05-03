@@ -6,6 +6,7 @@ import DeleteClientButton from "./components/DeleteClientButton";
 import { Edit, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 
 interface Client {
   id: string;
@@ -31,6 +32,7 @@ const roleColors: Record<string, string> = {
 
 export default function ClientsPage() {
   const { t } = useI18n();
+  const vis = useMemberFieldSettings();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +69,12 @@ export default function ClientsPage() {
   // Filtrer les clients
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
-      if (roleFilter && client.role !== roleFilter) return false;
-      if (categoryFilter && client.category !== categoryFilter) return false;
+      if (vis.role.enabled && roleFilter && client.role !== roleFilter) return false;
+      if (vis.category.enabled && categoryFilter && client.category !== categoryFilter)
+        return false;
       return true;
     });
-  }, [clients, roleFilter, categoryFilter]);
+  }, [clients, roleFilter, categoryFilter, vis.role.enabled, vis.category.enabled]);
 
   // Obtenir les catégories uniques présentes
   const uniqueCategories = useMemo(() => {
@@ -81,6 +84,11 @@ export default function ClientsPage() {
     });
     return Array.from(cats);
   }, [clients]);
+
+  useEffect(() => {
+    if (!vis.role.enabled) setRoleFilter("");
+    if (!vis.category.enabled) setCategoryFilter("");
+  }, [vis.role.enabled, vis.category.enabled]);
 
   if (loading) {
     return (
@@ -124,42 +132,47 @@ export default function ClientsPage() {
       </div>
 
       {/* Filtres */}
-      {clients.length > 0 && (
+      {clients.length > 0 && (vis.role.enabled || vis.category.enabled) && (
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-4 h-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-700">{t("dashboard.clients.filtersLabel")}</span>
           </div>
           <div className="flex flex-wrap gap-3">
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">{t("dashboard.clients.filters.allRoles")}</option>
-              <option value="player">{t("dashboard.clients.roles.player")}</option>
-              <option value="coach">{t("dashboard.clients.roles.coach")}</option>
-              <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
-              <option value="staff">{t("dashboard.clients.roles.staff")}</option>
-            </select>
+            {vis.role.enabled && (
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{t("dashboard.clients.filters.allRoles")}</option>
+                <option value="player">{t("dashboard.clients.roles.player")}</option>
+                <option value="coach">{t("dashboard.clients.roles.coach")}</option>
+                <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
+                <option value="staff">{t("dashboard.clients.roles.staff")}</option>
+              </select>
+            )}
 
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">{t("dashboard.clients.filters.allCategories")}</option>
-              <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
-              <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
-              <option value="junior">{t("dashboard.clients.categories.junior")}</option>
-              <option value="president">{t("dashboard.clients.categories.president")}</option>
-              <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
-              <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
-              <option value="other">{t("dashboard.clients.categories.other")}</option>
-            </select>
+            {vis.category.enabled && (
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{t("dashboard.clients.filters.allCategories")}</option>
+                <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
+                <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
+                <option value="junior">{t("dashboard.clients.categories.junior")}</option>
+                <option value="president">{t("dashboard.clients.categories.president")}</option>
+                <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
+                <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
+                <option value="other">{t("dashboard.clients.categories.other")}</option>
+              </select>
+            )}
 
             {(roleFilter || categoryFilter) && (
               <button
+                type="button"
                 onClick={() => {
                   setRoleFilter("");
                   setCategoryFilter("");
@@ -216,12 +229,14 @@ export default function ClientsPage() {
                           {client.prenom ? `${client.prenom} ` : ""}
                           {client.nom || t("dashboard.clients.noName")}
                         </h3>
-                        <span
-                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}
-                        >
-                          {t(`dashboard.clients.roles.${client.role}`) || client.role}
-                        </span>
-                        {client.category && (
+                        {vis.role.enabled && (
+                          <span
+                            className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}
+                          >
+                            {t(`dashboard.clients.roles.${client.role}`) || client.role}
+                          </span>
+                        )}
+                        {vis.category.enabled && client.category && (
                           <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
                             {t(`dashboard.clients.categories.${client.category}`) ||
                               client.category}
@@ -229,29 +244,35 @@ export default function ClientsPage() {
                         )}
                       </div>
                       <div className="mt-2 grid gap-1 text-sm">
-                        <p className="text-slate-500 flex items-center gap-2">
-                          <span className="text-slate-400 w-16 shrink-0">Email</span>
-                          <span className="truncate">
-                            {client.email || t("dashboard.clients.notProvided")}
-                          </span>
-                        </p>
-                        <p className="text-slate-500 flex items-center gap-2">
-                          <span className="text-slate-400 w-16 shrink-0">Tél.</span>
-                          <span>{client.telephone || t("dashboard.clients.notProvided")}</span>
-                        </p>
-                        <p className="text-slate-500 flex items-center gap-2">
-                          <span className="text-slate-400 w-16 shrink-0">Adresse</span>
-                          <span className="truncate">
-                            {client.adresse || client.postal_code || client.city
-                              ? [
-                                  client.adresse,
-                                  [client.postal_code, client.city].filter(Boolean).join(" "),
-                                ]
-                                  .filter(Boolean)
-                                  .join(", ")
-                              : t("dashboard.clients.addressNotProvided")}
-                          </span>
-                        </p>
+                        {vis.email.enabled && (
+                          <p className="text-slate-500 flex items-center gap-2">
+                            <span className="text-slate-400 w-16 shrink-0">Email</span>
+                            <span className="truncate">
+                              {client.email || t("dashboard.clients.notProvided")}
+                            </span>
+                          </p>
+                        )}
+                        {vis.phone.enabled && (
+                          <p className="text-slate-500 flex items-center gap-2">
+                            <span className="text-slate-400 w-16 shrink-0">Tél.</span>
+                            <span>{client.telephone || t("dashboard.clients.notProvided")}</span>
+                          </p>
+                        )}
+                        {vis.address.enabled && (
+                          <p className="text-slate-500 flex items-center gap-2">
+                            <span className="text-slate-400 w-16 shrink-0">Adresse</span>
+                            <span className="truncate">
+                              {client.adresse || client.postal_code || client.city
+                                ? [
+                                    client.adresse,
+                                    [client.postal_code, client.city].filter(Boolean).join(" "),
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ")
+                                : t("dashboard.clients.addressNotProvided")}
+                            </span>
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Link>

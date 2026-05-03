@@ -29,6 +29,8 @@ export interface NormalizedClientRow {
   user_id: string;
   role: string;
   category: string | null;
+  date_of_birth: string | null;
+  avs_number: string | null;
   created_by: string | null;
   updated_by: string | null;
   created_at: string | null;
@@ -48,11 +50,20 @@ export function normalizedClientToApi(n: NormalizedClientRow) {
     user_id: n.user_id,
     role: n.role,
     category: n.category,
+    dateOfBirth: n.date_of_birth,
+    avsNumber: n.avs_number,
     createdBy: n.created_by,
     updatedBy: n.updated_by,
     createdAt: n.created_at,
     updatedAt: n.updated_at,
   };
+}
+
+/** Liste membres : ne jamais exposer l’AVS (ni la date de naissance) dans le JSON. */
+export function normalizedClientToApiListItem(n: NormalizedClientRow) {
+  const base = normalizedClientToApi(n);
+  const { avsNumber: _a, dateOfBirth: _d, ...rest } = base;
+  return rest;
 }
 
 export function normalizeClientsDbRow(
@@ -63,6 +74,16 @@ export function normalizeClientsDbRow(
 
   const user_id = optString(r.user_id);
   if (!user_id) return null;
+
+  const dob = r.date_of_birth;
+  const dobStr =
+    dob == null
+      ? null
+      : typeof dob === "string"
+        ? dob
+        : dob instanceof Date
+          ? dob.toISOString().slice(0, 10)
+          : String(dob).slice(0, 10);
 
   return {
     id,
@@ -75,6 +96,8 @@ export function normalizeClientsDbRow(
     user_id,
     role: optString(r.role) || "player",
     category: optString(r.category),
+    date_of_birth: dobStr,
+    avs_number: optString(r.avs_number),
     created_by: optString(r.created_by),
     updated_by: optString(r.updated_by),
     created_at: optString(r.created_at),

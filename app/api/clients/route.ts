@@ -6,8 +6,10 @@ import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import {
   normalizeClientsDbRow,
-  normalizedClientToApi,
+  normalizedClientToApiListItem,
 } from "@/lib/clients/normalizeDbRow";
+import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
+import { buildClientInsertPayload } from "@/lib/clients/memberWritePayload";
 
 export const runtime = "nodejs";
 
@@ -51,7 +53,7 @@ export async function GET() {
       (n): n is NonNullable<typeof n> =>
         n !== null && n.user_id === guard.clubId
     )
-    .map((n) => normalizedClientToApi(n));
+    .map((n) => normalizedClientToApiListItem(n));
 
   return NextResponse.json({ clients }, { status: 200 });
 }
@@ -83,9 +85,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { nom, email, telephone, adresse, postal_code, city, role, category } = body;
-
-  // Validation du nom (obligatoire)
+  const bodyObj = body as Record<string, unknown>;
+  const nom = bodyObj.nom;
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
     return NextResponse.json(
       { error: "Le champ 'nom' est requis" },
@@ -93,22 +94,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Insertion dans Supabase (colonnes FR : nom, telephone, adresse)
+  const fieldSettings = await fetchMergedMemberFieldSettings(supabase, guard.clubId);
+  const insertPayload = buildClientInsertPayload(
+    bodyObj,
+    fieldSettings,
+    guard.clubId,
+    user.id
+  );
+
   const { data: newClient, error: insertError } = await supabase
     .from("clients")
-    .insert({
-      user_id: guard.clubId,
-      nom: nom.trim(),
-      email: email || null,
-      telephone: telephone || null,
-      adresse: adresse || null,
-      postal_code: postal_code || null,
-      city: city || null,
-      role: role || "player",
-      category: category || null,
-      created_by: user.id,
-      updated_by: user.id,
-    })
+    .insert(insertPayload)
     .select("*")
     .single();
 
@@ -130,7 +126,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const clientResponse = normalizedClientToApi(normalized);
+  const clientResponse = normalizedClientToApiListItem(normalized);
 
   const meta = extractRequestMetadata(request);
   await logAudit({

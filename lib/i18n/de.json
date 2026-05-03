@@ -684,6 +684,27 @@
           "Alle Funktionen"
         ]
       },
+      "memberFields": {
+        "sectionHeading": "Mitgliederverwaltung",
+        "title": "Mitgliedfelder",
+        "subtitle": "Wählen Sie, welche Angaben Ihr Verein zu Mitgliedern pflegen möchte.",
+        "save": "Speichern",
+        "saveSuccess": "Einstellungen der Felder gespeichert.",
+        "saveError": "Einstellungen konnten nicht gespeichert werden.",
+        "saveForbidden": "Nur Vereinsadministratorinnen und -administratoren können diese Einstellungen ändern.",
+        "loadError": "Feldeinstellungen konnten nicht geladen werden.",
+        "readOnlyHint": "Sie können die Liste einsehen; Änderungen sind für berechtigte Personen reserviert.",
+        "avsWarning": "Die AHV-Nummer ist sensibel. Aktivieren Sie dieses Feld nur, wenn Ihr Verein es wirklich braucht.",
+        "fields": {
+          "email": "E-Mail",
+          "phone": "Telefon",
+          "address": "Adresse",
+          "birth_date": "Geburtsdatum",
+          "category": "Kategorie / Status",
+          "role": "Rolle / Funktion",
+          "avs_number": "AHV-Nummer"
+        }
+      },
       "branding": {
         "title": "Marke",
         "logoLabel": "Firmenlogo",
@@ -817,7 +838,9 @@
         "phone": "Telefon",
         "address": "Adresse",
         "role": "Rolle",
-        "category": "Kategorie"
+        "category": "Kategorie",
+        "dateOfBirth": "Geburtsdatum",
+        "avsNumber": "AHV-Nummer"
       },
       "roles": {
         "player": "Spieler",
@@ -855,7 +878,10 @@
         "lastModified": "Zuletzt geändert",
         "missing": "—",
         "auditCreatedBy": "Erstellt von",
-        "auditUpdatedBy": "Geändert von"
+        "auditUpdatedBy": "Geändert von",
+        "birthDate": "Geburtsdatum",
+        "avsNumber": "AHV-Nummer",
+        "avsMaskedHint": "Maskierte Anzeige zum Schutz dieser Daten."
       },
       "errors": {
         "missingId": "Kunden-ID fehlt",

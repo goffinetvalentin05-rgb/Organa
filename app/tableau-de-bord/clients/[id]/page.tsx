@@ -4,6 +4,8 @@ import { requireCurrentClub } from "@/lib/auth/rbac";
 import { checkPermission, PERMISSIONS } from "@/lib/auth/permissions";
 import MemberDetailView, { type MemberDetailModel } from "./MemberDetailView";
 import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
+import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
+import { maskAvsNumber } from "@/lib/member-fields/types";
 
 interface PageProps {
   params: Promise<{ id: string }> | { id: string };
@@ -41,6 +43,12 @@ export default async function ClientDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const fieldVisibility = await fetchMergedMemberFieldSettings(supabase, clubId);
+  const avs_masked =
+    fieldVisibility.avs_number.enabled && n.avs_number
+      ? maskAvsNumber(n.avs_number)
+      : null;
+
   const member: MemberDetailModel = {
     id: n.id,
     nom: n.nom,
@@ -52,6 +60,9 @@ export default async function ClientDetailPage({ params }: PageProps) {
     city: n.city,
     role: n.role,
     category: n.category,
+    date_of_birth: n.date_of_birth,
+    avs_masked,
+    fieldVisibility,
     created_at: n.created_at,
     updated_at: n.updated_at,
     created_by: n.created_by,

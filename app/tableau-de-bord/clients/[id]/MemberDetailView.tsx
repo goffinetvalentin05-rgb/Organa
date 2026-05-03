@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import CreatedByBadge from "@/components/CreatedByBadge";
+import type { MemberFieldsMerged } from "@/lib/member-fields/types";
 
 export interface MemberDetailModel {
   id: string;
@@ -16,6 +17,10 @@ export interface MemberDetailModel {
   city: string | null;
   role: string;
   category: string | null;
+  date_of_birth: string | null;
+  /** Masqué ; null si champ désactivé ou vide */
+  avs_masked: string | null;
+  fieldVisibility: MemberFieldsMerged;
   created_at: string | null;
   updated_at: string | null;
   created_by: string | null;
@@ -44,14 +49,39 @@ function formatDateTime(iso: string | null | undefined, locale: string): string 
   }
 }
 
+function formatDateOnly(iso: string | null | undefined, locale: string): string {
+  if (!iso) return "—";
+  try {
+    const d = new Date(iso.includes("T") ? iso : `${iso}T12:00:00`);
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  } catch {
+    return "—";
+  }
+}
+
+function displayOrDash(v: string | null | undefined, tMissing: string) {
+  if (v == null || String(v).trim() === "") return tMissing;
+  return String(v);
+}
+
 export default function MemberDetailView({
   member,
   canManageMembers,
 }: MemberDetailViewProps) {
   const { t, locale } = useI18n();
   const loc = locale === "en" ? "en-CH" : locale === "de" ? "de-CH" : "fr-CH";
+  const v = member.fieldVisibility;
+  const missing = t("dashboard.clients.memberDetail.missing");
 
-  const addressLine = [member.adresse, [member.postal_code, member.city].filter(Boolean).join(" ").trim()]
+  const addressLine = [
+    member.adresse,
+    [member.postal_code, member.city].filter(Boolean).join(" ").trim(),
+  ]
     .filter(Boolean)
     .join(", ");
 
@@ -106,51 +136,99 @@ export default function MemberDetailView({
               {t("dashboard.clients.memberDetail.lastName")}
             </dt>
             <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 break-words">
-              {member.nom?.trim() || t("dashboard.clients.memberDetail.missing")}
+              {member.nom?.trim() || missing}
             </dd>
           </div>
-          <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
-            <dt className="text-sm font-medium text-slate-500">
-              {t("dashboard.clients.memberDetail.email")}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 break-all">
-              {member.email || t("dashboard.clients.memberDetail.missing")}
-            </dd>
-          </div>
-          <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
-            <dt className="text-sm font-medium text-slate-500">
-              {t("dashboard.clients.memberDetail.phone")}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-              {member.telephone || t("dashboard.clients.memberDetail.missing")}
-            </dd>
-          </div>
-          <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
-            <dt className="text-sm font-medium text-slate-500">
-              {t("dashboard.clients.memberDetail.address")}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 break-words">
-              {addressLine || t("dashboard.clients.memberDetail.missing")}
-            </dd>
-          </div>
-          <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
-            <dt className="text-sm font-medium text-slate-500">
-              {t("dashboard.clients.memberDetail.role")}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-              {t(`dashboard.clients.roles.${member.role}`) || member.role}
-            </dd>
-          </div>
-          <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
-            <dt className="text-sm font-medium text-slate-500">
-              {t("dashboard.clients.memberDetail.category")}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-              {member.category
-                ? t(`dashboard.clients.categories.${member.category}`) || member.category
-                : t("dashboard.clients.memberDetail.missing")}
-            </dd>
-          </div>
+
+          {v.email.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.email")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 break-all">
+                {displayOrDash(member.email, missing)}
+              </dd>
+            </div>
+          )}
+
+          {v.phone.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.phone")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
+                {displayOrDash(member.telephone, missing)}
+              </dd>
+            </div>
+          )}
+
+          {v.address.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.address")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 break-words">
+                {addressLine || missing}
+              </dd>
+            </div>
+          )}
+
+          {v.birth_date.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.birthDate")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
+                {member.date_of_birth
+                  ? formatDateOnly(member.date_of_birth, loc)
+                  : missing}
+              </dd>
+            </div>
+          )}
+
+          {v.role.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.role")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
+                {t(`dashboard.clients.roles.${member.role}`) || member.role}
+              </dd>
+            </div>
+          )}
+
+          {v.category.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.category")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
+                {member.category
+                  ? t(`dashboard.clients.categories.${member.category}`) ||
+                    member.category
+                  : missing}
+              </dd>
+            </div>
+          )}
+
+          {v.avs_number.enabled && (
+            <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
+              <dt className="text-sm font-medium text-slate-500">
+                {t("dashboard.clients.memberDetail.avsNumber")}
+              </dt>
+              <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
+                <span className="font-mono tracking-wide">
+                  {member.avs_masked || missing}
+                </span>
+                {member.avs_masked ? (
+                  <span className="block text-xs text-slate-500 mt-1">
+                    {t("dashboard.clients.memberDetail.avsMaskedHint")}
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+          )}
+
           <div className="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-8">
             <dt className="text-sm font-medium text-slate-500">
               {t("dashboard.clients.memberDetail.addedAt")}

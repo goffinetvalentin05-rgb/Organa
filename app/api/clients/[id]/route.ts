@@ -7,7 +7,11 @@ import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit"
 import {
   normalizeClientsDbRow,
   normalizedClientToApi,
+  normalizedClientToApiListItem,
 } from "@/lib/clients/normalizeDbRow";
+import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
+import { buildClientUpdatePatch } from "@/lib/clients/memberWritePayload";
+import { maskAvsNumber } from "@/lib/member-fields/types";
 
 export const runtime = "nodejs";
 
@@ -75,7 +79,13 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({ client: normalizedClientToApi(normalized) });
+  const api = normalizedClientToApi(normalized);
+  return NextResponse.json({
+    client: {
+      ...api,
+      avsNumber: maskAvsNumber(normalized.avs_number),
+    },
+  });
 }
 
 /* =========================
@@ -120,9 +130,8 @@ export async function PUT(
     );
   }
 
-  const { nom, email, telephone, adresse, postal_code, city, role, category } = body;
-
-  // Validation du nom (obligatoire)
+  const bodyObj = body as Record<string, unknown>;
+  const nom = bodyObj.nom;
   if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
     return NextResponse.json(
       { error: "Le nom est obligatoire" },
@@ -130,19 +139,31 @@ export async function PUT(
     );
   }
 
+  const { data: existingRow, error: loadExistingErr } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", guard.clubId)
+    .maybeSingle();
+
+  if (loadExistingErr || !existingRow) {
+    return NextResponse.json(
+      { error: "Client introuvable ou non autorisé" },
+      { status: 404 }
+    );
+  }
+
+  const fieldSettings = await fetchMergedMemberFieldSettings(supabase, guard.clubId);
+  const patch = buildClientUpdatePatch(
+    bodyObj,
+    fieldSettings,
+    existingRow as Record<string, unknown>,
+    user.id
+  );
+
   const { data: updated, error: updateError } = await supabase
     .from("clients")
-    .update({
-      nom: nom.trim(),
-      email: email || null,
-      telephone: telephone || null,
-      adresse: adresse || null,
-      postal_code: postal_code || null,
-      city: city || null,
-      role: role || "player",
-      category: category ?? null,
-      updated_by: user.id,
-    })
+    .update(patch)
     .eq("id", id)
     .eq("user_id", guard.clubId)
     .select("*")
@@ -174,9 +195,13 @@ export async function PUT(
     );
   }
 
+  const api = normalizedClientToApiListItem(normalized);
   return NextResponse.json({
     success: true,
-    client: normalizedClientToApi(normalized),
+    client: {
+      ...api,
+      avsNumber: maskAvsNumber(normalized.avs_number),
+    },
   });
 }
 

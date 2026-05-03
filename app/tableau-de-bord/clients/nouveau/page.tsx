@@ -7,10 +7,12 @@ import LimitReachedAlert from "@/components/LimitReachedAlert";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { ArrowRight, Users } from "@/lib/icons";
+import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 
 export default function NouveauClientPage() {
   const router = useRouter();
   const { t } = useI18n();
+  const vis = useMemberFieldSettings();
   const [formData, setFormData] = useState({
     nom: "",
     email: "",
@@ -20,6 +22,8 @@ export default function NouveauClientPage() {
     city: "",
     role: "player",
     category: "",
+    date_of_birth: "",
+    avs_number: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{
@@ -31,7 +35,6 @@ export default function NouveauClientPage() {
     e.preventDefault();
     setError(null);
 
-    // Validation front-end : le nom est obligatoire et ne peut pas être vide
     const trimmedNom = formData.nom.trim();
     if (!trimmedNom) {
       setError({
@@ -41,15 +44,27 @@ export default function NouveauClientPage() {
       return;
     }
 
+    if (vis.email.enabled && !formData.email.trim()) {
+      setError({
+        type: "OTHER",
+        message: t("dashboard.clients.fields.email") + " — requis",
+      });
+      return;
+    }
+
     setLoading(true);
 
-    // Préparer les données avec trim() sur les champs texte
     const dataToSend = {
-      ...formData,
       nom: trimmedNom,
-      adresse: formData.adresse.trim() || "",
-      postal_code: formData.postal_code.trim() || "",
-      city: formData.city.trim() || "",
+      email: formData.email.trim(),
+      telephone: formData.telephone.trim(),
+      adresse: formData.adresse.trim(),
+      postal_code: formData.postal_code.trim(),
+      city: formData.city.trim(),
+      role: formData.role,
+      category: formData.category.trim() || null,
+      date_of_birth: formData.date_of_birth.trim() || null,
+      avs_number: formData.avs_number.trim() || null,
     };
 
     try {
@@ -61,7 +76,7 @@ export default function NouveauClientPage() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        
+
         if (data.error === "LIMIT_REACHED") {
           setError({
             type: "LIMIT_REACHED",
@@ -80,7 +95,7 @@ export default function NouveauClientPage() {
       }
 
       router.push("/tableau-de-bord/clients");
-    } catch (err) {
+    } catch {
       setError({
         type: "OTHER",
         message: t("dashboard.common.unexpectedError"),
@@ -91,7 +106,6 @@ export default function NouveauClientPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm">
         <Link href="/tableau-de-bord/clients" className="text-slate-500 hover:text-slate-700 transition-colors">
           Clients
@@ -100,9 +114,8 @@ export default function NouveauClientPage() {
         <span className="text-slate-900 font-medium">Nouveau</span>
       </div>
 
-      {/* En-tête */}
       <div className="flex items-start gap-4">
-        <div 
+        <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
           style={{ backgroundColor: "var(--obillz-blue-light)" }}
         >
@@ -114,19 +127,16 @@ export default function NouveauClientPage() {
         </div>
       </div>
 
-      {/* Message d'erreur pour limite atteinte */}
       {error?.type === "LIMIT_REACHED" && (
         <LimitReachedAlert message={error.message} resource="clients" />
       )}
 
-      {/* Message d'erreur générique */}
       {error?.type === "OTHER" && (
         <div className="bg-red-50 rounded-xl border border-red-200 p-4">
           <p className="text-red-700 text-sm">{error.message}</p>
         </div>
       )}
 
-      {/* Formulaire */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
           <div>
@@ -143,116 +153,159 @@ export default function NouveauClientPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.email")} <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              required
-              placeholder="email@exemple.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="input-obillz"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.phone")}
-            </label>
-            <input
-              type="tel"
-              placeholder="+41 79 123 45 67"
-              value={formData.telephone}
-              onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
-              className="input-obillz"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.address")}
-            </label>
-            <textarea
-              placeholder="Adresse complète"
-              value={formData.adresse}
-              onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
-              rows={3}
-              className="input-obillz resize-none"
-            />
-          </div>
-
-          {/* Code postal et Localité */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {vis.email.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Code postal
+                {t("dashboard.clients.fields.email")} <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                placeholder="1000"
-                value={formData.postal_code}
-                onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                type="email"
+                required
+                placeholder="email@exemple.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="input-obillz"
               />
             </div>
+          )}
 
+          {vis.phone.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Localité
+                {t("dashboard.clients.fields.phone")}
               </label>
               <input
-                type="text"
-                placeholder="Lausanne"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                type="tel"
+                placeholder="+41 79 123 45 67"
+                value={formData.telephone}
+                onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                 className="input-obillz"
               />
             </div>
-          </div>
+          )}
 
-          {/* Rôle et Catégorie */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {vis.address.enabled && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  {t("dashboard.clients.fields.address")}
+                </label>
+                <textarea
+                  placeholder="Adresse complète"
+                  value={formData.adresse}
+                  onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
+                  rows={3}
+                  className="input-obillz resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Code postal
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="1000"
+                    value={formData.postal_code}
+                    onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                    className="input-obillz"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Localité
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Lausanne"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="input-obillz"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {vis.birth_date.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                {t("dashboard.clients.fields.role")}
+                {t("dashboard.clients.fields.dateOfBirth")}
               </label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              <input
+                type="date"
+                value={formData.date_of_birth}
+                onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
                 className="input-obillz"
-              >
-                <option value="player">{t("dashboard.clients.roles.player")}</option>
-                <option value="coach">{t("dashboard.clients.roles.coach")}</option>
-                <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
-                <option value="staff">{t("dashboard.clients.roles.staff")}</option>
-              </select>
+              />
             </div>
+          )}
 
+          {vis.avs_number.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                {t("dashboard.clients.fields.category")}
+                {t("dashboard.clients.fields.avsNumber")}
               </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="input-obillz"
-              >
-                <option value="">{t("dashboard.clients.filters.allCategories")}</option>
-                <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
-                <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
-                <option value="junior">{t("dashboard.clients.categories.junior")}</option>
-                <option value="president">{t("dashboard.clients.categories.president")}</option>
-                <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
-                <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
-                <option value="other">{t("dashboard.clients.categories.other")}</option>
-              </select>
+              <input
+                type="text"
+                autoComplete="off"
+                value={formData.avs_number}
+                onChange={(e) => setFormData({ ...formData, avs_number: e.target.value })}
+                className="input-obillz font-mono"
+              />
+              <p className="mt-1 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                {t("dashboard.settings.memberFields.avsWarning")}
+              </p>
             </div>
-          </div>
+          )}
+
+          {(vis.role.enabled || vis.category.enabled) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {vis.role.enabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.clients.fields.role")}
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="input-obillz"
+                  >
+                    <option value="player">{t("dashboard.clients.roles.player")}</option>
+                    <option value="coach">{t("dashboard.clients.roles.coach")}</option>
+                    <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
+                    <option value="staff">{t("dashboard.clients.roles.staff")}</option>
+                  </select>
+                </div>
+              )}
+
+              {vis.category.enabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.clients.fields.category")}
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="input-obillz"
+                  >
+                    <option value="">{t("dashboard.clients.filters.allCategories")}</option>
+                    <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
+                    <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
+                    <option value="junior">{t("dashboard.clients.categories.junior")}</option>
+                    <option value="president">{t("dashboard.clients.categories.president")}</option>
+                    <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
+                    <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
+                    <option value="other">{t("dashboard.clients.categories.other")}</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             type="button"

@@ -7,6 +7,7 @@ import LimitReachedAlert from "@/components/LimitReachedAlert";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { ArrowRight, Users } from "@/lib/icons";
+import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 
 interface ClientFormData {
   id: string;
@@ -18,6 +19,8 @@ interface ClientFormData {
   city: string;
   role: string;
   category: string;
+  date_of_birth: string;
+  avs_number: string;
 }
 
 interface EditClientFormProps {
@@ -31,6 +34,7 @@ export default function EditClientForm({
 }: EditClientFormProps) {
   const router = useRouter();
   const { t } = useI18n();
+  const vis = useMemberFieldSettings();
   const [formData, setFormData] = useState({
     nom: initialData.nom || "",
     email: initialData.email || "",
@@ -40,6 +44,8 @@ export default function EditClientForm({
     city: initialData.city || "",
     role: initialData.role || "player",
     category: initialData.category || "",
+    date_of_birth: initialData.date_of_birth || "",
+    avs_number: initialData.avs_number || "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<{
@@ -79,6 +85,8 @@ export default function EditClientForm({
       city: formData.city.trim(),
       role: formData.role,
       category: formData.category.trim() || null,
+      date_of_birth: formData.date_of_birth.trim() || null,
+      avs_number: formData.avs_number.trim() || null,
     };
 
     try {
@@ -172,123 +180,173 @@ export default function EditClientForm({
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.email")}
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="input-obillz"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.phone")}
-            </label>
-            <input
-              type="tel"
-              value={formData.telephone}
-              onChange={(e) =>
-                setFormData({ ...formData, telephone: e.target.value })
-              }
-              className="input-obillz"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.clients.fields.address")}
-            </label>
-            <textarea
-              value={formData.adresse}
-              onChange={(e) =>
-                setFormData({ ...formData, adresse: e.target.value })
-              }
-              rows={3}
-              className="input-obillz resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {vis.email.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Code postal
+                {t("dashboard.clients.fields.email")}
               </label>
               <input
-                type="text"
-                value={formData.postal_code}
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="input-obillz"
+              />
+            </div>
+          )}
+
+          {vis.phone.enabled && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                {t("dashboard.clients.fields.phone")}
+              </label>
+              <input
+                type="tel"
+                value={formData.telephone}
                 onChange={(e) =>
-                  setFormData({ ...formData, postal_code: e.target.value })
+                  setFormData({ ...formData, telephone: e.target.value })
                 }
                 className="input-obillz"
               />
             </div>
+          )}
+
+          {vis.address.enabled && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  {t("dashboard.clients.fields.address")}
+                </label>
+                <textarea
+                  value={formData.adresse}
+                  onChange={(e) =>
+                    setFormData({ ...formData, adresse: e.target.value })
+                  }
+                  rows={3}
+                  className="input-obillz resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Code postal
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.postal_code}
+                    onChange={(e) =>
+                      setFormData({ ...formData, postal_code: e.target.value })
+                    }
+                    className="input-obillz"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Localité
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="input-obillz"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {vis.birth_date.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Localité
+                {t("dashboard.clients.fields.dateOfBirth")}
               </label>
               <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                type="date"
+                value={formData.date_of_birth}
+                onChange={(e) =>
+                  setFormData({ ...formData, date_of_birth: e.target.value })
+                }
                 className="input-obillz"
               />
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {vis.avs_number.enabled && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                {t("dashboard.clients.fields.role")}
+                {t("dashboard.clients.fields.avsNumber")}
               </label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="input-obillz"
-              >
-                <option value="player">{t("dashboard.clients.roles.player")}</option>
-                <option value="coach">{t("dashboard.clients.roles.coach")}</option>
-                <option value="volunteer">
-                  {t("dashboard.clients.roles.volunteer")}
-                </option>
-                <option value="staff">{t("dashboard.clients.roles.staff")}</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                {t("dashboard.clients.fields.category")}
-              </label>
-              <select
-                value={formData.category}
+              <input
+                type="text"
+                autoComplete="off"
+                value={formData.avs_number}
                 onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
+                  setFormData({ ...formData, avs_number: e.target.value })
                 }
-                className="input-obillz"
-              >
-                <option value="">{t("dashboard.clients.filters.allCategories")}</option>
-                <option value="first_team">
-                  {t("dashboard.clients.categories.first_team")}
-                </option>
-                <option value="second_team">
-                  {t("dashboard.clients.categories.second_team")}
-                </option>
-                <option value="junior">{t("dashboard.clients.categories.junior")}</option>
-                <option value="president">
-                  {t("dashboard.clients.categories.president")}
-                </option>
-                <option value="treasurer">
-                  {t("dashboard.clients.categories.treasurer")}
-                </option>
-                <option value="secretary">
-                  {t("dashboard.clients.categories.secretary")}
-                </option>
-                <option value="other">{t("dashboard.clients.categories.other")}</option>
-              </select>
+                className="input-obillz font-mono"
+              />
+              <p className="mt-1 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                {t("dashboard.settings.memberFields.avsWarning")}
+              </p>
             </div>
-          </div>
+          )}
+
+          {(vis.role.enabled || vis.category.enabled) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {vis.role.enabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.clients.fields.role")}
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="input-obillz"
+                  >
+                    <option value="player">{t("dashboard.clients.roles.player")}</option>
+                    <option value="coach">{t("dashboard.clients.roles.coach")}</option>
+                    <option value="volunteer">
+                      {t("dashboard.clients.roles.volunteer")}
+                    </option>
+                    <option value="staff">{t("dashboard.clients.roles.staff")}</option>
+                  </select>
+                </div>
+              )}
+              {vis.category.enabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.clients.fields.category")}
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    className="input-obillz"
+                  >
+                    <option value="">{t("dashboard.clients.filters.allCategories")}</option>
+                    <option value="first_team">
+                      {t("dashboard.clients.categories.first_team")}
+                    </option>
+                    <option value="second_team">
+                      {t("dashboard.clients.categories.second_team")}
+                    </option>
+                    <option value="junior">{t("dashboard.clients.categories.junior")}</option>
+                    <option value="president">
+                      {t("dashboard.clients.categories.president")}
+                    </option>
+                    <option value="treasurer">
+                      {t("dashboard.clients.categories.treasurer")}
+                    </option>
+                    <option value="secretary">
+                      {t("dashboard.clients.categories.secretary")}
+                    </option>
+                    <option value="other">{t("dashboard.clients.categories.other")}</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3">

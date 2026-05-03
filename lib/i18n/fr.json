@@ -566,6 +566,27 @@
           "Toutes les fonctionnalités"
         ]
       },
+      "memberFields": {
+        "sectionHeading": "Gestion des membres",
+        "title": "Champs des membres",
+        "subtitle": "Choisissez les informations que vous souhaitez gérer pour les membres de votre club.",
+        "save": "Enregistrer",
+        "saveSuccess": "Configuration des champs enregistrée.",
+        "saveError": "Impossible d'enregistrer la configuration.",
+        "saveForbidden": "Seuls les administrateurs du club peuvent modifier ces réglages.",
+        "loadError": "Impossible de charger la configuration des champs.",
+        "readOnlyHint": "Vous pouvez consulter cette liste ; la modification est réservée aux personnes autorisées dans les paramètres du club.",
+        "avsWarning": "Le numéro AVS est une donnée sensible. Activez ce champ uniquement si votre club en a réellement besoin.",
+        "fields": {
+          "email": "Email",
+          "phone": "Téléphone",
+          "address": "Adresse",
+          "birth_date": "Date de naissance",
+          "category": "Catégorie / statut",
+          "role": "Rôle / fonction",
+          "avs_number": "Numéro AVS"
+        }
+      },
       "branding": {
         "title": "Identité du club",
         "logoLabel": "Logo du club",
@@ -699,7 +720,9 @@
         "phone": "Téléphone",
         "address": "Adresse",
         "role": "Rôle",
-        "category": "Catégorie"
+        "category": "Catégorie",
+        "dateOfBirth": "Date de naissance",
+        "avsNumber": "Numéro AVS"
       },
       "roles": {
         "player": "Joueur",
@@ -737,7 +760,10 @@
         "lastModified": "Dernière modification",
         "missing": "—",
         "auditCreatedBy": "Créé par",
-        "auditUpdatedBy": "Modifié par"
+        "auditUpdatedBy": "Modifié par",
+        "birthDate": "Date de naissance",
+        "avsNumber": "Numéro AVS",
+        "avsMaskedHint": "Affichage masqué pour protéger cette donnée."
       },
       "errors": {
         "missingId": "ID du membre manquant",

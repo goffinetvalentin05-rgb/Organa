@@ -686,6 +686,27 @@
           "All features"
         ]
       },
+      "memberFields": {
+        "sectionHeading": "Member management",
+        "title": "Member fields",
+        "subtitle": "Choose which member details your club wants to manage.",
+        "save": "Save",
+        "saveSuccess": "Member field settings saved.",
+        "saveError": "Could not save settings.",
+        "saveForbidden": "Only club administrators can change these settings.",
+        "loadError": "Could not load field settings.",
+        "readOnlyHint": "You can review this list; changes are limited to people allowed in club settings.",
+        "avsWarning": "The AVS number is sensitive. Enable it only if your club truly needs it.",
+        "fields": {
+          "email": "Email",
+          "phone": "Phone",
+          "address": "Address",
+          "birth_date": "Date of birth",
+          "category": "Category / status",
+          "role": "Role / function",
+          "avs_number": "AVS number"
+        }
+      },
       "branding": {
         "title": "Club Identity",
         "logoLabel": "Club logo",
@@ -819,7 +840,9 @@
         "phone": "Phone",
         "address": "Address",
         "role": "Role",
-        "category": "Category"
+        "category": "Category",
+        "dateOfBirth": "Date of birth",
+        "avsNumber": "AVS number"
       },
       "roles": {
         "player": "Player",
@@ -857,7 +880,10 @@
         "lastModified": "Last updated",
         "missing": "—",
         "auditCreatedBy": "Created by",
-        "auditUpdatedBy": "Updated by"
+        "auditUpdatedBy": "Updated by",
+        "birthDate": "Date of birth",
+        "avsNumber": "AVS number",
+        "avsMaskedHint": "Masked display to protect this data."
       },
       "errors": {
         "missingId": "Client ID missing",

@@ -10,6 +10,7 @@ import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 
 // Types pour les infos d'abonnement
 interface SubscriptionInfo {
@@ -564,6 +565,16 @@ export default function ParametresPage() {
           </Link>
         </div>
       </div>
+
+      <section className="space-y-4" aria-labelledby="member-management-heading">
+        <h2
+          id="member-management-heading"
+          className="text-xl font-bold text-slate-900"
+        >
+          {t("dashboard.settings.memberFields.sectionHeading")}
+        </h2>
+        <MemberFieldsSettingsCard />
+      </section>
 
       {/* Section Abonnement */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
