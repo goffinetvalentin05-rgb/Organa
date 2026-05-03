@@ -171,8 +171,9 @@ export async function POST(
     }
 
     await ensureMemberParticipationForPlanning(supabase, {
-      clientId: clientId,
-      planningId: planningId,
+      memberId: clientId,
+      planningId,
+      createdBy: guard.userId,
     });
 
     // Envoyer la notification par email si demandé et si le membre a un email
@@ -391,11 +392,14 @@ export async function DELETE(
     }
 
     await refreshMemberParticipationAfterAssignmentsChange(supabase, {
-      clientId: removedClientId,
+      memberId: removedClientId,
       planningId,
     });
 
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
+    if (removedClientId) {
+      revalidatePath(`/tableau-de-bord/clients/${removedClientId}`);
+    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {

@@ -5,13 +5,18 @@ import { ArrowLeft, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import CreatedByBadge from "@/components/CreatedByBadge";
 import type { MemberFieldsMerged } from "@/lib/member-fields/types";
+import {
+  participationStatusLabelFr,
+  type MemberParticipationStatus,
+} from "@/lib/planning/participationStatus";
 
 export interface MemberPlanningParticipation {
   id: string;
   planningId: string;
-  name: string;
-  date: string;
-  status: string;
+  eventTitle: string;
+  eventDate: string | null;
+  participationStatus: MemberParticipationStatus;
+  createdAt: string;
 }
 
 export interface MemberDetailModel {
@@ -273,33 +278,77 @@ export default function MemberDetailView({
         )}
       </div>
 
-      {planningParticipations.length > 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="text-lg font-semibold text-slate-900">Participations aux plannings</h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Plannings sur lesquels ce membre est inscrit (affectation ou inscription reconnue).
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div
+          className="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
+          style={{ background: "linear-gradient(135deg, rgba(124, 92, 255, 0.08) 0%, rgba(15, 23, 42, 0.03) 100%)" }}
+        >
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Participations</h2>
+            <p className="text-sm text-slate-600 mt-1 max-w-xl">
+              Historique des plannings / événements (inscription interne, publique reconnue ou
+              rattachement admin).
             </p>
           </div>
-          <ul className="divide-y divide-slate-100">
-            {planningParticipations.map((p) => (
-              <li key={p.id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>
-                  <Link
-                    href={`/tableau-de-bord/plannings/${p.planningId}`}
-                    className="font-medium text-violet-700 hover:text-violet-900 hover:underline"
-                  >
-                    {p.name}
-                  </Link>
-                  <p className="text-sm text-slate-600 mt-0.5">
-                    {formatDateOnly(p.date, loc)} · {p.status}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Total</span>
+            <span
+              className="inline-flex min-w-[2.25rem] justify-center rounded-full px-2.5 py-1 text-sm font-semibold text-white shadow-sm"
+              style={{ backgroundColor: "var(--obillz-hero-blue, #4f46e5)" }}
+            >
+              {planningParticipations.length}
+            </span>
+          </div>
         </div>
-      ) : null}
+
+        {planningParticipations.length === 0 ? (
+          <div className="px-5 sm:px-6 py-10 sm:py-12 text-center">
+            <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
+              Aucune participation enregistrée pour ce membre. Les inscriptions liées à un planning
+              apparaîtront ici automatiquement.
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {planningParticipations.map((p) => {
+              const status = p.participationStatus;
+              const badgeClass =
+                status === "present"
+                  ? "bg-emerald-100 text-emerald-900"
+                  : status === "absent"
+                    ? "bg-slate-200 text-slate-800"
+                    : status === "cancelled"
+                      ? "bg-rose-100 text-rose-900"
+                      : "bg-violet-100 text-violet-900";
+              return (
+                <li
+                  key={p.id}
+                  className="px-4 sm:px-6 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/tableau-de-bord/plannings/${p.planningId}`}
+                      className="font-medium text-violet-700 hover:text-violet-900 hover:underline break-words"
+                    >
+                      {p.eventTitle}
+                    </Link>
+                    <p className="text-sm text-slate-600 mt-1">
+                      {p.eventDate ? formatDateOnly(p.eventDate, loc) : "—"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}
+                    >
+                      {participationStatusLabelFr(status)}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

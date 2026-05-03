@@ -513,8 +513,9 @@ export async function POST(
 
     if (linkedClientId) {
       await ensureMemberParticipationForPlanning(supabase, {
-        clientId: linkedClientId,
+        memberId: linkedClientId,
         planningId: link.planning_id,
+        createdBy: null,
       });
     }
 

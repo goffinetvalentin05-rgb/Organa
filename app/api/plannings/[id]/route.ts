@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { syncMemberParticipationsWithPlanning } from "@/lib/planning/memberParticipations";
 
 export const runtime = "nodejs";
 
@@ -274,6 +275,13 @@ export async function PUT(
         { status: 500 }
       );
     }
+
+    await syncMemberParticipationsWithPlanning(supabase, {
+      planningId: id,
+      name: updatedPlanning.name,
+      date: updatedPlanning.date,
+      eventId: updatedPlanning.event_id ?? null,
+    });
 
     revalidatePath("/tableau-de-bord/plannings");
     revalidatePath(`/tableau-de-bord/plannings/${id}`);

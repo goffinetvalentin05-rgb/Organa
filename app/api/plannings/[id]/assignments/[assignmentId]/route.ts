@@ -132,13 +132,14 @@ export async function PATCH(
     }
 
     await ensureMemberParticipationForPlanning(supabase, {
-      clientId,
+      memberId: clientId,
       planningId,
+      createdBy: guard.userId,
     });
 
     if (previousClientId && previousClientId !== clientId) {
       await refreshMemberParticipationAfterAssignmentsChange(supabase, {
-        clientId: previousClientId,
+        memberId: previousClientId,
         planningId,
       });
     }

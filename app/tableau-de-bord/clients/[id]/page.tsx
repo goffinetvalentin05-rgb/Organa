@@ -9,6 +9,7 @@ import MemberDetailView, {
 import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
 import { maskAvsNumber } from "@/lib/member-fields/types";
+import type { MemberParticipationStatus } from "@/lib/planning/participationStatus";
 
 interface PageProps {
   params: Promise<{ id: string }> | { id: string };
@@ -75,29 +76,28 @@ export default async function ClientDetailPage({ params }: PageProps) {
   let planningParticipations: MemberPlanningParticipation[] = [];
   const { data: participationRows, error: partErr } = await supabase
     .from("member_participations")
-    .select("id, planning_id, created_at")
-    .eq("client_id", id)
-    .order("created_at", { ascending: false });
+    .select("id, planning_id, event_title, event_date, status, created_at")
+    .eq("member_id", id)
+    .eq("club_id", clubId);
 
   if (!partErr && participationRows?.length) {
-    const planningIds = [...new Set(participationRows.map((r) => r.planning_id))];
-    const { data: planningRows } = await supabase
-      .from("plannings")
-      .select("id, name, date, status")
-      .in("id", planningIds)
-      .eq("user_id", clubId);
-
-    const byId = new Map((planningRows || []).map((p) => [p.id, p]));
-    planningParticipations = participationRows.map((row) => {
-      const pl = byId.get(row.planning_id);
-      return {
-        id: row.id,
-        planningId: row.planning_id,
-        name: pl?.name ?? "Planning",
-        date: pl?.date ?? "",
-        status: pl?.status ?? "",
-      };
+    const sorted = [...participationRows].sort((a, b) => {
+      const da = a.event_date ? new Date(`${a.event_date}T12:00:00`).getTime() : 0;
+      const db = b.event_date ? new Date(`${b.event_date}T12:00:00`).getTime() : 0;
+      if (db !== da) return db - da;
+      const ca = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const cb = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return cb - ca;
     });
+
+    planningParticipations = sorted.map((row) => ({
+      id: row.id,
+      planningId: row.planning_id,
+      eventTitle: row.event_title ?? "Planning",
+      eventDate: row.event_date ?? null,
+      participationStatus: (row.status ?? "registered") as MemberParticipationStatus,
+      createdAt: row.created_at ?? "",
+    }));
   }
 
   return (
