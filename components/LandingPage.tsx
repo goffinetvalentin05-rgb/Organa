@@ -19,6 +19,10 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import {
+  obillzLandingGridOverlayClass,
+  obillzLandingRootClass,
+} from "@/components/ui/styles";
 
 type ComparisonView = "without" | "with";
 type FeatureTabId =
@@ -312,8 +316,8 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <main className="relative min-h-screen bg-[var(--obillz-hero-blue)] text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]" />
+    <main className={obillzLandingRootClass}>
+      <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       <div className="relative z-10">
         <section className="mt-0 w-full">

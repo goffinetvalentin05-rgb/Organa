@@ -96,7 +96,7 @@ body.app-bg::after {
   display: none;
 }
 
-/* Pas d'effets landing sur le dashboard */
+/* Pas de pseudo-éléments sur le body : le fond landing est porté par `.dashboard-shell`. */
 body.app-bg:has(.dashboard-shell)::before {
   display: none;
 }

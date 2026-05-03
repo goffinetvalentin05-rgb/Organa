@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { dashboardMainScrimClass } from "@/components/ui";
+import { obillzLandingGridOverlayClass, obillzLandingRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
@@ -128,39 +128,24 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell relative min-h-screen bg-gradient-to-br from-[#152456] via-[#1e3a8a] to-[#0f1630]">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+    <div className={`dashboard-shell ${obillzLandingRootClass}`}>
+      <div className={obillzLandingGridOverlayClass} aria-hidden />
+
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — même bleu que la landing (grille du shell visible à travers) */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/[0.08] bg-slate-950/35 shadow-[4px_0_32px_rgba(0,0,0,0.25)] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/10 bg-transparent transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Grille subtile en arrière-plan */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "32px 32px",
-          }}
-        />
-
-        <div className="relative flex flex-col h-full">
+        <div className="relative z-10 flex h-full flex-col">
           {/* Logo & close button */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
             <Link href="/tableau-de-bord" className="flex items-center group">
@@ -225,7 +210,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/25 shadow-sm backdrop-blur-md">
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-transparent">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
             {/* Left: Mobile menu only */}
             <div className="flex items-center">
@@ -267,14 +252,11 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Page content — léger scrim pour profondeur sur fond bleu */}
         <main className="relative flex-1 overflow-x-hidden p-4 lg:p-8">
-          <div className={dashboardMainScrimClass} aria-hidden />
           <div className="relative">{children}</div>
         </main>
 
-        {/* Footer */}
-        <footer className="border-t border-white/10 bg-slate-950/25 px-4 py-4 backdrop-blur-md lg:px-8">
+        <footer className="border-t border-white/10 bg-transparent px-4 py-4 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/75">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">

@@ -3,7 +3,8 @@ export {
   glassCardClass,
   glassCardHeaderClass,
   iconBadgeClass,
-  dashboardMainScrimClass,
+  obillzLandingRootClass,
+  obillzLandingGridOverlayClass,
 } from "./styles";
 export { default as PageLayout } from "./PageLayout";
 export { default as PageHeader } from "./PageHeader";
