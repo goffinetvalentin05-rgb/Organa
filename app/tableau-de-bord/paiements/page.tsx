@@ -149,7 +149,7 @@ export default function PaiementsPage() {
           </div>
         ) : payments.length === 0 ? (
           <div className="p-6">
-            <EmptyState icon={CreditCard} title={t("dashboard.payments.emptyState")} />
+            <EmptyState embedded icon={CreditCard} title={t("dashboard.payments.emptyState")} />
           </div>
         ) : (
           <div className="divide-y divide-slate-100/90">

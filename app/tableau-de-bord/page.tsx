@@ -339,7 +339,7 @@ export default function TableauDeBordPage() {
           value={loading ? "-" : stats.totalClients}
           footer={
             !loading && stats.totalClients === 0 ? (
-              <p className="text-sm text-slate-400">{t("dashboard.overview.kpis.clientsEmpty")}</p>
+              <p className="text-sm text-white/65">{t("dashboard.overview.kpis.clientsEmpty")}</p>
             ) : null
           }
         />
@@ -353,22 +353,22 @@ export default function TableauDeBordPage() {
             !loading ? (
               <div className="flex flex-wrap gap-2 text-sm">
                 {stats.devisPayes > 0 ? (
-                  <span className="font-medium text-emerald-600">
+                  <span className="font-medium text-emerald-200">
                     {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
                   </span>
                 ) : null}
                 {stats.devisEnRetard > 0 ? (
-                  <span className="font-medium text-red-500">
+                  <span className="font-medium text-rose-200">
                     {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
                   </span>
                 ) : null}
                 {stats.devisEnAttente > 0 ? (
-                  <span className="font-medium text-[#2563EB]">
+                  <span className="font-medium text-sky-200">
                     {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
                   </span>
                 ) : null}
                 {stats.totalDevis === 0 ? (
-                  <span className="text-slate-400">{t("dashboard.overview.kpis.allClear")}</span>
+                  <span className="text-white/60">{t("dashboard.overview.kpis.allClear")}</span>
                 ) : null}
               </div>
             ) : null
@@ -383,11 +383,11 @@ export default function TableauDeBordPage() {
           footer={
             !loading ? (
               stats.facturesNonPayees > 0 ? (
-                <p className="text-sm font-medium text-red-500">
+                <p className="text-sm font-medium text-rose-200">
                   {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
                 </p>
               ) : (
-                <p className="text-sm text-slate-400">{t("dashboard.overview.kpis.allClear")}</p>
+                <p className="text-sm text-white/60">{t("dashboard.overview.kpis.allClear")}</p>
               )
             ) : null
           }
@@ -397,7 +397,7 @@ export default function TableauDeBordPage() {
           label="Solde du club"
           icon={Receipt}
           value={loading ? "-" : formatMontant(stats.soldeClub)}
-          footer={<p className="text-sm text-slate-500">Cotisations + Factures - Charges</p>}
+          footer={<p className="text-sm text-white/65">Cotisations + Factures - Charges</p>}
         />
       </div>
 
@@ -406,7 +406,7 @@ export default function TableauDeBordPage() {
           icon={Receipt}
           title={t("dashboard.overview.now.title")}
           headerRight={
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
               {t("dashboard.overview.now.badge")}
             </span>
           }

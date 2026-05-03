@@ -133,6 +133,7 @@ export default function DevisPage() {
           </GlassCard>
         ) : devis.length === 0 ? (
           <EmptyState
+            embedded
             icon={FileText}
             title={t("dashboard.quotes.emptyState")}
             action={

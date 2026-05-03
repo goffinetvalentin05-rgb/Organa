@@ -8,11 +8,17 @@ const variants = {
   surface:
     "rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-all hover:border-blue-200 hover:bg-white hover:shadow-md",
   ghost:
-    "rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-slate-900",
+    "rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100/90 hover:text-slate-900",
+  /** Liens discrets sur carte glass (fond bleu). */
+  ghostLight:
+    "rounded-xl px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/15 hover:text-white",
   dangerSoft:
     "rounded-xl border border-red-100 bg-red-50/90 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100",
   premiumInline:
     "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:opacity-95",
+  /** CTA sombre sur bandeau glass (réf. Paramètres « Gérer les accès »). */
+  solidDark:
+    "inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/30 transition hover:bg-slate-800",
 } as const;
 
 type Base = {

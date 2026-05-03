@@ -159,6 +159,7 @@ export default function PlanningsPage() {
           </GlassCard>
         ) : filteredPlannings.length === 0 ? (
           <EmptyState
+            embedded
             icon={ClipboardList}
             title={t("dashboard.plannings.emptyState")}
             action={

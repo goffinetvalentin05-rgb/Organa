@@ -33,15 +33,22 @@ export default function TableCard({
           )}
         >
           <div className="min-w-0">
-            {title ? <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2> : null}
+            {title ? <h2 className="text-lg font-bold tracking-tight text-white drop-shadow-sm">{title}</h2> : null}
             {description ? (
-              <p className="mt-1 text-sm text-slate-600">{description}</p>
+              <p className="mt-1 text-sm font-medium text-white/75">{description}</p>
             ) : null}
           </div>
           {toolbar ? <div className="flex shrink-0 flex-wrap items-center gap-2">{toolbar}</div> : null}
         </header>
       ) : null}
-      <div className={cn(hasHeader ? "" : "overflow-hidden", bodyClassName)}>{children}</div>
+      <div
+        className={cn(
+          hasHeader ? "rounded-b-3xl border-t border-white/[0.1] bg-white text-slate-900" : "overflow-hidden",
+          bodyClassName
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }

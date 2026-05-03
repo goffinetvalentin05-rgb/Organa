@@ -34,16 +34,20 @@ export default function SectionCard({
               </div>
             ) : null}
             <div className="min-w-0 pt-0.5">
-              <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2>
+              <h2 className="text-lg font-bold tracking-tight text-white drop-shadow-sm">{title}</h2>
               {description ? (
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">{description}</p>
+                <p className="mt-1 text-sm font-medium leading-relaxed text-white/75">{description}</p>
               ) : null}
             </div>
           </div>
-          {headerRight ? <div className="shrink-0 sm:pt-1">{headerRight}</div> : null}
+          {headerRight ? <div className="shrink-0 sm:pt-1 [&_a]:text-white [&_button]:text-white">{headerRight}</div> : null}
         </div>
       </header>
-      <div className="space-y-4 px-4 py-5 sm:px-5">{children}</div>
+      <div className="px-4 pb-5 pt-2 sm:px-5 sm:pb-6">
+        <div className="space-y-4 rounded-2xl border border-slate-100/90 bg-white p-4 text-slate-900 shadow-inner shadow-slate-900/[0.04] sm:p-5">
+          {children}
+        </div>
+      </div>
     </section>
   );
 }

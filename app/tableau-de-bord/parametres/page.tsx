@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import { PageLayout, SectionCard } from "@/components/ui";
+import { PageLayout, PageHeader, SectionCard, GlassCard } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
@@ -518,8 +518,8 @@ export default function ParametresPage() {
 
   if (loadingSettings || !parametres) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 text-slate-500">
+      <div className="mx-auto max-w-4xl">
+        <div className="flex items-center gap-3 text-white/80">
           <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -536,46 +536,40 @@ export default function ParametresPage() {
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
       <PageLayout maxWidth="4xl" className="space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-            {t("dashboard.settings.title")}
-          </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-            {t("dashboard.settings.subtitle")}
-          </p>
-        </div>
+        <PageHeader title={t("dashboard.settings.title")} subtitle={t("dashboard.settings.subtitle")} />
 
         {saved && (
-          <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/95 p-4 text-emerald-900 shadow-sm backdrop-blur-sm">
             <CheckCircle className="h-5 w-5 shrink-0" />
             {t("dashboard.settings.saveSuccess")}
           </div>
         )}
 
-        <Link
-          href="/tableau-de-bord/parametres/utilisateurs"
-          className="group relative block overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-br from-white via-blue-50/50 to-indigo-50/40 p-5 shadow-md shadow-blue-900/5 transition-all hover:border-blue-300 hover:shadow-lg hover:shadow-blue-900/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:p-6"
-        >
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-blue-600/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-md shadow-blue-600/30">
-                <UserCheck className="h-6 w-6" />
+        <Link href="/tableau-de-bord/parametres/utilisateurs" className="group block">
+          <GlassCard
+            padding="lg"
+            className="transition-all duration-200 hover:border-white/35 hover:shadow-xl hover:shadow-blue-950/30"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-lg shadow-blue-900/35">
+                  <UserCheck className="h-6 w-6" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-bold text-white drop-shadow-sm">
+                    {t("dashboard.settings.layout.sections.usersAccess")}
+                  </h2>
+                  <p className="mt-1 text-sm font-medium leading-relaxed text-white/75">
+                    {t("dashboard.settings.layout.usersAccess.description")}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <h2 className="text-lg font-bold text-slate-900">
-                  {t("dashboard.settings.layout.sections.usersAccess")}
-                </h2>
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                  {t("dashboard.settings.layout.usersAccess.description")}
-                </p>
-              </div>
+              <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/30 transition group-hover:bg-slate-800 sm:py-2.5">
+                {t("dashboard.settings.layout.usersAccess.cta")}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
             </div>
-            <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition group-hover:from-[#1d4ed8] group-hover:to-[#1e40af] sm:py-2.5">
-              {t("dashboard.settings.layout.usersAccess.cta")}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </div>
+          </GlassCard>
         </Link>
 
         <SectionCard

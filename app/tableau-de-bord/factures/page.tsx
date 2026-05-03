@@ -200,6 +200,7 @@ export default function FacturesPage() {
           </GlassCard>
         ) : factures.length === 0 ? (
           <EmptyState
+            embedded
             icon={Receipt}
             title={t("dashboard.invoices.emptyState")}
             action={

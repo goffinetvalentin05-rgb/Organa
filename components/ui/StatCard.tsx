@@ -23,26 +23,21 @@ export default function StatCard({ label, value, icon: Icon, footer, href, class
   const iconWrap = (isInteractive: boolean) => (
     <div
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100/90 transition-colors",
-        isInteractive && "group-hover:bg-blue-50"
+        "flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition-colors",
+        isInteractive && "group-hover:bg-white/25"
       )}
     >
-      <Icon
-        className={cn(
-          "h-5 w-5 text-slate-600 transition-colors",
-          isInteractive && "group-hover:text-[#2563EB]"
-        )}
-      />
+      <Icon className={cn("h-5 w-5 transition-opacity", isInteractive && "group-hover:opacity-95")} />
     </div>
   );
 
   const inner = (isInteractive: boolean) => (
     <>
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-500">{label}</span>
+        <span className="text-sm font-medium text-white/80">{label}</span>
         {iconWrap(isInteractive)}
       </div>
-      <div className="text-4xl font-bold tracking-tight text-slate-900">{value}</div>
+      <div className="text-4xl font-bold tracking-tight text-white drop-shadow-sm">{value}</div>
       {footer ? <div className="mt-2">{footer}</div> : null}
     </>
   );

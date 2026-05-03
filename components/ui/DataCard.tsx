@@ -25,14 +25,16 @@ export default function DataCard({
   return (
     <GlassCard padding={padding} className={cn(className)} {...rest}>
       {hasHead ? (
-        <div className="mb-4 border-b border-slate-100/90 pb-4">
-          {title ? <h3 className="text-base font-bold tracking-tight text-slate-900">{title}</h3> : null}
+        <div className="mb-4 border-b border-white/15 pb-4">
+          {title ? <h3 className="text-base font-bold tracking-tight text-white drop-shadow-sm">{title}</h3> : null}
           {description ? (
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">{description}</p>
+            <p className="mt-1 text-sm font-medium leading-relaxed text-white/75">{description}</p>
           ) : null}
         </div>
       ) : null}
-      {children}
+      <div className="rounded-2xl border border-slate-100/90 bg-white/95 p-4 text-slate-900 shadow-inner shadow-slate-900/[0.04] sm:p-5">
+        {children}
+      </div>
     </GlassCard>
   );
 }

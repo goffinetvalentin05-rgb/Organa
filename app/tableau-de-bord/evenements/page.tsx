@@ -101,9 +101,9 @@ export default function EvenementsPage() {
   };
 
   const getResultColor = (result: number) => {
-    if (result > 0) return "text-green-600";
-    if (result < 0) return "text-red-600";
-    return "text-slate-600";
+    if (result > 0) return "text-emerald-300";
+    if (result < 0) return "text-rose-300";
+    return "text-white/80";
   };
 
   return (
@@ -134,7 +134,7 @@ export default function EvenementsPage() {
       <GlassCard padding="none" className="overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-secondary">{t("dashboard.common.loading")}</p>
+            <p className="text-white/80">{t("dashboard.common.loading")}</p>
           </div>
         ) : errorMessage ? (
           <GlassCard padding="lg" className="m-5 border-red-200/80 bg-red-50/40 text-center">
@@ -165,14 +165,14 @@ export default function EvenementsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-primary">{event.name}</h3>
+                        <h3 className="text-lg font-semibold text-white drop-shadow-sm">{event.name}</h3>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(event.status)}`}>
                           {t(`dashboard.events.status.${event.status}`)}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-secondary">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-white/75">
                         {event.eventType && (
-                          <span className="px-2 py-0.5 bg-slate-100 rounded text-slate-600">
+                          <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white">
                             {event.eventType.name}
                           </span>
                         )}
@@ -183,21 +183,21 @@ export default function EvenementsPage() {
                         </span>
                       </div>
                       {event.description && (
-                        <p className="mt-2 text-sm text-secondary line-clamp-2">{event.description}</p>
+                        <p className="mt-2 line-clamp-2 text-sm text-white/70">{event.description}</p>
                       )}
                     </div>
                     <div className="text-right">
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-xs uppercase text-tertiary mb-1">{t("dashboard.events.detail.totalRevenue")}</p>
-                          <p className="font-semibold text-green-600">{formatMontant(event.totalRevenue)}</p>
+                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.totalRevenue")}</p>
+                          <p className="font-semibold text-emerald-300">{formatMontant(event.totalRevenue)}</p>
                         </div>
                         <div>
-                          <p className="text-xs uppercase text-tertiary mb-1">{t("dashboard.events.detail.totalExpenses")}</p>
-                          <p className="font-semibold text-red-600">{formatMontant(event.totalExpenses)}</p>
+                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.totalExpenses")}</p>
+                          <p className="font-semibold text-rose-300">{formatMontant(event.totalExpenses)}</p>
                         </div>
                         <div>
-                          <p className="text-xs uppercase text-tertiary mb-1">{t("dashboard.events.detail.netResult")}</p>
+                          <p className="mb-1 text-xs uppercase text-white/55">{t("dashboard.events.detail.netResult")}</p>
                           <p className={`font-bold text-lg ${getResultColor(event.netResult)}`}>
                             {formatMontant(event.netResult)}
                           </p>
@@ -205,8 +205,8 @@ export default function EvenementsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100/90 pt-3">
-                    <ActionButton href={`/tableau-de-bord/evenements/${event.id}`} variant="ghost" className="inline-flex items-center gap-2">
+                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-white/15 pt-3">
+                    <ActionButton href={`/tableau-de-bord/evenements/${event.id}`} variant="ghostLight" className="inline-flex items-center gap-2">
                       <Eye className="h-4 w-4" />
                       {t("dashboard.common.view")}
                     </ActionButton>

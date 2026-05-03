@@ -725,6 +725,7 @@ export default function DepensesPage() {
         ) : depensesTriees.length === 0 ? (
           <div className="p-6">
             <EmptyState
+              embedded
               icon={Receipt}
               title={t("dashboard.expenses.emptyState")}
               action={

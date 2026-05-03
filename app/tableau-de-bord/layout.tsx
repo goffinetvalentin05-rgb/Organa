@@ -147,12 +147,12 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-0 h-screen w-72 z-50 transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 transition-transform duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-black/[0.12] lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
           backgroundColor: "var(--obillz-hero-blue)",
-          boxShadow: "4px 0 20px rgba(0,0,0,0.05)",
+          boxShadow: "4px 0 20px rgba(0,0,0,0.08)",
         }}
       >
         {/* Grille subtile en arrière-plan */}
@@ -199,10 +199,10 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
                       active
-                        ? "bg-white text-[var(--obillz-hero-blue)] font-semibold shadow-lg"
-                        : "text-white/80 hover:text-white hover:bg-white/10"
+                        ? "rounded-full bg-white text-[var(--obillz-hero-blue)] font-semibold shadow-lg"
+                        : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
                     }`}
                   >
                     <IconComponent className={`w-5 h-5 ${active ? "text-[var(--obillz-hero-blue)]" : ""}`} />
