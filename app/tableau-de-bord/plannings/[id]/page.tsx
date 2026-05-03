@@ -34,8 +34,11 @@ interface Member {
 
 interface Assignment {
   id: string;
+  slotId?: string;
   clientId: string | null;
   source?: "internal_member" | "public_signup";
+  /** Inscription publique : linked | unlinked | pending_review ; null si interne */
+  memberLinkStatus?: "linked" | "unlinked" | "pending_review" | null;
   member: Member;
   notifiedAt?: string;
   createdAt: string;
@@ -97,6 +100,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   const [searchTerm, setSearchTerm] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [sendNotification, setSendNotification] = useState(true);
+
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkTargetAssignment, setLinkTargetAssignment] = useState<Assignment | null>(null);
+  const [linkTargetSlot, setLinkTargetSlot] = useState<Slot | null>(null);
+  const [linkSearchTerm, setLinkSearchTerm] = useState("");
+  const [linkAssigning, setLinkAssigning] = useState(false);
 
   // Modal ajout / édition créneau
   const [showSlotModal, setShowSlotModal] = useState(false);
@@ -275,6 +284,39 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     setShowAssignModal(true);
   };
 
+  const openLinkModal = (slot: Slot, assignment: Assignment) => {
+    setLinkTargetSlot(slot);
+    setLinkTargetAssignment(assignment);
+    setLinkSearchTerm("");
+    setShowLinkModal(true);
+  };
+
+  const handleLinkToMember = async (memberId: string) => {
+    if (!linkTargetAssignment) return;
+    setLinkAssigning(true);
+    try {
+      const res = await fetch(`/api/plannings/${id}/assignments/${linkTargetAssignment.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: memberId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || "Rattachement impossible");
+      }
+      toast.success("Inscription rattachée au membre");
+      setShowLinkModal(false);
+      setLinkTargetAssignment(null);
+      setLinkTargetSlot(null);
+      await loadPlanning();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Erreur";
+      toast.error(msg);
+    } finally {
+      setLinkAssigning(false);
+    }
+  };
+
   const handleAssign = async (memberId: string) => {
     if (!selectedSlot) return;
     
@@ -438,6 +480,17 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     return m.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
            m.email?.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  const membersAvailableForLink = useMemo(() => {
+    if (!linkTargetSlot) return [];
+    return members.filter((m) => {
+      const alreadyAssigned = linkTargetSlot.assignments.some((a) => a.clientId === m.id);
+      if (alreadyAssigned) return false;
+      if (!linkSearchTerm) return true;
+      const q = linkSearchTerm.toLowerCase();
+      return m.nom.toLowerCase().includes(q) || m.email?.toLowerCase().includes(q);
+    });
+  }, [members, linkTargetSlot, linkSearchTerm]);
 
   const handleDownloadPdf = async () => {
     setDownloading(true);
@@ -733,38 +786,72 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   
                   <div className="flex flex-wrap gap-3">
                     {/* Affectations existantes */}
-                    {slot.assignments.map((assignment) => (
-                      <div
-                        key={assignment.id}
-                        className="group relative flex items-center gap-3 px-4 py-3 bg-green-50 border border-green-200 rounded-lg"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center">
-                          <CheckCircle className="w-4 h-4 text-green-700" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-green-900">{assignment.member.nom}</p>
-                          {assignment.member.email && (
-                            <p className="text-xs text-green-700">{assignment.member.email}</p>
-                          )}
-                          {assignment.source === "public_signup" && (
-                            <p className="text-xs text-green-700 mt-1">Statut: Bénévole public</p>
-                          )}
-                          {assignment.notifiedAt && (
-                            <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
-                              <Mail className="w-3 h-3" />
-                              Notifié
-                            </p>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => handleRemoveAssignment(assignment.id)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                          title="Retirer"
+                    {slot.assignments.map((assignment) => {
+                      const isPublic = assignment.source === "public_signup";
+                      const linkStatus = assignment.memberLinkStatus;
+                      const showLinkButton = isPublic && !assignment.clientId;
+                      const linkBadge =
+                        !isPublic ? (
+                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-slate-200/80 text-slate-700">
+                            Membre club
+                          </span>
+                        ) : linkStatus === "pending_review" ? (
+                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-amber-100 text-amber-900">
+                            À vérifier
+                          </span>
+                        ) : linkStatus === "linked" || assignment.clientId ? (
+                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-emerald-100 text-emerald-900">
+                            Lié à un membre
+                          </span>
+                        ) : (
+                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-slate-200/80 text-slate-700">
+                            Non lié
+                          </span>
+                        );
+
+                      return (
+                        <div
+                          key={assignment.id}
+                          className="group relative flex flex-col gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-lg min-w-[200px]"
                         >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center shrink-0">
+                              <CheckCircle className="w-4 h-4 text-green-700" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-green-900 break-words">{assignment.member.nom}</p>
+                              {assignment.member.email && (
+                                <p className="text-xs text-green-700 break-all">{assignment.member.email}</p>
+                              )}
+                              {linkBadge}
+                              {assignment.notifiedAt && (
+                                <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
+                                  <Mail className="w-3 h-3 shrink-0" />
+                                  Notifié
+                                </p>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAssignment(assignment.id)}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                              title="Retirer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {showLinkButton && (
+                            <button
+                              type="button"
+                              onClick={() => openLinkModal(slot, assignment)}
+                              className="text-left text-xs font-medium text-violet-700 hover:text-violet-900 underline-offset-2 hover:underline"
+                            >
+                              Rattacher à un membre
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
 
                     {/* Cases vides */}
                     {Array.from({ length: slot.requiredPeople - slot.assignedCount }).map((_, index) => (
@@ -863,6 +950,78 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                             {member.role}
                           </span>
                         )}
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-slate-400" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLinkModal && linkTargetSlot && linkTargetAssignment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-subtle">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold">Rattacher à un membre</h3>
+                  <p className="text-secondary text-sm mt-1">
+                    {linkTargetAssignment.member.nom} — {linkTargetSlot.location} •{" "}
+                    {formatDate(linkTargetSlot.slotDate || planning?.date || "")} •{" "}
+                    {formatTime(linkTargetSlot.startTime)} - {formatTime(linkTargetSlot.endTime)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLinkModal(false);
+                    setLinkTargetAssignment(null);
+                    setLinkTargetSlot(null);
+                  }}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 border-b border-subtle">
+              <input
+                type="text"
+                placeholder="Rechercher un membre..."
+                value={linkSearchTerm}
+                onChange={(e) => setLinkSearchTerm(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                autoFocus
+              />
+            </div>
+
+            <div className="overflow-y-auto max-h-[40vh]">
+              {membersAvailableForLink.length === 0 ? (
+                <div className="p-8 text-center text-secondary">
+                  {linkSearchTerm ? "Aucun membre trouvé" : "Aucun membre disponible"}
+                </div>
+              ) : (
+                <div className="divide-y divide-subtle">
+                  {membersAvailableForLink.map((member) => (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={() => handleLinkToMember(member.id)}
+                      disabled={linkAssigning}
+                      className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left disabled:opacity-50"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
+                        <span className="text-violet-800 font-semibold">
+                          {member.nom.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{member.nom}</p>
+                        {member.email && <p className="text-sm text-secondary">{member.email}</p>}
                       </div>
                       <ArrowRight className="w-5 h-5 text-slate-400" />
                     </button>

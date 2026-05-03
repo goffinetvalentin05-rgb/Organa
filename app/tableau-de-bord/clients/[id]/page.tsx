@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireCurrentClub } from "@/lib/auth/rbac";
 import { checkPermission, PERMISSIONS } from "@/lib/auth/permissions";
-import MemberDetailView, { type MemberDetailModel } from "./MemberDetailView";
+import MemberDetailView, {
+  type MemberDetailModel,
+  type MemberPlanningParticipation,
+} from "./MemberDetailView";
 import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
 import { maskAvsNumber } from "@/lib/member-fields/types";
@@ -69,7 +72,39 @@ export default async function ClientDetailPage({ params }: PageProps) {
     updated_by: n.updated_by,
   };
 
+  let planningParticipations: MemberPlanningParticipation[] = [];
+  const { data: participationRows, error: partErr } = await supabase
+    .from("member_participations")
+    .select("id, planning_id, created_at")
+    .eq("client_id", id)
+    .order("created_at", { ascending: false });
+
+  if (!partErr && participationRows?.length) {
+    const planningIds = [...new Set(participationRows.map((r) => r.planning_id))];
+    const { data: planningRows } = await supabase
+      .from("plannings")
+      .select("id, name, date, status")
+      .in("id", planningIds)
+      .eq("user_id", clubId);
+
+    const byId = new Map((planningRows || []).map((p) => [p.id, p]));
+    planningParticipations = participationRows.map((row) => {
+      const pl = byId.get(row.planning_id);
+      return {
+        id: row.id,
+        planningId: row.planning_id,
+        name: pl?.name ?? "Planning",
+        date: pl?.date ?? "",
+        status: pl?.status ?? "",
+      };
+    });
+  }
+
   return (
-    <MemberDetailView member={member} canManageMembers={manageOk.ok} />
+    <MemberDetailView
+      member={member}
+      canManageMembers={manageOk.ok}
+      planningParticipations={planningParticipations}
+    />
   );
 }

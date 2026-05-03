@@ -105,6 +105,7 @@ export async function GET(
           public_name,
           public_email,
           public_phone,
+          member_link_status,
           clients (
             id,
             nom,
@@ -122,28 +123,49 @@ export async function GET(
     const slotsWithAssignments = (slotsRows || []).map((slot: any) => {
       const slotAssignments = assignments
         .filter((a: any) => a.slot_id === slot.id)
-        .map((a: any) => ({
-          id: a.id,
-          clientId: a.client_id,
-          source: a.source || "internal_member",
-          member:
-            a.source === "public_signup"
-              ? {
-                  id: `public-${a.id}`,
-                  nom: a.public_name || "Bénévole",
-                  email: a.public_email || null,
-                  telephone: a.public_phone || null,
-                  role: "Bénévole public",
-                  category: "public",
-                  status: "public",
-                }
-              : {
-                  ...(a.clients || {}),
-                  status: "member",
-                },
-          notifiedAt: a.notified_at,
-          createdAt: a.created_at,
-        }));
+        .map((a: any) => {
+          const relRaw = a.clients;
+          const rel = Array.isArray(relRaw) ? relRaw[0] : relRaw;
+          const isPublic = a.source === "public_signup";
+          const memberLinkStatus =
+            a.member_link_status ||
+            (isPublic ? (a.client_id ? "linked" : "unlinked") : null);
+
+          return {
+            id: a.id,
+            slotId: a.slot_id,
+            clientId: a.client_id,
+            source: a.source || "internal_member",
+            memberLinkStatus,
+            member:
+              isPublic && a.client_id && rel
+                ? {
+                    id: rel.id,
+                    nom: rel.nom || a.public_name || "Bénévole",
+                    email: rel.email ?? a.public_email ?? null,
+                    telephone: rel.telephone ?? a.public_phone ?? null,
+                    role: rel.role || "Bénévole",
+                    category: rel.category || "public",
+                    status: "member",
+                  }
+                : isPublic
+                  ? {
+                      id: `public-${a.id}`,
+                      nom: a.public_name || "Bénévole",
+                      email: a.public_email || null,
+                      telephone: a.public_phone || null,
+                      role: "Bénévole public",
+                      category: "public",
+                      status: "public",
+                    }
+                  : {
+                      ...(rel || {}),
+                      status: "member",
+                    },
+            notifiedAt: a.notified_at,
+            createdAt: a.created_at,
+          };
+        });
 
       return {
         id: slot.id,

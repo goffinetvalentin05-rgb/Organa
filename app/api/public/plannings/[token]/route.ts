@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { rateLimitGuard } from "@/lib/security/rateLimit";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
+import { matchPublicNameToMember, type ClubMemberForMatch } from "@/lib/planning/matchPublicNameToMember";
+import { ensureMemberParticipationForPlanning } from "@/lib/planning/memberParticipations";
 
 export const runtime = "nodejs";
 
@@ -446,18 +448,60 @@ export async function POST(
       return NextResponse.json({ error: "Ce créneau est déjà complet" }, { status: 400 });
     }
 
+    const rawForMatch = name.trim();
+    const publicDisplayName = rawForMatch || "Bénévole";
+
+    const { data: clubMembersRaw, error: membersErr } = await supabase
+      .from("clients")
+      .select("id, nom")
+      .eq("user_id", link.club_id)
+      .is("deleted_at", null);
+
+    if (membersErr) {
+      console.error("[API][public-plannings][POST] clients club:", membersErr.message);
+    }
+
+    const clubMembers = (clubMembersRaw || []) as ClubMemberForMatch[];
+    const nameMatch =
+      rawForMatch.length > 0
+        ? matchPublicNameToMember(rawForMatch, clubMembers)
+        : ({ kind: "none" } as const);
+
+    let linkedClientId: string | null = null;
+    let memberLinkStatus: "linked" | "unlinked" | "pending_review" = "unlinked";
+
+    if (nameMatch.kind === "unique") {
+      linkedClientId = nameMatch.clientId;
+      memberLinkStatus = "linked";
+      const { data: dup } = await supabase
+        .from("planning_assignments")
+        .select("id")
+        .eq("slot_id", slot.id)
+        .eq("client_id", linkedClientId)
+        .maybeSingle();
+      if (dup) {
+        return NextResponse.json(
+          { error: "Vous êtes déjà inscrit sur ce créneau avec ce profil membre" },
+          { status: 400 }
+        );
+      }
+    } else if (nameMatch.kind === "ambiguous") {
+      memberLinkStatus = "pending_review";
+    }
+
     const { data: assignment, error: insertError } = await supabase
       .from("planning_assignments")
       .insert({
         slot_id: slot.id,
-        client_id: null,
+        client_id: linkedClientId,
         assigned_by: link.club_id,
         source: "public_signup",
-        public_name: name || "Bénévole",
+        public_name: publicDisplayName,
         public_email: email || null,
         public_phone: phone || null,
+        member_link_status: memberLinkStatus,
       })
-      .select("id, created_at, source, public_name, public_email, public_phone")
+      .select("id, created_at, source, public_name, public_email, public_phone, client_id, member_link_status")
       .single();
 
     if (insertError || !assignment) {
@@ -465,6 +509,13 @@ export async function POST(
         { error: "Impossible de finaliser l'inscription" },
         { status: 500 }
       );
+    }
+
+    if (linkedClientId) {
+      await ensureMemberParticipationForPlanning(supabase, {
+        clientId: linkedClientId,
+        planningId: link.planning_id,
+      });
     }
 
     if (email) {
@@ -559,23 +610,39 @@ Si vous avez une question, contactez le club.`;
       resourceType: "planning_assignments",
       resourceId: assignment.id,
       outcome: "success",
-      metadata: { source: "public_signup", token, slot_id: slotId },
+      metadata: {
+        source: "public_signup",
+        token,
+        slot_id: slotId,
+        member_link_status: assignment.member_link_status,
+        client_id: assignment.client_id,
+      },
       ...meta,
     });
 
+    const linked = Boolean(assignment.client_id);
     return NextResponse.json(
       {
         assignment: {
           id: assignment.id,
           source: assignment.source,
           createdAt: assignment.created_at,
-          member: {
-            id: `public-${assignment.id}`,
-            nom: assignment.public_name,
-            email: assignment.public_email || undefined,
-            telephone: assignment.public_phone || undefined,
-            status: "public",
-          },
+          memberLinkStatus: assignment.member_link_status,
+          member: linked
+            ? {
+                id: assignment.client_id as string,
+                nom: assignment.public_name,
+                email: assignment.public_email || undefined,
+                telephone: assignment.public_phone || undefined,
+                status: "member",
+              }
+            : {
+                id: `public-${assignment.id}`,
+                nom: assignment.public_name,
+                email: assignment.public_email || undefined,
+                telephone: assignment.public_phone || undefined,
+                status: "public",
+              },
         },
       },
       { status: 201 }

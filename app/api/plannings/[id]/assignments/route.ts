@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import {
+  ensureMemberParticipationForPlanning,
+  refreshMemberParticipationAfterAssignmentsChange,
+} from "@/lib/planning/memberParticipations";
 
 export const runtime = "nodejs";
 
@@ -165,6 +169,11 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    await ensureMemberParticipationForPlanning(supabase, {
+      clientId: clientId,
+      planningId: planningId,
+    });
 
     // Envoyer la notification par email si demandé et si le membre a un email
     let notificationSent = false;
@@ -342,6 +351,7 @@ export async function DELETE(
       .select(`
         id,
         slot_id,
+        client_id,
         planning_slots!inner (
           planning_id
         )
@@ -356,6 +366,16 @@ export async function DELETE(
       );
     }
 
+    const slotRow = assignment.planning_slots as { planning_id?: string } | { planning_id?: string }[];
+    const planningIdFromSlot = Array.isArray(slotRow)
+      ? slotRow[0]?.planning_id
+      : slotRow?.planning_id;
+    if (planningIdFromSlot !== planningId) {
+      return NextResponse.json({ error: "Affectation non trouvée" }, { status: 404 });
+    }
+
+    const removedClientId = assignment.client_id as string | null;
+
     // Supprimer l'affectation
     const { error } = await supabase
       .from("planning_assignments")
@@ -369,6 +389,11 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    await refreshMemberParticipationAfterAssignmentsChange(supabase, {
+      clientId: removedClientId,
+      planningId,
+    });
 
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
 

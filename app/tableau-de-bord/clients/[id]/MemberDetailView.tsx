@@ -6,6 +6,14 @@ import { useI18n } from "@/components/I18nProvider";
 import CreatedByBadge from "@/components/CreatedByBadge";
 import type { MemberFieldsMerged } from "@/lib/member-fields/types";
 
+export interface MemberPlanningParticipation {
+  id: string;
+  planningId: string;
+  name: string;
+  date: string;
+  status: string;
+}
+
 export interface MemberDetailModel {
   id: string;
   nom: string | null;
@@ -30,6 +38,7 @@ export interface MemberDetailModel {
 interface MemberDetailViewProps {
   member: MemberDetailModel;
   canManageMembers: boolean;
+  planningParticipations?: MemberPlanningParticipation[];
 }
 
 function formatDateTime(iso: string | null | undefined, locale: string): string {
@@ -72,6 +81,7 @@ function displayOrDash(v: string | null | undefined, tMissing: string) {
 export default function MemberDetailView({
   member,
   canManageMembers,
+  planningParticipations = [],
 }: MemberDetailViewProps) {
   const { t, locale } = useI18n();
   const loc = locale === "en" ? "en-CH" : locale === "de" ? "de-CH" : "fr-CH";
@@ -262,6 +272,34 @@ export default function MemberDetailView({
           </div>
         )}
       </div>
+
+      {planningParticipations.length > 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="text-lg font-semibold text-slate-900">Participations aux plannings</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Plannings sur lesquels ce membre est inscrit (affectation ou inscription reconnue).
+            </p>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {planningParticipations.map((p) => (
+              <li key={p.id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <Link
+                    href={`/tableau-de-bord/plannings/${p.planningId}`}
+                    className="font-medium text-violet-700 hover:text-violet-900 hover:underline"
+                  >
+                    {p.name}
+                  </Link>
+                  <p className="text-sm text-slate-600 mt-0.5">
+                    {formatDateOnly(p.date, loc)} · {p.status}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
