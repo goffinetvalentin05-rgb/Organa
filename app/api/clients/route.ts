@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
+import {
+  normalizeClientsDbRow,
+  normalizedClientToApi,
+} from "@/lib/clients/normalizeDbRow";
 
 export const runtime = "nodejs";
 
@@ -25,12 +29,11 @@ export async function GET() {
 
   const supabase = await createClient();
 
-  // Colonnes réelles : migration 001 (nom, telephone, adresse). user_id = identifiant du club.
+  // select('*') : évite les 500 si certaines colonnes (postal_code, created_by…) ne sont pas
+  // encore en prod ; normalizeClientsDbRow gère nom/name, telephone/phone, etc.
   const { data, error } = await supabase
     .from("clients")
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
-    )
+    .select("*")
     .eq("user_id", guard.clubId)
     .order("created_at", { ascending: false });
 
@@ -42,25 +45,13 @@ export async function GET() {
     );
   }
 
-  // Filtrer les clients valides (avec ID) et mapper vers le contrat JSON du frontend
   const clients = (data || [])
-    .filter((c) => c.id && typeof c.id === "string" && c.user_id === guard.clubId)
-    .map((c) => ({
-      id: c.id,
-      nom: c.nom,
-      email: c.email,
-      telephone: c.telephone,
-      adresse: c.adresse,
-      postal_code: c.postal_code,
-      city: c.city,
-      user_id: c.user_id,
-      role: c.role,
-      category: c.category,
-      createdBy: c.created_by ?? null,
-      updatedBy: c.updated_by ?? null,
-      createdAt: c.created_at ?? null,
-      updatedAt: c.updated_at ?? null,
-    }));
+    .map((c) => normalizeClientsDbRow(c as Record<string, unknown>))
+    .filter(
+      (n): n is NonNullable<typeof n> =>
+        n !== null && n.user_id === guard.clubId
+    )
+    .map((n) => normalizedClientToApi(n));
 
   return NextResponse.json({ clients }, { status: 200 });
 }
@@ -118,9 +109,7 @@ export async function POST(request: NextRequest) {
       created_by: user.id,
       updated_by: user.id,
     })
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at"
-    )
+    .select("*")
     .single();
 
   if (insertError) {
@@ -131,36 +120,25 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!newClient || !newClient.id) {
+  const normalized = newClient
+    ? normalizeClientsDbRow(newClient as Record<string, unknown>)
+    : null;
+  if (!normalized || !normalized.id) {
     return NextResponse.json(
       { error: "Erreur lors de la création du client" },
       { status: 500 }
     );
   }
 
-  const clientResponse = {
-    id: newClient.id,
-    nom: newClient.nom,
-    email: newClient.email,
-    telephone: newClient.telephone,
-    adresse: newClient.adresse,
-    postal_code: newClient.postal_code,
-    city: newClient.city,
-    user_id: newClient.user_id,
-    role: newClient.role,
-    category: newClient.category,
-    createdBy: newClient.created_by ?? null,
-    updatedBy: newClient.updated_by ?? null,
-    createdAt: (newClient as { created_at?: string | null }).created_at ?? null,
-  };
+  const clientResponse = normalizedClientToApi(normalized);
 
   const meta = extractRequestMetadata(request);
   await logAudit({
     clubId: guard.clubId,
     action: AuditAction.CREATE,
     resourceType: "member",
-    resourceId: String(newClient.id),
-    metadata: { role: newClient.role },
+    resourceId: String(normalized.id),
+    metadata: { role: normalized.role },
     ...meta,
   });
 

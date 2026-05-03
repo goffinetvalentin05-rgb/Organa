@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireCurrentClub } from "@/lib/auth/rbac";
 import { checkPermission, PERMISSIONS } from "@/lib/auth/permissions";
 import MemberDetailView, { type MemberDetailModel } from "./MemberDetailView";
+import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 
 interface PageProps {
   params: Promise<{ id: string }> | { id: string };
@@ -26,9 +27,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("clients")
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
-    )
+    .select("*")
     .eq("id", id)
     .eq("user_id", clubId)
     .maybeSingle();
@@ -37,21 +36,26 @@ export default async function ClientDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const n = normalizeClientsDbRow(data as Record<string, unknown>);
+  if (!n) {
+    notFound();
+  }
+
   const member: MemberDetailModel = {
-    id: data.id,
-    nom: data.nom,
+    id: n.id,
+    nom: n.nom,
     prenom: null,
-    email: data.email,
-    telephone: data.telephone,
-    adresse: data.adresse,
-    postal_code: data.postal_code,
-    city: data.city,
-    role: data.role ?? "player",
-    category: data.category,
-    created_at: data.created_at ?? null,
-    updated_at: data.updated_at ?? null,
-    created_by: data.created_by ?? null,
-    updated_by: data.updated_by ?? null,
+    email: n.email,
+    telephone: n.telephone,
+    adresse: n.adresse,
+    postal_code: n.postal_code,
+    city: n.city,
+    role: n.role,
+    category: n.category,
+    created_at: n.created_at,
+    updated_at: n.updated_at,
+    created_by: n.created_by,
+    updated_by: n.updated_by,
   };
 
   return (

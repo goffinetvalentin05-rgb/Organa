@@ -25,9 +25,7 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
 
   const { data, error } = await supabase
     .from("clients")
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category"
-    )
+    .select("*")
     .eq("id", id)
     .eq("user_id", clubId)
     .single();
@@ -36,16 +34,23 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
     notFound();
   }
 
+  const row = data as Record<string, unknown>;
+  const nom = (typeof row.nom === "string" ? row.nom : typeof row.name === "string" ? row.name : "") || "";
+  const telephone =
+    (typeof row.telephone === "string" ? row.telephone : typeof row.phone === "string" ? row.phone : "") || "";
+  const adresse =
+    (typeof row.adresse === "string" ? row.adresse : typeof row.address === "string" ? row.address : "") || "";
+
   const initialData = {
-    id: data.id,
-    nom: data.nom ?? "",
-    email: data.email ?? "",
-    telephone: data.telephone ?? "",
-    adresse: data.adresse ?? "",
-    postal_code: data.postal_code ?? "",
-    city: data.city ?? "",
-    role: data.role ?? "player",
-    category: data.category ?? "",
+    id: String(row.id ?? ""),
+    nom,
+    email: typeof row.email === "string" ? row.email : "",
+    telephone,
+    adresse,
+    postal_code: typeof row.postal_code === "string" ? row.postal_code : "",
+    city: typeof row.city === "string" ? row.city : "",
+    role: typeof row.role === "string" ? row.role : "player",
+    category: typeof row.category === "string" ? row.category : "",
   };
 
   return <EditClientForm clientId={id} initialData={initialData} />;

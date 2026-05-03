@@ -5,6 +5,7 @@ import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calc
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
+import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(id, nom, email, telephone, adresse, postal_code, city, role, category)"
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(*)"
       )
       .eq("user_id", guard.clubId);
 
@@ -391,15 +392,18 @@ function formatDocument(
     updatedBy: doc.updated_by ?? null,
     createdAt: doc.created_at ?? null,
     updatedAt: doc.updated_at ?? null,
-    client: client
-      ? {
-          id: client.id,
-          nom: client.nom,
-          email: client.email,
-          telephone: client.telephone,
-          adresse: client.adresse,
-        }
-      : null,
+    client: (() => {
+      if (!client) return null;
+      const n = normalizeClientsDbRow(client as Record<string, unknown>);
+      if (!n) return null;
+      return {
+        id: n.id,
+        nom: n.nom,
+        email: n.email,
+        telephone: n.telephone,
+        adresse: n.adresse,
+      };
+    })(),
   };
 }
 // PATCH /api/documents - Mettre à jour un document existant

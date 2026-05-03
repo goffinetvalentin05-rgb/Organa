@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
+import {
+  normalizeClientsDbRow,
+  normalizedClientToApi,
+} from "@/lib/clients/normalizeDbRow";
 
 export const runtime = "nodejs";
 
@@ -42,9 +46,7 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("clients")
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
-    )
+    .select("*")
     .eq("id", id)
     .eq("user_id", guard.clubId)
     .single();
@@ -65,24 +67,15 @@ export async function GET(
     );
   }
 
-  const client = {
-    id: data.id,
-    nom: data.nom,
-    email: data.email,
-    telephone: data.telephone,
-    adresse: data.adresse,
-    postal_code: data.postal_code,
-    city: data.city,
-    user_id: data.user_id,
-    role: data.role,
-    category: data.category,
-    createdBy: data.created_by ?? null,
-    updatedBy: data.updated_by ?? null,
-    createdAt: data.created_at ?? null,
-    updatedAt: data.updated_at ?? null,
-  };
+  const normalized = normalizeClientsDbRow(data as Record<string, unknown>);
+  if (!normalized) {
+    return NextResponse.json(
+      { error: "Client introuvable", code: "CLIENT_NOT_FOUND" },
+      { status: 404 }
+    );
+  }
 
-  return NextResponse.json({ client });
+  return NextResponse.json({ client: normalizedClientToApi(normalized) });
 }
 
 /* =========================
@@ -152,9 +145,7 @@ export async function PUT(
     })
     .eq("id", id)
     .eq("user_id", guard.clubId)
-    .select(
-      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
-    )
+    .select("*")
     .maybeSingle();
 
   if (updateError) {
@@ -175,24 +166,18 @@ export async function PUT(
   // Invalider le cache
   revalidatePath("/tableau-de-bord/clients");
 
-  const clientResponse = {
-    id: updated.id,
-    nom: updated.nom,
-    email: updated.email,
-    telephone: updated.telephone,
-    adresse: updated.adresse,
-    postal_code: updated.postal_code,
-    city: updated.city,
-    user_id: updated.user_id,
-    role: updated.role,
-    category: updated.category,
-    createdBy: updated.created_by ?? null,
-    updatedBy: updated.updated_by ?? null,
-    createdAt: updated.created_at ?? null,
-    updatedAt: updated.updated_at ?? null,
-  };
+  const normalized = normalizeClientsDbRow(updated as Record<string, unknown>);
+  if (!normalized) {
+    return NextResponse.json(
+      { error: "Client introuvable ou non autorisé" },
+      { status: 404 }
+    );
+  }
 
-  return NextResponse.json({ success: true, client: clientResponse });
+  return NextResponse.json({
+    success: true,
+    client: normalizedClientToApi(normalized),
+  });
 }
 
 /* =========================

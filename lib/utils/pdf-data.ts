@@ -143,7 +143,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, nom, email, telephone, adresse, postal_code, city, role, category)"
+      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(*)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
