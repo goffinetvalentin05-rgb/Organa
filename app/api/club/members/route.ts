@@ -5,9 +5,14 @@ import {
   PERMISSIONS,
   requirePermission,
   sanitizePermissions,
-  fullPermissionMap,
 } from "@/lib/auth/permissions";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
+import {
+  buildInvitationUrl,
+  defaultInvitationExpiry,
+  generateInvitationToken,
+} from "@/lib/auth/invitations";
+import { sendInvitationEmail } from "@/lib/email/invite-email";
 import type { ClubRole } from "@/lib/auth/rbac";
 
 export const runtime = "nodejs";
@@ -141,8 +146,6 @@ export async function POST(request: NextRequest) {
   }
 
   // Résout un user_id existant pour cet email via la RPC SECURITY DEFINER.
-  // Phase 1 : on n'invite que des users qui ont déjà un compte Obillz.
-  // Phase 2 ajoutera un vrai flux d'invitation email (création + RSVP).
   const { data: targetUserId, error: rpcError } = await supabase.rpc(
     "find_user_id_by_email",
     { p_email: email }
@@ -156,17 +159,141 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const meta = extractRequestMetadata(request);
+  const admin = createAdminClient();
+
+  // ============================================
+  // Branche 1 : email inconnu → créer une invitation pending
+  // ============================================
   if (!targetUserId) {
+    // Vérifie qu'il n'y a pas déjà une invitation pending pour cet email
+    const { data: existingInvite } = await supabase
+      .from("club_invitations")
+      .select("id")
+      .eq("club_id", guard.clubId)
+      .ilike("email", email)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (existingInvite) {
+      return NextResponse.json(
+        {
+          error:
+            "Une invitation est déjà en attente pour cet email. Allez dans la section Invitations pour la relancer ou l'annuler.",
+          invitationId: existingInvite.id,
+        },
+        { status: 409 }
+      );
+    }
+
+    const token = generateInvitationToken();
+    const expiresAt = defaultInvitationExpiry();
+
+    const { data: invitation, error: invitationError } = await admin
+      .from("club_invitations")
+      .insert({
+        club_id: guard.clubId,
+        email,
+        name: name || null,
+        function_title: functionTitle || null,
+        role,
+        permissions,
+        token,
+        status: "pending",
+        expires_at: expiresAt.toISOString(),
+        created_by: guard.userId,
+        last_sent_at: new Date().toISOString(),
+        send_count: 1,
+      })
+      .select(
+        "id, club_id, email, name, function_title, role, permissions, status, expires_at, created_at"
+      )
+      .single();
+
+    if (invitationError || !invitation) {
+      console.error("[API][club/members][POST] invitation insert KO:", invitationError);
+      return NextResponse.json(
+        {
+          error: "Erreur lors de la création de l'invitation",
+          details: invitationError?.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    // Récupère le profil et l'inviteur pour l'email
+    const { data: clubProfile } = await supabase
+      .from("profiles")
+      .select(
+        "company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+      )
+      .eq("user_id", guard.clubId)
+      .maybeSingle();
+    const { data: inviterMembership } = await supabase
+      .from("club_memberships")
+      .select("name, email")
+      .eq("club_id", guard.clubId)
+      .eq("user_id", guard.userId)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    const origin = new URL(request.url).origin;
+    const invitationUrl = buildInvitationUrl(token, origin);
+
+    const emailResult = await sendInvitationEmail({
+      to: email,
+      recipientName: name || null,
+      inviterName: inviterMembership?.name || inviterMembership?.email || null,
+      clubName: clubProfile?.company_name || "Club Obillz",
+      functionTitle: functionTitle || null,
+      invitationUrl,
+      expiresAt,
+      clubProfile: {
+        company_name: clubProfile?.company_name,
+        company_email: clubProfile?.company_email,
+        email_sender_name: clubProfile?.email_sender_name,
+        email_sender_email: clubProfile?.email_sender_email,
+        resend_api_key: clubProfile?.resend_api_key,
+        email_custom_enabled: clubProfile?.email_custom_enabled,
+      },
+    });
+
+    await logAudit({
+      clubId: guard.clubId,
+      action: AuditAction.INVITE_MEMBER,
+      resourceType: "club_invitation",
+      resourceId: invitation.id,
+      metadata: {
+        email,
+        role,
+        function_title: functionTitle || null,
+        email_sent: emailResult.ok,
+        email_failure: emailResult.ok ? null : emailResult.reason,
+      },
+      ...meta,
+    });
+
     return NextResponse.json(
       {
-        error:
-          "Cet email ne correspond pas à un compte Obillz existant. Demandez à la personne de créer un compte avant de l'ajouter (un système d'invitation email arrivera bientôt).",
+        invitation: {
+          id: invitation.id,
+          email: invitation.email,
+          name: invitation.name,
+          functionTitle: invitation.function_title,
+          role: invitation.role,
+          status: invitation.status,
+          expiresAt: invitation.expires_at,
+          invitationUrl,
+        },
+        email: emailResult,
       },
-      { status: 422 }
+      { status: 201 }
     );
   }
 
-  // Empêche d'ajouter le même user_id deux fois (l'unique a club_id+user_id)
+  // ============================================
+  // Branche 2 : email connu → créer directement la membership active
+  // ============================================
+  // Empêche d'ajouter le même user_id deux fois (unique club_id+user_id)
   const { data: dupByUser } = await supabase
     .from("club_memberships")
     .select("id")
@@ -180,12 +307,6 @@ export async function POST(request: NextRequest) {
       { status: 409 }
     );
   }
-
-  // L'INSERT passe par le client admin car la RLS sur club_memberships
-  // exige `is_club_admin(club_id)` ; un committee avec la permission
-  // applicative `manage_users` doit pouvoir créer un membre, donc on
-  // contourne la RLS APRÈS avoir validé la permission applicative.
-  const admin = createAdminClient();
 
   const insertPayload: Record<string, unknown> = {
     club_id: guard.clubId,
@@ -221,7 +342,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const meta = extractRequestMetadata(request);
   await logAudit({
     clubId: guard.clubId,
     action: AuditAction.INVITE_MEMBER,

@@ -23,6 +23,10 @@ function isPublicApiPath(pathname: string): boolean {
   if (pathname.startsWith("/api/public/")) return true;
   if (pathname.startsWith("/api/webhooks/")) return true;
   if (pathname === "/api/registrations") return true;
+  // Acceptation d'invitation : le user vient de s'inscrire et n'a pas
+  // encore configuré MFA. La route gère elle-même l'auth (et la sécurité
+  // tient au token long stocké en clair = shared secret).
+  if (pathname.startsWith("/api/invitations/")) return true;
   return false;
 }
 

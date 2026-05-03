@@ -28,6 +28,20 @@ interface MemberDTO {
   createdBy: string | null;
 }
 
+interface InvitationDTO {
+  id: string;
+  email: string;
+  name: string | null;
+  functionTitle: string | null;
+  role: "owner" | "admin" | "committee" | "member";
+  status: "pending" | "accepted" | "cancelled" | "expired";
+  expiresAt: string;
+  createdAt: string;
+  lastSentAt: string | null;
+  sendCount: number;
+  invitationUrl?: string;
+}
+
 interface FormState {
   name: string;
   email: string;
@@ -68,6 +82,7 @@ function buildEmptyForm(): FormState {
 export default function UtilisateursPage() {
   const myPerms = usePermissions();
   const [members, setMembers] = useState<MemberDTO[]>([]);
+  const [invitations, setInvitations] = useState<InvitationDTO[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -78,16 +93,24 @@ export default function UtilisateursPage() {
 
   const canManage = myPerms.has("manage_users");
 
-  const fetchMembers = async () => {
+  const fetchAll = async () => {
     setLoadingMembers(true);
     try {
-      const res = await fetch("/api/club/members", { cache: "no-store" });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j?.error || `HTTP ${res.status}`);
+      const [resM, resI] = await Promise.all([
+        fetch("/api/club/members", { cache: "no-store" }),
+        fetch("/api/club/invitations", { cache: "no-store" }),
+      ]);
+      if (!resM.ok) {
+        const j = await resM.json().catch(() => ({}));
+        throw new Error(j?.error || `HTTP ${resM.status}`);
       }
-      const data = await res.json();
-      setMembers((data.members ?? []) as MemberDTO[]);
+      const dataM = await resM.json();
+      setMembers((dataM.members ?? []) as MemberDTO[]);
+
+      if (resI.ok) {
+        const dataI = await resI.json();
+        setInvitations((dataI.invitations ?? []) as InvitationDTO[]);
+      }
     } catch (e: any) {
       console.error("[utilisateurs] fetch KO:", e);
       toast.error(e?.message ?? "Erreur de chargement");
@@ -98,7 +121,7 @@ export default function UtilisateursPage() {
 
   useEffect(() => {
     if (!myPerms.loading && canManage) {
-      fetchMembers();
+      fetchAll();
     } else if (!myPerms.loading) {
       setLoadingMembers(false);
     }
@@ -191,9 +214,42 @@ export default function UtilisateursPage() {
         throw new Error(j?.error || `HTTP ${res.status}`);
       }
 
-      toast.success(editing ? "Accès mis à jour" : "Accès créé");
+      // En création (pas en édition), la réponse peut être :
+      //  - { member: ... } si l'email correspondait à un compte existant
+      //  - { invitation: ..., email: { ok, ... } } si on a créé une invitation
+      if (!editing) {
+        const data = await res.json().catch(() => ({}));
+        if (data?.invitation) {
+          if (data.email?.ok) {
+            toast.success(`Invitation envoyée à ${data.invitation.email}`);
+          } else {
+            // L'email n'est pas parti : on copie le lien dans le presse-papier
+            // et on prévient l'owner pour qu'il le partage manuellement.
+            const url = data.invitation.invitationUrl;
+            if (url) {
+              try {
+                await navigator.clipboard.writeText(url);
+                toast.success(
+                  "Invitation créée. Lien copié dans le presse-papier (l'envoi email n'était pas configuré)."
+                );
+              } catch {
+                toast.success(
+                  "Invitation créée. L'email n'a pas pu être envoyé : copiez le lien depuis la liste."
+                );
+              }
+            } else {
+              toast.success("Invitation créée.");
+            }
+          }
+        } else {
+          toast.success("Accès créé");
+        }
+      } else {
+        toast.success("Accès mis à jour");
+      }
+
       cancelForm();
-      await fetchMembers();
+      await fetchAll();
     } catch (e: any) {
       toast.error(e?.message ?? "Erreur");
     } finally {
@@ -214,7 +270,7 @@ export default function UtilisateursPage() {
         throw new Error(j?.error || `HTTP ${res.status}`);
       }
       toast.success(next === "active" ? "Accès réactivé" : "Accès désactivé");
-      await fetchMembers();
+      await fetchAll();
     } catch (e: any) {
       toast.error(e?.message ?? "Erreur");
     }
@@ -229,7 +285,79 @@ export default function UtilisateursPage() {
         throw new Error(j?.error || `HTTP ${res.status}`);
       }
       toast.success("Accès supprimé");
-      await fetchMembers();
+      await fetchAll();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur");
+    }
+  };
+
+  // ============================================
+  // Actions sur les invitations
+  // ============================================
+  const resendInvitation = async (inv: InvitationDTO) => {
+    try {
+      const res = await fetch(
+        `/api/club/invitations/${inv.id}?action=resend`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || `HTTP ${res.status}`);
+      }
+      const data = await res.json().catch(() => ({}));
+      if (data.email?.ok) {
+        toast.success(`Email renvoyé à ${inv.email}`);
+      } else if (data.invitationUrl) {
+        try {
+          await navigator.clipboard.writeText(data.invitationUrl);
+          toast.success("Lien copié (l'envoi email a échoué)");
+        } catch {
+          toast.success("Lien généré (copie manuelle nécessaire)");
+        }
+      } else {
+        toast.success("Invitation relancée");
+      }
+      await fetchAll();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur");
+    }
+  };
+
+  const cancelInvitation = async (inv: InvitationDTO) => {
+    if (!confirm(`Annuler l'invitation de ${inv.email} ?`)) return;
+    try {
+      const res = await fetch(`/api/club/invitations/${inv.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || `HTTP ${res.status}`);
+      }
+      toast.success("Invitation annulée");
+      await fetchAll();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur");
+    }
+  };
+
+  const copyInvitationLink = async (inv: InvitationDTO) => {
+    // L'API GET ne renvoie pas le token complet (sécurité). On relance
+    // l'invitation pour récupérer l'URL.
+    try {
+      const res = await fetch(
+        `/api/club/invitations/${inv.id}?action=resend`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.invitationUrl) {
+        await navigator.clipboard.writeText(data.invitationUrl);
+        toast.success("Lien d'invitation copié (un email a aussi été renvoyé)");
+      }
+      await fetchAll();
     } catch (e: any) {
       toast.error(e?.message ?? "Erreur");
     }
@@ -460,6 +588,92 @@ export default function UtilisateursPage() {
         </form>
       )}
 
+      {/* Invitations en attente */}
+      {invitations.filter((i) => i.status === "pending").length > 0 && (
+        <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+          <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">
+                Invitations en attente
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Les personnes ci-dessous ont reçu un email d'invitation. Le lien
+                expire automatiquement après 14 jours.
+              </p>
+            </div>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {invitations
+              .filter((i) => i.status === "pending")
+              .map((inv) => {
+                const expired = new Date(inv.expiresAt) < new Date();
+                return (
+                  <li
+                    key={inv.id}
+                    className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-slate-800">
+                          {inv.name ?? inv.email}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            expired
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {expired ? "Expirée" : "En attente"}
+                        </span>
+                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                          {ROLE_LABELS[inv.role]}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-sm text-slate-500">
+                        {inv.email}
+                        {inv.functionTitle ? ` · ${inv.functionTitle}` : ""}
+                      </div>
+                      <div className="mt-1 text-xs text-slate-400">
+                        Expire le{" "}
+                        {new Date(inv.expiresAt).toLocaleDateString("fr-CH", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                        {inv.sendCount > 1
+                          ? ` · ${inv.sendCount} envois`
+                          : ""}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => resendInvitation(inv)}
+                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                      >
+                        Renvoyer l'email
+                      </button>
+                      <button
+                        onClick={() => copyInvitationLink(inv)}
+                        className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
+                      >
+                        Copier le lien
+                      </button>
+                      <button
+                        onClick={() => cancelInvitation(inv)}
+                        className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      )}
+
       {/* Liste des membres */}
       <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
         <div className="border-b border-slate-200 px-6 py-4">
@@ -540,8 +754,9 @@ export default function UtilisateursPage() {
       </div>
 
       <div className="text-xs text-white/50">
-        ℹ️ Phase 1 : la personne doit déjà avoir un compte Obillz pour pouvoir
-        être ajoutée. Le système d'invitation par email arrive bientôt.
+        Si la personne n'a pas encore de compte Obillz, elle recevra un email
+        d'invitation. Le lien lui permet de créer son compte avec l'email
+        invité, puis de rejoindre le club d'un clic.
       </div>
     </div>
   );
