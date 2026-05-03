@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(id, nom, email, telephone, adresse, postal_code, city, role, category)"
       )
       .eq("user_id", guard.clubId);
 

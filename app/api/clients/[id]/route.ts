@@ -7,6 +7,15 @@ import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit"
 
 export const runtime = "nodejs";
 
+function logClientsSupabase(op: string, err: { code?: string; message?: string }) {
+  const msg = err.message?.slice(0, 200) ?? "";
+  console.error(`[API][clients][${op}] supabase_error`, {
+    code: err.code ?? null,
+    message_len: msg.length,
+    message_hint: msg ? msg.replace(/\S+@\S+/gi, "[redacted]") : null,
+  });
+}
+
 /* =========================
    GET : récupérer un client
    ========================= */
@@ -31,29 +40,37 @@ export async function GET(
 
   const supabase = await createClient();
 
-  // Récupérer le client depuis Supabase
-  // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at")
+    .select(
+      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
+    )
     .eq("id", id)
     .eq("user_id", guard.clubId)
     .single();
 
-  if (error || !data) {
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logClientsSupabase("GET_BY_ID", error);
+    }
     return NextResponse.json(
-      { error: "Client introuvable" },
+      { error: "Client introuvable", code: "CLIENT_NOT_FOUND" },
+      { status: 404 }
+    );
+  }
+  if (!data) {
+    return NextResponse.json(
+      { error: "Client introuvable", code: "CLIENT_NOT_FOUND" },
       { status: 404 }
     );
   }
 
-  // Mapper vers les noms français pour le frontend
   const client = {
     id: data.id,
-    nom: data.name,
+    nom: data.nom,
     email: data.email,
-    telephone: data.phone,
-    adresse: data.address,
+    telephone: data.telephone,
+    adresse: data.adresse,
     postal_code: data.postal_code,
     city: data.city,
     user_id: data.user_id,
@@ -120,15 +137,13 @@ export async function PUT(
     );
   }
 
-  // Mise à jour dans Supabase
-  // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data: updated, error: updateError } = await supabase
     .from("clients")
     .update({
-      name: nom.trim(),
+      nom: nom.trim(),
       email: email || null,
-      phone: telephone || null,
-      address: adresse || null,
+      telephone: telephone || null,
+      adresse: adresse || null,
       postal_code: postal_code || null,
       city: city || null,
       role: role || "player",
@@ -137,13 +152,15 @@ export async function PUT(
     })
     .eq("id", id)
     .eq("user_id", guard.clubId)
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at")
+    .select(
+      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
+    )
     .maybeSingle();
 
   if (updateError) {
-    console.error("[API][clients][PUT] Erreur Supabase", updateError);
+    logClientsSupabase("PUT", updateError);
     return NextResponse.json(
-      { error: updateError.message },
+      { error: "Impossible de mettre à jour le membre", code: "CLIENTS_UPDATE_FAILED" },
       { status: 500 }
     );
   }
@@ -160,10 +177,10 @@ export async function PUT(
 
   const clientResponse = {
     id: updated.id,
-    nom: updated.name,
+    nom: updated.nom,
     email: updated.email,
-    telephone: updated.phone,
-    adresse: updated.address,
+    telephone: updated.telephone,
+    adresse: updated.adresse,
     postal_code: updated.postal_code,
     city: updated.city,
     user_id: updated.user_id,
@@ -217,9 +234,9 @@ export async function DELETE(
     .select("id");
 
   if (deleteError) {
-    console.error("[API][clients][DELETE] Erreur Supabase", deleteError);
+    logClientsSupabase("DELETE", deleteError);
     return NextResponse.json(
-      { error: deleteError.message },
+      { error: "Impossible de supprimer le membre", code: "CLIENTS_DELETE_FAILED" },
       { status: 500 }
     );
   }

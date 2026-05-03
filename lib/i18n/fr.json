@@ -491,6 +491,7 @@
       "dashboard": "Dashboard du club",
       "newClient": "Nouveau membre",
       "editClient": "Modifier membre",
+      "memberDetail": "Fiche membre",
       "clients": "Membres",
       "quotes": "Cotisations",
       "invoices": "Factures",
@@ -655,6 +656,8 @@
     },
     "clients": {
       "authError": "Erreur d'authentification",
+      "loadForbidden": "Vous n’avez pas la permission d’afficher les membres.",
+      "loadErrorDetail": "Une erreur technique est survenue. Réessayez plus tard ou contactez le support.",
       "loadError": "Erreur lors du chargement des membres",
       "title": "Membres du club",
       "subtitle": "Gérez les membres de votre club et leurs informations.",
@@ -718,6 +721,23 @@
         "allRoles": "Tous les rôles",
         "allCategories": "Toutes les catégories",
         "resetFilters": "Réinitialiser"
+      },
+      "memberDetail": {
+        "title": "Fiche membre",
+        "back": "Retour à la liste",
+        "editAction": "Modifier",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "address": "Adresse",
+        "role": "Rôle",
+        "category": "Catégorie / statut",
+        "addedAt": "Date d’ajout",
+        "lastModified": "Dernière modification",
+        "missing": "—",
+        "auditCreatedBy": "Créé par",
+        "auditUpdatedBy": "Modifié par"
       },
       "errors": {
         "missingId": "ID du membre manquant",

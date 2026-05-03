@@ -143,7 +143,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, name, email, phone, address, postal_code, city, role, category)"
+      "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, nom, email, telephone, adresse, postal_code, city, role, category)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -210,10 +210,23 @@ export async function getDocumentPdfData(
       conditionsPaiement: profile?.payment_terms || "",
     },
     client: {
-      name: client?.name || "",
+      name:
+        (client as { nom?: string; name?: string } | null | undefined)?.nom ||
+        (client as { nom?: string; name?: string } | null | undefined)?.name ||
+        "",
       email: client?.email || "",
-      phone: client?.phone || "",
-      address: client?.address || "",
+      phone:
+        (client as { telephone?: string; phone?: string } | null | undefined)
+          ?.telephone ||
+        (client as { telephone?: string; phone?: string } | null | undefined)
+          ?.phone ||
+        "",
+      address:
+        (client as { adresse?: string; address?: string } | null | undefined)
+          ?.adresse ||
+        (client as { adresse?: string; address?: string } | null | undefined)
+          ?.address ||
+        "",
       postalCode: client?.postal_code || "",
       city: client?.city || "",
     },

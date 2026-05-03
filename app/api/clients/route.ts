@@ -7,6 +7,15 @@ import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit"
 
 export const runtime = "nodejs";
 
+function logClientsSupabase(op: string, err: { code?: string; message?: string }) {
+  const msg = err.message?.slice(0, 200) ?? "";
+  console.error(`[API][clients][${op}] supabase_error`, {
+    code: err.code ?? null,
+    message_len: msg.length,
+    message_hint: msg ? msg.replace(/\S+@\S+/gi, "[redacted]") : null,
+  });
+}
+
 /* =========================
    GET : liste des clients
    ========================= */
@@ -15,33 +24,33 @@ export async function GET() {
   if ("error" in guard) return guard.error;
 
   const supabase = await createClient();
-  const user = guard.ctx.user;
 
-  // Charger les clients depuis Supabase
-  // Note: Les colonnes BD sont en anglais (name, phone, address)
+  // Colonnes réelles : migration 001 (nom, telephone, adresse). user_id = identifiant du club.
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at")
+    .select(
+      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at"
+    )
     .eq("user_id", guard.clubId)
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("[API][clients][GET] Erreur Supabase", error);
+    logClientsSupabase("GET", error);
     return NextResponse.json(
-      { error: error.message },
+      { error: "Impossible de charger les membres", code: "CLIENTS_LIST_FAILED" },
       { status: 500 }
     );
   }
 
-  // Filtrer les clients valides (avec ID) et mapper vers les noms français pour le frontend
+  // Filtrer les clients valides (avec ID) et mapper vers le contrat JSON du frontend
   const clients = (data || [])
     .filter((c) => c.id && typeof c.id === "string" && c.user_id === guard.clubId)
     .map((c) => ({
       id: c.id,
-      nom: c.name,
+      nom: c.nom,
       email: c.email,
-      telephone: c.phone,
-      adresse: c.address,
+      telephone: c.telephone,
+      adresse: c.adresse,
       postal_code: c.postal_code,
       city: c.city,
       user_id: c.user_id,
@@ -93,17 +102,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Insertion dans Supabase
-  // Note: La colonne BD s'appelle "name", on mappe depuis "nom" du formulaire
-  // user_id porte le clubId (= owner historique) dans le modèle multi-tenant.
+  // Insertion dans Supabase (colonnes FR : nom, telephone, adresse)
   const { data: newClient, error: insertError } = await supabase
     .from("clients")
     .insert({
       user_id: guard.clubId,
-      name: nom.trim(),
+      nom: nom.trim(),
       email: email || null,
-      phone: telephone || null,
-      address: adresse || null,
+      telephone: telephone || null,
+      adresse: adresse || null,
       postal_code: postal_code || null,
       city: city || null,
       role: role || "player",
@@ -111,13 +118,15 @@ export async function POST(request: NextRequest) {
       created_by: user.id,
       updated_by: user.id,
     })
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at")
+    .select(
+      "id, nom, email, telephone, adresse, postal_code, city, user_id, role, category, created_by, updated_by, created_at"
+    )
     .single();
 
   if (insertError) {
-    console.error("[API][clients][POST] Erreur Supabase", insertError);
+    logClientsSupabase("POST", insertError);
     return NextResponse.json(
-      { error: insertError.message },
+      { error: "Impossible de créer le membre", code: "CLIENTS_CREATE_FAILED" },
       { status: 500 }
     );
   }
@@ -129,13 +138,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Mapper vers les noms français pour le frontend
   const clientResponse = {
     id: newClient.id,
-    nom: newClient.name,
+    nom: newClient.nom,
     email: newClient.email,
-    telephone: newClient.phone,
-    adresse: newClient.address,
+    telephone: newClient.telephone,
+    adresse: newClient.adresse,
     postal_code: newClient.postal_code,
     city: newClient.city,
     user_id: newClient.user_id,
@@ -143,7 +151,7 @@ export async function POST(request: NextRequest) {
     category: newClient.category,
     createdBy: newClient.created_by ?? null,
     updatedBy: newClient.updated_by ?? null,
-    createdAt: (newClient as any).created_at ?? null,
+    createdAt: (newClient as { created_at?: string | null }).created_at ?? null,
   };
 
   const meta = extractRequestMetadata(request);
@@ -152,7 +160,7 @@ export async function POST(request: NextRequest) {
     action: AuditAction.CREATE,
     resourceType: "member",
     resourceId: String(newClient.id),
-    metadata: { name: newClient.name, role: newClient.role },
+    metadata: { role: newClient.role },
     ...meta,
   });
 

@@ -494,6 +494,7 @@
       "dashboard": "Club Dashboard",
       "newClient": "New member",
       "editClient": "Edit member",
+      "memberDetail": "Member profile",
       "clients": "Members",
       "quotes": "Memberships",
       "invoices": "Invoices",
@@ -775,6 +776,8 @@
     },
     "clients": {
       "authError": "Authentication error",
+      "loadForbidden": "You do not have permission to view members.",
+      "loadErrorDetail": "A technical error occurred. Please try again later or contact support.",
       "loadError": "Error loading members",
       "title": "Club Members",
       "subtitle": "Manage your club members and their information.",
@@ -838,6 +841,23 @@
         "allRoles": "All roles",
         "allCategories": "All categories",
         "resetFilters": "Reset"
+      },
+      "memberDetail": {
+        "title": "Member profile",
+        "back": "Back to list",
+        "editAction": "Edit",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address",
+        "role": "Role",
+        "category": "Category / status",
+        "addedAt": "Date added",
+        "lastModified": "Last updated",
+        "missing": "—",
+        "auditCreatedBy": "Created by",
+        "auditUpdatedBy": "Updated by"
       },
       "errors": {
         "missingId": "Client ID missing",

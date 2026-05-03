@@ -107,6 +107,10 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/clients/") && pathname.includes("/edit")) {
       return t("dashboard.pageTitles.editClient");
     }
+    const memberDetailMatch = pathname?.match(/^\/tableau-de-bord\/clients\/([^/]+)$/);
+    if (memberDetailMatch && memberDetailMatch[1] !== "nouveau") {
+      return t("dashboard.pageTitles.memberDetail");
+    }
     if (pathname.startsWith("/tableau-de-bord/clients")) return t("dashboard.pageTitles.clients");
     if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
     if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");

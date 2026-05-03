@@ -18,6 +18,7 @@ interface Client {
   user_id: string;
   role: string;
   category: string | null;
+  prenom?: string | null;
 }
 
 // Couleurs pour les rôles
@@ -42,9 +43,15 @@ export default function ClientsPage() {
   useEffect(() => {
     async function fetchClients() {
       try {
-        const res = await fetch("/api/clients");
+        const res = await fetch("/api/clients", { cache: "no-store" });
         if (!res.ok) {
-          throw new Error("Erreur lors du chargement");
+          if (res.status === 401) {
+            throw new Error(t("dashboard.clients.authError"));
+          }
+          if (res.status === 403) {
+            throw new Error(t("dashboard.clients.loadForbidden"));
+          }
+          throw new Error(t("dashboard.clients.loadErrorDetail"));
         }
         const data = await res.json();
         setClients(data.clients || []);
@@ -55,7 +62,7 @@ export default function ClientsPage() {
       }
     }
     fetchClients();
-  }, []);
+  }, [t]);
 
   // Filtrer les clients
   const filteredClients = useMemo(() => {
@@ -193,33 +200,40 @@ export default function ClientsPage() {
                 className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="flex items-start gap-4">
-                    <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0"
+                  <Link
+                    href={`/tableau-de-bord/clients/${client.id}`}
+                    className="flex items-start gap-4 min-w-0 flex-1 text-left group rounded-xl outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0 group-hover:opacity-95 transition-opacity"
                       style={{ backgroundColor: "var(--obillz-hero-blue)" }}
                     >
                       {(client.nom || "?").charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-slate-900 truncate">
+                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
+                          {client.prenom ? `${client.prenom} ` : ""}
                           {client.nom || t("dashboard.clients.noName")}
                         </h3>
-                        {/* Badge Rôle */}
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}>
+                        <span
+                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}
+                        >
                           {t(`dashboard.clients.roles.${client.role}`) || client.role}
                         </span>
-                        {/* Badge Catégorie */}
                         {client.category && (
                           <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
-                            {t(`dashboard.clients.categories.${client.category}`) || client.category}
+                            {t(`dashboard.clients.categories.${client.category}`) ||
+                              client.category}
                           </span>
                         )}
                       </div>
                       <div className="mt-2 grid gap-1 text-sm">
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Email</span>
-                          <span className="truncate">{client.email || t("dashboard.clients.notProvided")}</span>
+                          <span className="truncate">
+                            {client.email || t("dashboard.clients.notProvided")}
+                          </span>
                         </p>
                         <p className="text-slate-500 flex items-center gap-2">
                           <span className="text-slate-400 w-16 shrink-0">Tél.</span>
@@ -231,17 +245,20 @@ export default function ClientsPage() {
                             {client.adresse || client.postal_code || client.city
                               ? [
                                   client.adresse,
-                                  [client.postal_code, client.city].filter(Boolean).join(" ")
-                                ].filter(Boolean).join(", ")
+                                  [client.postal_code, client.city].filter(Boolean).join(" "),
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ")
                               : t("dashboard.clients.addressNotProvided")}
                           </span>
                         </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 md:ml-4">
+                  </Link>
+                  <div className="flex flex-wrap items-center gap-2 md:ml-4 shrink-0">
                     <Link
                       href={`/tableau-de-bord/clients/${client.id}/edit`}
+                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all text-sm flex items-center gap-2 border border-slate-200 shadow-sm"
                     >
                       <Edit className="w-4 h-4" />

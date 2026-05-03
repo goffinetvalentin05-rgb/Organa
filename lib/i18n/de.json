@@ -493,6 +493,7 @@
       "dashboard": "Vereins-Dashboard",
       "newClient": "Neues Mitglied",
       "editClient": "Mitglied bearbeiten",
+      "memberDetail": "Mitgliedakte",
       "clients": "Mitglieder",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
@@ -773,6 +774,8 @@
     },
     "clients": {
       "authError": "Authentifizierungsfehler",
+      "loadForbidden": "Sie haben keine Berechtigung, Mitglieder anzuzeigen.",
+      "loadErrorDetail": "Ein technischer Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.",
       "loadError": "Fehler beim Laden der Kunden",
       "title": "Kunden",
       "subtitle": "Ein klarer Überblick über Ihre Kontakte und wichtige Informationen.",
@@ -836,6 +839,23 @@
         "allRoles": "Alle Rollen",
         "allCategories": "Alle Kategorien",
         "resetFilters": "Zurücksetzen"
+      },
+      "memberDetail": {
+        "title": "Mitgliedakte",
+        "back": "Zurück zur Liste",
+        "editAction": "Bearbeiten",
+        "firstName": "Vorname",
+        "lastName": "Name",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "address": "Adresse",
+        "role": "Rolle",
+        "category": "Kategorie / Status",
+        "addedAt": "Hinzugefügt am",
+        "lastModified": "Zuletzt geändert",
+        "missing": "—",
+        "auditCreatedBy": "Erstellt von",
+        "auditUpdatedBy": "Geändert von"
       },
       "errors": {
         "missingId": "Kunden-ID fehlt",
