@@ -3,7 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { rateLimitGuard } from "@/lib/security/rateLimit";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
-import { matchPublicNameToMember, type ClubMemberForMatch } from "@/lib/planning/matchPublicNameToMember";
+import { matchPublicNameToMember, normalizeForNameMatch } from "@/lib/planning/matchPublicNameToMember";
+import { fetchClubMembersForNameMatch } from "@/lib/planning/fetchClubMembersForNameMatch";
 import { ensureMemberParticipationForPlanning } from "@/lib/planning/memberParticipations";
 
 export const runtime = "nodejs";
@@ -451,21 +452,38 @@ export async function POST(
     const rawForMatch = name.trim();
     const publicDisplayName = rawForMatch || "Bénévole";
 
-    const { data: clubMembersRaw, error: membersErr } = await supabase
-      .from("clients")
-      .select("id, nom")
-      .eq("user_id", link.club_id)
-      .is("deleted_at", null);
+    const { members: clubMembers, selectUsed: membersSelectUsed, error: membersFetchErr } =
+      await fetchClubMembersForNameMatch(supabase, link.club_id);
 
-    if (membersErr) {
-      console.error("[API][public-plannings][POST] clients club:", membersErr.message);
+    if (membersFetchErr) {
+      console.error("[API][public-plannings][POST] fetch membres matching:", membersFetchErr);
     }
 
-    const clubMembers = (clubMembersRaw || []) as ClubMemberForMatch[];
     const nameMatch =
       rawForMatch.length > 0
         ? matchPublicNameToMember(rawForMatch, clubMembers)
         : ({ kind: "none" } as const);
+
+    const normalizedForLog = rawForMatch.length > 0 ? normalizeForNameMatch(rawForMatch) : "";
+    const matchLogPayload: Record<string, unknown> = {
+      phase: "public_signup_name_match",
+      clubId: link.club_id,
+      planningId: link.planning_id,
+      rawInputLen: rawForMatch.length,
+      normalizedInput: normalizedForLog,
+      membersSelectUsed,
+      candidateCount: clubMembers.length,
+      outcome: nameMatch.kind,
+    };
+    if (nameMatch.kind === "none") {
+      matchLogPayload.noMatchReason =
+        clubMembers.length === 0
+          ? "ZERO_ACTIVE_MEMBERS_LOADED"
+          : "NO_MATCH_AFTER_NORMALIZE";
+    } else if (nameMatch.kind === "ambiguous") {
+      matchLogPayload.ambiguousCount = nameMatch.clientIds.length;
+    }
+    console.info("[public-planning-match]", JSON.stringify(matchLogPayload));
 
     let linkedClientId: string | null = null;
     let memberLinkStatus: "linked" | "unlinked" | "pending_review" = "unlinked";
