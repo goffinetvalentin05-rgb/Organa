@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
+import { setActiveClubCookieClient } from "@/lib/auth/active-club";
 
 interface InvitationPublic {
   id: string;
@@ -118,17 +119,22 @@ export default function AcceptInvitationPage() {
   // ============================================
   // Helpers
   // ============================================
-  const acceptOnly = async () => {
+  const acceptOnly = async (): Promise<{ clubId: string }> => {
     const res = await fetch(`/api/invitations/${encodeURIComponent(token)}`, {
       method: "POST",
     });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const j = await res.json().catch(() => ({}));
-      throw new Error(j?.error || `HTTP ${res.status}`);
+      throw new Error(data?.error || `HTTP ${res.status}`);
     }
+    const clubId = data?.clubId as string | undefined;
+    if (!clubId) {
+      throw new Error("Réponse serveur invalide (club manquant).");
+    }
+    return { clubId };
   };
 
-  const signInThenAccept = async (pwd: string) => {
+  const signInThenAccept = async (pwd: string): Promise<{ clubId: string }> => {
     const supabase = createClient();
     const { error: signInErr } = await supabase.auth.signInWithPassword({
       email: expectedEmail,
@@ -141,7 +147,7 @@ export default function AcceptInvitationPage() {
           : signInErr.message || "Erreur de connexion"
       );
     }
-    await acceptOnly();
+    return acceptOnly();
   };
 
   // ============================================
@@ -186,7 +192,8 @@ export default function AcceptInvitationPage() {
         throw new Error(data?.error || `HTTP ${res.status}`);
       }
 
-      await signInThenAccept(password);
+      const { clubId } = await signInThenAccept(password);
+      setActiveClubCookieClient(clubId);
       toast.success(`Bienvenue dans ${invitation?.clubName ?? "le club"} !`);
       router.push("/tableau-de-bord");
     } catch (e: any) {
@@ -207,7 +214,8 @@ export default function AcceptInvitationPage() {
     }
     setSubmitting(true);
     try {
-      await signInThenAccept(password);
+      const { clubId } = await signInThenAccept(password);
+      setActiveClubCookieClient(clubId);
       toast.success(`Bienvenue dans ${invitation?.clubName ?? "le club"} !`);
       router.push("/tableau-de-bord");
     } catch (e: any) {
@@ -223,7 +231,8 @@ export default function AcceptInvitationPage() {
   const acceptWhenLogged = async () => {
     setSubmitting(true);
     try {
-      await acceptOnly();
+      const { clubId } = await acceptOnly();
+      setActiveClubCookieClient(clubId);
       toast.success(`Bienvenue dans ${invitation?.clubName ?? "le club"} !`);
       router.push("/tableau-de-bord");
     } catch (e: any) {

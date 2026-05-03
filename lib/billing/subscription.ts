@@ -12,6 +12,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { getAuthContext } from "@/lib/auth/rbac";
 
 // ============================================
 // Types
@@ -81,17 +82,30 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     throw new Error("Utilisateur non authentifié");
   }
 
-  // 2. Lire le profil depuis profiles
+  // Abonnement facturé : le club est identifié par club_id (= user_id du
+  // propriétaire du compte club). Un membre invité doit hériter du statut
+  // d’abonnement du club, pas de son propre essai « perso ».
+  const ctx = await getAuthContext();
+  const billingUserId = ctx?.current?.clubId ?? user.id;
+
+  // 2. Lire le profil « facturation » (proprio du club courant ou soi-même)
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select(
       "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder"
     )
-    .eq("user_id", user.id)
+    .eq("user_id", billingUserId)
     .maybeSingle();
 
-  // 3. Si aucun profil existe, le créer avec trial
+  // 3. Si aucun profil : créer un essai uniquement pour SON compte perso
   if (!profile) {
+    if (billingUserId !== user.id) {
+      console.warn(
+        `[BILLING][getSubscriptionStatus] Pas de profil pour billingUserId=${billingUserId} (club)`
+      );
+      return createExpiredSubscription();
+    }
+
     console.log(
       `[BILLING][getSubscriptionStatus] Profil inexistant pour user_id=${user.id}, création avec trial`
     );
@@ -128,7 +142,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
   // 4. Bypass fondateur: accès total sans vérification trial/abonnement
   if (profile.is_founder === true) {
     console.log(
-      `[BILLING][getSubscriptionStatus] user_id=${user.id} is_founder=true, bypass des vérifications d'abonnement`
+      `[BILLING][getSubscriptionStatus] billing_user_id=${billingUserId} is_founder=true, bypass des vérifications d'abonnement`
     );
 
     return {
@@ -187,14 +201,16 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     const isTrialExpired = now > trialEndsAt;
 
     if (isTrialExpired) {
-      // Mettre à jour le statut en 'expired'
-      await supabase
-        .from("profiles")
-        .update({ subscription_status: "expired" })
-        .eq("user_id", user.id);
+      // Mettre à jour le statut en 'expired' (uniquement son propre profil)
+      if (billingUserId === user.id) {
+        await supabase
+          .from("profiles")
+          .update({ subscription_status: "expired" })
+          .eq("user_id", billingUserId);
+      }
 
       console.log(
-        `[BILLING][getSubscriptionStatus] Trial expiré pour user_id=${user.id}`
+        `[BILLING][getSubscriptionStatus] Trial expiré pour billing_user_id=${billingUserId}`
       );
 
       return {
@@ -216,7 +232,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     );
 
     console.log(
-      `[BILLING][getSubscriptionStatus] user_id=${user.id} status=trial days_remaining=${trialDaysRemaining}`
+      `[BILLING][getSubscriptionStatus] billing_user_id=${billingUserId} status=trial days_remaining=${trialDaysRemaining}`
     );
 
     return {
@@ -234,7 +250,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
 
   // 8. Statut 'expired' ou autre
   console.log(
-    `[BILLING][getSubscriptionStatus] user_id=${user.id} status=expired`
+    `[BILLING][getSubscriptionStatus] billing_user_id=${billingUserId} status=expired`
   );
 
   return {

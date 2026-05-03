@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { OBILLZ_ACTIVE_CLUB_COOKIE } from "@/lib/auth/active-club";
 
 /**
  * Modèle des rôles dans un club.
@@ -17,6 +19,8 @@ export interface Membership {
   clubId: string;
   userId: string;
   role: ClubRole;
+  /** ISO date d’acceptation (tri du club « courant » par défaut). */
+  acceptedAt?: string | null;
 }
 
 export interface AuthContext {
@@ -51,8 +55,9 @@ export async function getAuthContext(): Promise<AuthContext | null> {
 
   const { data: rows, error: mErr } = await supabase
     .from("club_memberships")
-    .select("club_id, user_id, role")
+    .select("club_id, user_id, role, accepted_at")
     .eq("user_id", user.id)
+    .eq("status", "active")
     .is("deleted_at", null);
 
   if (mErr) {
@@ -68,15 +73,41 @@ export async function getAuthContext(): Promise<AuthContext | null> {
     clubId: r.club_id as string,
     userId: r.user_id as string,
     role: r.role as ClubRole,
+    acceptedAt: (r.accepted_at as string | null) ?? null,
   }));
 
-  // Stratégie par défaut : si l'utilisateur a un membership owner sur son
-  // propre club_id (= user.id), on le prend en priorité (compat ancien modèle).
-  // Sinon le premier membership actif.
-  const ownClub = memberships.find(
+  // Club « perso » créé à l’inscription : owner avec club_id = auth.uid().
+  // Un invité a AUSSI ce membership + celui du vrai club → ne pas toujours
+  // préférer le perso sinon il ne voit aucune donnée du club.
+  const personalOwner = memberships.find(
     (m) => m.clubId === user.id && m.role === "owner"
   );
-  const current = ownClub ?? memberships[0] ?? null;
+  const externalMemberships = memberships.filter((m) => m.clubId !== user.id);
+
+  let current: Membership | null = null;
+
+  try {
+    const jar = await cookies();
+    const pref = jar.get(OBILLZ_ACTIVE_CLUB_COOKIE)?.value;
+    if (pref && memberships.some((m) => m.clubId === pref)) {
+      current = memberships.find((m) => m.clubId === pref) ?? null;
+    }
+  } catch {
+    // cookies() indisponible (hors requête Next)
+  }
+
+  if (!current) {
+    if (externalMemberships.length > 0) {
+      externalMemberships.sort((a, b) => {
+        const ta = a.acceptedAt ? Date.parse(a.acceptedAt) : 0;
+        const tb = b.acceptedAt ? Date.parse(b.acceptedAt) : 0;
+        return tb - ta;
+      });
+      current = externalMemberships[0] ?? null;
+    } else {
+      current = personalOwner ?? memberships[0] ?? null;
+    }
+  }
 
   return {
     user: { id: user.id, email: user.email ?? null },
