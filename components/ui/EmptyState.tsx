@@ -2,7 +2,7 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass } from "./glassStyles";
+import { glassCardClass } from "./styles";
 
 type IconProps = { className?: string };
 

@@ -1317,7 +1317,8 @@
         "audienceManual": "Sélection manuelle",
         "send": "Envoyer la campagne",
         "sending": "Envoi...",
-        "empty": "Aucune campagne pour le moment."
+        "empty": "Aucune campagne pour le moment.",
+        "historyTitle": "Historique des campagnes"
       }
     },
     "events": {

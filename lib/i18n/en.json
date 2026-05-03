@@ -484,6 +484,7 @@
       "buvette": "Club Bar",
       "plannings": "Plannings",
       "qrcodes": "QR Codes",
+      "marketing": "Marketing campaigns",
       "expenses": "Club Expenses",
       "assistant": "AI Assistant",
       "reminders": "Reminders",
@@ -504,6 +505,7 @@
       "buvette": "Club Bar",
       "plannings": "Plannings",
       "qrcodes": "QR Codes",
+      "marketing": "Marketing campaigns",
       "expenses": "Club Expenses",
       "calendar": "Calendar",
       "settings": "Club Settings",
@@ -1464,7 +1466,8 @@
         "audienceManual": "Manual selection",
         "send": "Send campaign",
         "sending": "Sending...",
-        "empty": "No campaigns yet."
+        "empty": "No campaigns yet.",
+        "historyTitle": "Campaign history"
       }
     },
     "events": {

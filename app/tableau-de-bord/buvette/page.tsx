@@ -5,6 +5,7 @@ import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -340,36 +341,37 @@ N'hésite pas à nous contacter si tu as des questions.
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Buvette</h1>
-          <p className="text-slate-600 mt-1">Gestion des disponibilités et demandes externes.</p>
-        </div>
-        <div className="rounded-xl bg-white border border-slate-200 px-4 py-3 text-sm">
-          <p className="font-medium text-slate-700 mb-1">Lien public</p>
-          <p className="text-slate-500 break-all">{loadingLink ? "Chargement..." : publicUrl || "Indisponible"}</p>
-          {!!publicUrl && (
-            <div className="mt-2 flex gap-2">
-              <a
-                href={publicUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs px-2.5 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50"
-              >
-                Ouvrir
-              </a>
-              <button
-                onClick={copyPublicUrl}
-                disabled={copying}
-                className="text-xs px-2.5 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50"
-              >
-                {copying ? "Copie..." : "Copier"}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+    <PageLayout maxWidth="7xl" className="space-y-6">
+      <PageHeader
+        title="Buvette"
+        subtitle="Gestion des disponibilités et demandes externes."
+        actions={
+          <GlassCard padding="sm" className="max-w-md shrink-0 text-sm shadow-sm">
+            <p className="mb-1 font-medium text-slate-800">Lien public</p>
+            <p className="break-all text-slate-600">{loadingLink ? "Chargement..." : publicUrl || "Indisponible"}</p>
+            {!!publicUrl && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <a
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-md border border-slate-200/90 px-2.5 py-1.5 text-xs transition hover:bg-white/80"
+                >
+                  Ouvrir
+                </a>
+                <button
+                  type="button"
+                  onClick={copyPublicUrl}
+                  disabled={copying}
+                  className="rounded-md border border-slate-200/90 px-2.5 py-1.5 text-xs transition hover:bg-white/80 disabled:opacity-50"
+                >
+                  {copying ? "Copie..." : "Copier"}
+                </button>
+              </div>
+            )}
+          </GlassCard>
+        }
+      />
 
       <div className="flex items-center gap-2 text-sm">
         <span className="inline-flex items-center gap-1">
@@ -383,11 +385,15 @@ N'hésite pas à nous contacter si tu as des questions.
         </span>
       </div>
 
-      {message && <div className="rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-700">{message}</div>}
+      {message ? (
+        <GlassCard padding="md" className="border-slate-200/80 text-sm text-slate-700">
+          {message}
+        </GlassCard>
+      ) : null}
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="flex items-center justify-between mb-4">
+        <GlassCard padding="md">
+          <div className="mb-4 flex items-center justify-between">
             <button onClick={() => goMonth(-1)} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">{"<"}</button>
             <p className="font-semibold text-slate-800">{month}</p>
             <button onClick={() => goMonth(1)} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">{">"}</button>
@@ -434,9 +440,9 @@ N'hésite pas à nous contacter si tu as des questions.
               </div>
             </>
           )}
-        </div>
+        </GlassCard>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4">
+        <GlassCard padding="md" className="space-y-4">
           <h2 className="font-semibold text-slate-900">Détails date</h2>
           {!selectedDate ? (
             <p className="text-sm text-slate-500">Sélectionne une date dans le calendrier.</p>
@@ -533,10 +539,10 @@ N'hésite pas à nous contacter si tu as des questions.
               )}
             </>
           )}
-        </div>
+        </GlassCard>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <GlassCard padding="md">
         <h2 className="font-semibold text-slate-900 mb-3">Demandes récentes</h2>
         <div className="space-y-2">
           {requests.length === 0 && <p className="text-sm text-slate-500">Aucune demande pour le moment.</p>}
@@ -557,7 +563,7 @@ N'hésite pas à nous contacter si tu as des questions.
             </button>
           ))}
         </div>
-      </div>
+      </GlassCard>
 
       {showInfoModal && selectedRequest && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
@@ -669,6 +675,6 @@ N'hésite pas à nous contacter si tu as des questions.
           </div>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }

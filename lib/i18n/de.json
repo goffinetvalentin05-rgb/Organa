@@ -483,6 +483,7 @@
       "buvette": "Vereinsbar",
       "plannings": "Planungen",
       "qrcodes": "QR-Codes",
+      "marketing": "Marketing-Kampagnen",
       "expenses": "Vereinskosten",
       "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen",
@@ -502,6 +503,7 @@
       "buvette": "Vereinsbar",
       "plannings": "Planungen",
       "qrcodes": "QR-Codes",
+      "marketing": "Marketing-Kampagnen",
       "expenses": "Vereinskosten",
       "calendar": "Kalender",
       "settings": "Vereinseinstellungen",
@@ -1424,7 +1426,8 @@
         "audienceManual": "Manuelle Auswahl",
         "send": "Kampagne senden",
         "sending": "Wird gesendet...",
-        "empty": "Noch keine Kampagnen."
+        "empty": "Noch keine Kampagnen.",
+        "historyTitle": "Kampagnenverlauf"
       }
     }
   }

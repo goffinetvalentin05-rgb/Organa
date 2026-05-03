@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Edit, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
-import { GlassCard, SectionCard, ActionButton } from "@/components/dashboard-ui";
+import { PageLayout, GlassCard, SectionCard, ActionButton } from "@/components/ui";
 import CreatedByBadge from "@/components/CreatedByBadge";
 import type { MemberFieldsMerged } from "@/lib/member-fields/types";
 import {
@@ -102,7 +102,7 @@ export default function MemberDetailView({
     .join(", ");
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 pb-10">
+    <PageLayout maxWidth="3xl" className="space-y-6">
       <GlassCard
         padding="sm"
         className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
@@ -341,6 +341,6 @@ export default function MemberDetailView({
           </ul>
         )}
       </SectionCard>
-    </div>
+    </PageLayout>
   );
 }

@@ -7,6 +7,14 @@ import { Eye, Trash, Download, Receipt } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageLayout,
+  PageHeader,
+  TableCard,
+  EmptyState,
+  ActionButton,
+  GlassCard,
+} from "@/components/ui";
 
 interface Facture {
   id: string;
@@ -109,78 +117,76 @@ export default function FacturesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.invoices.title")}</h1>
-          <p className="mt-1 text-slate-500">{t("dashboard.invoices.subtitle")}</p>
-          {/* Cas d'usage club */}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-              Sponsors
-            </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
-              Locations de salle
-            </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
-              Événements
-            </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
-              Buvette
-            </span>
+    <PageLayout maxWidth="7xl" className="space-y-6">
+      <PageHeader
+        title={t("dashboard.invoices.title")}
+        subtitle={t("dashboard.invoices.subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowAccountingExport((value) => !value)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900"
+              >
+                <Download className="h-4 w-4" />
+                {t("dashboard.invoices.exportAccountingAction")}
+              </button>
+              {showAccountingExport ? (
+                <div className="absolute right-0 z-10 mt-2 w-64 rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-md">
+                  <label className="mb-2 block text-sm text-slate-600">
+                    {t("dashboard.invoices.exportAccountingYearLabel")}
+                  </label>
+                  <select
+                    value={accountingYear}
+                    onChange={(event) => setAccountingYear(event.target.value)}
+                    className="input-obillz"
+                  >
+                    {accountingYears.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                  <DashboardPrimaryButton
+                    type="button"
+                    onClick={handleExportAccounting}
+                    icon="none"
+                    className="mt-4 w-full justify-center text-sm"
+                    size="sm"
+                  >
+                    {t("dashboard.invoices.exportAccountingDownload")}
+                  </DashboardPrimaryButton>
+                </div>
+              ) : null}
+            </div>
+            <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle">
+              {t("dashboard.invoices.newAction")}
+            </DashboardPrimaryButton>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowAccountingExport((value) => !value)}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-2 text-sm font-medium"
-            >
-              <Download className="w-4 h-4" />
-              {t("dashboard.invoices.exportAccountingAction")}
-            </button>
-            {showAccountingExport && (
-              <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-lg z-10">
-                <label className="block text-sm text-slate-600 mb-2">
-                  {t("dashboard.invoices.exportAccountingYearLabel")}
-                </label>
-                <select
-                  value={accountingYear}
-                  onChange={(event) => setAccountingYear(event.target.value)}
-                  className="input-obillz"
-                >
-                  {accountingYears.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-                <DashboardPrimaryButton
-                  type="button"
-                  onClick={handleExportAccounting}
-                  icon="none"
-                  className="mt-4 w-full justify-center text-sm"
-                  size="sm"
-                >
-                  {t("dashboard.invoices.exportAccountingDownload")}
-                </DashboardPrimaryButton>
-              </div>
-            )}
-          </div>
-          <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle">
-            {t("dashboard.invoices.newAction")}
-          </DashboardPrimaryButton>
-        </div>
+        }
+      />
+
+      <div className="flex flex-wrap gap-2">
+        <span className="inline-flex items-center rounded-full bg-blue-50/90 px-3 py-1 text-xs font-medium text-blue-800 backdrop-blur-sm">
+          Sponsors
+        </span>
+        <span className="inline-flex items-center rounded-full bg-purple-50/90 px-3 py-1 text-xs font-medium text-purple-800 backdrop-blur-sm">
+          Locations de salle
+        </span>
+        <span className="inline-flex items-center rounded-full bg-emerald-50/90 px-3 py-1 text-xs font-medium text-emerald-800 backdrop-blur-sm">
+          Événements
+        </span>
+        <span className="inline-flex items-center rounded-full bg-amber-50/90 px-3 py-1 text-xs font-medium text-amber-900 backdrop-blur-sm">
+          Buvette
+        </span>
       </div>
 
-      {/* Contenu */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <TableCard bodyClassName="p-0">
         {loading ? (
           <div className="p-12 text-center">
             <div className="inline-flex items-center gap-3 text-slate-500">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
@@ -188,20 +194,20 @@ export default function FacturesPage() {
             </div>
           </div>
         ) : errorMessage ? (
-          <div className="p-12 text-center">
-            <p className="text-red-600 font-medium mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-slate-500 text-sm">{errorMessage}</p>
-          </div>
+          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
+            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+          </GlassCard>
         ) : factures.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <Receipt className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-600 mb-4">{t("dashboard.invoices.emptyState")}</p>
-            <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle" className="inline-flex">
-              {t("dashboard.invoices.emptyCta")}
-            </DashboardPrimaryButton>
-          </div>
+          <EmptyState
+            icon={Receipt}
+            title={t("dashboard.invoices.emptyState")}
+            action={
+              <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle" className="inline-flex">
+                {t("dashboard.invoices.emptyCta")}
+              </DashboardPrimaryButton>
+            }
+          />
         ) : (
           <>
             {/* Vue liste moderne */}
@@ -211,7 +217,7 @@ export default function FacturesPage() {
                 return (
                   <div
                     key={facture.id}
-                    className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
+                    className="p-5 transition-colors hover:bg-blue-50/25 md:p-6"
                   >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div className="flex items-start gap-4">
@@ -244,20 +250,19 @@ export default function FacturesPage() {
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Link
-                            href={`/tableau-de-bord/factures/${facture.id}`}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
+                          <ActionButton href={`/tableau-de-bord/factures/${facture.id}`} className="inline-flex items-center gap-2">
+                            <Eye className="h-4 w-4" />
                             <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                          </Link>
-                          <button
+                          </ActionButton>
+                          <ActionButton
+                            type="button"
+                            variant="dangerSoft"
                             onClick={() => handleDelete(facture.id)}
-                            className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
                             title={t("dashboard.common.delete")}
+                            className="inline-flex p-2"
                           >
-                            <Trash className="w-4 h-4" />
-                          </button>
+                            <Trash className="h-4 w-4" />
+                          </ActionButton>
                         </div>
                       </div>
                     </div>
@@ -267,14 +272,14 @@ export default function FacturesPage() {
             </div>
 
             {/* Footer avec compteur */}
-            <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
-              <p className="text-sm text-slate-500 text-center">
+            <div className="border-t border-slate-100/90 bg-slate-50/80 px-6 py-4 backdrop-blur-sm">
+              <p className="text-center text-sm text-slate-500">
                 {factures.length} facture{factures.length > 1 ? "s" : ""} au total
               </p>
             </div>
           </>
         )}
-      </div>
-    </div>
+      </TableCard>
+    </PageLayout>
   );
 }

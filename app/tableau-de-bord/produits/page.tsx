@@ -7,6 +7,7 @@ import { Edit, Trash } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import { PageLayout, PageHeader, TableCard, EmptyState, GlassCard, ActionButton } from "@/components/ui";
 
 interface EventOption {
   id: string;
@@ -180,51 +181,51 @@ function ProduitsPageInner() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.productRevenues.title")}</h1>
-          <p className="mt-2 text-secondary max-w-2xl">{t("dashboard.productRevenues.subtitle")}</p>
-        </div>
-        <DashboardPrimaryButton type="button" onClick={openNew}>
-          {t("dashboard.productRevenues.addButton")}
-        </DashboardPrimaryButton>
-      </div>
+    <PageLayout maxWidth="5xl" className="space-y-8">
+      <PageHeader
+        title={t("dashboard.productRevenues.title")}
+        subtitle={t("dashboard.productRevenues.subtitle")}
+        actions={
+          <DashboardPrimaryButton type="button" onClick={openNew}>
+            {t("dashboard.productRevenues.addButton")}
+          </DashboardPrimaryButton>
+        }
+      />
 
-      {errorMessage && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm">{errorMessage}</div>
-      )}
+      {errorMessage ? (
+        <GlassCard padding="md" className="border-red-200/80 bg-red-50/50 text-sm text-red-800">
+          {errorMessage}
+        </GlassCard>
+      ) : null}
 
       {loading ? (
         <p className="text-secondary">{t("dashboard.common.loading")}</p>
       ) : revenues.length === 0 ? (
-        <div className="rounded-2xl border border-subtle bg-surface/80 p-12 text-center shadow-premium">
-          <p className="text-secondary mb-2">{t("dashboard.productRevenues.emptyState")}</p>
-          <p className="text-sm text-secondary mb-6">{t("dashboard.productRevenues.emptyHint")}</p>
-          <button
-            type="button"
-            onClick={openNew}
-            className="px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
-          >
-            {t("dashboard.productRevenues.addButton")}
-          </button>
-        </div>
+        <EmptyState
+          title={t("dashboard.productRevenues.emptyState")}
+          description={t("dashboard.productRevenues.emptyHint")}
+          action={
+            <ActionButton type="button" variant="premiumInline" onClick={openNew}>
+              {t("dashboard.productRevenues.addButton")}
+            </ActionButton>
+          }
+        />
       ) : (
-        <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
+        <TableCard bodyClassName="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-subtle bg-surface/80">
+                <tr className="border-b border-slate-100/90 bg-slate-50/60 backdrop-blur-sm">
                   <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.name")}</th>
                   <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.date")}</th>
                   <th className="px-4 py-3 text-sm font-semibold text-secondary">{t("dashboard.productRevenues.columns.amount")}</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-secondary hidden md:table-cell">{t("dashboard.productRevenues.columns.event")}</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-secondary text-right">{t("dashboard.common.actions")}</th>
+                  <th className="hidden px-4 py-3 text-sm font-semibold text-secondary md:table-cell">{t("dashboard.productRevenues.columns.event")}</th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-secondary">{t("dashboard.common.actions")}</th>
                 </tr>
               </thead>
               <tbody>
                 {revenues.map((r) => (
-                  <tr key={r.id} className="border-b border-subtle/80 hover:bg-surface/50">
+                  <tr key={r.id} className="border-b border-slate-100/80 transition-colors hover:bg-blue-50/20">
                     <td className="px-4 py-3 font-medium">{r.name}</td>
                     <td className="px-4 py-3 text-secondary text-sm">{formatDate(r.revenue_date)}</td>
                     <td className="px-4 py-3 font-semibold text-green-600">{formatMontant(r.amount)}</td>
@@ -238,34 +239,36 @@ function ProduitsPageInner() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
+                      <ActionButton
                         type="button"
+                        variant="ghost"
                         onClick={() => openEdit(r)}
-                        className="p-2 rounded-lg hover:bg-surface text-secondary inline-flex mr-1"
                         title={t("dashboard.productRevenues.editButton")}
+                        className="mr-1 inline-flex p-2"
                       >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
+                        <Edit className="h-4 w-4" />
+                      </ActionButton>
+                      <ActionButton
                         type="button"
+                        variant="dangerSoft"
                         onClick={() => void handleDelete(r.id)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-600 inline-flex"
                         title={t("dashboard.common.delete")}
+                        className="inline-flex p-2"
                       >
-                        <Trash className="w-4 h-4" />
-                      </button>
+                        <Trash className="h-4 w-4" />
+                      </ActionButton>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </TableCard>
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-subtle bg-surface p-6 shadow-premium max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <GlassCard className="max-h-[90vh] w-full max-w-lg overflow-y-auto shadow-2xl shadow-blue-900/15" padding="lg">
             <h2 className="text-xl font-semibold mb-4">
               {editing ? t("dashboard.productRevenues.form.titleEdit") : t("dashboard.productRevenues.form.titleNew")}
             </h2>
@@ -345,16 +348,22 @@ function ProduitsPageInner() {
                 </button>
               </div>
             </form>
-          </div>
+          </GlassCard>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }
 
 export default function ProduitsPage() {
   return (
-    <Suspense fallback={<div className="max-w-5xl mx-auto p-8 text-secondary">…</div>}>
+    <Suspense
+      fallback={
+        <PageLayout maxWidth="5xl" className="py-8 text-secondary">
+          …
+        </PageLayout>
+      }
+    >
       <ProduitsPageInner />
     </Suspense>
   );

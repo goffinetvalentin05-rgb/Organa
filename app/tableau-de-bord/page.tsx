@@ -17,13 +17,14 @@ import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import {
+  PageLayout,
   PageHeader,
   StatCard,
   SectionCard,
   EmptyState,
-  DataTableCard,
+  TableCard,
   glassCardClass,
-} from "@/components/dashboard-ui";
+} from "@/components/ui";
 
 interface Client {
   id: string;
@@ -314,7 +315,7 @@ export default function TableauDeBordPage() {
     "group flex items-center gap-4 rounded-xl border border-slate-200/90 bg-white/60 p-5 shadow-sm transition-all duration-200 hover:border-blue-200/90 hover:bg-white hover:shadow-md";
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-10">
+    <PageLayout maxWidth="7xl" className="space-y-8">
       <Suspense fallback={null}>
         <CheckoutHandler />
       </Suspense>
@@ -484,7 +485,7 @@ export default function TableauDeBordPage() {
         </div>
       </SectionCard>
 
-      <DataTableCard title={t("dashboard.overview.lastDocuments.title")} bodyClassName="p-5 sm:p-6 md:p-8">
+      <TableCard title={t("dashboard.overview.lastDocuments.title")} bodyClassName="p-5 sm:p-6 md:p-8">
         {loading ? (
           <div className="py-10 text-center text-slate-500">{t("dashboard.overview.lastDocuments.loading")}</div>
         ) : derniersDocuments.length === 0 ? (
@@ -525,7 +526,7 @@ export default function TableauDeBordPage() {
             ))}
           </div>
         )}
-      </DataTableCard>
-    </div>
+      </TableCard>
+    </PageLayout>
   );
 }

@@ -1,12 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
-import { Eye, Trash, FileText, ArrowRight } from "@/lib/icons";
+import { Eye, Trash, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageLayout,
+  PageHeader,
+  TableCard,
+  EmptyState,
+  ActionButton,
+  GlassCard,
+} from "@/components/ui";
 
 interface Devis {
   id: string;
@@ -97,24 +104,22 @@ export default function DevisPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.quotes.title")}</h1>
-          <p className="mt-1 text-slate-500">{t("dashboard.quotes.subtitle")}</p>
-        </div>
-        <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau">
-          {t("dashboard.quotes.newAction")}
-        </DashboardPrimaryButton>
-      </div>
+    <PageLayout maxWidth="7xl" className="space-y-6">
+      <PageHeader
+        title={t("dashboard.quotes.title")}
+        subtitle={t("dashboard.quotes.subtitle")}
+        actions={
+          <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau">
+            {t("dashboard.quotes.newAction")}
+          </DashboardPrimaryButton>
+        }
+      />
 
-      {/* Contenu */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <TableCard bodyClassName="p-0">
         {loading ? (
           <div className="p-12 text-center">
             <div className="inline-flex items-center gap-3 text-slate-500">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
@@ -122,20 +127,20 @@ export default function DevisPage() {
             </div>
           </div>
         ) : errorMessage ? (
-          <div className="p-12 text-center">
-            <p className="text-red-600 font-medium mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-slate-500 text-sm">{errorMessage}</p>
-          </div>
+          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
+            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+          </GlassCard>
         ) : devis.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-600 mb-4">{t("dashboard.quotes.emptyState")}</p>
-            <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau" className="inline-flex">
-              {t("dashboard.quotes.emptyCta")}
-            </DashboardPrimaryButton>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title={t("dashboard.quotes.emptyState")}
+            action={
+              <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau" className="inline-flex">
+                {t("dashboard.quotes.emptyCta")}
+              </DashboardPrimaryButton>
+            }
+          />
         ) : (
           <>
             {/* Vue liste moderne */}
@@ -145,7 +150,7 @@ export default function DevisPage() {
                 return (
                   <div
                     key={devisItem.id}
-                    className="p-5 md:p-6 hover:bg-slate-50 transition-colors"
+                    className="p-5 transition-colors hover:bg-blue-50/25 md:p-6"
                   >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div className="flex items-start gap-4">
@@ -178,20 +183,19 @@ export default function DevisPage() {
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Link
-                            href={`/tableau-de-bord/devis/${devisItem.id}`}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
+                          <ActionButton href={`/tableau-de-bord/devis/${devisItem.id}`} className="inline-flex items-center gap-2">
+                            <Eye className="h-4 w-4" />
                             <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                          </Link>
-                          <button
+                          </ActionButton>
+                          <ActionButton
+                            type="button"
+                            variant="dangerSoft"
                             onClick={() => handleDelete(devisItem.id)}
-                            className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
                             title={t("dashboard.common.delete")}
+                            className="inline-flex p-2"
                           >
-                            <Trash className="w-4 h-4" />
-                          </button>
+                            <Trash className="h-4 w-4" />
+                          </ActionButton>
                         </div>
                       </div>
                     </div>
@@ -201,14 +205,14 @@ export default function DevisPage() {
             </div>
 
             {/* Footer avec compteur */}
-            <div className="border-t border-slate-100 px-6 py-4 bg-slate-50">
-              <p className="text-sm text-slate-500 text-center">
+            <div className="border-t border-slate-100/90 bg-slate-50/80 px-6 py-4 backdrop-blur-sm">
+              <p className="text-center text-sm text-slate-500">
                 {t("dashboard.quotes.totalCount", { count: devis.length })}
               </p>
             </div>
           </>
         )}
-      </div>
-    </div>
+      </TableCard>
+    </PageLayout>
   );
 }

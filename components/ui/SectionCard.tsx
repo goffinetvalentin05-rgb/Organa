@@ -2,7 +2,7 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass, glassCardHeaderClass, iconBadgeClass } from "./glassStyles";
+import { glassCardClass, glassCardHeaderClass, iconBadgeClass } from "./styles";
 
 type IconProps = { className?: string };
 
@@ -10,7 +10,6 @@ export type SectionCardProps = {
   title: string;
   description?: string;
   icon?: ComponentType<IconProps>;
-  /** Contenu aligné à droite dans l’en-tête (badge, lien, etc.) */
   headerRight?: ReactNode;
   children: ReactNode;
   className?: string;

@@ -8,7 +8,7 @@ const variants = {
   surface:
     "rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-all hover:border-blue-200 hover:bg-white hover:shadow-md",
   ghost:
-    "rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white/60 hover:text-slate-900",
+    "rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-slate-900",
   dangerSoft:
     "rounded-xl border border-red-100 bg-red-50/90 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100",
   premiumInline:

@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import { SectionCard } from "@/components/dashboard-ui";
+import { PageLayout, SectionCard } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
@@ -535,7 +535,7 @@ export default function ParametresPage() {
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
-      <div className="mx-auto max-w-4xl space-y-8 pb-12">
+      <PageLayout maxWidth="4xl" className="space-y-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
             {t("dashboard.settings.title")}
@@ -1080,7 +1080,7 @@ export default function ParametresPage() {
             </DashboardPrimaryButton>
           </div>
       </form>
-    </div>
+    </PageLayout>
     </>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Eye, Trash, Download } from "@/lib/icons";
+import { Eye, Trash, Download, Receipt } from "@/lib/icons";
+import { PageLayout, PageHeader, TableCard, EmptyState, GlassCard } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
@@ -503,26 +504,23 @@ export default function DepensesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.expenses.title")}</h1>
-          <p className="mt-2 text-secondary">
-            {t("dashboard.expenses.subtitle")}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowAccountingExport((value) => !value)}
-              className="px-4 py-3 rounded-lg border border-subtle bg-white text-secondary hover:text-primary transition-all flex items-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              {t("dashboard.expenses.exportAccountingAction")}
-            </button>
-            {showAccountingExport && (
-              <div className="absolute right-0 mt-3 w-64 rounded-xl border border-subtle bg-white p-4 shadow-premium z-10">
+    <PageLayout maxWidth="7xl" className="space-y-8">
+      <PageHeader
+        title={t("dashboard.expenses.title")}
+        subtitle={t("dashboard.expenses.subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowAccountingExport((value) => !value)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900"
+              >
+                <Download className="h-5 w-5" />
+                {t("dashboard.expenses.exportAccountingAction")}
+              </button>
+              {showAccountingExport ? (
+                <div className="absolute right-0 z-10 mt-3 w-64 rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-md">
                 <label className="block text-sm text-secondary mb-2">
                   {t("dashboard.expenses.exportAccountingYearLabel")}
                 </label>
@@ -544,27 +542,26 @@ export default function DepensesPage() {
                 >
                   {t("dashboard.expenses.exportAccountingDownload")}
                 </button>
-              </div>
-            )}
+                </div>
+              ) : null}
+            </div>
+            <DashboardPrimaryButton
+              type="button"
+              onClick={() => {
+                setShowForm((value) => !value);
+              }}
+              className="relative z-50"
+              style={{ pointerEvents: "auto" }}
+            >
+              {t("dashboard.expenses.newExpense")}
+            </DashboardPrimaryButton>
           </div>
-          <DashboardPrimaryButton
-            type="button"
-            onClick={() => {
-              setShowForm((value) => !value);
-            }}
-            className="relative z-50"
-            style={{ pointerEvents: "auto" }}
-          >
-            {t("dashboard.expenses.newExpense")}
-          </DashboardPrimaryButton>
-        </div>
-      </div>
+        }
+      />
 
-      {showForm && (
-        <form
-          onSubmit={handleCreateSubmit}
-          className="rounded-2xl border border-subtle bg-white p-6 space-y-4 shadow-premium"
-        >
+      {showForm ? (
+        <GlassCard padding="lg">
+          <form onSubmit={handleCreateSubmit} className="space-y-4">
           {successMessage && (
             <p className="text-sm text-green-600">{successMessage}</p>
           )}
@@ -712,43 +709,48 @@ export default function DepensesPage() {
             </DashboardPrimaryButton>
           </div>
         </form>
-      )}
+        </GlassCard>
+      ) : null}
 
-      <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
+      <TableCard bodyClassName="p-0">
         {loading ? (
           <div className="p-12 text-center">
             <p className="text-secondary">{t("dashboard.common.loading")}</p>
           </div>
         ) : errorMessage ? (
-          <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-secondary text-sm">{errorMessage}</p>
-          </div>
+          <GlassCard padding="lg" className="m-5 border-red-200/80 bg-red-50/50 text-center">
+            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+          </GlassCard>
         ) : depensesTriees.length === 0 ? (
-          <div className="p-12 text-center">
-            <p className="text-secondary mb-4">
-              {t("dashboard.expenses.emptyState")}
-            </p>
-            <button
-              type="button"
-              onClick={openCreateForm}
-              className="inline-block px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
-              style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-            >
-              {t("dashboard.expenses.emptyCta")}
-            </button>
+          <div className="p-6">
+            <EmptyState
+              icon={Receipt}
+              title={t("dashboard.expenses.emptyState")}
+              action={
+                <button
+                  type="button"
+                  onClick={openCreateForm}
+                  className="inline-block rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:opacity-95"
+                  style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+                >
+                  {t("dashboard.expenses.emptyCta")}
+                </button>
+              }
+            />
           </div>
         ) : (
-          <div className="p-6 space-y-4">
+          <div className="space-y-4 p-6">
             {depensesTriees.map((depense) => {
               const statutAffiche = getStatutAffiche(depense);
               const besoinAction =
                 depense.status === "a_payer" &&
                 (isDatePassee(depense.date) || isDateProche(depense.date, 7));
               return (
-                <div
+                <GlassCard
                   key={depense.id}
-                  className="rounded-2xl border border-subtle bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                  padding="md"
+                  className="transition-all duration-200 hover:border-blue-200/80 hover:shadow-md"
                 >
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
@@ -810,12 +812,12 @@ export default function DepensesPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </GlassCard>
               );
             })}
           </div>
         )}
-      </div>
+      </TableCard>
 
       {showViewModal && selectedDepense && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
@@ -1024,7 +1026,7 @@ export default function DepensesPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }
 

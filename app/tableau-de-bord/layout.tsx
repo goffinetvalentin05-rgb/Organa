@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { dashboardMainScrimClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
@@ -270,9 +271,10 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8">
-          {children}
+        {/* Page content — léger scrim pour profondeur sur fond bleu */}
+        <main className="relative flex-1 overflow-x-hidden p-4 lg:p-8">
+          <div className={dashboardMainScrimClass} aria-hidden />
+          <div className="relative">{children}</div>
         </main>
 
         {/* Footer */}

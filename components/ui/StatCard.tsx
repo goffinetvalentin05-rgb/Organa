@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass } from "./glassStyles";
+import { glassCardClass } from "./styles";
 
 type IconProps = { className?: string };
 
@@ -20,27 +20,27 @@ export type StatCardProps = {
 };
 
 export default function StatCard({ label, value, icon: Icon, footer, href, className }: StatCardProps) {
-  const iconWrap = (interactive: boolean) => (
+  const iconWrap = (isInteractive: boolean) => (
     <div
       className={cn(
         "flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100/90 transition-colors",
-        interactive && "group-hover:bg-blue-50"
+        isInteractive && "group-hover:bg-blue-50"
       )}
     >
       <Icon
         className={cn(
           "h-5 w-5 text-slate-600 transition-colors",
-          interactive && "group-hover:text-[#2563EB]"
+          isInteractive && "group-hover:text-[#2563EB]"
         )}
       />
     </div>
   );
 
-  const inner = (interactive: boolean) => (
+  const inner = (isInteractive: boolean) => (
     <>
       <div className="mb-4 flex items-center justify-between">
         <span className="text-sm font-medium text-slate-500">{label}</span>
-        {iconWrap(interactive)}
+        {iconWrap(isInteractive)}
       </div>
       <div className="text-4xl font-bold tracking-tight text-slate-900">{value}</div>
       {footer ? <div className="mt-2">{footer}</div> : null}

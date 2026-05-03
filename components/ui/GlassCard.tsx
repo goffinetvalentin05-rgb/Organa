@@ -2,7 +2,7 @@
 
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass } from "./glassStyles";
+import { glassCardClass } from "./styles";
 
 const paddings = {
   none: "",

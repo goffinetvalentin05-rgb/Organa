@@ -2,26 +2,25 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass, glassCardHeaderClass } from "./glassStyles";
+import { glassCardClass, glassCardHeaderClass } from "./styles";
 
-export type DataTableCardProps = {
+export type TableCardProps = {
   children: ReactNode;
   title?: string;
   description?: string;
-  /** Filtres / actions dans la barre du haut */
   toolbar?: ReactNode;
   className?: string;
   bodyClassName?: string;
 };
 
-export default function DataTableCard({
+export default function TableCard({
   children,
   title,
   description,
   toolbar,
   className,
   bodyClassName,
-}: DataTableCardProps) {
+}: TableCardProps) {
   const hasHeader = Boolean(title || description || toolbar);
 
   return (

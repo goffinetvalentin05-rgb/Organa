@@ -15,6 +15,7 @@ import {
   Users,
   Calendar2,
 } from "@/lib/icons";
+import { PageLayout, PageHeader, GlassCard, EmptyState, ActionButton } from "@/components/ui";
 
 interface QRCodeItem {
   id: string;
@@ -159,54 +160,41 @@ export default function QRCodesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            {t("dashboard.qrcodes.title")}
-          </h1>
-          <p className="mt-1 text-slate-500">
-            {t("dashboard.qrcodes.subtitle")}
-          </p>
-        </div>
-        <DashboardPrimaryButton type="button" onClick={() => setShowCreateModal(true)}>
-          {t("dashboard.qrcodes.newAction")}
-        </DashboardPrimaryButton>
-      </div>
+    <PageLayout maxWidth="7xl" className="space-y-6">
+      <PageHeader
+        title={t("dashboard.qrcodes.title")}
+        subtitle={t("dashboard.qrcodes.subtitle")}
+        actions={
+          <DashboardPrimaryButton type="button" onClick={() => setShowCreateModal(true)}>
+            {t("dashboard.qrcodes.newAction")}
+          </DashboardPrimaryButton>
+        }
+      />
 
-      {/* Content */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+        <GlassCard padding="lg" className="text-center">
           <div className="inline-flex items-center gap-3 text-slate-500">
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {t("dashboard.common.loading")}
           </div>
-        </div>
+        </GlassCard>
       ) : qrcodes.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <QrCode className="w-8 h-8 text-slate-400" />
-          </div>
-          <p className="text-slate-600 mb-4">{t("dashboard.qrcodes.emptyState")}</p>
-          <DashboardPrimaryButton
-            type="button"
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex"
-          >
-            {t("dashboard.qrcodes.emptyCta")}
-          </DashboardPrimaryButton>
-        </div>
+        <EmptyState
+          icon={QrCode}
+          title={t("dashboard.qrcodes.emptyState")}
+          action={
+            <DashboardPrimaryButton type="button" onClick={() => setShowCreateModal(true)} className="inline-flex">
+              {t("dashboard.qrcodes.emptyCta")}
+            </DashboardPrimaryButton>
+          }
+        />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {qrcodes.map((qr) => (
-            <div
-              key={qr.id}
-              className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow"
-            >
+            <GlassCard key={qr.id} padding="none" className="overflow-hidden transition-shadow hover:shadow-lg">
               {/* QR Code Preview */}
               <div className="p-6 bg-gradient-to-br from-slate-50 to-white flex justify-center">
                 <div className="bg-white p-3 rounded-xl shadow-sm">
@@ -282,20 +270,19 @@ export default function QRCodesPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </GlassCard>
           ))}
         </div>
       )}
 
-      {/* Create Modal */}
-      {showCreateModal && (
+      {showCreateModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
             onClick={() => setShowCreateModal(false)}
           />
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+          <GlassCard className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto shadow-2xl shadow-blue-900/15" padding="none">
+            <div className="sticky top-0 z-[1] flex items-center justify-between border-b border-slate-200/90 bg-white/85 p-6 backdrop-blur-md">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
                   {t("dashboard.qrcodes.createTitle")}
@@ -312,7 +299,7 @@ export default function QRCodesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-5">
+            <form onSubmit={handleCreate} className="space-y-5 p-6">
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -397,9 +384,9 @@ export default function QRCodesPage() {
                 )}
               </DashboardPrimaryButton>
             </form>
-          </div>
+          </GlassCard>
         </div>
-      )}
-    </div>
+      ) : null}
+    </PageLayout>
   );
 }

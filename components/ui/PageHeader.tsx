@@ -6,7 +6,6 @@ import { cn } from "./cn";
 export type PageHeaderProps = {
   title: string;
   subtitle?: string;
-  /** Zone droite : filtres, boutons, etc. */
   actions?: ReactNode;
   className?: string;
 };

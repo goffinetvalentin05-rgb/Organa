@@ -5,6 +5,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
+import { PageLayout, PageHeader, TableCard, EmptyState, DataCard } from "@/components/ui";
 
 interface DocumentClient {
   nom?: string;
@@ -100,84 +101,63 @@ export default function PaiementsPage() {
   const invoicePayments = payments.filter((p) => p.type === "invoice");
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* En-tête */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            {t("dashboard.payments.title")}
-          </h1>
-          <p className="mt-1 text-slate-500">
-            {t("dashboard.payments.subtitle")}
-          </p>
-        </div>
-      </div>
+    <PageLayout maxWidth="7xl" className="space-y-8">
+      <PageHeader title={t("dashboard.payments.title")} subtitle={t("dashboard.payments.subtitle")} />
 
-      {/* Résumé */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-emerald-600" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <DataCard padding="lg" className="border-emerald-100/80">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100/90">
+              <CreditCard className="h-5 w-5 text-emerald-600" />
             </div>
             <span className="text-sm font-medium text-slate-500">Chiffre généré</span>
           </div>
-          <div className="text-3xl font-bold text-slate-900">
+          <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : formatMontant(totalPayments)}
           </div>
-        </div>
+        </DataCard>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-600" />
+        <DataCard padding="lg" className="border-blue-100/80">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100/90">
+              <FileText className="h-5 w-5 text-blue-600" />
             </div>
             <span className="text-sm font-medium text-slate-500">Cotisations vendues</span>
           </div>
-          <div className="text-3xl font-bold text-slate-900">
+          <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : membershipPayments.length}
           </div>
-        </div>
+        </DataCard>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-purple-600" />
+        <DataCard padding="lg" className="border-purple-100/80">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100/90">
+              <Receipt className="h-5 w-5 text-purple-600" />
             </div>
             <span className="text-sm font-medium text-slate-500">Produits facturés</span>
           </div>
-          <div className="text-3xl font-bold text-slate-900">
+          <div className="text-3xl font-bold tracking-tight text-slate-900">
             {loading ? "-" : invoicePayments.length}
           </div>
-        </div>
+        </DataCard>
       </div>
 
-      {/* Liste des paiements */}
-      <div className="bg-white rounded-2xl border border-slate-200">
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-900">
-            Produits
-          </h2>
-        </div>
-
+      <TableCard title="Produits" bodyClassName="p-0">
         {loading ? (
-          <div className="p-8 text-center text-slate-400">
+          <div className="p-8 text-center text-slate-500">
             {t("dashboard.common.loading")}
           </div>
         ) : payments.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-              <CreditCard className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-500">{t("dashboard.payments.emptyState")}</p>
+          <div className="p-6">
+            <EmptyState icon={CreditCard} title={t("dashboard.payments.emptyState")} />
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100/90">
             {payments.map((payment) => (
               <a
                 key={payment.id}
                 href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
-                className="flex items-center justify-between p-5 hover:bg-slate-50 transition-colors"
+                className="flex items-center justify-between p-5 transition-colors hover:bg-blue-50/25"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -223,7 +203,7 @@ export default function PaiementsPage() {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </TableCard>
+    </PageLayout>
   );
 }

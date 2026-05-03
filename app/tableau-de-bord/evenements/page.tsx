@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { Eye, Trash, Calendar } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
+import { PageLayout, PageHeader, GlassCard, EmptyState, ActionButton } from "@/components/ui";
 
 interface EventType {
   id: string;
@@ -107,56 +107,59 @@ export default function EvenementsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("dashboard.events.title")}</h1>
-          <p className="mt-2 text-secondary">{t("dashboard.events.subtitle")}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-subtle bg-white text-secondary"
-          >
-            <option value="all">{t("dashboard.plannings.filters.all")}</option>
-            <option value="planned">{t("dashboard.events.status.planned")}</option>
-            <option value="completed">{t("dashboard.events.status.completed")}</option>
-          </select>
-          <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau">
-            {t("dashboard.events.newEvent")}
-          </DashboardPrimaryButton>
-        </div>
-      </div>
+    <PageLayout maxWidth="7xl" className="space-y-8">
+      <PageHeader
+        title={t("dashboard.events.title")}
+        subtitle={t("dashboard.events.subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm text-slate-700 shadow-sm backdrop-blur-sm"
+            >
+              <option value="all">{t("dashboard.plannings.filters.all")}</option>
+              <option value="planned">{t("dashboard.events.status.planned")}</option>
+              <option value="completed">{t("dashboard.events.status.completed")}</option>
+            </select>
+            <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau">
+              {t("dashboard.events.newEvent")}
+            </DashboardPrimaryButton>
+          </div>
+        }
+      />
 
-      {limitReached && (
-        <LimitReachedAlert message={t("dashboard.events.limitReached")} />
-      )}
+      {limitReached ? <LimitReachedAlert message={t("dashboard.events.limitReached")} /> : null}
 
-      <div className="rounded-2xl border border-subtle bg-white overflow-hidden shadow-premium">
+      <GlassCard padding="none" className="overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
             <p className="text-secondary">{t("dashboard.common.loading")}</p>
           </div>
         ) : errorMessage ? (
-          <div className="p-12 text-center">
-            <p className="text-red-600 mb-2">{t("dashboard.common.loadFailed")}</p>
-            <p className="text-secondary text-sm">{errorMessage}</p>
-          </div>
+          <GlassCard padding="lg" className="m-5 border-red-200/80 bg-red-50/40 text-center">
+            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+          </GlassCard>
         ) : filteredEvents.length === 0 ? (
-          <div className="p-12 text-center">
-            <Calendar className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <p className="text-secondary mb-4">{t("dashboard.events.emptyState")}</p>
-            <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau" className="inline-flex rounded-full">
-              {t("dashboard.events.emptyCta")}
-            </DashboardPrimaryButton>
+          <div className="p-8">
+            <EmptyState
+              icon={Calendar}
+              title={t("dashboard.events.emptyState")}
+              action={
+                <DashboardPrimaryButton href="/tableau-de-bord/evenements/nouveau" className="inline-flex rounded-full">
+                  {t("dashboard.events.emptyCta")}
+                </DashboardPrimaryButton>
+              }
+            />
           </div>
         ) : (
-          <div className="p-6 space-y-4">
+          <div className="space-y-4 p-6">
             {filteredEvents.map((event) => (
-              <div
+              <GlassCard
                 key={event.id}
-                className="rounded-2xl border border-subtle bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent-border hover:bg-surface-hover"
+                padding="md"
+                className="transition-all duration-200 hover:border-blue-200/80 hover:shadow-md"
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -202,28 +205,27 @@ export default function EvenementsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-subtle">
-                    <Link
-                      href={`/tableau-de-bord/evenements/${event.id}`}
-                      className="px-4 py-2 rounded-full bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all text-sm flex items-center gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
+                  <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100/90 pt-3">
+                    <ActionButton href={`/tableau-de-bord/evenements/${event.id}`} variant="ghost" className="inline-flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
                       {t("dashboard.common.view")}
-                    </Link>
-                    <button
+                    </ActionButton>
+                    <ActionButton
+                      type="button"
+                      variant="dangerSoft"
                       onClick={() => handleDelete(event.id)}
-                      className="px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm flex items-center justify-center"
                       title={t("dashboard.common.delete")}
+                      className="inline-flex items-center justify-center gap-2"
                     >
-                      <Trash className="w-4 h-4" />
-                    </button>
+                      <Trash className="h-4 w-4" />
+                    </ActionButton>
                   </div>
                 </div>
-              </div>
+              </GlassCard>
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </GlassCard>
+    </PageLayout>
   );
 }

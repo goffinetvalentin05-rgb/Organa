@@ -5,13 +5,14 @@ import { Eye, Trash, ClipboardList, Calendar, Users } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import {
+  PageLayout,
   PageHeader,
-  DataTableCard,
+  TableCard,
   GlassCard,
   EmptyState,
   ActionButton,
   glassCardClass,
-} from "@/components/dashboard-ui";
+} from "@/components/ui";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
 
@@ -121,7 +122,7 @@ export default function PlanningsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-10">
+    <PageLayout maxWidth="7xl" className="space-y-8 pb-10">
       <PageHeader
         title={t("dashboard.plannings.title")}
         subtitle={t("dashboard.plannings.subtitle")}
@@ -148,7 +149,7 @@ export default function PlanningsPage() {
         <LimitReachedAlert message="Limite de plannings atteinte. Passez au plan Pro pour en créer plus." />
       )}
 
-      <DataTableCard bodyClassName="p-0">
+      <TableCard bodyClassName="p-0">
         {loading ? (
           <div className="p-12 text-center text-slate-500">{t("dashboard.plannings.loading")}</div>
         ) : errorMessage ? (
@@ -245,7 +246,7 @@ export default function PlanningsPage() {
             ))}
           </div>
         )}
-      </DataTableCard>
-    </div>
+      </TableCard>
+    </PageLayout>
   );
 }

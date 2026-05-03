@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { PageLayout, PageHeader, GlassCard, TableCard } from "@/components/ui";
 
 type MarketingContact = {
   id: string;
@@ -258,39 +259,43 @@ export default function MarketingCampaignsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-8 text-center text-slate-500">
+      <PageLayout maxWidth="6xl" className="py-10 text-center text-slate-600">
         {t("dashboard.marketing.loading")}
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-2 inline-flex gap-2">
+    <PageLayout maxWidth="6xl" className="space-y-6">
+      <PageHeader title={t("dashboard.pageTitles.marketing")} />
+
+      <GlassCard padding="sm" className="inline-flex w-fit max-w-full flex-wrap gap-2">
         <button
-          className={`px-4 py-2 rounded-xl text-sm font-medium ${
+          type="button"
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "contacts"
-              ? "bg-[var(--obillz-hero-blue)] text-white"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[var(--obillz-hero-blue)] text-white shadow-sm"
+              : "text-slate-600 hover:bg-white/70"
           }`}
           onClick={() => setActiveTab("contacts")}
         >
           {t("dashboard.marketing.tabs.contacts")}
         </button>
         <button
-          className={`px-4 py-2 rounded-xl text-sm font-medium ${
+          type="button"
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "campaigns"
-              ? "bg-[var(--obillz-hero-blue)] text-white"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[var(--obillz-hero-blue)] text-white shadow-sm"
+              : "text-slate-600 hover:bg-white/70"
           }`}
           onClick={() => setActiveTab("campaigns")}
         >
           {t("dashboard.marketing.tabs.campaigns")}
         </button>
-      </div>
+      </GlassCard>
 
-      {activeTab === "contacts" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+      {activeTab === "contacts" ? (
+        <GlassCard padding="lg" className="space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
               <input
@@ -335,7 +340,7 @@ export default function MarketingCampaignsPage() {
                 {contacts.length === 0 ? (
                   <tr>
                     <td className="py-6 text-slate-500" colSpan={6}>
-                      Aucun contact pour le moment
+                      {t("dashboard.marketing.contacts.empty")}
                     </td>
                   </tr>
                 ) : (
@@ -366,15 +371,15 @@ export default function MarketingCampaignsPage() {
               </tbody>
             </table>
           </div>
-        </section>
-      )}
+        </GlassCard>
+      ) : null}
 
-      {contactModalOpen && (
+      {contactModalOpen ? (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/50" onClick={closeContactModal} />
-          <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {editingContactId ? "Modifier un contact" : "Ajouter un contact"}
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={closeContactModal} />
+          <GlassCard className="relative z-[1] w-full max-w-lg shadow-2xl shadow-blue-900/10" padding="lg">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">
+              {editingContactId ? t("dashboard.marketing.contacts.modalEditTitle") : t("dashboard.marketing.contacts.modalAddTitle")}
             </h3>
 
             <form onSubmit={handleSaveContact} className="space-y-3">
@@ -435,17 +440,15 @@ export default function MarketingCampaignsPage() {
                 </button>
               </div>
             </form>
-          </div>
+          </GlassCard>
         </div>
-      )}
+      ) : null}
 
-      {activeTab === "campaigns" && (
+      {activeTab === "campaigns" ? (
         <section className="space-y-6">
-          <form
-            onSubmit={handleSendCampaign}
-            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4"
-          >
-            <h2 className="text-lg font-semibold">Créer une campagne</h2>
+          <GlassCard padding="lg">
+            <form onSubmit={handleSendCampaign} className="space-y-4">
+            <h2 className="text-lg font-semibold text-slate-900">{t("dashboard.marketing.campaigns.createTitle")}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input
@@ -570,16 +573,16 @@ export default function MarketingCampaignsPage() {
             <button
               type="submit"
               disabled={sending}
-              className="px-5 py-2.5 rounded-lg text-white font-medium disabled:opacity-60"
+              className="rounded-lg px-5 py-2.5 font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--obillz-hero-blue)" }}
             >
-              {sending ? "Envoi en cours..." : "Envoyer"}
+              {sending ? t("dashboard.marketing.campaigns.sending") : t("dashboard.marketing.campaigns.send")}
             </button>
           </form>
+          </GlassCard>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">Historique des campagnes</h2>
-            <div className="overflow-x-auto">
+          <TableCard title={t("dashboard.marketing.campaigns.historyTitle")} bodyClassName="p-0">
+            <div className="overflow-x-auto p-6 pt-0">
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -594,7 +597,7 @@ export default function MarketingCampaignsPage() {
                   {campaigns.length === 0 ? (
                     <tr>
                       <td className="py-6 text-slate-500" colSpan={5}>
-                        Aucune campagne envoyée.
+                        {t("dashboard.marketing.campaigns.empty")}
                       </td>
                     </tr>
                   ) : (
@@ -631,10 +634,10 @@ export default function MarketingCampaignsPage() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </TableCard>
         </section>
-      )}
-    </div>
+      ) : null}
+    </PageLayout>
   );
 }
 

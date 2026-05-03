@@ -8,14 +8,15 @@ import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import {
+  PageLayout,
   PageHeader,
   GlassCard,
-  DataTableCard,
+  TableCard,
   EmptyState,
   ActionButton,
   glassCardClass,
   cn,
-} from "@/components/dashboard-ui";
+} from "@/components/ui";
 
 interface Client {
   id: string;
@@ -122,7 +123,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 pb-10">
+    <PageLayout maxWidth="7xl" className="space-y-6">
       <PageHeader
         title={t("dashboard.clients.title")}
         subtitle={t("dashboard.clients.subtitle")}
@@ -204,7 +205,7 @@ export default function ClientsPage() {
           }
         />
       ) : (
-        <DataTableCard bodyClassName="overflow-hidden">
+        <TableCard bodyClassName="overflow-hidden">
           <div className="divide-y divide-slate-100/90">
             {filteredClients.map((client) => (
               <div
@@ -295,7 +296,7 @@ export default function ClientsPage() {
               </div>
             ))}
           </div>
-        </DataTableCard>
+        </TableCard>
       )}
 
       {/* Footer avec compteur */}
@@ -307,6 +308,6 @@ export default function ClientsPage() {
           }
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }
