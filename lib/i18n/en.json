@@ -670,6 +670,41 @@
       "loadingPage": "Loading settings...",
       "saveSuccess": "Settings saved successfully",
       "saveButton": "💾 Save settings",
+      "layout": {
+        "saveBarHint": "Changes in the sections below are saved together.",
+        "sections": {
+          "usersAccess": "Users & access",
+          "members": "Members",
+          "clubInfo": "Club information",
+          "finances": "Finances",
+          "security": "Security",
+          "advanced": "Advanced"
+        },
+        "sectionDescriptions": {
+          "members": "Member profile fields and how categories are used.",
+          "clubInfo": "Logo, colors, currency and contact details shown on your documents.",
+          "finances": "Obillz subscription and banking details on PDFs.",
+          "security": "Sensitive outgoing email configuration.",
+          "advanced": "Technical options for generated documents."
+        },
+        "usersAccess": {
+          "description": "Manage who can access this club and what each person can view or edit.",
+          "cta": "Manage access"
+        },
+        "accordions": {
+          "memberFields": "Member fields",
+          "memberCategories": "Categories / status",
+          "visualIdentity": "Visual identity",
+          "contactDetails": "Club contact details",
+          "subscription": "Subscription",
+          "banking": "Bank account & payment terms",
+          "email": "Outgoing email (Obillz / Resend)",
+          "pdfHeader": "PDF document headers"
+        },
+        "memberCategories": {
+          "body": "Category labels (first team, junior, board, etc.) are predefined in the app. To show and edit them on member profiles, enable the “Category / status” field under “Member fields” above."
+        }
+      },
       "subscription": {
         "title": "Subscription",
         "currentPlan": "Current plan:",

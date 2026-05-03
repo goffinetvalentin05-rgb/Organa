@@ -550,6 +550,41 @@
       "loadingPage": "Chargement des paramètres...",
       "saveSuccess": "Paramètres enregistrés avec succès",
       "saveButton": "💾 Enregistrer les paramètres",
+      "layout": {
+        "saveBarHint": "Les changements des sections ci-dessous sont enregistrés en une seule fois.",
+        "sections": {
+          "usersAccess": "Utilisateurs & accès",
+          "members": "Membres",
+          "clubInfo": "Informations du club",
+          "finances": "Finances",
+          "security": "Sécurité",
+          "advanced": "Avancé"
+        },
+        "sectionDescriptions": {
+          "members": "Champs des fiches membres et usage des catégories.",
+          "clubInfo": "Logo, couleurs, devise et coordonnées affichées sur vos documents.",
+          "finances": "Abonnement Obillz et informations bancaires sur les PDF.",
+          "security": "Configuration sensible de l’envoi d’e-mails.",
+          "advanced": "Réglages techniques des documents générés."
+        },
+        "usersAccess": {
+          "description": "Gérez les personnes autorisées sur ce club et ce que chacune peut voir ou modifier.",
+          "cta": "Gérer les accès"
+        },
+        "accordions": {
+          "memberFields": "Champs des membres",
+          "memberCategories": "Catégories / statuts",
+          "visualIdentity": "Identité visuelle",
+          "contactDetails": "Coordonnées du club",
+          "subscription": "Abonnement",
+          "banking": "Compte bancaire & conditions de paiement",
+          "email": "E-mail sortant (Obillz / Resend)",
+          "pdfHeader": "En-têtes des documents PDF"
+        },
+        "memberCategories": {
+          "body": "Les libellés de catégorie (équipe première, junior, bureau, etc.) sont prédéfinis dans l’application. Pour les utiliser sur les fiches, activez le champ « Catégorie / statut » dans « Champs des membres » ci-dessus."
+        }
+      },
       "subscription": {
         "title": "Abonnement",
         "currentPlan": "Plan actuel :",

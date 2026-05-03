@@ -6,11 +6,25 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Parametres } from "@/lib/mock-data";
-import { Upload, Trash, Loader, Building2, CheckCircle } from "@/lib/icons";
+import {
+  Upload,
+  Trash,
+  Loader,
+  Building2,
+  CheckCircle,
+  UserCheck,
+  Users,
+  Wallet,
+  Shield,
+  Settings,
+  ArrowRight,
+} from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
+import SettingsSectionCard from "./SettingsSectionCard";
+import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
 interface SubscriptionInfo {
@@ -51,9 +65,8 @@ function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
 
 export default function ParametresPage() {
   const router = useRouter();
-  const { t, tList } = useI18n();
+  const { t } = useI18n();
   const [parametres, setParametres] = useState<Parametres | null>(null);
-  const [userPlan, setUserPlan] = useState<"free" | "pro" | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
@@ -232,7 +245,6 @@ export default function ParametresPage() {
       const response = await fetch("/api/me");
       if (response.ok) {
         const data = await parseResponseBody(response);
-        setUserPlan(data.user?.plan || "free");
         setSubscription(data.subscription || null);
       }
     } catch (error) {
@@ -518,558 +530,555 @@ export default function ParametresPage() {
     );
   }
 
-  const planLabel =
-    userPlan === "pro"
-      ? t("dashboard.settings.subscription.planPro")
-      : t("dashboard.settings.subscription.planFree");
-  const proFeatures = tList("dashboard.settings.subscription.proFeatures");
-
   return (
     <>
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
-      <div className="max-w-4xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{t("dashboard.settings.title")}</h1>
-        <p className="mt-1 text-slate-500">
-          {t("dashboard.settings.subtitle")}
-        </p>
-      </div>
-
-      {saved && (
-        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-700 flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          {t("dashboard.settings.saveSuccess")}
+      <div className="mx-auto max-w-4xl space-y-8 pb-12">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+            {t("dashboard.settings.title")}
+          </h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+            {t("dashboard.settings.subtitle")}
+          </p>
         </div>
-      )}
 
-      {/* Section Utilisateurs / Accès — lien vers la sous-page dédiée */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              Utilisateurs / Accès
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Gérez les personnes qui ont accès à ce club et choisissez
-              précisément ce que chacune peut voir ou modifier.
-            </p>
-          </div>
-          <Link
-            href="/tableau-de-bord/parametres/utilisateurs"
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            Gérer les accès →
-          </Link>
-        </div>
-      </div>
-
-      <section className="space-y-4" aria-labelledby="member-management-heading">
-        <h2
-          id="member-management-heading"
-          className="text-xl font-bold text-slate-900"
-        >
-          {t("dashboard.settings.memberFields.sectionHeading")}
-        </h2>
-        <MemberFieldsSettingsCard />
-      </section>
-
-      {/* Section Abonnement */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Abonnement</h2>
-        
-        {loadingPlan ? (
-          <p className="text-slate-500">{t("dashboard.common.loading")}</p>
-        ) : (
-          <div className="space-y-4">
-            {/* Statut de l'abonnement */}
-            {subscription && (
-              <div
-                className={`p-4 rounded-xl border-2 ${
-                  subscription.status === "active"
-                    ? "border-green-500 bg-green-50"
-                    : subscription.status === "trial"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-red-500 bg-red-50"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {subscription.status === "active" ? (
-                      <>
-                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-green-800">Abonnement actif</p>
-                          <p className="text-sm text-green-700">
-                            {subscription.billingCycle === "yearly" ? "Annuel" : "Mensuel"} – Accès complet
-                          </p>
-                        </div>
-                      </>
-                    ) : subscription.status === "trial" ? (
-                      <>
-                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-blue-800">
-                            Période d'essai – {subscription.trialDaysRemaining} jour{subscription.trialDaysRemaining > 1 ? "s" : ""} restant{subscription.trialDaysRemaining > 1 ? "s" : ""}
-                          </p>
-                          <p className="text-sm text-blue-700">
-                            Profitez de toutes les fonctionnalités
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-red-800">Essai terminé</p>
-                          <p className="text-sm text-red-700">
-                            Abonnez-vous pour continuer
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  
-                  {/* Bouton d'action */}
-                  {subscription.status !== "active" && (
-                    <Link
-                      href="/tableau-de-bord/abonnement"
-                      className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      {subscription.status === "trial" ? "Voir les tarifs" : "S'abonner"}
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Tarifs rapides */}
-            {subscription && subscription.status !== "active" && (
-              <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                <p className="text-sm font-medium text-slate-900 mb-3">Tarifs</p>
-                <div className="flex gap-4">
-                  <div className="flex-1 p-3 rounded-lg bg-white border border-slate-200">
-                    <p className="text-xs text-slate-500 mb-1">Mensuel</p>
-                    <p className="text-lg font-bold text-slate-900">39 CHF<span className="text-sm font-normal text-slate-500">/mois</span></p>
-                  </div>
-                  <div className="flex-1 p-3 rounded-lg bg-white border-2 border-indigo-500 relative">
-                    <span className="absolute -top-2 right-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                      2 mois offerts
-                    </span>
-                    <p className="text-xs text-slate-500 mb-1">Annuel</p>
-                    <p className="text-lg font-bold text-slate-900">390 CHF<span className="text-sm font-normal text-slate-500">/an</span></p>
-                  </div>
-                </div>
-              </div>
-            )}
+        {saved && (
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+            <CheckCircle className="h-5 w-5 shrink-0" />
+            {t("dashboard.settings.saveSuccess")}
           </div>
         )}
-      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Section Marque */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.branding.title")}</h2>
-          
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t("dashboard.settings.branding.logoLabel")}
-            </label>
-            <div className="flex items-start gap-6">
-              <div className="w-32 h-32 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden relative group">
-                {logoPreview ? (
-                  <Image
-                    src={logoPreview}
-                    alt={t("dashboard.settings.branding.logoAlt")}
-                    width={128}
-                    height={128}
-                    className="object-contain p-2"
-                    unoptimized={logoPreview.includes("supabase.co")}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-slate-400 p-4">
-                    <Building2 className="w-12 h-12 mb-2" />
-                    <span className="text-xs text-center">{t("dashboard.settings.branding.noLogo")}</span>
-                  </div>
-                )}
+        <Link
+          href="/tableau-de-bord/parametres/utilisateurs"
+          className="group relative block overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-br from-white via-blue-50/50 to-indigo-50/40 p-5 shadow-md shadow-blue-900/5 transition-all hover:border-blue-300 hover:shadow-lg hover:shadow-blue-900/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:p-6"
+        >
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-blue-600/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-md shadow-blue-600/30">
+                <UserCheck className="h-6 w-6" />
               </div>
-              <div className="flex-1 space-y-3">
-                <div>
-                  <label className="inline-flex items-center gap-2 px-4 py-2 text-white font-medium rounded-xl transition-all cursor-pointer" style={{ backgroundColor: "var(--obillz-hero-blue)" }}>
-                    {uploading ? (
-                      <>
-                        <Loader className="w-4 h-4 animate-spin" />
-                        {t("dashboard.settings.branding.uploading")}
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4" />
-                        {t("dashboard.settings.branding.upload")}
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/svg+xml"
-                      onChange={handleLogoUpload}
-                      disabled={uploading}
-                      className="hidden"
-                    />
-                  </label>
-                  <p className="text-xs text-tertiary mt-2">
-                    {t("dashboard.settings.branding.formats")}
-                  </p>
-                </div>
-                {logoPreview && (
-                  <button
-                    type="button"
-                    onClick={handleLogoDelete}
-                    disabled={deleting}
-                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {deleting ? (
-                      <>
-                        <Loader className="w-4 h-4 animate-spin" />
-                        {t("dashboard.settings.branding.deleting")}
-                      </>
-                    ) : (
-                      <>
-                        <Trash className="w-4 h-4" />
-                        {t("dashboard.settings.branding.delete")}
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.settings.branding.headerStyleLabel")}
-            </label>
-            <select
-              value={formData.styleEnTete ?? "moderne"}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  styleEnTete: e.target.value as "simple" | "moderne" | "classique",
-                })
-              }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            >
-              <option value="simple">{t("dashboard.settings.branding.headerStyles.simple")}</option>
-              <option value="moderne">{t("dashboard.settings.branding.headerStyles.moderne")}</option>
-              <option value="classique">{t("dashboard.settings.branding.headerStyles.classique")}</option>
-            </select>
-            <p className="text-xs text-tertiary mt-2">
-              {t("dashboard.settings.branding.headerStyleHelp")}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.settings.branding.primaryColorLabel")}
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="color"
-                value={formData.primaryColor ?? "#6D5EF8"}
-                onChange={(e) =>
-                  setFormData({ ...formData, primaryColor: e.target.value })
-                }
-                className="h-12 w-20 rounded-lg border border-subtle-hover bg-surface cursor-pointer"
-              />
-              <input
-                type="text"
-                value={formData.primaryColor ?? "#6D5EF8"}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^#[0-9A-Fa-f]{0,6}$/.test(value) || value === "") {
-                    setFormData({ ...formData, primaryColor: value || "#6D5EF8" });
-                  }
-                }}
-                placeholder="#6D5EF8"
-                className="flex-1 rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] font-mono"
-              />
-            </div>
-            <p className="text-xs text-tertiary mt-2">
-              {t("dashboard.settings.branding.primaryColorHelp")}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.settings.branding.currencyLabel")}
-            </label>
-            <select
-              value={formData.currency ?? "CHF"}
-              onChange={(e) =>
-                setFormData({ ...formData, currency: e.target.value })
-              }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            >
-              <option value="CHF">{t("dashboard.settings.branding.currencies.CHF")}</option>
-              <option value="EUR">{t("dashboard.settings.branding.currencies.EUR")}</option>
-              <option value="USD">{t("dashboard.settings.branding.currencies.USD")}</option>
-              <option value="GBP">{t("dashboard.settings.branding.currencies.GBP")}</option>
-              <option value="CAD">{t("dashboard.settings.branding.currencies.CAD")}</option>
-              <option value="AUD">{t("dashboard.settings.branding.currencies.AUD")}</option>
-              <option value="JPY">{t("dashboard.settings.branding.currencies.JPY")}</option>
-            </select>
-            <p className="text-xs text-tertiary mt-2">
-              {t("dashboard.settings.branding.currencyHelp")}
-            </p>
-          </div>
-        </div>
-
-        {/* Section Informations entreprise */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.companyInfo.title")}</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.companyInfo.nameLabel")}
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.nomEntreprise ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, nomEntreprise: e.target.value })
-                }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.companyInfo.addressLabel")}
-              </label>
-              <textarea
-                required
-                value={formData.adresse ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, adresse: e.target.value })
-                }
-                rows={3}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  {t("dashboard.settings.companyInfo.emailLabel")}
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  {t("dashboard.settings.companyInfo.phoneLabel")}
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.telephone ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, telephone: e.target.value })
-                  }
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Section Informations bancaires */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">{t("dashboard.settings.billing.title")}</h2>
-          <p className="text-sm text-slate-500 mb-4">
-            {t("dashboard.settings.billing.subtitle")}
-          </p>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.billing.ibanLabel")}
-              </label>
-              <input
-                type="text"
-                value={formData.iban ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, iban: e.target.value })
-                }
-                placeholder={t("dashboard.settings.billing.ibanPlaceholder")}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.billing.bankNameLabel")}
-              </label>
-              <input
-                type="text"
-                value={formData.bankName ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, bankName: e.target.value })
-                }
-                placeholder={t("dashboard.settings.billing.bankNamePlaceholder")}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.settings.billing.paymentTermsLabel")}
-              </label>
-              <textarea
-                value={formData.conditionsPaiement ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, conditionsPaiement: e.target.value })
-                }
-                placeholder={t("dashboard.settings.billing.paymentTermsPlaceholder")}
-                rows={3}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              />
-              <p className="text-xs text-tertiary mt-1">
-                {t("dashboard.settings.billing.paymentTermsHelp")}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Section Email */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-2">{t("dashboard.settings.email.title")}</h2>
-          <p className="text-sm text-slate-500 mb-4">
-            {t("dashboard.settings.email.introDefault")}
-          </p>
-
-          <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 mb-4">
-            <div>
-              <p className="text-sm font-medium text-slate-900">
-                {t("dashboard.settings.email.customToggle")}
-              </p>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {t("dashboard.settings.email.customToggleHelp")}
-              </p>
-            </div>
-            <label className="inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                className="sr-only"
-                checked={formData.emailCustomEnabled}
-                onChange={(e) =>
-                  setFormData({ ...formData, emailCustomEnabled: e.target.checked, resendApiKeyTouched: false })
-                }
-              />
-              <span
-                className={`h-6 w-11 rounded-full relative transition-colors ${
-                  formData.emailCustomEnabled ? "bg-[#7C5CFF]" : "bg-slate-300"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                    formData.emailCustomEnabled ? "right-0.5" : "left-0.5"
-                  }`}
-                />
-              </span>
-            </label>
-          </div>
-
-          {!formData.emailCustomEnabled ? (
-            <p className="text-sm text-slate-600 rounded-lg bg-emerald-50 border border-emerald-100 px-4 py-3">
-              {t("dashboard.settings.email.obillzInfo")}
-            </p>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                {t("dashboard.settings.email.resendDomainHelp")}
-              </p>
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  {t("dashboard.settings.email.customSenderLabel")}
-                </label>
-                <input
-                  type="email"
-                  value={formData.emailExpediteur ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, emailExpediteur: e.target.value })
-                  }
-                  placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  {t("dashboard.settings.email.apiKeyLabel")}
-                </label>
-                <input
-                  type="password"
-                  value={formData.resendApiKey ?? ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      resendApiKey: e.target.value,
-                      resendApiKeyTouched: true,
-                    })
-                  }
-                  placeholder={
-                    formData.resendKeyConfigured
-                      ? t("dashboard.settings.email.apiKeyUnchangedHint")
-                      : t("dashboard.settings.email.apiKeyPlaceholder")
-                  }
-                  autoComplete="off"
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-                />
-                <p className="text-xs text-tertiary mt-1">
-                  {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
-                  <a
-                    href="https://resend.com/api-keys"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="accent hover:underline"
-                  >
-                    resend.com/api-keys
-                  </a>
-                  {t("dashboard.settings.email.apiKeyHelpAfter")}
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold text-slate-900">
+                  {t("dashboard.settings.layout.sections.usersAccess")}
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                  {t("dashboard.settings.layout.usersAccess.description")}
                 </p>
               </div>
             </div>
-          )}
-        </div>
+            <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition group-hover:from-[#1d4ed8] group-hover:to-[#1e40af] sm:py-2.5">
+              {t("dashboard.settings.layout.usersAccess.cta")}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </div>
+        </Link>
 
-        {/* Bouton sauvegarder */}
-        <div className="flex justify-end">
-          <DashboardPrimaryButton type="submit" icon="none">
-            {t("dashboard.settings.saveButton")}
-          </DashboardPrimaryButton>
-        </div>
+        <SettingsSectionCard
+          icon={Users}
+          title={t("dashboard.settings.layout.sections.members")}
+          description={t("dashboard.settings.layout.sectionDescriptions.members")}
+        >
+          <SettingsAccordion
+            title={t("dashboard.settings.layout.accordions.memberFields")}
+            defaultOpen
+          >
+            <MemberFieldsSettingsCard embedded />
+          </SettingsAccordion>
+          <SettingsAccordion title={t("dashboard.settings.layout.accordions.memberCategories")}>
+            <p className="text-sm leading-relaxed text-slate-600">
+              {t("dashboard.settings.layout.memberCategories.body")}
+            </p>
+          </SettingsAccordion>
+        </SettingsSectionCard>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <SettingsSectionCard
+            icon={Building2}
+            title={t("dashboard.settings.layout.sections.clubInfo")}
+            description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
+          >
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.visualIdentity")}>
+              <div className="mb-6">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  {t("dashboard.settings.branding.logoLabel")}
+                </label>
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                    {logoPreview ? (
+                      <Image
+                        src={logoPreview}
+                        alt={t("dashboard.settings.branding.logoAlt")}
+                        width={128}
+                        height={128}
+                        className="object-contain p-2"
+                        unoptimized={logoPreview.includes("supabase.co")}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-4 text-slate-400">
+                        <Building2 className="mb-2 h-12 w-12" />
+                        <span className="text-center text-xs">{t("dashboard.settings.branding.noLogo")}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div>
+                      <label
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white transition-all"
+                        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                      >
+                        {uploading ? (
+                          <>
+                            <Loader className="h-4 w-4 animate-spin" />
+                            {t("dashboard.settings.branding.uploading")}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4" />
+                            {t("dashboard.settings.branding.upload")}
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+                          onChange={handleLogoUpload}
+                          disabled={uploading}
+                          className="hidden"
+                        />
+                      </label>
+                      <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.formats")}</p>
+                    </div>
+                    {logoPreview ? (
+                      <button
+                        type="button"
+                        onClick={handleLogoDelete}
+                        disabled={deleting}
+                        className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 font-medium text-red-600 transition-all hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deleting ? (
+                          <>
+                            <Loader className="h-4 w-4 animate-spin" />
+                            {t("dashboard.settings.branding.deleting")}
+                          </>
+                        ) : (
+                          <>
+                            <Trash className="h-4 w-4" />
+                            {t("dashboard.settings.branding.delete")}
+                          </>
+                        )}
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-primary">
+                  {t("dashboard.settings.branding.primaryColorLabel")}
+                </label>
+                <div className="flex flex-wrap items-center gap-4">
+                  <input
+                    type="color"
+                    value={formData.primaryColor ?? "#6D5EF8"}
+                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                    className="h-12 w-20 cursor-pointer rounded-lg border border-subtle-hover bg-surface"
+                  />
+                  <input
+                    type="text"
+                    value={formData.primaryColor ?? "#6D5EF8"}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^#[0-9A-Fa-f]{0,6}$/.test(value) || value === "") {
+                        setFormData({ ...formData, primaryColor: value || "#6D5EF8" });
+                      }
+                    }}
+                    placeholder="#6D5EF8"
+                    className="min-w-[8rem] flex-1 rounded-lg border border-subtle-hover bg-surface px-4 py-2 font-mono text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.primaryColorHelp")}</p>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-primary">
+                  {t("dashboard.settings.branding.currencyLabel")}
+                </label>
+                <select
+                  value={formData.currency ?? "CHF"}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                >
+                  <option value="CHF">{t("dashboard.settings.branding.currencies.CHF")}</option>
+                  <option value="EUR">{t("dashboard.settings.branding.currencies.EUR")}</option>
+                  <option value="USD">{t("dashboard.settings.branding.currencies.USD")}</option>
+                  <option value="GBP">{t("dashboard.settings.branding.currencies.GBP")}</option>
+                  <option value="CAD">{t("dashboard.settings.branding.currencies.CAD")}</option>
+                  <option value="AUD">{t("dashboard.settings.branding.currencies.AUD")}</option>
+                  <option value="JPY">{t("dashboard.settings.branding.currencies.JPY")}</option>
+                </select>
+                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.currencyHelp")}</p>
+              </div>
+            </SettingsAccordion>
+
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.contactDetails")}>
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-primary">
+                    {t("dashboard.settings.companyInfo.nameLabel")}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.nomEntreprise ?? ""}
+                    onChange={(e) => setFormData({ ...formData, nomEntreprise: e.target.value })}
+                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-primary">
+                    {t("dashboard.settings.companyInfo.addressLabel")}
+                  </label>
+                  <textarea
+                    required
+                    value={formData.adresse ?? ""}
+                    onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-primary">
+                      {t("dashboard.settings.companyInfo.emailLabel")}
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email ?? ""}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-primary">
+                      {t("dashboard.settings.companyInfo.phoneLabel")}
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={formData.telephone ?? ""}
+                      onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </SettingsAccordion>
+          </SettingsSectionCard>
+
+          <SettingsSectionCard
+            icon={Wallet}
+            title={t("dashboard.settings.layout.sections.finances")}
+            description={t("dashboard.settings.layout.sectionDescriptions.finances")}
+          >
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.subscription")}>
+              {loadingPlan ? (
+                <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
+              ) : (
+                <div className="space-y-4">
+                  {subscription ? (
+                    <div
+                      className={`rounded-xl border-2 p-4 ${
+                        subscription.status === "active"
+                          ? "border-green-500 bg-green-50"
+                          : subscription.status === "trial"
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-red-500 bg-red-50"
+                      }`}
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                          {subscription.status === "active" ? (
+                            <>
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500">
+                                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="font-semibold text-green-800">Abonnement actif</p>
+                                <p className="text-sm text-green-700">
+                                  {subscription.billingCycle === "yearly" ? "Annuel" : "Mensuel"} – Accès complet
+                                </p>
+                              </div>
+                            </>
+                          ) : subscription.status === "trial" ? (
+                            <>
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500">
+                                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="font-semibold text-blue-800">
+                                  Période d&apos;essai – {subscription.trialDaysRemaining} jour
+                                  {subscription.trialDaysRemaining > 1 ? "s" : ""} restant
+                                  {subscription.trialDaysRemaining > 1 ? "s" : ""}
+                                </p>
+                                <p className="text-sm text-blue-700">Profitez de toutes les fonctionnalités</p>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500">
+                                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                  />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="font-semibold text-red-800">Essai terminé</p>
+                                <p className="text-sm text-red-700">Abonnez-vous pour continuer</p>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {subscription.status !== "active" ? (
+                          <Link
+                            href="/tableau-de-bord/abonnement"
+                            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-95"
+                          >
+                            {subscription.status === "trial" ? "Voir les tarifs" : "S\u2019abonner"}
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {subscription && subscription.status !== "active" ? (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="mb-3 text-sm font-medium text-slate-900">Tarifs</p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                        <div className="flex-1 rounded-lg border border-slate-200 bg-white p-3">
+                          <p className="mb-1 text-xs text-slate-500">Mensuel</p>
+                          <p className="text-lg font-bold text-slate-900">
+                            39 CHF<span className="text-sm font-normal text-slate-500">/mois</span>
+                          </p>
+                        </div>
+                        <div className="relative flex-1 rounded-lg border-2 border-indigo-500 bg-white p-3">
+                          <span className="absolute -top-2 right-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                            2 mois offerts
+                          </span>
+                          <p className="mb-1 text-xs text-slate-500">Annuel</p>
+                          <p className="text-lg font-bold text-slate-900">
+                            390 CHF<span className="text-sm font-normal text-slate-500">/an</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </SettingsAccordion>
+
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.banking")}>
+              <p className="mb-4 text-sm text-slate-500">{t("dashboard.settings.billing.subtitle")}</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-primary">
+                    {t("dashboard.settings.billing.ibanLabel")}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.iban ?? ""}
+                    onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
+                    placeholder={t("dashboard.settings.billing.ibanPlaceholder")}
+                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-primary">
+                    {t("dashboard.settings.billing.bankNameLabel")}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bankName ?? ""}
+                    onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                    placeholder={t("dashboard.settings.billing.bankNamePlaceholder")}
+                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-primary">
+                    {t("dashboard.settings.billing.paymentTermsLabel")}
+                  </label>
+                  <textarea
+                    value={formData.conditionsPaiement ?? ""}
+                    onChange={(e) => setFormData({ ...formData, conditionsPaiement: e.target.value })}
+                    placeholder={t("dashboard.settings.billing.paymentTermsPlaceholder")}
+                    rows={3}
+                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  />
+                  <p className="mt-1 text-xs text-tertiary">{t("dashboard.settings.billing.paymentTermsHelp")}</p>
+                </div>
+              </div>
+            </SettingsAccordion>
+          </SettingsSectionCard>
+
+          <SettingsSectionCard
+            icon={Shield}
+            title={t("dashboard.settings.layout.sections.security")}
+            description={t("dashboard.settings.layout.sectionDescriptions.security")}
+          >
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.email")}>
+              <p className="mb-4 text-sm text-slate-500">{t("dashboard.settings.email.introDefault")}</p>
+
+              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-slate-900">{t("dashboard.settings.email.customToggle")}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">{t("dashboard.settings.email.customToggleHelp")}</p>
+                </div>
+                <label className="inline-flex shrink-0 cursor-pointer items-center self-start sm:self-center">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={formData.emailCustomEnabled}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        emailCustomEnabled: e.target.checked,
+                        resendApiKeyTouched: false,
+                      })
+                    }
+                  />
+                  <span
+                    className={`relative h-6 w-11 rounded-full transition-colors ${
+                      formData.emailCustomEnabled ? "bg-[#2563EB]" : "bg-slate-300"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        formData.emailCustomEnabled ? "right-0.5" : "left-0.5"
+                      }`}
+                    />
+                  </span>
+                </label>
+              </div>
+
+              {!formData.emailCustomEnabled ? (
+                <p className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-slate-600">
+                  {t("dashboard.settings.email.obillzInfo")}
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                    {t("dashboard.settings.email.resendDomainHelp")}
+                  </p>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-primary">
+                      {t("dashboard.settings.email.customSenderLabel")}
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.emailExpediteur ?? ""}
+                      onChange={(e) => setFormData({ ...formData, emailExpediteur: e.target.value })}
+                      placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
+                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-primary">
+                      {t("dashboard.settings.email.apiKeyLabel")}
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.resendApiKey ?? ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          resendApiKey: e.target.value,
+                          resendApiKeyTouched: true,
+                        })
+                      }
+                      placeholder={
+                        formData.resendKeyConfigured
+                          ? t("dashboard.settings.email.apiKeyUnchangedHint")
+                          : t("dashboard.settings.email.apiKeyPlaceholder")
+                      }
+                      autoComplete="off"
+                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    />
+                    <p className="mt-1 text-xs text-tertiary">
+                      {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
+                      <a
+                        href="https://resend.com/api-keys"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="accent hover:underline"
+                      >
+                        resend.com/api-keys
+                      </a>
+                      {t("dashboard.settings.email.apiKeyHelpAfter")}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </SettingsAccordion>
+          </SettingsSectionCard>
+
+          <SettingsSectionCard
+            icon={Settings}
+            title={t("dashboard.settings.layout.sections.advanced")}
+            description={t("dashboard.settings.layout.sectionDescriptions.advanced")}
+          >
+            <SettingsAccordion title={t("dashboard.settings.layout.accordions.pdfHeader")}>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-primary">
+                  {t("dashboard.settings.branding.headerStyleLabel")}
+                </label>
+                <select
+                  value={formData.styleEnTete ?? "moderne"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      styleEnTete: e.target.value as "simple" | "moderne" | "classique",
+                    })
+                  }
+                  className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                >
+                  <option value="simple">{t("dashboard.settings.branding.headerStyles.simple")}</option>
+                  <option value="moderne">{t("dashboard.settings.branding.headerStyles.moderne")}</option>
+                  <option value="classique">{t("dashboard.settings.branding.headerStyles.classique")}</option>
+                </select>
+                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.headerStyleHelp")}</p>
+              </div>
+            </SettingsAccordion>
+          </SettingsSectionCard>
+
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50/90 via-white to-blue-50/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
+            <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
+              {t("dashboard.settings.saveButton")}
+            </DashboardPrimaryButton>
+          </div>
       </form>
     </div>
     </>

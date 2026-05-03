@@ -21,7 +21,14 @@ const FIELD_ORDER: MemberFieldKey[] = [
   "avs_number",
 ];
 
-export default function MemberFieldsSettingsCard() {
+type MemberFieldsSettingsCardProps = {
+  /** Intégré dans un accordéon : pas de carte externe ni titre dupliqué. */
+  embedded?: boolean;
+};
+
+export default function MemberFieldsSettingsCard({
+  embedded = false,
+}: MemberFieldsSettingsCardProps) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -109,16 +116,24 @@ export default function MemberFieldsSettingsCard() {
   const labelKey = (k: MemberFieldKey) =>
     `dashboard.settings.memberFields.fields.${k}` as const;
 
+  const shellClass = embedded
+    ? "space-y-5"
+    : "space-y-5 rounded-2xl border border-slate-200 bg-white p-6";
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
-      <div>
-        <h3 className="text-lg font-bold text-slate-900">
-          {t("dashboard.settings.memberFields.title")}
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          {t("dashboard.settings.memberFields.subtitle")}
-        </p>
-      </div>
+    <div className={shellClass}>
+      {!embedded ? (
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">
+            {t("dashboard.settings.memberFields.title")}
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            {t("dashboard.settings.memberFields.subtitle")}
+          </p>
+        </div>
+      ) : (
+        <p className="text-sm text-slate-600">{t("dashboard.settings.memberFields.subtitle")}</p>
+      )}
 
       {loading ? (
         <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
