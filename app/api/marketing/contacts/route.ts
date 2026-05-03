@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const search = request.nextUrl.searchParams.get("search")?.trim() || "";
     const source = request.nextUrl.searchParams.get("source")?.trim() || "";
@@ -24,7 +20,7 @@ export async function GET(request: NextRequest) {
       .select(
         "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed, unsubscribed_at"
       )
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .order("created_at", { ascending: false });
 
     if (search) {
@@ -42,7 +38,7 @@ export async function GET(request: NextRequest) {
     const { data: sourceRows } = await supabase
       .from("marketing_contacts")
       .select("source")
-      .eq("club_id", user.id);
+      .eq("club_id", guard.clubId);
 
     const sources = Array.from(new Set((sourceRows || []).map((row) => row.source).filter(Boolean)));
 
@@ -55,15 +51,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -92,7 +83,7 @@ export async function POST(request: NextRequest) {
     const { data: existingContact } = await supabase
       .from("marketing_contacts")
       .select("id")
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .eq("email_normalized", email)
       .maybeSingle();
 
@@ -106,7 +97,7 @@ export async function POST(request: NextRequest) {
     const { data: contact, error } = await supabase
       .from("marketing_contacts")
       .insert({
-        club_id: user.id,
+        club_id: guard.clubId,
         first_name: firstName,
         last_name: lastName,
         email,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
 
 export const runtime = "nodejs";
@@ -26,15 +27,10 @@ async function assertEventOwnedByUser(
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const { data: rows, error } = await supabase
       .from("club_revenues")
@@ -50,7 +46,7 @@ export async function GET() {
         updated_at
       `
       )
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("revenue_date", { ascending: false });
 
     if (error) {
@@ -107,15 +103,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -136,13 +127,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
 
-    const eventCheck = await assertEventOwnedByUser(supabase, user.id, eventId ?? null);
+    const eventCheck = await assertEventOwnedByUser(supabase, guard.clubId, eventId ?? null);
     if (!eventCheck.ok) return eventCheck.response;
 
     const { data: inserted, error } = await supabase
       .from("club_revenues")
       .insert({
-        user_id: user.id,
+        user_id: guard.clubId,
         name: name.trim(),
         amount: amountNum,
         revenue_date: revenueDate,

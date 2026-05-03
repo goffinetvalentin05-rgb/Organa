@@ -5,6 +5,11 @@ import { getCurrencySymbol } from "@/lib/utils/currency";
 
 type DocumentType = "quote" | "invoice";
 
+export type GetDocumentPdfDataOptions = {
+  /** `profiles.user_id` / `documents.user_id` du club (propriétaire). Défaut : compte connecté. */
+  dataUserId?: string;
+};
+
 /**
  * Convertit une URL d'image en Data URL (base64)
  * Cela permet à @react-pdf/renderer de charger l'image de manière fiable
@@ -70,7 +75,11 @@ async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
   }
 }
 
-export async function getDocumentPdfData(id: string, type: DocumentType) {
+export async function getDocumentPdfData(
+  id: string,
+  type: DocumentType,
+  options?: GetDocumentPdfDataOptions
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -81,12 +90,14 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
     throw new Error("Non authentifié");
   }
 
+  const scopeUserId = options?.dataUserId ?? user.id;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select(
       "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms"
     )
-    .eq("user_id", user.id)
+    .eq("user_id", scopeUserId)
     .maybeSingle();
 
   // Récupérer l'URL du logo depuis le profil
@@ -135,7 +146,7 @@ export async function getDocumentPdfData(id: string, type: DocumentType) {
       "id, numero, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(id, name, email, phone, address, postal_code, city, role, category)"
     )
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", scopeUserId)
     .single();
 
   if (docError || !document || document.type !== type) {

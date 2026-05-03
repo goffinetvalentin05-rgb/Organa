@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -9,20 +10,15 @@ export const runtime = "nodejs";
    ========================= */
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("event_types")
       .select("id, name, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("name", { ascending: true });
 
     if (error) {
@@ -48,15 +44,10 @@ export async function GET() {
    ========================= */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const body = await request.json();
     const { name } = body || {};
@@ -71,7 +62,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from("event_types")
       .insert({
-        user_id: user.id,
+        user_id: guard.clubId,
         name: name.trim(),
       })
       .select("id, name, created_at")

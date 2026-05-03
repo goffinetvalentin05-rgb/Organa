@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 /**
  * API Route pour uploader le logo d'entreprise
@@ -11,23 +12,14 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST(request: NextRequest) {
   try {
     console.log("[API][upload-logo] POST - Début upload");
+    const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
+    const clubId = guard.clubId;
+    const actorId = guard.userId;
 
-    // Vérifier l'authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      console.error("[API][upload-logo] POST - Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié", details: authError?.message },
-        { status: 401 }
-      );
-    }
-
-    console.log("[API][upload-logo] POST - User authentifié:", user.id);
+    console.log("[API][upload-logo] POST - club:", clubId, "actor:", actorId);
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -64,16 +56,22 @@ export async function POST(request: NextRequest) {
     let { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("logo_path, logo_url")
-      .eq("user_id", user.id)
+      .eq("user_id", clubId)
       .maybeSingle();
 
-    // Si le profil n'existe pas, le créer
+    // Si le profil n'existe pas, le créer (compte propriétaire uniquement)
     if (!profile) {
+      if (clubId !== actorId) {
+        return NextResponse.json(
+          { error: "Profil club introuvable" },
+          { status: 404 }
+        );
+      }
       console.log("[API][upload-logo] POST - Profil inexistant, création...");
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert({
-          user_id: user.id,
+          user_id: actorId,
           plan: "free",
         })
         .select("logo_path, logo_url")
@@ -100,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     // Générer un nom de fichier selon les spécifications: userId/logo-timestamp.extension
     const fileExtension = file.name.split(".").pop()?.toLowerCase() || "png";
-    const fileName = `${user.id}/logo-${Date.now()}.${fileExtension}`;
+    const fileName = `${clubId}/logo-${Date.now()}.${fileExtension}`;
 
     console.log("[API][upload-logo] POST - Upload fichier:", fileName);
 
@@ -151,7 +149,7 @@ export async function POST(request: NextRequest) {
         logo_url: logoUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", user.id);
+      .eq("user_id", clubId);
 
     if (updateError) {
       console.error("[API][upload-logo] POST - Erreur mise à jour profiles:", updateError);
@@ -199,29 +197,19 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     console.log("[API][upload-logo] DELETE - Début suppression");
+    const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
+    const clubId = guard.clubId;
 
-    // Vérifier l'authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      console.error("[API][upload-logo] DELETE - Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié", details: authError?.message },
-        { status: 401 }
-      );
-    }
-
-    console.log("[API][upload-logo] DELETE - User authentifié:", user.id);
+    console.log("[API][upload-logo] DELETE - club:", clubId);
 
     // Récupérer le logo_path actuel
     const { data: profile, error: fetchError } = await supabase
       .from("profiles")
       .select("logo_path, logo_url")
-      .eq("user_id", user.id)
+      .eq("user_id", clubId)
       .maybeSingle();
 
     if (fetchError) {
@@ -271,7 +259,7 @@ export async function DELETE(request: NextRequest) {
         logo_url: null,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", user.id);
+      .eq("user_id", clubId);
 
     if (updateError) {
       console.error("[API][upload-logo] DELETE - Erreur mise à jour profiles:", updateError);

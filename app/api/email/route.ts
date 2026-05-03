@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -30,15 +31,10 @@ function getFirstName(fullName: string | null | undefined): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const body = await request.json();
     const { type, documentId } = body; // type: 'devis' | 'facture', documentId: string
@@ -51,7 +47,7 @@ export async function POST(request: NextRequest) {
       .select(
         "company_name, company_email, company_phone, company_address, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
       )
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (profileError) {
@@ -109,7 +105,7 @@ export async function POST(request: NextRequest) {
         "id, numero, type, items, notes, total_ttc, date_echeance, client:clients(id, nom, email, adresse)"
       )
       .eq("id", documentId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (documentError || !documentData || documentData.type !== expectedType) {

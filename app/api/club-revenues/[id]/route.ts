@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
 
 export const runtime = "nodejs";
@@ -29,16 +30,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     const { data, error } = await supabase
       .from("club_revenues")
@@ -55,7 +51,7 @@ export async function GET(
       `
       )
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (error || !data) {
@@ -87,16 +83,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -117,14 +108,14 @@ export async function PUT(
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
 
-    const eventCheck = await assertEventOwnedByUser(supabase, user.id, eventId ?? null);
+    const eventCheck = await assertEventOwnedByUser(supabase, guard.clubId, eventId ?? null);
     if (!eventCheck.ok) return eventCheck.response;
 
     const { data: existing } = await supabase
       .from("club_revenues")
       .select("event_id")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     const { data: updated, error } = await supabase
@@ -137,7 +128,7 @@ export async function PUT(
         event_id: eventId || null,
       })
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .select(
         `
         id,
@@ -200,16 +191,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -220,10 +206,14 @@ export async function DELETE(
       .from("club_revenues")
       .select("event_id")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
-    const { error } = await supabase.from("club_revenues").delete().eq("id", id).eq("user_id", user.id);
+    const { error } = await supabase
+      .from("club_revenues")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][club-revenues][DELETE]", error.message, error.code);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { sumClubRevenues, sumInvoiceRevenueFromDocuments, totalEventRevenue } from "@/lib/financial/eventFinancials";
 
 export const runtime = "nodejs";
@@ -14,16 +15,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.VIEW_EXPENSES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     if (!id) {
       return NextResponse.json({ error: "ID de l'événement requis" }, { status: 400 });
@@ -48,7 +44,7 @@ export async function GET(
         )
       `)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (error || !event) {
@@ -75,7 +71,7 @@ export async function GET(
           nom
         )
       `)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("event_id", id)
       .eq("type", "invoice")
       .order("date_creation", { ascending: false });
@@ -84,7 +80,7 @@ export async function GET(
     const { data: clubRevenuesRows, error: clubRevenuesError } = await supabase
       .from("club_revenues")
       .select("id, name, amount, revenue_date, description")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("event_id", id)
       .order("revenue_date", { ascending: false });
     if (clubRevenuesError) {
@@ -95,7 +91,7 @@ export async function GET(
     const { data: expenses } = await supabase
       .from("expenses")
       .select("id, description, amount, date, status")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("event_id", id)
       .order("date", { ascending: false });
 
@@ -148,18 +144,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_EXPENSES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
       return accessCheck.response;
@@ -200,7 +190,7 @@ export async function PUT(
       .from("events")
       .update(payload)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .select(`
         id,
         name,
@@ -253,18 +243,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_EXPENSES);
+    if ("error" in guard) return guard.error;
+
     const { id } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
       return accessCheck.response;
@@ -278,7 +262,7 @@ export async function DELETE(
       .from("events")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][events][DELETE] Erreur Supabase:", error);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -60,16 +61,6 @@ const buildFileName = (resource: ExportResource) => {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
     const { searchParams } = request.nextUrl;
     const resource = searchParams.get("resource") as ExportResource | null;
 
@@ -80,13 +71,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const permission =
+      resource === "invoices"
+        ? PERMISSIONS.VIEW_INVOICES
+        : resource === "clients"
+          ? PERMISSIONS.VIEW_MEMBERS
+          : PERMISSIONS.VIEW_EXPENSES;
+
+    const guard = await requirePermission(permission);
+    if ("error" in guard) return guard.error;
+
+    const supabase = await createClient();
+
     if (resource === "invoices") {
       const { data, error } = await supabase
         .from("documents")
         .select(
           "numero, status, date_creation, total_ht, total_tva, total_ttc, client:clients(nom)"
         )
-        .eq("user_id", user.id)
+        .eq("user_id", guard.clubId)
         .eq("type", "invoice")
         .order("created_at", { ascending: false });
 
@@ -137,7 +140,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase
         .from("clients")
         .select("nom, email, telephone, adresse, created_at")
-        .eq("user_id", user.id)
+        .eq("user_id", guard.clubId)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -173,7 +176,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from("expenses")
       .select("description, amount, date, status, notes")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("date", { ascending: false });
 
     if (error) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -9,20 +10,15 @@ type SendTo = "all" | "source" | "manual";
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const { data: campaigns, error } = await supabase
       .from("marketing_campaigns")
       .select("id, name, subject, status, recipient_count, sent_at, created_at")
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -38,15 +34,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -76,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (profileError) {
@@ -105,7 +96,7 @@ export async function POST(request: NextRequest) {
     let contactsQuery = supabase
       .from("marketing_contacts")
       .select("id, email")
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .eq("unsubscribed", false);
 
     if (sendTo === "source" && source) {
@@ -127,7 +118,7 @@ export async function POST(request: NextRequest) {
     const { data: campaign, error: campaignError } = await supabase
       .from("marketing_campaigns")
       .insert({
-        club_id: user.id,
+        club_id: guard.clubId,
         name,
         subject,
         content_html: contentHtml,
@@ -142,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     const recipientPayload = contacts.map((contact) => ({
       campaign_id: campaign.id,
-      club_id: user.id,
+      club_id: guard.clubId,
       contact_id: contact.id,
       email: contact.email,
       status: "pending",
@@ -158,7 +149,7 @@ export async function POST(request: NextRequest) {
         .from("marketing_campaigns")
         .update({ status: "failed", recipient_count: 0 })
         .eq("id", campaign.id)
-        .eq("club_id", user.id);
+        .eq("club_id", guard.clubId);
 
       return NextResponse.json(
         { error: recipientsError?.message || "Erreur préparation destinataires" },
@@ -213,7 +204,7 @@ export async function POST(request: NextRequest) {
         recipient_count: recipients.length,
       })
       .eq("id", campaign.id)
-      .eq("club_id", user.id);
+      .eq("club_id", guard.clubId);
 
     return NextResponse.json(
       {

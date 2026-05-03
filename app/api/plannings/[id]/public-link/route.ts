@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -29,22 +30,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     const { data: planning } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (!planning) {
@@ -55,7 +51,7 @@ export async function GET(
       .from("public_planning_links")
       .select("id, token, active, created_at, require_name, require_email")
       .eq("planning_id", planningId)
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .maybeSingle();
 
     if (!link) {
@@ -92,22 +88,17 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     const { data: planning } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (!planning) {
@@ -124,7 +115,7 @@ export async function POST(
       .from("public_planning_links")
       .select("id, token, active, created_at, require_name, require_email")
       .eq("planning_id", planningId)
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .maybeSingle();
 
     let linkData: PublicPlanningLinkRow | null = existing;
@@ -137,7 +128,7 @@ export async function POST(
           .insert({
             planning_id: planningId,
             token,
-            club_id: user.id,
+            club_id: guard.clubId,
             active: true,
             require_name: requireName,
             require_email: requireEmail,

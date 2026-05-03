@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { nanoid } from "nanoid";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
-// GET: List all QR codes for the current user
+// GET: List all QR codes for the current club
 export async function GET() {
   try {
+    const guard = await requirePermission(PERMISSIONS.VIEW_MEMBERS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
 
     const { data: qrcodes, error } = await supabase
       .from("qrcodes")
-      .select(`
+      .select(
+        `
         *,
         registrations:registrations(count)
-      `)
-      .eq("user_id", user.id)
+      `
+      )
+      .eq("user_id", guard.clubId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -26,7 +27,6 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Format the response to include registration count
     const formattedQrcodes = qrcodes?.map((qr) => ({
       ...qr,
       registrationsCount: qr.registrations?.[0]?.count || 0,
@@ -42,12 +42,10 @@ export async function GET() {
 // POST: Create a new QR code
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
 
     const body = await request.json();
     const { name, description, eventType, eventDate } = body;
@@ -56,13 +54,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Le nom est obligatoire" }, { status: 400 });
     }
 
-    // Generate a unique code for the QR
     const code = nanoid(10);
 
     const { data: qrcode, error } = await supabase
       .from("qrcodes")
       .insert({
-        user_id: user.id,
+        user_id: guard.clubId,
         name: name.trim(),
         description: description?.trim() || null,
         event_type: eventType || "other",
@@ -88,12 +85,10 @@ export async function POST(request: NextRequest) {
 // DELETE: Delete a QR code
 export async function DELETE(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -106,7 +101,7 @@ export async function DELETE(request: NextRequest) {
       .from("qrcodes")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][QRCodes] Erreur suppression:", error);

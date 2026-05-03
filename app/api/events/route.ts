@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -10,15 +11,10 @@ export const runtime = "nodejs";
    ========================= */
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     // Récupérer les événements avec le type
     const { data: events, error } = await supabase
@@ -38,7 +34,7 @@ export async function GET() {
           name
         )
       `)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("start_date", { ascending: false });
 
     if (error) {
@@ -53,7 +49,7 @@ export async function GET() {
     const { data: documentsData } = await supabase
       .from("documents")
       .select("event_id, total_ttc, type")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("type", "invoice")
       .not("event_id", "is", null);
 
@@ -61,7 +57,7 @@ export async function GET() {
     const { data: clubRevenuesData, error: clubRevenuesError } = await supabase
       .from("club_revenues")
       .select("event_id, amount")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .not("event_id", "is", null);
     if (clubRevenuesError) {
       console.warn("[API][events][GET] club_revenues:", clubRevenuesError.message);
@@ -71,7 +67,7 @@ export async function GET() {
     const { data: expensesData } = await supabase
       .from("expenses")
       .select("event_id, amount")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .not("event_id", "is", null);
 
     // Calculer les totaux par événement
@@ -122,17 +118,11 @@ export async function GET() {
    ========================= */
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_EXPENSES);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
       return accessCheck.response;
@@ -157,7 +147,7 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = {
-      user_id: user.id,
+      user_id: guard.clubId,
       name: name.trim(),
       description: description?.trim() || null,
       start_date: startDate,

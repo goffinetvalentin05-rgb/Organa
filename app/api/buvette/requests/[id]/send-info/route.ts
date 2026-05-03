@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -16,14 +17,10 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (!user) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const body = await request.json();
     const message = typeof body?.message === "string" ? body.message.trim() : "";
@@ -35,7 +32,7 @@ export async function POST(
       .from("buvette_requests")
       .select("id, status, first_name, last_name, email, reservation_date, event_type")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (reqError || !reqData) {
@@ -59,7 +56,7 @@ export async function POST(
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (profileError) {

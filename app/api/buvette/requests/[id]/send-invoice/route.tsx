@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -49,15 +50,10 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const body = await request.json();
     const amount = Number(body?.amount);
@@ -70,7 +66,7 @@ export async function POST(
       .from("buvette_requests")
       .select("id, status, first_name, last_name, email, reservation_date, event_type")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (reqError || !reqData) {
@@ -94,7 +90,7 @@ export async function POST(
       .select(
         "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, resend_api_key, email_custom_enabled, email_sender_name, email_sender_email"
       )
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (profileError) {
@@ -148,7 +144,7 @@ export async function POST(
     const { count: invoiceCount } = await supabase
       .from("documents")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("type", "invoice")
       .gte("created_at", `${year}-01-01`)
       .lte("created_at", `${year}-12-31`);
@@ -161,7 +157,7 @@ export async function POST(
     const { data: existingClientByEmail } = await supabase
       .from("clients")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("email", reqData.email)
       .limit(1)
       .maybeSingle();
@@ -172,7 +168,7 @@ export async function POST(
       const { data: createdClient, error: createClientError } = await supabase
         .from("clients")
         .insert({
-          user_id: user.id,
+          user_id: guard.clubId,
           name: fullName || reqData.email,
           email: reqData.email,
           role: "player",
@@ -298,7 +294,7 @@ N'hésite pas à nous contacter si tu as des questions.
     const { data: insertedInvoice, error: insertInvoiceError } = await supabase
       .from("documents")
       .insert({
-        user_id: user.id,
+        user_id: guard.clubId,
         client_id: clientId,
         type: "invoice",
         status: "envoye",

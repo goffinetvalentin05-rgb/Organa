@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -14,15 +15,10 @@ export async function PUT(
       return NextResponse.json({ error: "ID manquant" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -51,7 +47,7 @@ export async function PUT(
     const { data: duplicateEmail } = await supabase
       .from("marketing_contacts")
       .select("id")
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .eq("email_normalized", email)
       .neq("id", id)
       .maybeSingle();
@@ -73,7 +69,7 @@ export async function PUT(
         source,
       })
       .eq("id", id)
-      .eq("club_id", user.id)
+      .eq("club_id", guard.clubId)
       .select("id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed")
       .single();
 
@@ -98,15 +94,10 @@ export async function DELETE(
       return NextResponse.json({ error: "ID manquant" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user?.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
@@ -117,7 +108,7 @@ export async function DELETE(
       .from("marketing_contacts")
       .delete()
       .eq("id", id)
-      .eq("club_id", user.id);
+      .eq("club_id", guard.clubId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

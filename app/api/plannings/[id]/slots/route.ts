@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -13,23 +14,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur (date pour réponse si pas de slot_date en base)
+    // Vérifier que le planning appartient au club courant
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
       .select("id, date")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {
@@ -165,23 +161,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
       .select("id, date")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {
@@ -304,23 +294,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {

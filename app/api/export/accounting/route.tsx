@@ -4,6 +4,7 @@ import JSZip from "jszip";
 import { createClient } from "@/lib/supabase/server";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getDocumentPdfData } from "@/lib/utils/pdf-data";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -97,16 +98,6 @@ const buildAttachmentFileName = (
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
     const { searchParams } = request.nextUrl;
     const resourceParam = searchParams.get("resource");
     const yearParam = searchParams.get("year");
@@ -125,13 +116,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const permission =
+      resource === "expenses" ? PERMISSIONS.VIEW_EXPENSES : PERMISSIONS.VIEW_INVOICES;
+    const guard = await requirePermission(permission);
+    if ("error" in guard) return guard.error;
+
+    const supabase = await createClient();
+
     const startDate = `${year}-01-01`;
     const endDate = `${year}-12-31`;
 
     const { data: profile } = await supabase
       .from("profiles")
       .select("currency, currency_symbol")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     const currency = profile?.currency || "CHF";
@@ -140,7 +138,7 @@ export async function GET(request: NextRequest) {
       const { data: expenses, error } = await supabase
         .from("expenses")
         .select("id, description, amount, date, status, notes, attachment_url")
-        .eq("user_id", user.id)
+        .eq("user_id", guard.clubId)
         .gte("date", startDate)
         .lte("date", endDate)
         .order("date", { ascending: true });
@@ -225,7 +223,7 @@ export async function GET(request: NextRequest) {
       .select(
         "id, numero, status, date_creation, total_ht, total_tva, total_ttc, client:clients(nom)"
       )
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("type", "invoice")
       .neq("status", "brouillon")
       .gte("date_creation", startDate)
@@ -274,7 +272,9 @@ export async function GET(request: NextRequest) {
     zip.file(`factures-${year}.csv`, csv);
 
     for (const doc of documents || []) {
-      const pdfData = await getDocumentPdfData(doc.id, "invoice");
+      const pdfData = await getDocumentPdfData(doc.id, "invoice", {
+        dataUserId: guard.clubId,
+      });
       const pdfBuffer = await renderToBuffer(
         <FacturePdf
           company={pdfData.company}

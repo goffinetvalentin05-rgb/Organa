@@ -6,6 +6,7 @@ import {
   formatVolunteerDisplayNameForPdf,
   sortPlanningSlotsForPdf,
 } from "@/lib/planning/pdfVolunteerDisplay";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -21,15 +22,10 @@ export async function GET(request: Request) {
       );
     }
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     // Récupérer le planning
     const { data: planning, error: planningError } = await supabase
@@ -47,7 +43,7 @@ export async function GET(request: Request) {
         )
       `)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {
@@ -121,7 +117,7 @@ export async function GET(request: Request) {
         .from("clients")
         .select("*")
         .in("id", clientIds)
-        .eq("user_id", user.id);
+        .eq("user_id", guard.clubId);
 
       if (clientsErr) {
         console.error("[PDF][planning] clients batch:", clientsErr.message);
@@ -135,7 +131,7 @@ export async function GET(request: Request) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("company_name, company_address, company_email, company_phone, logo_url")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     // Structurer les données pour le PDF (toujours depuis slotsRows, pas slots — cohérent avec le fallback sans slot_date)

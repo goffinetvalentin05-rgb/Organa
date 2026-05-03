@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/company-settings";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 /**
  * API Route pour récupérer les paramètres de l'entreprise
@@ -10,58 +11,54 @@ import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/compan
 export async function GET(request: NextRequest) {
   try {
     console.log("[API][settings] GET - Début récupération");
+    const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
+    const clubId = guard.clubId;
+    const actorId = guard.userId;
 
-    // Vérifier l'authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    console.log("[API][settings] GET - club:", clubId, "actor:", actorId);
 
-    if (authError || !user) {
-      console.error("[API][settings] GET - Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié", details: authError?.message },
-        { status: 401 }
-      );
-    }
-
-    console.log("[API][settings] GET - User authentifié:", user.id);
-
-    // Récupérer les paramètres depuis profiles - TOUTES les colonnes nécessaires
+    // Profil « entreprise » du club = ligne profiles.user_id = propriétaire du club
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
       .select(
         "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
       )
-      .eq("user_id", user.id)
+      .eq("user_id", clubId)
       .maybeSingle();
 
-    // Si le profil n'existe pas, le créer avec valeurs par défaut
+    // Création auto du profil : uniquement pour son propre compte-club (pas pour un invité)
     if (!profile) {
-      console.log("[API][settings] GET - Profil inexistant, création avec valeurs par défaut...");
-      const defaultCurrencySymbol = getCurrencySymbol(DEFAULT_COMPANY_SETTINGS.currency);
-      
-      const { data: newProfile, error: createError } = await supabase
-        .from("profiles")
-        .insert({
-          user_id: user.id,
-          plan: "free",
-          primary_color: DEFAULT_COMPANY_SETTINGS.primary_color,
-          currency: DEFAULT_COMPANY_SETTINGS.currency,
-          currency_symbol: defaultCurrencySymbol,
-        })
-        .select(
-          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
-        )
-        .single();
+      if (clubId === actorId) {
+        console.log("[API][settings] GET - Profil inexistant, création avec valeurs par défaut...");
+        const defaultCurrencySymbol = getCurrencySymbol(DEFAULT_COMPANY_SETTINGS.currency);
 
-      if (createError) {
-        console.error("[API][settings] GET - Erreur création profil:", createError);
-        // En cas d'erreur de création, retourner les valeurs par défaut plutôt que de planter
-        profile = null;
+        const { data: newProfile, error: createError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: actorId,
+            plan: "free",
+            primary_color: DEFAULT_COMPANY_SETTINGS.primary_color,
+            currency: DEFAULT_COMPANY_SETTINGS.currency,
+            currency_symbol: defaultCurrencySymbol,
+          })
+          .select(
+            "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+          )
+          .single();
+
+        if (createError) {
+          console.error("[API][settings] GET - Erreur création profil:", createError);
+          profile = null;
+        } else {
+          profile = newProfile as any;
+        }
       } else {
-        profile = newProfile as any;
+        console.log(
+          "[API][settings] GET - Pas de profil pour ce club (hors création auto invité)"
+        );
       }
     } else if (fetchError) {
       console.error("[API][settings] GET - Erreur récupération profil:", {
@@ -148,23 +145,14 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     console.log("[API][settings] PUT - Début sauvegarde");
+    const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
+    const clubId = guard.clubId;
+    const actorId = guard.userId;
 
-    // Vérifier l'authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      console.error("[API][settings] PUT - Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié", details: authError?.message },
-        { status: 401 }
-      );
-    }
-
-    console.log("[API][settings] PUT - User authentifié:", user.id);
+    console.log("[API][settings] PUT - club:", clubId, "actor:", actorId);
 
     // Parser et valider le body
     let body: any;
@@ -219,7 +207,7 @@ export async function PUT(request: NextRequest) {
       .select(
         "user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
       )
-      .eq("user_id", user.id)
+      .eq("user_id", clubId)
       .maybeSingle();
 
     if (checkError) {
@@ -246,7 +234,7 @@ export async function PUT(request: NextRequest) {
     // Construire UN SEUL objet avec TOUS les champs du profil
     // Fusionner les valeurs existantes avec les nouvelles valeurs du body
     const profilePayload: any = {
-      user_id: user.id,
+      user_id: clubId,
       plan: existingProfile?.plan || "free",
       updated_at: new Date().toISOString(),
     };
@@ -367,7 +355,7 @@ export async function PUT(request: NextRequest) {
       const { data: profile, error: updateError } = await supabase
         .from("profiles")
         .update(updateData)
-        .eq("user_id", user.id)
+        .eq("user_id", clubId)
         .select(
           "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
         )

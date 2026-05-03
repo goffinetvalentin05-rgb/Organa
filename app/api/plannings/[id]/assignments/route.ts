@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -20,23 +21,17 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
       .select("id, name, date")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {
@@ -86,7 +81,7 @@ export async function POST(
       .from("clients")
       .select("id, name, email")
       .eq("id", clientId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .maybeSingle();
 
     if (memberByName && !memberByNameError) {
@@ -100,7 +95,7 @@ export async function POST(
         .from("clients")
         .select("id, nom, email")
         .eq("id", clientId)
-        .eq("user_id", user.id)
+        .eq("user_id", guard.clubId)
         .maybeSingle();
 
       if (memberByNom && !memberByNomError) {
@@ -112,7 +107,7 @@ export async function POST(
       } else {
         console.error("[API][assignments][POST] Membre introuvable:", {
           clientId,
-          userId: user.id,
+          userId: guard.userId,
           memberByNameError: memberByNameError?.message || null,
           memberByNomError: memberByNomError?.message || null,
         });
@@ -157,7 +152,7 @@ export async function POST(
       .insert({
         slot_id: slotId,
         client_id: clientId,
-        assigned_by: user.id,
+        assigned_by: guard.userId,
         source: "internal_member",
       })
       .select()
@@ -179,7 +174,7 @@ export async function POST(
         const { data: profile } = await supabase
           .from("profiles")
           .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
-          .eq("user_id", user.id)
+          .eq("user_id", guard.clubId)
           .maybeSingle();
 
         if (!memberRecord?.email) {
@@ -198,7 +193,7 @@ export async function POST(
           });
           if (!delivery) {
             console.error("[API][assignments][POST] Envoi email impossible (Resend non configuré)", {
-              userId: user.id,
+              userId: guard.userId,
               assignmentId: assignment.id,
             });
           } else {
@@ -311,23 +306,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const { id: planningId } = await params;
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", planningId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (planningError || !planning) {

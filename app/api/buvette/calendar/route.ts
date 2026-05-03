@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getMonthBounds } from "@/lib/buvette/calendar";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (!user) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const month = request.nextUrl.searchParams.get("month");
     if (!month || !/^\d{4}-\d{2}$/.test(month)) {
@@ -26,7 +23,7 @@ export async function GET(request: NextRequest) {
     const { data: slots, error: slotsError } = await supabase
       .from("buvette_slots")
       .select("slot_date, status, source, reason, request_id")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .gte("slot_date", start)
       .lte("slot_date", end);
 
@@ -37,7 +34,7 @@ export async function GET(request: NextRequest) {
     const { data: requests, error: reqError } = await supabase
       .from("buvette_requests")
       .select("id, reservation_date, status, first_name, last_name, event_type")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .gte("reservation_date", start)
       .lte("reservation_date", end);
 

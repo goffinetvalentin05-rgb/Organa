@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { DevisPdf } from "@/lib/pdf/DevisPdf";
 import { getDocumentPdfData } from "@/lib/utils/pdf-data";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -17,7 +18,10 @@ export async function GET(request: Request) {
       );
     }
 
-    const data = await getDocumentPdfData(id, "quote");
+    const guard = await requirePermission(PERMISSIONS.VIEW_DOCUMENTS);
+    if ("error" in guard) return guard.error;
+
+    const data = await getDocumentPdfData(id, "quote", { dataUserId: guard.clubId });
 
     // Générer le PDF avec @react-pdf/renderer
     const pdfBuffer = await renderToBuffer(
