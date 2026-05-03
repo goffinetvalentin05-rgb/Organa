@@ -95,9 +95,14 @@ export function renderInviteEmailHtml(input: InviteEmailInput): {
               ${fct ? `<div><strong>Fonction proposée :</strong> ${fct}</div>` : ""}
               <div><strong>Lien valable jusqu'au :</strong> ${expiry}</div>
             </div>
-            <p>Pour accepter cette invitation et accéder à votre espace :</p>
+            <p>Cliquez sur le bouton ci-dessous pour&nbsp;:</p>
+            <ul style="margin: 0 0 16px 20px; padding: 0; line-height:1.7;">
+              <li>créer votre mot de passe (si vous n'avez pas encore de compte) ;</li>
+              <li>ou vous connecter si vous avez déjà un compte Obillz.</li>
+            </ul>
+            <p>Vous serez ensuite ajouté(e) automatiquement à l'espace du club.</p>
             <p>
-              <a href="${url}" class="cta">Accepter l'invitation</a>
+              <a href="${url}" class="cta">Rejoindre ${clubName}</a>
             </p>
             <div class="url-fallback">
               Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
@@ -119,7 +124,10 @@ export function renderInviteEmailHtml(input: InviteEmailInput): {
     `${input.clubName} sur Obillz.\n\n` +
     (input.functionTitle ? `Fonction proposée : ${input.functionTitle}\n` : "") +
     `Lien valable jusqu'au : ${expiry}\n\n` +
-    `Accepter l'invitation : ${url}\n\n` +
+    `Cliquez sur le lien ci-dessous pour créer votre mot de passe (ou vous ` +
+    `connecter si vous avez déjà un compte). Vous serez ensuite ajouté(e) ` +
+    `automatiquement à l'espace du club.\n\n` +
+    `Rejoindre ${input.clubName} : ${url}\n\n` +
     `Si vous n'attendiez pas cette invitation, ignorez ce message.`;
 
   return { subject, html, text };

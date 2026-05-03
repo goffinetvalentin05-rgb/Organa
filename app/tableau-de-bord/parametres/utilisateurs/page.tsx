@@ -79,6 +79,26 @@ function buildEmptyForm(): FormState {
   };
 }
 
+interface EmailStatus {
+  canSend: boolean;
+  mode: "custom" | "obillz" | null;
+  reason: "ok" | "no_global_key" | "custom_disabled" | "custom_invalid";
+  globalConfigured: boolean;
+  custom: {
+    enabled: boolean;
+    hasKey: boolean;
+    hasSender: boolean;
+    validSender: boolean;
+  };
+}
+
+interface PendingInvite {
+  email: string;
+  url: string;
+  emailOk: boolean;
+  reason?: string;
+}
+
 export default function UtilisateursPage() {
   const myPerms = usePermissions();
   const [members, setMembers] = useState<MemberDTO[]>([]);
@@ -90,15 +110,18 @@ export default function UtilisateursPage() {
   const [editing, setEditing] = useState<{ id: string; member: MemberDTO } | null>(
     null
   );
+  const [emailStatus, setEmailStatus] = useState<EmailStatus | null>(null);
+  const [lastInvite, setLastInvite] = useState<PendingInvite | null>(null);
 
   const canManage = myPerms.has("manage_users");
 
   const fetchAll = async () => {
     setLoadingMembers(true);
     try {
-      const [resM, resI] = await Promise.all([
+      const [resM, resI, resE] = await Promise.all([
         fetch("/api/club/members", { cache: "no-store" }),
         fetch("/api/club/invitations", { cache: "no-store" }),
+        fetch("/api/club/email-status", { cache: "no-store" }),
       ]);
       if (!resM.ok) {
         const j = await resM.json().catch(() => ({}));
@@ -110,6 +133,10 @@ export default function UtilisateursPage() {
       if (resI.ok) {
         const dataI = await resI.json();
         setInvitations((dataI.invitations ?? []) as InvitationDTO[]);
+      }
+      if (resE.ok) {
+        const dataE = await resE.json();
+        setEmailStatus(dataE as EmailStatus);
       }
     } catch (e: any) {
       console.error("[utilisateurs] fetch KO:", e);
@@ -220,29 +247,34 @@ export default function UtilisateursPage() {
       if (!editing) {
         const data = await res.json().catch(() => ({}));
         if (data?.invitation) {
+          const url = data.invitation.invitationUrl as string | undefined;
           if (data.email?.ok) {
             toast.success(`Invitation envoyée à ${data.invitation.email}`);
-          } else {
-            // L'email n'est pas parti : on copie le lien dans le presse-papier
-            // et on prévient l'owner pour qu'il le partage manuellement.
-            const url = data.invitation.invitationUrl;
-            if (url) {
-              try {
-                await navigator.clipboard.writeText(url);
-                toast.success(
-                  "Invitation créée. Lien copié dans le presse-papier (l'envoi email n'était pas configuré)."
-                );
-              } catch {
-                toast.success(
-                  "Invitation créée. L'email n'a pas pu être envoyé : copiez le lien depuis la liste."
-                );
-              }
-            } else {
-              toast.success("Invitation créée.");
+            setLastInvite(null);
+          } else if (url) {
+            try {
+              await navigator.clipboard.writeText(url);
+              toast(
+                "Invitation créée. Email non envoyé : lien copié dans le presse-papier."
+              );
+            } catch {
+              toast(
+                "Invitation créée. Email non envoyé : copiez le lien depuis l'encadré ci-dessous."
+              );
             }
+            setLastInvite({
+              email: data.invitation.email,
+              url,
+              emailOk: false,
+              reason: data.email?.reason,
+            });
+          } else {
+            toast.success("Invitation créée.");
+            setLastInvite(null);
           }
         } else {
           toast.success("Accès créé");
+          setLastInvite(null);
         }
       } else {
         toast.success("Accès mis à jour");
@@ -307,13 +339,20 @@ export default function UtilisateursPage() {
       const data = await res.json().catch(() => ({}));
       if (data.email?.ok) {
         toast.success(`Email renvoyé à ${inv.email}`);
+        setLastInvite(null);
       } else if (data.invitationUrl) {
         try {
           await navigator.clipboard.writeText(data.invitationUrl);
-          toast.success("Lien copié (l'envoi email a échoué)");
+          toast("Lien copié (l'envoi email a échoué)");
         } catch {
-          toast.success("Lien généré (copie manuelle nécessaire)");
+          toast("Lien généré (copie manuelle nécessaire)");
         }
+        setLastInvite({
+          email: inv.email,
+          url: data.invitationUrl,
+          emailOk: false,
+          reason: data.email?.reason,
+        });
       } else {
         toast.success("Invitation relancée");
       }
@@ -418,6 +457,105 @@ export default function UtilisateursPage() {
           </button>
         )}
       </header>
+
+      {emailStatus && !emailStatus.canSend && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <span
+              aria-hidden
+              className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-amber-200 text-amber-800 font-bold"
+            >
+              !
+            </span>
+            <div className="flex-1 space-y-2 text-sm text-amber-900">
+              <p className="font-semibold">
+                L'envoi d'emails d'invitation n'est pas actif pour ce club.
+              </p>
+              {emailStatus.reason === "no_global_key" && (
+                <p>
+                  Aucun service d'envoi n'est configuré (ni Resend personnalisé
+                  côté club, ni clé Resend globale Obillz). Vous pouvez créer
+                  des invitations, mais le lien devra être transmis
+                  manuellement (copier/coller).
+                </p>
+              )}
+              {emailStatus.reason === "custom_invalid" && (
+                <p>
+                  Votre configuration Resend personnalisée semble incomplète
+                  (clé API ou adresse expéditeur manquante / invalide).
+                  Corrigez-la dans{" "}
+                  <Link
+                    href="/tableau-de-bord/parametres"
+                    className="underline font-semibold"
+                  >
+                    Paramètres → Email expéditeur
+                  </Link>
+                  , ou désactivez l'envoi personnalisé pour utiliser Obillz par
+                  défaut.
+                </p>
+              )}
+              <p className="text-xs text-amber-800">
+                Pour activer l'envoi automatique d'emails : ajoutez{" "}
+                <code className="rounded bg-amber-100 px-1">RESEND_API_KEY</code>{" "}
+                et{" "}
+                <code className="rounded bg-amber-100 px-1">
+                  RESEND_FROM_EMAIL
+                </code>{" "}
+                dans le fichier{" "}
+                <code className="rounded bg-amber-100 px-1">.env.local</code>{" "}
+                puis redémarrez le serveur, ou configurez Resend côté club.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {lastInvite && !lastInvite.emailOk && (
+        <div className="rounded-2xl border border-blue-300 bg-blue-50 p-5">
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="font-semibold text-blue-900">
+                Lien d'invitation à transmettre manuellement
+              </p>
+              <p className="mt-1 text-sm text-blue-800">
+                L'email n'a pas pu être envoyé à{" "}
+                <strong>{lastInvite.email}</strong>. Copiez le lien ci-dessous
+                et envoyez-le à la personne par le moyen de votre choix
+                (WhatsApp, SMS, email perso…).
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                readOnly
+                value={lastInvite.url}
+                className="flex-1 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs text-slate-700 font-mono"
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(lastInvite.url);
+                    toast.success("Lien copié");
+                  } catch {
+                    toast.error("Impossible de copier — sélectionnez le lien.");
+                  }
+                }}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Copier
+              </button>
+              <button
+                type="button"
+                onClick={() => setLastInvite(null)}
+                className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <form
