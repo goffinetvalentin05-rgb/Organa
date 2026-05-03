@@ -128,7 +128,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="dashboard-shell relative min-h-screen bg-gradient-to-br from-[#12172e] via-[#1a2768] to-[#0a0e1c]">
+    <div className="dashboard-shell relative min-h-screen bg-gradient-to-br from-[#152456] via-[#1e3a8a] to-[#0f1630]">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{

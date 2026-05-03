@@ -132,34 +132,32 @@ export default function MemberFieldsSettingsCard({
           </p>
         </div>
       ) : (
-        <p className="text-sm text-slate-600">{t("dashboard.settings.memberFields.subtitle")}</p>
+        <p className="text-sm text-white/70">{t("dashboard.settings.memberFields.subtitle")}</p>
       )}
 
       {loading ? (
-        <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
+        <p className="text-sm text-white/60">{t("dashboard.common.loading")}</p>
       ) : (
         <>
           <ul className="space-y-3">
             {FIELD_ORDER.map((key) => (
               <li
                 key={key}
-                className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4 rounded-xl border border-slate-100 bg-slate-50/80 p-4"
+                className="flex flex-col gap-2 rounded-xl border border-white/[0.18] bg-white/[0.08] p-4 backdrop-blur-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4"
               >
                 <div className="min-w-0 flex-1">
-                  <label className="flex items-start gap-3 cursor-pointer">
+                  <label className="flex cursor-pointer items-start gap-3">
                     <input
                       type="checkbox"
-                      className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="mt-1 h-4 w-4 rounded border-white/35 bg-white/20 text-blue-500 focus:ring-blue-400/60"
                       checked={fields[key].enabled}
                       disabled={!canSave}
                       onChange={(e) => toggle(key, e.target.checked)}
                     />
                     <span>
-                      <span className="font-medium text-slate-900 block">
-                        {t(labelKey(key))}
-                      </span>
+                      <span className="block font-medium text-white/95">{t(labelKey(key))}</span>
                       {key === "avs_number" && (
-                        <span className="mt-1 block text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                        <span className="mt-1 block rounded-lg border border-amber-300/35 bg-amber-500/15 px-2 py-1.5 text-xs text-amber-50">
                           {t("dashboard.settings.memberFields.avsWarning")}
                         </span>
                       )}
@@ -171,9 +169,7 @@ export default function MemberFieldsSettingsCard({
           </ul>
 
           {!canSave && (
-            <p className="text-sm text-slate-500">
-              {t("dashboard.settings.memberFields.readOnlyHint")}
-            </p>
+            <p className="text-sm text-white/65">{t("dashboard.settings.memberFields.readOnlyHint")}</p>
           )}
 
           <div className="pt-2">

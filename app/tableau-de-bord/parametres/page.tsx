@@ -548,7 +548,7 @@ export default function ParametresPage() {
         <Link href="/tableau-de-bord/parametres/utilisateurs" className="group block">
           <GlassCard
             padding="lg"
-            className="transition-all duration-200 hover:border-white/35 hover:shadow-xl hover:shadow-blue-950/30"
+            className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
@@ -564,7 +564,7 @@ export default function ParametresPage() {
                   </p>
                 </div>
               </div>
-              <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/30 transition group-hover:bg-slate-800 sm:py-2.5">
+              <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/30 bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-900/25 transition group-hover:opacity-95 sm:py-2.5">
                 {t("dashboard.settings.layout.usersAccess.cta")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -573,6 +573,7 @@ export default function ParametresPage() {
         </Link>
 
         <SectionCard
+          bodySurface="glass"
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}
           description={t("dashboard.settings.layout.sectionDescriptions.members")}
@@ -584,7 +585,7 @@ export default function ParametresPage() {
             <MemberFieldsSettingsCard embedded />
           </SettingsAccordion>
           <SettingsAccordion title={t("dashboard.settings.layout.accordions.memberCategories")}>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <p className="text-sm leading-relaxed text-white/70">
               {t("dashboard.settings.layout.memberCategories.body")}
             </p>
           </SettingsAccordion>
@@ -592,17 +593,18 @@ export default function ParametresPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <SectionCard
+            bodySurface="glass"
             icon={Building2}
             title={t("dashboard.settings.layout.sections.clubInfo")}
             description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.visualIdentity")}>
               <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-slate-700">
+                <label className="mb-2 block text-sm font-medium text-white/88">
                   {t("dashboard.settings.branding.logoLabel")}
                 </label>
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
                     {logoPreview ? (
                       <Image
                         src={logoPreview}
@@ -613,7 +615,7 @@ export default function ParametresPage() {
                         unoptimized={logoPreview.includes("supabase.co")}
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-slate-400">
+                      <div className="flex flex-col items-center justify-center p-4 text-white/50">
                         <Building2 className="mb-2 h-12 w-12" />
                         <span className="text-center text-xs">{t("dashboard.settings.branding.noLogo")}</span>
                       </div>
@@ -778,13 +780,14 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
+            bodySurface="glass"
             icon={Wallet}
             title={t("dashboard.settings.layout.sections.finances")}
             description={t("dashboard.settings.layout.sectionDescriptions.finances")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.subscription")}>
               {loadingPlan ? (
-                <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
+                <p className="text-sm text-white/65">{t("dashboard.common.loading")}</p>
               ) : (
                 <div className="space-y-4">
                   {subscription ? (
@@ -938,17 +941,18 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
+            bodySurface="glass"
             icon={Shield}
             title={t("dashboard.settings.layout.sections.security")}
             description={t("dashboard.settings.layout.sectionDescriptions.security")}
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.email")}>
-              <p className="mb-4 text-sm text-slate-500">{t("dashboard.settings.email.introDefault")}</p>
+              <p className="mb-4 text-sm text-white/65">{t("dashboard.settings.email.introDefault")}</p>
 
-              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900">{t("dashboard.settings.email.customToggle")}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">{t("dashboard.settings.email.customToggleHelp")}</p>
+                  <p className="text-sm font-medium text-white/95">{t("dashboard.settings.email.customToggle")}</p>
+                  <p className="mt-0.5 text-xs text-white/60">{t("dashboard.settings.email.customToggleHelp")}</p>
                 </div>
                 <label className="inline-flex shrink-0 cursor-pointer items-center self-start sm:self-center">
                   <input
@@ -1039,6 +1043,7 @@ export default function ParametresPage() {
           </SectionCard>
 
           <SectionCard
+            bodySurface="glass"
             icon={Settings}
             title={t("dashboard.settings.layout.sections.advanced")}
             description={t("dashboard.settings.layout.sectionDescriptions.advanced")}
@@ -1068,7 +1073,7 @@ export default function ParametresPage() {
           </SectionCard>
 
           <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50/90 via-white to-blue-50/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
+            <p className="text-sm text-white/70">{t("dashboard.settings.layout.saveBarHint")}</p>
             <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
               {t("dashboard.settings.saveButton")}
             </DashboardPrimaryButton>
