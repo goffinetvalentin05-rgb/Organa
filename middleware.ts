@@ -29,6 +29,7 @@ function isPublicApiPath(pathname: string): boolean {
 /** Endpoints API où le contrôle MFA est relâché (bootstrap UI minimale). */
 function isMfaExemptApi(pathname: string): boolean {
   if (pathname === "/api/me") return true;
+  if (pathname === "/api/me/permissions") return true;
   return false;
 }
 

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 
 export const runtime = "nodejs";
 
@@ -24,27 +26,18 @@ export async function GET(
     );
   }
 
+  const guard = await requirePermission(PERMISSIONS.VIEW_MEMBERS);
+  if ("error" in guard) return guard.error;
+
   const supabase = await createClient();
-
-  // Authentification
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.id) {
-    return NextResponse.json(
-      { error: "Non authentifié" },
-      { status: 401 }
-    );
-  }
 
   // Récupérer le client depuis Supabase
   // Note: Les colonnes BD sont en anglais (name, phone, address)
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at")
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", guard.clubId)
     .single();
 
   if (error || !data) {
@@ -66,6 +59,10 @@ export async function GET(
     user_id: data.user_id,
     role: data.role,
     category: data.category,
+    createdBy: data.created_by ?? null,
+    updatedBy: data.updated_by ?? null,
+    createdAt: data.created_at ?? null,
+    updatedAt: data.updated_at ?? null,
   };
 
   return NextResponse.json({ client });
@@ -90,19 +87,11 @@ export async function PUT(
     );
   }
 
+  const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
+  if ("error" in guard) return guard.error;
+
   const supabase = await createClient();
-
-  // Authentification
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.id) {
-    return NextResponse.json(
-      { error: "Non authentifié" },
-      { status: 401 }
-    );
-  }
+  const user = guard.ctx.user;
 
   // Vérifier l'accès en écriture (trial actif ou abonnement)
   const accessCheck = await requireWriteAccess();
@@ -144,10 +133,11 @@ export async function PUT(
       city: city || null,
       role: role || "player",
       category: category ?? null,
+      updated_by: user.id,
     })
     .eq("id", id)
-    .eq("user_id", user.id)
-    .select("id, name, email, phone, address, postal_code, city, user_id, role, category")
+    .eq("user_id", guard.clubId)
+    .select("id, name, email, phone, address, postal_code, city, user_id, role, category, created_by, updated_by, created_at, updated_at")
     .maybeSingle();
 
   if (updateError) {
@@ -179,6 +169,10 @@ export async function PUT(
     user_id: updated.user_id,
     role: updated.role,
     category: updated.category,
+    createdBy: updated.created_by ?? null,
+    updatedBy: updated.updated_by ?? null,
+    createdAt: updated.created_at ?? null,
+    updatedAt: updated.updated_at ?? null,
   };
 
   return NextResponse.json({ success: true, client: clientResponse });
@@ -203,19 +197,10 @@ export async function DELETE(
     );
   }
 
+  const guard = await requirePermission(PERMISSIONS.DELETE_MEMBERS);
+  if ("error" in guard) return guard.error;
+
   const supabase = await createClient();
-
-  // Authentification
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.id) {
-    return NextResponse.json(
-      { error: "Non authentifié" },
-      { status: 401 }
-    );
-  }
 
   // Vérifier l'accès en écriture (trial actif ou abonnement)
   const accessCheck = await requireWriteAccess();
@@ -223,12 +208,12 @@ export async function DELETE(
     return accessCheck.response;
   }
 
-  // Suppression dans Supabase (vérifier qu’une ligne a bien été supprimée)
+  // Suppression dans Supabase (vérifier qu'une ligne a bien été supprimée)
   const { data: deletedRows, error: deleteError } = await supabase
     .from("clients")
     .delete()
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", guard.clubId)
     .select("id");
 
   if (deleteError) {
@@ -245,6 +230,16 @@ export async function DELETE(
       { status: 404 }
     );
   }
+
+  const meta = extractRequestMetadata(request);
+  await logAudit({
+    clubId: guard.clubId,
+    action: AuditAction.HARD_DELETE,
+    resourceType: "member",
+    resourceId: id,
+    metadata: {},
+    ...meta,
+  });
 
   // Invalider le cache
   revalidatePath("/tableau-de-bord/clients");

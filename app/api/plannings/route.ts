@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -11,15 +12,10 @@ export const runtime = "nodejs";
    ========================= */
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     // Récupérer les plannings avec les événements liés
     const { data: plannings, error } = await supabase
@@ -32,13 +28,15 @@ export async function GET() {
         status,
         created_at,
         updated_at,
+        created_by,
+        updated_by,
         event_id,
         events (
           id,
           name
         )
       `)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("date", { ascending: false });
 
     if (error) {
@@ -108,15 +106,11 @@ export async function GET() {
    ========================= */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
+    const user = guard.ctx.user;
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
@@ -143,12 +137,14 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = {
-      user_id: user.id,
+      user_id: guard.clubId,
       name: name.trim(),
       description: description?.trim() || null,
       date: date,
       status: status || "draft",
       event_id: eventId || null,
+      created_by: user.id,
+      updated_by: user.id,
     };
 
     const { data: newPlanning, error } = await supabase
@@ -162,6 +158,8 @@ export async function POST(request: NextRequest) {
         status,
         created_at,
         updated_at,
+        created_by,
+        updated_by,
         event_id,
         events (
           id,

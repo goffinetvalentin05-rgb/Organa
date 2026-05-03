@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -10,17 +12,11 @@ export const runtime = "nodejs";
 // GET /api/documents - Lister ou récupérer un document
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      console.error("[API][documents][GET] Erreur auth:", authError);
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const user = guard.ctx.user;
 
     const { searchParams } = request.nextUrl;
     const type = searchParams.get("type");
@@ -29,9 +25,9 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
+        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(id, nom:name, email, telephone:phone, adresse:address)"
       )
-      .eq("user_id", user.id);
+      .eq("user_id", guard.clubId);
 
     if (type) {
       query = query.eq("type", type);
@@ -53,7 +49,7 @@ export async function GET(request: NextRequest) {
           .from("events")
           .select("id, name")
           .eq("id", data.event_id)
-          .eq("user_id", user.id)
+          .eq("user_id", guard.clubId)
           .maybeSingle();
         if (ev) {
           linkedEvent = { id: ev.id, name: ev.name };
@@ -94,21 +90,11 @@ export async function GET(request: NextRequest) {
 // POST /api/documents - Créer un nouveau document
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-
-    // Authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      console.error("[API][documents][POST] Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié" },
-        { status: 401 }
-      );
-    }
+    const user = guard.ctx.user;
 
     console.log("[API][documents][POST] User authentifié:", user.id);
 
@@ -154,12 +140,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier que le client appartient à l'utilisateur
+    // Vérifier que le client appartient au club
     const { data: client, error: clientError } = await supabase
       .from("clients")
       .select("id")
       .eq("id", clientId)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (clientError || !client) {
@@ -180,7 +166,7 @@ export async function POST(request: NextRequest) {
     const { count: docCount } = await supabase
       .from("documents")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .eq("type", type)
       .gte("created_at", `${year}-01-01`)
       .lte("created_at", `${year}-12-31`);
@@ -193,7 +179,7 @@ export async function POST(request: NextRequest) {
     // Préparer les données d'insertion avec les noms de colonnes exacts
     // Ne jamais envoyer date_echeance si elle est vide/undefined (laisser le default de la DB)
     const documentData: any = {
-      user_id: user.id,
+      user_id: guard.clubId,
       client_id: clientId,
       type: type, // 'quote' ou 'invoice'
       items: lignes, // jsonb
@@ -203,6 +189,8 @@ export async function POST(request: NextRequest) {
       total_tva: totalTVA,
       total_ttc: totalTTC,
       numero: numero,
+      created_by: user.id,
+      updated_by: user.id,
     };
 
     // Ajouter date_echeance uniquement si fourni et non vide
@@ -279,6 +267,16 @@ export async function POST(request: NextRequest) {
       type: newDocument.type,
     });
 
+    const meta = extractRequestMetadata(request);
+    await logAudit({
+      clubId: guard.clubId,
+      action: AuditAction.CREATE,
+      resourceType: type === "invoice" ? "invoice" : "quote",
+      resourceId: String(newDocument.id),
+      metadata: { numero: newDocument.numero, total_ttc: totalTTC },
+      ...meta,
+    });
+
     return NextResponse.json({
       id: newDocument.id.toString(),
       numero: newDocument.numero,
@@ -296,17 +294,10 @@ export async function POST(request: NextRequest) {
 // DELETE /api/documents - Supprimer un document
 export async function DELETE(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.DELETE_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      console.error("[API][documents][DELETE] Erreur auth:", authError);
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
@@ -324,11 +315,19 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Récupérer le doc avant delete pour audit
+    const { data: docInfo } = await supabase
+      .from("documents")
+      .select("numero, type, total_ttc")
+      .eq("id", id)
+      .eq("user_id", guard.clubId)
+      .maybeSingle();
+
     const { error } = await supabase
       .from("documents")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][documents][DELETE] Erreur Supabase:", error);
@@ -337,6 +336,16 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const meta = extractRequestMetadata(request);
+    await logAudit({
+      clubId: guard.clubId,
+      action: AuditAction.HARD_DELETE,
+      resourceType: docInfo?.type === "invoice" ? "invoice" : "quote",
+      resourceId: id,
+      metadata: { numero: docInfo?.numero, total_ttc: docInfo?.total_ttc },
+      ...meta,
+    });
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/devis");
@@ -378,6 +387,10 @@ function formatDocument(
     eventId: doc.event_id ?? null,
     linkedEvent:
       linkedEvent !== undefined ? linkedEvent : null,
+    createdBy: doc.created_by ?? null,
+    updatedBy: doc.updated_by ?? null,
+    createdAt: doc.created_at ?? null,
+    updatedAt: doc.updated_at ?? null,
     client: client
       ? {
           id: client.id,
@@ -392,21 +405,11 @@ function formatDocument(
 // PATCH /api/documents - Mettre à jour un document existant
 export async function PATCH(request: NextRequest) {
   try {
+    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-
-    // Authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user || !user.id) {
-      console.error("[API][documents][PATCH] Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié" },
-        { status: 401 }
-      );
-    }
+    const user = guard.ctx.user;
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess();
@@ -431,12 +434,12 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Vérifier que le document appartient à l'utilisateur
+    // Vérifier que le document appartient au club
     const { data: existingDoc, error: fetchError } = await supabase
       .from("documents")
       .select("id, numero, event_id")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (fetchError || !existingDoc) {
@@ -497,7 +500,7 @@ export async function PATCH(request: NextRequest) {
           .from("events")
           .select("id")
           .eq("id", nextEventId)
-          .eq("user_id", user.id)
+          .eq("user_id", guard.clubId)
           .maybeSingle();
         if (evErr || !ev) {
           return NextResponse.json(
@@ -512,12 +515,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (clientId) {
-      // Vérifier que le client appartient à l'utilisateur
+      // Vérifier que le client appartient au club
       const { data: client, error: clientError } = await supabase
         .from("clients")
         .select("id")
         .eq("id", clientId)
-        .eq("user_id", user.id)
+        .eq("user_id", guard.clubId)
         .single();
 
       if (clientError || !client) {
@@ -538,12 +541,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    updateData.updated_by = user.id;
+
     // Mettre à jour le document
     const { data: updatedDoc, error: updateError } = await supabase
       .from("documents")
       .update(updateData)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .select("id, numero, type, event_id")
       .single();
 

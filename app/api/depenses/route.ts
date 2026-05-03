@@ -1,25 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("expenses")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .order("date", { ascending: true });
 
     if (error) {
@@ -58,15 +55,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
+    const user = guard.ctx.user;
 
     const body = await request.json();
     const {
@@ -98,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = {
-      user_id: user.id,
+      user_id: guard.clubId,
       description: String(descriptionValue).trim(),
       amount,
       date,
@@ -106,12 +99,14 @@ export async function POST(request: NextRequest) {
       notes: notes || null,
       attachment_url: attachment_url ?? attachmentUrl ?? null,
       event_id: event_id ?? eventId ?? null,
+      created_by: user.id,
+      updated_by: user.id,
     };
 
     const { data, error } = await supabase
       .from("expenses")
       .insert(payload)
-      .select("id, description, amount, date, status, notes, attachment_url")
+      .select("id, description, amount, date, status, notes, attachment_url, created_by, updated_by, created_at")
       .single();
 
     if (error) {
@@ -139,6 +134,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const meta = extractRequestMetadata(request);
+    await logAudit({
+      clubId: guard.clubId,
+      action: AuditAction.CREATE,
+      resourceType: "expense",
+      resourceId: String(data?.id ?? ""),
+      metadata: { description: payload.description, amount: payload.amount, date: payload.date },
+      ...meta,
+    });
+
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/depenses");
 
@@ -157,15 +162,10 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.DELETE_EXPENSES);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     const { searchParams } = request.nextUrl;
     const id = searchParams.get("id");
@@ -177,11 +177,18 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const { data: expenseInfo } = await supabase
+      .from("expenses")
+      .select("description, amount")
+      .eq("id", id)
+      .eq("user_id", guard.clubId)
+      .maybeSingle();
+
     const { error } = await supabase
       .from("expenses")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][depenses][DELETE] Erreur Supabase:", error);
@@ -195,6 +202,19 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const meta = extractRequestMetadata(request);
+    await logAudit({
+      clubId: guard.clubId,
+      action: AuditAction.HARD_DELETE,
+      resourceType: "expense",
+      resourceId: id,
+      metadata: {
+        description: expenseInfo?.description,
+        amount: expenseInfo?.amount,
+      },
+      ...meta,
+    });
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/depenses");
@@ -223,6 +243,10 @@ function formatDepense(depense: any) {
     status: depense.status || "a_payer",
     notes: depense.notes || undefined,
     attachmentUrl: depense.attachment_url || undefined,
+    createdBy: depense.created_by ?? null,
+    updatedBy: depense.updated_by ?? null,
+    createdAt: depense.created_at ?? null,
+    updatedAt: depense.updated_at ?? null,
   };
 }
 

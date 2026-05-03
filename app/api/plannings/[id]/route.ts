@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
 
@@ -13,15 +14,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
 
     // Récupérer le planning
     const { data: planning, error } = await supabase
@@ -34,6 +30,8 @@ export async function GET(
         status,
         created_at,
         updated_at,
+        created_by,
+        updated_by,
         event_id,
         events (
           id,
@@ -41,7 +39,7 @@ export async function GET(
         )
       `)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (error || !planning) {
@@ -195,25 +193,21 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
+    const supabase = await createClient();
+    const user = guard.ctx.user;
 
     const body = await request.json();
     const { name, description, date, status, eventId } = body || {};
 
-    // Vérifier que le planning appartient à l'utilisateur
+    // Vérifier que le planning appartient au club
     const { data: existingPlanning, error: fetchError } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (fetchError || !existingPlanning) {
@@ -223,7 +217,7 @@ export async function PUT(
       );
     }
 
-    const updatePayload: any = {};
+    const updatePayload: any = { updated_by: user.id };
     if (name !== undefined) updatePayload.name = name.trim();
     if (description !== undefined) updatePayload.description = description?.trim() || null;
     if (date !== undefined) updatePayload.date = date;
@@ -234,6 +228,7 @@ export async function PUT(
       .from("plannings")
       .update(updatePayload)
       .eq("id", id)
+      .eq("user_id", guard.clubId)
       .select(`
         id,
         name,
@@ -285,22 +280,17 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const guard = await requirePermission(PERMISSIONS.MANAGE_PLANNINGS);
+    if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.id) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-    }
-
-    // Vérifier que le planning appartient à l'utilisateur
+    // Vérifier que le planning appartient au club
     const { data: existingPlanning, error: fetchError } = await supabase
       .from("plannings")
       .select("id")
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (fetchError || !existingPlanning) {
@@ -314,7 +304,8 @@ export async function DELETE(
     const { error } = await supabase
       .from("plannings")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("user_id", guard.clubId);
 
     if (error) {
       console.error("[API][plannings][DELETE] Erreur Supabase:", error);

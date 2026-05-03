@@ -544,6 +544,27 @@ export default function ParametresPage() {
         </div>
       )}
 
+      {/* Section Utilisateurs / Accès — lien vers la sous-page dédiée */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              Utilisateurs / Accès
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Gérez les personnes qui ont accès à ce club et choisissez
+              précisément ce que chacune peut voir ou modifier.
+            </p>
+          </div>
+          <Link
+            href="/tableau-de-bord/parametres/utilisateurs"
+            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Gérer les accès →
+          </Link>
+        </div>
+      </div>
+
       {/* Section Abonnement */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Abonnement</h2>
