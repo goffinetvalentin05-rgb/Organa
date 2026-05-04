@@ -981,7 +981,8 @@
       "exportAccountingYearLabel": "Année comptable",
       "exportAccountingDownload": "Télécharger l'export",
       "emptyState": "Aucune facture pour le moment",
-      "emptyCta": "Créer votre première facture"
+      "emptyCta": "Créer votre première facture",
+      "listTotal": "{count} facture(s) au total"
     },
     "sponsoring": {
       "title": "Sponsoring",

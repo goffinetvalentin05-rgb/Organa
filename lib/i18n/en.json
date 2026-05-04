@@ -1096,7 +1096,8 @@
       "exportAccountingYearLabel": "Accounting year",
       "exportAccountingDownload": "Download export",
       "emptyState": "No invoices yet",
-      "emptyCta": "Create your first invoice"
+      "emptyCta": "Create your first invoice",
+      "listTotal": "{count} invoice(s) in total"
     },
     "sponsoring": {
       "title": "Sponsoring",

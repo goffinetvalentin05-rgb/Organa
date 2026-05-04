@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { Eye, Trash, Download, Receipt } from "@/lib/icons";
@@ -14,7 +13,7 @@ import {
   EmptyState,
   ActionButton,
   GlassCard,
-  dashboardListRowClass,
+  dashboardTableHeadRowClass,
 } from "@/components/ui";
 
 interface Facture {
@@ -208,47 +207,48 @@ export default function FacturesPage() {
           />
         ) : (
           <>
-            {/* Vue liste moderne */}
-            <div className="divide-y divide-slate-100">
-              {factures.map((facture) => {
-                const montant = calculerTotalTTC(facture.lignes);
-                return (
-                  <div
-                    key={facture.id}
-                    className={dashboardListRowClass}
-                  >
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div className="flex items-start gap-4">
-                        <div 
-                          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: "var(--obillz-blue-light)" }}
-                        >
-                          <Receipt className="w-6 h-6 text-[var(--obillz-hero-blue)]" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <h3 className="font-semibold text-slate-900">{facture.numero}</h3>
-                            <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
-                              {getStatutLabel(facture.statut)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-slate-500 mt-1">
-                            {facture.client?.nom || t("dashboard.common.unknownClient")}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">
-                            Créée le {formatDate(facture.dateCreation)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 md:gap-6">
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-slate-900">{formatMontant(montant)}</p>
-                          <p className="text-xs text-slate-400">TTC</p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <ActionButton href={`/tableau-de-bord/factures/${facture.id}`} className="inline-flex items-center gap-2">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead>
+                  <tr className={dashboardTableHeadRowClass}>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.number")}</th>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.client")}</th>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.date")}</th>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.amount")}</th>
+                    <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {factures.map((facture) => {
+                    const montant = calculerTotalTTC(facture.lignes);
+                    return (
+                      <tr
+                        key={facture.id}
+                        className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
+                      >
+                        <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{facture.numero}</td>
+                        <td className="max-w-[220px] truncate px-4 py-3 text-slate-700 sm:max-w-[280px] sm:px-6">
+                          {facture.client?.nom || t("dashboard.common.unknownClient")}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600 sm:px-6">
+                          {formatDate(facture.dateCreation)}
+                        </td>
+                        <td className="px-4 py-3 sm:px-6">
+                          <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
+                            {getStatutLabel(facture.statut)}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 font-semibold text-emerald-700 sm:px-6">
+                          {formatMontant(montant)}
+                          <span className="ml-1 text-xs font-normal text-slate-500">TTC</span>
+                        </td>
+                        <td className="px-4 py-3 text-right sm:px-6">
+                          <ActionButton
+                            href={`/tableau-de-bord/factures/${facture.id}`}
+                            className="mr-1 inline-flex items-center gap-1.5 p-2"
+                            title={t("dashboard.common.view")}
+                          >
                             <Eye className="h-4 w-4" />
                             <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
                           </ActionButton>
@@ -261,18 +261,17 @@ export default function FacturesPage() {
                           >
                             <Trash className="h-4 w-4" />
                           </ActionButton>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
-            {/* Footer avec compteur */}
-            <div className="border-t border-slate-100 bg-slate-50 px-6 py-4">
+            <div className="border-t border-slate-100 bg-slate-50/90 px-4 py-3 sm:px-6">
               <p className="text-center text-sm text-slate-600">
-                {factures.length} facture{factures.length > 1 ? "s" : ""} au total
+                {t("dashboard.invoices.listTotal", { count: factures.length })}
               </p>
             </div>
           </>

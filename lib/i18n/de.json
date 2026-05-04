@@ -1059,7 +1059,8 @@
       "exportAccountingYearLabel": "Geschäftsjahr",
       "exportAccountingDownload": "Export herunterladen",
       "emptyState": "Noch keine Rechnungen",
-      "emptyCta": "Erste Rechnung erstellen"
+      "emptyCta": "Erste Rechnung erstellen",
+      "listTotal": "{count} Rechnung(en) gesamt"
     },
     "sponsoring": {
       "title": "Sponsoring",
