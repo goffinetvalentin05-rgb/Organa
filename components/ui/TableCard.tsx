@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass, glassCardHeaderClass, innerContentClass } from "./styles";
+import { glassFrameClass, glassCardHeaderClass, innerContentClass } from "./styles";
 
 const tableCardBodyPaddingClass = "p-1.5 sm:p-2";
 
@@ -26,7 +26,7 @@ export default function TableCard({
   const hasHeader = Boolean(title || description || toolbar);
 
   return (
-    <div className={cn(glassCardClass, "flex flex-col overflow-hidden", className)}>
+    <div className={cn(glassFrameClass, "flex flex-col overflow-hidden", className)}>
       {hasHeader ? (
         <header
           className={cn(
@@ -35,10 +35,8 @@ export default function TableCard({
           )}
         >
           <div className="min-w-0">
-            {title ? <h2 className="text-lg font-bold tracking-tight text-white drop-shadow-sm">{title}</h2> : null}
-            {description ? (
-              <p className="mt-1 text-sm font-medium text-white/75">{description}</p>
-            ) : null}
+            {title ? <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2> : null}
+            {description ? <p className="mt-1 text-sm font-medium text-slate-600">{description}</p> : null}
           </div>
           {toolbar ? <div className="flex shrink-0 flex-wrap items-center gap-2">{toolbar}</div> : null}
         </header>

@@ -11,6 +11,7 @@ import {
   PageLayout,
   PageHeader,
   GlassCard,
+  ListCard,
   TableCard,
   EmptyState,
   ActionButton,
@@ -136,7 +137,7 @@ export default function ClientsPage() {
       />
 
       {clients.length > 0 && (vis.role.enabled || vis.category.enabled) && (
-        <GlassCard padding="sm" className="border-slate-200/80">
+        <ListCard>
           <div className="mb-3 flex items-center gap-2">
             <Filter className="h-4 w-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-700">{t("dashboard.clients.filtersLabel")}</span>
@@ -186,7 +187,7 @@ export default function ClientsPage() {
               </button>
             )}
           </div>
-        </GlassCard>
+        </ListCard>
       )}
 
       {filteredClients.length === 0 ? (

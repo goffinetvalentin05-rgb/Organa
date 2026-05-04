@@ -2,7 +2,7 @@
 
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassCardClass, innerContentClass } from "./styles";
+import { glassCardClass, glassFrameClass, innerContentClass } from "./styles";
 
 const paddings = {
   none: "",
@@ -14,7 +14,7 @@ const paddings = {
 export type GlassCardProps = {
   children: ReactNode;
   padding?: keyof typeof paddings;
-  /** Faux : une seule couche glass (ex. `padding="none"` plein écran). Par défaut : vrai sauf si `padding="none"`. */
+  /** Faux : une seule couche glass (pleine carte). Vrai : cadre + panneau intérieur (formulaires denses). */
   useInnerContent?: boolean;
   className?: string;
 } & Omit<HTMLAttributes<HTMLDivElement>, "children">;
@@ -26,8 +26,7 @@ export default function GlassCard({
   className,
   ...rest
 }: GlassCardProps) {
-  const inner =
-    useInnerContent !== undefined ? useInnerContent : padding !== "none";
+  const inner = useInnerContent !== undefined ? useInnerContent : padding !== "none";
 
   if (!inner) {
     return (
@@ -38,7 +37,7 @@ export default function GlassCard({
   }
 
   return (
-    <div className={cn(glassCardClass, "p-2", className)} {...rest}>
+    <div className={cn(glassFrameClass, className)} {...rest}>
       <div className={cn(innerContentClass, paddings[padding])}>{children}</div>
     </div>
   );

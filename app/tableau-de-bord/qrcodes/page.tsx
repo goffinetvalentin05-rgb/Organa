@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { QRCodeSVG } from "qrcode.react";
@@ -14,8 +13,18 @@ import {
   X,
   Users,
   Calendar2,
+  ArrowRight,
 } from "@/lib/icons";
-import { PageLayout, PageHeader, GlassCard, EmptyState, ActionButton } from "@/components/ui";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  EmptyState,
+  ActionButton,
+  DashboardBadge,
+  glassCardHeaderClass,
+  cn,
+} from "@/components/ui";
 
 interface QRCodeItem {
   id: string;
@@ -148,15 +157,15 @@ export default function QRCodesPage() {
     return types[type] || type;
   };
 
-  const getEventTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      meal: "bg-amber-100 text-amber-700",
-      match: "bg-emerald-100 text-emerald-700",
-      tournament: "bg-purple-100 text-purple-700",
-      party: "bg-pink-100 text-pink-700",
-      other: "bg-slate-100 text-slate-700",
+  const getEventBadgeVariant = (type: string): "warning" | "success" | "info" | "neutral" | "default" => {
+    const map: Record<string, "warning" | "success" | "info" | "neutral" | "default"> = {
+      meal: "warning",
+      match: "success",
+      tournament: "info",
+      party: "neutral",
+      other: "default",
     };
-    return colors[type] || "bg-slate-100 text-slate-700";
+    return map[type] ?? "default";
   };
 
   return (
@@ -172,9 +181,9 @@ export default function QRCodesPage() {
       />
 
       {loading ? (
-        <GlassCard padding="lg" className="text-center">
-          <div className="inline-flex items-center gap-3 text-slate-500">
-            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+        <GlassCard padding="lg" useInnerContent={false} className="text-center text-slate-600 shadow-xl shadow-blue-950/10">
+          <div className="inline-flex items-center gap-3">
+            <svg className="h-5 w-5 animate-spin text-[#2563EB]" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
@@ -192,82 +201,93 @@ export default function QRCodesPage() {
           }
         />
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {qrcodes.map((qr) => (
-            <GlassCard key={qr.id} padding="none" className="overflow-hidden transition-shadow hover:shadow-lg">
-              {/* QR Code Preview */}
-              <div className="p-6 bg-gradient-to-br from-slate-50 to-white flex justify-center">
-                <div className="bg-white p-3 rounded-xl shadow-sm">
+            <GlassCard
+              key={qr.id}
+              padding="none"
+              useInnerContent={false}
+              className="flex flex-col overflow-hidden shadow-xl shadow-blue-950/10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-blue-950/15"
+            >
+              <div className="relative flex justify-center bg-gradient-to-br from-white/95 via-sky-50/70 to-indigo-100/55 px-6 pb-2 pt-8">
+                <div className="rounded-2xl bg-white p-4 shadow-lg ring-1 ring-white/90">
                   <QRCodeSVG
                     id={`qr-${qr.code}`}
                     value={`${typeof window !== "undefined" ? window.location.origin : ""}/inscription/${qr.code}`}
-                    size={120}
+                    size={128}
                     level="M"
                   />
                 </div>
               </div>
 
-              {/* Info */}
-              <div className="p-5 border-t border-slate-100">
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <h3 className="font-semibold text-slate-900 line-clamp-1">{qr.name}</h3>
-                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${getEventTypeColor(qr.event_type)}`}>
+              <div className="flex flex-1 flex-col border-t border-white/45 p-5">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <h3 className="line-clamp-2 min-w-0 text-base font-bold leading-snug text-slate-900">{qr.name}</h3>
+                  <DashboardBadge variant={getEventBadgeVariant(qr.event_type)} className="shrink-0">
                     {getEventTypeLabel(qr.event_type)}
-                  </span>
+                  </DashboardBadge>
                 </div>
 
-                {qr.description && (
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-3">{qr.description}</p>
-                )}
+                {qr.description ? (
+                  <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-600">{qr.description}</p>
+                ) : null}
 
-                <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="w-4 h-4" />
-                    <span>
+                <div className="mb-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                    <span className="font-medium">
                       {qr.registrationsCount > 0
                         ? `${qr.registrationsCount} ${t("dashboard.qrcodes.card.registrations")}`
-                        : t("dashboard.qrcodes.card.noRegistrations")
-                      }
+                        : t("dashboard.qrcodes.card.noRegistrations")}
                     </span>
                   </div>
-                  {qr.event_date && (
-                    <div className="flex items-center gap-1.5">
-                      <Calendar2 className="w-4 h-4" />
-                      <span>{formatDate(qr.event_date)}</span>
+                  {qr.event_date ? (
+                    <div className="flex items-center gap-2">
+                      <Calendar2 className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                      <span className="font-medium">{formatDate(qr.event_date)}</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <Link
+                <div className="mt-auto space-y-3">
+                  <ActionButton
                     href={`/tableau-de-bord/qrcodes/${qr.id}`}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[var(--obillz-blue-light)] text-[var(--obillz-hero-blue)] text-sm font-medium hover:bg-blue-100 transition-colors"
+                    variant="premiumInline"
+                    className="w-full justify-center rounded-full py-3"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="h-4 w-4" />
                     {t("dashboard.qrcodes.card.viewDetails")}
-                  </Link>
-                  <button
-                    onClick={() => downloadQR(qr.code, qr.name)}
-                    className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-                    title={t("dashboard.qrcodes.card.download")}
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => copyLink(qr.code)}
-                    className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-                    title={t("dashboard.qrcodes.card.copyLink")}
-                  >
-                    <QrCode className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(qr.id)}
-                    className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                    title={t("dashboard.common.delete")}
-                  >
-                    <Trash className="w-4 h-4" />
-                  </button>
+                    <ArrowRight className="h-4 w-4 opacity-90" />
+                  </ActionButton>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => downloadQR(qr.code, qr.name)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-white"
+                      title={t("dashboard.qrcodes.card.download")}
+                    >
+                      <Download className="h-4 w-4" />
+                      {t("dashboard.qrcodes.card.download")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => copyLink(qr.code)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-white"
+                      title={t("dashboard.qrcodes.card.copyLink")}
+                    >
+                      <QrCode className="h-4 w-4" />
+                      {t("dashboard.qrcodes.card.copyLink")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(qr.id)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-red-100 bg-red-50/90 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                      title={t("dashboard.common.delete")}
+                    >
+                      <Trash className="h-4 w-4" />
+                      {t("dashboard.common.delete")}
+                    </button>
+                  </div>
                 </div>
               </div>
             </GlassCard>
@@ -281,25 +301,31 @@ export default function QRCodesPage() {
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
             onClick={() => setShowCreateModal(false)}
           />
-          <GlassCard className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto shadow-2xl shadow-blue-900/15" padding="none">
-            <div className="sticky top-0 z-[1] flex items-center justify-between border-b border-slate-200/90 bg-white/85 p-6 backdrop-blur-md">
+          <GlassCard
+            className="relative max-h-[90vh] w-full max-w-lg overflow-hidden shadow-2xl shadow-blue-950/25"
+            padding="none"
+            useInnerContent={false}
+          >
+            <div
+              className={cn(
+                glassCardHeaderClass,
+                "sticky top-0 z-[1] flex items-center justify-between p-6 backdrop-blur-md"
+              )}
+            >
               <div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  {t("dashboard.qrcodes.createTitle")}
-                </h2>
-                <p className="text-sm text-slate-500 mt-1">
-                  {t("dashboard.qrcodes.createSubtitle")}
-                </p>
+                <h2 className="text-xl font-bold text-slate-900">{t("dashboard.qrcodes.createTitle")}</h2>
+                <p className="mt-1 text-sm text-slate-600">{t("dashboard.qrcodes.createSubtitle")}</p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                className="rounded-xl p-2 text-slate-500 transition hover:bg-white/80 hover:text-slate-800"
               >
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="space-y-5 p-6">
+            <form onSubmit={handleCreate} className="max-h-[calc(90vh-5.5rem)] space-y-5 overflow-y-auto p-6">
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">

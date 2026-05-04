@@ -186,7 +186,7 @@ export default function EvenementsPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredEvents.map((event) => (
-                  <tr key={event.id} className="bg-white transition-colors hover:bg-blue-50/30">
+                  <tr key={event.id} className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]">
                     <td className="px-4 py-3 align-top sm:px-6">
                       <div className="font-medium text-slate-900">{event.name}</div>
                       {event.description ? (

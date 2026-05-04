@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { obillzLandingGridOverlayClass, obillzLandingRootClass } from "@/components/ui";
+import { dashboardGridOverlayClass, dashboardShellRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
@@ -141,8 +141,8 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className={`dashboard-shell ${obillzLandingRootClass}`}>
-      <div className={obillzLandingGridOverlayClass} aria-hidden />
+    <div className={`dashboard-shell ${dashboardShellRootClass}`}>
+      <div className={dashboardGridOverlayClass} aria-hidden />
 
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
@@ -154,7 +154,7 @@ export default function DashboardLayout({
 
       {/* Sidebar — même bleu que la landing (grille du shell visible à travers) */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/10 bg-transparent transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/15 bg-slate-950/25 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

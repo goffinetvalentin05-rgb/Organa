@@ -21,6 +21,6 @@ export type PageLayoutProps = {
 
 export default function PageLayout({ children, maxWidth = "7xl", className }: PageLayoutProps) {
   return (
-    <div className={cn("mx-auto w-full space-y-6 pb-12", maxMap[maxWidth], className)}>{children}</div>
+    <div className={cn("mx-auto w-full pb-12", maxMap[maxWidth], className)}>{children}</div>
   );
 }

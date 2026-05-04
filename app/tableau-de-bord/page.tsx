@@ -24,6 +24,8 @@ import {
   SectionCard,
   EmptyState,
   TableCard,
+  glassNestedRowClass,
+  cn,
 } from "@/components/ui";
 
 interface Client {
@@ -334,8 +336,10 @@ export default function TableauDeBordPage() {
   };
 
 
-  const quickTile =
-    "group flex items-center gap-4 rounded-xl border border-slate-200/90 bg-white/60 p-5 shadow-sm transition-all duration-200 hover:border-blue-200/90 hover:bg-white hover:shadow-md";
+  const quickTile = cn(
+    glassNestedRowClass,
+    "group flex items-center gap-4 p-5 transition-all duration-200 hover:border-blue-300/90"
+  );
 
   return (
     <PageLayout maxWidth="7xl" className="space-y-8">
@@ -362,7 +366,7 @@ export default function TableauDeBordPage() {
           value={loading ? "-" : stats.totalClients}
           footer={
             !loading && stats.totalClients === 0 ? (
-              <p className="text-sm text-white/65">{t("dashboard.overview.kpis.clientsEmpty")}</p>
+              <p className="text-sm text-slate-500">{t("dashboard.overview.kpis.clientsEmpty")}</p>
             ) : null
           }
         />
@@ -376,22 +380,22 @@ export default function TableauDeBordPage() {
             !loading ? (
               <div className="flex flex-wrap gap-2 text-sm">
                 {stats.devisPayes > 0 ? (
-                  <span className="font-medium text-emerald-200">
+                  <span className="font-medium text-emerald-700">
                     {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
                   </span>
                 ) : null}
                 {stats.devisEnRetard > 0 ? (
-                  <span className="font-medium text-rose-200">
+                  <span className="font-medium text-rose-700">
                     {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
                   </span>
                 ) : null}
                 {stats.devisEnAttente > 0 ? (
-                  <span className="font-medium text-sky-200">
+                  <span className="font-medium text-sky-700">
                     {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
                   </span>
                 ) : null}
                 {stats.totalDevis === 0 ? (
-                  <span className="text-white/60">{t("dashboard.overview.kpis.allClear")}</span>
+                  <span className="text-slate-500">{t("dashboard.overview.kpis.allClear")}</span>
                 ) : null}
               </div>
             ) : null
@@ -406,11 +410,11 @@ export default function TableauDeBordPage() {
           footer={
             !loading ? (
               stats.facturesNonPayees > 0 ? (
-                <p className="text-sm font-medium text-rose-200">
+                <p className="text-sm font-medium text-rose-700">
                   {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
                 </p>
               ) : (
-                <p className="text-sm text-white/60">{t("dashboard.overview.kpis.allClear")}</p>
+                <p className="text-sm text-slate-500">{t("dashboard.overview.kpis.allClear")}</p>
               )
             ) : null
           }
@@ -420,7 +424,7 @@ export default function TableauDeBordPage() {
           label="Solde du club"
           icon={Receipt}
           value={loading ? "-" : formatMontant(stats.soldeClub)}
-          footer={<p className="text-sm text-white/65">Cotisations + Factures - Charges</p>}
+          footer={<p className="text-sm text-slate-500">Cotisations + Factures - Charges</p>}
         />
       </div>
 
@@ -429,7 +433,7 @@ export default function TableauDeBordPage() {
           icon={Handshake}
           title={t("dashboard.overview.sponsoringWatch.title")}
           headerRight={
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               {t("dashboard.overview.sponsoringWatch.badge")}
             </span>
           }
@@ -449,7 +453,10 @@ export default function TableauDeBordPage() {
                   <Link
                     key={item.id}
                     href={`/tableau-de-bord/sponsoring/${item.id}`}
-                    className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-amber-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+                    className={cn(
+                      glassNestedRowClass,
+                      "flex flex-col gap-2 transition hover:border-amber-200/90 sm:flex-row sm:items-center sm:justify-between"
+                    )}
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900">{item.sponsorName}</p>
@@ -489,7 +496,7 @@ export default function TableauDeBordPage() {
           icon={Receipt}
           title={t("dashboard.overview.now.title")}
           headerRight={
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               {t("dashboard.overview.now.badge")}
             </span>
           }
@@ -499,7 +506,10 @@ export default function TableauDeBordPage() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md md:flex-row md:items-center md:justify-between"
+                className={cn(
+                  glassNestedRowClass,
+                  "flex flex-col gap-4 transition-all hover:border-slate-300/90 md:flex-row md:items-center md:justify-between"
+                )}
               >
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
@@ -581,7 +591,10 @@ export default function TableauDeBordPage() {
               <Link
                 key={`${doc.type}-${doc.id}`}
                 href={`/tableau-de-bord/${doc.type === "devis" ? "devis" : "factures"}/${doc.id}`}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-sm"
+                className={cn(
+                  glassNestedRowClass,
+                  "flex items-center justify-between transition-all hover:border-slate-300/90"
+                )}
               >
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">

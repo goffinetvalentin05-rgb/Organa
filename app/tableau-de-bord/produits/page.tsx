@@ -233,7 +233,7 @@ function ProduitsPageInner() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {revenues.map((r) => (
-                  <tr key={r.id} className="bg-white transition-colors hover:bg-blue-50/30">
+                  <tr key={r.id} className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]">
                     <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{r.name}</td>
                     <td className="px-4 py-3 text-sm text-slate-600 sm:px-6">{formatDate(r.revenue_date)}</td>
                     <td className="px-4 py-3 font-semibold text-emerald-700 sm:px-6">{formatMontant(r.amount)}</td>
@@ -367,7 +367,7 @@ export default function ProduitsPage() {
   return (
     <Suspense
       fallback={
-        <PageLayout maxWidth="5xl" className="py-8 text-secondary">
+        <PageLayout maxWidth="5xl" className="space-y-6 py-8 text-secondary">
           …
         </PageLayout>
       }

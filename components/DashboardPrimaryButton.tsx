@@ -5,11 +5,11 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { Plus } from "@/lib/icons";
 
 const baseClass =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200/90 bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-[0_4px_14px_rgba(15,23,42,0.08)] transition-all duration-200 hover:border-[var(--obillz-blue-border)] hover:shadow-[0_8px_22px_rgba(26,35,255,0.12)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--obillz-hero-blue)]/35 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] font-semibold text-white shadow-lg shadow-blue-900/25 transition-all duration-200 hover:opacity-95 hover:shadow-xl hover:shadow-blue-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40 disabled:pointer-events-none disabled:opacity-50";
 
 const sizeClass = {
-  default: "px-4 py-2.5 text-sm",
-  sm: "px-3 py-2 text-xs",
+  default: "px-5 py-2.5 text-sm",
+  sm: "px-4 py-2 text-xs",
 } as const;
 
 export type DashboardPrimaryButtonProps = {
@@ -31,12 +31,7 @@ function cn(...parts: (string | false | undefined)[]) {
 export default function DashboardPrimaryButton(props: DashboardPrimaryButtonProps) {
   const { children, className, icon = "plus", size = "default", fullWidth } = props;
 
-  const classes = cn(
-    baseClass,
-    sizeClass[size],
-    fullWidth && "w-full",
-    className
-  );
+  const classes = cn(baseClass, sizeClass[size], fullWidth && "w-full", className);
 
   const content = (
     <>

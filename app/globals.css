@@ -85,7 +85,7 @@ body.app-bg {
 
 /* Pages SaaS - fond sobre */
 body.app-bg:has(.dashboard-shell) {
-  background-color: var(--obillz-hero-blue) !important;
+  background: linear-gradient(to bottom right, #2563eb, #4338ca, #312e81) !important;
 }
 
 body.app-bg::before {
@@ -212,13 +212,6 @@ h3 {
 
 .dashboard-shell .accent-bg {
   border: 1px solid var(--accent-border);
-}
-
-/* Forcer des cartes de contenu blanches sur fond dashboard bleu */
-.dashboard-shell .bg-surface\/80,
-.dashboard-shell .bg-surface\/60,
-.dashboard-shell .bg-white\/95 {
-  background-color: #ffffff !important;
 }
 
 /* Contraste lisible des cartes sur fond bleu */
