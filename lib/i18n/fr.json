@@ -478,7 +478,7 @@
       "quotes": "Cotisations",
       "invoices": "Factures",
       "sponsoring": "Sponsoring",
-      "payments": "Paiements",
+      "payments": "Encaissements",
       "productRevenues": "Revenus",
       "events": "Événements",
       "buvette": "Buvette",
@@ -500,7 +500,7 @@
       "sponsoringNew": "Nouveau contrat",
       "sponsoringEdit": "Modifier le contrat",
       "sponsoringContract": "Contrat sponsor",
-      "payments": "Paiements",
+      "payments": "Encaissements",
       "productRevenues": "Produits & revenus",
       "events": "Événements",
       "buvette": "Buvette",
@@ -1135,6 +1135,13 @@
       "emptyState": "Aucune charge enregistrée pour le moment.",
       "emptyCta": "Ajouter votre première charge",
       "dueLabel": "Échéance :",
+      "listColumns": {
+        "supplier": "Fournisseur",
+        "dueDate": "Échéance",
+        "attachment": "PJ"
+      },
+      "attachmentBadge": "PJ",
+      "actionRecommendedHint": "À traiter (échéance proche ou en retard).",
       "attachmentAvailable": "Pièce jointe disponible",
       "noAttachment": "Aucune pièce jointe",
       "viewTitle": "Charge",
@@ -1189,9 +1196,9 @@
       }
     },
     "payments": {
-      "title": "Paiements",
-      "subtitle": "Consultez les revenus générés par votre club",
-      "emptyState": "Aucun paiement enregistré pour le moment.",
+      "title": "Encaissements",
+      "subtitle": "Consultez les montants encaissés par votre club : cotisations et factures payées.",
+      "emptyState": "Aucun encaissement enregistré pour le moment.",
       "stats": {
         "totalReceived": "Total encaissé",
         "membershipsCount": "Cotisations payées",
@@ -1496,7 +1503,7 @@
     },
     "productRevenues": {
       "title": "Revenus",
-      "subtitle": "Encaissements simples du club (buvette, entrées, tombola, etc.), avec ou sans lien vers un événement — distinct des factures et des paiements liés aux cotisations.",
+      "subtitle": "Saisies manuelles (buvette, entrées, tombola, etc.), avec ou sans lien vers un événement — distinct de l’onglet Encaissements (cotisations et factures payées).",
       "loadError": "Erreur lors du chargement",
       "emptyState": "Aucun revenu enregistré",
       "emptyHint": "Ajoutez vos premières ventes ou encaissements (buvette, repas, entrées…).",

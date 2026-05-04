@@ -479,7 +479,7 @@
       "quotes": "Memberships",
       "invoices": "Invoices",
       "sponsoring": "Sponsoring",
-      "payments": "Payments",
+      "payments": "Receipts",
       "productRevenues": "Revenue",
       "events": "Events",
       "buvette": "Club Bar",
@@ -504,7 +504,7 @@
       "sponsoringNew": "New contract",
       "sponsoringEdit": "Edit contract",
       "sponsoringContract": "Sponsor contract",
-      "payments": "Payment History",
+      "payments": "Receipts",
       "productRevenues": "Products & revenue",
       "events": "Events",
       "buvette": "Club Bar",
@@ -1262,6 +1262,13 @@
       "emptyState": "No expenses recorded yet.",
       "emptyCta": "Add your first expense",
       "dueLabel": "Due:",
+      "listColumns": {
+        "supplier": "Supplier",
+        "dueDate": "Due",
+        "attachment": "File"
+      },
+      "attachmentBadge": "File",
+      "actionRecommendedHint": "Action needed (due soon or overdue).",
       "attachmentAvailable": "Attachment available",
       "noAttachment": "No attachment",
       "viewTitle": "Expense",
@@ -1338,9 +1345,9 @@
       }
     },
     "payments": {
-      "title": "Payment History",
-      "subtitle": "View received payments history",
-      "emptyState": "No payments recorded yet.",
+      "title": "Receipts",
+      "subtitle": "See amounts collected by your club: paid memberships and invoices.",
+      "emptyState": "No receipts recorded yet.",
       "stats": {
         "totalReceived": "Total received",
         "membershipsCount": "Memberships paid",
@@ -1645,7 +1652,7 @@
     },
     "productRevenues": {
       "title": "Revenue",
-      "subtitle": "Simple club receipts (bar, tickets, raffle, etc.), optionally linked to an event — separate from formal invoices and membership payment history.",
+      "subtitle": "Manual entries (bar, tickets, raffle, etc.), optionally linked to an event — separate from the Receipts tab (paid memberships and invoices).",
       "loadError": "Error loading data",
       "emptyState": "No revenue recorded yet",
       "emptyHint": "Add your first sales or cash-ins (bar, meals, tickets…).",

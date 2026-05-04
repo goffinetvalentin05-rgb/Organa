@@ -479,7 +479,7 @@
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "sponsoring": "Sponsoring",
-      "payments": "Zahlungen",
+      "payments": "Zahlungseingänge",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
       "plannings": "Planungen",
@@ -503,7 +503,7 @@
       "sponsoringNew": "Neuer Vertrag",
       "sponsoringEdit": "Vertrag bearbeiten",
       "sponsoringContract": "Sponsorvertrag",
-      "payments": "Zahlungsverlauf",
+      "payments": "Zahlungseingänge",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
       "plannings": "Planungen",
@@ -1222,6 +1222,13 @@
       "emptyState": "Noch keine Ausgaben erfasst.",
       "emptyCta": "Erste Ausgabe hinzufügen",
       "dueLabel": "Fällig:",
+      "listColumns": {
+        "supplier": "Lieferant",
+        "dueDate": "Fälligkeit",
+        "attachment": "Anh."
+      },
+      "attachmentBadge": "Anhang",
+      "actionRecommendedHint": "Handlungsbedarf (bald fällig oder überfällig).",
       "attachmentAvailable": "Anhang verfügbar",
       "noAttachment": "Kein Anhang",
       "viewTitle": "Ausgabe",
@@ -1298,9 +1305,9 @@
       }
     },
     "payments": {
-      "title": "Zahlungsverlauf",
-      "subtitle": "Übersicht über eingegangene Zahlungen",
-      "emptyState": "Noch keine Zahlungen erfasst.",
+      "title": "Zahlungseingänge",
+      "subtitle": "Eingegangene Beträge Ihres Vereins: bezahlte Beiträge und Rechnungen.",
+      "emptyState": "Noch keine Zahlungseingänge erfasst.",
       "stats": {
         "totalReceived": "Summe eingegangen",
         "membershipsCount": "Bezahlte Mitgliedsbeiträge",

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import Link from "next/link";
 import { Eye, Edit, Trash, Download, Receipt } from "@/lib/icons";
 import {
   PageLayout,
@@ -10,7 +9,7 @@ import {
   EmptyState,
   GlassCard,
   ActionButton,
-  dashboardListRowClass,
+  dashboardTableHeadRowClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
@@ -749,54 +748,74 @@ export default function DepensesPage() {
             />
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
-            {depensesTriees.map((depense) => {
-              const statutAffiche = getStatutAffiche(depense);
-              const besoinAction =
-                depense.status === "a_payer" &&
-                (isDatePassee(depense.date) || isDateProche(depense.date, 7));
-              return (
-                <div key={depense.id} className={dashboardListRowClass}>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          {t("dashboard.expenses.fields.supplier")}
-                        </p>
-                        <p className="mt-2 text-lg font-semibold text-slate-900">{depense.label}</p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          {t("dashboard.expenses.dueLabel")} {formatDate(depense.date)}
-                        </p>
-                        {besoinAction ? (
-                          <p className="mt-2 text-sm text-amber-700">
-                            Une action est recommandée pour sécuriser ce paiement.
-                          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[880px] text-left text-sm">
+              <thead>
+                <tr className={dashboardTableHeadRowClass}>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.supplier")}</th>
+                  <th className="whitespace-nowrap px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.dueDate")}</th>
+                  <th className="whitespace-nowrap px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.attachment")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.amount")}</th>
+                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
+                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {depensesTriees.map((depense) => {
+                  const statutAffiche = getStatutAffiche(depense);
+                  const besoinAction =
+                    depense.status === "a_payer" &&
+                    (isDatePassee(depense.date) || isDateProche(depense.date, 7));
+                  const hrefPJ = depense.attachmentUrl ? buildAttachmentHref(depense.attachmentUrl) : null;
+                  return (
+                    <tr
+                      key={depense.id}
+                      className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
+                    >
+                      <td className="max-w-[220px] px-4 py-3 sm:max-w-xs sm:px-6">
+                        <p className="truncate font-medium text-slate-900">{depense.label}</p>
+                        {depense.notes ? (
+                          <p className="mt-0.5 truncate text-xs text-slate-500">{depense.notes}</p>
                         ) : null}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          {t("dashboard.common.amount")}
-                        </p>
-                        <p className="mt-2 text-2xl font-semibold text-slate-900">{formatMontant(depense.amount)}</p>
+                        {besoinAction ? (
+                          <p className="mt-0.5 text-xs text-amber-700">{t("dashboard.expenses.actionRecommendedHint")}</p>
+                        ) : null}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600 sm:px-6">
+                        {formatDate(depense.date)}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
+                        {hrefPJ ? (
+                          <a
+                            href={hrefPJ}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={t("dashboard.expenses.attachmentAvailable")}
+                            className="inline-flex rounded-full border border-emerald-200/80 bg-emerald-50/90 px-2 py-0.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100/90"
+                          >
+                            {t("dashboard.expenses.attachmentBadge")}
+                          </a>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-900 sm:px-6">
+                        {formatMontant(depense.amount)}
+                      </td>
+                      <td className="px-4 py-3 sm:px-6">
                         <span
-                          className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatutColor(
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${getStatutColor(
                             statutAffiche
                           )}`}
                         >
                           {getStatutLabel(statutAffiche, t)}
                         </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-3">
-                      <div className="text-sm text-slate-600">
-                        {depense.attachmentUrl
-                          ? t("dashboard.expenses.attachmentAvailable")
-                          : t("dashboard.expenses.noAttachment")}
-                      </div>
-                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                      </td>
+                      <td className="px-4 py-3 text-right sm:px-6">
                         <ActionButton
                           type="button"
-                          className="inline-flex items-center gap-1.5 p-2"
+                          className="mr-1 inline-flex items-center gap-1.5 p-2"
+                          title={t("dashboard.common.view")}
                           onClick={() => handleVoir(depense)}
                         >
                           <Eye className="h-4 w-4" />
@@ -804,7 +823,8 @@ export default function DepensesPage() {
                         </ActionButton>
                         <ActionButton
                           type="button"
-                          className="inline-flex items-center gap-1.5 p-2"
+                          className="mr-1 inline-flex items-center gap-1.5 p-2"
+                          title={t("dashboard.common.edit")}
                           onClick={() => handleModifier(depense)}
                         >
                           <Edit className="h-4 w-4" />
@@ -819,12 +839,12 @@ export default function DepensesPage() {
                         >
                           <Trash className="h-4 w-4" />
                         </ActionButton>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </TableCard>
