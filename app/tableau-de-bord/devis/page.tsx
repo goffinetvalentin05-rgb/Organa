@@ -105,7 +105,7 @@ export default function DevisPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.quotes.title")}
         subtitle={t("dashboard.quotes.subtitle")}

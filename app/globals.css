@@ -85,7 +85,7 @@ body.app-bg {
 
 /* Pages SaaS - fond sobre */
 body.app-bg:has(.dashboard-shell) {
-  background: linear-gradient(to bottom right, #2563eb, #4338ca, #312e81) !important;
+  background-color: var(--obillz-hero-blue) !important;
 }
 
 body.app-bg::before {

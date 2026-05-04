@@ -189,7 +189,7 @@ function ProduitsPageInner() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.productRevenues.title")}
         subtitle={t("dashboard.productRevenues.subtitle")}
@@ -367,7 +367,7 @@ export default function ProduitsPage() {
   return (
     <Suspense
       fallback={
-        <PageLayout maxWidth="5xl" className="space-y-6 py-8 text-secondary">
+        <PageLayout maxWidth="5xl" stack="none" className="py-8 text-secondary">
           …
         </PageLayout>
       }

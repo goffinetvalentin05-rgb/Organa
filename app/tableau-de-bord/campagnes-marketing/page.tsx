@@ -259,14 +259,14 @@ export default function MarketingCampaignsPage() {
 
   if (loading) {
     return (
-      <PageLayout maxWidth="6xl" className="py-10 text-center text-white/70">
+      <PageLayout maxWidth="6xl" stack="none" className="py-10 text-center text-white/70">
         {t("dashboard.marketing.loading")}
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout maxWidth="6xl" className="space-y-6">
+    <PageLayout maxWidth="6xl">
       <PageHeader title={t("dashboard.pageTitles.marketing")} />
 
       <GlassCard padding="sm" className="inline-flex w-fit max-w-full flex-wrap gap-2">

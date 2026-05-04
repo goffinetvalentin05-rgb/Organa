@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { dashboardGridOverlayClass, dashboardShellRootClass } from "@/components/ui";
+import { obillzLandingGridOverlayClass, obillzLandingRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import {
   LayoutDashboard,
@@ -141,8 +141,8 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className={`dashboard-shell ${dashboardShellRootClass}`}>
-      <div className={dashboardGridOverlayClass} aria-hidden />
+    <div className={`dashboard-shell ${obillzLandingRootClass}`}>
+      <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
@@ -154,7 +154,7 @@ export default function DashboardLayout({
 
       {/* Sidebar — même bleu que la landing (grille du shell visible à travers) */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/15 bg-slate-950/25 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/10 bg-white/[0.06] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -223,8 +223,8 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 border-b border-white/10 bg-transparent">
-          <div className="flex items-center justify-between px-4 py-3 lg:px-6">
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-[var(--obillz-hero-blue)]/80 backdrop-blur-md">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
             {/* Left: Mobile menu only */}
             <div className="flex items-center">
               <button
@@ -265,12 +265,12 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="relative flex-1 overflow-x-hidden p-4 lg:p-8">
-          <div className="relative">{children}</div>
+        <main className="relative flex-1 min-w-0 overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <div className="relative w-full min-w-0">{children}</div>
         </main>
 
-        <footer className="border-t border-white/10 bg-transparent px-4 py-4 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/75">
+        <footer className="border-t border-white/10 bg-transparent">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-white/75 sm:flex-row sm:px-6 lg:px-8">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
               <Link href="/mentions-legales" className="hover:text-white transition-colors">

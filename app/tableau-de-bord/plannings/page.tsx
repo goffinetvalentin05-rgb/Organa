@@ -122,7 +122,7 @@ export default function PlanningsPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6 pb-10">
+    <PageLayout maxWidth="7xl" className="pb-10">
       <PageHeader
         title={t("dashboard.plannings.title")}
         subtitle={t("dashboard.plannings.subtitle")}

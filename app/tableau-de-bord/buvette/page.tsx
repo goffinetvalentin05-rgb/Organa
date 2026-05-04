@@ -341,7 +341,7 @@ N'hésite pas à nous contacter si tu as des questions.
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title="Buvette"
         subtitle="Gestion des disponibilités et demandes externes."

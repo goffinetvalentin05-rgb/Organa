@@ -102,7 +102,7 @@ export default function MemberDetailView({
     .join(", ");
 
   return (
-    <PageLayout maxWidth="3xl" className="space-y-6">
+    <PageLayout maxWidth="3xl">
       <GlassCard
         padding="sm"
         className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"

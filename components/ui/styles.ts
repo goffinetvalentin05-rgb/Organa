@@ -1,22 +1,19 @@
 /**
- * Fond marketing Obillz — aligné landing (`LandingPage` `<main>`).
+ * Fond marketing Obillz — identique à `LandingPage` (`<main>`).
  */
 export const obillzLandingRootClass =
   "relative min-h-screen bg-[var(--obillz-hero-blue)] text-white";
 
-/**
- * Shell tableau de bord — dégradé bleu/violet (direction artistique premium SaaS).
- */
-export const dashboardShellRootClass =
-  "relative min-h-screen bg-gradient-to-br from-blue-600 via-indigo-700 to-[#312e81] text-white";
-
-/** Grille landing — référence inchangée. */
+/** Grille 32px / opacité 10% — identique à la landing. */
 export const obillzLandingGridOverlayClass =
   "pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]";
 
-/** Grille dashboard — plus large, plus discrète. */
-export const dashboardGridOverlayClass =
-  "pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:40px_40px]";
+/**
+ * Shell dashboard — **même fond et même grille que la landing** (pas d’arrière-plan séparé).
+ */
+export const dashboardShellRootClass = obillzLandingRootClass;
+
+export const dashboardGridOverlayClass = obillzLandingGridOverlayClass;
 
 /**
  * Cadre extérieur (double couche) — léger voile sur le dégradé de page.

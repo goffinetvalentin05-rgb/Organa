@@ -125,7 +125,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.clients.title")}
         subtitle={t("dashboard.clients.subtitle")}

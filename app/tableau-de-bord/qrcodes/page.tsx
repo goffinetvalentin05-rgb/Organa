@@ -169,7 +169,7 @@ export default function QRCodesPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.qrcodes.title")}
         subtitle={t("dashboard.qrcodes.subtitle")}
@@ -201,13 +201,13 @@ export default function QRCodesPage() {
           }
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 sm:gap-7 xl:grid-cols-3">
           {qrcodes.map((qr) => (
             <GlassCard
               key={qr.id}
               padding="none"
               useInnerContent={false}
-              className="flex flex-col overflow-hidden shadow-xl shadow-blue-950/10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-blue-950/15"
+              className="flex h-full min-h-0 flex-col overflow-hidden shadow-xl shadow-blue-950/10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-blue-950/15"
             >
               <div className="relative flex justify-center bg-gradient-to-br from-white/95 via-sky-50/70 to-indigo-100/55 px-6 pb-2 pt-8">
                 <div className="rounded-2xl bg-white p-4 shadow-lg ring-1 ring-white/90">

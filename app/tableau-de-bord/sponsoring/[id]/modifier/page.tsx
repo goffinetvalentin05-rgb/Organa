@@ -50,7 +50,7 @@ export default function ModifierContratSponsorPage() {
   }, [load]);
 
   return (
-    <PageLayout maxWidth="3xl" className="space-y-6">
+    <PageLayout maxWidth="3xl">
       <div>
         <Link
           href={`/tableau-de-bord/sponsoring/${id}`}

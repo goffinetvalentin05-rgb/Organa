@@ -512,7 +512,7 @@ export default function DepensesPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.expenses.title")}
         subtitle={t("dashboard.expenses.subtitle")}

@@ -101,7 +101,7 @@ export default function PaiementsPage() {
   const invoicePayments = payments.filter((p) => p.type === "invoice");
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader title={t("dashboard.payments.title")} subtitle={t("dashboard.payments.subtitle")} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

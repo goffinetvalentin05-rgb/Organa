@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { cn } from "./cn";
 import { glassFrameClass, glassCardHeaderClass, innerContentClass } from "./styles";
 
-const tableCardBodyPaddingClass = "p-1.5 sm:p-2";
+const tableCardBodyPaddingClass = "p-2 sm:p-2.5";
 
 export type TableCardProps = {
   children: ReactNode;
@@ -31,7 +31,7 @@ export default function TableCard({
         <header
           className={cn(
             glassCardHeaderClass,
-            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
           )}
         >
           <div className="min-w-0">

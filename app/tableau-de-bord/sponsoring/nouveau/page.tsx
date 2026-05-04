@@ -33,7 +33,7 @@ export default function NouveauContratSponsorPage() {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <PageLayout maxWidth="3xl" className="space-y-6">
+    <PageLayout maxWidth="3xl">
       <div>
         <Link
           href="/tableau-de-bord/sponsoring"

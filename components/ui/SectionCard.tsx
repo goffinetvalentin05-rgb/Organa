@@ -15,7 +15,7 @@ export type SectionCardProps = {
   className?: string;
 };
 
-const sectionBodyClass = cn(innerContentClass, "space-y-4 p-4 sm:p-5");
+const sectionBodyClass = cn(innerContentClass, "space-y-4 p-4 sm:p-5 sm:space-y-5");
 
 export default function SectionCard({
   title,
@@ -27,8 +27,8 @@ export default function SectionCard({
 }: SectionCardProps) {
   return (
     <section className={cn(glassFrameClass, "flex flex-col overflow-hidden", className)}>
-      <header className={cn(glassCardHeaderClass, "px-4 py-4 sm:px-5")}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <header className={cn(glassCardHeaderClass, "px-4 py-4 sm:px-6 sm:py-5")}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             {Icon ? (
               <div className={iconBadgeClass}>
@@ -49,7 +49,7 @@ export default function SectionCard({
           ) : null}
         </div>
       </header>
-      <div className="p-2 pt-0">
+      <div className="p-2.5 pt-0 sm:p-3 sm:pt-0">
         <div className={sectionBodyClass}>{children}</div>
       </div>
     </section>

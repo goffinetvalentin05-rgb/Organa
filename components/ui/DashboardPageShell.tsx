@@ -8,15 +8,16 @@ export type DashboardPageShellProps = Omit<PageLayoutProps, "children"> & {
   children: ReactNode;
 };
 
-/** Conteneur standard des pages dashboard : largeur max + espacement vertical homogène. */
+/** Conteneur standard dashboard : largeur max + stack vertical homogène. */
 export default function DashboardPageShell({
   children,
   className,
   maxWidth = "7xl",
+  stack = "comfortable",
   ...rest
 }: DashboardPageShellProps) {
   return (
-    <PageLayout maxWidth={maxWidth} className={cn("space-y-8", className)} {...rest}>
+    <PageLayout maxWidth={maxWidth} stack={stack} className={cn(className)} {...rest}>
       {children}
     </PageLayout>
   );

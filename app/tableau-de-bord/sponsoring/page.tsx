@@ -101,7 +101,7 @@ export default function SponsoringPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl" className="space-y-6">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.sponsoring.title")}
         subtitle={t("dashboard.sponsoring.subtitle")}

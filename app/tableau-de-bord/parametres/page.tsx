@@ -535,7 +535,7 @@ export default function ParametresPage() {
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
-      <PageLayout maxWidth="4xl" className="space-y-8">
+      <PageLayout maxWidth="4xl">
         <PageHeader title={t("dashboard.settings.title")} subtitle={t("dashboard.settings.subtitle")} />
 
         {saved && (

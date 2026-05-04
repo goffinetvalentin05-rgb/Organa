@@ -104,7 +104,7 @@ export default function ContratSponsorDetailPage() {
 
   if (loading || !contract) {
     return (
-      <PageLayout maxWidth="3xl" className="space-y-6">
+      <PageLayout maxWidth="3xl">
         <GlassCard className="p-10 text-center text-slate-500">{t("dashboard.common.loading")}</GlassCard>
       </PageLayout>
     );
@@ -114,7 +114,7 @@ export default function ContratSponsorDetailPage() {
   const downloadPdfUrl = `/api/pdf/contrat-sponsor/download?id=${contract.id}&locale=${locale}`;
 
   return (
-    <PageLayout maxWidth="3xl" className="space-y-6">
+    <PageLayout maxWidth="3xl">
       <div>
         <Link
           href="/tableau-de-bord/sponsoring"
