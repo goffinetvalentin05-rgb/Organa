@@ -23,18 +23,16 @@ export default function DataCard({
   const hasHead = Boolean(title || description);
 
   return (
-    <GlassCard padding={padding} useInnerContent={false} className={cn(className)} {...rest}>
+    <GlassCard padding={padding} className={cn(className)} {...rest}>
       {hasHead ? (
-        <div className="mb-4 border-b border-slate-200/70 pb-4">
+        <div className="mb-4 border-b border-white/30 pb-4">
           {title ? <h3 className="text-base font-bold tracking-tight text-slate-900">{title}</h3> : null}
           {description ? (
             <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">{description}</p>
           ) : null}
         </div>
       ) : null}
-      <div className="rounded-xl border border-slate-200/55 bg-white/55 p-4 shadow-inner shadow-blue-950/[0.04] backdrop-blur-sm sm:p-5">
-        {children}
-      </div>
+      <div className="min-w-0">{children}</div>
     </GlassCard>
   );
 }

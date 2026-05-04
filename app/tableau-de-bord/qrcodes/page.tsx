@@ -181,7 +181,7 @@ export default function QRCodesPage() {
       />
 
       {loading ? (
-        <GlassCard padding="lg" useInnerContent={false} className="text-center text-slate-600 shadow-xl shadow-blue-950/10">
+        <GlassCard padding="lg" className="text-center text-slate-600 shadow-xl shadow-blue-950/10">
           <div className="inline-flex items-center gap-3">
             <svg className="h-5 w-5 animate-spin text-[#2563EB]" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -206,7 +206,6 @@ export default function QRCodesPage() {
             <GlassCard
               key={qr.id}
               padding="none"
-              useInnerContent={false}
               className="flex h-full min-h-0 flex-col overflow-hidden shadow-xl shadow-blue-950/10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-blue-950/15"
             >
               <div className="relative flex justify-center bg-gradient-to-br from-white/95 via-sky-50/70 to-indigo-100/55 px-6 pb-2 pt-8">
@@ -304,7 +303,6 @@ export default function QRCodesPage() {
           <GlassCard
             className="relative max-h-[90vh] w-full max-w-lg overflow-hidden shadow-2xl shadow-blue-950/25"
             padding="none"
-            useInnerContent={false}
           >
             <div
               className={cn(

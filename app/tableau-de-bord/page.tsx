@@ -437,18 +437,30 @@ export default function TableauDeBordPage() {
               {t("dashboard.overview.sponsoringWatch.badge")}
             </span>
           }
+          footer={
+            sponsorRenewals.totalWatch > 0 ? (
+              <div className="text-right">
+                <Link
+                  href="/tableau-de-bord/sponsoring"
+                  className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+                >
+                  {t("dashboard.overview.sponsoringWatch.cta")}
+                </Link>
+              </div>
+            ) : undefined
+          }
         >
           {sponsorRenewals.totalWatch === 0 ? (
             <p className="text-sm text-slate-600">{t("dashboard.overview.sponsoringWatch.empty")}</p>
           ) : (
             <>
-              <p className="mb-4 text-sm font-medium text-amber-950">
+              <p className="text-sm font-medium text-amber-950">
                 {t("dashboard.overview.sponsoringWatch.summary").replace(
                   "{count}",
                   String(sponsorRenewals.totalWatch)
                 )}
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {sponsorRenewals.items.map((item) => (
                   <Link
                     key={item.id}
@@ -478,14 +490,6 @@ export default function TableauDeBordPage() {
                   </Link>
                 ))}
               </div>
-              <div className="mt-4 text-right">
-                <Link
-                  href="/tableau-de-bord/sponsoring"
-                  className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
-                >
-                  {t("dashboard.overview.sponsoringWatch.cta")}
-                </Link>
-              </div>
             </>
           )}
         </SectionCard>
@@ -501,7 +505,7 @@ export default function TableauDeBordPage() {
             </span>
           }
         >
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {aTraiterMaintenant.map((item) => (
               <Link
                 key={item.id}
@@ -586,7 +590,7 @@ export default function TableauDeBordPage() {
             {t("dashboard.overview.lastDocuments.empty")}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {derniersDocuments.map((doc) => (
               <Link
                 key={`${doc.type}-${doc.id}`}

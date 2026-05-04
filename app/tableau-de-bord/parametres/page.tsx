@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import { PageLayout, PageHeader, SectionCard, GlassCard, cn, glassCardClass, innerContentClass } from "@/components/ui";
+import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 
 // Types pour les infos d'abonnement
@@ -1066,18 +1066,15 @@ export default function ParametresPage() {
             </SettingsAccordion>
           </SectionCard>
 
-          <div className={cn(glassCardClass, "p-2")}>
-            <div
-              className={cn(
-                innerContentClass,
-                "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
-              )}
-            >
-              <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
-              <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
-                {t("dashboard.settings.saveButton")}
-              </DashboardPrimaryButton>
-            </div>
+          <div
+            className={cn(
+              "flex flex-col gap-3 rounded-[24px] border border-white/40 bg-gradient-to-br from-white/95 via-sky-50/80 to-indigo-200/45 px-4 py-4 shadow-xl shadow-blue-950/10 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
+            )}
+          >
+            <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
+            <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
+              {t("dashboard.settings.saveButton")}
+            </DashboardPrimaryButton>
           </div>
       </form>
     </PageLayout>

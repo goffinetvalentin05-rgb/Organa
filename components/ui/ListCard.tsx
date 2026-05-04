@@ -2,19 +2,20 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { glassFrameClass, innerContentClass } from "./styles";
+import { unifiedSectionShellClass, unifiedSectionBodyClass } from "./styles";
 
 export type ListCardProps = {
   children: ReactNode;
   className?: string;
+  /** Remplace le padding du corps si besoin (ex. `p-3`). */
   bodyClassName?: string;
 };
 
-/** Liste ou bloc de rangées dans un conteneur glass (filtres, résumés). */
+/** Filtres / résumés — une seule carte, pas de double cadre. */
 export default function ListCard({ children, className, bodyClassName }: ListCardProps) {
   return (
-    <div className={cn(glassFrameClass, className)}>
-      <div className={cn(innerContentClass, "p-4 sm:p-5", bodyClassName)}>{children}</div>
+    <div className={cn(unifiedSectionShellClass, className)}>
+      <div className={cn(unifiedSectionBodyClass, bodyClassName)}>{children}</div>
     </div>
   );
 }

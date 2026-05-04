@@ -2,7 +2,12 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "./cn";
-import { glassFrameClass, glassCardHeaderClass, iconBadgeClass, innerContentClass } from "./styles";
+import {
+  unifiedSectionShellClass,
+  unifiedSectionHeaderClass,
+  unifiedSectionBodyClass,
+  iconBadgeClass,
+} from "./styles";
 
 type IconProps = { className?: string };
 
@@ -13,9 +18,10 @@ export type SectionCardProps = {
   headerRight?: ReactNode;
   children: ReactNode;
   className?: string;
+  /** Zone sous le corps (ex. lien « Voir tout »). */
+  footer?: ReactNode;
+  bodyClassName?: string;
 };
-
-const sectionBodyClass = cn(innerContentClass, "space-y-4 p-4 sm:p-5 sm:space-y-5");
 
 export default function SectionCard({
   title,
@@ -24,10 +30,12 @@ export default function SectionCard({
   headerRight,
   children,
   className,
+  footer,
+  bodyClassName,
 }: SectionCardProps) {
   return (
-    <section className={cn(glassFrameClass, "flex flex-col overflow-hidden", className)}>
-      <header className={cn(glassCardHeaderClass, "px-4 py-4 sm:px-6 sm:py-5")}>
+    <section className={cn(unifiedSectionShellClass, "flex flex-col", className)}>
+      <header className={cn(unifiedSectionHeaderClass, "px-4 py-4 sm:px-6 sm:py-4")}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             {Icon ? (
@@ -49,9 +57,14 @@ export default function SectionCard({
           ) : null}
         </div>
       </header>
-      <div className="p-2.5 pt-0 sm:p-3 sm:pt-0">
-        <div className={sectionBodyClass}>{children}</div>
+
+      <div className={cn(unifiedSectionBodyClass, "min-w-0 flex-1 space-y-4 sm:space-y-5", bodyClassName)}>
+        {children}
       </div>
+
+      {footer ? (
+        <footer className="border-t border-white/25 px-4 py-3 sm:px-6 sm:py-3.5">{footer}</footer>
+      ) : null}
     </section>
   );
 }

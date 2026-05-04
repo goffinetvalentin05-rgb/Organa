@@ -2,9 +2,9 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { glassFrameClass, glassCardHeaderClass, innerContentClass } from "./styles";
+import { unifiedSectionShellClass, unifiedSectionHeaderClass } from "./styles";
 
-const tableCardBodyPaddingClass = "p-2 sm:p-2.5";
+const defaultBodyPadding = "px-4 py-4 sm:px-6 sm:py-5";
 
 export type TableCardProps = {
   children: ReactNode;
@@ -26,12 +26,12 @@ export default function TableCard({
   const hasHeader = Boolean(title || description || toolbar);
 
   return (
-    <div className={cn(glassFrameClass, "flex flex-col overflow-hidden", className)}>
+    <div className={cn(unifiedSectionShellClass, "flex flex-col", className)}>
       {hasHeader ? (
         <header
           className={cn(
-            glassCardHeaderClass,
-            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
+            unifiedSectionHeaderClass,
+            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4"
           )}
         >
           <div className="min-w-0">
@@ -42,17 +42,13 @@ export default function TableCard({
         </header>
       ) : null}
 
-      <div className={cn(hasHeader ? `${tableCardBodyPaddingClass} pt-0` : tableCardBodyPaddingClass, "min-h-0 flex-1")}>
-        <div
-          className={cn(
-            innerContentClass,
-            hasHeader && "rounded-t-none border-t-0",
-            !hasHeader && "min-h-0 overflow-hidden",
-            bodyClassName
-          )}
-        >
-          {children}
-        </div>
+      <div
+        className={cn(
+          "min-h-0 min-w-0 flex-1 overflow-x-auto",
+          bodyClassName === undefined ? defaultBodyPadding : bodyClassName
+        )}
+      >
+        {children}
       </div>
     </div>
   );
