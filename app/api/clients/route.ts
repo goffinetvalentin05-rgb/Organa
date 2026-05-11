@@ -13,13 +13,108 @@ import { buildClientInsertPayload } from "@/lib/clients/memberWritePayload";
 
 export const runtime = "nodejs";
 
-function logClientsSupabase(op: string, err: { code?: string; message?: string }) {
-  const msg = err.message?.slice(0, 200) ?? "";
+const CLIENT_CREATE_USER_MESSAGE =
+  "Impossible de créer le membre. Vérifiez les informations saisies ou réessayez.";
+
+function redactEmails(s: string): string {
+  return s.replace(/\S+@\S+/gi, "[redacted]");
+}
+
+function logClientsSupabase(
+  op: string,
+  err: {
+    code?: string;
+    message?: string;
+    details?: string | null;
+    hint?: string | null;
+  },
+  meta?: Record<string, unknown>
+) {
+  const msg = err.message ?? "";
   console.error(`[API][clients][${op}] supabase_error`, {
+    ...meta,
     code: err.code ?? null,
-    message_len: msg.length,
-    message_hint: msg ? msg.replace(/\S+@\S+/gi, "[redacted]") : null,
+    message: redactEmails(msg).slice(0, 600),
+    details: err.details ?? null,
+    hint: err.hint ?? null,
   });
+}
+
+/** Log debug : pas de secrets ; champs sensibles masqués ou réduits à une longueur. */
+function summarizeInsertPayloadForLog(payload: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(payload)) {
+    if (typeof v === "string") {
+      if (
+        k === "email" ||
+        k === "telephone" ||
+        k === "adresse" ||
+        k === "avs_number"
+      ) {
+        out[k] = v.length === 0 ? "" : `[présent, len=${v.length}]`;
+      } else {
+        out[k] = v.length > 120 ? `[len=${v.length}]` : v;
+      }
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+function jsonForClientCreateFailure(
+  insertError: {
+    code?: string;
+    message?: string;
+    details?: string | null;
+    hint?: string | null;
+  },
+  isDev: boolean
+): { status: number; body: Record<string, unknown> } {
+  const code = insertError.code ?? "";
+  let status = 500;
+  let message = CLIENT_CREATE_USER_MESSAGE;
+  let apiCode = "CLIENTS_CREATE_FAILED";
+
+  if (code === "23505") {
+    status = 409;
+    message =
+      "Impossible de créer le membre : une contrainte d'unicité a été violée (souvent un email déjà utilisé).";
+    apiCode = "CLIENTS_CREATE_DUPLICATE";
+  } else if (code === "23502") {
+    status = 400;
+    message =
+      "Impossible de créer le membre : données incomplètes (champ obligatoire manquant).";
+    apiCode = "CLIENTS_CREATE_NOT_NULL";
+  } else if (
+    code === "42501" ||
+    (insertError.message &&
+      /row-level security|violates row-level security/i.test(insertError.message))
+  ) {
+    message =
+      "Impossible de créer le membre : vous n'avez pas l'autorisation d'enregistrer pour ce club.";
+    apiCode = "CLIENTS_CREATE_RLS";
+  } else if (code === "PGRST116") {
+    message =
+      "Impossible de créer le membre : aucune ligne retournée (vérifiez les droits ou les filtres).";
+    apiCode = "CLIENTS_CREATE_NO_ROW";
+  }
+
+  const body: Record<string, unknown> = {
+    error: message,
+    code: apiCode,
+  };
+  if (isDev) {
+    body.debug = {
+      supabaseCode: insertError.code ?? null,
+      supabaseMessage: insertError.message
+        ? redactEmails(insertError.message)
+        : null,
+      details: insertError.details ?? null,
+      hint: insertError.hint ?? null,
+    };
+  }
+  return { status, body };
 }
 
 /* =========================
@@ -102,6 +197,15 @@ export async function POST(request: NextRequest) {
     user.id
   );
 
+  const isDev = process.env.NODE_ENV === "development";
+
+  console.error("[API][clients][POST] attempt", {
+    clubId: guard.clubId,
+    actorUserId: user.id,
+    insertKeys: Object.keys(insertPayload),
+    payloadSummary: summarizeInsertPayloadForLog(insertPayload),
+  });
+
   const { data: newClient, error: insertError } = await supabase
     .from("clients")
     .insert(insertPayload)
@@ -109,11 +213,12 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (insertError) {
-    logClientsSupabase("POST", insertError);
-    return NextResponse.json(
-      { error: "Impossible de créer le membre", code: "CLIENTS_CREATE_FAILED" },
-      { status: 500 }
-    );
+    logClientsSupabase("POST", insertError, {
+      clubId: guard.clubId,
+      actorUserId: user.id,
+    });
+    const { status, body } = jsonForClientCreateFailure(insertError, isDev);
+    return NextResponse.json(body, { status });
   }
 
   const normalized = newClient

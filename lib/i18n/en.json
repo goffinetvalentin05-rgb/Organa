@@ -866,7 +866,7 @@
       "deleteAction": "Delete",
       "editAction": "Edit",
       "limitReached": "Free plan limit reached.",
-      "createError": "Error creating the member",
+      "createError": "Unable to create the member. Check the information entered or try again.",
       "newTitle": "New member",
       "newSubtitle": "Add a new member to the club",
       "creating": "Creating...",

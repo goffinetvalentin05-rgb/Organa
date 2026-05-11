@@ -77,6 +77,21 @@ export default function NouveauClientPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
 
+        if (process.env.NODE_ENV === "development") {
+          console.error("[Nouveau membre] POST /api/clients échoué", {
+            status: res.status,
+            code: data.code,
+            error: data.error,
+            debug: data.debug,
+            payloadKeys: Object.keys(dataToSend),
+            payloadSummary: {
+              nomLen: dataToSend.nom.length,
+              emailLen: dataToSend.email.length,
+              telephoneLen: dataToSend.telephone.length,
+            },
+          });
+        }
+
         if (data.error === "LIMIT_REACHED") {
           setError({
             type: "LIMIT_REACHED",
@@ -88,14 +103,20 @@ export default function NouveauClientPage() {
 
         setError({
           type: "OTHER",
-          message: data.message || data.error || t("dashboard.clients.createError"),
+          message:
+            (typeof data.error === "string" && data.error) ||
+            (typeof data.message === "string" && data.message) ||
+            t("dashboard.clients.createError"),
         });
         setLoading(false);
         return;
       }
 
       router.push("/tableau-de-bord/clients");
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[Nouveau membre] exception réseau / parse", err);
+      }
       setError({
         type: "OTHER",
         message: t("dashboard.common.unexpectedError"),

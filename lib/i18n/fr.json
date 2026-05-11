@@ -744,7 +744,7 @@
       "deleteAction": "Supprimer",
       "editAction": "Modifier",
       "limitReached": "Limite du plan gratuit atteinte.",
-      "createError": "Erreur lors de la création du membre",
+      "createError": "Impossible de créer le membre. Vérifiez les informations saisies ou réessayez.",
       "newTitle": "Nouveau membre",
       "newSubtitle": "Ajouter un nouveau membre au club",
       "creating": "Création...",
