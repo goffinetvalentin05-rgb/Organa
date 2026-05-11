@@ -96,6 +96,9 @@ function jsonForClientCreateFailure(
     if (col === "organization_id") {
       message =
         "Impossible de créer le membre : la base doit être mise à jour (migration « organization_id » sur les membres). Réessayez après déploiement SQL, ou contactez le support.";
+    } else if (col === "name") {
+      message =
+        "Impossible de créer le membre : la base contient encore l’ancienne colonne « name » en plus de « nom ». Exécutez la migration 040 sur Supabase (nettoyage des colonnes membres), puis réessayez.";
     } else if (col) {
       message = `Impossible de créer le membre : un champ obligatoire côté serveur est vide (« ${col} »). Vérifiez les paramètres du club ou contactez le support.`;
     } else {
