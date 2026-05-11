@@ -269,11 +269,11 @@ export function PublicPlanningConfirmationClient() {
                   rel="noopener noreferrer"
                   className="inline-flex justify-center items-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 transition-colors"
                 >
-                  Google Calendar
+                  Ajouter à Google Calendar
                 </a>
               ) : (
                 <span className="inline-flex justify-center items-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-400">
-                  Google Calendar (date indisponible)
+                  Ajouter à Google Calendar (date indisponible)
                 </span>
               )}
               <button
@@ -282,7 +282,7 @@ export function PublicPlanningConfirmationClient() {
                 disabled={!icsHref}
                 className="inline-flex justify-center items-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
-                Apple Calendar (.ics)
+                Ajouter à Apple Calendar
               </button>
               <button
                 type="button"
@@ -290,7 +290,7 @@ export function PublicPlanningConfirmationClient() {
                 disabled={!icsHref}
                 className="inline-flex justify-center items-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50 sm:col-span-2"
               >
-                Outlook (.ics)
+                Ajouter à Outlook
               </button>
             </div>
           </div>
