@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -21,13 +20,12 @@ function GridBackground() {
 }
 
 export default function InscriptionPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,9 +59,7 @@ export default function InscriptionPage() {
         return;
       }
 
-      toast.success("Compte créé avec succès ! 🎉");
-      router.push("/connexion");
-      router.refresh();
+      setRegistrationComplete(true);
     } catch (err: unknown) {
       console.error("Erreur inscription:", err);
       const msg = err instanceof Error ? err.message : "Erreur lors de la création du compte";
@@ -116,23 +112,67 @@ export default function InscriptionPage() {
         <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center justify-center py-12 md:py-20">
           {/* Titre */}
           <h1 className="max-w-2xl text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
-            Commencez gratuitement
+            {registrationComplete ? "Presque terminé" : "Commencez gratuitement"}
           </h1>
           <p className="mt-4 max-w-lg text-center text-sm leading-relaxed text-white/80 md:text-base">
-            Créez votre compte en quelques secondes et découvrez Obillz
+            {registrationComplete
+              ? "Encore une étape pour activer votre compte"
+              : "Créez votre compte en quelques secondes et découvrez Obillz"}
           </p>
 
           {/* Badge essai gratuit */}
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2">
-            <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm font-medium text-white">7 jours d'essai gratuit</span>
-          </div>
+          {!registrationComplete && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2">
+              <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm font-medium text-white">7 jours d'essai gratuit</span>
+            </div>
+          )}
 
-          {/* Carte d'inscription */}
+          {/* Carte d'inscription ou confirmation */}
           <div className="mt-8 w-full max-w-md">
             <div className="rounded-3xl border border-white/20 bg-white p-8 shadow-2xl md:p-10">
+              {registrationComplete ? (
+                <div className="text-center">
+                  <div
+                    className="mx-auto flex h-14 w-14 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--obillz-blue-light)" }}
+                    aria-hidden
+                  >
+                    <svg
+                      className="h-7 w-7"
+                      style={{ color: "var(--obillz-hero-blue)" }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="mt-6 text-2xl font-bold text-slate-900">Compte créé avec succès</h2>
+                  <p className="mt-4 text-center text-sm leading-relaxed text-slate-600 md:text-[15px]">
+                    Un email de confirmation vient de vous être envoyé. Veuillez cliquer sur le lien
+                    reçu pour activer votre compte.
+                  </p>
+                  <p className="mt-3 text-center text-sm leading-relaxed text-slate-600 md:text-[15px]">
+                    Pensez à vérifier vos courriers indésirables.
+                  </p>
+                  <Link
+                    href="/connexion"
+                    className="mt-8 flex w-full items-center justify-center rounded-xl py-3.5 text-base font-semibold text-white transition-all duration-300 hover:opacity-90 shadow-lg hover:shadow-xl"
+                    style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                  >
+                    Retour à la connexion
+                  </Link>
+                </div>
+              ) : (
+                <>
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-slate-900">Créer un compte</h2>
                 <p className="mt-2 text-sm text-slate-600">
@@ -235,9 +275,12 @@ export default function InscriptionPage() {
                   </Link>
                 </p>
               </div>
+                </>
+              )}
             </div>
 
             {/* Avantages */}
+            {!registrationComplete && (
             <div className="mt-8 grid grid-cols-3 gap-4">
               <div className="flex flex-col items-center text-center">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
@@ -264,6 +307,7 @@ export default function InscriptionPage() {
                 <span className="mt-2 text-xs text-white/80">Données sécurisées</span>
               </div>
             </div>
+            )}
           </div>
         </div>
 

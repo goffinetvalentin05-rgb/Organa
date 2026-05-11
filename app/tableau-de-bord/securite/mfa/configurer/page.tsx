@@ -123,15 +123,18 @@ function ConfigurerMfaForm() {
 
   if (loading || alreadyVerified) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="h-6 w-56 animate-pulse rounded bg-slate-200" />
-        <div className="mt-4 h-4 w-full animate-pulse rounded bg-slate-100" />
+      <div className="mx-auto max-w-2xl px-4 py-2 sm:px-6">
+        <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
+          <div className="h-7 w-72 max-w-full animate-pulse rounded-lg bg-slate-200" />
+          <div className="mt-4 h-4 w-full animate-pulse rounded bg-slate-100" />
+          <div className="mt-2 h-4 max-w-md animate-pulse rounded bg-slate-100" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 p-6">
+    <div className="mx-auto max-w-2xl space-y-5 px-4 py-2 sm:px-6 lg:py-0">
       <div className="flex justify-center lg:hidden">
         <Image
           src="/logo-obillz.png"
@@ -143,106 +146,141 @@ function ConfigurerMfaForm() {
         />
       </div>
 
-      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950">
-        <p className="font-medium">
-          Pour protéger les données du club, la double authentification est
-          obligatoire.
-        </p>
-      </div>
-
-      {mfaErr === "service" && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-          Le service de vérification MFA est temporairement indisponible ou a
-          renvoyé une erreur. Réessayez dans quelques instants. Si le problème
-          persiste, déconnectez-vous puis reconnectez-vous.
+      <div className="overflow-hidden rounded-2xl border border-white/25 bg-white/95 shadow-xl backdrop-blur-sm">
+        <div
+          className="border-b border-slate-100 px-5 py-5 sm:px-8 sm:py-6"
+          style={{ background: "linear-gradient(135deg, rgba(26,35,255,0.06) 0%, transparent 55%)" }}
+        >
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            Configurer la double authentification
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+            Pour protéger les données de votre club, la double authentification est obligatoire. Elle
+            ajoute une sécurité supplémentaire lors de vos connexions.
+          </p>
         </div>
-      )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900">
-          Configurer la double authentification
-        </h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Scannez le QR code avec une application comme Google Authenticator,
-          Authy ou 1Password, puis saisissez le code à 6 chiffres pour valider.
-        </p>
+        <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-7">
+          {mfaErr === "service" && (
+            <div className="rounded-xl border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              Le service de vérification MFA est temporairement indisponible ou a renvoyé une erreur.
+              Réessayez dans quelques instants. Si le problème persiste, déconnectez-vous puis
+              reconnectez-vous.
+            </div>
+          )}
 
-        {!pendingFactor && (
-          <button
-            type="button"
-            onClick={startEnroll}
-            disabled={enrolling}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
-            {enrolling ? "Préparation…" : "Afficher le QR code"}
-          </button>
-        )}
+          <section className="rounded-xl border border-slate-200/80 bg-slate-50/80 px-4 py-4 sm:px-5 sm:py-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Comment faire ?
+            </h2>
+            <ol className="mt-3 list-decimal space-y-3 pl-4 text-sm leading-relaxed text-slate-700 sm:text-[15px]">
+              <li>
+                Installez une application d&apos;authentification sur votre téléphone, par exemple :
+                <ul className="mt-2 list-disc space-y-1 pl-4 text-slate-600">
+                  <li>Google Authenticator</li>
+                  <li>Microsoft Authenticator</li>
+                  <li>2FAS</li>
+                  <li>Authy</li>
+                </ul>
+              </li>
+              <li>
+                Ouvrez l&apos;application et scannez le QR code affiché ci-dessous.{" "}
+                {!pendingFactor && (
+                  <span className="text-slate-500">
+                    (Utilisez d&apos;abord le bouton « Afficher le QR code » pour l&apos;afficher.)
+                  </span>
+                )}
+              </li>
+              <li>L&apos;application affichera un code à 6 chiffres.</li>
+              <li>
+                Entrez ce code dans le champ ci-dessous, puis cliquez sur « Valider et continuer ».
+              </li>
+            </ol>
+          </section>
 
-        {pendingFactor && (
-          <div className="mt-6 space-y-4">
-            <div className="flex justify-center rounded-lg border border-slate-200 bg-white p-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={pendingFactor.qr}
-                alt="QR code TOTP"
-                width={200}
-                height={200}
-                className="h-48 w-48"
-              />
-            </div>
-            <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
-              <div>Si vous ne pouvez pas scanner, saisissez ce secret :</div>
-              <code className="mt-1 block break-all font-mono text-slate-800">
-                {pendingFactor.secret}
-              </code>
-            </div>
-            <div>
-              <label
-                htmlFor="totp-code"
-                className="block text-sm font-medium text-slate-700"
-              >
-                Code à 6 chiffres
-              </label>
-              <input
-                id="totp-code"
-                value={verifyCode}
-                onChange={(e) =>
-                  setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                placeholder="123456"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm tracking-widest"
-              />
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
-                onClick={confirmEnroll}
-                disabled={verifying || verifyCode.length < 6}
-                className="flex-1 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-              >
-                {verifying ? "Vérification…" : "Valider et continuer"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPendingFactor(null);
-                  setVerifyCode("");
-                }}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        )}
+          {!pendingFactor && (
+            <button
+              type="button"
+              onClick={startEnroll}
+              disabled={enrolling}
+              className="inline-flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 disabled:opacity-50 sm:text-base"
+              style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+            >
+              {enrolling ? "Préparation…" : "Afficher le QR code"}
+            </button>
+          )}
 
-        <p className="mt-8 text-center text-sm text-slate-500">
-          <Link href="/connexion" className="underline hover:text-slate-700">
-            Retour à la connexion
-          </Link>
-        </p>
+          {pendingFactor && (
+            <div className="space-y-5 border-t border-slate-100 pt-6">
+              <div className="flex justify-center rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={pendingFactor.qr}
+                  alt="QR code à scanner avec votre application d’authentification"
+                  width={216}
+                  height={216}
+                  className="h-52 w-52 sm:h-56 sm:w-56"
+                />
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                <p className="font-medium text-slate-800">Secret (saisie manuelle)</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-600 sm:text-sm">
+                  Si vous ne pouvez pas scanner le QR code, copiez ce code dans votre application
+                  d&apos;authentification.
+                </p>
+                <code className="mt-2 block break-all rounded-lg bg-white px-3 py-2 font-mono text-xs text-slate-900 ring-1 ring-slate-200/80 sm:text-sm">
+                  {pendingFactor.secret}
+                </code>
+              </div>
+              <div>
+                <label htmlFor="totp-code" className="block text-sm font-medium text-slate-800">
+                  Code à 6 chiffres
+                </label>
+                <input
+                  id="totp-code"
+                  value={verifyCode}
+                  onChange={(e) =>
+                    setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-lg font-medium tracking-[0.35em] text-slate-900 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]"
+                />
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                <button
+                  type="button"
+                  onClick={confirmEnroll}
+                  disabled={verifying || verifyCode.length < 6}
+                  className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 disabled:opacity-50 sm:text-base"
+                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                >
+                  {verifying ? "Vérification…" : "Valider et continuer"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPendingFactor(null);
+                    setVerifyCode("");
+                  }}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
+            <Link
+              href="/connexion"
+              className="font-medium underline decoration-slate-300 underline-offset-2 hover:text-slate-800"
+            >
+              Retour à la connexion
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -252,9 +290,9 @@ export default function ConfigurerMfaPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-lg p-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="h-6 w-56 animate-pulse rounded bg-slate-200" />
+        <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+          <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
+            <div className="h-7 w-64 max-w-full animate-pulse rounded-lg bg-slate-200" />
           </div>
         </div>
       }
