@@ -62,6 +62,15 @@ function summarizeInsertPayloadForLog(payload: Record<string, unknown>) {
   return out;
 }
 
+function extractPgNotNullColumn(err: {
+  message?: string;
+  details?: string | null;
+}): string | null {
+  const src = `${err.message ?? ""} ${err.details ?? ""}`;
+  const m = src.match(/null value in column "([^"]+)"/i);
+  return m ? m[1] : null;
+}
+
 function jsonForClientCreateFailure(
   insertError: {
     code?: string;
@@ -83,8 +92,16 @@ function jsonForClientCreateFailure(
     apiCode = "CLIENTS_CREATE_DUPLICATE";
   } else if (code === "23502") {
     status = 400;
-    message =
-      "Impossible de créer le membre : données incomplètes (champ obligatoire manquant).";
+    const col = extractPgNotNullColumn(insertError);
+    if (col === "organization_id") {
+      message =
+        "Impossible de créer le membre : la base doit être mise à jour (migration « organization_id » sur les membres). Réessayez après déploiement SQL, ou contactez le support.";
+    } else if (col) {
+      message = `Impossible de créer le membre : un champ obligatoire côté serveur est vide (« ${col} »). Vérifiez les paramètres du club ou contactez le support.`;
+    } else {
+      message =
+        "Impossible de créer le membre : données incomplètes (champ obligatoire manquant).";
+    }
     apiCode = "CLIENTS_CREATE_NOT_NULL";
   } else if (
     code === "42501" ||
