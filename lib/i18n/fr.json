@@ -514,6 +514,7 @@
       "upToDate": "Tout est à jour",
       "connectedAs": "Connecté :",
       "userFallback": "Utilisateur",
+      "clubFallback": "Club",
       "logout": "Se déconnecter"
     },
     "common": {

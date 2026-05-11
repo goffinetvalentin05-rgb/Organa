@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus, PRICING } from "@/lib/billing/subscription";
+import { getAuthContext } from "@/lib/auth/rbac";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -53,12 +54,42 @@ export async function GET() {
     // Mapper vers l'ancien format 'plan' pour rétrocompatibilité
     const plan = subscription.canWrite ? "pro" : "free";
 
+    // Récupérer le nom du club actif (depuis le profil du clubId courant)
+    // Sert à l'affichage de la barre supérieure du dashboard.
+    let clubName: string | null = null;
+    let clubId: string | null = null;
+    try {
+      const ctx = await getAuthContext();
+      clubId = ctx?.current?.clubId ?? null;
+      if (clubId) {
+        const { data: clubProfile, error: clubProfileError } = await supabase
+          .from("profiles")
+          .select("company_name")
+          .eq("user_id", clubId)
+          .maybeSingle();
+        if (clubProfileError) {
+          console.warn("[API /me] Lecture company_name club échouée", {
+            clubId,
+            error: clubProfileError.message,
+          });
+        }
+        const raw = clubProfile?.company_name;
+        if (typeof raw === "string" && raw.trim()) {
+          clubName = raw.trim();
+        }
+      }
+    } catch (clubErr) {
+      console.warn("[API /me] Récupération clubName impossible", clubErr);
+    }
+
     return NextResponse.json(
       {
         user: {
           id: user.id,
           email: user.email,
           plan: plan, // Rétrocompatibilité
+          clubId,
+          clubName,
         },
         subscription: {
           status: subscription.status,

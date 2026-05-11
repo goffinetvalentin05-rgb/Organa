@@ -519,6 +519,7 @@
       "upToDate": "Alles aktuell",
       "connectedAs": "Angemeldet:",
       "userFallback": "Benutzer",
+      "clubFallback": "Verein",
       "logout": "Abmelden"
     },
     "assistant": {

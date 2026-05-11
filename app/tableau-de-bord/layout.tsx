@@ -35,8 +35,7 @@ export default function DashboardLayout({
   const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
-  const [companyName, setCompanyName] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [clubName, setClubName] = useState<string>("");
   const [loadingUser, setLoadingUser] = useState<boolean>(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -52,8 +51,8 @@ export default function DashboardLayout({
         }
 
         const data = await res.json();
-        setUserEmail(data.user?.email ?? null);
-        setCompanyName(data.user?.email?.split("@")[0] || "");
+        const rawClubName = typeof data.user?.clubName === "string" ? data.user.clubName.trim() : "";
+        setClubName(rawClubName);
       } catch (error) {
         console.error("[AUTH][DashboardLayout] Erreur lors de l'appel à /api/me", error);
       } finally {
@@ -239,21 +238,29 @@ export default function DashboardLayout({
             <div className="flex items-center gap-3">
               <LanguageSwitcher />
               
-              {!loadingUser && (
-                <div className="hidden md:flex items-center gap-2">
-                  <div className="flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5">
-                    <div 
+              {!loadingUser && (() => {
+                const displayName = clubName || t("dashboard.topbar.clubFallback");
+                const initial = (clubName || t("dashboard.topbar.clubFallback") || "C")
+                  .charAt(0)
+                  .toUpperCase();
+                return (
+                  <div
+                    className="flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5"
+                    aria-label={displayName}
+                    title={displayName}
+                  >
+                    <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
                       style={{ backgroundColor: "rgba(255,255,255,0.28)" }}
                     >
-                      {(companyName || userEmail || "U").charAt(0).toUpperCase()}
+                      {initial}
                     </div>
-                    <span className="text-sm font-medium text-white max-w-[120px] truncate">
-                      {companyName || userEmail || t("dashboard.topbar.userFallback")}
+                    <span className="hidden md:inline text-sm font-medium text-white max-w-[160px] truncate">
+                      {displayName}
                     </span>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               <button
                 onClick={handleLogout}

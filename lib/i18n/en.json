@@ -521,6 +521,7 @@
       "upToDate": "All up to date",
       "connectedAs": "Signed in:",
       "userFallback": "User",
+      "clubFallback": "Club",
       "logout": "Sign out"
     },
     "assistant": {
