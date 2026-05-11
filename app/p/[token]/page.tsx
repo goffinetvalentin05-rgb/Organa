@@ -161,6 +161,12 @@ export default function PublicPlanningPage({
         throw new Error(data?.error || "Inscription impossible");
       }
 
+      const assignmentId =
+        typeof data?.assignment?.id === "string" ? data.assignment.id : undefined;
+      if (!assignmentId) {
+        throw new Error("Réponse serveur incomplète (inscription).");
+      }
+
       const confirmation = data?.confirmation as PublicPlanningConfirmationPayload | undefined;
       if (confirmation) {
         try {
@@ -169,15 +175,12 @@ export default function PublicPlanningPage({
             JSON.stringify(confirmation)
           );
         } catch {
-          /* quota / navigation privée : on redirige quand même */
+          /* optionnel : la page de confirmation charge tout via assignmentId */
         }
-        closeSignupModal();
-        router.push(`/p/${token}/confirmation`);
-        return;
       }
 
       closeSignupModal();
-      await loadPlanning();
+      router.push(`/p/${token}/confirmation?assignmentId=${encodeURIComponent(assignmentId)}`);
     } catch (submitError: unknown) {
       setError(submitError instanceof Error ? submitError.message : "Erreur lors de l'inscription");
     } finally {
