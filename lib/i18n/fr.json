@@ -1076,16 +1076,63 @@
         "clients": "Membres",
         "quotes": "Cotisations",
         "invoices": "Factures",
+        "balance": "Solde du club",
+        "balanceFormula": "Cotisations + Factures + Revenus − Charges",
         "clientsEmpty": "Ajoutez vos premiers membres",
+        "newThisMonth": "+ {count} ce mois",
         "quotesPending": "en attente",
         "unpaid": "non payées",
         "allClear": "Tout est à jour",
         "paidQuotes": "payées",
-        "lateQuotes": "en retard"
+        "lateQuotes": "en retard",
+        "collected": "encaissées :",
+        "pendingAmount": "en attente :",
+        "billedTotal": "facturé :"
+      },
+      "priorities": {
+        "title": "Actions prioritaires",
+        "badge": "Synthèse",
+        "empty": "Tout est à jour pour le moment.",
+        "membershipsPending": "Cotisations en attente",
+        "invoicesUnpaid": "Factures non payées",
+        "expensesPending": "Charges à payer",
+        "sponsorsExpired": "Contrats sponsors expirés",
+        "sponsorsExpiring": "Contrats à renouveler bientôt",
+        "upcomingEvents": "Événements à venir",
+        "newMembers": "Nouveaux membres ce mois",
+        "urgent": "Urgent",
+        "toHandle": "À traiter",
+        "soon": "À venir",
+        "info": "Info"
+      },
+      "finance": {
+        "title": "Vue financière rapide",
+        "badge": "Synthèse",
+        "totalRevenue": "Total revenus",
+        "totalExpenses": "Total charges",
+        "netResult": "Résultat net",
+        "invoicesCollected": "Factures encaissées",
+        "membershipsCollected": "Cotisations encaissées",
+        "otherRevenue": "Autres revenus",
+        "pendingAmount": "Montant en attente",
+        "subnote": "Mise à jour en temps réel"
+      },
+      "upcomingEvents": {
+        "title": "Événements à venir",
+        "badge": "Agenda",
+        "empty": "Aucun événement à venir.",
+        "cta": "Voir tous les événements",
+        "viewDetail": "Voir",
+        "revenueLabel": "Revenus",
+        "expensesLabel": "Charges",
+        "status": {
+          "planned": "Planifié",
+          "completed": "Terminé"
+        }
       },
       "now": {
-        "title": "À traiter maintenant",
-        "badge": "Zone prioritaire",
+        "title": "Factures à suivre",
+        "badge": "À traiter",
         "empty": "Rien d'urgence pour le moment. Le club est à jour.",
         "subtitleAllClear": "Toutes les cotisations et factures sont à jour",
         "dueLabel": "Échéance :",
@@ -1115,9 +1162,10 @@
         "title": "Contrats à surveiller",
         "badge": "Sponsoring",
         "empty": "Aucun contrat à renouveler dans les 30 prochains jours ni expiré récemment.",
-        "summary": "⚠️ {count} contrat(s) à renouveler ou expiré(s)",
         "expired": "Expiré",
+        "expiringSoon": "Bientôt expiré",
         "expiresIn": "Expire dans {days} jour(s)",
+        "endDateLabel": "Fin :",
         "cta": "Voir tous les contrats"
       }
     },

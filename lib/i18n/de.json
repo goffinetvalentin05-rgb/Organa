@@ -1151,19 +1151,69 @@
       "statusNote": "Ihre Aktivität ist unter Kontrolle",
       "checkoutSuccess": "Zahlung erfolgreich! Ihr Konto ist jetzt Pro.",
       "kpis": {
-        "clients": "Kunden",
-        "quotes": "Angebote",
+        "clients": "Mitglieder",
+        "quotes": "Mitgliedsbeiträge",
         "invoices": "Rechnungen",
+        "balance": "Vereinssaldo",
+        "balanceFormula": "Beiträge + Rechnungen + Einnahmen − Ausgaben",
         "overdue": "Überfällig",
-        "clientsEmpty": "Alles bereit für den Start",
+        "clientsEmpty": "Fügen Sie Ihre ersten Mitglieder hinzu",
+        "newThisMonth": "+ {count} diesen Monat",
         "quotesPending": "ausstehend",
         "unpaid": "unbezahlt",
-        "allClear": "Alles aktuell"
+        "allClear": "Alles aktuell",
+        "paidQuotes": "bezahlt",
+        "lateQuotes": "überfällig",
+        "collected": "eingenommen:",
+        "pendingAmount": "ausstehend:",
+        "billedTotal": "fakturiert:"
+      },
+      "priorities": {
+        "title": "Prioritäre Aktionen",
+        "badge": "Übersicht",
+        "empty": "Aktuell ist alles auf dem neuesten Stand.",
+        "membershipsPending": "Ausstehende Beiträge",
+        "invoicesUnpaid": "Unbezahlte Rechnungen",
+        "expensesPending": "Zu zahlende Ausgaben",
+        "sponsorsExpired": "Abgelaufene Sponsorenverträge",
+        "sponsorsExpiring": "Bald zu erneuernde Verträge",
+        "upcomingEvents": "Anstehende Veranstaltungen",
+        "newMembers": "Neue Mitglieder diesen Monat",
+        "urgent": "Dringend",
+        "toHandle": "Zu erledigen",
+        "soon": "Bald",
+        "info": "Info"
+      },
+      "finance": {
+        "title": "Schnellansicht Finanzen",
+        "badge": "Übersicht",
+        "totalRevenue": "Gesamteinnahmen",
+        "totalExpenses": "Gesamtausgaben",
+        "netResult": "Nettoergebnis",
+        "invoicesCollected": "Eingenommene Rechnungen",
+        "membershipsCollected": "Eingenommene Beiträge",
+        "otherRevenue": "Andere Einnahmen",
+        "pendingAmount": "Ausstehender Betrag",
+        "subnote": "In Echtzeit aktualisiert"
+      },
+      "upcomingEvents": {
+        "title": "Anstehende Veranstaltungen",
+        "badge": "Agenda",
+        "empty": "Keine anstehenden Veranstaltungen.",
+        "cta": "Alle Veranstaltungen ansehen",
+        "viewDetail": "Ansehen",
+        "revenueLabel": "Einnahmen",
+        "expensesLabel": "Ausgaben",
+        "status": {
+          "planned": "Geplant",
+          "completed": "Abgeschlossen"
+        }
       },
       "now": {
-        "title": "Jetzt erledigen",
-        "badge": "Prioritätsbereich",
+        "title": "Rechnungen nachverfolgen",
+        "badge": "Zu erledigen",
         "empty": "Nichts Dringendes im Moment. Sie behalten die Kontrolle.",
+        "subtitleAllClear": "Alle Beiträge und Rechnungen sind aktuell",
         "dueLabel": "Fällig:",
         "viewDetail": "Details ansehen"
       },
@@ -1201,9 +1251,10 @@
         "title": "Verträge im Blick",
         "badge": "Sponsoring",
         "empty": "Keine Verträge in den nächsten 30 Tagen fällig oder kürzlich abgelaufen.",
-        "summary": "⚠️ {count} Vertrag/Verträge zu verlängern oder abgelaufen",
         "expired": "Abgelaufen",
+        "expiringSoon": "Bald ablaufend",
         "expiresIn": "Endet in {days} Tag(en)",
+        "endDateLabel": "Ende:",
         "cta": "Alle Verträge ansehen"
       }
     },
