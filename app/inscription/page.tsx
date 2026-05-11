@@ -160,9 +160,25 @@ export default function InscriptionPage() {
                     Un email de confirmation vient de vous être envoyé. Veuillez cliquer sur le lien
                     reçu pour activer votre compte.
                   </p>
-                  <p className="mt-3 text-center text-sm leading-relaxed text-slate-600 md:text-[15px]">
-                    Pensez à vérifier vos courriers indésirables.
-                  </p>
+                  <div className="mt-3 flex items-start justify-center gap-2 text-center">
+                    <svg
+                      className="mt-0.5 h-4 w-4 text-slate-400"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 8h.01" />
+                      <path d="M11 12h1v4h1" />
+                      <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <p className="text-xs leading-relaxed text-slate-500 sm:text-sm md:text-[13px]">
+                      Pensez à vérifier vos courriers indésirables (spam), il arrive parfois que l’email de confirmation s’y trouve.
+                    </p>
+                  </div>
                   <Link
                     href="/connexion"
                     className="mt-8 flex w-full items-center justify-center rounded-xl py-3.5 text-base font-semibold text-white transition-all duration-300 hover:opacity-90 shadow-lg hover:shadow-xl"
