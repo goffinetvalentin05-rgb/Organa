@@ -206,6 +206,33 @@ h3 {
   color: rgba(255, 255, 255, 0.82) !important;
 }
 
+/* Cartes claires dans le contenu : le <h1> n’est pas le grand titre « page sur fond bleu »
+   (ex. MFA, modales) — sans ceci, h1 / h1+p restent blancs et illisibles sur fond blanc. */
+.dashboard-shell main .dashboard-card-surface h1 {
+  color: #0f172a !important;
+  font-size: 1.25rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
+}
+
+@media (min-width: 640px) {
+  .dashboard-shell main .dashboard-card-surface h1 {
+    font-size: 1.5rem !important;
+  }
+}
+
+.dashboard-shell main .dashboard-card-surface h1 + p {
+  color: #475569 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.625 !important;
+}
+
+@media (min-width: 640px) {
+  .dashboard-shell main .dashboard-card-surface h1 + p {
+    font-size: 0.9375rem !important;
+  }
+}
+
 .dashboard-shell .accent-bg:hover {
   background: var(--accent-hover);
 }

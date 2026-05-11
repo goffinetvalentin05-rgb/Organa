@@ -124,7 +124,7 @@ function ConfigurerMfaForm() {
   if (loading || alreadyVerified) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-2 sm:px-6">
-        <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
+        <div className="dashboard-card-surface rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
           <div className="h-7 w-72 max-w-full animate-pulse rounded-lg bg-slate-200" />
           <div className="mt-4 h-4 w-full animate-pulse rounded bg-slate-100" />
           <div className="mt-2 h-4 max-w-md animate-pulse rounded bg-slate-100" />
@@ -146,15 +146,15 @@ function ConfigurerMfaForm() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/25 bg-white/95 shadow-xl backdrop-blur-sm">
+      <div className="dashboard-card-surface overflow-hidden rounded-2xl border border-white/25 bg-white/95 shadow-xl backdrop-blur-sm">
         <div
           className="border-b border-slate-100 px-5 py-5 sm:px-8 sm:py-6"
           style={{ background: "linear-gradient(135deg, rgba(26,35,255,0.06) 0%, transparent 55%)" }}
         >
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+          <h1 className="font-bold tracking-tight text-slate-900 sm:tracking-tight">
             Configurer la double authentification
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p className="mt-3 leading-relaxed text-slate-600">
             Pour protéger les données de votre club, la double authentification est obligatoire. Elle
             ajoute une sécurité supplémentaire lors de vos connexions.
           </p>
@@ -291,7 +291,7 @@ export default function ConfigurerMfaPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
-          <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
+          <div className="dashboard-card-surface rounded-2xl border border-white/20 bg-white/95 p-8 shadow-xl backdrop-blur-sm">
             <div className="h-7 w-64 max-w-full animate-pulse rounded-lg bg-slate-200" />
           </div>
         </div>
