@@ -125,14 +125,14 @@ export default function MfaPage() {
       <div>
         <Link
           href="/tableau-de-bord/securite"
-          className="text-sm text-slate-500 hover:underline"
+          className="text-sm text-white/70 hover:text-white hover:underline"
         >
           ← Retour Sécurité
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">
+        <h1 className="mt-2 text-3xl font-bold text-white drop-shadow-sm">
           Double authentification (TOTP)
         </h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-white/80">
           Utilisez une application comme Google Authenticator, Authy ou 1Password
           pour générer des codes à 6 chiffres.
         </p>

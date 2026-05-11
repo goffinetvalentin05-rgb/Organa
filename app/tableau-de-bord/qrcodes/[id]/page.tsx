@@ -201,7 +201,7 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
       {/* Back link */}
       <Link
         href="/tableau-de-bord/qrcodes"
-        className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+        className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
       >
         <ArrowRight className="w-4 h-4 rotate-180" />
         {t("dashboard.qrcodes.detail.backToList")}

@@ -219,6 +219,86 @@ h3 {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
 }
 
+/* ------------------------------------------------------------------
+   Harmonisation legacy → design system (dashboard-shell).
+   Beaucoup d'écrans dashboard utilisent encore d'anciennes classes
+   (`bg-surface`, `bg-surface/80`, `border-subtle`, `text-secondary`…).
+   Sur le fond bleu/violet, ces surfaces transparentes devenaient
+   illisibles ("bleu sur bleu"). On les remappe ici vers la même
+   surface claire glass utilisée par le Dashboard du club.
+   ------------------------------------------------------------------ */
+
+/* Cartes / panneaux clairs : toute déclinaison `.bg-surface`,
+   `.bg-surface/80`, `.bg-surface/60` devient une surface claire
+   semi-transparente lisible sur le fond bleu. */
+.dashboard-shell main .bg-surface,
+.dashboard-shell main [class*="bg-surface/"] {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  color: #0f172a;
+}
+
+.dashboard-shell main .bg-surface-hover {
+  background-color: rgba(241, 245, 249, 0.95) !important;
+  color: #0f172a;
+}
+
+.dashboard-shell main .bg-surface-hover:hover {
+  background-color: rgba(226, 232, 240, 0.98) !important;
+}
+
+/* Bordures discrètes mais visibles sur surface claire */
+.dashboard-shell main .border-subtle {
+  border-color: rgba(148, 163, 184, 0.35) !important;
+}
+
+.dashboard-shell main .border-subtle-hover {
+  border-color: rgba(100, 116, 139, 0.45) !important;
+}
+
+/* Textes legacy → couleurs slate lisibles sur surface claire */
+.dashboard-shell main .text-primary {
+  color: #0f172a !important;
+}
+
+.dashboard-shell main .text-secondary {
+  color: #475569 !important;
+}
+
+.dashboard-shell main .text-tertiary {
+  color: #64748b !important;
+}
+
+/* Bouton primaire legacy `accent-bg` : on garde le bleu Obillz mais on
+   l'aligne visuellement aux DashboardPrimaryButton (gradient + ombre). */
+.dashboard-shell main .accent-bg {
+  background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(37, 99, 235, 0.4) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25) !important;
+}
+
+.dashboard-shell main .accent-bg:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* Cartes anciennes (`rounded-2xl border border-subtle bg-surface/80`)
+   placées hors d'une section unifiée : on leur applique l'ombre du
+   design system pour rester cohérent. */
+.dashboard-shell main .shadow-premium {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Titre <h2> inside legacy cards: hard contrast on light card */
+.dashboard-shell main .bg-surface h1,
+.dashboard-shell main .bg-surface h2,
+.dashboard-shell main .bg-surface h3,
+.dashboard-shell main [class*="bg-surface/"] h2,
+.dashboard-shell main [class*="bg-surface/"] h3 {
+  color: #0f172a !important;
+}
+
 /* Champs formulaires : fond clair + texte foncé (îlots inner-content / tableaux) */
 .dashboard-shell input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
 .dashboard-shell select,

@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  SectionCard,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
-// Types
 interface SubscriptionInfo {
   status: "trial" | "active" | "expired";
   billingCycle: "monthly" | "yearly" | null;
@@ -28,11 +34,9 @@ export default function AbonnementClient() {
 
   useEffect(() => {
     fetchSubscriptionInfo();
-
-    // Vérifier si on revient d'un checkout réussi ou annulé
     const checkoutStatus = searchParams.get("checkout");
     if (checkoutStatus === "cancelled") {
-      // Afficher un message d'annulation si nécessaire
+      // noop — message peut être affiché si nécessaire
     }
   }, [searchParams]);
 
@@ -77,155 +81,147 @@ export default function AbonnementClient() {
     }
   };
 
-  // Calculer le prix
   const monthlyPrice = pricing?.monthly.amount || 39;
   const yearlyPrice = pricing?.yearly.amount || 390;
   const yearlyMonthlyEquivalent = Math.round(yearlyPrice / 12);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-primary">Abonnement</h1>
-        <p className="mt-2 text-secondary">
-          Un seul plan, toutes les fonctionnalités. Simple et transparent.
-        </p>
-      </div>
+    <PageLayout maxWidth="3xl">
+      <PageHeader
+        title="Abonnement"
+        subtitle="Un seul plan, toutes les fonctionnalités. Simple et transparent."
+      />
 
       {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 accent-border-strong"></div>
-        </div>
+        <GlassCard padding="lg" className="flex items-center justify-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        </GlassCard>
       ) : (
         <>
-          {/* Statut actuel */}
           {subscription && (
-            <div
-              className={`p-4 rounded-xl border-2 ${
+            <GlassCard
+              padding="lg"
+              className={
                 subscription.status === "active"
-                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                  ? "border-emerald-300/70 bg-emerald-50/85"
                   : subscription.status === "trial"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-red-500 bg-red-50 dark:bg-red-900/20"
-              }`}
+                    ? "border-blue-300/70 bg-blue-50/85"
+                    : "border-rose-300/70 bg-rose-50/85"
+              }
             >
               <div className="flex items-center gap-3">
                 {subscription.status === "active" ? (
                   <>
-                    <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-500/40">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-green-800 dark:text-green-200">
-                        Abonnement actif
-                      </p>
-                      <p className="text-sm text-green-700 dark:text-green-300">
+                      <p className="font-semibold text-emerald-900">Abonnement actif</p>
+                      <p className="text-sm text-emerald-800/90">
                         {subscription.billingCycle === "yearly" ? "Annuel" : "Mensuel"} – Accès complet à toutes les fonctionnalités
                       </p>
                     </div>
                   </>
                 ) : subscription.status === "trial" ? (
                   <>
-                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/40">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-blue-800 dark:text-blue-200">
-                        Période d'essai – {subscription.trialDaysRemaining} jour{subscription.trialDaysRemaining > 1 ? "s" : ""} restant{subscription.trialDaysRemaining > 1 ? "s" : ""}
+                      <p className="font-semibold text-blue-900">
+                        Période d&apos;essai – {subscription.trialDaysRemaining} jour{subscription.trialDaysRemaining > 1 ? "s" : ""} restant{subscription.trialDaysRemaining > 1 ? "s" : ""}
                       </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                      <p className="text-sm text-blue-800/90">
                         Profitez de toutes les fonctionnalités gratuitement
                       </p>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center shadow-md shadow-rose-500/40">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-red-800 dark:text-red-200">
-                        Essai terminé
-                      </p>
-                      <p className="text-sm text-red-700 dark:text-red-300">
-                        Abonnez-vous pour continuer à utiliser l'application
+                      <p className="font-semibold text-rose-900">Essai terminé</p>
+                      <p className="text-sm text-rose-800/90">
+                        Abonnez-vous pour continuer à utiliser l&apos;application
                       </p>
                     </div>
                   </>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
 
-          {/* Carte de tarification (visible seulement si pas d'abonnement actif) */}
           {subscription?.status !== "active" && (
-            <>
-              <div className="flex items-center justify-center gap-4 mb-6">
+            <GlassCard padding="lg" className="space-y-6">
+              <div className="flex items-center justify-center gap-4">
                 <span
-                  className={`font-medium ${billingCycle === "monthly" ? "text-primary" : "text-secondary"}`}
+                  className={`font-medium ${
+                    billingCycle === "monthly" ? "text-slate-900" : "text-slate-500"
+                  }`}
                 >
                   Mensuel
                 </span>
                 <button
                   type="button"
                   onClick={() =>
-                    setBillingCycle(
-                      billingCycle === "monthly" ? "yearly" : "monthly"
-                    )
+                    setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")
                   }
-                  className={`rounded-full bg-gray-200 w-14 h-7 relative cursor-pointer transition-colors ${
-                    billingCycle === "yearly" ? "accent-bg" : ""
+                  className={`relative h-7 w-14 cursor-pointer rounded-full transition-colors ${
+                    billingCycle === "yearly"
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600"
+                      : "bg-slate-300"
                   }`}
                   aria-label="Choisir la facturation mensuelle ou annuelle"
                 >
                   <span
-                    className={`absolute bg-white rounded-full w-5 h-5 top-1 left-1 transition-transform ${
+                    className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${
                       billingCycle === "yearly" ? "translate-x-7" : "translate-x-0"
                     }`}
                   />
                 </button>
                 <div className="flex flex-col items-start leading-tight">
                   <span
-                    className={`font-medium ${billingCycle === "yearly" ? "text-primary" : "text-secondary"}`}
+                    className={`font-medium ${
+                      billingCycle === "yearly" ? "text-slate-900" : "text-slate-500"
+                    }`}
                   >
                     Annuel
                   </span>
-                  <span className="bg-green-500 text-white rounded-full px-2 py-1 text-xs font-medium mt-1">
+                  <span className="mt-1 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
                     2 mois offerts
                   </span>
                 </div>
               </div>
 
-              <div className="bg-surface rounded-2xl border-2 border-subtle">
-              {/* Prix et détails */}
-              <div className="p-8 text-center">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/95 p-8 text-center shadow-sm">
                 <div className="mb-6">
                   {billingCycle === "yearly" ? (
                     <>
                       <div className="flex items-baseline justify-center gap-2">
-                        <span className="text-5xl font-bold text-primary">{yearlyPrice}</span>
-                        <span className="text-xl text-secondary">CHF/an</span>
+                        <span className="text-5xl font-bold text-slate-900">{yearlyPrice}</span>
+                        <span className="text-xl text-slate-600">CHF/an</span>
                       </div>
-                      <p className="mt-2 text-secondary">
-                        soit <span className="font-semibold">{yearlyMonthlyEquivalent} CHF/mois</span>
+                      <p className="mt-2 text-slate-600">
+                        soit <span className="font-semibold text-slate-900">{yearlyMonthlyEquivalent} CHF/mois</span>
                       </p>
                     </>
                   ) : (
                     <div className="flex items-baseline justify-center gap-2">
-                      <span className="text-5xl font-bold text-primary">{monthlyPrice}</span>
-                      <span className="text-xl text-secondary">CHF/mois</span>
+                      <span className="text-5xl font-bold text-slate-900">{monthlyPrice}</span>
+                      <span className="text-xl text-slate-600">CHF/mois</span>
                     </div>
                   )}
                 </div>
 
-                {/* Fonctionnalités */}
-                <ul className="space-y-3 mb-8 text-left max-w-sm mx-auto">
+                <ul className="mx-auto mb-8 max-w-sm space-y-3 text-left">
                   {[
                     "Membres illimités",
                     "Événements illimités",
@@ -238,7 +234,7 @@ export default function AbonnementClient() {
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <svg
-                        className="w-5 h-5 accent flex-shrink-0 mt-0.5"
+                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -250,20 +246,21 @@ export default function AbonnementClient() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      <span className="text-primary">{feature}</span>
+                      <span className="text-slate-800">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                {/* Bouton d'abonnement */}
-                <button
+                <DashboardPrimaryButton
+                  type="button"
                   onClick={handleSubscribe}
                   disabled={checkoutLoading}
-                  className="w-full max-w-sm px-6 py-3 accent-bg text-white font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  icon="none"
+                  className="mx-auto w-full max-w-sm justify-center"
                 >
                   {checkoutLoading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                         <circle
                           className="opacity-25"
                           cx="12"
@@ -271,6 +268,7 @@ export default function AbonnementClient() {
                           r="10"
                           stroke="currentColor"
                           strokeWidth="4"
+                          fill="none"
                         />
                         <path
                           className="opacity-75"
@@ -281,59 +279,62 @@ export default function AbonnementClient() {
                       Chargement...
                     </span>
                   ) : (
-                    `S'abonner – ${billingCycle === "yearly" ? yearlyPrice + " CHF/an" : monthlyPrice + " CHF/mois"}`
+                    `S'abonner – ${
+                      billingCycle === "yearly"
+                        ? yearlyPrice + " CHF/an"
+                        : monthlyPrice + " CHF/mois"
+                    }`
                   )}
-                </button>
+                </DashboardPrimaryButton>
 
-                <p className="mt-4 text-sm text-secondary">
+                <p className="mt-4 text-sm text-slate-500">
                   Paiement sécurisé par Stripe. Annulation possible à tout moment.
                 </p>
               </div>
-              </div>
-            </>
+            </GlassCard>
           )}
 
-          {/* FAQ */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-primary">Questions fréquentes</h2>
+          <SectionCard
+            title="Questions fréquentes"
+            description="Tout ce que vous devez savoir avant de vous abonner."
+          >
             <div className="space-y-3">
-              <details className="group bg-surface rounded-lg border border-subtle p-4">
-                <summary className="font-medium cursor-pointer list-none flex items-center justify-between">
-                  Que se passe-t-il après les 7 jours d'essai ?
-                  <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-secondary">
-                  Après 7 jours, votre compte passe en mode lecture seule. Vous pouvez toujours consulter vos données, mais vous ne pouvez plus créer ou modifier d'éléments. Abonnez-vous pour retrouver l'accès complet.
-                </p>
-              </details>
-              <details className="group bg-surface rounded-lg border border-subtle p-4">
-                <summary className="font-medium cursor-pointer list-none flex items-center justify-between">
-                  Puis-je annuler mon abonnement ?
-                  <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-secondary">
-                  Oui, vous pouvez annuler à tout moment. Votre abonnement restera actif jusqu'à la fin de la période payée. Aucun remboursement partiel n'est effectué.
-                </p>
-              </details>
-              <details className="group bg-surface rounded-lg border border-subtle p-4">
-                <summary className="font-medium cursor-pointer list-none flex items-center justify-between">
-                  Pourquoi choisir l'annuel ?
-                  <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-secondary">
-                  L'abonnement annuel inclut 2 mois offerts. C'est ideal pour les clubs qui savent qu'ils utiliseront l'application sur le long terme.
-                </p>
-              </details>
+              {[
+                {
+                  q: "Que se passe-t-il après les 7 jours d'essai ?",
+                  a: "Après 7 jours, votre compte passe en mode lecture seule. Vous pouvez toujours consulter vos données, mais vous ne pouvez plus créer ou modifier d'éléments. Abonnez-vous pour retrouver l'accès complet.",
+                },
+                {
+                  q: "Puis-je annuler mon abonnement ?",
+                  a: "Oui, vous pouvez annuler à tout moment. Votre abonnement restera actif jusqu'à la fin de la période payée. Aucun remboursement partiel n'est effectué.",
+                },
+                {
+                  q: "Pourquoi choisir l'annuel ?",
+                  a: "L'abonnement annuel inclut 2 mois offerts. C'est idéal pour les clubs qui savent qu'ils utiliseront l'application sur le long terme.",
+                },
+              ].map((item) => (
+                <details
+                  key={item.q}
+                  className="group rounded-xl border border-slate-200/70 bg-white/90 p-4"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-slate-900">
+                    {item.q}
+                    <svg
+                      className="h-5 w-5 text-slate-500 transition-transform group-open:rotate-180"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <p className="mt-3 text-slate-600">{item.a}</p>
+                </details>
+              ))}
             </div>
-          </div>
+          </SectionCard>
         </>
       )}
-    </div>
+    </PageLayout>
   );
 }

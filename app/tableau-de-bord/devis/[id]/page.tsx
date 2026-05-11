@@ -13,6 +13,12 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+} from "@/components/ui";
 
 interface Devis {
   id: string;
@@ -183,23 +189,27 @@ export default function DevisDetailPage() {
 
   if (!devis) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">{t("dashboard.common.loading")}</p>
-      </div>
+      <PageLayout maxWidth="4xl">
+        <GlassCard padding="lg" className="text-center">
+          <p className="text-slate-600">{t("dashboard.common.loading")}</p>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
   if (!devis.lignes || !Array.isArray(devis.lignes)) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">{t("dashboard.quotes.detail.invalidData")}</p>
-        <Link
-          href="/tableau-de-bord/devis"
-          className="text-secondary hover:text-primary mt-4 inline-block"
-        >
-          ← {t("dashboard.quotes.detail.backToList")}
-        </Link>
-      </div>
+      <PageLayout maxWidth="4xl">
+        <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
+          <p className="text-red-700 font-medium">{t("dashboard.quotes.detail.invalidData")}</p>
+          <Link
+            href="/tableau-de-bord/devis"
+            className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+          >
+            ← {t("dashboard.quotes.detail.backToList")}
+          </Link>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
@@ -229,77 +239,81 @@ export default function DevisDetailPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <Link
-            href="/tableau-de-bord/devis"
-            className="text-secondary hover:text-primary mb-2 inline-block"
-          >
-            ← {t("dashboard.quotes.detail.backToList")}
-          </Link>
-          <h1 className="text-3xl font-bold">{devis.numero}</h1>
-          <p className="mt-2 text-secondary">
-            {t("dashboard.common.client")}: {devis.client?.nom || t("dashboard.common.unknownClient")}
-          </p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={handleEnvoyerEmail}
-            disabled={envoiEmail || !devis.client?.email}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Mail className="w-4 h-4" />
-            {envoiEmail ? t("dashboard.quotes.detail.sending") : t("dashboard.quotes.detail.sendEmail")}
-          </button>
-          <button
-            onClick={() => {
-              if (!id) {
-                toast.error(t("dashboard.common.missingDocumentId"));
-                return;
-              }
-              const url = `/api/documents/${id}/pdf?type=quote`;
-              console.log("Opening PDF URL:", url);
-              window.open(url, "_blank");
-            }}
-            disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Eye className="w-4 h-4" />
-            {t("dashboard.quotes.detail.previewPdf")}
-          </button>
-          <button
-            onClick={() => {
-              if (!id) {
-                toast.error(t("dashboard.common.missingDocumentId"));
-                return;
-              }
-              const url = `/api/documents/${id}/pdf?type=quote&download=true`;
-              console.log("Downloading PDF URL:", url);
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = `obillz-cotisation-${devis?.numero || id}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-            disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Download className="w-4 h-4" />
-            {t("dashboard.quotes.detail.downloadPdf")}
-          </button>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
-          >
-            <Trash className="w-4 h-4" />
-            {t("dashboard.common.delete")}
-          </button>
-        </div>
+    <PageLayout maxWidth="4xl">
+      <div>
+        <Link
+          href="/tableau-de-bord/devis"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
+        >
+          ← {t("dashboard.quotes.detail.backToList")}
+        </Link>
       </div>
 
-      <div className="rounded-2xl border border-subtle bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+      <PageHeader
+        title={devis.numero}
+        subtitle={`${t("dashboard.common.client")}: ${devis.client?.nom || t("dashboard.common.unknownClient")}`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <ActionButton
+              type="button"
+              onClick={handleEnvoyerEmail}
+              disabled={envoiEmail || !devis.client?.email}
+              className="inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Mail className="w-4 h-4" />
+              {envoiEmail ? t("dashboard.quotes.detail.sending") : t("dashboard.quotes.detail.sendEmail")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                if (!id) {
+                  toast.error(t("dashboard.common.missingDocumentId"));
+                  return;
+                }
+                const url = `/api/documents/${id}/pdf?type=quote`;
+                window.open(url, "_blank");
+              }}
+              disabled={!id}
+              className="inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              <Eye className="w-4 h-4" />
+              {t("dashboard.quotes.detail.previewPdf")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                if (!id) {
+                  toast.error(t("dashboard.common.missingDocumentId"));
+                  return;
+                }
+                const url = `/api/documents/${id}/pdf?type=quote&download=true`;
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `obillz-cotisation-${devis?.numero || id}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              disabled={!id}
+              className="inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              <Download className="w-4 h-4" />
+              {t("dashboard.quotes.detail.downloadPdf")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              variant="dangerSoft"
+              onClick={handleDelete}
+              className="inline-flex items-center gap-2"
+            >
+              <Trash className="w-4 h-4" />
+              {t("dashboard.common.delete")}
+            </ActionButton>
+          </div>
+        }
+      />
+
+      <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl shadow-blue-950/10">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-4">
             {companySettings?.logo_url && (
@@ -460,9 +474,9 @@ export default function DevisDetailPage() {
         )}
       </div>
 
-      <div className="rounded-xl border border-subtle bg-surface p-6">
+      <GlassCard padding="md">
         <div className="mb-4">
-          <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.status")}</label>
+          <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.status")}</label>
           <select
             value={devis.statut}
             onChange={(e) =>
@@ -470,7 +484,7 @@ export default function DevisDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
               )
             }
-            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60"
           >
             <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
             <option value="envoye">{t("dashboard.status.quote.sent")}</option>
@@ -480,13 +494,12 @@ export default function DevisDetailPage() {
         </div>
         {devis.notes && (
           <div>
-            <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.notes")}</label>
-            <p className="text-primary">{devis.notes}</p>
+            <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.notes")}</label>
+            <p className="text-slate-900 whitespace-pre-line">{devis.notes}</p>
           </div>
         )}
-      </div>
-
-    </div>
+      </GlassCard>
+    </PageLayout>
   );
 }
 

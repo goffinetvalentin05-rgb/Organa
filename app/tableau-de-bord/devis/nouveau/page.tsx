@@ -12,6 +12,13 @@ import {
 import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface Client {
   id: string;
@@ -416,14 +423,14 @@ export default function NouveauDevisPage() {
   const totalTTC = calculerTotalTTC(lignes);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{t("dashboard.quotes.newTitle")}</h1>
-        <p className="mt-2 text-secondary">{t("dashboard.quotes.newSubtitle")}</p>
-      </div>
+    <PageLayout maxWidth="4xl">
+      <PageHeader
+        title={t("dashboard.quotes.newTitle")}
+        subtitle={t("dashboard.quotes.newSubtitle")}
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
+        <GlassCard padding="lg" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
               {t("dashboard.quotes.fields.client")}
@@ -478,19 +485,15 @@ export default function NouveauDevisPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
+        <GlassCard padding="lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("dashboard.quotes.lines.title")}</h2>
-            <button
-              type="button"
-              onClick={ajouterLigne}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-sm flex items-center gap-2 border border-subtle"
-            >
+            <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.quotes.lines.title")}</h2>
+            <ActionButton type="button" onClick={ajouterLigne} className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
               {t("dashboard.quotes.lines.add")}
-            </button>
+            </ActionButton>
           </div>
 
           <div className="space-y-4">
@@ -606,10 +609,10 @@ export default function NouveauDevisPage() {
               </div>
             ))}
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.quotes.fields.notes")}</h2>
+        <GlassCard padding="lg">
+          <h2 className="text-xl font-semibold text-slate-900 mb-4">{t("dashboard.quotes.fields.notes")}</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -617,11 +620,11 @@ export default function NouveauDevisPage() {
             placeholder={t("dashboard.quotes.fields.notesPlaceholder")}
             className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           />
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
+        <GlassCard padding="lg">
           <div className="space-y-2 text-right">
-            <div className="flex justify-between text-secondary">
+            <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.quotes.summary.totalHT")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -630,7 +633,7 @@ export default function NouveauDevisPage() {
                 }).format(totalHT)}
               </span>
             </div>
-            <div className="flex justify-between text-secondary">
+            <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.quotes.summary.vat")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -639,7 +642,7 @@ export default function NouveauDevisPage() {
                 }).format(totalTVA)}
               </span>
             </div>
-            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-subtle">
+            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-slate-200/70 text-slate-900">
               <span>{t("dashboard.quotes.summary.totalTTC")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -649,50 +652,46 @@ export default function NouveauDevisPage() {
               </span>
             </div>
           </div>
-        </div>
+        </GlassCard>
 
         {bulkProgress && (
-          <div className="rounded-xl border border-subtle bg-surface p-6 space-y-3">
-            <p className="text-sm font-medium text-primary">{bulkProgress.message}</p>
-            <div className="h-2 w-full rounded-full bg-surface-hover overflow-hidden">
+          <GlassCard padding="md" className="space-y-3">
+            <p className="text-sm font-medium text-slate-900">{bulkProgress.message}</p>
+            <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
               <div
-                className="h-full accent-bg transition-all"
+                className="h-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] transition-all"
                 style={{
                   width: `${bulkProgress.total > 0 ? (bulkProgress.current / bulkProgress.total) * 100 : 0}%`,
                 }}
               />
             </div>
-            <p className="text-xs text-secondary">
+            <p className="text-xs text-slate-600">
               {bulkProgress.created}/{bulkProgress.total} cotisations créées
             </p>
-          </div>
+          </GlassCard>
         )}
 
         {bulkSummary && (
-          <div className="rounded-xl border border-subtle bg-surface p-6 space-y-2">
-            <h3 className="text-lg font-semibold text-primary">Résumé de l'envoi groupé</h3>
-            <p className="text-secondary">{bulkSummary.created} cotisations créées</p>
-            <p className="text-secondary">{bulkSummary.emailed} emails envoyés</p>
-            <p className="text-secondary">{bulkSummary.skippedNoEmail} joueurs sans email ignorés</p>
+          <GlassCard padding="md" className="space-y-2">
+            <h3 className="text-lg font-semibold text-slate-900">Résumé de l&apos;envoi groupé</h3>
+            <p className="text-slate-600">{bulkSummary.created} cotisations créées</p>
+            <p className="text-slate-600">{bulkSummary.emailed} emails envoyés</p>
+            <p className="text-slate-600">{bulkSummary.skippedNoEmail} joueurs sans email ignorés</p>
             {bulkSummary.failed > 0 && (
-              <p className="text-red-600">{bulkSummary.failed} traitements en erreur</p>
+              <p className="text-red-600 font-medium">{bulkSummary.failed} traitements en erreur</p>
             )}
-          </div>
+          </GlassCard>
         )}
 
-        <div className="flex gap-3 flex-wrap">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
-          >
+        <div className="flex flex-wrap items-center gap-3">
+          <ActionButton type="button" onClick={() => router.back()} className="flex-1 justify-center min-w-[150px]">
             {t("dashboard.common.cancel")}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(false)}
             disabled={savingForPdf || isBulkProcessing}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
               <>
@@ -705,12 +704,12 @@ export default function NouveauDevisPage() {
                 {t("dashboard.quotes.previewPdf")}
               </>
             )}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(true)}
             disabled={savingForPdf || isBulkProcessing}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
               <>
@@ -723,24 +722,25 @@ export default function NouveauDevisPage() {
                 {t("dashboard.quotes.downloadPdf")}
               </>
             )}
-          </button>
-          <button
+          </ActionButton>
+          <DashboardPrimaryButton
             type="submit"
             disabled={isBulkProcessing}
-            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            icon="none"
+            className="flex-1 justify-center min-w-[180px] rounded-xl"
           >
             {isBulkProcessing ? (
-              <>
+              <span className="inline-flex items-center gap-2">
                 <Loader className="w-4 h-4 animate-spin" />
-                Envoi groupé en cours...
-              </>
+                Envoi groupé en cours…
+              </span>
             ) : (
               t("dashboard.quotes.createAction")
             )}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
-    </div>
+    </PageLayout>
   );
 }
 

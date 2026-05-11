@@ -7,11 +7,17 @@ import { ArrowRight, Plus, Trash, Clock, MapPin, Calendar } from "@/lib/icons";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+  SectionCard,
+} from "@/components/ui";
 
 interface Event {
   id: string;
   name: string;
-  start_date: string;
 }
 
 interface SlotForm {
@@ -24,6 +30,16 @@ interface SlotForm {
   notes: string;
 }
 
+const inputClass =
+  "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+
+const compactInputClass =
+  "w-full rounded-lg border border-slate-200/90 bg-white/95 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+
+const labelClass = "block text-sm font-medium text-slate-700 mb-2";
+
+const compactLabelClass = "flex items-center gap-1 mb-1.5 text-xs font-medium text-slate-600";
+
 export default function NouveauPlanningPage() {
   const { t } = useI18n();
   const router = useRouter();
@@ -31,13 +47,11 @@ export default function NouveauPlanningPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
-  // Formulaire principal
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [eventId, setEventId] = useState("");
 
-  // Créneaux
   const [slots, setSlots] = useState<SlotForm[]>([
     { id: "1", location: "", slotDate: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" },
   ]);
@@ -91,18 +105,17 @@ export default function NouveauPlanningPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       toast.error("Le nom du planning est requis");
       return;
     }
-    
+
     if (!date) {
       toast.error("La date est requise");
       return;
     }
 
-    // Valider les créneaux
     for (const slot of slots) {
       if (!slot.location.trim()) {
         toast.error("Chaque créneau doit avoir un lieu/poste");
@@ -164,17 +177,18 @@ export default function NouveauPlanningPage() {
     }
   };
 
-  // Pré-remplir la date si un événement est sélectionné
   const handleEventChange = (value: string) => {
     setEventId(value);
     if (value) {
       const selectedEvent = events.find((e) => e.id === value);
       if (selectedEvent && !date) {
-        const evDate = selectedEvent.start_date.slice(0, 10);
-        setDate(evDate);
-        setSlots((prev) =>
-          prev.map((s) => (!s.slotDate ? { ...s, slotDate: evDate } : s))
-        );
+        const evDate = ((selectedEvent as Event & { start_date?: string }).start_date || "").slice(0, 10);
+        if (evDate) {
+          setDate(evDate);
+          setSlots((prev) =>
+            prev.map((s) => (!s.slotDate ? { ...s, slotDate: evDate } : s))
+          );
+        }
       }
     }
   };
@@ -187,111 +201,97 @@ export default function NouveauPlanningPage() {
   }, [date]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Nouveau planning</h1>
-          <p className="mt-2 text-secondary">
-            Créez un planning et définissez vos créneaux horaires
-          </p>
-        </div>
+    <PageLayout maxWidth="5xl">
+      <div>
         <Link
           href="/tableau-de-bord/plannings"
-          className="text-secondary hover:text-primary transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
         >
-          Retour aux plannings
+          ← Retour aux plannings
         </Link>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <PageHeader
+        title="Nouveau planning"
+        subtitle="Créez un planning et définissez vos créneaux horaires"
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informations générales */}
-        <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-          <h2 className="text-xl font-semibold mb-6">Informations générales</h2>
-          
+        <SectionCard title="Informations générales" icon={Calendar}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">
-                Nom du planning *
-              </label>
+              <label className={labelClass}>Nom du planning *</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Bénévoles match du samedi"
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">
-                Date *
-              </label>
+              <label className={labelClass}>Date *</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">
-                Lié à un événement (optionnel)
-              </label>
+              <label className={labelClass}>Lié à un événement (optionnel)</label>
               <select
                 value={eventId}
                 onChange={(e) => handleEventChange(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={inputClass}
                 disabled={loadingEvents}
               >
                 <option value="">Aucun événement</option>
                 {events.map((event) => (
                   <option key={event.id} value={event.id}>
-                    {event.name} ({new Date(event.start_date).toLocaleDateString("fr-FR")})
+                    {event.name}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">
-                Description (optionnelle)
-              </label>
+              <label className={labelClass}>Description (optionnelle)</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Organisation de la buvette"
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={inputClass}
               />
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Créneaux horaires */}
-        <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">{t("dashboard.plannings.form.slotsSection")}</h2>
-            <button
-              type="button"
-              onClick={addSlot}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
-            >
+        <SectionCard
+          title={t("dashboard.plannings.form.slotsSection")}
+          icon={Clock}
+          headerRight={
+            <ActionButton type="button" onClick={addSlot} className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
               {t("dashboard.plannings.form.addSlot")}
-            </button>
-          </div>
-
+            </ActionButton>
+          }
+        >
           <div className="space-y-4">
             {slots.map((slot, index) => (
               <div
                 key={slot.id}
-                className="rounded-xl border border-subtle bg-surface/60 p-4 hover:bg-surface-hover transition-colors"
+                className="rounded-xl border border-slate-200/70 bg-white/90 p-4 shadow-sm transition-colors hover:bg-white"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-medium text-tertiary">Créneau {index + 1}</span>
+                  <span className="text-sm font-semibold text-slate-700">Créneau {index + 1}</span>
                   <button
                     type="button"
                     onClick={() => removeSlot(slot.id)}
@@ -304,7 +304,7 @@ export default function NouveauPlanningPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                   <div className="lg:col-span-2">
-                    <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
+                    <label className={compactLabelClass}>
                       <MapPin className="w-3 h-3" />
                       Lieu / Poste *
                     </label>
@@ -313,13 +313,13 @@ export default function NouveauPlanningPage() {
                       value={slot.location}
                       onChange={(e) => updateSlot(slot.id, "location", e.target.value)}
                       placeholder="Ex: Bar, Entrée, Cuisine..."
-                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      className={compactInputClass}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
+                    <label className={compactLabelClass}>
                       <Calendar className="w-3 h-3" />
                       Date *
                     </label>
@@ -327,13 +327,13 @@ export default function NouveauPlanningPage() {
                       type="date"
                       value={slot.slotDate}
                       onChange={(e) => updateSlot(slot.id, "slotDate", e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      className={compactInputClass}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
+                    <label className={compactLabelClass}>
                       <Clock className="w-3 h-3" />
                       Début *
                     </label>
@@ -341,13 +341,13 @@ export default function NouveauPlanningPage() {
                       type="time"
                       value={slot.startTime}
                       onChange={(e) => updateSlot(slot.id, "startTime", e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      className={compactInputClass}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-secondary mb-1.5 flex items-center gap-1">
+                    <label className={compactLabelClass}>
                       <Clock className="w-3 h-3" />
                       Fin *
                     </label>
@@ -355,29 +355,27 @@ export default function NouveauPlanningPage() {
                       type="time"
                       value={slot.endTime}
                       onChange={(e) => updateSlot(slot.id, "endTime", e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      className={compactInputClass}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-secondary mb-1.5">
-                      Nb personnes *
-                    </label>
+                    <label className={compactLabelClass}>Nb personnes *</label>
                     <input
                       type="number"
                       min={1}
                       max={50}
                       value={slot.requiredPeople}
                       onChange={(e) => updateSlot(slot.id, "requiredPeople", parseInt(e.target.value) || 1)}
-                      className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                      className={compactInputClass}
                       required
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-xs font-medium text-secondary mb-1.5">
+                  <label className="mb-1.5 block text-xs font-medium text-slate-600">
                     Notes (optionnel)
                   </label>
                   <input
@@ -385,7 +383,7 @@ export default function NouveauPlanningPage() {
                     value={slot.notes}
                     onChange={(e) => updateSlot(slot.id, "notes", e.target.value)}
                     placeholder="Instructions particulières..."
-                    className="w-full px-3 py-2 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all text-sm"
+                    className={compactInputClass}
                   />
                 </div>
               </div>
@@ -393,31 +391,29 @@ export default function NouveauPlanningPage() {
           </div>
 
           {/* Résumé */}
-          <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-secondary">
-                <strong>{slots.length}</strong> créneau{slots.length > 1 ? "x" : ""} défini{slots.length > 1 ? "s" : ""}
+          <GlassCard padding="sm" className="mt-2 bg-gradient-to-br from-blue-50/80 via-white/95 to-indigo-50/70">
+            <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-slate-700">
+                <strong className="text-slate-900">{slots.length}</strong> créneau{slots.length > 1 ? "x" : ""} défini{slots.length > 1 ? "s" : ""}
               </span>
-              <span className="text-secondary">
-                <strong>{slots.reduce((sum, s) => sum + s.requiredPeople, 0)}</strong> personne{slots.reduce((sum, s) => sum + s.requiredPeople, 0) > 1 ? "s" : ""} requise{slots.reduce((sum, s) => sum + s.requiredPeople, 0) > 1 ? "s" : ""} au total
+              <span className="text-slate-700">
+                <strong className="text-slate-900">{slots.reduce((sum, s) => sum + s.requiredPeople, 0)}</strong>{" "}
+                personne{slots.reduce((sum, s) => sum + s.requiredPeople, 0) > 1 ? "s" : ""} requise
+                {slots.reduce((sum, s) => sum + s.requiredPeople, 0) > 1 ? "s" : ""} au total
               </span>
             </div>
-          </div>
-        </div>
+          </GlassCard>
+        </SectionCard>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-4">
-          <Link
-            href="/tableau-de-bord/plannings"
-            className="px-6 py-3 text-secondary hover:text-primary transition-colors"
-          >
+        <div className="flex flex-col-reverse items-center gap-3 sm:flex-row sm:justify-end">
+          <ActionButton href="/tableau-de-bord/plannings" className="w-full justify-center sm:w-auto">
             {t("dashboard.plannings.form.cancel")}
-          </Link>
+          </ActionButton>
           <DashboardPrimaryButton
             type="submit"
             disabled={loading}
             icon="none"
-            className="px-8 disabled:cursor-not-allowed"
+            className="w-full justify-center rounded-xl px-8 sm:w-auto"
           >
             {loading ? (
               t("dashboard.plannings.form.creating")
@@ -430,6 +426,6 @@ export default function NouveauPlanningPage() {
           </DashboardPrimaryButton>
         </div>
       </form>
-    </div>
+    </PageLayout>
   );
 }

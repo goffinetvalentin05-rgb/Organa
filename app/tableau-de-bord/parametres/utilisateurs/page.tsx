@@ -438,9 +438,9 @@ export default function UtilisateursPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Utilisateurs / Accès</h1>
-          <p className="mt-1 text-sm text-white/70">
-            Donnez à chaque personne de votre club les droits qu'elle doit
+          <h1 className="text-3xl font-bold text-white drop-shadow-sm">Utilisateurs / Accès</h1>
+          <p className="mt-1 text-sm text-white/80">
+            Donnez à chaque personne de votre club les droits qu&apos;elle doit
             avoir : caissier, secrétaire, comité, entraîneur, etc.
           </p>
         </div>
@@ -451,7 +451,7 @@ export default function UtilisateursPage() {
               setForm(buildEmptyForm());
               setShowForm(true);
             }}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-100"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-900/25 transition hover:opacity-95"
           >
             + Ajouter une personne
           </button>

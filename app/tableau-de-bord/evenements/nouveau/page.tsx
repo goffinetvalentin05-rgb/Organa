@@ -5,11 +5,23 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface EventType {
   id: string;
   name: string;
 }
+
+const inputClass =
+  "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+
+const labelClass = "block text-sm font-medium text-slate-700 mb-2";
 
 export default function NouvelEvenementPage() {
   const { t } = useI18n();
@@ -106,166 +118,152 @@ export default function NouvelEvenementPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <PageLayout maxWidth="4xl">
       <div>
         <Link
           href="/tableau-de-bord/evenements"
-          className="text-sm text-secondary hover:text-primary transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
         >
           ← {t("dashboard.events.detail.backToList")}
         </Link>
-        <h1 className="text-3xl font-bold mt-4">{t("dashboard.events.form.title")}</h1>
-        <p className="mt-2 text-secondary">{t("dashboard.events.form.subtitle")}</p>
       </div>
 
-      {limitReached && (
-        <LimitReachedAlert message={t("dashboard.events.limitReached")} />
-      )}
+      <PageHeader
+        title={t("dashboard.events.form.title")}
+        subtitle={t("dashboard.events.form.subtitle")}
+      />
+
+      {limitReached && <LimitReachedAlert message={t("dashboard.events.limitReached")} />}
 
       {errorMessage && !limitReached && (
-        <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
-          {errorMessage}
-        </div>
+        <GlassCard padding="md" className="border-red-200/80 bg-red-50/70">
+          <p className="text-sm font-medium text-red-700">{errorMessage}</p>
+        </GlassCard>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-2xl border border-subtle bg-surface/80 p-6 space-y-6 shadow-premium">
-          {/* Nom */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.name")}
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder={t("dashboard.events.fields.namePlaceholder")}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            />
-          </div>
-
-          {/* Type d'événement */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.type")}
-            </label>
-            <div className="flex gap-2">
-              <select
-                value={formData.eventTypeId}
-                onChange={(e) => setFormData({ ...formData, eventTypeId: e.target.value })}
-                className="flex-1 rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              >
-                <option value="">{t("dashboard.events.fields.typePlaceholder")}</option>
-                {eventTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setShowNewTypeForm(!showNewTypeForm)}
-                className="px-4 py-3 rounded-lg border border-subtle bg-surface-hover text-secondary hover:text-primary transition-colors text-sm"
-              >
-                + {t("dashboard.events.fields.createType")}
-              </button>
-            </div>
-            {showNewTypeForm && (
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={newTypeName}
-                  onChange={(e) => setNewTypeName(e.target.value)}
-                  placeholder={t("dashboard.events.fields.newTypeName")}
-                  className="flex-1 rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-                />
-                <button
-                  type="button"
-                  onClick={handleCreateType}
-                  className="px-4 py-2 rounded-lg accent-bg text-white font-medium"
-                >
-                  OK
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <GlassCard padding="lg">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.events.fields.startDate")}
-              </label>
+              <label className={labelClass}>{t("dashboard.events.fields.name")}</label>
               <input
-                type="date"
+                type="text"
                 required
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder={t("dashboard.events.fields.namePlaceholder")}
+                className={inputClass}
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.events.fields.endDate")}
-              </label>
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                min={formData.startDate}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              <label className={labelClass}>{t("dashboard.events.fields.type")}</label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <select
+                  value={formData.eventTypeId}
+                  onChange={(e) => setFormData({ ...formData, eventTypeId: e.target.value })}
+                  className={`${inputClass} flex-1`}
+                >
+                  <option value="">{t("dashboard.events.fields.typePlaceholder")}</option>
+                  {eventTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+                <ActionButton
+                  type="button"
+                  onClick={() => setShowNewTypeForm(!showNewTypeForm)}
+                  className="shrink-0 justify-center"
+                >
+                  + {t("dashboard.events.fields.createType")}
+                </ActionButton>
+              </div>
+              {showNewTypeForm && (
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="text"
+                    value={newTypeName}
+                    onChange={(e) => setNewTypeName(e.target.value)}
+                    placeholder={t("dashboard.events.fields.newTypeName")}
+                    className={`${inputClass} flex-1`}
+                  />
+                  <DashboardPrimaryButton
+                    type="button"
+                    onClick={handleCreateType}
+                    icon="none"
+                    className="shrink-0 rounded-xl"
+                  >
+                    OK
+                  </DashboardPrimaryButton>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>{t("dashboard.events.fields.startDate")}</label>
+                <input
+                  type="date"
+                  required
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("dashboard.events.fields.endDate")}</label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  min={formData.startDate}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>{t("dashboard.events.fields.description")}</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder={t("dashboard.events.fields.descriptionPlaceholder")}
+                rows={4}
+                className={inputClass}
               />
             </div>
-          </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.description")}
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder={t("dashboard.events.fields.descriptionPlaceholder")}
-              rows={4}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            />
+            <div>
+              <label className={labelClass}>{t("dashboard.events.fields.status")}</label>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value as "planned" | "completed" })
+                }
+                className={inputClass}
+              >
+                <option value="planned">{t("dashboard.events.status.planned")}</option>
+                <option value="completed">{t("dashboard.events.status.completed")}</option>
+              </select>
+            </div>
           </div>
+        </GlassCard>
 
-          {/* Statut */}
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.status")}
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as "planned" | "completed" })}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            >
-              <option value="planned">{t("dashboard.events.status.planned")}</option>
-              <option value="completed">{t("dashboard.events.status.completed")}</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-4">
-          <Link
-            href="/tableau-de-bord/evenements"
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary text-center transition-all"
-          >
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
+          <ActionButton href="/tableau-de-bord/evenements" className="flex-1 justify-center">
             {t("dashboard.events.form.cancel")}
-          </Link>
-          <button
+          </ActionButton>
+          <DashboardPrimaryButton
             type="submit"
             disabled={loading || limitReached}
-            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50"
+            icon="none"
+            className="flex-1 justify-center rounded-xl"
           >
             {loading ? t("dashboard.common.loading") : t("dashboard.events.form.createAction")}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
-    </div>
+    </PageLayout>
   );
 }

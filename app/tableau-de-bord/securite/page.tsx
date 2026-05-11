@@ -38,9 +38,9 @@ export default async function SecuritePage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8 p-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Sécurité du compte</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Authentification à deux facteurs, gestion des accès et journal d'audit.
+        <h1 className="text-3xl font-bold text-white drop-shadow-sm">Sécurité du compte</h1>
+        <p className="mt-1 text-sm text-white/80">
+          Authentification à deux facteurs, gestion des accès et journal d&apos;audit.
         </p>
       </div>
 

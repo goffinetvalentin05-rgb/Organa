@@ -339,21 +339,18 @@ function ProduitsPageInner() {
                   ))}
                 </select>
               </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="flex-1 px-4 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary text-center transition-all"
-                >
+              <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
+                <ActionButton type="button" onClick={closeForm} className="flex-1 justify-center">
                   {t("dashboard.productRevenues.form.cancel")}
-                </button>
-                <button
+                </ActionButton>
+                <ActionButton
                   type="submit"
+                  variant="premiumInline"
                   disabled={saving}
-                  className="flex-1 px-4 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50"
+                  className="flex-1 justify-center disabled:opacity-50"
                 >
                   {saving ? t("dashboard.productRevenues.form.saving") : t("dashboard.productRevenues.form.save")}
-                </button>
+                </ActionButton>
               </div>
             </form>
           </GlassCard>

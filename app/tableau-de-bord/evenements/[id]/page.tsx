@@ -5,7 +5,18 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { Edit, Trash, Eye } from "@/lib/icons";
+import { Edit, Trash, Eye, Calendar, ArrowRight, X } from "@/lib/icons";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  SectionCard,
+  ActionButton,
+  EmptyState,
+  cn,
+  glassNestedRowClass,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import EventFinancialChart from "./EventFinancialChart";
 
 interface EventType {
@@ -61,12 +72,17 @@ interface EventDetail {
   expenses: LinkedExpense[];
 }
 
+const inputClass =
+  "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+
+const labelClass = "block text-sm font-medium text-slate-700 mb-2";
+
 export default function EventDetailPage() {
   const { t, locale } = useI18n();
   const router = useRouter();
   const params = useParams();
   const eventId = params?.id as string;
-  
+
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -195,16 +211,15 @@ export default function EventDetailPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    return status === "completed"
-      ? "bg-green-100 text-green-700"
-      : "bg-blue-100 text-blue-700";
-  };
+  const statusBadgeClass = (status: string) =>
+    status === "completed"
+      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+      : "bg-blue-100 text-blue-700 border-blue-200";
 
-  const getResultColor = (result: number) => {
-    if (result > 0) return "text-green-600";
-    if (result < 0) return "text-red-600";
-    return "text-slate-600";
+  const resultColor = (result: number) => {
+    if (result > 0) return "text-emerald-700";
+    if (result < 0) return "text-rose-700";
+    return "text-slate-700";
   };
 
   const openAddRevenueModal = () => {
@@ -259,418 +274,444 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto p-8 text-center">
-        <p className="text-secondary">{t("dashboard.common.loading")}</p>
-      </div>
+      <PageLayout maxWidth="5xl">
+        <GlassCard padding="lg" className="text-center">
+          <p className="text-slate-600">{t("dashboard.common.loading")}</p>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
   if (errorMessage || !event) {
     return (
-      <div className="max-w-5xl mx-auto p-8 text-center">
-        <p className="text-red-600 mb-4">{errorMessage || "Événement non trouvé"}</p>
+      <PageLayout maxWidth="5xl">
+        <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
+          <p className="text-red-700 font-medium">{errorMessage || "Événement non trouvé"}</p>
+          <Link
+            href="/tableau-de-bord/evenements"
+            className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+          >
+            ← {t("dashboard.events.detail.backToList")}
+          </Link>
+        </GlassCard>
+      </PageLayout>
+    );
+  }
+
+  const subtitleParts: string[] = [];
+  if (event.eventType?.name) subtitleParts.push(event.eventType.name);
+  subtitleParts.push(
+    event.end_date && event.end_date !== event.start_date
+      ? `${formatDate(event.start_date)} → ${formatDate(event.end_date)}`
+      : formatDate(event.start_date)
+  );
+
+  return (
+    <PageLayout maxWidth="6xl">
+      <div>
         <Link
           href="/tableau-de-bord/evenements"
-          className="text-secondary hover:text-primary transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
         >
           ← {t("dashboard.events.detail.backToList")}
         </Link>
       </div>
-    );
-  }
 
-  return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <Link
-            href="/tableau-de-bord/evenements"
-            className="text-sm text-secondary hover:text-primary transition-colors"
-          >
-            ← {t("dashboard.events.detail.backToList")}
-          </Link>
-          {!isEditing ? (
-            <>
-              <div className="flex items-center gap-3 mt-4">
-                <h1 className="text-3xl font-bold">{event.name}</h1>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(event.status)}`}>
-                  {t(`dashboard.events.status.${event.status}`)}
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-4 mt-2 text-secondary">
-                {event.eventType && (
-                  <span className="px-2 py-0.5 bg-slate-100 rounded text-slate-600">
-                    {event.eventType.name}
-                  </span>
+      <PageHeader
+        title={isEditing ? t("dashboard.events.form.editTitle") : event.name}
+        subtitle={isEditing ? undefined : subtitleParts.join(" • ")}
+        actions={
+          isEditing ? null : (
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
+                  statusBadgeClass(event.status)
                 )}
-                <span>
-                  {event.end_date && event.end_date !== event.start_date
-                    ? `${formatDate(event.start_date)} → ${formatDate(event.end_date)}`
-                    : formatDate(event.start_date)}
-                </span>
-              </div>
-              {event.description && (
-                <p className="mt-4 text-secondary">{event.description}</p>
-              )}
-            </>
-          ) : (
-            <h1 className="text-3xl font-bold mt-4">{t("dashboard.events.form.editTitle")}</h1>
-          )}
-        </div>
-        {!isEditing && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-secondary hover:text-primary transition-all flex items-center gap-2"
-            >
-              <Edit className="w-4 h-4" />
-              {t("dashboard.events.detail.editAction")}
-            </button>
-            <button
-              onClick={handleDelete}
-              className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
-            >
-              <Trash className="w-4 h-4" />
-              {t("dashboard.events.detail.deleteAction")}
-            </button>
-          </div>
-        )}
-      </div>
+              >
+                {t(`dashboard.events.status.${event.status}`)}
+              </span>
+              <ActionButton type="button" onClick={() => setIsEditing(true)} className="inline-flex items-center gap-2">
+                <Edit className="h-4 w-4" />
+                {t("dashboard.events.detail.editAction")}
+              </ActionButton>
+              <ActionButton type="button" variant="dangerSoft" onClick={handleDelete} className="inline-flex items-center gap-2">
+                <Trash className="h-4 w-4" />
+                {t("dashboard.events.detail.deleteAction")}
+              </ActionButton>
+            </div>
+          )
+        }
+      />
 
-      {/* Edit Form */}
-      {isEditing && (
-        <form onSubmit={handleUpdate} className="rounded-2xl border border-subtle bg-surface/80 p-6 space-y-6 shadow-premium">
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.name")}
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            />
-          </div>
+      {!isEditing && event.description ? (
+        <GlassCard padding="md">
+          <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-line">{event.description}</p>
+        </GlassCard>
+      ) : null}
 
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.type")}
-            </label>
-            <select
-              value={formData.eventTypeId}
-              onChange={(e) => setFormData({ ...formData, eventTypeId: e.target.value })}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            >
-              <option value="">{t("dashboard.events.fields.typePlaceholder")}</option>
-              {eventTypes.map((type) => (
-                <option key={type.id} value={type.id}>{type.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {isEditing ? (
+        <GlassCard padding="lg">
+          <form onSubmit={handleUpdate} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.events.fields.startDate")}
-              </label>
+              <label className={labelClass}>{t("dashboard.events.fields.name")}</label>
               <input
-                type="date"
+                type="text"
                 required
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className={inputClass}
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.events.fields.endDate")}
-              </label>
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                min={formData.startDate}
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              <label className={labelClass}>{t("dashboard.events.fields.type")}</label>
+              <select
+                value={formData.eventTypeId}
+                onChange={(e) => setFormData({ ...formData, eventTypeId: e.target.value })}
+                className={inputClass}
+              >
+                <option value="">{t("dashboard.events.fields.typePlaceholder")}</option>
+                {eventTypes.map((type) => (
+                  <option key={type.id} value={type.id}>{type.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>{t("dashboard.events.fields.startDate")}</label>
+                <input
+                  type="date"
+                  required
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("dashboard.events.fields.endDate")}</label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  min={formData.startDate}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>{t("dashboard.events.fields.description")}</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                className={inputClass}
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.description")}
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            />
-          </div>
+            <div>
+              <label className={labelClass}>{t("dashboard.events.fields.status")}</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as "planned" | "completed" })}
+                className={inputClass}
+              >
+                <option value="planned">{t("dashboard.events.status.planned")}</option>
+                <option value="completed">{t("dashboard.events.status.completed")}</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.events.fields.status")}
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as "planned" | "completed" })}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-            >
-              <option value="planned">{t("dashboard.events.status.planned")}</option>
-              <option value="completed">{t("dashboard.events.status.completed")}</option>
-            </select>
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary text-center transition-all"
-            >
-              {t("dashboard.events.form.cancel")}
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
-            >
-              {t("dashboard.events.form.saveAction")}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Financial Summary */}
-      {!isEditing && (
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
+              <ActionButton type="button" onClick={() => setIsEditing(false)} className="flex-1 justify-center">
+                {t("dashboard.events.form.cancel")}
+              </ActionButton>
+              <DashboardPrimaryButton type="submit" icon="none" className="flex-1 justify-center rounded-xl">
+                {t("dashboard.events.form.saveAction")}
+              </DashboardPrimaryButton>
+            </div>
+          </form>
+        </GlassCard>
+      ) : (
         <>
-          <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-            <h2 className="text-xl font-semibold mb-6">{t("dashboard.events.detail.financialSummary")}</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="rounded-xl bg-green-50 p-5">
-                <p className="text-sm text-green-600 font-medium mb-1">{t("dashboard.events.detail.totalRevenue")}</p>
-                <p className="text-3xl font-bold text-green-700">{formatMontant(event.totalRevenue)}</p>
-                <div className="mt-3 space-y-1 text-xs text-green-800/90">
+          {/* Bilan financier */}
+          <SectionCard
+            title={t("dashboard.events.detail.financialSummary")}
+            icon={Calendar}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/80 p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+                  {t("dashboard.events.detail.totalRevenue")}
+                </p>
+                <p className="mt-2 text-3xl font-bold text-emerald-800">{formatMontant(event.totalRevenue)}</p>
+                <div className="mt-3 space-y-1 text-xs text-emerald-900/85">
                   <p>
-                    {t("dashboard.events.detail.revenueFromInvoices")} : {formatMontant(event.revenueFromInvoices)}
+                    {t("dashboard.events.detail.revenueFromInvoices")} : <span className="font-semibold">{formatMontant(event.revenueFromInvoices)}</span>
                   </p>
                   <p>
-                    {t("dashboard.events.detail.revenueFromProducts")} : {formatMontant(event.revenueFromProducts)}
+                    {t("dashboard.events.detail.revenueFromProducts")} : <span className="font-semibold">{formatMontant(event.revenueFromProducts)}</span>
                   </p>
                 </div>
               </div>
-              <div className="rounded-xl bg-red-50 p-5">
-                <p className="text-sm text-red-600 font-medium mb-1">{t("dashboard.events.detail.totalExpenses")}</p>
-                <p className="text-3xl font-bold text-red-700">{formatMontant(event.totalExpenses)}</p>
+              <div className="rounded-2xl border border-rose-200/70 bg-rose-50/80 p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider text-rose-700">
+                  {t("dashboard.events.detail.totalExpenses")}
+                </p>
+                <p className="mt-2 text-3xl font-bold text-rose-800">{formatMontant(event.totalExpenses)}</p>
               </div>
-              <div className={`rounded-xl p-5 ${event.netResult >= 0 ? "bg-blue-50" : "bg-orange-50"}`}>
-                <p className={`text-sm font-medium mb-1 ${event.netResult >= 0 ? "text-blue-600" : "text-orange-600"}`}>
+              <div
+                className={cn(
+                  "rounded-2xl border p-5 shadow-sm",
+                  event.netResult >= 0
+                    ? "border-blue-200/70 bg-blue-50/80"
+                    : "border-amber-200/70 bg-amber-50/80"
+                )}
+              >
+                <p
+                  className={cn(
+                    "text-xs font-semibold uppercase tracking-wider",
+                    event.netResult >= 0 ? "text-blue-700" : "text-amber-700"
+                  )}
+                >
                   {t("dashboard.events.detail.netResult")}
                 </p>
-                <p className={`text-3xl font-bold ${getResultColor(event.netResult)}`}>
+                <p className={cn("mt-2 text-3xl font-bold", resultColor(event.netResult))}>
                   {formatMontant(event.netResult)}
                 </p>
-                <p className={`text-sm mt-1 ${event.netResult >= 0 ? "text-blue-500" : "text-orange-500"}`}>
-                  {event.netResult >= 0 ? t("dashboard.events.detail.profit") : t("dashboard.events.detail.loss")}
+                <p
+                  className={cn(
+                    "mt-1 text-xs font-medium",
+                    event.netResult >= 0 ? "text-blue-700" : "text-amber-700"
+                  )}
+                >
+                  {event.netResult >= 0
+                    ? t("dashboard.events.detail.profit")
+                    : t("dashboard.events.detail.loss")}
                 </p>
               </div>
             </div>
 
-            {/* Chart */}
-            {(event.totalRevenue > 0 || event.totalExpenses > 0) && (
-              <EventFinancialChart
-                revenue={event.totalRevenue}
-                expenses={event.totalExpenses}
-              />
-            )}
-          </div>
-
-          {/* Factures (documents facture) */}
-          <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-              <div>
-                <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedDocuments")}</h2>
-                <p className="text-sm text-secondary mt-1">{t("dashboard.events.detail.linkedDocumentsHint")}</p>
+            {event.totalRevenue > 0 || event.totalExpenses > 0 ? (
+              <div className="mt-2 rounded-2xl border border-slate-200/70 bg-white/85 p-4 sm:p-6 shadow-sm">
+                <EventFinancialChart
+                  revenue={event.totalRevenue}
+                  expenses={event.totalExpenses}
+                />
               </div>
+            ) : null}
+          </SectionCard>
+
+          {/* Factures liées */}
+          <SectionCard
+            title={t("dashboard.events.detail.linkedDocuments")}
+            description={t("dashboard.events.detail.linkedDocumentsHint")}
+            headerRight={
               <Link
                 href={`/tableau-de-bord/factures/nouvelle?eventId=${eventId}`}
-                className="text-sm text-secondary hover:text-primary transition-colors shrink-0"
+                className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
               >
                 + {t("dashboard.events.detail.linkDocument")}
               </Link>
-            </div>
+            }
+          >
             {event.documents.length === 0 ? (
-              <p className="text-secondary text-center py-8">{t("dashboard.events.detail.noDocuments")}</p>
+              <EmptyState
+                embedded
+                title={t("dashboard.events.detail.noDocuments")}
+              />
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {event.documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-4 rounded-lg bg-surface border border-subtle">
-                    <div>
-                      <p className="font-medium">{doc.numero}</p>
-                      <p className="text-sm text-secondary">{doc.client?.nom || "—"}</p>
+                  <div
+                    key={doc.id}
+                    className={cn(glassNestedRowClass, "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between")}
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900">{doc.numero}</p>
+                      <p className="truncate text-sm text-slate-500">{doc.client?.nom || "—"}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-green-600">{formatMontant(Number(doc.total_ttc))}</p>
-                      <p className="text-sm text-secondary">{formatDate(doc.date_creation)}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="font-semibold text-emerald-700">{formatMontant(Number(doc.total_ttc))}</p>
+                        <p className="text-xs text-slate-500">{formatDate(doc.date_creation)}</p>
+                      </div>
+                      <ActionButton href={`/tableau-de-bord/factures/${doc.id}`} className="inline-flex items-center gap-1.5 p-2">
+                        <Eye className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
+                      </ActionButton>
                     </div>
-                    <Link
-                      href={`/tableau-de-bord/factures/${doc.id}`}
-                      className="ml-4 p-2 rounded-lg bg-surface-hover hover:bg-surface transition-colors"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
                   </div>
                 ))}
               </div>
             )}
-          </div>
+          </SectionCard>
 
           {/* Charges */}
-          <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedExpenses")}</h2>
+          <SectionCard
+            title={t("dashboard.events.detail.linkedExpenses")}
+            headerRight={
               <Link
                 href="/tableau-de-bord/depenses"
-                className="text-sm text-secondary hover:text-primary transition-colors"
+                className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
               >
                 + {t("dashboard.events.detail.linkExpense")}
               </Link>
-            </div>
+            }
+          >
             {event.expenses.length === 0 ? (
-              <p className="text-secondary text-center py-8">{t("dashboard.events.detail.noExpenses")}</p>
+              <EmptyState embedded title={t("dashboard.events.detail.noExpenses")} />
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {event.expenses.map((expense) => (
-                  <div key={expense.id} className="flex items-center justify-between p-4 rounded-lg bg-surface border border-subtle">
-                    <div>
-                      <p className="font-medium">{expense.description}</p>
-                      <p className="text-sm text-secondary">{formatDate(expense.date)}</p>
+                  <div
+                    key={expense.id}
+                    className={cn(glassNestedRowClass, "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between")}
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900">{expense.description}</p>
+                      <p className="text-sm text-slate-500">{formatDate(expense.date)}</p>
                     </div>
-                    <p className="font-semibold text-red-600">{formatMontant(Number(expense.amount))}</p>
+                    <p className="font-semibold text-rose-700">{formatMontant(Number(expense.amount))}</p>
                   </div>
                 ))}
               </div>
             )}
-          </div>
+          </SectionCard>
 
-          {/* Produits / revenus simples */}
-          <div className="rounded-2xl border border-subtle bg-surface/80 p-6 shadow-premium">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-              <div>
-                <h2 className="text-xl font-semibold">{t("dashboard.events.detail.linkedProducts")}</h2>
-                <p className="text-sm text-secondary mt-1">{t("dashboard.events.detail.linkedProductsHint")}</p>
-              </div>
-              <div className="flex flex-wrap gap-3 shrink-0">
+          {/* Revenus / produits simples */}
+          <SectionCard
+            title={t("dashboard.events.detail.linkedProducts")}
+            description={t("dashboard.events.detail.linkedProductsHint")}
+            headerRight={
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={openAddRevenueModal}
-                  className="text-sm text-secondary hover:text-primary transition-colors"
+                  className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
                 >
                   + {t("dashboard.events.detail.linkProduct")}
                 </button>
                 <Link
                   href={`/tableau-de-bord/produits?eventId=${eventId}`}
-                  className="text-sm text-secondary hover:text-primary transition-colors"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900"
                 >
-                  {t("dashboard.productRevenues.title")} →
+                  {t("dashboard.productRevenues.title")}
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </div>
+            }
+          >
             {event.clubRevenues.length === 0 ? (
-              <p className="text-secondary text-center py-8">{t("dashboard.events.detail.noProducts")}</p>
+              <EmptyState embedded title={t("dashboard.events.detail.noProducts")} />
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {event.clubRevenues.map((row) => (
                   <div
                     key={row.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 rounded-lg bg-surface border border-subtle"
+                    className={cn(glassNestedRowClass, "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between")}
                   >
-                    <div>
-                      <p className="font-medium">{row.name}</p>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900">{row.name}</p>
                       {row.description ? (
-                        <p className="text-sm text-secondary line-clamp-2">{row.description}</p>
+                        <p className="text-sm text-slate-500 line-clamp-2">{row.description}</p>
                       ) : null}
-                      <p className="text-sm text-secondary">{formatDate(row.revenue_date)}</p>
+                      <p className="text-xs text-slate-500">{formatDate(row.revenue_date)}</p>
                     </div>
-                    <p className="font-semibold text-green-600 sm:text-right">{formatMontant(Number(row.amount))}</p>
+                    <p className="font-semibold text-emerald-700 sm:text-right">
+                      {formatMontant(Number(row.amount))}
+                    </p>
                   </div>
                 ))}
               </div>
             )}
-          </div>
+          </SectionCard>
 
           {showAddRevenueModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-              <div className="w-full max-w-md rounded-2xl border border-subtle bg-surface p-6 shadow-premium">
-                <h3 className="text-lg font-semibold mb-4">{t("dashboard.productRevenues.form.titleNew")}</h3>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+              <GlassCard
+                padding="lg"
+                className="w-full max-w-md shadow-2xl shadow-blue-900/20"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {t("dashboard.productRevenues.form.titleNew")}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddRevenueModal(false)}
+                    className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
                 {revenueModalError && (
-                  <p className="text-sm text-red-600 mb-3">{revenueModalError}</p>
+                  <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {revenueModalError}
+                  </p>
                 )}
                 <form onSubmit={handleAddRevenue} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.name")}</label>
+                    <label className={labelClass}>{t("dashboard.productRevenues.form.name")}</label>
                     <input
                       required
                       value={revenueForm.name}
                       onChange={(e) => setRevenueForm({ ...revenueForm, name: e.target.value })}
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className={inputClass}
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.amount")}</label>
+                      <label className={labelClass}>{t("dashboard.productRevenues.form.amount")}</label>
                       <input
                         required
                         type="text"
                         inputMode="decimal"
                         value={revenueForm.amount}
                         onChange={(e) => setRevenueForm({ ...revenueForm, amount: e.target.value })}
-                        className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                        className={inputClass}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.date")}</label>
+                      <label className={labelClass}>{t("dashboard.productRevenues.form.date")}</label>
                       <input
                         required
                         type="date"
                         value={revenueForm.revenueDate}
                         onChange={(e) => setRevenueForm({ ...revenueForm, revenueDate: e.target.value })}
-                        className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                        className={inputClass}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">{t("dashboard.productRevenues.form.description")}</label>
+                    <label className={labelClass}>{t("dashboard.productRevenues.form.description")}</label>
                     <textarea
                       rows={2}
                       value={revenueForm.description}
                       onChange={(e) => setRevenueForm({ ...revenueForm, description: e.target.value })}
-                      className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-3 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                      className={inputClass}
                     />
                   </div>
-                  <div className="flex gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddRevenueModal(false)}
-                      className="flex-1 px-4 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
-                    >
+                  <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
+                    <ActionButton type="button" onClick={() => setShowAddRevenueModal(false)} className="flex-1 justify-center">
                       {t("dashboard.productRevenues.form.cancel")}
-                    </button>
-                    <button
+                    </ActionButton>
+                    <DashboardPrimaryButton
                       type="submit"
+                      icon="none"
                       disabled={savingRevenue}
-                      className="flex-1 px-4 py-3 rounded-lg accent-bg text-white font-medium transition-all disabled:opacity-50"
+                      className="flex-1 justify-center rounded-xl"
                     >
                       {savingRevenue ? t("dashboard.productRevenues.form.saving") : t("dashboard.productRevenues.form.save")}
-                    </button>
+                    </DashboardPrimaryButton>
                   </div>
                 </form>
-              </div>
+              </GlassCard>
             </div>
           )}
         </>
       )}
-    </div>
+    </PageLayout>
   );
 }

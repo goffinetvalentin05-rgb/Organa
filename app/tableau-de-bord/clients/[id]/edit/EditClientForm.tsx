@@ -130,28 +130,25 @@ export default function EditClientForm({
       <div className="flex items-center gap-2 text-sm">
         <Link
           href="/tableau-de-bord/clients"
-          className="text-slate-500 hover:text-slate-700 transition-colors"
+          className="text-white/70 hover:text-white transition-colors"
         >
           {t("dashboard.pageTitles.clients")}
         </Link>
-        <span className="text-slate-400">/</span>
-        <span className="text-slate-900 font-medium">
+        <span className="text-white/50">/</span>
+        <span className="text-white font-medium">
           {t("dashboard.pageTitles.editClient")}
         </span>
       </div>
 
       <div className="flex items-start gap-4">
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "var(--obillz-blue-light)" }}
-        >
-          <Users className="w-7 h-7 text-[var(--obillz-hero-blue)]" />
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 bg-white/15 border border-white/20 backdrop-blur-sm">
+          <Users className="w-7 h-7 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-white drop-shadow-sm">
             {t("dashboard.clients.editTitle")}
           </h1>
-          <p className="mt-1 text-slate-500">{t("dashboard.clients.editSubtitle")}</p>
+          <p className="mt-1 text-white/80">{t("dashboard.clients.editSubtitle")}</p>
         </div>
       </div>
 

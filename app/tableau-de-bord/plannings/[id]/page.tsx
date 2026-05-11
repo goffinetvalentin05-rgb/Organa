@@ -21,6 +21,20 @@ import {
 import toast from "react-hot-toast";
 import { localeToIntl } from "@/lib/i18n";
 import { useI18n } from "@/components/I18nProvider";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  SectionCard,
+  ActionButton,
+  cn,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+
+const planningInputClass =
+  "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+
+const planningLabelClass = "block text-sm font-medium text-slate-700 mb-2";
 
 interface Member {
   id: string;
@@ -544,173 +558,152 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto p-12 text-center">
-        <p className="text-secondary">Chargement...</p>
-      </div>
+      <PageLayout maxWidth="7xl">
+        <GlassCard padding="lg" className="text-center">
+          <p className="text-slate-600">Chargement…</p>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
   if (errorMessage || !planning) {
     return (
-      <div className="max-w-7xl mx-auto p-12 text-center">
-        <p className="text-red-600 mb-4">{errorMessage || "Planning non trouvé"}</p>
-        <Link
-          href="/tableau-de-bord/plannings"
-          className="text-accent hover:underline"
-        >
-          Retour aux plannings
-        </Link>
-      </div>
+      <PageLayout maxWidth="7xl">
+        <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
+          <p className="text-red-700 font-medium">{errorMessage || "Planning non trouvé"}</p>
+          <Link
+            href="/tableau-de-bord/plannings"
+            className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+          >
+            ← Retour aux plannings
+          </Link>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">{planning.name}</h1>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(planning.status)}`}>
+    <PageLayout maxWidth="7xl">
+      <div>
+        <Link
+          href="/tableau-de-bord/plannings"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
+        >
+          ← Retour aux plannings
+        </Link>
+      </div>
+
+      <PageHeader
+        title={planning.name}
+        subtitle={planning.description || formatDate(planning.date)}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold ${getStatusColor(planning.status)} border-current/20`}>
               {getStatusLabel(planning.status)}
             </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-secondary">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
-              {formatDate(planning.date)}
-            </span>
-            {planning.event && (
-              <Link
-                href={`/tableau-de-bord/evenements/${planning.event.id}`}
-                className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-sm hover:bg-purple-200 transition-colors"
-              >
-                {planning.event.name}
-              </Link>
+            <ActionButton type="button" onClick={handleGeneratePublicLink} disabled={sharing} className="inline-flex items-center gap-2">
+              {sharing ? "Génération…" : publicLink ? "Mettre à jour le partage" : "Partager le planning"}
+            </ActionButton>
+            {publicLink && (
+              <ActionButton type="button" onClick={handleCopyPublicLink} disabled={copying} className="inline-flex items-center gap-2">
+                {copying ? "Copie…" : "Copier le lien"}
+              </ActionButton>
             )}
-          </div>
-          {planning.description && (
-            <p className="mt-2 text-secondary">{planning.description}</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleGeneratePublicLink}
-            disabled={sharing}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
-          >
-            {sharing ? "Génération..." : publicLink ? "Mettre à jour le partage" : "Partager le planning"}
-          </button>
-          {publicLink && (
-            <button
-              onClick={handleCopyPublicLink}
-              disabled={copying}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-sm disabled:opacity-50"
+            <ActionButton type="button" onClick={handleDownloadPdf} disabled={downloading} className="inline-flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              {downloading ? "Génération…" : "Télécharger PDF"}
+            </ActionButton>
+            <select
+              value={planning.status}
+              onChange={(e) => handleUpdateStatus(e.target.value)}
+              className={planningInputClass + " w-auto"}
             >
-              {copying ? "Copie..." : "Copier le lien"}
-            </button>
-          )}
-          <button
-            onClick={handleDownloadPdf}
-            disabled={downloading}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
-          >
-            <Download className="w-4 h-4" />
-            {downloading ? "Génération..." : "Télécharger PDF"}
-          </button>
-          <select
-            value={planning.status}
-            onChange={(e) => handleUpdateStatus(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-subtle bg-white text-sm"
-          >
-            <option value="draft">Brouillon</option>
-            <option value="published">Publié</option>
-            <option value="archived">Archivé</option>
-          </select>
+              <option value="draft">Brouillon</option>
+              <option value="published">Publié</option>
+              <option value="archived">Archivé</option>
+            </select>
+          </div>
+        }
+      />
+
+      {planning.event ? (
+        <div className="flex items-center gap-2 text-sm text-white/85">
+          <Calendar className="w-4 h-4" />
+          <span>Lié à :</span>
           <Link
-            href="/tableau-de-bord/plannings"
-            className="text-secondary hover:text-primary transition-colors"
+            href={`/tableau-de-bord/evenements/${planning.event.id}`}
+            className="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold text-white hover:bg-white/25 transition-colors"
           >
-            Retour
+            {planning.event.name}
           </Link>
         </div>
-      </div>
+      ) : null}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-subtle bg-surface/80 p-4">
-          <p className="text-sm text-tertiary mb-1">Créneaux</p>
-          <p className="text-2xl font-bold">{planning.slots?.length ?? 0}</p>
-        </div>
-        <div className="rounded-xl border border-subtle bg-surface/80 p-4">
-          <p className="text-sm text-tertiary mb-1">Personnes requises</p>
-          <p className="text-2xl font-bold">{planning.totalRequired}</p>
-        </div>
-        <div className="rounded-xl border border-subtle bg-surface/80 p-4">
-          <p className="text-sm text-tertiary mb-1">Affectations</p>
-          <p className="text-2xl font-bold">{planning.totalAssigned}</p>
-        </div>
-        <div className="rounded-xl border border-subtle bg-surface/80 p-4">
-          <p className="text-sm text-tertiary mb-1">Taux de remplissage</p>
-          <p className={`text-2xl font-bold ${getFillRateColor(planning.fillRate)}`}>
-            {planning.fillRate}%
-          </p>
-        </div>
+        <GlassCard padding="md">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Créneaux</p>
+          <p className="text-3xl font-bold text-slate-900">{planning.slots?.length ?? 0}</p>
+        </GlassCard>
+        <GlassCard padding="md">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Personnes requises</p>
+          <p className="text-3xl font-bold text-slate-900">{planning.totalRequired}</p>
+        </GlassCard>
+        <GlassCard padding="md">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Affectations</p>
+          <p className="text-3xl font-bold text-slate-900">{planning.totalAssigned}</p>
+        </GlassCard>
+        <GlassCard padding="md">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Taux de remplissage</p>
+          <p className={`text-3xl font-bold ${getFillRateColor(planning.fillRate)}`}>{planning.fillRate}%</p>
+        </GlassCard>
       </div>
 
       {publicLink && (
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-4">
-          <p className="text-sm text-indigo-900 font-medium">Lien public de recrutement</p>
-          <p className="text-sm text-indigo-700 mt-1 break-all">{publicLink.url}</p>
-          <p className="text-xs text-indigo-600 mt-2">
-            Partagez ce lien (WhatsApp, email, etc.) pour laisser les bénévoles s&apos;inscrire eux-memes.
+        <GlassCard padding="md" className="border-indigo-200/80 bg-gradient-to-br from-indigo-50/80 via-white/95 to-blue-50/70">
+          <p className="text-sm font-semibold text-indigo-900">Lien public de recrutement</p>
+          <p className="mt-1 text-sm font-medium text-indigo-700 break-all">{publicLink.url}</p>
+          <p className="mt-2 text-xs text-indigo-700/80">
+            Partagez ce lien (WhatsApp, email, etc.) pour laisser les bénévoles s&apos;inscrire eux-mêmes.
           </p>
-        </div>
+        </GlassCard>
       )}
 
       {/* Grille des créneaux */}
-      <div className="rounded-2xl border border-subtle bg-surface/80 overflow-hidden shadow-premium">
-        <div className="flex items-center justify-between p-6 border-b border-subtle">
-          <h2 className="text-xl font-semibold">Grille d&apos;affectation</h2>
-          <button
-            type="button"
-            onClick={openAddSlotModal}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
-          >
+      <SectionCard
+        title="Grille d'affectation"
+        icon={Calendar}
+        headerRight={
+          <ActionButton type="button" onClick={openAddSlotModal} className="inline-flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Ajouter un créneau
-          </button>
-        </div>
-
+          </ActionButton>
+        }
+      >
         {(planning.slots?.length ?? 0) === 0 ? (
-          <div className="p-12 text-center">
-            <p className="text-secondary mb-4">Aucun créneau défini</p>
-            <button
-              type="button"
-              onClick={openAddSlotModal}
-              className="px-6 py-3 accent-bg text-white font-medium rounded-full transition-all"
-            >
+          <div className="rounded-2xl border border-dashed border-slate-300/70 bg-white/50 p-10 text-center">
+            <p className="text-slate-600 mb-4">Aucun créneau défini</p>
+            <DashboardPrimaryButton type="button" onClick={openAddSlotModal} icon="none">
               Créer votre premier créneau
-            </button>
+            </DashboardPrimaryButton>
           </div>
         ) : (
-          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {slotGroups.map(([dayKey, slotsForDay]) => (
               <section
                 key={dayKey}
-                className="rounded-2xl border border-subtle bg-surface/90 shadow-[0_1px_3px_rgba(15,23,42,0.06)] overflow-hidden"
+                className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm"
               >
-                <header className="px-4 py-3.5 sm:px-5 sm:py-4 border-b border-subtle bg-gradient-to-r from-slate-50/95 via-white to-slate-50/40">
+                <header className="border-b border-slate-200/70 bg-gradient-to-r from-slate-50/95 via-white to-slate-50/40 px-4 py-3.5 sm:px-5 sm:py-4">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div
-                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-subtle bg-white shadow-sm"
+                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 bg-white shadow-sm"
                       aria-hidden
                     >
                       <Calendar className="w-5 h-5 text-[var(--obillz-hero-blue)] opacity-90" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base sm:text-lg font-semibold text-primary leading-snug">
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug">
                         {formatDate(dayKey)}
                       </h3>
                     </div>
@@ -721,17 +714,17 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             {slotsForDay.map((slot) => (
               <div
                 key={slot.id}
-                className="rounded-xl border border-subtle bg-white/70 overflow-hidden shadow-sm"
+                className="overflow-hidden rounded-xl border border-slate-200/70 bg-white/95 shadow-sm"
               >
                 {/* Header du créneau */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-50/80 border-b border-subtle">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/60 bg-slate-50/80 p-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-accent-bg/10 flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-accent" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-primary text-[15px] sm:text-base">{slot.location}</h3>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary mt-0.5">
+                      <h3 className="font-semibold text-slate-900 text-[15px] sm:text-base">{slot.location}</h3>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 mt-0.5">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 shrink-0" />
                           {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
@@ -741,7 +734,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                           {slot.assignedCount} / {slot.requiredPeople}
                         </span>
                         {slot.isFull && (
-                          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">
                             Complet
                           </span>
                         )}
@@ -750,14 +743,16 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   </div>
                   <div className="flex items-center gap-2">
                     {!slot.isFull && (
-                      <button
+                      <DashboardPrimaryButton
                         type="button"
                         onClick={() => openAssignModal(slot)}
-                        className="px-4 py-2 accent-bg text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                        icon="none"
+                        size="sm"
+                        className="rounded-xl"
                       >
                         <UserCheck className="w-4 h-4" />
                         Affecter
-                      </button>
+                      </DashboardPrimaryButton>
                     )}
                     <button
                       type="button"
@@ -858,12 +853,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       <button
                         key={`empty-${index}`}
                         onClick={() => openAssignModal(slot)}
-                        className="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-accent hover:bg-accent-bg/5 transition-all group"
+                        className="group flex items-center gap-3 rounded-lg border-2 border-dashed border-slate-300 px-4 py-3 transition-all hover:border-blue-300 hover:bg-blue-50/40"
                       >
-                        <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-accent-bg/20 flex items-center justify-center transition-colors">
-                          <Plus className="w-4 h-4 text-slate-400 group-hover:text-accent" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 transition-colors group-hover:bg-blue-100">
+                          <Plus className="w-4 h-4 text-slate-400 group-hover:text-[var(--obillz-hero-blue)]" />
                         </div>
-                        <span className="text-slate-400 group-hover:text-accent text-sm">
+                        <span className="text-sm text-slate-500 group-hover:text-[var(--obillz-hero-blue)]">
                           Affecter un membre
                         </span>
                       </button>
@@ -877,45 +872,45 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             ))}
           </div>
         )}
-      </div>
+      </SectionCard>
 
       {/* Modal d'affectation */}
       {showAssignModal && selectedSlot && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-subtle">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden border border-slate-200/70">
+            <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold">Affecter un membre</h3>
-                  <p className="text-secondary text-sm mt-1">
+                  <h3 className="text-xl font-semibold text-slate-900">Affecter un membre</h3>
+                  <p className="text-slate-600 text-sm mt-1">
                     {selectedSlot.location} • {formatDate(selectedSlot.slotDate || planning.date)} •{" "}
                     {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                   </p>
                 </div>
                 <button
                   onClick={() => setShowAssignModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 border-b border-subtle">
+            <div className="p-4 border-b border-slate-200/70">
               <input
                 type="text"
                 placeholder="Rechercher un membre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={planningInputClass}
                 autoFocus
               />
-              <label className="flex items-center gap-2 mt-3 text-sm text-secondary">
+              <label className="flex items-center gap-2 mt-3 text-sm text-slate-600">
                 <input
                   type="checkbox"
                   checked={sendNotification}
                   onChange={(e) => setSendNotification(e.target.checked)}
-                  className="rounded border-slate-300 text-accent focus:ring-accent"
+                  className="rounded border-slate-300 text-[var(--obillz-hero-blue)] focus:ring-blue-200"
                 />
                 Envoyer une notification par email
               </label>
@@ -923,11 +918,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
             <div className="overflow-y-auto max-h-[40vh]">
               {availableMembers.length === 0 ? (
-                <div className="p-8 text-center text-secondary">
+                <div className="p-8 text-center text-slate-600">
                   {searchTerm ? "Aucun membre trouvé" : "Aucun membre disponible"}
                 </div>
               ) : (
-                <div className="divide-y divide-subtle">
+                <div className="divide-y divide-slate-200/60">
                   {availableMembers.map((member) => (
                     <button
                       key={member.id}
@@ -935,15 +930,15 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       disabled={assigning}
                       className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left disabled:opacity-50"
                     >
-                      <div className="w-10 h-10 rounded-full bg-accent-bg/20 flex items-center justify-center">
-                        <span className="text-accent font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                        <span className="text-[var(--obillz-hero-blue)] font-semibold">
                           {member.nom.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{member.nom}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-900">{member.nom}</p>
                         {member.email && (
-                          <p className="text-sm text-secondary">{member.email}</p>
+                          <p className="text-sm text-slate-500 truncate">{member.email}</p>
                         )}
                         {member.role && (
                           <span className="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
@@ -962,13 +957,13 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       )}
 
       {showLinkModal && linkTargetSlot && linkTargetAssignment && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-subtle">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden border border-slate-200/70">
+            <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold">Rattacher à un membre</h3>
-                  <p className="text-secondary text-sm mt-1">
+                  <h3 className="text-xl font-semibold text-slate-900">Rattacher à un membre</h3>
+                  <p className="text-slate-600 text-sm mt-1">
                     {linkTargetAssignment.member.nom} — {linkTargetSlot.location} •{" "}
                     {formatDate(linkTargetSlot.slotDate || planning?.date || "")} •{" "}
                     {formatTime(linkTargetSlot.startTime)} - {formatTime(linkTargetSlot.endTime)}
@@ -981,31 +976,31 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     setLinkTargetAssignment(null);
                     setLinkTargetSlot(null);
                   }}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 border-b border-subtle">
+            <div className="p-4 border-b border-slate-200/70">
               <input
                 type="text"
                 placeholder="Rechercher un membre..."
                 value={linkSearchTerm}
                 onChange={(e) => setLinkSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                className={planningInputClass}
                 autoFocus
               />
             </div>
 
             <div className="overflow-y-auto max-h-[40vh]">
               {membersAvailableForLink.length === 0 ? (
-                <div className="p-8 text-center text-secondary">
+                <div className="p-8 text-center text-slate-600">
                   {linkSearchTerm ? "Aucun membre trouvé" : "Aucun membre disponible"}
                 </div>
               ) : (
-                <div className="divide-y divide-subtle">
+                <div className="divide-y divide-slate-200/60">
                   {membersAvailableForLink.map((member) => (
                     <button
                       key={member.id}
@@ -1019,9 +1014,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                           {member.nom.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{member.nom}</p>
-                        {member.email && <p className="text-sm text-secondary">{member.email}</p>}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-900">{member.nom}</p>
+                        {member.email && <p className="text-sm text-slate-500 truncate">{member.email}</p>}
                       </div>
                       <ArrowRight className="w-5 h-5 text-slate-400" />
                     </button>
@@ -1035,11 +1030,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
       {/* Modal ajout / édition créneau */}
       {showSlotModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-subtle">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200/70">
+            <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">
+                <h3 className="text-xl font-semibold text-slate-900">
                   {editingSlotId ? "Modifier le créneau" : "Ajouter un créneau"}
                 </h3>
                 <button
@@ -1048,7 +1043,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     setShowSlotModal(false);
                     setEditingSlotId(null);
                   }}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1057,7 +1052,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className={planningLabelClass}>
                   Lieu / Poste *
                 </label>
                 <input
@@ -1065,52 +1060,52 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   value={slotForm.location}
                   onChange={(e) => setSlotForm({ ...slotForm, location: e.target.value })}
                   placeholder="Ex: Bar, Entrée, Cuisine..."
-                  className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                  className={planningInputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className={planningLabelClass}>
                   Date *
                 </label>
                 <input
                   type="date"
                   value={slotForm.slotDate}
                   onChange={(e) => setSlotForm({ ...slotForm, slotDate: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                  className={planningInputClass}
                 />
-                <p className="text-xs text-secondary mt-1.5">
+                <p className="text-xs text-slate-500 mt-1.5">
                   Peut être différente de la date principale du planning (préparation, rangement…).
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary mb-2">
+                  <label className={planningLabelClass}>
                     Début *
                   </label>
                   <input
                     type="time"
                     value={slotForm.startTime}
                     onChange={(e) => setSlotForm({ ...slotForm, startTime: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                    className={planningInputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary mb-2">
+                  <label className={planningLabelClass}>
                     Fin *
                   </label>
                   <input
                     type="time"
                     value={slotForm.endTime}
                     onChange={(e) => setSlotForm({ ...slotForm, endTime: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                    className={planningInputClass}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className={planningLabelClass}>
                   Nombre de personnes requises *
                 </label>
                 <input
@@ -1119,12 +1114,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   max={50}
                   value={slotForm.requiredPeople}
                   onChange={(e) => setSlotForm({ ...slotForm, requiredPeople: parseInt(e.target.value, 10) || 1 })}
-                  className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                  className={planningInputClass}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className={planningLabelClass}>
                   Notes (optionnel)
                 </label>
                 <input
@@ -1132,34 +1127,34 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   value={slotForm.notes}
                   onChange={(e) => setSlotForm({ ...slotForm, notes: e.target.value })}
                   placeholder="Instructions particulières..."
-                  className="w-full px-4 py-3 rounded-lg border border-subtle bg-white focus:border-accent-border focus:ring-2 focus:ring-accent-border/20 transition-all"
+                  className={planningInputClass}
                 />
               </div>
             </div>
 
-            <div className="p-6 border-t border-subtle flex justify-end gap-3">
-              <button
+            <div className="p-6 border-t border-slate-200/70 flex justify-end gap-3">
+              <ActionButton
                 type="button"
                 onClick={() => {
                   setShowSlotModal(false);
                   setEditingSlotId(null);
                 }}
-                className="px-6 py-2.5 text-secondary hover:text-primary transition-colors"
               >
                 Annuler
-              </button>
-              <button
+              </ActionButton>
+              <DashboardPrimaryButton
                 type="button"
                 onClick={handleSaveSlot}
                 disabled={savingSlot}
-                className="px-6 py-2.5 accent-bg text-white font-medium rounded-lg transition-all disabled:opacity-50"
+                icon="none"
+                className="rounded-xl"
               >
-                {savingSlot ? "Enregistrement..." : editingSlotId ? "Enregistrer" : "Ajouter"}
-              </button>
+                {savingSlot ? "Enregistrement…" : editingSlotId ? "Enregistrer" : "Ajouter"}
+              </DashboardPrimaryButton>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }

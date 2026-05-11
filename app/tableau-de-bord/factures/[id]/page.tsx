@@ -12,6 +12,13 @@ import { localeToIntl } from "@/lib/i18n";
 import LinkInvoiceToEventModal, {
   type EventListItem,
 } from "./LinkInvoiceToEventModal";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface Facture {
   id: string;
@@ -286,23 +293,27 @@ export default function FactureDetailPage() {
 
   if (!facture) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">{t("dashboard.common.loading")}</p>
-      </div>
+      <PageLayout maxWidth="4xl">
+        <GlassCard padding="lg" className="text-center">
+          <p className="text-slate-600">{t("dashboard.common.loading")}</p>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
   if (!facture.lignes || !Array.isArray(facture.lignes)) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-secondary">{t("dashboard.invoices.detail.invalidData")}</p>
-        <Link
-          href="/tableau-de-bord/factures"
-          className="text-secondary hover:text-primary mt-4 inline-block"
-        >
-          ← {t("dashboard.invoices.detail.backToList")}
-        </Link>
-      </div>
+      <PageLayout maxWidth="4xl">
+        <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
+          <p className="text-red-700 font-medium">{t("dashboard.invoices.detail.invalidData")}</p>
+          <Link
+            href="/tableau-de-bord/factures"
+            className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+          >
+            ← {t("dashboard.invoices.detail.backToList")}
+          </Link>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
@@ -322,79 +333,82 @@ export default function FactureDetailPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Link
-            href="/tableau-de-bord/factures"
-            className="text-secondary hover:text-primary mb-2 inline-block"
-          >
-            ← {t("dashboard.invoices.detail.backToList")}
-          </Link>
-          <h1 className="text-3xl font-bold">{facture.numero}</h1>
-          <p className="mt-2 text-secondary">
-            {t("dashboard.common.client")}: {facture.client?.nom || t("dashboard.common.unknownClient")}
-          </p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={handleEnvoyerEmail}
-            disabled={envoiEmail || !facture.client?.email}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Mail className="w-4 h-4" />
-            {envoiEmail ? t("dashboard.invoices.detail.sending") : t("dashboard.invoices.detail.sendEmail")}
-          </button>
-          <button
-            onClick={() => {
-              if (!id) {
-                toast.error(t("dashboard.common.missingDocumentId"));
-                return;
-              }
-              const url = `/api/documents/${id}/pdf?type=invoice`;
-              console.log("Opening PDF URL:", url);
-              window.open(url, "_blank");
-            }}
-            disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Eye className="w-4 h-4" />
-            {t("dashboard.invoices.detail.previewPdf")}
-          </button>
-          <button
-            onClick={() => {
-              if (!id) {
-                toast.error(t("dashboard.common.missingDocumentId"));
-                return;
-              }
-              const url = `/api/documents/${id}/pdf?type=invoice&download=true`;
-              console.log("Downloading PDF URL:", url);
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = `obillz-invoice-${facture?.numero || id}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-            disabled={!id}
-            className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
-          >
-            <Download className="w-4 h-4" />
-            {t("dashboard.invoices.detail.downloadPdf")}
-          </button>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-2"
-          >
-            <Trash className="w-4 h-4" />
-            {t("dashboard.common.delete")}
-          </button>
-        </div>
+    <PageLayout maxWidth="4xl">
+      <div>
+        <Link
+          href="/tableau-de-bord/factures"
+          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
+        >
+          ← {t("dashboard.invoices.detail.backToList")}
+        </Link>
       </div>
 
+      <PageHeader
+        title={facture.numero}
+        subtitle={`${t("dashboard.common.client")}: ${facture.client?.nom || t("dashboard.common.unknownClient")}`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <ActionButton
+              type="button"
+              onClick={handleEnvoyerEmail}
+              disabled={envoiEmail || !facture.client?.email}
+              className="inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Mail className="w-4 h-4" />
+              {envoiEmail ? t("dashboard.invoices.detail.sending") : t("dashboard.invoices.detail.sendEmail")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                if (!id) {
+                  toast.error(t("dashboard.common.missingDocumentId"));
+                  return;
+                }
+                const url = `/api/documents/${id}/pdf?type=invoice`;
+                window.open(url, "_blank");
+              }}
+              disabled={!id}
+              className="inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              <Eye className="w-4 h-4" />
+              {t("dashboard.invoices.detail.previewPdf")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                if (!id) {
+                  toast.error(t("dashboard.common.missingDocumentId"));
+                  return;
+                }
+                const url = `/api/documents/${id}/pdf?type=invoice&download=true`;
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `obillz-invoice-${facture?.numero || id}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              disabled={!id}
+              className="inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              <Download className="w-4 h-4" />
+              {t("dashboard.invoices.detail.downloadPdf")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              variant="dangerSoft"
+              onClick={handleDelete}
+              className="inline-flex items-center gap-2"
+            >
+              <Trash className="w-4 h-4" />
+              {t("dashboard.common.delete")}
+            </ActionButton>
+          </div>
+        }
+      />
+
       {/* Aperçu */}
-      <div className="rounded-2xl border border-subtle bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+      <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl shadow-blue-950/10">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-4">
             {companySettings?.logo_url && (
@@ -562,12 +576,9 @@ export default function FactureDetailPage() {
       </div>
 
       {/* Événement lié */}
-      <div className="rounded-xl border border-subtle bg-surface p-6">
+      <GlassCard padding="md">
         <div className="flex items-start gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ backgroundColor: "var(--obillz-blue-light)" }}
-          >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
             <Calendar className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
           </div>
           <div className="flex-1 min-w-0">
@@ -575,9 +586,9 @@ export default function FactureDetailPage() {
               {t("dashboard.invoices.detail.eventSectionTitle")}
             </h2>
             {facture.linkedEvent ? (
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     {t("dashboard.invoices.detail.eventLinkedLabel")}
                   </p>
                   <Link
@@ -588,56 +599,36 @@ export default function FactureDetailPage() {
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={openEventModal}
-                    disabled={linkSaving}
-                    className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-medium transition-colors disabled:opacity-50"
-                  >
+                  <ActionButton type="button" onClick={openEventModal} disabled={linkSaving} className="disabled:opacity-50">
                     {t("dashboard.invoices.detail.changeEvent")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleUnlinkEvent}
-                    disabled={linkSaving}
-                    className="px-4 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 border border-red-200 transition-colors disabled:opacity-50"
-                  >
+                  </ActionButton>
+                  <ActionButton type="button" variant="dangerSoft" onClick={handleUnlinkEvent} disabled={linkSaving} className="disabled:opacity-50">
                     {t("dashboard.invoices.detail.unlinkEvent")}
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             ) : facture.eventId ? (
               <div className="mt-3 space-y-3">
-                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
                   {t("dashboard.invoices.detail.eventOrphan")}
                 </p>
-                <button
-                  type="button"
-                  onClick={openEventModal}
-                  disabled={linkSaving}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-[var(--obillz-hero-blue,#1d4ed8)] hover:opacity-95 disabled:opacity-50 transition-colors"
-                >
+                <DashboardPrimaryButton type="button" onClick={openEventModal} disabled={linkSaving} icon="none" className="rounded-xl">
                   {t("dashboard.invoices.detail.linkToEvent")}
-                </button>
+                </DashboardPrimaryButton>
               </div>
             ) : (
               <div className="mt-3">
-                <p className="text-sm text-slate-500 mb-3">
+                <p className="mb-3 text-sm text-slate-600">
                   {t("dashboard.invoices.detail.eventNone")}
                 </p>
-                <button
-                  type="button"
-                  onClick={openEventModal}
-                  disabled={linkSaving}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-[var(--obillz-hero-blue,#1d4ed8)] hover:opacity-95 disabled:opacity-50 transition-colors"
-                >
+                <DashboardPrimaryButton type="button" onClick={openEventModal} disabled={linkSaving} icon="none" className="rounded-xl">
                   {t("dashboard.invoices.detail.linkToEvent")}
-                </button>
+                </DashboardPrimaryButton>
               </div>
             )}
           </div>
         </div>
-      </div>
+      </GlassCard>
 
       <LinkInvoiceToEventModal
         open={eventModalOpen}
@@ -651,9 +642,9 @@ export default function FactureDetailPage() {
       />
 
       {/* Statut et notes */}
-      <div className="rounded-xl border border-subtle bg-surface p-6">
+      <GlassCard padding="md">
         <div className="mb-4">
-          <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.status")}</label>
+          <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.status")}</label>
           <select
             value={facture.statut}
             onChange={(e) =>
@@ -661,7 +652,7 @@ export default function FactureDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "paye" | "en-retard"
               )
             }
-            className="rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+            className="rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60"
           >
             <option value="brouillon">{t("dashboard.status.invoice.draft")}</option>
             <option value="envoye">{t("dashboard.status.invoice.sent")}</option>
@@ -671,13 +662,12 @@ export default function FactureDetailPage() {
         </div>
         {facture.notes && (
           <div>
-            <label className="text-sm text-secondary mb-2 block">{t("dashboard.common.notes")}</label>
-            <p className="text-primary">{facture.notes}</p>
+            <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.notes")}</label>
+            <p className="whitespace-pre-line text-slate-900">{facture.notes}</p>
           </div>
         )}
-      </div>
-
-    </div>
+      </GlassCard>
+    </PageLayout>
   );
 }
 

@@ -12,6 +12,13 @@ import {
 import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  ActionButton,
+} from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface Client {
   id: string;
@@ -281,14 +288,14 @@ function NouvelleFacturePageContent() {
   const totalTTC = calculerTotalTTC(lignes);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{t("dashboard.invoices.form.title")}</h1>
-        <p className="mt-2 text-secondary">{t("dashboard.invoices.form.subtitle")}</p>
-      </div>
+    <PageLayout maxWidth="4xl">
+      <PageHeader
+        title={t("dashboard.invoices.form.title")}
+        subtitle={t("dashboard.invoices.form.subtitle")}
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-subtle bg-surface p-6 space-y-4">
+        <GlassCard padding="lg" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
               {t("dashboard.invoices.form.fields.client")}
@@ -375,19 +382,15 @@ function NouvelleFacturePageContent() {
               </select>
             </div>
           )}
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
+        <GlassCard padding="lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{t("dashboard.invoices.form.lines.title")}</h2>
-            <button
-              type="button"
-              onClick={ajouterLigne}
-              className="px-4 py-2 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all text-sm flex items-center gap-2 border border-subtle"
-            >
+            <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.invoices.form.lines.title")}</h2>
+            <ActionButton type="button" onClick={ajouterLigne} className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
               {t("dashboard.invoices.form.lines.add")}
-            </button>
+            </ActionButton>
           </div>
 
           <div className="space-y-4">
@@ -503,10 +506,10 @@ function NouvelleFacturePageContent() {
               </div>
             ))}
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
-          <h2 className="text-xl font-semibold mb-4">{t("dashboard.invoices.form.fields.notes")}</h2>
+        <GlassCard padding="lg">
+          <h2 className="text-xl font-semibold text-slate-900 mb-4">{t("dashboard.invoices.form.fields.notes")}</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -514,11 +517,11 @@ function NouvelleFacturePageContent() {
             placeholder={t("dashboard.invoices.form.fields.notesPlaceholder")}
             className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
           />
-        </div>
+        </GlassCard>
 
-        <div className="rounded-xl border border-subtle bg-surface p-6">
+        <GlassCard padding="lg">
           <div className="space-y-2 text-right">
-            <div className="flex justify-between text-secondary">
+            <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.common.totalHT")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -527,7 +530,7 @@ function NouvelleFacturePageContent() {
                 }).format(totalHT)}
               </span>
             </div>
-            <div className="flex justify-between text-secondary">
+            <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.common.vatLabel")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -536,7 +539,7 @@ function NouvelleFacturePageContent() {
                 }).format(totalTVA)}
               </span>
             </div>
-            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-subtle">
+            <div className="flex justify-between text-2xl font-bold pt-2 border-t border-slate-200/70 text-slate-900">
               <span>{t("dashboard.common.totalTTC")}</span>
               <span>
                 {new Intl.NumberFormat(localeToIntl[locale], {
@@ -546,21 +549,17 @@ function NouvelleFacturePageContent() {
               </span>
             </div>
           </div>
-        </div>
+        </GlassCard>
 
-        <div className="flex gap-3 flex-wrap">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary transition-all"
-          >
+        <div className="flex flex-wrap items-center gap-3">
+          <ActionButton type="button" onClick={() => router.back()} className="flex-1 justify-center min-w-[150px]">
             {t("dashboard.common.cancel")}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(false)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
               <>
@@ -573,12 +572,12 @@ function NouvelleFacturePageContent() {
                 {t("dashboard.invoices.form.previewPdf")}
               </>
             )}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(true)}
             disabled={savingForPdf}
-            className="px-6 py-3 rounded-lg bg-surface-hover hover:bg-surface text-primary font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-subtle"
+            className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
               <>
@@ -591,22 +590,19 @@ function NouvelleFacturePageContent() {
                 {t("dashboard.invoices.form.downloadPdf")}
               </>
             )}
-          </button>
-          <button
-            type="submit"
-            className="flex-1 px-6 py-3 rounded-lg accent-bg text-white font-medium transition-all"
-          >
+          </ActionButton>
+          <DashboardPrimaryButton type="submit" icon="none" className="flex-1 justify-center min-w-[180px] rounded-xl">
             {t("dashboard.invoices.form.createAction")}
-          </button>
+          </DashboardPrimaryButton>
         </div>
       </form>
-    </div>
+    </PageLayout>
   );
 }
 
 export default function NouvelleFacturePage() {
   return (
-    <Suspense fallback={<div className="max-w-4xl mx-auto p-8 text-secondary">…</div>}>
+    <Suspense fallback={<PageLayout maxWidth="4xl" stack="none" className="py-8 text-white/80">…</PageLayout>}>
       <NouvelleFacturePageContent />
     </Suspense>
   );
