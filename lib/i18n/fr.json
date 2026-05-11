@@ -1105,17 +1105,8 @@
         "soon": "À venir",
         "info": "Info"
       },
-      "finance": {
-        "title": "Vue financière rapide",
-        "badge": "Synthèse",
-        "totalRevenue": "Total revenus",
-        "totalExpenses": "Total charges",
-        "netResult": "Résultat net",
-        "invoicesCollected": "Factures encaissées",
-        "membershipsCollected": "Cotisations encaissées",
-        "otherRevenue": "Autres revenus",
-        "pendingAmount": "Montant en attente",
-        "subnote": "Mise à jour en temps réel"
+      "activity": {
+        "clubRevenue": "Revenu club"
       },
       "upcomingEvents": {
         "title": "Événements à venir",

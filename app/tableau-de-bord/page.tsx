@@ -152,14 +152,10 @@ export default function TableauDeBordPage() {
     montantCotisationsAttente: 0,
     montantFacturesPayees: 0,
     montantFacturesAttente: 0,
-    montantAutresRevenus: 0,
     totalChargesPayees: 0,
     totalChargesAttente: 0,
     chargesAttenteCount: 0,
     soldeClub: 0,
-    resultatNet: 0,
-    totalRevenus: 0,
-    totalCharges: 0,
   });
 
   const [aTraiterMaintenant, setATraiterMaintenant] = useState<ATraiterItem[]>([]);
@@ -287,14 +283,10 @@ export default function TableauDeBordPage() {
           montantCotisationsAttente,
           montantFacturesPayees,
           montantFacturesAttente,
-          montantAutresRevenus,
           totalChargesPayees,
           totalChargesAttente,
           chargesAttenteCount,
           soldeClub,
-          resultatNet: soldeClub,
-          totalRevenus,
-          totalCharges,
         });
 
         setATraiterMaintenant(buildATraiterMaintenant(factures));
@@ -478,7 +470,7 @@ export default function TableauDeBordPage() {
         id: `revenue-${r.id}`,
         type: "revenue",
         title: r.name,
-        subtitle: r.event?.name || t("dashboard.overview.finance.otherRevenue"),
+        subtitle: r.event?.name || t("dashboard.overview.activity.clubRevenue"),
         date: r.created_at || r.revenue_date,
         amount: Number(r.amount) || 0,
       });
@@ -839,104 +831,6 @@ export default function TableauDeBordPage() {
               })}
             </div>
           )}
-        </SectionCard>
-      ) : null}
-
-      {/* === Vue financière rapide === */}
-      {!loading ? (
-        <SectionCard
-          icon={Wallet}
-          title={t("dashboard.overview.finance.title")}
-          headerRight={
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              {t("dashboard.overview.finance.badge")}
-            </span>
-          }
-          footer={
-            <p className="text-xs text-slate-500">
-              {t("dashboard.overview.finance.subnote")}
-            </p>
-          }
-        >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className={cn(glassNestedRowClass, "flex flex-col gap-1")}>
-              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                {t("dashboard.overview.finance.totalRevenue")}
-              </span>
-              <span className="text-2xl font-bold text-slate-900">
-                {formatMontant(stats.totalRevenus)}
-              </span>
-              <span className="text-xs text-slate-500">
-                {t("dashboard.overview.finance.invoicesCollected")} ·{" "}
-                <span className="font-medium text-slate-700">
-                  {formatMontant(stats.montantFacturesPayees)}
-                </span>
-              </span>
-              <span className="text-xs text-slate-500">
-                {t("dashboard.overview.finance.membershipsCollected")} ·{" "}
-                <span className="font-medium text-slate-700">
-                  {formatMontant(stats.montantCotisationsPayees)}
-                </span>
-              </span>
-              {stats.montantAutresRevenus > 0 ? (
-                <span className="text-xs text-slate-500">
-                  {t("dashboard.overview.finance.otherRevenue")} ·{" "}
-                  <span className="font-medium text-slate-700">
-                    {formatMontant(stats.montantAutresRevenus)}
-                  </span>
-                </span>
-              ) : null}
-            </div>
-
-            <div className={cn(glassNestedRowClass, "flex flex-col gap-1")}>
-              <span className="text-xs font-semibold uppercase tracking-wider text-rose-700">
-                {t("dashboard.overview.finance.totalExpenses")}
-              </span>
-              <span className="text-2xl font-bold text-slate-900">
-                {formatMontant(stats.totalCharges)}
-              </span>
-              {stats.totalChargesAttente > 0 ? (
-                <span className="text-xs text-slate-500">
-                  {t("dashboard.overview.finance.pendingAmount")} ·{" "}
-                  <span className="font-medium text-amber-700">
-                    {formatMontant(stats.totalChargesAttente)}
-                  </span>
-                </span>
-              ) : null}
-            </div>
-
-            <div
-              className={cn(
-                glassNestedRowClass,
-                "flex flex-col gap-1",
-                stats.resultatNet >= 0
-                  ? "border-emerald-200/80 bg-emerald-50/70"
-                  : "border-rose-200/80 bg-rose-50/70"
-              )}
-            >
-              <span
-                className={cn(
-                  "text-xs font-semibold uppercase tracking-wider",
-                  stats.resultatNet >= 0 ? "text-emerald-700" : "text-rose-700"
-                )}
-              >
-                {t("dashboard.overview.finance.netResult")}
-              </span>
-              <span className="text-2xl font-bold text-slate-900">
-                {formatMontant(stats.resultatNet)}
-              </span>
-              {stats.montantFacturesAttente > 0 || stats.montantCotisationsAttente > 0 ? (
-                <span className="text-xs text-slate-500">
-                  {t("dashboard.overview.finance.pendingAmount")} ·{" "}
-                  <span className="font-medium text-slate-700">
-                    {formatMontant(
-                      stats.montantFacturesAttente + stats.montantCotisationsAttente
-                    )}
-                  </span>
-                </span>
-              ) : null}
-            </div>
-          </div>
         </SectionCard>
       ) : null}
 

@@ -1221,17 +1221,8 @@
         "soon": "Soon",
         "info": "Info"
       },
-      "finance": {
-        "title": "Quick financial view",
-        "badge": "Summary",
-        "totalRevenue": "Total revenue",
-        "totalExpenses": "Total expenses",
-        "netResult": "Net result",
-        "invoicesCollected": "Invoices collected",
-        "membershipsCollected": "Memberships collected",
-        "otherRevenue": "Other revenue",
-        "pendingAmount": "Pending amount",
-        "subnote": "Updated in real time"
+      "activity": {
+        "clubRevenue": "Club revenue"
       },
       "upcomingEvents": {
         "title": "Upcoming events",

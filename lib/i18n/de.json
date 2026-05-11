@@ -1184,17 +1184,8 @@
         "soon": "Bald",
         "info": "Info"
       },
-      "finance": {
-        "title": "Schnellansicht Finanzen",
-        "badge": "Übersicht",
-        "totalRevenue": "Gesamteinnahmen",
-        "totalExpenses": "Gesamtausgaben",
-        "netResult": "Nettoergebnis",
-        "invoicesCollected": "Eingenommene Rechnungen",
-        "membershipsCollected": "Eingenommene Beiträge",
-        "otherRevenue": "Andere Einnahmen",
-        "pendingAmount": "Ausstehender Betrag",
-        "subnote": "In Echtzeit aktualisiert"
+      "activity": {
+        "clubRevenue": "Vereinseinnahme"
       },
       "upcomingEvents": {
         "title": "Anstehende Veranstaltungen",
