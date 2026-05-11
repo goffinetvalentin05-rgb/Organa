@@ -1,7 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar, Clock, Plus, Users, X } from "@/lib/icons";
+import {
+  PUBLIC_PLANNING_CONFIRM_STORAGE_KEY,
+  type PublicPlanningConfirmationPayload,
+} from "@/lib/planning/publicPlanningConfirmationPayload";
 
 interface PublicAssignment {
   id: string;
@@ -46,10 +51,10 @@ export default function PublicPlanningPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = use(params);
+  const router = useRouter();
   const [planning, setPlanning] = useState<PublicPlanning | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PublicSlot | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -111,7 +116,6 @@ export default function PublicPlanningPage({
 
   const openSignupModal = (slot: PublicSlot) => {
     if (slot.isFull) return;
-    setMessage(null);
     setError(null);
     setSelectedSlot(slot);
     setFormData({ name: "", email: "", phone: "" });
@@ -138,7 +142,6 @@ export default function PublicPlanningPage({
 
     setSubmitting(true);
     setError(null);
-    setMessage(null);
     try {
       const response = await fetch(`/api/public/plannings/${token}`, {
         method: "POST",
@@ -158,7 +161,21 @@ export default function PublicPlanningPage({
         throw new Error(data?.error || "Inscription impossible");
       }
 
-      setMessage("Merci, votre inscription est confirmée.");
+      const confirmation = data?.confirmation as PublicPlanningConfirmationPayload | undefined;
+      if (confirmation) {
+        try {
+          sessionStorage.setItem(
+            PUBLIC_PLANNING_CONFIRM_STORAGE_KEY,
+            JSON.stringify(confirmation)
+          );
+        } catch {
+          /* quota / navigation privée : on redirige quand même */
+        }
+        closeSignupModal();
+        router.push(`/p/${token}/confirmation`);
+        return;
+      }
+
       closeSignupModal();
       await loadPlanning();
     } catch (submitError: unknown) {
@@ -214,11 +231,6 @@ export default function PublicPlanningPage({
               </span>
             )}
           </div>
-          {message && (
-            <div className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              {message}
-            </div>
-          )}
         </div>
 
         <div className="space-y-4">

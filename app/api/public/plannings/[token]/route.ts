@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { rateLimitGuard } from "@/lib/security/rateLimit";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 import { matchPublicNameToMember, normalizeForNameMatch } from "@/lib/planning/matchPublicNameToMember";
 import { fetchClubMembersForNameMatch } from "@/lib/planning/fetchClubMembersForNameMatch";
 import { ensureMemberParticipationForPlanning } from "@/lib/planning/memberParticipations";
+import type { PublicPlanningConfirmationPayload } from "@/lib/planning/publicPlanningConfirmationPayload";
 
 export const runtime = "nodejs";
 
@@ -537,89 +537,42 @@ export async function POST(
       });
     }
 
-    if (email) {
-      try {
-        const { data: planning } = await supabase
-          .from("plannings")
-          .select("name, date")
-          .eq("id", link.planning_id)
-          .maybeSingle();
+    const { data: planningRow } = await supabase
+      .from("plannings")
+      .select("name, date, description")
+      .eq("id", link.planning_id)
+      .maybeSingle();
 
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
-          .eq("user_id", link.club_id)
-          .maybeSingle();
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("company_name")
+      .eq("user_id", link.club_id)
+      .maybeSingle();
 
-        const delivery = resolveResendFromProfile({
-          company_name: profile?.company_name,
-          company_email: profile?.company_email,
-          email_sender_name: profile?.email_sender_name,
-          email_sender_email: profile?.email_sender_email,
-          resend_api_key: profile?.resend_api_key,
-          email_custom_enabled: profile?.email_custom_enabled,
-        });
-        if (delivery) {
-          const resend = delivery.resend;
-          const subject = "Confirmation - inscription benevole";
-          const clubName = profile?.company_name || "Club";
-          const eventName = planning?.name || "Evenement";
-          const slotName = slot.location || "Poste";
-          const startTime = (slot.start_time || "").slice(0, 5);
-          const endTime = (slot.end_time || "").slice(0, 5);
-          const volunteerName = name || "benevole";
-          const slotDateRaw = (slot as { slot_date?: string }).slot_date || planning?.date;
-          const slotDateLabel = slotDateRaw
-            ? new Date(`${slotDateRaw}T12:00:00`).toLocaleDateString("fr-FR", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
-            : "";
+    const slotDateRaw =
+      (slot as { slot_date?: string | null }).slot_date || planningRow?.date || "";
+    const slotDateLabel = slotDateRaw
+      ? new Date(`${slotDateRaw}T12:00:00`).toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "";
 
-          const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
-              <p>Bonjour ${volunteerName},</p>
-              <p>Votre inscription est confirmee pour l'evenement suivant :</p>
-              <p>
-                <strong>Evenement :</strong> ${eventName}<br/>
-                <strong>Poste :</strong> ${slotName}<br/>
-                ${slotDateLabel ? `<strong>Date :</strong> ${slotDateLabel}<br/>` : ""}
-                <strong>Horaire :</strong> ${startTime} - ${endTime}
-              </p>
-              <p>Merci pour votre aide !</p>
-              <p>${clubName}</p>
-              <p style="font-size: 12px; color: #6b7280;">Si vous avez une question, contactez le club.</p>
-            </div>
-          `;
-
-          const text = `Bonjour ${volunteerName},
-
-Votre inscription est confirmee pour l'evenement suivant :
-
-Evenement : ${eventName}
-Poste : ${slotName}
-${slotDateLabel ? `Date : ${slotDateLabel}\n` : ""}Horaire : ${startTime} - ${endTime}
-
-Merci pour votre aide !
-
-${clubName}
-
-Si vous avez une question, contactez le club.`;
-
-          await resend.emails.send({
-            from: delivery.from,
-            to: [email],
-            subject,
-            html,
-            text,
-          });
-        }
-      } catch (emailError) {
-        console.error("[API][public-plannings][POST] Erreur envoi email confirmation:", emailError);
-      }
-    }
+    const confirmation: PublicPlanningConfirmationPayload = {
+      assignmentId: assignment.id,
+      planningId: link.planning_id,
+      eventName: planningRow?.name || "Événement",
+      slotLocation: slot.location || "Poste / créneau",
+      slotDate: slotDateRaw,
+      slotDateLabel,
+      startTime: (slot.start_time || "").slice(0, 5),
+      endTime: (slot.end_time || "").slice(0, 5),
+      participantName: name.trim() || publicDisplayName,
+      clubName: profileRow?.company_name || "Club",
+      planningDescription: planningRow?.description || undefined,
+    };
 
     await logAudit({
       clubId: link.club_id,
@@ -663,6 +616,7 @@ Si vous avez une question, contactez le club.`;
                 status: "public",
               },
         },
+        confirmation,
       },
       { status: 201 }
     );
