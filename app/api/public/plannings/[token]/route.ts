@@ -6,6 +6,7 @@ import { matchPublicNameToMember, normalizeForNameMatch } from "@/lib/planning/m
 import { fetchClubMembersForNameMatch } from "@/lib/planning/fetchClubMembersForNameMatch";
 import { ensureMemberParticipationForPlanning } from "@/lib/planning/memberParticipations";
 import type { PublicPlanningConfirmationPayload } from "@/lib/planning/publicPlanningConfirmationPayload";
+import { isPublicPlanningSlug } from "@/lib/planning/publicPlanningSlug";
 
 export const runtime = "nodejs";
 
@@ -199,16 +200,24 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = await params;
-    if (!token || token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
-      return NextResponse.json({ error: "Token invalide" }, { status: 400 });
+    const { token: identifier } = await params;
+    const slugOk = identifier ? isPublicPlanningSlug(identifier) : false;
+    const tokenOk =
+      identifier &&
+      identifier.length >= 16 &&
+      identifier.length <= 128 &&
+      /^[A-Za-z0-9_-]+$/.test(identifier);
+
+    if (!identifier || (!slugOk && !tokenOk)) {
+      return NextResponse.json({ error: "Identifiant invalide" }, { status: 400 });
     }
+
     const supabase = createAdminClient();
 
     const { data: link } = await supabase
       .from("public_planning_links")
-      .select("planning_id, club_id, active, require_name, require_email")
-      .eq("token", token)
+      .select("planning_id, club_id, active, require_name, require_email, slug, token")
+      .eq(slugOk ? "slug" : "token", identifier)
       .maybeSingle();
 
     if (!link || !link.active) {
@@ -362,6 +371,7 @@ export async function GET(
           requireName: link.require_name,
           requireEmail: link.require_email,
         },
+        canonicalSlug: link.slug,
       },
       { status: 200 }
     );
@@ -388,10 +398,19 @@ export async function POST(
   if (!rl.ok) return rl.response;
 
   try {
-    const { token } = await params;
-    if (!token || token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
+    const { token: identifier } = await params;
+
+    const slugOk = identifier ? isPublicPlanningSlug(identifier) : false;
+    const tokenOk =
+      identifier &&
+      identifier.length >= 16 &&
+      identifier.length <= 128 &&
+      /^[A-Za-z0-9_-]+$/.test(identifier);
+
+    if (!identifier || (!slugOk && !tokenOk)) {
       return NextResponse.json({ error: "Token invalide" }, { status: 400 });
     }
+
     const supabase = createAdminClient();
     const body: { slotId?: string; name?: string; email?: string; phone?: string } =
       await request.json();
@@ -409,8 +428,8 @@ export async function POST(
 
     const { data: link } = await supabase
       .from("public_planning_links")
-      .select("planning_id, club_id, active, require_name, require_email")
-      .eq("token", token)
+      .select("planning_id, club_id, active, require_name, require_email, slug")
+      .eq(slugOk ? "slug" : "token", identifier)
       .maybeSingle();
 
     if (!link || !link.active) {
@@ -584,7 +603,8 @@ export async function POST(
       outcome: "success",
       metadata: {
         source: "public_signup",
-        token,
+        token: identifier,
+        slug: link.slug,
         slot_id: slotId,
         member_link_status: assignment.member_link_status,
         client_id: assignment.client_id,
@@ -617,6 +637,7 @@ export async function POST(
               },
         },
         confirmation,
+        canonicalSlug: link.slug,
       },
       { status: 201 }
     );

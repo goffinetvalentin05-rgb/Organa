@@ -30,6 +30,7 @@ export function PublicPlanningConfirmationClient() {
   const assignmentIdFromUrl = searchParams.get("assignmentId");
 
   const [payload, setPayload] = useState<PublicPlanningConfirmationPayload | null>(null);
+  const [canonicalSlug, setCanonicalSlug] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [icsHref, setIcsHref] = useState<string | null>(null);
 
@@ -55,7 +56,18 @@ export function PublicPlanningConfirmationClient() {
             return;
           }
           const c = data?.confirmation as PublicPlanningConfirmationPayload | undefined;
+          const cSlug = typeof data?.canonicalSlug === "string" ? data.canonicalSlug : null;
+          if (cSlug && cSlug !== token && !cancelled) {
+            setCanonicalSlug(cSlug);
+            router.replace(
+              `/p/${encodeURIComponent(cSlug)}/confirmation?assignmentId=${encodeURIComponent(
+                assignmentIdFromUrl
+              )}`
+            );
+            return;
+          }
           if (c && !cancelled) {
+            setCanonicalSlug(cSlug || token);
             setPayload(c);
             return;
           }
@@ -171,7 +183,7 @@ export function PublicPlanningConfirmationClient() {
         </div>
         <div className="max-w-lg mx-auto mt-4">
           <Link
-            href={`/p/${token}`}
+            href={`/p/${canonicalSlug || token}`}
             className="text-sm font-medium text-slate-700 underline"
           >
             Retour à l&apos;événement
@@ -297,7 +309,7 @@ export function PublicPlanningConfirmationClient() {
 
           <div className="mt-8 pt-6 border-t border-slate-100">
             <Link
-              href={`/p/${token}`}
+              href={`/p/${canonicalSlug || token}`}
               className="inline-flex w-full justify-center items-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
             >
               Retour à l&apos;événement

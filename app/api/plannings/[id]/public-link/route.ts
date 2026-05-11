@@ -3,12 +3,14 @@ import { randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { slugifyPublicPlanningName } from "@/lib/planning/publicPlanningSlug";
 
 export const runtime = "nodejs";
 
 interface PublicPlanningLinkRow {
   id: string;
   token: string;
+  slug: string | null;
   active: boolean;
   created_at: string;
   require_name: boolean;
@@ -38,7 +40,7 @@ export async function GET(
 
     const { data: planning } = await supabase
       .from("plannings")
-      .select("id")
+      .select("id, name")
       .eq("id", planningId)
       .eq("user_id", guard.clubId)
       .maybeSingle();
@@ -49,7 +51,7 @@ export async function GET(
 
     const { data: link } = await supabase
       .from("public_planning_links")
-      .select("id, token, active, created_at, require_name, require_email")
+      .select("id, token, slug, active, created_at, require_name, require_email")
       .eq("planning_id", planningId)
       .eq("club_id", guard.clubId)
       .maybeSingle();
@@ -59,17 +61,19 @@ export async function GET(
     }
 
     const baseUrl = resolveBaseUrl(request);
+    const publicPath = `/p/${link.slug || link.token}`;
     return NextResponse.json(
       {
         publicLink: {
           id: link.id,
           token: link.token,
+          slug: link.slug,
           active: link.active,
           createdAt: link.created_at,
           requireName: link.require_name,
           requireEmail: link.require_email,
-          path: `/p/${link.token}`,
-          url: `${baseUrl}/p/${link.token}`,
+          path: publicPath,
+          url: `${baseUrl}${publicPath}`,
         },
       },
       { status: 200 }
@@ -96,7 +100,7 @@ export async function POST(
 
     const { data: planning } = await supabase
       .from("plannings")
-      .select("id")
+      .select("id, name")
       .eq("id", planningId)
       .eq("user_id", guard.clubId)
       .maybeSingle();
@@ -113,7 +117,7 @@ export async function POST(
 
     const { data: existing } = await supabase
       .from("public_planning_links")
-      .select("id, token, active, created_at, require_name, require_email")
+      .select("id, token, slug, active, created_at, require_name, require_email")
       .eq("planning_id", planningId)
       .eq("club_id", guard.clubId)
       .maybeSingle();
@@ -121,32 +125,78 @@ export async function POST(
     let linkData: PublicPlanningLinkRow | null = existing;
     if (!existing) {
       let created: PublicPlanningLinkRow | null = null;
-      for (let attempt = 0; attempt < 5; attempt += 1) {
-        const token = generatePublicToken();
-        const { data, error } = await supabase
-          .from("public_planning_links")
-          .insert({
-            planning_id: planningId,
-            token,
-            club_id: guard.clubId,
-            active: true,
-            require_name: requireName,
-            require_email: requireEmail,
-          })
-          .select("id, token, active, created_at, require_name, require_email")
-          .maybeSingle();
+      const baseSlug = slugifyPublicPlanningName(planning?.name || "planning");
 
-        if (!error && data) {
-          created = data;
-          break;
+      // On tente plusieurs slugs en cas de collisions (même base sur plusieurs plannings)
+      outer: for (let attempt = 0; attempt < 5; attempt += 1) {
+        const token = generatePublicToken();
+        for (let slugAttempt = 0; slugAttempt < 50; slugAttempt += 1) {
+          const slug =
+            slugAttempt === 0 ? baseSlug : `${baseSlug}-${slugAttempt + 1}`;
+
+          const { data, error } = await supabase
+            .from("public_planning_links")
+            .insert({
+              planning_id: planningId,
+              token,
+              slug,
+              club_id: guard.clubId,
+              active: true,
+              require_name: requireName,
+              require_email: requireEmail,
+            })
+            .select("id, token, slug, active, created_at, require_name, require_email")
+            .maybeSingle();
+
+          if (!error && data) {
+            created = data;
+            break outer;
+          }
+
+          // Collision sur slug (ou token) => on essaye le suffixe suivant
+          if (error && "code" in error && (error as any).code === "23505") {
+            continue;
+          }
+
+          if (error) throw error;
         }
       }
 
       if (!created) {
-        return NextResponse.json(
-          { error: "Impossible de générer un lien public" },
-          { status: 500 }
-        );
+        // Race condition : un autre request a peut-être déjà créé le lien.
+        const { data: afterRace } = await supabase
+          .from("public_planning_links")
+          .select("id, token, slug, active, created_at, require_name, require_email")
+          .eq("planning_id", planningId)
+          .eq("club_id", guard.clubId)
+          .maybeSingle();
+
+        if (!afterRace) {
+          return NextResponse.json(
+            { error: "Impossible de générer un lien public" },
+            { status: 500 }
+          );
+        }
+
+        const { data: updatedAfterRace, error: afterUpdateError } = await supabase
+          .from("public_planning_links")
+          .update({
+            active: true,
+            require_name: requireName,
+            require_email: requireEmail,
+          })
+          .eq("id", afterRace.id)
+          .select("id, token, slug, active, created_at, require_name, require_email")
+          .single();
+
+        if (afterUpdateError || !updatedAfterRace) {
+          return NextResponse.json(
+            { error: "Impossible de mettre à jour le lien public" },
+            { status: 500 }
+          );
+        }
+
+        created = updatedAfterRace;
       }
 
       linkData = created;
@@ -159,7 +209,7 @@ export async function POST(
           require_email: requireEmail,
         })
         .eq("id", existing.id)
-        .select("id, token, active, created_at, require_name, require_email")
+        .select("id, token, slug, active, created_at, require_name, require_email")
         .single();
 
       if (updateError || !updated) {
@@ -182,17 +232,19 @@ export async function POST(
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
 
     const baseUrl = resolveBaseUrl(request);
+    const publicPath = `/p/${linkData.slug || linkData.token}`;
     return NextResponse.json(
       {
         publicLink: {
           id: linkData.id,
           token: linkData.token,
+          slug: linkData.slug,
           active: linkData.active,
           createdAt: linkData.created_at,
           requireName: linkData.require_name,
           requireEmail: linkData.require_email,
-          path: `/p/${linkData.token}`,
-          url: `${baseUrl}/p/${linkData.token}`,
+          path: publicPath,
+          url: `${baseUrl}${publicPath}`,
         },
       },
       { status: 201 }

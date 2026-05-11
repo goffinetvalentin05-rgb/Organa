@@ -53,6 +53,7 @@ export default function PublicPlanningPage({
   const { token } = use(params);
   const router = useRouter();
   const [planning, setPlanning] = useState<PublicPlanning | null>(null);
+  const [publicSlug, setPublicSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PublicSlot | null>(null);
@@ -76,7 +77,17 @@ export default function PublicPlanningPage({
         throw new Error(data?.error || "Lien invalide");
       }
 
+      const canonicalSlug =
+        typeof data?.canonicalSlug === "string" ? data.canonicalSlug : null;
+
       setPlanning(data.planning || null);
+      const nextSlug = canonicalSlug || token;
+      setPublicSlug(nextSlug);
+
+      // Si on est tombé sur un ancien token, on redirige vers l'URL canonique.
+      if (canonicalSlug && canonicalSlug !== token) {
+        router.replace(`/p/${canonicalSlug}`);
+      }
     } catch (loadError: unknown) {
       setError(loadError instanceof Error ? loadError.message : "Impossible de charger le planning");
       setPlanning(null);
@@ -129,6 +140,7 @@ export default function PublicPlanningPage({
   const submitSignup = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!planning || !selectedSlot) return;
+    const identifier = publicSlug || token;
 
     if (planning.requireName && !formData.name.trim()) {
       setError("Le nom est requis.");
@@ -143,7 +155,7 @@ export default function PublicPlanningPage({
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(`/api/public/plannings/${token}`, {
+      const response = await fetch(`/api/public/plannings/${identifier}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,7 +192,9 @@ export default function PublicPlanningPage({
       }
 
       closeSignupModal();
-      router.push(`/p/${token}/confirmation?assignmentId=${encodeURIComponent(assignmentId)}`);
+      router.push(
+        `/p/${identifier}/confirmation?assignmentId=${encodeURIComponent(assignmentId)}`
+      );
     } catch (submitError: unknown) {
       setError(submitError instanceof Error ? submitError.message : "Erreur lors de l'inscription");
     } finally {

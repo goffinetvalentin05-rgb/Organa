@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PublicPlanningConfirmationPayload } from "@/lib/planning/publicPlanningConfirmationPayload";
+import { isPublicPlanningSlug } from "@/lib/planning/publicPlanningSlug";
 
 export const runtime = "nodejs";
 
@@ -14,11 +15,18 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = await params;
+    const { token: identifier } = await params;
     const assignmentId = request.nextUrl.searchParams.get("assignmentId");
 
-    if (!token || token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
-      return NextResponse.json({ error: "Token invalide" }, { status: 400 });
+    const slugOk = identifier ? isPublicPlanningSlug(identifier) : false;
+    const tokenOk =
+      identifier &&
+      identifier.length >= 16 &&
+      identifier.length <= 128 &&
+      /^[A-Za-z0-9_-]+$/.test(identifier);
+
+    if (!identifier || (!slugOk && !tokenOk)) {
+      return NextResponse.json({ error: "Identifiant invalide" }, { status: 400 });
     }
     if (!assignmentId || !/^[0-9a-f-]{36}$/i.test(assignmentId)) {
       return NextResponse.json({ error: "Inscription invalide" }, { status: 400 });
@@ -28,8 +36,8 @@ export async function GET(
 
     const { data: link } = await supabase
       .from("public_planning_links")
-      .select("planning_id, club_id, active")
-      .eq("token", token)
+      .select("planning_id, club_id, active, slug")
+      .eq(slugOk ? "slug" : "token", identifier)
       .maybeSingle();
 
     if (!link || !link.active) {
@@ -98,7 +106,7 @@ export async function GET(
       planningDescription: planningRow?.description || undefined,
     };
 
-    return NextResponse.json({ confirmation }, { status: 200 });
+    return NextResponse.json({ confirmation, canonicalSlug: link.slug }, { status: 200 });
   } catch (error: unknown) {
     const details = error instanceof Error ? error.message : undefined;
     console.error("[API][public-plannings][confirmation][GET]", details);
