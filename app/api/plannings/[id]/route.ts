@@ -225,6 +225,15 @@ export async function PUT(
     const body = await request.json();
     const { name, description, date, status, eventId } = body || {};
 
+    if (name !== undefined) {
+      if (typeof name !== "string" || name.trim().length === 0) {
+        return NextResponse.json(
+          { error: "Le titre du planning est obligatoire et ne peut pas être vide" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Vérifier que le planning appartient au club
     const { data: existingPlanning, error: fetchError } = await supabase
       .from("plannings")
@@ -241,7 +250,7 @@ export async function PUT(
     }
 
     const updatePayload: any = { updated_by: user.id };
-    if (name !== undefined) updatePayload.name = name.trim();
+    if (name !== undefined) updatePayload.name = String(name).trim();
     if (description !== undefined) updatePayload.description = description?.trim() || null;
     if (date !== undefined) updatePayload.date = date;
     if (status !== undefined) updatePayload.status = status;

@@ -30,6 +30,8 @@ import {
   cn,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import { PERMISSIONS } from "@/lib/auth/permissions-shared";
 
 const planningInputClass =
   "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
@@ -102,7 +104,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const router = useRouter();
   const { locale } = useI18n();
-  
+  const { has: hasPermission, loading: permissionsLoading } = usePermissions();
+
   const [planning, setPlanning] = useState<Planning | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,6 +140,10 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   const [publicLink, setPublicLink] = useState<PublicPlanningLink | null>(null);
   const [sharing, setSharing] = useState(false);
   const [copying, setCopying] = useState(false);
+
+  const [showEditPlanningModal, setShowEditPlanningModal] = useState(false);
+  const [editPlanningForm, setEditPlanningForm] = useState({ name: "", description: "" });
+  const [savingPlanningMeta, setSavingPlanningMeta] = useState(false);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -485,6 +492,62 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     }
   };
 
+  const openEditPlanningModal = () => {
+    if (!planning) return;
+    setEditPlanningForm({
+      name: planning.name,
+      description: planning.description ?? "",
+    });
+    setShowEditPlanningModal(true);
+  };
+
+  const handleSavePlanningMeta = async () => {
+    const trimmedTitle = editPlanningForm.name.trim();
+    if (!trimmedTitle) {
+      toast.error("Le titre du planning est obligatoire");
+      return;
+    }
+
+    setSavingPlanningMeta(true);
+    try {
+      const response = await fetch(`/api/plannings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: trimmedTitle,
+          description: editPlanningForm.description.trim() || null,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
+        throw new Error(msg || "Erreur lors de l'enregistrement");
+      }
+
+      const updated = data?.planning;
+      if (updated && planning) {
+        setPlanning({
+          ...planning,
+          name: updated.name,
+          description: updated.description ?? undefined,
+          date: updated.date ?? planning.date,
+          status: updated.status ?? planning.status,
+          event: updated.event ?? planning.event,
+        });
+      }
+
+      toast.success("Planning mis à jour");
+      setShowEditPlanningModal(false);
+      router.refresh();
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Erreur lors de l'enregistrement";
+      toast.error(message);
+    } finally {
+      setSavingPlanningMeta(false);
+    }
+  };
+
   // Filtrer les membres disponibles (pas déjà affectés au créneau)
   const availableMembers = members.filter((m) => {
     if (!selectedSlot) return true;
@@ -601,6 +664,17 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             <span className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold ${getStatusColor(planning.status)} border-current/20`}>
               {getStatusLabel(planning.status)}
             </span>
+            {!permissionsLoading && hasPermission(PERMISSIONS.MANAGE_PLANNINGS) && (
+              <ActionButton
+                type="button"
+                onClick={openEditPlanningModal}
+                className="inline-flex items-center gap-2"
+                title="Modifier le titre et la description"
+              >
+                <Edit className="w-4 h-4" />
+                Modifier
+              </ActionButton>
+            )}
             <ActionButton type="button" onClick={handleGeneratePublicLink} disabled={sharing} className="inline-flex items-center gap-2">
               {sharing ? "Génération…" : publicLink ? "Mettre à jour le partage" : "Partager le planning"}
             </ActionButton>
@@ -1023,6 +1097,74 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditPlanningModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 shadow-2xl backdrop-blur-md">
+            <div className="border-b border-slate-200/70 p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-xl font-semibold text-slate-900">Modifier le planning</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowEditPlanningModal(false)}
+                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  aria-label="Fermer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-slate-600">
+                Le lien public partagé ne change pas lorsque vous modifiez le titre.
+              </p>
+            </div>
+
+            <div className="space-y-4 p-6">
+              <div>
+                <label htmlFor="edit-planning-title" className={planningLabelClass}>
+                  Titre du planning *
+                </label>
+                <input
+                  id="edit-planning-title"
+                  type="text"
+                  value={editPlanningForm.name}
+                  onChange={(e) => setEditPlanningForm((f) => ({ ...f, name: e.target.value }))}
+                  className={planningInputClass}
+                  autoComplete="off"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label htmlFor="edit-planning-description" className={planningLabelClass}>
+                  Description (optionnel)
+                </label>
+                <textarea
+                  id="edit-planning-description"
+                  value={editPlanningForm.description}
+                  onChange={(e) => setEditPlanningForm((f) => ({ ...f, description: e.target.value }))}
+                  rows={3}
+                  placeholder="Sous-titre ou précisions visibles sur la fiche…"
+                  className={cn(planningInputClass, "min-h-[5.5rem] resize-y")}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-slate-200/70 p-6">
+              <ActionButton type="button" onClick={() => setShowEditPlanningModal(false)} disabled={savingPlanningMeta}>
+                Annuler
+              </ActionButton>
+              <DashboardPrimaryButton
+                type="button"
+                onClick={() => void handleSavePlanningMeta()}
+                disabled={savingPlanningMeta}
+                icon="none"
+                className="rounded-xl"
+              >
+                {savingPlanningMeta ? "Enregistrement…" : "Enregistrer"}
+              </DashboardPrimaryButton>
             </div>
           </div>
         </div>
