@@ -114,17 +114,29 @@ export default function PublicPlanningPage({
     });
   };
 
-  const formattedDate = useMemo(() => {
-    if (!planning?.date) return "-";
-    const date = new Date(planning.date);
-    if (Number.isNaN(date.getTime())) return planning.date;
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }, [planning?.date]);
+  const planningPeriodLabel = useMemo(() => {
+    if (!planning?.slots?.length) return "—";
+    const dates = [
+      ...new Set(
+        planning.slots
+          .map((s) => (s.slotDate && String(s.slotDate).trim()) || "")
+          .filter(Boolean)
+      ),
+    ].sort();
+    if (dates.length === 0) return "—";
+    const fmt = (ymd: string) => {
+      const d = new Date(`${ymd}T12:00:00`);
+      if (Number.isNaN(d.getTime())) return ymd;
+      return d.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    };
+    if (dates.length === 1) return fmt(dates[0]);
+    return `Du ${fmt(dates[0])} au ${fmt(dates[dates.length - 1])}`;
+  }, [planning]);
 
   const openSignupModal = (slot: PublicSlot) => {
     if (slot.isFull) return;
@@ -232,7 +244,7 @@ export default function PublicPlanningPage({
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              {formattedDate}
+              {planningPeriodLabel}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Users className="w-4 h-4" />

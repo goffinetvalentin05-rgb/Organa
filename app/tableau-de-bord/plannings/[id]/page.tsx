@@ -39,6 +39,9 @@ const planningInputClass =
 
 const planningLabelClass = "block text-sm font-medium text-slate-700 mb-2";
 
+/** Regroupement des colonnes de grille : uniquement les dates réelles des créneaux (pas plannings.date). */
+const GRID_DAY_MISSING = "__no_slot_date__";
+
 interface Member {
   id: string;
   nom: string;
@@ -144,6 +147,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   const [showEditPlanningModal, setShowEditPlanningModal] = useState(false);
   const [editPlanningForm, setEditPlanningForm] = useState({ name: "", description: "", date: "" });
+  const [editPlanningInitial, setEditPlanningInitial] = useState({ name: "", description: "", date: "" });
   const [savingPlanningMeta, setSavingPlanningMeta] = useState(false);
 
   const formatDate = (value: string) => {
@@ -166,12 +170,10 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     if (!planning) return [] as [string, Slot[]][];
     const rawSlots = Array.isArray(planning.slots) ? planning.slots : [];
     const m = new Map<string, Slot[]>();
-    const fallbackDay = planning.date || "";
     for (const s of rawSlots) {
-      const d =
-        (s.slotDate != null && String(s.slotDate).trim() !== "")
-          ? String(s.slotDate).trim()
-          : fallbackDay;
+      const trimmed =
+        s.slotDate != null && String(s.slotDate).trim() !== "" ? String(s.slotDate).trim() : "";
+      const d = trimmed || GRID_DAY_MISSING;
       if (!m.has(d)) m.set(d, []);
       m.get(d)!.push(s);
     }
@@ -183,7 +185,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         return (a.ordre ?? 0) - (b.ordre ?? 0);
       });
     return [...m.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
+      .sort(([a], [b]) => {
+        if (a === GRID_DAY_MISSING) return 1;
+        if (b === GRID_DAY_MISSING) return -1;
+        return a.localeCompare(b);
+      })
       .map(([dateKey, slots]) => [dateKey, sortByStartTime(slots)] as [string, Slot[]]);
   }, [planning]);
 
@@ -205,7 +211,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     setEditingSlotId(slot.id);
     setSlotForm({
       location: slot.location,
-      slotDate: slot.slotDate || planning?.date || "",
+      slotDate: slot.slotDate?.trim() || "",
       startTime: formatTime(slot.startTime),
       endTime: formatTime(slot.endTime),
       requiredPeople: slot.requiredPeople,
@@ -496,11 +502,13 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   const openEditPlanningModal = () => {
     if (!planning) return;
-    setEditPlanningForm({
+    const snap = {
       name: planning.name,
       description: planning.description ?? "",
       date: planning.date,
-    });
+    };
+    setEditPlanningForm(snap);
+    setEditPlanningInitial(snap);
     setShowEditPlanningModal(true);
   };
 
@@ -523,14 +531,29 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
     setSavingPlanningMeta(true);
     try {
+      const payload: Record<string, string | null> = {};
+      if (trimmedTitle !== editPlanningInitial.name.trim()) {
+        payload.name = trimmedTitle;
+      }
+      const nextDesc = editPlanningForm.description.trim() || null;
+      const prevDesc = (editPlanningInitial.description || "").trim() || null;
+      if (nextDesc !== prevDesc) {
+        payload.description = nextDesc;
+      }
+      if (trimmedDate !== editPlanningInitial.date.trim()) {
+        payload.date = trimmedDate;
+      }
+
+      if (Object.keys(payload).length === 0) {
+        toast.success("Aucune modification");
+        setShowEditPlanningModal(false);
+        return;
+      }
+
       const response = await fetch(`/api/plannings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: trimmedTitle,
-          description: editPlanningForm.description.trim() || null,
-          date: trimmedDate,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -782,7 +805,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug">
-                        {formatDate(dayKey)}
+                        {dayKey === GRID_DAY_MISSING ? "Date non renseignée" : formatDate(dayKey)}
                       </h3>
                     </div>
                   </div>
@@ -961,7 +984,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 <div>
                   <h3 className="text-xl font-semibold text-slate-900">Affecter un membre</h3>
                   <p className="text-slate-600 text-sm mt-1">
-                    {selectedSlot.location} • {formatDate(selectedSlot.slotDate || planning.date)} •{" "}
+                    {selectedSlot.location} •{" "}
+                    {selectedSlot.slotDate?.trim()
+                      ? formatDate(selectedSlot.slotDate)
+                      : "Date non renseignée"}{" "}
+                    •{" "}
                     {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                   </p>
                 </div>
@@ -1043,7 +1070,10 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   <h3 className="text-xl font-semibold text-slate-900">Rattacher à un membre</h3>
                   <p className="text-slate-600 text-sm mt-1">
                     {linkTargetAssignment.member.nom} — {linkTargetSlot.location} •{" "}
-                    {formatDate(linkTargetSlot.slotDate || planning?.date || "")} •{" "}
+                    {linkTargetSlot.slotDate?.trim()
+                      ? formatDate(linkTargetSlot.slotDate)
+                      : "Date non renseignée"}{" "}
+                    •{" "}
                     {formatTime(linkTargetSlot.startTime)} - {formatTime(linkTargetSlot.endTime)}
                   </p>
                 </div>
@@ -1122,9 +1152,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </button>
               </div>
               <p className="mt-2 text-sm text-slate-600">
-                Le lien public partagé ne change pas lorsque vous modifiez le titre ou la date. Les heures des
-                créneaux restent identiques ; seul le jour est décalé avec la date principale (y compris pour des
-                journées différentes sur un même planning).
+                La date ci-dessous est la date générale du planning (référence, listes, sous-titre). Elle ne modifie
+                jamais la date enregistrée sur chaque créneau : la grille, le lien public et le PDF utilisent uniquement
+                la date de chaque créneau. Les affectations, horaires et capacités ne sont pas modifiés.
               </p>
             </div>
 

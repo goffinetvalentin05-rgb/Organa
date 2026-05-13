@@ -264,9 +264,10 @@ interface PlanningPdfProps {
   };
 }
 
-// Fonction pour formater la date
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
+// Dates longues (en-tête PDF) : midi local pour éviter les décalages fuseau sur YYYY-MM-DD
+const formatLongFr = (dateString: string) => {
+  const date = new Date(`${dateString}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString("fr-FR", {
     weekday: "long",
     day: "numeric",
@@ -297,6 +298,25 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
   slots,
   summary,
 }) => {
+  const uniqueSlotDates = Array.from(
+    new Set(
+      slots
+        .map((s) => (s.slotDate && String(s.slotDate).trim()) || "")
+        .filter(Boolean)
+    )
+  ).sort();
+
+  const planningHeaderDate =
+    uniqueSlotDates.length === 0
+      ? planning.date
+        ? formatLongFr(planning.date)
+        : "—"
+      : uniqueSlotDates.length === 1
+        ? formatLongFr(uniqueSlotDates[0])
+        : `Du ${formatLongFr(uniqueSlotDates[0])} au ${formatLongFr(
+            uniqueSlotDates[uniqueSlotDates.length - 1]
+          )}`;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -319,7 +339,7 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
             </View>
             <View style={styles.planningInfo}>
               <Text style={styles.planningTitle}>{planning.name}</Text>
-              <Text style={styles.planningDate}>{formatDate(planning.date)}</Text>
+              <Text style={styles.planningDate}>{planningHeaderDate}</Text>
               {planning.eventName && (
                 <Text style={styles.eventBadge}>{planning.eventName}</Text>
               )}

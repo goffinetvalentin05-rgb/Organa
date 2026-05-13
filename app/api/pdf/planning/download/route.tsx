@@ -161,8 +161,8 @@ export async function GET(request: Request) {
         location: slot.location,
         slotDate:
           slot.slot_date != null && String(slot.slot_date).trim() !== ""
-            ? slot.slot_date
-            : planning.date,
+            ? String(slot.slot_date).trim()
+            : "",
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
@@ -172,6 +172,17 @@ export async function GET(request: Request) {
     });
 
     const slotsSorted = sortPlanningSlotsForPdf(slotsWithAssignments);
+
+    const slotYmds = (slotsWithAssignments || [])
+      .map((s: { slotDate?: string }) => (s.slotDate && String(s.slotDate).trim()) || "")
+      .filter(Boolean)
+      .sort();
+    const fileDateStem =
+      slotYmds.length > 0
+        ? slotYmds[0]
+        : planning.date
+          ? String(planning.date).trim().split("T")[0]
+          : "planning";
 
     const totalRequired = slotsWithAssignments.reduce((sum: number, s: any) => sum + s.requiredPeople, 0);
     const totalAssigned = slotsWithAssignments.reduce((sum: number, s: any) => sum + s.assignments.length, 0);
@@ -209,9 +220,7 @@ export async function GET(request: Request) {
       />
     );
 
-    // Nom du fichier
-    const dateFormatted = new Date(planning.date).toISOString().split("T")[0];
-    const filename = `planning-${planning.name.replace(/[^a-zA-Z0-9]/g, "-")}-${dateFormatted}.pdf`;
+    const filename = `planning-${planning.name.replace(/[^a-zA-Z0-9]/g, "-")}-${fileDateStem}.pdf`;
 
     // Retourner le PDF pour téléchargement
     return new Response(new Uint8Array(pdfBuffer), {

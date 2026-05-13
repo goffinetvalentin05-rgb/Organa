@@ -146,11 +146,14 @@ export async function refreshMemberParticipationAfterAssignmentsChange(
 }
 
 /**
- * Quand un planning est modifié : aligner les métadonnées des participations liées.
+ * Quand un planning est modifié : aligner titre et événement des participations liées.
+ * La date affichée côté membre reste celle connue à l’inscription (`event_date`) : la
+ * « date générale » du planning ne doit pas réécrire les dates des créneaux ni
+ * déplacer arbitrairement les métadonnées calendaires des bénévoles.
  */
 export async function syncMemberParticipationsWithPlanning(
   supabase: SupabaseClient,
-  params: { planningId: string; name: string; date: string; eventId: string | null }
+  params: { planningId: string; name: string; eventId: string | null }
 ): Promise<void> {
   const eventTitle = params.name?.trim() || "Planning";
   const now = new Date().toISOString();
@@ -159,7 +162,6 @@ export async function syncMemberParticipationsWithPlanning(
     .from("member_participations")
     .update({
       event_title: eventTitle,
-      event_date: params.date || null,
       event_id: params.eventId,
       updated_at: now,
     })

@@ -338,7 +338,10 @@ export async function GET(
       return {
         id: slot.id,
         location: slot.location,
-        slotDate: slot.slot_date ?? planning.date,
+        slotDate:
+          slot.slot_date != null && String(slot.slot_date).trim() !== ""
+            ? String(slot.slot_date).trim()
+            : "",
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
@@ -570,8 +573,8 @@ export async function POST(
       .eq("user_id", link.club_id)
       .maybeSingle();
 
-    const slotDateRaw =
-      (slot as { slot_date?: string | null }).slot_date || planningRow?.date || "";
+    const sd = (slot as { slot_date?: string | null }).slot_date;
+    const slotDateRaw = sd != null && String(sd).trim() !== "" ? String(sd).trim() : "";
     const slotDateLabel = slotDateRaw
       ? new Date(`${slotDateRaw}T12:00:00`).toLocaleDateString("fr-FR", {
           weekday: "long",

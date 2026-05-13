@@ -81,8 +81,8 @@ export async function GET(
       .maybeSingle();
 
     const participantName = (assignment.public_name || "").trim() || "Participant";
-    const slotDateRaw =
-      (slot as { slot_date?: string | null }).slot_date || planningRow?.date || "";
+    const sd = (slot as { slot_date?: string | null }).slot_date;
+    const slotDateRaw = sd != null && String(sd).trim() !== "" ? String(sd).trim() : "";
     const slotDateLabel = slotDateRaw
       ? new Date(`${slotDateRaw}T12:00:00`).toLocaleDateString("fr-FR", {
           weekday: "long",

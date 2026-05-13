@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { syncMemberParticipationsWithPlanning } from "@/lib/planning/memberParticipations";
-import { isValidIsoDateOnly, calendarDayDeltaIso } from "@/lib/planning/isoCalendarDate";
-import { shiftAllPlanningSlotDatesByDelta } from "@/lib/planning/shiftPlanningSlotDates";
+import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
 
 export const runtime = "nodejs";
 
@@ -173,9 +172,10 @@ export async function GET(
       return {
         id: slot.id,
         location: slot.location,
-        slotDate: slot.slot_date != null && String(slot.slot_date).trim() !== ""
-          ? slot.slot_date
-          : planning.date,
+        slotDate:
+          slot.slot_date != null && String(slot.slot_date).trim() !== ""
+            ? String(slot.slot_date).trim()
+            : "",
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
@@ -211,6 +211,9 @@ export async function GET(
 
 /* =========================
    PUT : mettre à jour un planning
+   Ne met jamais à jour planning_slots (slot_date, horaires, capacités, notes, etc.).
+   La date stockée sur plannings.date est la date générale / affichage ; les journées
+   de grille et le public s’appuient sur planning_slots.slot_date.
    ========================= */
 export async function PUT(
   request: NextRequest,
@@ -251,7 +254,7 @@ export async function PUT(
     // Vérifier que le planning appartient au club
     const { data: existingPlanning, error: fetchError } = await supabase
       .from("plannings")
-      .select("id, date")
+      .select("id")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .single();
@@ -263,19 +266,12 @@ export async function PUT(
       );
     }
 
-    const oldPlanningDate = String((existingPlanning as { date?: string }).date || "").trim();
-
     const updatePayload: Record<string, unknown> = { updated_by: user.id };
     if (name !== undefined) updatePayload.name = String(name).trim();
     if (description !== undefined) updatePayload.description = description?.trim() || null;
     if (date !== undefined) updatePayload.date = String(date).trim();
     if (status !== undefined) updatePayload.status = status;
     if (eventId !== undefined) updatePayload.event_id = eventId || null;
-
-    const dateDeltaDays =
-      date !== undefined && oldPlanningDate && isValidIsoDateOnly(oldPlanningDate)
-        ? calendarDayDeltaIso(oldPlanningDate, String(date).trim())
-        : 0;
 
     const { data: updatedPlanning, error } = await supabase
       .from("plannings")
@@ -306,29 +302,9 @@ export async function PUT(
       );
     }
 
-    if (date !== undefined && dateDeltaDays !== 0) {
-      const shiftRes = await shiftAllPlanningSlotDatesByDelta(supabase, id, dateDeltaDays);
-      if (!shiftRes.ok) {
-        await supabase
-          .from("plannings")
-          .update({ date: oldPlanningDate, updated_by: user.id })
-          .eq("id", id)
-          .eq("user_id", guard.clubId);
-        console.error("[API][plannings][PUT] Décalage des créneaux:", shiftRes.message);
-        return NextResponse.json(
-          {
-            error: "Erreur lors de la mise à jour des dates des créneaux",
-            details: shiftRes.message,
-          },
-          { status: 500 }
-        );
-      }
-    }
-
     await syncMemberParticipationsWithPlanning(supabase, {
       planningId: id,
       name: updatedPlanning.name,
-      date: updatedPlanning.date,
       eventId: updatedPlanning.event_id ?? null,
     });
 
