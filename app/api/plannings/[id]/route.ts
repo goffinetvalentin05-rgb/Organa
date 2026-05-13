@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { syncMemberParticipationsWithPlanning } from "@/lib/planning/memberParticipations";
+import { isValidIsoDateOnly, calendarDayDeltaIso } from "@/lib/planning/isoCalendarDate";
+import { shiftAllPlanningSlotDatesByDelta } from "@/lib/planning/shiftPlanningSlotDates";
 
 export const runtime = "nodejs";
 
@@ -234,10 +236,22 @@ export async function PUT(
       }
     }
 
+    if (date !== undefined) {
+      if (typeof date !== "string" || !isValidIsoDateOnly(date)) {
+        return NextResponse.json(
+          {
+            error:
+              "La date du planning est obligatoire et doit être au format AAAA-MM-JJ (ex. 2026-05-21)",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // Vérifier que le planning appartient au club
     const { data: existingPlanning, error: fetchError } = await supabase
       .from("plannings")
-      .select("id")
+      .select("id, date")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .single();
@@ -249,12 +263,19 @@ export async function PUT(
       );
     }
 
-    const updatePayload: any = { updated_by: user.id };
+    const oldPlanningDate = String((existingPlanning as { date?: string }).date || "").trim();
+
+    const updatePayload: Record<string, unknown> = { updated_by: user.id };
     if (name !== undefined) updatePayload.name = String(name).trim();
     if (description !== undefined) updatePayload.description = description?.trim() || null;
-    if (date !== undefined) updatePayload.date = date;
+    if (date !== undefined) updatePayload.date = String(date).trim();
     if (status !== undefined) updatePayload.status = status;
     if (eventId !== undefined) updatePayload.event_id = eventId || null;
+
+    const dateDeltaDays =
+      date !== undefined && oldPlanningDate && isValidIsoDateOnly(oldPlanningDate)
+        ? calendarDayDeltaIso(oldPlanningDate, String(date).trim())
+        : 0;
 
     const { data: updatedPlanning, error } = await supabase
       .from("plannings")
@@ -277,12 +298,31 @@ export async function PUT(
       `)
       .single();
 
-    if (error) {
+    if (error || !updatedPlanning) {
       console.error("[API][plannings][PUT] Erreur Supabase:", error);
       return NextResponse.json(
-        { error: "Erreur lors de la mise à jour", details: error.message },
+        { error: "Erreur lors de la mise à jour", details: error?.message },
         { status: 500 }
       );
+    }
+
+    if (date !== undefined && dateDeltaDays !== 0) {
+      const shiftRes = await shiftAllPlanningSlotDatesByDelta(supabase, id, dateDeltaDays);
+      if (!shiftRes.ok) {
+        await supabase
+          .from("plannings")
+          .update({ date: oldPlanningDate, updated_by: user.id })
+          .eq("id", id)
+          .eq("user_id", guard.clubId);
+        console.error("[API][plannings][PUT] Décalage des créneaux:", shiftRes.message);
+        return NextResponse.json(
+          {
+            error: "Erreur lors de la mise à jour des dates des créneaux",
+            details: shiftRes.message,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     await syncMemberParticipationsWithPlanning(supabase, {

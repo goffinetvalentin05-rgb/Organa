@@ -32,6 +32,7 @@ import {
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions-shared";
+import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
 
 const planningInputClass =
   "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
@@ -142,7 +143,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   const [copying, setCopying] = useState(false);
 
   const [showEditPlanningModal, setShowEditPlanningModal] = useState(false);
-  const [editPlanningForm, setEditPlanningForm] = useState({ name: "", description: "" });
+  const [editPlanningForm, setEditPlanningForm] = useState({ name: "", description: "", date: "" });
   const [savingPlanningMeta, setSavingPlanningMeta] = useState(false);
 
   const formatDate = (value: string) => {
@@ -219,8 +220,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     loadPublicLink();
   }, [id]);
 
-  const loadPlanning = async () => {
-    setLoading(true);
+  const loadPlanning = async (options?: { quiet?: boolean }) => {
+    const quiet = options?.quiet === true;
+    if (!quiet) setLoading(true);
     setErrorMessage(null);
     try {
       const response = await fetch(`/api/plannings/${id}`, { cache: "no-store" });
@@ -234,7 +236,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       console.error("[PlanningDetail] Error:", error);
       setErrorMessage(error.message);
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   };
 
@@ -497,6 +499,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     setEditPlanningForm({
       name: planning.name,
       description: planning.description ?? "",
+      date: planning.date,
     });
     setShowEditPlanningModal(true);
   };
@@ -508,6 +511,16 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       return;
     }
 
+    const trimmedDate = editPlanningForm.date.trim();
+    if (!trimmedDate) {
+      toast.error("La date du planning est obligatoire");
+      return;
+    }
+    if (!isValidIsoDateOnly(trimmedDate)) {
+      toast.error("La date doit être valide (format AAAA-MM-JJ)");
+      return;
+    }
+
     setSavingPlanningMeta(true);
     try {
       const response = await fetch(`/api/plannings/${id}`, {
@@ -516,6 +529,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         body: JSON.stringify({
           name: trimmedTitle,
           description: editPlanningForm.description.trim() || null,
+          date: trimmedDate,
         }),
       });
 
@@ -525,17 +539,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         throw new Error(msg || "Erreur lors de l'enregistrement");
       }
 
-      const updated = data?.planning;
-      if (updated && planning) {
-        setPlanning({
-          ...planning,
-          name: updated.name,
-          description: updated.description ?? undefined,
-          date: updated.date ?? planning.date,
-          status: updated.status ?? planning.status,
-          event: updated.event ?? planning.event,
-        });
-      }
+      await loadPlanning({ quiet: true });
 
       toast.success("Planning mis à jour");
       setShowEditPlanningModal(false);
@@ -669,7 +673,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 type="button"
                 onClick={openEditPlanningModal}
                 className="inline-flex items-center gap-2"
-                title="Modifier le titre et la description"
+                title="Modifier le titre, la date et la description"
               >
                 <Edit className="w-4 h-4" />
                 Modifier
@@ -1118,7 +1122,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </button>
               </div>
               <p className="mt-2 text-sm text-slate-600">
-                Le lien public partagé ne change pas lorsque vous modifiez le titre.
+                Le lien public partagé ne change pas lorsque vous modifiez le titre ou la date. Les heures des
+                créneaux restent identiques ; seul le jour est décalé avec la date principale (y compris pour des
+                journées différentes sur un même planning).
               </p>
             </div>
 
@@ -1135,6 +1141,19 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   className={planningInputClass}
                   autoComplete="off"
                   autoFocus
+                />
+              </div>
+              <div>
+                <label htmlFor="edit-planning-date" className={planningLabelClass}>
+                  Date du planning *
+                </label>
+                <input
+                  id="edit-planning-date"
+                  type="date"
+                  value={editPlanningForm.date}
+                  onChange={(e) => setEditPlanningForm((f) => ({ ...f, date: e.target.value }))}
+                  className={planningInputClass}
+                  required
                 />
               </div>
               <div>
@@ -1159,7 +1178,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               <DashboardPrimaryButton
                 type="button"
                 onClick={() => void handleSavePlanningMeta()}
-                disabled={savingPlanningMeta}
+                disabled={
+                  savingPlanningMeta ||
+                  !editPlanningForm.date.trim() ||
+                  !isValidIsoDateOnly(editPlanningForm.date.trim())
+                }
                 icon="none"
                 className="rounded-xl"
               >
