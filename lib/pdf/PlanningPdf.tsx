@@ -298,24 +298,9 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
   slots,
   summary,
 }) => {
-  const uniqueSlotDates = Array.from(
-    new Set(
-      slots
-        .map((s) => (s.slotDate && String(s.slotDate).trim()) || "")
-        .filter(Boolean)
-    )
-  ).sort();
-
-  const planningHeaderDate =
-    uniqueSlotDates.length === 0
-      ? planning.date
-        ? formatLongFr(planning.date)
-        : "—"
-      : uniqueSlotDates.length === 1
-        ? formatLongFr(uniqueSlotDates[0])
-        : `Du ${formatLongFr(uniqueSlotDates[0])} au ${formatLongFr(
-            uniqueSlotDates[uniqueSlotDates.length - 1]
-          )}`;
+  const planningHeaderDate = planning.date?.trim()
+    ? formatLongFr(planning.date.trim())
+    : "—";
 
   return (
     <Document>

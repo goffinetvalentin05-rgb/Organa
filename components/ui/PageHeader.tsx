@@ -5,7 +5,7 @@ import { cn } from "./cn";
 
 export type PageHeaderProps = {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   actions?: ReactNode;
   className?: string;
 };
@@ -21,7 +21,9 @@ export default function PageHeader({ title, subtitle, actions, className }: Page
       <div className="min-w-0 flex-1 space-y-1.5 md:pr-4">
         <h1 className="text-2xl font-bold tracking-tight text-white drop-shadow-sm md:text-3xl">{title}</h1>
         {subtitle ? (
-          <p className="max-w-2xl text-sm font-medium leading-relaxed text-white/80 md:text-base">{subtitle}</p>
+          <div className="max-w-2xl space-y-1 text-sm font-medium leading-relaxed text-white/80 md:text-base [&>p]:m-0">
+            {subtitle}
+          </div>
         ) : null}
       </div>
       {actions ? (

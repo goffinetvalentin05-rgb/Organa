@@ -152,7 +152,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   const formatDate = (value: string) => {
     if (!value) return "-";
-    const date = new Date(value);
+    const normalized = value.includes("T") ? value : `${value.trim()}T12:00:00`;
+    const date = new Date(normalized);
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString(localeToIntl[locale], {
       weekday: "long",
@@ -685,7 +686,14 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
       <PageHeader
         title={planning.name}
-        subtitle={planning.description || formatDate(planning.date)}
+        subtitle={
+          <>
+            <p className="font-semibold text-white/95">{formatDate(planning.date)}</p>
+            {planning.description?.trim() ? (
+              <p className="text-sm font-normal text-white/75">{planning.description.trim()}</p>
+            ) : null}
+          </>
+        }
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <span className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold ${getStatusColor(planning.status)} border-current/20`}>
@@ -826,6 +834,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     <div>
                       <h3 className="font-semibold text-slate-900 text-[15px] sm:text-base">{slot.location}</h3>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 mt-0.5">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+                          {slot.slotDate?.trim()
+                            ? formatDate(slot.slotDate.trim())
+                            : "Date non renseignée"}
+                        </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 shrink-0" />
                           {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
