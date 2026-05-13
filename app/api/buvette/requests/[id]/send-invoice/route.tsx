@@ -5,6 +5,7 @@ import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
 
 export const runtime = "nodejs";
 
@@ -187,6 +188,9 @@ export async function POST(
       clientId = createdClient.id;
     }
 
+    const lineDescription = `Location buvette - ${reqData.event_type} - ${formattedDate}`;
+    const buvetteDocumentTitle = lineDescription.slice(0, DOCUMENT_TITLE_MAX_LENGTH);
+
     const pdfBuffer = await renderToBuffer(
       <FacturePdf
         company={{
@@ -212,6 +216,7 @@ export async function POST(
           currencySymbol,
           vatRate: 0,
           notes: `Date de réservation: ${formattedDate}`,
+          subject: buvetteDocumentTitle,
         }}
         lines={[
           {
@@ -241,7 +246,6 @@ N'hésite pas à nous contacter si tu as des questions.
     const finalTextMessage = customMessage || defaultMessage;
     const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
     const filename = `facture-buvette-${invoiceNumber}.pdf`;
-    const lineDescription = `Location buvette - ${reqData.event_type} - ${formattedDate}`;
 
     const { data, error } = await resendInstance.emails.send({
       from: fromEmail,
@@ -305,6 +309,7 @@ N'hésite pas à nous contacter si tu as des questions.
         total_tva: 0,
         total_ttc: amount,
         numero: invoiceNumber,
+        title: buvetteDocumentTitle,
         notes: `Facture générée depuis Buvette (request_id=${id})`,
       })
       .select("id")

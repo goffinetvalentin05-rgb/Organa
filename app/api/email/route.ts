@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const { data: documentData, error: documentError } = await supabase
       .from("documents")
       .select(
-        "id, numero, type, items, notes, total_ttc, date_echeance, client:clients(id, nom, email, adresse)"
+        "id, numero, title, type, items, notes, total_ttc, date_echeance, client:clients(id, nom, email, adresse)"
       )
       .eq("id", documentId)
       .eq("user_id", guard.clubId)
@@ -114,10 +114,11 @@ export async function POST(request: NextRequest) {
     }
 
     const document = documentData;
+    const docTitle = String((document as { title?: string }).title || "").trim();
     const sujet =
       expectedType === "quote"
-        ? `Ta cotisation n°${document.numero || ""} - ${parametres.nomEntreprise || "Obillz"}`
-        : `Votre facture n°${document.numero || ""} - ${parametres.nomEntreprise || "Obillz"}`;
+        ? `Ta cotisation n°${document.numero || ""}${docTitle ? ` — ${docTitle}` : ""} - ${parametres.nomEntreprise || "Obillz"}`
+        : `Votre facture n°${document.numero || ""}${docTitle ? ` — ${docTitle}` : ""} - ${parametres.nomEntreprise || "Obillz"}`;
 
     const client = Array.isArray(document.client)
       ? document.client[0]
@@ -205,6 +206,7 @@ export async function POST(request: NextRequest) {
                 expectedType === "quote"
                   ? `<p>Bonjour ${firstName},</p>
               <p>Tu trouveras en piece jointe ta cotisation n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
+              ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}
               <p><strong>Montant total :</strong> ${montantFormate}</p>
               <p><strong>Membre :</strong> ${clientNom}</p>
               ${dueDateLine}
@@ -212,6 +214,7 @@ export async function POST(request: NextRequest) {
               <p>A bientot !</p>`
                   : `<p>Bonjour ${firstName},</p>
               <p>Tu trouveras en piece jointe ta facture n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
+              ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}
               <p><strong>Montant total :</strong> ${montantFormate}</p>
               <p><strong>Membre :</strong> ${clientNom}</p>
               ${dueDateLine}

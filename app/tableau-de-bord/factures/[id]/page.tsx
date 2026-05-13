@@ -6,12 +6,13 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Eye, Download, Mail, Trash, Calendar } from "@/lib/icons";
+import { Eye, Download, Mail, Trash, Calendar, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import LinkInvoiceToEventModal, {
   type EventListItem,
 } from "./LinkInvoiceToEventModal";
+import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
 import {
   PageLayout,
   PageHeader,
@@ -23,6 +24,7 @@ import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 interface Facture {
   id: string;
   numero: string;
+  title?: string;
   clientId?: string | null;
   client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
   lignes: any[];
@@ -64,6 +66,7 @@ export default function FactureDetailPage() {
   const [eventsLoading, setEventsLoading] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
   const [linkSaving, setLinkSaving] = useState(false);
+  const [identityModalOpen, setIdentityModalOpen] = useState(false);
 
   const loadFacture = useCallback(async () => {
     if (!id) return;
@@ -345,9 +348,20 @@ export default function FactureDetailPage() {
 
       <PageHeader
         title={facture.numero}
-        subtitle={`${t("dashboard.common.client")}: ${facture.client?.nom || t("dashboard.common.unknownClient")}`}
+        subtitle={`${t("dashboard.common.client")}: ${facture.client?.nom || t("dashboard.common.unknownClient")}${
+          facture.title ? ` · ${facture.title}` : ""
+        }`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            <ActionButton
+              type="button"
+              onClick={() => setIdentityModalOpen(true)}
+              className="inline-flex items-center gap-2"
+              title={t("dashboard.common.edit")}
+            >
+              <Edit className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+            </ActionButton>
             <ActionButton
               type="button"
               onClick={handleEnvoyerEmail}
@@ -443,6 +457,9 @@ export default function FactureDetailPage() {
             <p className="text-sm text-slate-500 mt-1">
               N° {facture.numero}
             </p>
+            {facture.title ? (
+              <p className="text-sm font-medium text-slate-700 mt-2">{facture.title}</p>
+            ) : null}
             <div className="mt-3 space-y-1 text-sm text-slate-600">
               <div className="flex items-center justify-between gap-4">
                 <span>{t("dashboard.invoices.detail.createdAt")}</span>
@@ -639,6 +656,20 @@ export default function FactureDetailPage() {
         onSelectedEventIdChange={setSelectedEventId}
         onConfirm={handleConfirmEventLink}
         saving={linkSaving}
+      />
+
+      <EditDocumentIdentityModal
+        open={identityModalOpen}
+        onClose={() => setIdentityModalOpen(false)}
+        kind="invoice"
+        documentId={id}
+        initialNumero={facture.numero}
+        initialTitle={facture.title || ""}
+        onSaved={(next) => {
+          setFacture((prev) => (prev ? { ...prev, numero: next.numero, title: next.title } : prev));
+          setIdentityModalOpen(false);
+          toast.success(t("dashboard.documents.identityEdit.success"));
+        }}
       />
 
       {/* Statut et notes */}

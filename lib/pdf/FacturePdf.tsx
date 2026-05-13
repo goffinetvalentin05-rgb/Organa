@@ -34,6 +34,8 @@ interface FacturePdfProps {
     currencySymbol?: string;
     vatRate?: number;
     notes?: string;
+    /** Intitulé métier (ex. facture sponsoring), affiché sous « FACTURE » */
+    subject?: string;
   };
   lines: Array<{
     label: string;
@@ -102,6 +104,20 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
               <Text style={[styles.documentType, dynamicStyles.documentType]}>
                 FACTURE
               </Text>
+              {document.subject ? (
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: "#64748B",
+                    marginTop: 4,
+                    textAlign: "right",
+                    maxWidth: 200,
+                  }}
+                  wrap
+                >
+                  {document.subject}
+                </Text>
+              ) : null}
               <View style={styles.metaBox}>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>Numéro</Text>

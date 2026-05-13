@@ -665,7 +665,25 @@
       "noLines": "Keine Positionen",
       "totalHT": "Zwischensumme:",
       "vatLabel": "MwSt.:",
-      "totalTTC": "Total:"
+      "totalTTC": "Total:",
+      "documentTitle": "Titel"
+    },
+    "documents": {
+      "identityEdit": {
+        "modalTitleInvoice": "Referenz und Titel der Rechnung",
+        "modalTitleQuote": "Referenz und Titel des Mitgliedsbeitrags",
+        "modalHint": "Diese Angaben erscheinen in der Oberfläche, in Listen und im PDF.",
+        "referenceInvoice": "Nummer / Referenz",
+        "referenceQuote": "Nummer / Referenz",
+        "titleLabel": "Titel",
+        "save": "Speichern",
+        "success": "Änderungen gespeichert.",
+        "errorEmpty": "Nummer und Titel sind erforderlich.",
+        "errorTooLong": "Nummer oder Titel überschreitet die maximale Länge.",
+        "errorDuplicate": "Diese Referenz wird bereits für ein anderes Dokument desselben Typs in Ihrem Verein verwendet.",
+        "errorGeneric": "Speichern nicht möglich.",
+        "maxChars": "Maximal {max} Zeichen"
+      }
     },
     "limits": {
       "title": "Limit des Gratisplans erreicht",

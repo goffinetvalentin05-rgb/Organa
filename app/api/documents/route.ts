@@ -6,6 +6,10 @@ import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
+import {
+  DOCUMENT_NUMERO_MAX_LENGTH,
+  DOCUMENT_TITLE_MAX_LENGTH,
+} from "@/lib/documents/identityLimits";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -26,7 +30,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("documents")
       .select(
-        "id, numero, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(*)"
+        "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(*)"
       )
       .eq("user_id", guard.clubId);
 
@@ -177,6 +181,17 @@ export async function POST(request: NextRequest) {
       ? `COT-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`
       : `FAC-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`;
 
+    const firstDesignation = lignes
+      .map((l: { designation?: string }) => String(l?.designation || "").trim())
+      .find((d: string) => d.length > 0);
+    const defaultTitle =
+      firstDesignation ||
+      (type === "quote" ? "Cotisation" : "Facture");
+    const title =
+      defaultTitle.length > DOCUMENT_TITLE_MAX_LENGTH
+        ? defaultTitle.slice(0, DOCUMENT_TITLE_MAX_LENGTH)
+        : defaultTitle;
+
     // Préparer les données d'insertion avec les noms de colonnes exacts
     // Ne jamais envoyer date_echeance si elle est vide/undefined (laisser le default de la DB)
     const documentData: any = {
@@ -190,6 +205,7 @@ export async function POST(request: NextRequest) {
       total_tva: totalTVA,
       total_ttc: totalTTC,
       numero: numero,
+      title,
       created_by: user.id,
       updated_by: user.id,
     };
@@ -374,6 +390,7 @@ function formatDocument(
   return {
     id: doc.id,
     numero: doc.numero || "",
+    title: doc.title || "",
     type: doc.type,
     statut: doc.status || "brouillon",
     dateCreation: doc.date_creation || "",
@@ -422,7 +439,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes, eventId } = body;
+    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes, eventId, numero, title } =
+      body;
 
     if (!id) {
       return NextResponse.json(
@@ -441,7 +459,7 @@ export async function PATCH(request: NextRequest) {
     // Vérifier que le document appartient au club
     const { data: existingDoc, error: fetchError } = await supabase
       .from("documents")
-      .select("id, numero, event_id")
+      .select("id, numero, title, event_id, type")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .single();
@@ -454,10 +472,67 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    if (existingDoc.type !== type) {
+      return NextResponse.json(
+        { error: "Le type de document ne correspond pas" },
+        { status: 400 }
+      );
+    }
+
     const previousEventId = existingDoc.event_id as string | null;
 
     // Préparer les données de mise à jour (ne pas écraser le statut si non fourni)
     const updateData: any = {};
+
+    const identityKeysProvided = numero !== undefined || title !== undefined;
+    if (identityKeysProvided) {
+      const currentNum = String(existingDoc.numero ?? "").trim();
+      const currentTitle = String((existingDoc as { title?: string | null }).title ?? "").trim();
+      const nextNumero = numero !== undefined ? String(numero).trim() : currentNum;
+      const nextTitle = title !== undefined ? String(title).trim() : currentTitle;
+
+      if (!nextNumero || !nextTitle) {
+        return NextResponse.json(
+          { error: "Le numéro et le titre sont obligatoires" },
+          { status: 400 }
+        );
+      }
+      if (
+        nextNumero.length > DOCUMENT_NUMERO_MAX_LENGTH ||
+        nextTitle.length > DOCUMENT_TITLE_MAX_LENGTH
+      ) {
+        return NextResponse.json(
+          { error: "Le numéro ou le titre dépasse la longueur maximale autorisée" },
+          { status: 400 }
+        );
+      }
+
+      if (nextNumero !== currentNum) {
+        const { data: dupRow } = await supabase
+          .from("documents")
+          .select("id")
+          .eq("user_id", guard.clubId)
+          .eq("type", existingDoc.type)
+          .neq("id", id)
+          .is("deleted_at", null)
+          .eq("numero", nextNumero)
+          .maybeSingle();
+
+        if (dupRow?.id) {
+          return NextResponse.json(
+            {
+              error:
+                "Ce numéro est déjà utilisé pour un autre document du même type dans votre club",
+            },
+            { status: 409 }
+          );
+        }
+      }
+
+      updateData.numero = nextNumero;
+      updateData.title = nextTitle;
+    }
+
     if (statut !== undefined) {
       updateData.status = statut;
     }
@@ -553,7 +628,7 @@ export async function PATCH(request: NextRequest) {
       .update(updateData)
       .eq("id", id)
       .eq("user_id", guard.clubId)
-      .select("id, numero, type, event_id")
+      .select("id, numero, title, type, event_id")
       .single();
 
     if (updateError) {
@@ -563,6 +638,15 @@ export async function PATCH(request: NextRequest) {
         details: updateError.details,
         hint: updateError.hint,
       });
+      if (updateError.code === "23505") {
+        return NextResponse.json(
+          {
+            error:
+              "Ce numéro est déjà utilisé pour un autre document du même type dans votre club",
+          },
+          { status: 409 }
+        );
+      }
       return NextResponse.json(
         { 
           error: "Erreur lors de la mise à jour du document",
@@ -580,6 +664,7 @@ export async function PATCH(request: NextRequest) {
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/devis");
+    revalidatePath(`/tableau-de-bord/devis/${id}`);
     revalidatePath("/tableau-de-bord/factures");
     revalidatePath(`/tableau-de-bord/factures/${id}`);
     revalidatePath("/tableau-de-bord/evenements");
@@ -593,6 +678,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({
       id: updatedDoc.id.toString(),
       numero: updatedDoc.numero,
+      title: (updatedDoc as { title?: string }).title ?? "",
       type: updatedDoc.type,
       eventId: updatedDoc.event_id ?? null,
     });

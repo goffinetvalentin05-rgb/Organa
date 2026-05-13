@@ -37,6 +37,8 @@ interface DevisPdfProps {
     vatRate?: number;
     notes?: string;
     type?: "quote" | "invoice";
+    /** Intitulé métier affiché sous le type de document (cotisation / devis) */
+    subject?: string;
   };
   lines: Array<{
     label: string;
@@ -117,6 +119,20 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
               <Text style={[styles.documentType, dynamicStyles.documentType]}>
                 {title}
               </Text>
+              {document.subject ? (
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: "#64748B",
+                    marginTop: 4,
+                    textAlign: "right",
+                    maxWidth: 200,
+                  }}
+                  wrap
+                >
+                  {document.subject}
+                </Text>
+              ) : null}
               <View style={styles.metaBox}>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{numberLabel}</Text>

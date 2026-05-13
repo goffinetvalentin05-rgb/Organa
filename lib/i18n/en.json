@@ -667,7 +667,25 @@
       "noLines": "No line items",
       "totalHT": "Subtotal:",
       "vatLabel": "VAT:",
-      "totalTTC": "Total:"
+      "totalTTC": "Total:",
+      "documentTitle": "Title"
+    },
+    "documents": {
+      "identityEdit": {
+        "modalTitleInvoice": "Invoice reference and title",
+        "modalTitleQuote": "Membership fee reference and title",
+        "modalHint": "These appear on screen, in lists, and on the PDF.",
+        "referenceInvoice": "Number / reference",
+        "referenceQuote": "Number / reference",
+        "titleLabel": "Title",
+        "save": "Save",
+        "success": "Changes saved.",
+        "errorEmpty": "Reference and title are required.",
+        "errorTooLong": "The reference or title exceeds the maximum length.",
+        "errorDuplicate": "This reference is already used for another document of the same type in your club.",
+        "errorGeneric": "Could not save changes.",
+        "maxChars": "Up to {max} characters"
+      }
     },
     "limits": {
       "title": "Free plan limit reached",

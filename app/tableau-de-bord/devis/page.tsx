@@ -19,6 +19,7 @@ import {
 interface Devis {
   id: string;
   numero: string;
+  title?: string;
   client?: { nom?: string };
   lignes: any[];
   statut: string;
@@ -146,10 +147,11 @@ export default function DevisPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-sm">
+              <table className="w-full min-w-[800px] text-left text-sm">
                 <thead>
                   <tr className={dashboardTableHeadRowClass}>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.number")}</th>
+                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.documentTitle")}</th>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.client")}</th>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.date")}</th>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
@@ -166,6 +168,9 @@ export default function DevisPage() {
                         className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
                       >
                         <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{devisItem.numero}</td>
+                        <td className="max-w-[200px] truncate px-4 py-3 text-slate-700 sm:max-w-[260px] sm:px-6">
+                          {devisItem.title || "—"}
+                        </td>
                         <td className="max-w-[220px] truncate px-4 py-3 text-slate-700 sm:max-w-[280px] sm:px-6">
                           {devisItem.client?.nom || t("dashboard.common.unknownClient")}
                         </td>

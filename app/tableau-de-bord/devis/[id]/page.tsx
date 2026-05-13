@@ -10,7 +10,7 @@ import {
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Eye, Download, Mail, Trash } from "@/lib/icons";
+import { Eye, Download, Mail, Trash, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import {
@@ -19,10 +19,12 @@ import {
   GlassCard,
   ActionButton,
 } from "@/components/ui";
+import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
 
 interface Devis {
   id: string;
   numero: string;
+  title?: string;
   clientId?: string | null;
   client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
   lignes: any[];
@@ -55,6 +57,7 @@ export default function DevisDetailPage() {
   const [envoiEmail, setEnvoiEmail] = useState(false);
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
+  const [identityModalOpen, setIdentityModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -251,9 +254,20 @@ export default function DevisDetailPage() {
 
       <PageHeader
         title={devis.numero}
-        subtitle={`${t("dashboard.common.client")}: ${devis.client?.nom || t("dashboard.common.unknownClient")}`}
+        subtitle={`${t("dashboard.common.client")}: ${devis.client?.nom || t("dashboard.common.unknownClient")}${
+          devis.title ? ` · ${devis.title}` : ""
+        }`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            <ActionButton
+              type="button"
+              onClick={() => setIdentityModalOpen(true)}
+              className="inline-flex items-center gap-2"
+              title={t("dashboard.common.edit")}
+            >
+              <Edit className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+            </ActionButton>
             <ActionButton
               type="button"
               onClick={handleEnvoyerEmail}
@@ -348,6 +362,9 @@ export default function DevisDetailPage() {
             <p className="text-sm text-slate-500 mt-1">
               N° {devis.numero}
             </p>
+            {devis.title ? (
+              <p className="text-sm font-medium text-slate-700 mt-2">{devis.title}</p>
+            ) : null}
             <div className="mt-3 space-y-1 text-sm text-slate-600">
               <div className="flex items-center justify-between gap-4">
                 <span>{t("dashboard.quotes.detail.createdAt")}</span>
@@ -473,6 +490,20 @@ export default function DevisDetailPage() {
           </div>
         )}
       </div>
+
+      <EditDocumentIdentityModal
+        open={identityModalOpen}
+        onClose={() => setIdentityModalOpen(false)}
+        kind="quote"
+        documentId={id}
+        initialNumero={devis.numero}
+        initialTitle={devis.title || ""}
+        onSaved={(next) => {
+          setDevis((prev) => (prev ? { ...prev, numero: next.numero, title: next.title } : prev));
+          setIdentityModalOpen(false);
+          toast.success(t("dashboard.documents.identityEdit.success"));
+        }}
+      />
 
       <GlassCard padding="md">
         <div className="mb-4">

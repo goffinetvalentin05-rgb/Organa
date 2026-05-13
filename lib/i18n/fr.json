@@ -545,7 +545,25 @@
       "noLines": "Aucune ligne",
       "totalHT": "Total HT:",
       "vatLabel": "TVA:",
-      "totalTTC": "Total TTC:"
+      "totalTTC": "Total TTC:",
+      "documentTitle": "Titre"
+    },
+    "documents": {
+      "identityEdit": {
+        "modalTitleInvoice": "Référence et titre de la facture",
+        "modalTitleQuote": "Référence et titre de la cotisation",
+        "modalHint": "Ces informations apparaissent sur l’écran, dans les listes et sur le PDF.",
+        "referenceInvoice": "Numéro / référence",
+        "referenceQuote": "Numéro / référence",
+        "titleLabel": "Titre",
+        "save": "Enregistrer",
+        "success": "Modifications enregistrées.",
+        "errorEmpty": "Le numéro et le titre sont obligatoires.",
+        "errorTooLong": "Le numéro ou le titre dépasse la longueur maximale autorisée.",
+        "errorDuplicate": "Ce numéro est déjà utilisé pour une autre facture ou cotisation du même type dans votre club.",
+        "errorGeneric": "Impossible d’enregistrer les modifications.",
+        "maxChars": "Maximum {max} caractères"
+      }
     },
     "limits": {
       "title": "Limite du plan gratuit atteinte",
