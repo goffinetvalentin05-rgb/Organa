@@ -73,6 +73,7 @@ interface PublicPlanningSlotRow {
   start_time: string;
   end_time: string;
   required_people: number;
+  notes?: string | null;
   ordre: number;
 }
 
@@ -242,7 +243,7 @@ export async function GET(
 
     const { data: slots, error: slotsError } = await supabase
       .from("planning_slots")
-      .select("id, location, slot_date, start_time, end_time, required_people, ordre")
+      .select("id, location, slot_date, start_time, end_time, required_people, notes, ordre")
       .eq("planning_id", planning.id)
       .order("slot_date", { ascending: true })
       .order("ordre", { ascending: true });
@@ -253,7 +254,7 @@ export async function GET(
     } else {
       const { data: legacySlots, error: legacyError } = await supabase
         .from("planning_slots")
-        .select("id, location, start_time, end_time, required_people, ordre")
+        .select("id, location, start_time, end_time, required_people, notes, ordre")
         .eq("planning_id", planning.id)
         .order("ordre", { ascending: true });
       slotsRows =
@@ -341,6 +342,7 @@ export async function GET(
         startTime: slot.start_time,
         endTime: slot.end_time,
         requiredPeople: slot.required_people,
+        notes: slot.notes ?? null,
         assignedCount: slotAssignments.length,
         isFull: slotAssignments.length >= slot.required_people,
         assignments: slotAssignments,

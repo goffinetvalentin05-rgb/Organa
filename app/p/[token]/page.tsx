@@ -26,6 +26,7 @@ interface PublicSlot {
   startTime: string;
   endTime: string;
   requiredPeople: number;
+  notes?: string | null;
   assignedCount: number;
   isFull: boolean;
   assignments: PublicAssignment[];
@@ -271,6 +272,9 @@ export default function PublicPlanningPage({
                     </span>
                   )}
                 </div>
+                {slot.notes?.trim() ? (
+                  <p className="mt-2 text-sm leading-snug text-slate-600 italic">{slot.notes.trim()}</p>
+                ) : null}
               </div>
 
               <div className="p-4 sm:p-5 flex flex-wrap gap-3">
@@ -312,6 +316,9 @@ export default function PublicPlanningPage({
                   {selectedSlot.location} • {formatSlotDateShort(selectedSlot.slotDate)} •{" "}
                   {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                 </p>
+                {selectedSlot.notes?.trim() ? (
+                  <p className="mt-1 text-sm text-slate-600 italic">{selectedSlot.notes.trim()}</p>
+                ) : null}
               </div>
               <button onClick={closeSignupModal} className="p-1.5 rounded hover:bg-slate-100">
                 <X className="w-4 h-4" />
