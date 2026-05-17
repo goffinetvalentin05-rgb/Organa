@@ -7,6 +7,11 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
+import {
+  formatPlanningPdfLongFr,
+  formatPlanningPdfSlotDateShort,
+  formatPlanningPdfTime,
+} from "@/lib/pdf/planningPdfFormatters";
 
 // Styles pour le PDF - Simple, noir et blanc, lisible à l'impression
 const styles = StyleSheet.create({
@@ -264,34 +269,6 @@ interface PlanningPdfProps {
   };
 }
 
-// Dates longues (en-tête PDF) : midi local pour éviter les décalages fuseau sur YYYY-MM-DD
-const formatLongFr = (dateString: string) => {
-  const date = new Date(`${dateString}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return date.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-};
-
-// Fonction pour formater l'heure
-const formatTime = (time: string) => {
-  return time?.slice(0, 5) || time;
-};
-
-const formatSlotDateShort = (dateString: string | undefined) => {
-  if (!dateString) return "—";
-  const date = new Date(`${dateString}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return date.toLocaleDateString("fr-FR", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-};
-
 export const PlanningPdf: React.FC<PlanningPdfProps> = ({
   club,
   planning,
@@ -299,7 +276,7 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
   summary,
 }) => {
   const planningHeaderDate = planning.date?.trim()
-    ? formatLongFr(planning.date.trim())
+    ? formatPlanningPdfLongFr(planning.date.trim())
     : "—";
 
   return (
@@ -394,7 +371,9 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
                 ]}
               >
                 <View style={styles.colDate}>
-                  <Text style={styles.tableCell}>{formatSlotDateShort(slot.slotDate)}</Text>
+                  <Text style={styles.tableCell}>
+                    {formatPlanningPdfSlotDateShort(slot.slotDate)}
+                  </Text>
                 </View>
 
                 {/* Location */}
@@ -408,7 +387,8 @@ export const PlanningPdf: React.FC<PlanningPdfProps> = ({
                 {/* Time */}
                 <View style={styles.colTime}>
                   <Text style={styles.timeText}>
-                    {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                    {formatPlanningPdfTime(slot.startTime)} -{" "}
+                    {formatPlanningPdfTime(slot.endTime)}
                   </Text>
                 </View>
 

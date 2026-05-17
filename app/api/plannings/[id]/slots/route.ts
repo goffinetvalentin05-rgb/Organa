@@ -261,7 +261,9 @@ export async function PUT(
         ? String(row.slot_date)
         : typeof slotDate === "string" && slotDate.trim() !== ""
           ? slotDate.trim()
-          : planningDate;
+          : /* Uniquement pour lignes legacy sans slot_date en base — ne jamais recopier
+             plannings.date ici lors d’un simple changement de date générale côté planning. */
+            planningDate;
 
     revalidatePath(`/tableau-de-bord/plannings/${planningId}`);
 

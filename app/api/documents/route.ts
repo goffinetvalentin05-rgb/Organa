@@ -622,7 +622,7 @@ export async function PATCH(request: NextRequest) {
 
     updateData.updated_by = user.id;
 
-    // Mettre à jour le document
+    // Garde-fou : toujours filtrer par user_id (club) — ne jamais faire d’UPDATE documents global.
     const { data: updatedDoc, error: updateError } = await supabase
       .from("documents")
       .update(updateData)
