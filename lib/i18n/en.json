@@ -718,6 +718,29 @@
           "description": "Manage who can access this club and what each person can view or edit.",
           "cta": "Manage access"
         },
+        "usersAccessLocked": {
+          "badge": "Available with Team",
+          "description": "Invite several committee members and set their permissions per module.",
+          "cta": "Discover Obillz Team"
+        },
+        "teamUpgrade": {
+          "title": "Work together with Obillz Team",
+          "description": "Your current plan lets you use Obillz with the club's main account. To invite other committee members and set custom permissions, upgrade to Obillz Team.",
+          "benefit1": "Invite several committee members",
+          "benefit2": "Set permissions per module",
+          "benefit3": "Avoid sharing a single account",
+          "benefit4": "Secure access to club data",
+          "benefit5": "Better traceability of actions",
+          "price": "CHF 490/year or CHF 45/month",
+          "priceHint": "Only CHF 100/year more than the Standard plan.",
+          "billingYearly": "Yearly",
+          "billingMonthly": "Monthly",
+          "ctaPrimary": "Upgrade to Obillz Team",
+          "ctaSecondary": "Contact us",
+          "checkoutLoading": "Redirecting...",
+          "checkoutUnavailable": "Online checkout for Obillz Team is not configured yet. Contact us at contact@obillz.com.",
+          "checkoutError": "Something went wrong. Please try again."
+        },
         "accordions": {
           "memberFields": "Member fields",
           "memberCategories": "Categories / status",

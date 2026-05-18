@@ -296,7 +296,8 @@ export async function canPerformWriteAction(): Promise<boolean> {
 export async function activateSubscription(
   userId: string,
   billingCycle: "monthly" | "yearly",
-  stripeSubscriptionId?: string
+  stripeSubscriptionId?: string,
+  subscriptionTier: "standard" | "team" = "standard"
 ): Promise<void> {
   const supabase = await createClient();
 
@@ -316,6 +317,7 @@ export async function activateSubscription(
     subscription_started_at: now.toISOString(),
     subscription_ends_at: endsAt.toISOString(),
     plan: "pro", // Garder pour rétrocompatibilité
+    subscription_tier: subscriptionTier,
   };
 
   if (stripeSubscriptionId) {

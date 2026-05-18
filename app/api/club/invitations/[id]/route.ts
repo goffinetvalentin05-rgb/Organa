@@ -5,6 +5,7 @@ import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import { logAudit, extractRequestMetadata } from "@/lib/auth/audit";
 import { buildInvitationUrl } from "@/lib/auth/invitations";
 import { sendInvitationEmail } from "@/lib/email/invite-email";
+import { requireTeamPlan } from "@/lib/billing/teamPlan";
 
 export const runtime = "nodejs";
 
@@ -33,6 +34,9 @@ export async function DELETE(
 
   const guard = await requirePermission(PERMISSIONS.MANAGE_USERS);
   if ("error" in guard) return guard.error;
+
+  const teamPlan = await requireTeamPlan(guard.clubId);
+  if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   const supabase = await createClient();
   const { data: invitation } = await supabase
@@ -104,6 +108,9 @@ export async function POST(
 
   const guard = await requirePermission(PERMISSIONS.MANAGE_USERS);
   if ("error" in guard) return guard.error;
+
+  const teamPlan = await requireTeamPlan(guard.clubId);
+  if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   const supabase = await createClient();
   const { data: invitation } = await supabase

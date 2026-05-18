@@ -12,12 +12,10 @@ import {
   Loader,
   Building2,
   CheckCircle,
-  UserCheck,
   Users,
   Wallet,
   Shield,
   Settings,
-  ArrowRight,
 } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
@@ -25,6 +23,7 @@ import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
+import UsersAccessCard from "@/components/billing/UsersAccessCard";
 
 // Types pour les infos d'abonnement
 interface SubscriptionInfo {
@@ -68,6 +67,7 @@ export default function ParametresPage() {
   const { t } = useI18n();
   const [parametres, setParametres] = useState<Parametres | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
+  const [canManageTeamAccess, setCanManageTeamAccess] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   // State initial vide - sera hydraté depuis la DB
@@ -246,6 +246,9 @@ export default function ParametresPage() {
       if (response.ok) {
         const data = await parseResponseBody(response);
         setSubscription(data.subscription || null);
+        setCanManageTeamAccess(
+          data.product?.canManageTeamAccess === true
+        );
       }
     } catch (error) {
       console.error("Erreur lors de la récupération du plan", error);
@@ -545,33 +548,10 @@ export default function ParametresPage() {
           </div>
         )}
 
-        <Link href="/tableau-de-bord/parametres/utilisateurs" className="group block">
-          <GlassCard
-            padding="lg"
-            className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex min-w-0 items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-lg shadow-blue-900/35">
-                  <UserCheck className="h-6 w-6" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-lg font-bold text-white drop-shadow-sm">
-                    {t("dashboard.settings.layout.sections.usersAccess")}
-                  </h2>
-                  <p className="mt-1 text-sm font-medium leading-relaxed text-white/75">
-                    {t("dashboard.settings.layout.usersAccess.description")}
-                  </p>
-                </div>
-              </div>
-              <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/30 bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-900/25 transition group-hover:opacity-95 sm:py-2.5">
-                {t("dashboard.settings.layout.usersAccess.cta")}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </GlassCard>
-        </Link>
-
+        <UsersAccessCard
+          canManageTeamAccess={canManageTeamAccess}
+          loading={loadingPlan}
+        />
         <SectionCard
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}

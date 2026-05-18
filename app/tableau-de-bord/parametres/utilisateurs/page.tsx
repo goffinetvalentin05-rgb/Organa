@@ -13,6 +13,8 @@ import {
   type Permission,
 } from "@/lib/auth/permissions-shared";
 import { usePermissions } from "@/lib/auth/permissions-client";
+import TeamUpgradeModal from "@/components/billing/TeamUpgradeModal";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface MemberDTO {
   id: string;
@@ -112,8 +114,21 @@ export default function UtilisateursPage() {
   );
   const [emailStatus, setEmailStatus] = useState<EmailStatus | null>(null);
   const [lastInvite, setLastInvite] = useState<PendingInvite | null>(null);
+  const [canManageTeamAccess, setCanManageTeamAccess] = useState<boolean | null>(
+    null
+  );
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const canManage = myPerms.has("manage_users");
+
+  useEffect(() => {
+    fetch("/api/me", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        setCanManageTeamAccess(data?.product?.canManageTeamAccess === true);
+      })
+      .catch(() => setCanManageTeamAccess(false));
+  }, []);
 
   const fetchAll = async () => {
     setLoadingMembers(true);
@@ -125,7 +140,11 @@ export default function UtilisateursPage() {
       ]);
       if (!resM.ok) {
         const j = await resM.json().catch(() => ({}));
-        throw new Error(j?.error || `HTTP ${resM.status}`);
+        if (j?.error === "TEAM_PLAN_REQUIRED") {
+          setCanManageTeamAccess(false);
+          throw new Error(j.message || "Obillz Équipe requis");
+        }
+        throw new Error(j?.error || j?.message || `HTTP ${resM.status}`);
       }
       const dataM = await resM.json();
       setMembers((dataM.members ?? []) as MemberDTO[]);
@@ -147,12 +166,12 @@ export default function UtilisateursPage() {
   };
 
   useEffect(() => {
-    if (!myPerms.loading && canManage) {
+    if (!myPerms.loading && canManage && canManageTeamAccess === true) {
       fetchAll();
     } else if (!myPerms.loading) {
       setLoadingMembers(false);
     }
-  }, [myPerms.loading, canManage]);
+  }, [myPerms.loading, canManage, canManageTeamAccess]);
 
   // ============================================
   // Helpers UI
@@ -428,6 +447,43 @@ export default function UtilisateursPage() {
           ← Retour aux paramètres
         </Link>
       </div>
+    );
+  }
+
+  if (canManageTeamAccess === null) {
+    return (
+      <div className="text-white/80 text-sm">Chargement...</div>
+    );
+  }
+
+  if (!canManageTeamAccess) {
+    return (
+      <>
+        <div className="rounded-2xl border border-white/20 bg-white/10 p-8 shadow-lg backdrop-blur-md">
+          <span className="inline-flex rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-200">
+            Disponible avec Équipe
+          </span>
+          <h1 className="mt-3 text-2xl font-bold text-white">
+            Utilisateurs & accès
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75">
+            Invitez plusieurs membres du comité et définissez leurs droits selon
+            les modules. Cette fonctionnalité est incluse dans Obillz Équipe.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <DashboardPrimaryButton type="button" onClick={() => setUpgradeOpen(true)}>
+              Découvrir Obillz Équipe
+            </DashboardPrimaryButton>
+            <Link
+              href="/tableau-de-bord/parametres"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+            >
+              ← Retour aux paramètres
+            </Link>
+          </div>
+        </div>
+        <TeamUpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
+      </>
     );
   }
 

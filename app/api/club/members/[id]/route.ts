@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth/permissions";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 import type { ClubRole } from "@/lib/auth/rbac";
+import { requireTeamPlan } from "@/lib/billing/teamPlan";
 
 export const runtime = "nodejs";
 
@@ -42,6 +43,9 @@ export async function PATCH(
 
   const guard = await requirePermission(PERMISSIONS.MANAGE_USERS);
   if ("error" in guard) return guard.error;
+
+  const teamPlan = await requireTeamPlan(guard.clubId);
+  if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   let body: any;
   try {
@@ -235,6 +239,9 @@ export async function DELETE(
 
   const guard = await requirePermission(PERMISSIONS.MANAGE_USERS);
   if ("error" in guard) return guard.error;
+
+  const teamPlan = await requireTeamPlan(guard.clubId);
+  if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   const supabase = await createClient();
   const { data: target } = await supabase

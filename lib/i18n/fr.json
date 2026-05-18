@@ -596,6 +596,29 @@
           "description": "Gérez les personnes autorisées sur ce club et ce que chacune peut voir ou modifier.",
           "cta": "Gérer les accès"
         },
+        "usersAccessLocked": {
+          "badge": "Disponible avec Équipe",
+          "description": "Invitez plusieurs membres du comité et définissez leurs droits selon les modules.",
+          "cta": "Découvrir Obillz Équipe"
+        },
+        "teamUpgrade": {
+          "title": "Travaillez à plusieurs avec Obillz Équipe",
+          "description": "Votre formule actuelle permet d'utiliser Obillz avec le compte principal du club. Pour inviter d'autres membres du comité et définir des droits personnalisés, passez à Obillz Équipe.",
+          "benefit1": "Inviter plusieurs membres du comité",
+          "benefit2": "Définir les droits selon les modules",
+          "benefit3": "Éviter de partager un seul compte",
+          "benefit4": "Sécuriser l'accès aux données du club",
+          "benefit5": "Garder une meilleure traçabilité des actions",
+          "price": "CHF 490/an ou CHF 45/mois",
+          "priceHint": "Seulement CHF 100/an de plus que la formule Standard.",
+          "billingYearly": "Annuel",
+          "billingMonthly": "Mensuel",
+          "ctaPrimary": "Passer à Obillz Équipe",
+          "ctaSecondary": "Me contacter",
+          "checkoutLoading": "Redirection...",
+          "checkoutUnavailable": "Le paiement en ligne pour Obillz Équipe n'est pas encore configuré. Contactez-nous à contact@obillz.com.",
+          "checkoutError": "Une erreur est survenue. Veuillez réessayer."
+        },
         "accordions": {
           "memberFields": "Champs des membres",
           "memberCategories": "Catégories / statuts",

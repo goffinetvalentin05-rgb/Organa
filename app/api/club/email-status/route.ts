@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
+import { requireTeamPlan } from "@/lib/billing/teamPlan";
 
 export const runtime = "nodejs";
 
@@ -23,6 +24,9 @@ export const runtime = "nodejs";
 export async function GET() {
   const guard = await requirePermission(PERMISSIONS.MANAGE_USERS);
   if ("error" in guard) return guard.error;
+
+  const teamPlan = await requireTeamPlan(guard.clubId);
+  if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   const supabase = await createClient();
   const { data: profile } = await supabase

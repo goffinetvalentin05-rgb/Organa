@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus, PRICING } from "@/lib/billing/subscription";
+import {
+  canManageTeamAccess,
+  getClubSubscriptionTier,
+  TEAM_PRICING,
+  STANDARD_PRICING,
+} from "@/lib/billing/teamPlan";
 import { getAuthContext } from "@/lib/auth/rbac";
 
 // Forcer le runtime Node.js (pas Edge)
@@ -82,6 +88,15 @@ export async function GET() {
       console.warn("[API /me] Récupération clubName impossible", clubErr);
     }
 
+    let subscriptionTier: "standard" | "team" = "standard";
+    let teamAccess = false;
+    try {
+      subscriptionTier = await getClubSubscriptionTier(clubId ?? undefined);
+      teamAccess = await canManageTeamAccess(clubId ?? undefined);
+    } catch (tierErr) {
+      console.warn("[API /me] Lecture formule club impossible", tierErr);
+    }
+
     return NextResponse.json(
       {
         user: {
@@ -101,6 +116,12 @@ export async function GET() {
           subscriptionEndsAt: subscription.subscriptionEndsAt?.toISOString() || null,
         },
         pricing: PRICING,
+        product: {
+          tier: subscriptionTier,
+          canManageTeamAccess: teamAccess,
+          standardPricing: STANDARD_PRICING,
+          teamPricing: TEAM_PRICING,
+        },
       },
       { status: 200 }
     );

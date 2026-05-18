@@ -31,6 +31,18 @@ export {
 // Fonctions legacy (rétrocompatibilité)
 export { getPlan, type Plan, type PlanResult } from "./getPlan";
 
+// Formule Standard / Équipe
+export {
+  canManageTeamAccess,
+  getClubSubscriptionTier,
+  requireTeamPlan,
+  TEAM_PLAN_ERROR_MESSAGE,
+  TEAM_PRICING,
+  STANDARD_PRICING,
+  type SubscriptionTier,
+  type TeamPlanDeniedResponse,
+} from "./teamPlan";
+
 // Limites et utilitaires
 export {
   canPerformAction,
