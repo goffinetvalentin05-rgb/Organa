@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
+  Check,
   Coffee,
   FileText,
   LayoutDashboard,
@@ -206,6 +207,57 @@ const faqItems = [
       "Oui. Notre équipe répond aux comités qui ont besoin d'un coup de main pour démarrer ou pour configurer leur club au quotidien.",
   },
 ];
+
+/** Inscription gratuite ; le checkout Stripe (plan standard/team) se fait dans Paramètres après connexion. */
+const LANDING_PRICING_SIGNUP_STANDARD = "/inscription";
+/** TODO: persister ?plan=team après inscription pour pré-sélectionner Obillz Équipe au checkout. */
+const LANDING_PRICING_SIGNUP_TEAM = "/inscription?plan=team";
+const LANDING_PRICING_ADVICE_MAILTO =
+  "mailto:contact@obillz.com?subject=Question%20sur%20les%20formules%20Obillz";
+
+const pricingPlans = [
+  {
+    id: "standard",
+    name: "Obillz Standard",
+    yearlyPrice: "CHF 390/an",
+    monthlyHint: "ou CHF 39/mois",
+    description:
+      "Pour les clubs qui souhaitent gérer Obillz avec le compte principal du club.",
+    features: [
+      "Membres, cotisations et factures",
+      "Revenus, charges et encaissements",
+      "Événements, plannings et QR codes",
+      "Sponsoring et buvette",
+      "Utilisation avec le compte principal du club",
+    ],
+    cta: "Choisir Standard",
+    href: LANDING_PRICING_SIGNUP_STANDARD,
+    footnote: "Idéal pour démarrer simplement.",
+    highlighted: false,
+    badge: null as string | null,
+  },
+  {
+    id: "team",
+    name: "Obillz Équipe",
+    yearlyPrice: "CHF 490/an",
+    monthlyHint: "ou CHF 45/mois",
+    description:
+      "Pour les clubs qui veulent travailler à plusieurs avec des accès sécurisés et des droits personnalisés.",
+    features: [
+      "Toutes les fonctionnalités Standard",
+      "Invitations de plusieurs membres du comité",
+      "Accès personnalisés selon les modules",
+      "Droits séparés pour président, caissier, secrétaire, responsable buvette, etc.",
+      "Plus besoin de partager un seul compte",
+      "Meilleure sécurité et meilleure organisation",
+    ],
+    cta: "Choisir Équipe",
+    href: LANDING_PRICING_SIGNUP_TEAM,
+    footnote: "Seulement CHF 100/an de plus que Standard.",
+    highlighted: true,
+    badge: "Pour les comités",
+  },
+] as const;
 
 const heroFloatingCardsData = [
   {
@@ -968,6 +1020,132 @@ export default function LandingPage() {
               Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
               comité sur la vie sportive et les projets du club.
             </p>
+          </motion.div>
+        </section>
+
+        <section
+          id="tarifs"
+          className="relative mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 md:mt-32"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto max-w-[820px] text-center"
+          >
+            <div className="mb-6 flex items-center justify-center gap-2" aria-hidden>
+              <span className="h-px w-10 bg-white/30" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+              <span className="h-px w-10 bg-white/30" />
+            </div>
+            <h2 className="text-balance text-3xl font-black text-white md:text-5xl">
+              Des tarifs simples pour tous les clubs
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-blue-100/90 md:text-lg">
+              Choisissez la formule qui correspond à votre manière de gérer votre club. Une solution
+              accessible, claire et sans frais cachés.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-12 grid max-w-[1040px] grid-cols-1 gap-5 md:mt-14 md:grid-cols-2 md:gap-6 lg:gap-8"
+          >
+            {pricingPlans.map((plan) => (
+              <article
+                key={plan.id}
+                className={`relative flex flex-col overflow-hidden rounded-[1.75rem] border p-6 backdrop-blur-xl transition duration-300 md:p-8 ${
+                  plan.highlighted
+                    ? "border-white/35 bg-gradient-to-br from-white/[0.14] via-white/[0.08] to-[#1A23FF]/[0.12] shadow-[0_28px_60px_rgba(2,6,23,0.38)] md:-translate-y-1"
+                    : "border-white/12 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-white/[0.02] hover:border-white/22 hover:bg-white/[0.06]"
+                }`}
+              >
+                {plan.badge ? (
+                  <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-white/30 bg-[#1A23FF] px-4 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-[0_8px_24px_rgba(26,35,255,0.45)]">
+                    {plan.badge}
+                  </span>
+                ) : null}
+                <div className={plan.badge ? "pt-2" : undefined}>
+                  <h3 className="text-xl font-black text-white md:text-2xl">{plan.name}</h3>
+                  <p className="mt-4 text-3xl font-black tabular-nums tracking-tight text-white md:text-4xl">
+                    {plan.yearlyPrice}
+                  </p>
+                  <p className="mt-1.5 text-sm font-medium text-blue-100/80">{plan.monthlyHint}</p>
+                  <p className="mt-4 text-sm leading-relaxed text-blue-100/85 md:text-[0.9375rem]">
+                    {plan.description}
+                  </p>
+                </div>
+                <ul className="mt-6 flex-1 space-y-3 border-t border-white/10 pt-6">
+                  {plan.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-3 text-[0.8125rem] leading-snug text-blue-100/90 md:text-sm"
+                    >
+                      <span
+                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                          plan.highlighted
+                            ? "bg-white/15 text-white ring-1 ring-white/25"
+                            : "bg-white/10 text-white/90 ring-1 ring-white/15"
+                        }`}
+                        aria-hidden
+                      >
+                        <Check className="h-3 w-3" strokeWidth={2.5} />
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-8">
+                  <Link
+                    href={plan.href}
+                    className={`inline-flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-bold transition hover:-translate-y-0.5 md:text-base ${
+                      plan.highlighted
+                        ? "bg-white text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)]"
+                        : "border border-white/40 text-white hover:bg-white/10"
+                    }`}
+                  >
+                    {plan.cta}
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-blue-100/70 md:text-[0.8125rem]">
+                    {plan.footnote}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-8 max-w-3xl text-center text-sm leading-relaxed text-blue-100/85 md:mt-10 md:text-[0.9375rem]"
+          >
+            Les deux formules incluent l&apos;accès aux fonctionnalités principales d&apos;Obillz. La
+            formule Équipe ajoute la gestion des utilisateurs et des permissions pour les clubs qui
+            souhaitent répartir la gestion entre plusieurs personnes.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-10 flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-6 text-center backdrop-blur-md md:mt-12"
+          >
+            <p className="text-sm font-semibold text-white md:text-base">
+              Vous ne savez pas quelle formule choisir ?
+            </p>
+            <a
+              href={LANDING_PRICING_ADVICE_MAILTO}
+              className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-white/20"
+            >
+              Demander conseil
+            </a>
           </motion.div>
         </section>
 
