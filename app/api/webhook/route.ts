@@ -1,7 +1,13 @@
+import { NextRequest } from "next/server";
+import { handleStripeWebhook } from "@/lib/billing/handleStripeWebhook";
+
 /**
- * Alias de compatibilité pour l’endpoint Stripe configuré en production :
- * https://obillz.com/api/webhook
- *
- * Implémentation unique : app/api/webhooks/stripe/route.ts
+ * Alias production : https://obillz.com/api/webhook
+ * Même logique que /api/webhooks/stripe
  */
-export { POST, dynamic, runtime } from "../webhooks/stripe/route";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function POST(request: NextRequest) {
+  return handleStripeWebhook(request);
+}
