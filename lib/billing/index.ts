@@ -31,6 +31,20 @@ export {
 // Fonctions legacy (rétrocompatibilité)
 export { getPlan, type Plan, type PlanResult } from "./getPlan";
 
+// Stripe (Price IDs, sync webhook)
+export {
+  resolveStripePriceId,
+  tierFromStripePriceId,
+  tierFromStripeMetadata,
+  missingTeamPriceEnvKeys,
+  resetStripePriceIdCache,
+  type StripeProductPlan,
+  type StripeBillingInterval,
+  type StripePriceResolution,
+} from "./stripePrices";
+
+export { syncProfileFromStripe, findUserIdByStripeRefs } from "./stripeSync";
+
 // Formule Standard / Équipe
 export {
   canManageTeamAccess,

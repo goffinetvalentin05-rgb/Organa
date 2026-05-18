@@ -70,7 +70,7 @@ export async function getClubSubscriptionTier(
   const supabase = await createClient();
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("subscription_tier, is_founder")
+    .select("subscription_tier, is_founder, subscription_status")
     .eq("user_id", billingClubId)
     .maybeSingle();
 
@@ -87,11 +87,34 @@ export async function getClubSubscriptionTier(
 }
 
 /**
- * Indique si le club peut gérer les utilisateurs et les accès (formule Équipe).
+ * Abonnement payant actif sur le club facturé (hors essai gratuit).
+ */
+async function isBillingClubSubscriptionActive(
+  billingClubId: string
+): Promise<boolean> {
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_status, is_founder")
+    .eq("user_id", billingClubId)
+    .maybeSingle();
+
+  if (!profile) return false;
+  if (profile.is_founder === true) return true;
+  return profile.subscription_status === "active";
+}
+
+/**
+ * Indique si le club peut gérer les utilisateurs et les accès (formule Équipe active).
  */
 export async function canManageTeamAccess(clubId?: string): Promise<boolean> {
-  const tier = await getClubSubscriptionTier(clubId);
-  return tier === "team";
+  const billingClubId = await resolveBillingClubId(clubId);
+  if (!billingClubId) return false;
+
+  const tier = await getClubSubscriptionTier(billingClubId);
+  if (tier !== "team") return false;
+
+  return isBillingClubSubscriptionActive(billingClubId);
 }
 
 /**

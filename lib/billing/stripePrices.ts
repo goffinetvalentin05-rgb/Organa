@@ -2,6 +2,8 @@
  * Résolution des Price IDs Stripe (variables d'environnement + repli legacy).
  */
 
+import type { SubscriptionTier } from "./teamPlan";
+
 export type StripeProductPlan = "standard" | "team";
 export type StripeBillingInterval = "monthly" | "yearly";
 
@@ -22,6 +24,11 @@ const LEGACY_STANDARD_PRICES: Record<StripeBillingInterval, string> = {
   yearly: "price_1TQTbbHvElMyrvJkmsJXnHKW",
 };
 
+export interface StripePriceResolution {
+  tier: SubscriptionTier;
+  interval: StripeBillingInterval;
+}
+
 function isConfiguredPriceId(value: string | undefined): value is string {
   if (!value) return false;
   const v = value.trim();
@@ -30,6 +37,40 @@ function isConfiguredPriceId(value: string | undefined): value is string {
     return false;
   }
   return v.startsWith("price_");
+}
+
+function buildPriceIdMap(): Map<string, StripePriceResolution> {
+  const map = new Map<string, StripePriceResolution>();
+
+  for (const interval of ["monthly", "yearly"] as const) {
+    map.set(LEGACY_STANDARD_PRICES[interval], { tier: "standard", interval });
+  }
+
+  for (const plan of ["standard", "team"] as const) {
+    for (const interval of ["monthly", "yearly"] as const) {
+      const envKey = ENV_KEYS[plan][interval];
+      const priceId = process.env[envKey];
+      if (isConfiguredPriceId(priceId)) {
+        map.set(priceId, { tier: plan, interval });
+      }
+    }
+  }
+
+  return map;
+}
+
+let cachedPriceMap: Map<string, StripePriceResolution> | null = null;
+
+function getPriceIdMap(): Map<string, StripePriceResolution> {
+  if (!cachedPriceMap) {
+    cachedPriceMap = buildPriceIdMap();
+  }
+  return cachedPriceMap;
+}
+
+/** Invalide le cache (tests ou rechargement env en dev). */
+export function resetStripePriceIdCache(): void {
+  cachedPriceMap = null;
 }
 
 /**
@@ -49,7 +90,27 @@ export function resolveStripePriceId(
     return LEGACY_STANDARD_PRICES[interval];
   }
 
-  // TODO: configurer STRIPE_PRICE_TEAM_MONTHLY et STRIPE_PRICE_TEAM_YEARLY dans .env.local
+  return null;
+}
+
+/**
+ * Déduit la formule Obillz et le cycle à partir d'un Price ID Stripe.
+ */
+export function tierFromStripePriceId(
+  priceId: string | null | undefined
+): StripePriceResolution | null {
+  if (!priceId) return null;
+  return getPriceIdMap().get(priceId) ?? null;
+}
+
+/**
+ * Déduit la formule depuis les métadonnées checkout / subscription Stripe.
+ */
+export function tierFromStripeMetadata(
+  metadata: Record<string, string> | null | undefined
+): SubscriptionTier | null {
+  const raw = metadata?.subscription_tier;
+  if (raw === "team" || raw === "standard") return raw;
   return null;
 }
 

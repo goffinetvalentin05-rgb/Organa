@@ -174,6 +174,13 @@ export async function POST(request: NextRequest) {
           billing_interval: billingInterval,
           subscription_tier: plan,
         },
+        subscription_data: {
+          metadata: {
+            user_id: user.id,
+            billing_interval: billingInterval,
+            subscription_tier: plan,
+          },
+        },
       });
     } catch (stripeError: unknown) {
       const details =

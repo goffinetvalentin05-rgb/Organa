@@ -59,9 +59,12 @@ STRIPE_SECRET_KEY=sk_test_51AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
 
 1. Allez sur https://dashboard.stripe.com/webhooks
 2. Cliquez sur **"Add endpoint"** (ou modifiez un endpoint existant)
-3. Entrez l'URL : `https://votre-domaine.com/api/webhooks/stripe`
+3. Entrez l'URL (les deux fonctionnent, même handler) :
+   - `https://obillz.com/api/webhook` (URL historique production)
+   - ou `https://votre-domaine.com/api/webhooks/stripe`
 4. Sélectionnez les événements à écouter :
    - `checkout.session.completed`
+   - `customer.subscription.updated`
    - `customer.subscription.deleted`
    - `invoice.payment_failed`
 5. Après la création, cliquez sur l'endpoint
@@ -188,8 +191,8 @@ SUPABASE_SERVICE_ROLE_KEY=votre_service_role_key_secret
 Après configuration complète :
 
 1. ✅ Le bouton "Passer à Pro" ouvre Stripe Checkout
-2. ✅ Après paiement, le webhook met automatiquement `plan = "pro"` dans la base
-3. ✅ Si l'abonnement est annulé, le plan repasse automatiquement à `"free"`
+2. ✅ Après paiement, le webhook active l'abonnement et définit `subscription_tier` (`standard` ou `team` selon le Price ID)
+3. ✅ Si l'abonnement est annulé, le statut repasse à `expired` (la formule `subscription_tier` est conservée)
 4. ✅ Si le paiement échoue, le plan repasse à `"free"`
 5. ✅ Les IDs Stripe (customer_id, subscription_id) sont sauvegardés dans la base
 
