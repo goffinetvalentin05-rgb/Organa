@@ -255,7 +255,7 @@ const pricingPlans = [
     href: LANDING_PRICING_SIGNUP_TEAM,
     footnote: "Seulement CHF 100/an de plus que Standard.",
     highlighted: true,
-    badge: "Pour les comités",
+    badge: "Accès multiples",
   },
 ] as const;
 
@@ -1005,14 +1005,6 @@ export default function LandingPage() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="relative mx-auto flex max-w-[820px] flex-col items-center px-2 text-center text-white md:px-4"
           >
-            <div
-              className="mb-6 flex items-center gap-2"
-              aria-hidden
-            >
-              <span className="h-px w-10 bg-white/30" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-              <span className="h-px w-10 bg-white/30" />
-            </div>
             <h2 className="text-3xl font-black md:text-5xl">
               Moins d&apos;administratif. Plus de temps pour votre club.
             </h2>
@@ -1034,11 +1026,6 @@ export default function LandingPage() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto max-w-[820px] text-center"
           >
-            <div className="mb-6 flex items-center justify-center gap-2" aria-hidden>
-              <span className="h-px w-10 bg-white/30" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-              <span className="h-px w-10 bg-white/30" />
-            </div>
             <h2 className="text-balance text-3xl font-black text-white md:text-5xl">
               Des tarifs simples pour tous les clubs
             </h2>
