@@ -1,6 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
+import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 
 export type ProductWidgetData = {
@@ -28,23 +29,28 @@ export function ProductWidgetCard({
   className?: string;
 }) {
   const statusColors = {
-    success: "text-emerald-600",
-    pending: "text-amber-600",
+    success: "text-[#1A23FF]",
+    pending: "text-slate-600",
     info: "text-[#1A23FF]",
   };
 
   return (
-    <div
-      className={`rounded-2xl border border-slate-200/90 bg-white text-slate-900 shadow-[0_16px_32px_rgba(15,23,42,0.14)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#1A23FF]/20 hover:shadow-[0_20px_40px_rgba(26,35,255,0.15)] ${compact ? "p-3" : "p-3.5 md:p-4"} ${className}`}
+    <motion.div
+      whileHover={{ y: -3, transition: { duration: 0.22 } }}
+      className={`group relative overflow-hidden rounded-2xl border border-white/60 bg-white/98 text-slate-900 shadow-[0_20px_44px_rgba(15,23,42,0.16)] backdrop-blur-md transition-[box-shadow,border-color] duration-300 hover:border-[#1A23FF]/25 hover:shadow-[0_24px_52px_rgba(26,35,255,0.18)] ${compact ? "p-3" : "p-3.5 md:p-4"} ${className}`}
     >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1A23FF]/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        aria-hidden
+      />
       <div className="flex items-start justify-between gap-2">
         <p
-          className={`font-semibold uppercase tracking-[0.08em] text-slate-500 ${compact ? "text-[0.65rem]" : "text-[10px] md:text-xs"}`}
+          className={`font-semibold uppercase tracking-[0.1em] text-slate-500 ${compact ? "text-[0.65rem]" : "text-[10px] md:text-xs"}`}
         >
           {label}
         </p>
         {Icon ? (
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#1A23FF]/10 text-[#1A23FF]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#1A23FF]/10 text-[#1A23FF] ring-1 ring-[#1A23FF]/10 transition group-hover:bg-[#1A23FF]/15">
             <Icon className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
           </span>
         ) : status === "success" ? (
@@ -62,7 +68,7 @@ export function ProductWidgetCard({
           {hint}
         </p>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
 
