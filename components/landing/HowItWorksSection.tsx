@@ -2,36 +2,17 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { LandingPrimaryButton } from "@/components/landing/LandingButtons";
+import { useI18n } from "@/components/I18nProvider";
+import { getTranslationValue } from "@/lib/i18n";
 import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 
-const steps = [
-  {
-    num: "01",
-    title: "Créez votre club",
-    description: "Quelques minutes pour configurer votre espace.",
-  },
-  {
-    num: "02",
-    title: "Ajoutez vos membres",
-    description:
-      "Import ou saisie quand vous le souhaitez — vous pouvez démarrer sans liste complète.",
-  },
-  {
-    num: "03",
-    title: "Activez ce dont vous avez besoin",
-    description:
-      "Cotisations, événements, buvette, factures, page publique, campagnes… activez les modules utiles à votre club.",
-  },
-  {
-    num: "04",
-    title: "Pilotez au quotidien",
-    description:
-      "Envoyez, suivez, communiquez et encaissez depuis un seul tableau de bord, sur ordinateur ou mobile.",
-  },
-];
+type Step = { title: string; description: string };
 
 export default function HowItWorksSection() {
+  const { t, locale } = useI18n();
   const reduceMotion = useReducedMotion();
+  const raw = getTranslationValue(locale, "marketing.howItWorks.steps");
+  const steps = (Array.isArray(raw) ? raw : []) as Step[];
 
   return (
     <section id="comment-ca-marche" className="relative scroll-mt-24 py-16 md:py-24">
@@ -49,11 +30,13 @@ export default function HowItWorksSection() {
           className="text-center"
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
-            Comment ça marche
+            {t("marketing.howItWorks.label")}
           </p>
-          <h2 className="mt-3 text-2xl font-black text-white md:text-4xl">Simple à mettre en place.</h2>
+          <h2 className="mt-3 text-2xl font-black text-white md:text-4xl">
+            {t("marketing.howItWorks.title")}
+          </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm text-blue-100/70 md:text-base">
-            Pas besoin de tout configurer d&apos;un coup — avancez à votre rythme, module par module.
+            {t("marketing.howItWorks.subtitle")}
           </p>
         </motion.div>
 
@@ -76,7 +59,13 @@ export default function HowItWorksSection() {
 
           <div className="space-y-10 md:space-y-12">
             {steps.map((step, i) => (
-              <StepRow key={step.num} step={step} index={i} reduceMotion={!!reduceMotion} />
+              <StepRow
+                key={step.title}
+                step={step}
+                num={String(i + 1).padStart(2, "0")}
+                index={i}
+                reduceMotion={!!reduceMotion}
+              />
             ))}
           </div>
         </div>
@@ -88,7 +77,7 @@ export default function HowItWorksSection() {
           transition={{ duration: 0.5, ease: easePremium }}
           className="mt-12 flex justify-center md:mt-14"
         >
-          <LandingPrimaryButton href="/inscription">Tester Obillz gratuitement</LandingPrimaryButton>
+          <LandingPrimaryButton href="/inscription">{t("marketing.howItWorks.cta")}</LandingPrimaryButton>
         </motion.div>
       </div>
     </section>
@@ -97,50 +86,38 @@ export default function HowItWorksSection() {
 
 function StepRow({
   step,
+  num,
   index,
   reduceMotion,
 }: {
-  step: (typeof steps)[number];
+  step: Step;
+  num: string;
   index: number;
   reduceMotion: boolean;
 }) {
-  const isEven = index % 2 === 0;
+  const isLeft = index % 2 === 0;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: isEven ? -28 : 28 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={viewportOnce}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: easePremium }}
-      className={`relative flex gap-6 md:gap-10 ${isEven ? "" : "md:flex-row-reverse"}`}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.55, delay: index * 0.08, ease: easePremium }}
+      className={`relative flex gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}
     >
-      <motion.div
-        className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-400/45 bg-[#0a0f24] text-sm font-black text-blue-200 shadow-[0_0_28px_rgba(26,35,255,0.45)] md:absolute md:left-1/2 md:-translate-x-1/2"
-        animate={
-          reduceMotion
-            ? undefined
-            : { boxShadow: ["0 0 20px rgba(26,35,255,0.35)", "0 0 32px rgba(147,197,253,0.5)", "0 0 20px rgba(26,35,255,0.35)"] }
-        }
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }}
-      >
-        {step.num}
-      </motion.div>
-
-      <motion.article
-        whileHover={reduceMotion ? undefined : { y: -3 }}
-        className={`group flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 backdrop-blur-md transition-[border-color,box-shadow] duration-300 hover:border-blue-400/30 hover:shadow-[0_0_40px_rgba(26,35,255,0.18)] md:max-w-[calc(50%-3.25rem)] ${
-          isEven ? "md:mr-auto md:pr-16 md:text-right" : "md:ml-auto md:pl-16 md:text-left"
+      <div className="flex w-12 shrink-0 flex-col items-center md:absolute md:left-1/2 md:w-auto md:-translate-x-1/2">
+        <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/35 bg-[#1A23FF]/25 text-sm font-black text-white shadow-[0_0_24px_rgba(26,35,255,0.4)]">
+          {num}
+        </span>
+      </div>
+      <div
+        className={`min-w-0 flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 backdrop-blur-md md:max-w-[calc(50%-3rem)] ${
+          isLeft ? "md:mr-auto md:pr-12" : "md:ml-auto md:pl-12"
         }`}
       >
-        <div
-          className={`pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
-            isEven ? "" : ""
-          }`}
-          aria-hidden
-        />
         <h3 className="text-lg font-bold text-white">{step.title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-blue-100/70">{step.description}</p>
-      </motion.article>
+      </div>
     </motion.div>
   );
 }

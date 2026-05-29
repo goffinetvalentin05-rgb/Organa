@@ -3,9 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LandingPrimaryButton } from "@/components/landing/LandingButtons";
+import { useI18n } from "@/components/I18nProvider";
 import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 
 export default function FinalCtaSection() {
+  const { t } = useI18n();
+
   return (
     <section id="cta-final" className="relative scroll-mt-24 pb-20 pt-8 md:pb-28">
       <motion.div
@@ -27,17 +30,17 @@ export default function FinalCtaSection() {
         />
 
         <h2 className="relative text-2xl font-black text-white md:text-4xl">
-          Votre club mérite mieux qu&apos;un fichier Excel.
+          {t("marketing.finalCta.title")}
         </h2>
         <p className="relative mx-auto mt-4 max-w-md text-sm text-blue-100/80 md:text-base">
-          Centralisez votre gestion et gagnez du temps dès maintenant.
+          {t("marketing.finalCta.subtitle")}
         </p>
         <div className="relative mt-8 flex justify-center">
-          <LandingPrimaryButton href="/inscription">Tester Obillz gratuitement</LandingPrimaryButton>
+          <LandingPrimaryButton href="/inscription">{t("marketing.finalCta.cta")}</LandingPrimaryButton>
         </div>
         <p className="relative mt-5 text-xs text-blue-200/55">
           <Link href="/connexion" className="underline-offset-2 hover:text-white hover:underline">
-            Déjà un compte ? Connexion
+            {t("marketing.finalCta.loginPrompt")}
           </Link>
         </p>
       </motion.div>

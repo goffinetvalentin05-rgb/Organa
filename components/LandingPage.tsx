@@ -1,6 +1,7 @@
 "use client";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import HeroHandVisual from "@/components/landing/HeroHandVisual";
 import HeroSection from "@/components/landing/HeroSection";
@@ -23,6 +24,7 @@ export default function LandingPage() {
       <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       <div className="relative z-10">
+        <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
         <ProblemSection />

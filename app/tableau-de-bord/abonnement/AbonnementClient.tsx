@@ -9,7 +9,9 @@ import {
   SectionCard,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
-import { STANDARD_PLAN_FEATURES } from "@/lib/billing/pricing";
+import { useI18n } from "@/components/I18nProvider";
+import { getTranslationValue } from "@/lib/i18n";
+import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 interface SubscriptionInfo {
   status: "trial" | "active" | "expired";
@@ -26,7 +28,11 @@ interface Pricing {
 }
 
 export default function AbonnementClient() {
+  const { t, tList, locale } = useI18n();
   const searchParams = useSearchParams();
+  const planFeatures = tList("marketing.pricing.standardFeatures");
+  const faqRaw = getTranslationValue(locale, "dashboard.abonnementPage.faq");
+  const faqItems = (Array.isArray(faqRaw) ? faqRaw : []) as { q: string; a: string }[];
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,11 +78,11 @@ export default function AbonnementClient() {
         window.location.href = data.url;
       } else {
         console.error("Erreur checkout:", data.error);
-        alert(data.message || "Une erreur est survenue. Veuillez réessayer.");
+        alert(data.message || t("dashboard.abonnementPage.checkoutError"));
       }
     } catch (error) {
       console.error("Erreur lors du checkout:", error);
-      alert("Une erreur est survenue. Veuillez réessayer.");
+      alert(t("dashboard.abonnementPage.checkoutError"));
     } finally {
       setCheckoutLoading(false);
     }
@@ -89,8 +95,8 @@ export default function AbonnementClient() {
   return (
     <PageLayout maxWidth="3xl">
       <PageHeader
-        title="Abonnement"
-        subtitle="Un seul plan, toutes les fonctionnalités. Simple et transparent."
+        title={t("dashboard.abonnementPage.title")}
+        subtitle={t("dashboard.abonnementPage.subtitle")}
       />
 
       {loading ? (
@@ -194,10 +200,10 @@ export default function AbonnementClient() {
                       billingCycle === "yearly" ? "text-slate-900" : "text-slate-500"
                     }`}
                   >
-                    Annuel
+                    {t("dashboard.abonnementPage.yearly")}
                   </span>
                   <span className="mt-1 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
-                    2 mois offerts
+                    {t("marketing.pricing.yearlySavingsBadge")}
                   </span>
                 </div>
               </div>
@@ -223,7 +229,7 @@ export default function AbonnementClient() {
                 </div>
 
                 <ul className="mx-auto mb-8 max-w-sm space-y-3 text-left">
-                  {STANDARD_PLAN_FEATURES.map((feature) => (
+                  {planFeatures.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <svg
                         className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"
@@ -287,30 +293,20 @@ export default function AbonnementClient() {
           )}
 
           <SectionCard
-            title="Questions fréquentes"
-            description="Tout ce que vous devez savoir avant de vous abonner."
+            title={t("dashboard.abonnementPage.faqTitle")}
+            description={t("dashboard.abonnementPage.faqDescription")}
           >
             <div className="space-y-3">
-              {[
-                {
-                  q: "Que se passe-t-il après les 7 jours d'essai ?",
-                  a: "Après 7 jours, votre compte passe en mode lecture seule. Vous pouvez toujours consulter vos données, mais vous ne pouvez plus créer ou modifier d'éléments. Abonnez-vous pour retrouver l'accès complet.",
-                },
-                {
-                  q: "Puis-je annuler mon abonnement ?",
-                  a: "Oui, vous pouvez annuler à tout moment. Votre abonnement restera actif jusqu'à la fin de la période payée. Aucun remboursement partiel n'est effectué.",
-                },
-                {
-                  q: "Pourquoi choisir l'annuel ?",
-                  a: "L'abonnement annuel inclut 2 mois offerts. C'est idéal pour les clubs qui savent qu'ils utiliseront l'application sur le long terme.",
-                },
-              ].map((item) => (
+              {faqItems.map((item) => {
+                const q = item.q.replace(/\{days\}/g, String(TRIAL_DURATION_DAYS));
+                const a = item.a.replace(/\{days\}/g, String(TRIAL_DURATION_DAYS));
+                return (
                 <details
-                  key={item.q}
+                  key={q}
                   className="group rounded-xl border border-slate-200/70 bg-white/90 p-4"
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-slate-900">
-                    {item.q}
+                    {q}
                     <svg
                       className="h-5 w-5 text-slate-500 transition-transform group-open:rotate-180"
                       fill="none"
@@ -320,9 +316,10 @@ export default function AbonnementClient() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </summary>
-                  <p className="mt-3 text-slate-600">{item.a}</p>
+                  <p className="mt-3 text-slate-600">{a}</p>
                 </details>
-              ))}
+                );
+              })}
             </div>
           </SectionCard>
         </>

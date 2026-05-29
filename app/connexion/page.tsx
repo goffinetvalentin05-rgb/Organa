@@ -15,8 +15,10 @@ import {
   AuthPageMotion,
   AuthSubmitButton,
 } from "@/components/auth/AuthForm";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function ConnexionPage() {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,12 +33,12 @@ export default function ConnexionPage() {
     setErrorMessage(null);
 
     if (!email || !email.includes("@")) {
-      toast.error("Veuillez entrer une adresse email valide");
+      toast.error(t("auth.login.invalidEmail"));
       return;
     }
 
     if (!password || password.length < 8) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères");
+      toast.error(t("auth.login.passwordMin"));
       return;
     }
 
@@ -49,10 +51,9 @@ export default function ConnexionPage() {
       });
 
       if (error) {
-        const message =
-          error.message?.toLowerCase().includes("invalid login credentials")
-            ? "Email ou mot de passe incorrect"
-            : error.message || "Erreur lors de la connexion";
+        const message = error.message?.toLowerCase().includes("invalid login credentials")
+          ? t("auth.login.invalidCredentials")
+          : error.message || t("auth.login.error");
 
         setErrorMessage(message);
         toast.error(message);
@@ -61,13 +62,12 @@ export default function ConnexionPage() {
 
       if (data.user) {
         await supabase.auth.getSession();
-        toast.success("Connexion réussie !");
+        toast.success(t("auth.login.success"));
         await new Promise((resolve) => setTimeout(resolve, 100));
         window.location.href = "/tableau-de-bord";
       }
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Erreur lors de la connexion";
+      const msg = err instanceof Error ? err.message : t("auth.login.error");
       setErrorMessage(msg);
       toast.error(msg);
     } finally {
@@ -80,33 +80,29 @@ export default function ConnexionPage() {
       <AuthPageMotion>
         <div className="text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
-            Connexion
+            {t("auth.login.badge")}
           </p>
           <h1 className="mt-3 text-balance text-2xl font-black text-white md:text-3xl">
-            Bon retour sur Obillz
+            {t("auth.login.title")}
           </h1>
-          <p className="mt-3 text-sm text-blue-100/75 md:text-base">
-            Accédez à votre espace de gestion de club
-          </p>
+          <p className="mt-3 text-sm text-blue-100/75 md:text-base">{t("auth.login.subtitle")}</p>
         </div>
 
         <div className="mt-8">
           <AuthCard>
             <div className="text-center">
-              <h2 className="text-lg font-bold text-white">Identifiants</h2>
-              <p className="mt-1 text-sm text-blue-100/65">
-                Entrez votre email et votre mot de passe
-              </p>
+              <h2 className="text-lg font-bold text-white">{t("auth.login.cardTitle")}</h2>
+              <p className="mt-1 text-sm text-blue-100/65">{t("auth.login.cardSubtitle")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-7 space-y-5">
               {errorMessage ? <AuthError message={errorMessage} /> : null}
 
-              <AuthField id="email" label="Adresse email">
+              <AuthField id="email" label={t("auth.login.email")}>
                 <AuthInput
                   id="email"
                   type="email"
-                  placeholder="votre@email.com"
+                  placeholder={t("auth.login.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -114,7 +110,7 @@ export default function ConnexionPage() {
                 />
               </AuthField>
 
-              <AuthField id="password" label="Mot de passe">
+              <AuthField id="password" label={t("auth.login.password")}>
                 <AuthInput
                   id="password"
                   type="password"
@@ -126,26 +122,26 @@ export default function ConnexionPage() {
                 />
               </AuthField>
 
-              <AuthSubmitButton loading={loading} loadingLabel="Connexion en cours...">
-                Se connecter
+              <AuthSubmitButton loading={loading} loadingLabel={t("auth.login.loading")}>
+                {t("auth.login.submit")}
               </AuthSubmitButton>
             </form>
 
             <AuthFooterLink
-              prompt="Pas encore de compte ?"
+              prompt={t("auth.login.noAccount")}
               linkHref="/inscription"
-              linkLabel="Créer un compte gratuitement"
+              linkLabel={t("auth.login.signUpFree")}
             />
           </AuthCard>
 
           <div className="mt-5 flex items-center justify-center gap-2 text-blue-100/55">
             <Shield className="h-4 w-4 shrink-0 text-blue-300/70" aria-hidden />
-            <span className="text-xs">Connexion sécurisée · SSL</span>
+            <span className="text-xs">{t("auth.login.secureNote")}</span>
           </div>
 
           <p className="mt-4 text-center sm:hidden">
             <Link href="/" className="text-xs text-blue-100/50 hover:text-white">
-              ← Retour à l&apos;accueil
+              {t("auth.login.backHome")}
             </Link>
           </p>
         </div>

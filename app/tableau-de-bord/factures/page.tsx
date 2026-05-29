@@ -170,12 +170,12 @@ export default function FacturesPage() {
       />
 
       <div className="flex flex-wrap gap-2">
-        {["Sponsors", "Locations de salle", "Événements", "Buvette"].map((label) => (
+        {(["sponsors", "venueRental", "events", "buvette"] as const).map((key) => (
           <span
-            key={label}
+            key={key}
             className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm"
           >
-            {label}
+            {t(`dashboard.invoices.categoryTags.${key}`)}
           </span>
         ))}
       </div>

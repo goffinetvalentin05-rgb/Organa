@@ -282,8 +282,8 @@ export default function MemberDetailView({
 
       <SectionCard
         icon={ClipboardList}
-        title="Participations"
-        description="Historique des plannings / événements (inscription interne, publique reconnue ou rattachement admin)."
+        title={t("dashboard.clients.memberDetail.participationsTitle")}
+        description={t("dashboard.clients.memberDetail.participationsDescription")}
         headerRight={
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium uppercase tracking-wide text-white/70">Total</span>

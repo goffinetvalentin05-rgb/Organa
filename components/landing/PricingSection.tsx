@@ -4,20 +4,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { LandingPrimaryButton } from "@/components/landing/LandingButtons";
+import { useI18n } from "@/components/I18nProvider";
 import {
   scrollReveal,
   staggerContainer,
   staggerItem,
   viewportOnce,
 } from "@/components/landing/landing-motion";
-import {
-  type PlanPricing,
-  STANDARD_PLAN_FEATURES,
-  STANDARD_PRICING,
-  TEAM_PLAN_EXTRA_FEATURES,
-  TEAM_PRICING,
-  TRIAL_DURATION_DAYS,
-} from "@/lib/billing/pricing";
+import { type PlanPricing, STANDARD_PRICING, TEAM_PRICING, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -29,18 +23,26 @@ function PlanCard({
   features,
   extraLabel,
   highlighted,
+  teamBadge,
+  perMonthSuffix,
+  perYearSuffix,
+  monthlyEquivalentLabel,
 }: {
   name: string;
   description: string;
   pricing: PlanPricing;
   billingCycle: BillingCycle;
-  features: readonly string[];
+  features: string[];
   extraLabel?: string;
   highlighted?: boolean;
+  teamBadge: string;
+  perMonthSuffix: string;
+  perYearSuffix: string;
+  monthlyEquivalentLabel: (amount: number) => string;
 }) {
   const amount =
     billingCycle === "yearly" ? pricing.yearly.amount : pricing.monthly.amount;
-  const suffix = billingCycle === "yearly" ? "CHF/an" : "CHF/mois";
+  const suffix = billingCycle === "yearly" ? perYearSuffix : perMonthSuffix;
   const monthlyEquivalent =
     billingCycle === "yearly" ? Math.round(pricing.yearly.amount / 12) : null;
 
@@ -54,7 +56,7 @@ function PlanCard({
     >
       {highlighted ? (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#1A23FF] px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-[0_0_20px_rgba(26,35,255,0.6)]">
-          Comité multi-utilisateurs
+          {teamBadge}
         </span>
       ) : null}
 
@@ -69,9 +71,7 @@ function PlanCard({
           <span className="text-base text-blue-100/70">{suffix}</span>
         </div>
         {monthlyEquivalent !== null ? (
-          <p className="mt-1.5 text-sm text-blue-100/60">
-            soit <span className="font-semibold text-white">{monthlyEquivalent} CHF/mois</span>
-          </p>
+          <p className="mt-1.5 text-sm text-blue-100/60">{monthlyEquivalentLabel(monthlyEquivalent)}</p>
         ) : null}
         {billingCycle === "yearly" && "savings" in pricing.yearly ? (
           <span className="mt-3 inline-block rounded-full bg-emerald-500/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
@@ -107,7 +107,10 @@ function PlanCard({
 }
 
 export default function PricingSection() {
+  const { t, tList } = useI18n();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
+  const standardFeatures = tList("marketing.pricing.standardFeatures");
+  const teamFeatures = tList("marketing.pricing.teamFeatures");
 
   return (
     <section id="tarifs" className="relative scroll-mt-24 py-16 md:py-24">
@@ -128,20 +131,19 @@ export default function PricingSection() {
             variants={staggerItem}
             className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80"
           >
-            Tarifs
+            {t("marketing.pricing.label")}
           </motion.p>
           <motion.h2
             variants={staggerItem}
             className="mt-3 text-balance text-2xl font-black text-white md:text-4xl"
           >
-            Deux formules, selon la taille de votre comité
+            {t("marketing.pricing.title")}
           </motion.h2>
           <motion.p
             variants={staggerItem}
             className="mx-auto mt-4 max-w-lg text-sm text-blue-100/75 md:text-base"
           >
-            {TRIAL_DURATION_DAYS} jours d&apos;essai gratuit sur Obillz Standard. Passez à Équipe
-            quand vous voulez inviter tout le comité.
+            {t("marketing.pricing.subtitle", { days: TRIAL_DURATION_DAYS })}
           </motion.p>
         </motion.div>
 
@@ -157,7 +159,7 @@ export default function PricingSection() {
               billingCycle === "monthly" ? "text-white" : "text-blue-100/50"
             }`}
           >
-            Mensuel
+            {t("marketing.pricing.monthly")}
           </span>
           <button
             type="button"
@@ -167,7 +169,7 @@ export default function PricingSection() {
                 ? "bg-gradient-to-r from-[#1A23FF] to-blue-500 shadow-[0_0_24px_rgba(26,35,255,0.5)]"
                 : "bg-white/20"
             }`}
-            aria-label="Choisir la facturation mensuelle ou annuelle"
+            aria-label={t("marketing.pricing.billingToggleAria")}
           >
             <span
               className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
@@ -180,7 +182,7 @@ export default function PricingSection() {
               billingCycle === "yearly" ? "text-white" : "text-blue-100/50"
             }`}
           >
-            Annuel
+            {t("marketing.pricing.yearly")}
           </span>
         </motion.div>
 
@@ -193,22 +195,34 @@ export default function PricingSection() {
         >
           <motion.div variants={staggerItem}>
             <PlanCard
-              name="Obillz Standard"
-              description="Compte principal du club — toutes les fonctionnalités de gestion."
+              name={t("marketing.pricing.standardName")}
+              description={t("marketing.pricing.standardDescription")}
               pricing={STANDARD_PRICING}
               billingCycle={billingCycle}
-              features={STANDARD_PLAN_FEATURES}
+              features={standardFeatures}
+              teamBadge={t("marketing.pricing.teamBadge")}
+              perMonthSuffix={t("marketing.pricing.perMonthSuffix")}
+              perYearSuffix={t("marketing.pricing.perYearSuffix")}
+              monthlyEquivalentLabel={(amount) =>
+                t("marketing.pricing.monthlyEquivalent", { amount })
+              }
             />
           </motion.div>
           <motion.div variants={staggerItem}>
             <PlanCard
-              name="Obillz Équipe"
-              description="Plusieurs membres du comité, chacun avec ses accès."
+              name={t("marketing.pricing.teamName")}
+              description={t("marketing.pricing.teamDescription")}
               pricing={TEAM_PRICING}
               billingCycle={billingCycle}
-              features={TEAM_PLAN_EXTRA_FEATURES}
-              extraLabel="Tout Standard, plus :"
+              features={teamFeatures}
+              extraLabel={t("marketing.pricing.teamExtraLabel")}
               highlighted
+              teamBadge={t("marketing.pricing.teamBadge")}
+              perMonthSuffix={t("marketing.pricing.perMonthSuffix")}
+              perYearSuffix={t("marketing.pricing.perYearSuffix")}
+              monthlyEquivalentLabel={(amount) =>
+                t("marketing.pricing.monthlyEquivalent", { amount })
+              }
             />
           </motion.div>
         </motion.div>
@@ -221,11 +235,9 @@ export default function PricingSection() {
           className="relative mt-10 flex flex-col items-center gap-3"
         >
           <LandingPrimaryButton href="/inscription">
-            Tester {TRIAL_DURATION_DAYS} jours gratuitement
+            {t("marketing.pricing.cta", { days: TRIAL_DURATION_DAYS })}
           </LandingPrimaryButton>
-          <p className="text-xs text-blue-100/50">
-            Paiement sécurisé par Stripe · Annulation possible à tout moment
-          </p>
+          <p className="text-xs text-blue-100/50">{t("marketing.pricing.footnote")}</p>
         </motion.div>
       </div>
     </section>

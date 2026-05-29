@@ -64,7 +64,7 @@ function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
     // Vérifier si on revient d'un paiement réussi
     const checkoutStatus = searchParams?.get("checkout");
     if (checkoutStatus === "success") {
-      toast.success("Abonnement activé avec succès !");
+      toast.success(t("dashboard.settings.subscriptionActivated"));
       onSuccess();
       // Nettoyer l'URL
       router.replace("/tableau-de-bord/parametres");
@@ -863,7 +863,9 @@ export default function ParametresPage() {
                             href="/tableau-de-bord/abonnement"
                             className="inline-flex shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-95"
                           >
-                            {subscription.status === "trial" ? "Voir les tarifs" : "S\u2019abonner"}
+                            {subscription.status === "trial"
+                              ? t("dashboard.settings.viewPricing")
+                              : t("dashboard.settings.subscribe")}
                           </Link>
                         ) : null}
                       </div>

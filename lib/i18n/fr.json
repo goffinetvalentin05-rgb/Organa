@@ -28,17 +28,39 @@
       "ctaPrimary": "Commencer gratuitement",
       "ctaSecondary": "Voir la démo",
       "paymentsLabel": "Compatible paiements :",
-      "payments": ["SEPA", "Carte", "Virement", "Multi-devises"],
+      "payments": [
+        "SEPA",
+        "Carte",
+        "Virement",
+        "Multi-devises"
+      ],
       "preview": {
         "label": "Aperçu produit",
-        "invoices": { "label": "Cotisations", "value": "€12 300" },
-        "quotes": { "label": "Budgets", "sent": "8 prévus", "pending": "2 en attente" },
-        "expenses": { "label": "Dépenses", "value": "€3 480", "due": "Échéances à 10 jours" },
+        "invoices": {
+          "label": "Cotisations",
+          "value": "€12 300"
+        },
+        "quotes": {
+          "label": "Budgets",
+          "sent": "8 prévus",
+          "pending": "2 en attente"
+        },
+        "expenses": {
+          "label": "Dépenses",
+          "value": "€3 480",
+          "due": "Échéances à 10 jours"
+        },
         "followUp": {
           "label": "Suivi",
-          "items": ["Relance cotisation #2043", "Paiement reçu", "Échéance dépense"]
+          "items": [
+            "Relance cotisation #2043",
+            "Paiement reçu",
+            "Échéance dépense"
+          ]
         },
-        "abstract": { "label": "Visuel abstrait" }
+        "abstract": {
+          "label": "Visuel abstrait"
+        }
       }
     },
     "problem": {
@@ -114,17 +136,30 @@
       "label": "Vue produit",
       "title": "Un dashboard qui parle vraiment.",
       "description": "Suivez l'état des cotisations et des dépenses en temps réel : payé, en attente, en retard. Une vision claire des finances du club.",
-      "tags": ["Suivi des cotisations", "Relances manuelles", "Vue dépenses", "Tout centralisé"],
+      "tags": [
+        "Suivi des cotisations",
+        "Relances manuelles",
+        "Vue dépenses",
+        "Tout centralisé"
+      ],
       "preview": {
         "label": "Aperçu dashboard",
         "stats": {
-          "labels": ["Cotisations encaissées", "En attente", "Dépenses"],
+          "labels": [
+            "Cotisations encaissées",
+            "En attente",
+            "Dépenses"
+          ],
           "value": "+12%",
           "period": "Cette semaine"
         },
         "deadlines": {
           "label": "Échéances",
-          "items": ["Relance cotisation #1098", "Paiement fournisseur", "Budget à valider"],
+          "items": [
+            "Relance cotisation #1098",
+            "Paiement fournisseur",
+            "Budget à valider"
+          ],
           "today": "Aujourd'hui"
         }
       },
@@ -149,7 +184,11 @@
       "free": {
         "title": "Free",
         "subtitle": "Pour démarrer sans risque.",
-        "features": ["Cotisations et budgets", "Suivi basique des membres", "Accès limité"],
+        "features": [
+          "Cotisations et budgets",
+          "Suivi basique des membres",
+          "Accès limité"
+        ],
         "cta": "Commencer gratuitement"
       },
       "pro": {
@@ -271,10 +310,22 @@
     "overview": "Vue d'ensemble",
     "period": "7 jours",
     "stats": {
-      "clients": { "label": "Clients", "value": "18 actifs" },
-      "quotes": { "label": "Devis", "value": "7 envoyés" },
-      "invoices": { "label": "Factures", "value": "12 émises" },
-      "payments": { "label": "Paiements", "value": "9 reçus" }
+      "clients": {
+        "label": "Clients",
+        "value": "18 actifs"
+      },
+      "quotes": {
+        "label": "Devis",
+        "value": "7 envoyés"
+      },
+      "invoices": {
+        "label": "Factures",
+        "value": "12 émises"
+      },
+      "payments": {
+        "label": "Paiements",
+        "value": "9 reçus"
+      }
     },
     "quoteCard": {
       "title": "Devis",
@@ -826,7 +877,10 @@
           "addManual": "Ajouter un lien manuel",
           "disabledHint": "Activez le bloc ci-dessus pour choisir les liens visibles sur votre page."
         }
-      }
+      },
+      "subscriptionActivated": "Abonnement activé avec succès !",
+      "viewPricing": "Voir les tarifs",
+      "subscribe": "S'abonner"
     },
     "clients": {
       "authError": "Erreur d'authentification",
@@ -950,7 +1004,9 @@
         "auditUpdatedBy": "Modifié par",
         "birthDate": "Date de naissance",
         "avsNumber": "Numéro AVS",
-        "avsMaskedHint": "Affichage masqué pour protéger cette donnée."
+        "avsMaskedHint": "Affichage masqué pour protéger cette donnée.",
+        "participationsTitle": "Participations",
+        "participationsDescription": "Historique des plannings / événements (inscription interne, publique reconnue ou rattachement admin)."
       },
       "errors": {
         "missingId": "ID du membre manquant",
@@ -1163,7 +1219,13 @@
       "exportAccountingDownload": "Télécharger l'export",
       "emptyState": "Aucune facture pour le moment",
       "emptyCta": "Créer votre première facture",
-      "listTotal": "{count} facture(s) au total"
+      "listTotal": "{count} facture(s) au total",
+      "categoryTags": {
+        "sponsors": "Sponsors",
+        "venueRental": "Locations de salle",
+        "events": "Événements",
+        "buvette": "Buvette"
+      }
     },
     "sponsoring": {
       "title": "Sponsoring",
@@ -1591,7 +1653,15 @@
       "legendOccupied": "Occupée",
       "legendReserved": "Réservée",
       "calendarLoading": "Chargement du calendrier...",
-      "weekdays": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+      "weekdays": [
+        "Lun",
+        "Mar",
+        "Mer",
+        "Jeu",
+        "Ven",
+        "Sam",
+        "Dim"
+      ]
     },
     "marketing": {
       "loading": "Chargement...",
@@ -1756,7 +1826,64 @@
         "save": "Enregistrer",
         "saving": "Enregistrement…"
       }
+    },
+    "abonnementPage": {
+      "title": "Abonnement",
+      "subtitle": "Un seul plan, toutes les fonctionnalités. Simple et transparent.",
+      "billingToggleAria": "Choisir la facturation mensuelle ou annuelle",
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "faqTitle": "Questions fréquentes",
+      "faqDescription": "Tout ce que vous devez savoir avant de vous abonner.",
+      "checkoutError": "Une erreur est survenue. Veuillez réessayer.",
+      "statusActive": "Abonnement actif",
+      "statusTrial": "Période d'essai",
+      "statusExpired": "Essai terminé",
+      "subscribe": "S'abonner",
+      "perMonth": "/mois",
+      "perYear": "/an",
+      "faq": [
+        {
+          "q": "Que se passe-t-il après les {days} jours d'essai ?",
+          "a": "Après {days} jours, votre compte passe en mode lecture seule. Vous pouvez toujours consulter vos données, mais vous ne pouvez plus créer ou modifier d'éléments. Abonnez-vous pour retrouver l'accès complet."
+        },
+        {
+          "q": "Puis-je annuler mon abonnement ?",
+          "a": "Oui, vous pouvez annuler à tout moment. Votre abonnement restera actif jusqu'à la fin de la période payée. Aucun remboursement partiel n'est effectué."
+        },
+        {
+          "q": "Pourquoi choisir l'annuel ?",
+          "a": "2 mois offerts par rapport au mensuel — économisez sur la durée."
+        }
+      ]
+    }
+  },
+  "common": {
+    "languageSelector": "Langue"
+  },
+  "auth": {
+    "login": {
+      "badge": "Connexion",
+      "title": "Bon retour sur Obillz",
+      "subtitle": "Accédez à votre espace de gestion de club",
+      "cardTitle": "Identifiants",
+      "cardSubtitle": "Entrez votre email et votre mot de passe",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "Créer un compte",
+      "invalidEmail": "Veuillez entrer une adresse email valide",
+      "passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
+      "invalidCredentials": "Email ou mot de passe incorrect",
+      "success": "Connexion réussie !",
+      "error": "Erreur lors de la connexion",
+      "emailPlaceholder": "votre@email.com",
+      "loading": "Connexion en cours...",
+      "signUpFree": "Créer un compte gratuitement",
+      "secureNote": "Connexion sécurisée · SSL",
+      "backHome": "← Retour à l'accueil"
     }
   }
 }
-

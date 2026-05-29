@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useI18n } from "@/components/I18nProvider";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 function SwissFlag({ className }: { className?: string }) {
@@ -21,31 +22,7 @@ function SwissFlag({ className }: { className?: string }) {
   );
 }
 
-const productLinks = [
-  { href: "#comment-ca-marche", label: "Comment ça marche" },
-  { href: "#modules", label: "Modules" },
-  { href: "#tarifs", label: "Tarifs" },
-  { href: "#faq", label: "FAQ" },
-] as const;
-
-const accountLinks = [
-  { href: "/inscription", label: "Créer un compte" },
-  { href: "/connexion", label: "Connexion" },
-] as const;
-
-const legalLinks = [
-  { href: "/conditions-utilisation", label: "Conditions d'utilisation" },
-  { href: "/politique-confidentialite", label: "Confidentialité" },
-  { href: "/politique-cookies", label: "Cookies" },
-] as const;
-
-function FooterLinkColumn({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+function FooterLinkColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/90">{title}</p>
@@ -79,7 +56,15 @@ function FooterLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 export default function LandingFooter() {
+  const { t } = useI18n();
   const year = new Date().getFullYear();
+
+  const productLinks = [
+    { href: "#comment-ca-marche", label: t("marketing.nav.howItWorks") },
+    { href: "#modules", label: t("marketing.nav.modules") },
+    { href: "#tarifs", label: t("marketing.nav.pricing") },
+    { href: "#faq", label: t("marketing.nav.faq") },
+  ];
 
   return (
     <footer className="relative z-10 mt-4 overflow-hidden border-t border-white/[0.06] bg-[#020409]/95">
@@ -96,13 +81,12 @@ export default function LandingFooter() {
             </Link>
 
             <p className="mt-5 text-sm leading-relaxed text-blue-100/55">
-              Le logiciel pour gérer votre club sportif : membres, cotisations, factures, événements
-              et paiements — depuis un seul espace.
+              {t("marketing.footer.description")}
             </p>
 
             <div className="mt-4 flex items-center gap-2.5">
               <SwissFlag className="h-5 w-5 shrink-0 rounded-[3px]" />
-              <span className="text-xs text-blue-100/45">Conçu pour les clubs sportifs en Suisse</span>
+              <span className="text-xs text-blue-100/45">{t("marketing.footer.swissMade")}</span>
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -114,7 +98,7 @@ export default function LandingFooter() {
                   className="pointer-events-none absolute -inset-1 rounded-full bg-[#1A23FF]/40 opacity-60 blur-xl transition duration-300 group-hover:opacity-90"
                   aria-hidden
                 />
-                <span className="relative">Tester Obillz gratuitement</span>
+                <span className="relative">{t("marketing.footer.cta")}</span>
                 <ArrowRight
                   className="relative h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
                   strokeWidth={2.5}
@@ -125,12 +109,12 @@ export default function LandingFooter() {
                 href="/connexion"
                 className="inline-flex w-full items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/90 transition duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-white sm:w-auto"
               >
-                Connexion
+                {t("marketing.footer.login")}
               </Link>
             </div>
           </div>
 
-          <FooterLinkColumn title="Produit">
+          <FooterLinkColumn title={t("marketing.footer.product")}>
             {productLinks.map((link) => (
               <FooterLink key={link.href} href={link.href}>
                 {link.label}
@@ -138,15 +122,12 @@ export default function LandingFooter() {
             ))}
           </FooterLinkColumn>
 
-          <FooterLinkColumn title="Compte">
-            {accountLinks.map((link) => (
-              <FooterLink key={link.href} href={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
+          <FooterLinkColumn title={t("marketing.footer.account")}>
+            <FooterLink href="/inscription">{t("marketing.footer.createAccount")}</FooterLink>
+            <FooterLink href="/connexion">{t("marketing.footer.login")}</FooterLink>
           </FooterLinkColumn>
 
-          <FooterLinkColumn title="Contact">
+          <FooterLinkColumn title={t("marketing.footer.contact")}>
             <li>
               <a
                 href="mailto:contact@obillz.com"
@@ -155,11 +136,10 @@ export default function LandingFooter() {
                 contact@obillz.com
               </a>
             </li>
-            {legalLinks.map((link) => (
-              <FooterLink key={link.href} href={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
+            <FooterLink href="/mentions-legales">{t("marketing.footer.legalMentions")}</FooterLink>
+            <FooterLink href="/conditions-utilisation">{t("marketing.footer.legalTerms")}</FooterLink>
+            <FooterLink href="/politique-confidentialite">{t("marketing.footer.legalPrivacy")}</FooterLink>
+            <FooterLink href="/politique-cookies">{t("marketing.footer.legalCookies")}</FooterLink>
           </FooterLinkColumn>
         </div>
       </div>
@@ -170,14 +150,14 @@ export default function LandingFooter() {
           aria-hidden
         >
           <span className="translate-y-[28%] select-none whitespace-nowrap text-[clamp(5rem,22vw,13rem)] font-black uppercase leading-none tracking-[-0.04em] text-white/[0.035]">
-            OBILLZ
+            {t("marketing.footer.watermark")}
           </span>
         </div>
 
         <div className="relative mx-auto flex w-[94%] max-w-[1160px] flex-col gap-4 py-6 text-xs text-blue-100/40 sm:flex-row sm:items-center sm:justify-between md:py-7">
-          <p>© {year} Obillz. Tous droits réservés.</p>
+          <p>{t("marketing.footer.copyright", { year })}</p>
           <p className="text-blue-100/45">
-            {TRIAL_DURATION_DAYS} jours d&apos;essai gratuit · Sans carte bancaire pour démarrer
+            {t("marketing.footer.trialNote", { days: TRIAL_DURATION_DAYS })}
           </p>
         </div>
       </div>

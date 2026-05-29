@@ -2,16 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import {
-  ChevronDown,
-  Clock,
-  HelpCircle,
-  Shield,
-  Sparkles,
-  Users,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import {
   easePremium,
   scrollReveal,
@@ -19,78 +10,10 @@ import {
   staggerItem,
   viewportOnce,
 } from "@/components/landing/landing-motion";
-import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
+import { useI18n } from "@/components/I18nProvider";
+import { useLandingFaq, type LandingFaqItem } from "@/lib/landing/use-landing-faq";
 
-type FaqEntry = {
-  question: string;
-  answer: string;
-  icon: LucideIcon;
-  group: "Démarrage" | "Abonnement" | "Sécurité";
-  featured?: boolean;
-};
-
-const faqItems: FaqEntry[] = [
-  {
-    group: "Démarrage",
-    icon: Users,
-    featured: true,
-    question: "Obillz est-il adapté à tous les clubs sportifs ?",
-    answer:
-      "Oui. Football, hockey, tennis, volleyball ou association locale : membres, cotisations, factures, événements et plannings au même endroit.",
-  },
-  {
-    group: "Démarrage",
-    icon: Clock,
-    featured: true,
-    question: "Combien de temps pour configurer le club ?",
-    answer:
-      "Quelques minutes pour créer l'espace. Ajoutez vos membres et lancez vos premières cotisations quand vous voulez.",
-  },
-  {
-    group: "Démarrage",
-    icon: Sparkles,
-    question: "Les membres doivent-ils installer une application ?",
-    answer:
-      "Non. Paiement, inscription à un événement ou infos via liens et QR codes — sans appli obligatoire.",
-  },
-  {
-    group: "Abonnement",
-    icon: Wallet,
-    question: `Que se passe-t-il après les ${TRIAL_DURATION_DAYS} jours d'essai ?`,
-    answer: `Après ${TRIAL_DURATION_DAYS} jours, le compte passe en lecture seule. Vos données restent consultables ; l'édition revient avec l'abonnement.`,
-  },
-  {
-    group: "Abonnement",
-    icon: Users,
-    question: "Quelle différence entre Standard et Équipe ?",
-    answer:
-      "Standard : un compte pour tout gérer. Équipe : plusieurs comptes comité avec rôles et permissions par module.",
-  },
-  {
-    group: "Abonnement",
-    icon: Wallet,
-    question: "Puis-je annuler mon abonnement ?",
-    answer:
-      "Oui, à tout moment. L'accès reste actif jusqu'à la fin de la période payée.",
-  },
-  {
-    group: "Abonnement",
-    icon: Wallet,
-    question: "Pourquoi choisir l'abonnement annuel ?",
-    answer: "2 mois offerts par rapport au mensuel — idéal pour un usage sur la durée.",
-  },
-  {
-    group: "Sécurité",
-    icon: Shield,
-    question: "Mes données sont-elles sécurisées ?",
-    answer: "Oui. Hébergement sécurisé, accès protégés et paiements via Stripe.",
-  },
-];
-
-const featuredItems = faqItems.filter((item) => item.featured);
-const accordionItems = faqItems.filter((item) => !item.featured);
-
-function FeaturedCard({ item, reduceMotion }: { item: FaqEntry; reduceMotion: boolean | null }) {
+function FeaturedCard({ item, reduceMotion }: { item: LandingFaqItem; reduceMotion: boolean | null }) {
   const Icon = item.icon;
   return (
     <motion.article
@@ -104,7 +27,7 @@ function FeaturedCard({ item, reduceMotion }: { item: FaqEntry; reduceMotion: bo
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-300/70">
-            {item.group}
+            {item.groupLabel}
           </p>
           <p className="mt-0.5 text-[13px] font-medium leading-snug text-white/95">
             {item.question}
@@ -123,7 +46,7 @@ function AccordionItem({
   onToggle,
   reduceMotion,
 }: {
-  item: FaqEntry;
+  item: LandingFaqItem;
   index: number;
   isOpen: boolean;
   onToggle: () => void;
@@ -161,7 +84,7 @@ function AccordionItem({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[10px] font-semibold uppercase tracking-wide text-blue-300/60">
-            {item.group}
+            {item.groupLabel}
           </span>
           <span className="mt-0.5 block text-[13px] font-medium leading-snug text-white/95">
             {item.question}
@@ -196,6 +119,10 @@ function AccordionItem({
 }
 
 export default function FaqSection() {
+  const { t } = useI18n();
+  const faqItems = useLandingFaq();
+  const featuredItems = faqItems.filter((item) => item.featured);
+  const accordionItems = faqItems.filter((item) => !item.featured);
   const [openIndex, setOpenIndex] = useState<number>(0);
   const reduceMotion = useReducedMotion();
 
@@ -247,10 +174,10 @@ export default function FaqSection() {
               aria-hidden
             >
               <span className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-blue-100/60">
-                {faqItems.length} thèmes
+                {t("marketing.faq.themesCount", { count: faqItems.length })}
               </span>
               <span className="h-1 w-1 rounded-full bg-blue-400/50" />
-              <span className="text-xs text-blue-100/50">Démarrage · Abonnement · Sécurité</span>
+              <span className="text-xs text-blue-100/50">{t("marketing.faq.themesList")}</span>
             </motion.div>
           </motion.div>
 
@@ -276,7 +203,7 @@ export default function FaqSection() {
               className="relative space-y-2.5 rounded-[1.5rem] border border-white/[0.08] bg-white/[0.02] p-3 shadow-[0_0_60px_rgba(26,35,255,0.1)] backdrop-blur-sm md:p-4"
             >
               <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300/70">
-                Autres questions
+                {t("marketing.faq.otherQuestions")}
               </p>
               <motion.div
                 variants={staggerContainer}

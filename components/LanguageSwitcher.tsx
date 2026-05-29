@@ -10,13 +10,13 @@ const options: { code: Locale; label: string }[] = [
 ];
 
 export default function LanguageSwitcher() {
-  const { locale, setLocale } = useI18n();
+  const { locale, setLocale, t } = useI18n();
 
   return (
     <div
       className="flex items-center rounded-full border border-white/20 bg-white/[0.08] p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md"
       role="group"
-      aria-label="Langue"
+      aria-label={t("common.languageSelector")}
     >
       {options.map((option) => {
         const isActive = locale === option.code;

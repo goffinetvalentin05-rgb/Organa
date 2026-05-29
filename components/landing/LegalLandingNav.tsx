@@ -8,14 +8,14 @@ import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
 const linkKeys = [
-  { href: "#probleme", key: "marketing.nav.problem" },
-  { href: "#modules", key: "marketing.nav.modules" },
-  { href: "#comment-ca-marche", key: "marketing.nav.howItWorks" },
-  { href: "#tarifs", key: "marketing.nav.pricing" },
-  { href: "#faq", key: "marketing.nav.faq" },
+  { href: "/#probleme", key: "marketing.nav.problem" },
+  { href: "/#modules", key: "marketing.nav.modules" },
+  { href: "/#comment-ca-marche", key: "marketing.nav.howItWorks" },
+  { href: "/#tarifs", key: "marketing.nav.pricing" },
+  { href: "/#faq", key: "marketing.nav.faq" },
 ] as const;
 
-export default function LandingNav() {
+export default function LegalLandingNav() {
   const { t } = useI18n();
 
   return (
@@ -39,13 +39,13 @@ export default function LandingNav() {
 
         <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Navigation">
           {linkKeys.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/15 hover:text-white"
             >
               {t(link.key)}
-            </a>
+            </Link>
           ))}
         </nav>
 

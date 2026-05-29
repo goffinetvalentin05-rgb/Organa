@@ -2,149 +2,16 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
-import {
-  CalendarDays,
-  Check,
-  ChevronRight,
-  CreditCard,
-  Coffee,
-  Globe,
-  Receipt,
-  TrendingDown,
-  Users,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
+import { useI18n } from "@/components/I18nProvider";
+import { useLandingModules } from "@/lib/landing/use-landing-modules";
 import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
-
-type ModuleItem = {
-  id: string;
-  title: string;
-  tagline: string;
-  description: string;
-  bullets: string[];
-  icon: LucideIcon;
-  preview: { headline: string; sub: string; chips: string[] };
-};
-
-const modules: ModuleItem[] = [
-  {
-    id: "membres",
-    title: "Membres",
-    tagline: "Toute votre équipe, une seule liste",
-    description:
-      "Centralisez les joueurs, licenciés et comité. Chaque membre a sa fiche, ses cotisations et son historique au même endroit.",
-    bullets: ["Fiches claires et à jour", "Import depuis Excel", "Export pour l'AG en un clic"],
-    icon: Users,
-    preview: {
-      headline: "284 membres",
-      sub: "12 nouveaux ce mois",
-      chips: ["Actifs", "Comité", "Juniors"],
-    },
-  },
-  {
-    id: "cotisations",
-    title: "Cotisations",
-    tagline: "Envoyez et suivez sans relances manuelles",
-    description:
-      "Générez les cotisations de saison, envoyez-les par e-mail et voyez immédiatement qui a payé ou qui est en attente.",
-    bullets: ["Envoi groupé par e-mail", "Relances ciblées", "Statut en temps réel"],
-    icon: Wallet,
-    preview: {
-      headline: "92% payées",
-      sub: "8% en attente · saison 25/26",
-      chips: ["Envoyées", "Payées", "À relancer"],
-    },
-  },
-  {
-    id: "factures",
-    title: "Factures",
-    tagline: "Des documents pro, envoyés vite",
-    description:
-      "Créez des factures propres pour sponsors ou prestataires et suivez les paiements sans quitter Obillz.",
-    bullets: ["Modèles prêts à l'emploi", "Envoi PDF par e-mail", "Suivi payé / impayé"],
-    icon: Receipt,
-    preview: {
-      headline: "17 factures",
-      sub: "4 en attente de paiement",
-      chips: ["Brouillon", "Envoyée", "Payée"],
-    },
-  },
-  {
-    id: "evenements",
-    title: "Événements",
-    tagline: "Inscriptions et plannings simplifiés",
-    description:
-      "Tournois, repas de club, corvées : partagez un lien ou un QR code et récupérez toutes les réponses au même endroit.",
-    bullets: ["Lien ou QR code public", "Liste des inscrits", "Plannings après-match"],
-    icon: CalendarDays,
-    preview: {
-      headline: "3 événements",
-      sub: "42 inscriptions cette semaine",
-      chips: ["À venir", "Inscriptions", "Terminé"],
-    },
-  },
-  {
-    id: "paiements",
-    title: "Paiements",
-    tagline: "Encaissements visibles en direct",
-    description:
-      "Cotisations, buvette, événements : suivez les entrées d'argent et gardez une vue claire sur la trésorerie du club.",
-    bullets: ["Solde club en direct", "Historique des encaissements", "Vue par catégorie"],
-    icon: CreditCard,
-    preview: {
-      headline: "CHF 8'420",
-      sub: "encaissés · 30 derniers jours",
-      chips: ["Cotisations", "Buvette", "Événements"],
-    },
-  },
-  {
-    id: "depenses",
-    title: "Dépenses",
-    tagline: "Charges du club sous contrôle",
-    description:
-      "Enregistrez les dépenses du club et gardez une comptabilité lisible aux côtés des recettes et cotisations.",
-    bullets: ["Saisie rapide", "Catégories personnalisées", "Vue avec les recettes"],
-    icon: TrendingDown,
-    preview: {
-      headline: "Suivi charges",
-      sub: "Matériel, déplacements, licences",
-      chips: ["À valider", "Payé", "Archivé"],
-    },
-  },
-  {
-    id: "buvette",
-    title: "Buvette",
-    tagline: "Réservations sans chaos",
-    description:
-      "Gérez les créneaux buvette, les demandes et les confirmations pour les matchs et événements du club.",
-    bullets: ["Calendrier des créneaux", "Demandes centralisées", "Moins de messages perdus"],
-    icon: Coffee,
-    preview: {
-      headline: "Créneaux buvette",
-      sub: "Samedi 14h–18h · confirmé",
-      chips: ["Demandé", "Confirmé", "Passé"],
-    },
-  },
-  {
-    id: "page-publique",
-    title: "Page publique",
-    tagline: "Votre vitrine en ligne",
-    description:
-      "Une page web du club pour présenter l'équipe, le programme des matchs et les liens utiles aux membres.",
-    bullets: ["URL personnalisée", "Logo et couleurs du club", "Liens inscriptions & buvette"],
-    icon: Globe,
-    preview: {
-      headline: "Page du club",
-      sub: "Matchs · contact · liens utiles",
-      chips: ["Programme", "Buvette", "Contact"],
-    },
-  },
-];
 
 const AUTO_MS = 5200;
 
 export default function ModulesSection() {
+  const { t } = useI18n();
+  const modules = useLandingModules();
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -161,9 +28,10 @@ export default function ModulesSection() {
       setActive((i) => (i + 1) % modules.length);
     }, AUTO_MS);
     return () => window.clearInterval(id);
-  }, [paused, reduceMotion]);
+  }, [paused, reduceMotion, modules.length]);
 
-  const current = modules[active];
+  const current = modules[active] ?? modules[0];
+  if (!current) return null;
   const Icon = current.icon;
 
   return (
@@ -182,13 +50,13 @@ export default function ModulesSection() {
           className="mx-auto max-w-2xl text-center"
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
-            Fonctionnalités
+            {t("marketing.modules.label")}
           </p>
           <h2 className="mt-3 text-balance text-2xl font-black text-white md:text-4xl">
-            Tout le club au même endroit.
+            {t("marketing.modules.title")}
           </h2>
           <p className="mt-4 text-sm text-blue-100/70 md:text-base">
-            Cliquez sur un module pour explorer — la présentation défile aussi toute seule.
+            {t("marketing.modules.subtitle")}
           </p>
         </motion.div>
 
@@ -281,7 +149,7 @@ export default function ModulesSection() {
 
                   <div className="relative mt-6 flex-1 rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:mt-8 md:p-5">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-blue-300/70">
-                      Aperçu
+                      {t("marketing.modules.previewLabel")}
                     </p>
                     <p className="mt-2 text-2xl font-black tabular-nums text-white md:text-3xl">
                       {current.preview.headline}
@@ -308,7 +176,7 @@ export default function ModulesSection() {
                     type="button"
                     onClick={() => goTo(index)}
                     className="group flex flex-1 flex-col gap-1"
-                    aria-label={`Afficher ${mod.title}`}
+                    aria-label={t("marketing.modules.showModule", { name: mod.title })}
                   >
                     <span
                       className={`block h-1 overflow-hidden rounded-full bg-white/10 ${
@@ -339,7 +207,7 @@ export default function ModulesSection() {
 
           <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-blue-200/50 lg:hidden">
             <ChevronRight className="h-3.5 w-3.5 rotate-180" aria-hidden />
-            Faites défiler les modules
+            {t("marketing.modules.scrollHint")}
             <ChevronRight className="h-3.5 w-3.5" aria-hidden />
           </div>
         </motion.div>

@@ -1,0 +1,292 @@
+{
+  "metadata": {
+    "title": "Obillz — Run your sports club without losing your evenings",
+    "description": "Invoices, members, fees, events and payments in one platform built for sports clubs."
+  },
+  "nav": {
+    "problem": "The problem",
+    "modules": "Modules",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "login": "Log in",
+    "cta": "Try for free",
+    "ctaShort": "Try"
+  },
+  "hero": {
+    "title": "Run your club without losing your evenings.",
+    "subtitle": "Invoices, members, membership fees, events and payments in one platform built for sports clubs.",
+    "ctaPrimary": "Try Obillz for free",
+    "ctaSecondary": "See how it works",
+    "hubAriaLabel": "Obillz modules overview"
+  },
+  "problem": {
+    "title": "Clubs waste too much time on admin.",
+    "subtitle": "Between spreadsheets, WhatsApp messages, fee reminders and invoice tracking, running a club quickly gets messy.",
+    "cards": [
+      {
+        "title": "Forgotten membership fees",
+        "description": "Manual reminders, unclear tracking, members paying late."
+      },
+      {
+        "title": "Scattered invoices",
+        "description": "Excel files, lost emails, no clear view of what's been paid."
+      },
+      {
+        "title": "Overloaded committee",
+        "description": "WhatsApp, spreadsheets and paperwork — volunteering becomes unmanageable."
+      },
+      {
+        "title": "Poorly tracked events",
+        "description": "Sign-ups across multiple channels, incomplete lists, no central follow-up."
+      },
+      {
+        "title": "Too many separate tools",
+        "description": "Excel, WhatsApp, email, shared files… every task has its own tool, nothing connects."
+      },
+      {
+        "title": "Everyone on a different screen",
+        "description": "Phone, tablet or PC — the committee checks in from everywhere without the same up-to-date view."
+      }
+    ]
+  },
+  "modules": {
+    "label": "Features",
+    "title": "Your whole club in one place.",
+    "subtitle": "Click a module to explore — the presentation also auto-plays.",
+    "previewLabel": "Preview",
+    "scrollHint": "Scroll through modules",
+    "showModule": "Show {name}",
+    "items": {
+      "membres": {
+        "title": "Members",
+        "tagline": "Your whole team, one list",
+        "description": "Centralise players, licensed members and committee. Each member has their profile, fees and history in one place.",
+        "bullets": ["Clear, up-to-date profiles", "Import from Excel", "One-click AGM export"],
+        "preview": {
+          "headline": "284 members",
+          "sub": "12 new this month",
+          "chips": ["Active", "Committee", "Juniors"]
+        }
+      },
+      "cotisations": {
+        "title": "Membership fees",
+        "tagline": "Send and track without manual chasing",
+        "description": "Generate season fees, email them out and see instantly who has paid or is still pending.",
+        "bullets": ["Bulk email sending", "Targeted reminders", "Real-time status"],
+        "preview": {
+          "headline": "92% paid",
+          "sub": "8% pending · season 25/26",
+          "chips": ["Sent", "Paid", "To remind"]
+        }
+      },
+      "factures": {
+        "title": "Invoices",
+        "tagline": "Professional documents, sent fast",
+        "description": "Create clean invoices for sponsors or suppliers and track payments without leaving Obillz.",
+        "bullets": ["Ready-made templates", "PDF by email", "Paid / unpaid tracking"],
+        "preview": {
+          "headline": "17 invoices",
+          "sub": "4 awaiting payment",
+          "chips": ["Draft", "Sent", "Paid"]
+        }
+      },
+      "evenements": {
+        "title": "Events",
+        "tagline": "Simpler sign-ups and schedules",
+        "description": "Tournaments, club dinners, work parties: share a link or QR code and collect every response in one place.",
+        "bullets": ["Public link or QR code", "Attendee list", "Post-match schedules"],
+        "preview": {
+          "headline": "3 events",
+          "sub": "42 sign-ups this week",
+          "chips": ["Upcoming", "Sign-ups", "Done"]
+        }
+      },
+      "paiements": {
+        "title": "Payments",
+        "tagline": "Income visible in real time",
+        "description": "Fees, bar sales, events: track money in and keep a clear view of club finances.",
+        "bullets": ["Live club balance", "Payment history", "View by category"],
+        "preview": {
+          "headline": "CHF 8,420",
+          "sub": "collected · last 30 days",
+          "chips": ["Fees", "Bar", "Events"]
+        }
+      },
+      "depenses": {
+        "title": "Expenses",
+        "tagline": "Club costs under control",
+        "description": "Record club expenses and keep readable accounts alongside income and fees.",
+        "bullets": ["Quick entry", "Custom categories", "View with income"],
+        "preview": {
+          "headline": "Expense tracking",
+          "sub": "Equipment, travel, licences",
+          "chips": ["To approve", "Paid", "Archived"]
+        }
+      },
+      "buvette": {
+        "title": "Bar",
+        "tagline": "Bookings without chaos",
+        "description": "Manage bar slots, requests and confirmations for matches and club events.",
+        "bullets": ["Slot calendar", "Centralised requests", "Fewer lost messages"],
+        "preview": {
+          "headline": "Bar slots",
+          "sub": "Saturday 2–6 pm · confirmed",
+          "chips": ["Requested", "Confirmed", "Past"]
+        }
+      },
+      "page-publique": {
+        "title": "Public page",
+        "tagline": "Your club online",
+        "description": "A club web page to present the team, match schedule and useful links for members.",
+        "bullets": ["Custom URL", "Club logo and colours", "Sign-up & bar links"],
+        "preview": {
+          "headline": "Club page",
+          "sub": "Matches · contact · useful links",
+          "chips": ["Schedule", "Bar", "Contact"]
+        }
+      }
+    }
+  },
+  "howItWorks": {
+    "label": "How it works",
+    "title": "Easy to get started.",
+    "subtitle": "No need to set everything up at once — go at your own pace, module by module.",
+    "cta": "Try Obillz for free",
+    "steps": [
+      {
+        "title": "Create your club",
+        "description": "A few minutes to set up your workspace."
+      },
+      {
+        "title": "Add your members",
+        "description": "Import or enter when you want — you can start without a full list."
+      },
+      {
+        "title": "Enable what you need",
+        "description": "Fees, events, bar, invoices, public page, campaigns… turn on the modules your club needs."
+      },
+      {
+        "title": "Run day to day",
+        "description": "Send, track, communicate and collect from one dashboard, on desktop or mobile."
+      }
+    ]
+  },
+  "pricing": {
+    "label": "Pricing",
+    "title": "Two plans for your committee size",
+    "subtitle": "{days}-day free trial on Obillz Standard. Upgrade to Team when you want to invite the whole committee.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "billingToggleAria": "Choose monthly or yearly billing",
+    "standardName": "Obillz Standard",
+    "standardDescription": "Main club account — all management features.",
+    "teamName": "Obillz Team",
+    "teamDescription": "Several committee members, each with their own access.",
+    "teamExtraLabel": "Everything in Standard, plus:",
+    "teamBadge": "Multi-user committee",
+    "perMonthSuffix": "CHF/month",
+    "perYearSuffix": "CHF/year",
+    "monthlyEquivalent": "i.e. {amount} CHF/month",
+    "yearlySavingsBadge": "2 months free",
+    "cta": "Try {days} days for free",
+    "footnote": "Secure payment via Stripe · Cancel anytime",
+    "standardFeatures": [
+      "Unlimited members",
+      "Unlimited events",
+      "Schedules & assignments",
+      "Invoices & quotes",
+      "Expense management",
+      "Custom QR codes",
+      "Data export",
+      "Priority support"
+    ],
+    "teamFeatures": [
+      "Multi-user invitations",
+      "Roles & permissions per module",
+      "Separate committee accounts",
+      "Action audit trail"
+    ]
+  },
+  "faq": {
+    "badge": "FAQ",
+    "titleLine1": "Still have questions?",
+    "titleLine2": "We've got answers.",
+    "subtitle": "The essentials at a glance, details in one click.",
+    "themesCount": "{count} topics",
+    "themesList": "Getting started · Subscription · Security",
+    "otherQuestions": "More questions",
+    "groups": {
+      "gettingStarted": "Getting started",
+      "subscription": "Subscription",
+      "security": "Security"
+    },
+    "items": [
+      {
+        "group": "gettingStarted",
+        "featured": true,
+        "question": "Is Obillz suitable for all sports clubs?",
+        "answer": "Yes. Football, hockey, tennis, volleyball or local associations: members, fees, invoices, events and schedules in one place."
+      },
+      {
+        "group": "gettingStarted",
+        "featured": true,
+        "question": "How long to set up the club?",
+        "answer": "A few minutes to create your space. Add members and launch your first fees whenever you're ready."
+      },
+      {
+        "group": "gettingStarted",
+        "question": "Do members need to install an app?",
+        "answer": "No. Pay, sign up for events or get info via links and QR codes — no app required."
+      },
+      {
+        "group": "subscription",
+        "question": "What happens after the {days}-day trial?",
+        "answer": "After {days} days, the account becomes read-only. Your data stays visible; editing returns with a subscription."
+      },
+      {
+        "group": "subscription",
+        "question": "What's the difference between Standard and Team?",
+        "answer": "Standard: one account to manage everything. Team: several committee accounts with roles and permissions per module."
+      },
+      {
+        "group": "subscription",
+        "question": "Can I cancel my subscription?",
+        "answer": "Yes, anytime. Access stays active until the end of the paid period."
+      },
+      {
+        "group": "subscription",
+        "question": "Why choose yearly billing?",
+        "answer": "2 months free compared to monthly — ideal for long-term use."
+      },
+      {
+        "group": "security",
+        "question": "Is my data secure?",
+        "answer": "Yes. Secure hosting, protected access and payments via Stripe."
+      }
+    ]
+  },
+  "finalCta": {
+    "title": "Your club deserves better than a spreadsheet.",
+    "subtitle": "Centralise your management and save time starting now.",
+    "cta": "Try Obillz for free",
+    "loginPrompt": "Already have an account? Log in"
+  },
+  "footer": {
+    "description": "Software to run your sports club: members, fees, invoices, events and payments — all in one place.",
+    "swissMade": "Built for sports clubs in Switzerland",
+    "cta": "Try Obillz for free",
+    "login": "Log in",
+    "product": "Product",
+    "account": "Account",
+    "contact": "Contact",
+    "createAccount": "Create an account",
+    "legalMentions": "Legal notice",
+    "legalTerms": "Terms of use",
+    "legalPrivacy": "Privacy",
+    "legalCookies": "Cookies",
+    "copyright": "© {year} Obillz. All rights reserved.",
+    "trialNote": "{days}-day free trial · No credit card required to start",
+    "watermark": "OBILLZ"
+  }
+}

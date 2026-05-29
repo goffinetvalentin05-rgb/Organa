@@ -28,17 +28,39 @@
       "ctaPrimary": "Start for free",
       "ctaSecondary": "See the demo",
       "paymentsLabel": "Compatible payments:",
-      "payments": ["SEPA", "Card", "Bank transfer", "Multi-currency"],
+      "payments": [
+        "SEPA",
+        "Card",
+        "Bank transfer",
+        "Multi-currency"
+      ],
       "preview": {
         "label": "Product preview",
-        "invoices": { "label": "Invoices", "value": "€12 300" },
-        "quotes": { "label": "Quotes", "sent": "8 sent", "pending": "2 pending" },
-        "expenses": { "label": "Expenses", "value": "€3 480", "due": "Due in 10 days" },
+        "invoices": {
+          "label": "Invoices",
+          "value": "€12 300"
+        },
+        "quotes": {
+          "label": "Quotes",
+          "sent": "8 sent",
+          "pending": "2 pending"
+        },
+        "expenses": {
+          "label": "Expenses",
+          "value": "€3 480",
+          "due": "Due in 10 days"
+        },
         "followUp": {
           "label": "Follow-up",
-          "items": ["Follow-up #2043", "Payment received", "Expense due"]
+          "items": [
+            "Follow-up #2043",
+            "Payment received",
+            "Expense due"
+          ]
         },
-        "abstract": { "label": "Abstract visual" }
+        "abstract": {
+          "label": "Abstract visual"
+        }
       }
     },
     "problem": {
@@ -114,17 +136,30 @@
       "label": "Product view",
       "title": "A dashboard that truly speaks.",
       "description": "Track invoice status in real time from a clear dashboard, with paid / pending / overdue statuses.",
-      "tags": ["Status tracking", "Manual follow-ups", "Expense view", "All in one place"],
+      "tags": [
+        "Status tracking",
+        "Manual follow-ups",
+        "Expense view",
+        "All in one place"
+      ],
       "preview": {
         "label": "Dashboard preview",
         "stats": {
-          "labels": ["Paid invoices", "Pending", "Expenses"],
+          "labels": [
+            "Paid invoices",
+            "Pending",
+            "Expenses"
+          ],
           "value": "+12%",
           "period": "This week"
         },
         "deadlines": {
           "label": "Deadlines",
-          "items": ["Invoice follow-up #1098", "Cloud expense payment", "Quote to approve"],
+          "items": [
+            "Invoice follow-up #1098",
+            "Cloud expense payment",
+            "Quote to approve"
+          ],
           "today": "Today"
         }
       },
@@ -149,7 +184,11 @@
       "free": {
         "title": "Free",
         "subtitle": "Start with no risk.",
-        "features": ["Quote and invoice creation", "Basic tracking", "Limited access"],
+        "features": [
+          "Quote and invoice creation",
+          "Basic tracking",
+          "Limited access"
+        ],
         "cta": "Start for free"
       },
       "pro": {
@@ -271,10 +310,22 @@
     "overview": "Overview",
     "period": "7 days",
     "stats": {
-      "clients": { "label": "Clients", "value": "18 active" },
-      "quotes": { "label": "Quotes", "value": "7 sent" },
-      "invoices": { "label": "Invoices", "value": "12 issued" },
-      "payments": { "label": "Payments", "value": "9 received" }
+      "clients": {
+        "label": "Clients",
+        "value": "18 active"
+      },
+      "quotes": {
+        "label": "Quotes",
+        "value": "7 sent"
+      },
+      "invoices": {
+        "label": "Invoices",
+        "value": "12 issued"
+      },
+      "payments": {
+        "label": "Payments",
+        "value": "9 received"
+      }
     },
     "quoteCard": {
       "title": "Quote",
@@ -948,7 +999,10 @@
           "addManual": "Add a manual link",
           "disabledHint": "Enable the block above to choose links shown on your page."
         }
-      }
+      },
+      "subscriptionActivated": "Subscription activated successfully!",
+      "viewPricing": "View pricing",
+      "subscribe": "Subscribe"
     },
     "clients": {
       "authError": "Authentication error",
@@ -1072,7 +1126,9 @@
         "auditUpdatedBy": "Updated by",
         "birthDate": "Date of birth",
         "avsNumber": "AVS number",
-        "avsMaskedHint": "Masked display to protect this data."
+        "avsMaskedHint": "Masked display to protect this data.",
+        "participationsTitle": "Participation",
+        "participationsDescription": "Schedule / event history (internal sign-up, recognised public registration or admin link)."
       },
       "errors": {
         "missingId": "Client ID missing",
@@ -1278,7 +1334,13 @@
       "exportAccountingDownload": "Download export",
       "emptyState": "No invoices yet",
       "emptyCta": "Create your first invoice",
-      "listTotal": "{count} invoice(s) in total"
+      "listTotal": "{count} invoice(s) in total",
+      "categoryTags": {
+        "sponsors": "Sponsors",
+        "venueRental": "Venue hire",
+        "events": "Events",
+        "buvette": "Bar"
+      }
     },
     "sponsoring": {
       "title": "Sponsoring",
@@ -1740,7 +1802,15 @@
       "legendOccupied": "Occupied",
       "legendReserved": "Reserved",
       "calendarLoading": "Loading calendar...",
-      "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+      "weekdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ]
     },
     "marketing": {
       "loading": "Loading...",
@@ -1905,7 +1975,64 @@
         "save": "Save",
         "saving": "Saving…"
       }
+    },
+    "abonnementPage": {
+      "title": "Subscription",
+      "subtitle": "One plan, all features. Simple and transparent.",
+      "billingToggleAria": "Choose monthly or yearly billing",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "faqTitle": "Frequently asked questions",
+      "faqDescription": "Everything you need to know before subscribing.",
+      "checkoutError": "Something went wrong. Please try again.",
+      "statusActive": "Active subscription",
+      "statusTrial": "Trial period",
+      "statusExpired": "Trial ended",
+      "subscribe": "Subscribe",
+      "perMonth": "/month",
+      "perYear": "/year",
+      "faq": [
+        {
+          "q": "What happens after the {days}-day trial?",
+          "a": "After {days} days, your account becomes read-only. You can still view your data but cannot create or edit items. Subscribe to regain full access."
+        },
+        {
+          "q": "Can I cancel my subscription?",
+          "a": "Yes, anytime. Your subscription stays active until the end of the paid period. No partial refunds."
+        },
+        {
+          "q": "Why choose yearly?",
+          "a": "2 months free compared to monthly — save over time."
+        }
+      ]
+    }
+  },
+  "common": {
+    "languageSelector": "Language"
+  },
+  "auth": {
+    "login": {
+      "badge": "Log in",
+      "title": "Welcome back to Obillz",
+      "subtitle": "Access your club management workspace",
+      "cardTitle": "Credentials",
+      "cardSubtitle": "Enter your email and password",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "No account yet?",
+      "signUp": "Create an account",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordMin": "Password must be at least 8 characters",
+      "invalidCredentials": "Incorrect email or password",
+      "success": "Logged in successfully!",
+      "error": "Error while logging in",
+      "emailPlaceholder": "you@email.com",
+      "loading": "Signing in...",
+      "signUpFree": "Create a free account",
+      "secureNote": "Secure connection · SSL",
+      "backHome": "← Back to home"
     }
   }
 }
-

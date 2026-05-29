@@ -28,17 +28,39 @@
       "ctaPrimary": "Kostenlos starten",
       "ctaSecondary": "Demo ansehen",
       "paymentsLabel": "Kompatible Zahlungen:",
-      "payments": ["SEPA", "Karte", "Überweisung", "Mehrwährungen"],
+      "payments": [
+        "SEPA",
+        "Karte",
+        "Überweisung",
+        "Mehrwährungen"
+      ],
       "preview": {
         "label": "Produktvorschau",
-        "invoices": { "label": "Rechnungen", "value": "€12 300" },
-        "quotes": { "label": "Angebote", "sent": "8 gesendet", "pending": "2 ausstehend" },
-        "expenses": { "label": "Ausgaben", "value": "€3 480", "due": "Fälligkeiten in 10 Tagen" },
+        "invoices": {
+          "label": "Rechnungen",
+          "value": "€12 300"
+        },
+        "quotes": {
+          "label": "Angebote",
+          "sent": "8 gesendet",
+          "pending": "2 ausstehend"
+        },
+        "expenses": {
+          "label": "Ausgaben",
+          "value": "€3 480",
+          "due": "Fälligkeiten in 10 Tagen"
+        },
         "followUp": {
           "label": "Nachverfolgung",
-          "items": ["Nachfassen #2043", "Zahlung erhalten", "Ausgabenfälligkeit"]
+          "items": [
+            "Nachfassen #2043",
+            "Zahlung erhalten",
+            "Ausgabenfälligkeit"
+          ]
         },
-        "abstract": { "label": "Abstraktes Visual" }
+        "abstract": {
+          "label": "Abstraktes Visual"
+        }
       }
     },
     "problem": {
@@ -114,17 +136,30 @@
       "label": "Produktansicht",
       "title": "Ein Dashboard, das wirklich spricht.",
       "description": "Verfolgen Sie den Rechnungsstatus in Echtzeit über ein klares Dashboard, mit Status bezahlt / ausstehend / überfällig.",
-      "tags": ["Status-Tracking", "Manuelle Nachfassungen", "Ausgabenübersicht", "Alles zentral"],
+      "tags": [
+        "Status-Tracking",
+        "Manuelle Nachfassungen",
+        "Ausgabenübersicht",
+        "Alles zentral"
+      ],
       "preview": {
         "label": "Dashboard-Vorschau",
         "stats": {
-          "labels": ["Bezahlte Rechnungen", "Ausstehend", "Ausgaben"],
+          "labels": [
+            "Bezahlte Rechnungen",
+            "Ausstehend",
+            "Ausgaben"
+          ],
           "value": "+12%",
           "period": "Diese Woche"
         },
         "deadlines": {
           "label": "Fälligkeiten",
-          "items": ["Rechnungsnachfassung #1098", "Zahlung Cloud-Ausgabe", "Angebot zur Freigabe"],
+          "items": [
+            "Rechnungsnachfassung #1098",
+            "Zahlung Cloud-Ausgabe",
+            "Angebot zur Freigabe"
+          ],
           "today": "Heute"
         }
       },
@@ -149,7 +184,11 @@
       "free": {
         "title": "Free",
         "subtitle": "Zum Start ohne Risiko.",
-        "features": ["Angebote und Rechnungen erstellen", "Basis-Tracking", "Begrenzter Zugang"],
+        "features": [
+          "Angebote und Rechnungen erstellen",
+          "Basis-Tracking",
+          "Begrenzter Zugang"
+        ],
         "cta": "Kostenlos starten"
       },
       "pro": {
@@ -271,10 +310,22 @@
     "overview": "Überblick",
     "period": "7 Tage",
     "stats": {
-      "clients": { "label": "Kunden", "value": "18 aktiv" },
-      "quotes": { "label": "Angebote", "value": "7 gesendet" },
-      "invoices": { "label": "Rechnungen", "value": "12 erstellt" },
-      "payments": { "label": "Zahlungen", "value": "9 erhalten" }
+      "clients": {
+        "label": "Kunden",
+        "value": "18 aktiv"
+      },
+      "quotes": {
+        "label": "Angebote",
+        "value": "7 gesendet"
+      },
+      "invoices": {
+        "label": "Rechnungen",
+        "value": "12 erstellt"
+      },
+      "payments": {
+        "label": "Zahlungen",
+        "value": "9 erhalten"
+      }
     },
     "quoteCard": {
       "title": "Angebot",
@@ -888,7 +939,10 @@
           "addManual": "Manuellen Link hinzufügen",
           "disabledHint": "Aktivieren Sie den Block oben, um die sichtbaren Links zu wählen."
         }
-      }
+      },
+      "subscriptionActivated": "Abonnement erfolgreich aktiviert!",
+      "viewPricing": "Preise ansehen",
+      "subscribe": "Abonnieren"
     },
     "clients": {
       "authError": "Authentifizierungsfehler",
@@ -1012,7 +1066,9 @@
         "auditUpdatedBy": "Geändert von",
         "birthDate": "Geburtsdatum",
         "avsNumber": "AHV-Nummer",
-        "avsMaskedHint": "Maskierte Anzeige zum Schutz dieser Daten."
+        "avsMaskedHint": "Maskierte Anzeige zum Schutz dieser Daten.",
+        "participationsTitle": "Teilnahmen",
+        "participationsDescription": "Historie Pläne / Events (interne Anmeldung, öffentliche oder Admin-Zuordnung)."
       },
       "errors": {
         "missingId": "Kunden-ID fehlt",
@@ -1218,7 +1274,13 @@
       "exportAccountingDownload": "Export herunterladen",
       "emptyState": "Noch keine Rechnungen",
       "emptyCta": "Erste Rechnung erstellen",
-      "listTotal": "{count} Rechnung(en) gesamt"
+      "listTotal": "{count} Rechnung(en) gesamt",
+      "categoryTags": {
+        "sponsors": "Sponsoren",
+        "venueRental": "Hallenmiete",
+        "events": "Events",
+        "buvette": "Verzehr"
+      }
     },
     "sponsoring": {
       "title": "Sponsoring",
@@ -1680,7 +1742,15 @@
       "legendOccupied": "Belegt",
       "legendReserved": "Reserviert",
       "calendarLoading": "Kalender wird geladen...",
-      "weekdays": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+      "weekdays": [
+        "Mo",
+        "Di",
+        "Mi",
+        "Do",
+        "Fr",
+        "Sa",
+        "So"
+      ]
     },
     "marketing": {
       "loading": "Wird geladen...",
@@ -1723,7 +1793,64 @@
         "empty": "Noch keine Kampagnen.",
         "historyTitle": "Kampagnenverlauf"
       }
+    },
+    "abonnementPage": {
+      "title": "Abonnement",
+      "subtitle": "Ein Tarif, alle Funktionen. Einfach und transparent.",
+      "billingToggleAria": "Monatliche oder jährliche Abrechnung wählen",
+      "monthly": "Monatlich",
+      "yearly": "Jährlich",
+      "faqTitle": "Häufige Fragen",
+      "faqDescription": "Alles Wichtige vor dem Abo.",
+      "checkoutError": "Ein Fehler ist aufgetreten. Bitte erneut versuchen.",
+      "statusActive": "Aktives Abonnement",
+      "statusTrial": "Testphase",
+      "statusExpired": "Test beendet",
+      "subscribe": "Abonnieren",
+      "perMonth": "/Monat",
+      "perYear": "/Jahr",
+      "faq": [
+        {
+          "q": "Was passiert nach {days} Testtagen?",
+          "a": "Nach {days} Tagen nur Lesemodus. Daten bleiben sichtbar; Bearbeitung mit Abo."
+        },
+        {
+          "q": "Kann ich kündigen?",
+          "a": "Ja, jederzeit. Zugang bis Periodenende. Keine Teilrückerstattung."
+        },
+        {
+          "q": "Warum jährlich?",
+          "a": "2 Monate geschenkt gegenüber monatlich."
+        }
+      ]
+    }
+  },
+  "common": {
+    "languageSelector": "Sprache"
+  },
+  "auth": {
+    "login": {
+      "badge": "Anmelden",
+      "title": "Willkommen zurück bei Obillz",
+      "subtitle": "Zugang zu Ihrem Vereins-Verwaltungsbereich",
+      "cardTitle": "Zugangsdaten",
+      "cardSubtitle": "E-Mail und Passwort eingeben",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "forgotPassword": "Passwort vergessen?",
+      "noAccount": "Noch kein Konto?",
+      "signUp": "Konto erstellen",
+      "invalidEmail": "Bitte gültige E-Mail eingeben",
+      "passwordMin": "Passwort mindestens 8 Zeichen",
+      "invalidCredentials": "E-Mail oder Passwort falsch",
+      "success": "Erfolgreich angemeldet!",
+      "error": "Fehler bei der Anmeldung",
+      "emailPlaceholder": "ihre@email.com",
+      "loading": "Anmeldung läuft...",
+      "signUpFree": "Kostenloses Konto erstellen",
+      "secureNote": "Sichere Verbindung · SSL",
+      "backHome": "← Zur Startseite"
     }
   }
 }
-

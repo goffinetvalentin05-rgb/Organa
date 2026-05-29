@@ -1,0 +1,292 @@
+{
+  "metadata": {
+    "title": "Obillz — Verein verwalten, ohne den Abend zu verlieren",
+    "description": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine."
+  },
+  "nav": {
+    "problem": "Problem",
+    "modules": "Module",
+    "howItWorks": "So funktioniert's",
+    "pricing": "Preise",
+    "faq": "FAQ",
+    "login": "Anmelden",
+    "cta": "Kostenlos testen",
+    "ctaShort": "Testen"
+  },
+  "hero": {
+    "title": "Verein verwalten, ohne den Abend zu verlieren.",
+    "subtitle": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine.",
+    "ctaPrimary": "Obillz kostenlos testen",
+    "ctaSecondary": "So funktioniert's",
+    "hubAriaLabel": "Übersicht der Obillz-Module"
+  },
+  "problem": {
+    "title": "Vereine verlieren zu viel Zeit mit Verwaltung.",
+    "subtitle": "Zwischen Excel, WhatsApp, Beitragserinnerungen und Rechnungen wird die Vereinsarbeit schnell unübersichtlich.",
+    "cards": [
+      {
+        "title": "Vergessene Beiträge",
+        "description": "Manuelle Mahnungen, unklare Übersicht, Mitglieder zahlen zu spät."
+      },
+      {
+        "title": "Verstreute Rechnungen",
+        "description": "Excel-Dateien, verlorene Mails, kein klarer Überblick über Bezahltes."
+      },
+      {
+        "title": "Überlasteter Vorstand",
+        "description": "WhatsApp, Tabellen und Papierkram — Ehrenamt wird zur Belastung."
+      },
+      {
+        "title": "Schlecht verfolgte Events",
+        "description": "Anmeldungen über mehrere Kanäle, unvollständige Listen, keine zentrale Übersicht."
+      },
+      {
+        "title": "Zu viele getrennte Tools",
+        "description": "Excel, WhatsApp, Mails, geteilte Dateien — jedes Thema hat sein Tool, nichts hängt zusammen."
+      },
+      {
+        "title": "Jeder auf seinem Gerät",
+        "description": "Handy, Tablet oder PC — der Vorstand schaut von überall, ohne dieselbe aktuelle Sicht."
+      }
+    ]
+  },
+  "modules": {
+    "label": "Funktionen",
+    "title": "Der ganze Verein an einem Ort.",
+    "subtitle": "Modul anklicken zum Entdecken — die Präsentation läuft auch von selbst.",
+    "previewLabel": "Vorschau",
+    "scrollHint": "Module durchscrollen",
+    "showModule": "{name} anzeigen",
+    "items": {
+      "membres": {
+        "title": "Mitglieder",
+        "tagline": "Das ganze Team, eine Liste",
+        "description": "Spieler, Lizenznehmer und Vorstand zentral. Jedes Mitglied mit Profil, Beiträgen und Historie an einem Ort.",
+        "bullets": ["Klare, aktuelle Profile", "Import aus Excel", "Export für die GV per Klick"],
+        "preview": {
+          "headline": "284 Mitglieder",
+          "sub": "12 neu diesen Monat",
+          "chips": ["Aktiv", "Vorstand", "Junioren"]
+        }
+      },
+      "cotisations": {
+        "title": "Beiträge",
+        "tagline": "Versenden und nachverfolgen ohne manuelles Mahnen",
+        "description": "Saisonbeiträge erstellen, per E-Mail senden und sofort sehen, wer bezahlt hat oder aussteht.",
+        "bullets": ["Sammelversand per E-Mail", "Gezielte Erinnerungen", "Status in Echtzeit"],
+        "preview": {
+          "headline": "92% bezahlt",
+          "sub": "8% ausstehend · Saison 25/26",
+          "chips": ["Gesendet", "Bezahlt", "Mahnen"]
+        }
+      },
+      "factures": {
+        "title": "Rechnungen",
+        "tagline": "Professionelle Dokumente, schnell versendet",
+        "description": "Saubere Rechnungen für Sponsoren oder Lieferanten und Zahlungsverfolgung in Obillz.",
+        "bullets": ["Fertige Vorlagen", "PDF per E-Mail", "Bezahlt / offen"],
+        "preview": {
+          "headline": "17 Rechnungen",
+          "sub": "4 Zahlung ausstehend",
+          "chips": ["Entwurf", "Gesendet", "Bezahlt"]
+        }
+      },
+      "evenements": {
+        "title": "Events",
+        "tagline": "Anmeldungen und Pläne vereinfacht",
+        "description": "Turniere, Vereinsessen, Arbeitseinsätze: Link oder QR-Code teilen und alle Antworten an einem Ort.",
+        "bullets": ["Öffentlicher Link oder QR", "Teilnehmerliste", "Pläne nach dem Spiel"],
+        "preview": {
+          "headline": "3 Events",
+          "sub": "42 Anmeldungen diese Woche",
+          "chips": ["Bevorstehend", "Anmeldungen", "Erledigt"]
+        }
+      },
+      "paiements": {
+        "title": "Zahlungen",
+        "tagline": "Einnahmen live sichtbar",
+        "description": "Beiträge, Verzehr, Events: Eingänge verfolgen und klare Sicht auf die Vereinskasse.",
+        "bullets": ["Live-Vereinskonto", "Zahlungshistorie", "Ansicht nach Kategorie"],
+        "preview": {
+          "headline": "CHF 8'420",
+          "sub": "eingegangen · letzte 30 Tage",
+          "chips": ["Beiträge", "Verzehr", "Events"]
+        }
+      },
+      "depenses": {
+        "title": "Ausgaben",
+        "tagline": "Vereinskosten im Griff",
+        "description": "Ausgaben erfassen und übersichtliche Buchhaltung neben Einnahmen und Beiträgen.",
+        "bullets": ["Schnelle Erfassung", "Eigene Kategorien", "Ansicht mit Einnahmen"],
+        "preview": {
+          "headline": "Ausgabenübersicht",
+          "sub": "Material, Fahrten, Lizenzen",
+          "chips": ["Zu prüfen", "Bezahlt", "Archiviert"]
+        }
+      },
+      "buvette": {
+        "title": "Verzehr",
+        "tagline": "Reservierungen ohne Chaos",
+        "description": "Verzehr-Slots, Anfragen und Bestätigungen für Spiele und Vereinsanlässe verwalten.",
+        "bullets": ["Slot-Kalender", "Zentrale Anfragen", "Weniger verlorene Nachrichten"],
+        "preview": {
+          "headline": "Verzehr-Slots",
+          "sub": "Samstag 14–18 Uhr · bestätigt",
+          "chips": ["Angefragt", "Bestätigt", "Vorbei"]
+        }
+      },
+      "page-publique": {
+        "title": "Öffentliche Seite",
+        "tagline": "Ihr Verein online",
+        "description": "Eine Vereinswebseite für Team, Spielplan und nützliche Links für Mitglieder.",
+        "bullets": ["Eigene URL", "Logo und Vereinsfarben", "Links Anmeldung & Verzehr"],
+        "preview": {
+          "headline": "Vereinsseite",
+          "sub": "Spiele · Kontakt · Links",
+          "chips": ["Programm", "Verzehr", "Kontakt"]
+        }
+      }
+    }
+  },
+  "howItWorks": {
+    "label": "So funktioniert's",
+    "title": "Einfach einzurichten.",
+    "subtitle": "Nicht alles auf einmal — Schritt für Schritt, Modul für Modul.",
+    "cta": "Obillz kostenlos testen",
+    "steps": [
+      {
+        "title": "Verein anlegen",
+        "description": "Ein paar Minuten für Ihren Bereich."
+      },
+      {
+        "title": "Mitglieder hinzufügen",
+        "description": "Import oder Eingabe wann Sie wollen — Start auch ohne vollständige Liste."
+      },
+      {
+        "title": "Was Sie brauchen aktivieren",
+        "description": "Beiträge, Events, Verzehr, Rechnungen, öffentliche Seite, Kampagnen… nur die passenden Module."
+      },
+      {
+        "title": "Im Alltag steuern",
+        "description": "Senden, verfolgen, kommunizieren und kassieren von einem Dashboard — Desktop oder Mobil."
+      }
+    ]
+  },
+  "pricing": {
+    "label": "Preise",
+    "title": "Zwei Tarife für Ihre Vorstandsgrösse",
+    "subtitle": "{days} Tage kostenlos mit Obillz Standard. Wechsel zu Team, wenn der ganze Vorstand mitmachen soll.",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "billingToggleAria": "Monatliche oder jährliche Abrechnung wählen",
+    "standardName": "Obillz Standard",
+    "standardDescription": "Hauptkonto des Vereins — alle Verwaltungsfunktionen.",
+    "teamName": "Obillz Team",
+    "teamDescription": "Mehrere Vorstandsmitglieder, jeweils mit eigenem Zugang.",
+    "teamExtraLabel": "Alles aus Standard, plus:",
+    "teamBadge": "Mehrbenutzer-Vorstand",
+    "perMonthSuffix": "CHF/Monat",
+    "perYearSuffix": "CHF/Jahr",
+    "monthlyEquivalent": "entspricht {amount} CHF/Monat",
+    "yearlySavingsBadge": "2 Monate geschenkt",
+    "cta": "{days} Tage kostenlos testen",
+    "footnote": "Sichere Zahlung via Stripe · Jederzeit kündbar",
+    "standardFeatures": [
+      "Unbegrenzte Mitglieder",
+      "Unbegrenzte Events",
+      "Pläne & Einteilungen",
+      "Rechnungen & Offerten",
+      "Ausgabenverwaltung",
+      "Eigene QR-Codes",
+      "Datenexport",
+      "Prioritäts-Support"
+    ],
+    "teamFeatures": [
+      "Multi-User-Einladungen",
+      "Rollen & Rechte pro Modul",
+      "Getrennte Vorstandskonten",
+      "Nachvollziehbarkeit der Aktionen"
+    ]
+  },
+  "faq": {
+    "badge": "FAQ",
+    "titleLine1": "Noch Fragen?",
+    "titleLine2": "Wir haben Antworten.",
+    "subtitle": "Das Wichtigste auf einen Blick, Details per Klick.",
+    "themesCount": "{count} Themen",
+    "themesList": "Einstieg · Abo · Sicherheit",
+    "otherQuestions": "Weitere Fragen",
+    "groups": {
+      "gettingStarted": "Einstieg",
+      "subscription": "Abonnement",
+      "security": "Sicherheit"
+    },
+    "items": [
+      {
+        "group": "gettingStarted",
+        "featured": true,
+        "question": "Ist Obillz für alle Sportvereine geeignet?",
+        "answer": "Ja. Fussball, Hockey, Tennis, Volleyball oder lokale Vereine: Mitglieder, Beiträge, Rechnungen, Events und Pläne an einem Ort."
+      },
+      {
+        "group": "gettingStarted",
+        "featured": true,
+        "question": "Wie lange dauert die Einrichtung?",
+        "answer": "Ein paar Minuten für den Bereich. Mitglieder und erste Beiträge, wann Sie möchten."
+      },
+      {
+        "group": "gettingStarted",
+        "question": "Brauchen Mitglieder eine App?",
+        "answer": "Nein. Zahlen, Event-Anmeldung oder Infos per Link und QR-Code — ohne Pflicht-App."
+      },
+      {
+        "group": "subscription",
+        "question": "Was passiert nach {days} Testtagen?",
+        "answer": "Nach {days} Tagen nur noch Lesemodus. Daten bleiben sichtbar; Bearbeitung mit Abo."
+      },
+      {
+        "group": "subscription",
+        "question": "Unterschied Standard und Team?",
+        "answer": "Standard: ein Konto für alles. Team: mehrere Vorstandskonten mit Rollen und Rechten pro Modul."
+      },
+      {
+        "group": "subscription",
+        "question": "Kann ich kündigen?",
+        "answer": "Ja, jederzeit. Zugang bis Periodenende."
+      },
+      {
+        "group": "subscription",
+        "question": "Warum jährlich?",
+        "answer": "2 Monate geschenkt gegenüber monatlich — ideal für Dauernutzung."
+      },
+      {
+        "group": "security",
+        "question": "Sind meine Daten sicher?",
+        "answer": "Ja. Sicheres Hosting, geschützte Zugänge und Zahlungen via Stripe."
+      }
+    ]
+  },
+  "finalCta": {
+    "title": "Ihr Verein verdient mehr als eine Excel-Tabelle.",
+    "subtitle": "Verwaltung zentralisieren und ab sofort Zeit sparen.",
+    "cta": "Obillz kostenlos testen",
+    "loginPrompt": "Bereits ein Konto? Anmelden"
+  },
+  "footer": {
+    "description": "Software für Sportvereine: Mitglieder, Beiträge, Rechnungen, Events und Zahlungen — alles an einem Ort.",
+    "swissMade": "Für Sportvereine in der Schweiz entwickelt",
+    "cta": "Obillz kostenlos testen",
+    "login": "Anmelden",
+    "product": "Produkt",
+    "account": "Konto",
+    "contact": "Kontakt",
+    "createAccount": "Konto erstellen",
+    "legalMentions": "Impressum",
+    "legalTerms": "Nutzungsbedingungen",
+    "legalPrivacy": "Datenschutz",
+    "legalCookies": "Cookies",
+    "copyright": "© {year} Obillz. Alle Rechte vorbehalten.",
+    "trialNote": "{days} Tage kostenlos · Keine Karte zum Start nötig",
+    "watermark": "OBILLZ"
+  }
+}
