@@ -17,8 +17,8 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Colors - Dashboard (fond bleu produit) */
-  --bg-dashboard: var(--obillz-hero-blue);
+  /* Colors - Dashboard (fond dark premium, aligné landing) */
+  --bg-dashboard: #020617;
   --bg-surface: #FFFFFF;
   --bg-surface-hover: #F1F5F9;
   --border: rgba(15, 23, 42, 0.08);
@@ -67,7 +67,25 @@
   --font-heading: var(--font-heading);
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  background: #020617;
+  overflow-x: hidden;
+}
+
 body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  background: #020617;
   color: var(--text-primary);
   font-family: var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   position: relative;
@@ -76,16 +94,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background global */
+/* Fond par défaut : marketing / auth / pages légales (évite les bandes blanches iOS Safari) */
 body.app-bg {
-  background-color: #ffffff !important;
-  min-height: 100vh !important;
+  background-color: #020617 !important;
+  min-height: 100dvh !important;
   position: relative;
 }
 
-/* Pages SaaS - fond sobre */
-body.app-bg:has(.dashboard-shell) {
-  background-color: var(--obillz-hero-blue) !important;
+body.app-bg:has(.obillz-landing),
+body.app-bg:has(.dashboard-shell),
+body.app-bg:has(.obillz-dashboard) {
+  background-color: #020617 !important;
 }
 
 body.app-bg::before {
@@ -196,7 +215,7 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-/* Titres principaux des pages dashboard sur fond bleu */
+/* Titres principaux des pages dashboard sur fond dark */
 .dashboard-shell main h1 {
   color: #ffffff !important;
 }
@@ -206,7 +225,7 @@ h3 {
   color: rgba(255, 255, 255, 0.82) !important;
 }
 
-/* Cartes claires dans le contenu : le <h1> n’est pas le grand titre « page sur fond bleu »
+/* Cartes claires dans le contenu : le <h1> n’est pas le grand titre « page sur fond dark »
    (ex. MFA, modales) — sans ceci, h1 / h1+p restent blancs et illisibles sur fond blanc. */
 .dashboard-shell main .dashboard-card-surface h1 {
   color: #0f172a !important;
@@ -241,7 +260,7 @@ h3 {
   border: 1px solid var(--accent-border);
 }
 
-/* Contraste lisible des cartes sur fond bleu */
+/* Contraste lisible des cartes sur fond dark */
 .dashboard-shell .shadow-premium {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
 }
@@ -250,14 +269,14 @@ h3 {
    Harmonisation legacy → design system (dashboard-shell).
    Beaucoup d'écrans dashboard utilisent encore d'anciennes classes
    (`bg-surface`, `bg-surface/80`, `border-subtle`, `text-secondary`…).
-   Sur le fond bleu/violet, ces surfaces transparentes devenaient
-   illisibles ("bleu sur bleu"). On les remappe ici vers la même
+   Sur le fond dark, ces surfaces transparentes devenaient
+   illisibles. On les remappe ici vers la même
    surface claire glass utilisée par le Dashboard du club.
    ------------------------------------------------------------------ */
 
 /* Cartes / panneaux clairs : toute déclinaison `.bg-surface`,
    `.bg-surface/80`, `.bg-surface/60` devient une surface claire
-   semi-transparente lisible sur le fond bleu. */
+   semi-transparente lisible sur le fond dark. */
 .dashboard-shell main .bg-surface,
 .dashboard-shell main [class*="bg-surface/"] {
   background-color: rgba(255, 255, 255, 0.94) !important;

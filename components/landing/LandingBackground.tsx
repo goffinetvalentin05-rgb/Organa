@@ -6,7 +6,10 @@ export default function LandingBackground() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none absolute inset-0 min-h-[100dvh] overflow-hidden bg-[#020617]"
+      aria-hidden
+    >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_70%_at_50%_-5%,rgba(26,35,255,0.28),transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_0%_50%,rgba(37,99,235,0.1),transparent_55%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_100%_80%,rgba(26,35,255,0.12),transparent_55%)]" />

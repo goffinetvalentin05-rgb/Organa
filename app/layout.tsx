@@ -1,5 +1,5 @@
 import "./globals.css";
-import Image from "next/image";
+import type { Viewport } from "next";
 import { Toaster } from "react-hot-toast";
 import { Inter } from "next/font/google";
 import { I18nProvider } from "@/components/I18nProvider";
@@ -14,6 +14,17 @@ const inter = Inter({
 export const metadata = {
   title: "Obillz",
   description: "La gestion simple pour les clubs sportifs",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#020617",
 };
 
 export default function RootLayout({
@@ -22,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={inter.variable}>
-      <body className="font-body min-h-screen text-white app-bg">
+    <html lang="fr" className={`${inter.variable} h-full`}>
+      <body className="font-body min-h-[100dvh] w-full text-white app-bg">
         {/* CONTENU DES PAGES */}
         {/* Note: Les pages gèrent leur propre structure HTML (balise <main> incluse) */}
         <I18nProvider>{children}</I18nProvider>

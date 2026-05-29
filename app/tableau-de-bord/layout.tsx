@@ -6,7 +6,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { obillzLandingGridOverlayClass, obillzLandingRootClass } from "@/components/ui";
+import LandingBackground from "@/components/landing/LandingBackground";
+import { dashboardShellRootClass, obillzLandingGridOverlayClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import ClubPublicPageAnnouncementModal from "@/components/public-page/ClubPublicPageAnnouncementModal";
 import {
@@ -144,7 +145,8 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className={`dashboard-shell ${obillzLandingRootClass}`}>
+    <div className={dashboardShellRootClass}>
+      <LandingBackground />
       <ClubPublicPageAnnouncementModal />
       <div className={obillzLandingGridOverlayClass} aria-hidden />
 
@@ -156,7 +158,7 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Sidebar — même bleu que la landing (grille du shell visible à travers) */}
+      {/* Sidebar — glass sur fond dark (grille du shell visible à travers) */}
       <aside
         className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/10 bg-white/[0.06] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -225,7 +227,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
+      <div className="relative z-10 lg:ml-72 flex min-h-[100dvh] flex-col">
         {/* Topbar — capsule glass (aligné landing / auth) */}
         <header className="sticky top-0 z-30 px-3 pt-3 sm:px-4 lg:px-6">
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/25 bg-white/[0.12] px-3 py-2 shadow-[0_8px_40px_rgba(26,35,255,0.2),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:gap-4 sm:px-4 sm:py-2.5">

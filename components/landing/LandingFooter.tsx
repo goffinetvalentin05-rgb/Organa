@@ -67,7 +67,7 @@ export default function LandingFooter() {
   ];
 
   return (
-    <footer className="relative z-10 mt-4 overflow-hidden border-t border-white/[0.06] bg-[#020409]/95">
+    <footer className="relative z-10 mt-4 overflow-hidden border-t border-white/[0.06] bg-[#020617]/95 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_100%,rgba(26,35,255,0.14),transparent_55%)]"
         aria-hidden

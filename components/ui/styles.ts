@@ -1,19 +1,22 @@
 /**
- * Fond marketing Obillz — landing dark premium (bleu / noir).
+ * Fond dark premium partagé (landing, dashboard, auth).
+ * Base #020617 — pas de dégradé bleu vif plein écran (ancien design).
  */
-export const obillzLandingRootClass =
-  "relative min-h-screen overflow-x-clip bg-[#03050f] text-white bg-[radial-gradient(ellipse_120%_80%_at_50%_-15%,rgba(26,35,255,0.35),transparent_55%),radial-gradient(ellipse_70%_50%_at_0%_40%,rgba(37,99,235,0.12),transparent_50%),radial-gradient(ellipse_60%_45%_at_100%_60%,rgba(26,35,255,0.15),transparent_52%),linear-gradient(180deg,#050816_0%,#03050f_40%,#020409_100%)]";
+const obillzAppShellBackgroundClass =
+  "relative isolate min-h-[100dvh] w-full overflow-x-clip bg-[#020617] text-white bg-[radial-gradient(ellipse_120%_80%_at_50%_-15%,rgba(26,35,255,0.35),transparent_55%),radial-gradient(ellipse_70%_50%_at_0%_40%,rgba(37,99,235,0.12),transparent_50%),radial-gradient(ellipse_60%_45%_at_100%_60%,rgba(26,35,255,0.15),transparent_52%),linear-gradient(180deg,#050816_0%,#020617_50%,#020409_100%)]";
 
-/** Grille discrète — landing dark */
+/** Fond marketing Obillz — landing dark premium */
+export const obillzLandingRootClass = `obillz-landing ${obillzAppShellBackgroundClass}`;
+
+/** Grille discrète — landing / dashboard dark */
 export const obillzLandingGridOverlayClass =
   "pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,rgba(96,165,250,0.35)_1px,transparent_1px),linear-gradient(to_bottom,rgba(96,165,250,0.35)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_90%_70%_at_50%_20%,black,transparent)]";
 
-/** Shell tableau de bord — bleu Obillz classique (inchangé). */
-export const dashboardShellRootClass =
-  "relative min-h-screen overflow-x-clip bg-[#1218e8] text-white bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,rgba(255,255,255,0.18),transparent_48%),radial-gradient(ellipse_60%_50%_at_100%_15%,rgba(96,165,250,0.2),transparent_52%),radial-gradient(ellipse_55%_45%_at_0%_85%,rgba(26,35,255,0.55),transparent_48%),linear-gradient(180deg,#1A23FF_0%,#151dd4_45%,#1218c8_100%)]";
+/** Shell tableau de bord — même fond dark que la landing (plus de bleu #1A23FF plein écran). */
+export const dashboardShellRootClass = `dashboard-shell obillz-dashboard ${obillzAppShellBackgroundClass}`;
 
-export const dashboardGridOverlayClass =
-  "pointer-events-none absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:32px_32px]";
+/** @deprecated Alias — grille identique à la landing */
+export const dashboardGridOverlayClass = obillzLandingGridOverlayClass;
 
 /**
  * Section / tableau / liste — **une seule carte** (un radius, une bordure, pas de cadre interne).
