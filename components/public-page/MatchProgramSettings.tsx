@@ -6,9 +6,23 @@ import { FileText, Loader, Trash } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import type { MatchProgramType, PublicPageSettings } from "@/lib/public-page/types";
 import { cn } from "@/components/ui";
-
-const inputClass =
-  "w-full rounded-xl border border-slate-200/80 bg-white/90 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20";
+import {
+  ppCheckboxClass,
+  ppDangerButtonClass,
+  ppDashedButtonClass,
+  ppDisabledBlockClass,
+  ppHintClass,
+  ppInputClass,
+  ppLabelClass,
+  ppPanelClass,
+  ppSecondaryButtonClass,
+  ppSegmentActive,
+  ppSegmentBase,
+  ppSegmentInactive,
+  ppToggleHintClass,
+  ppToggleRowClass,
+  ppToggleTitleClass,
+} from "./settings-styles";
 
 export default function MatchProgramSettings({
   form,
@@ -86,12 +100,12 @@ export default function MatchProgramSettings({
 
   return (
     <div className="space-y-4">
-      <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
+      <label className={ppToggleRowClass}>
         <div>
-          <span className="text-sm font-medium text-white">
+          <span className={ppToggleTitleClass}>
             {t("dashboard.settings.publicPage.matchProgram.enabled")}
           </span>
-          <p className="mt-0.5 text-xs text-white/55">
+          <p className={ppToggleHintClass}>
             {t("dashboard.settings.publicPage.matchProgram.enabledHint")}
           </p>
         </div>
@@ -104,138 +118,144 @@ export default function MatchProgramSettings({
               showMatchProgram: e.target.checked,
             })
           }
-          className="h-5 w-5 rounded accent-[#2563EB]"
+          className={ppCheckboxClass}
         />
       </label>
 
-      {form.showMatchProgram && (
-        <>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => setType("external_url")}
-              className={cn(
-                "flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition",
-                form.matchProgramType === "external_url"
-                  ? "border-blue-400 bg-blue-500/20 text-white"
-                  : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10"
-              )}
-            >
-              {t("dashboard.settings.publicPage.matchProgram.typeExternal")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setType("pdf")}
-              className={cn(
-                "flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition",
-                form.matchProgramType === "pdf"
-                  ? "border-blue-400 bg-blue-500/20 text-white"
-                  : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10"
-              )}
-            >
-              {t("dashboard.settings.publicPage.matchProgram.typePdf")}
-            </button>
-          </div>
-
-          {form.matchProgramType === "external_url" && (
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
-                {t("dashboard.settings.publicPage.matchProgram.urlLabel")}
-              </label>
-              <input
-                className={inputClass}
-                value={form.matchProgramUrl || ""}
-                onChange={(e) =>
-                  setForm({ ...form, matchProgramUrl: e.target.value, matchProgramType: "external_url" })
-                }
-                placeholder="https://..."
-              />
-              <p className="mt-1.5 text-xs text-white/50">
-                {t("dashboard.settings.publicPage.matchProgram.urlHint")}
-              </p>
+      <div className={cn(!form.showMatchProgram && ppDisabledBlockClass)}>
+        {form.showMatchProgram ? (
+          <>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setType("external_url")}
+                className={cn(
+                  ppSegmentBase,
+                  form.matchProgramType === "external_url" ? ppSegmentActive : ppSegmentInactive
+                )}
+              >
+                {t("dashboard.settings.publicPage.matchProgram.typeExternal")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setType("pdf")}
+                className={cn(
+                  ppSegmentBase,
+                  form.matchProgramType === "pdf" ? ppSegmentActive : ppSegmentInactive
+                )}
+              >
+                {t("dashboard.settings.publicPage.matchProgram.typePdf")}
+              </button>
             </div>
-          )}
 
-          {form.matchProgramType === "pdf" && (
-            <div className="space-y-3 rounded-xl border border-white/15 bg-white/5 p-4">
-              {form.matchProgramPdfPath ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
-                      <FileText className="h-5 w-5" />
+            {form.matchProgramType === "external_url" && (
+              <div>
+                <label className={ppLabelClass}>
+                  {t("dashboard.settings.publicPage.matchProgram.urlLabel")}
+                </label>
+                <input
+                  className={ppInputClass}
+                  value={form.matchProgramUrl || ""}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      matchProgramUrl: e.target.value,
+                      matchProgramType: "external_url",
+                    })
+                  }
+                  placeholder="https://..."
+                />
+                <p className={ppHintClass}>
+                  {t("dashboard.settings.publicPage.matchProgram.urlHint")}
+                </p>
+              </div>
+            )}
+
+            {form.matchProgramType === "pdf" && (
+              <div className={ppPanelClass}>
+                {form.matchProgramPdfPath ? (
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-slate-900">
+                          {form.matchProgramPdfName || "programme.pdf"}
+                        </p>
+                        {form.matchProgramPdfUrl ? (
+                          <a
+                            href={form.matchProgramPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-medium text-[#2563EB] hover:underline"
+                          >
+                            {t("dashboard.settings.publicPage.matchProgram.previewPdf")}
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
-                        {form.matchProgramPdfName || "programme.pdf"}
-                      </p>
-                      {form.matchProgramPdfUrl ? (
-                        <a
-                          href={form.matchProgramPdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-200 hover:underline"
-                        >
-                          {t("dashboard.settings.publicPage.matchProgram.previewPdf")}
-                        </a>
-                      ) : null}
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileRef.current?.click()}
+                        disabled={uploading}
+                        className={ppSecondaryButtonClass}
+                      >
+                        {uploading
+                          ? t("dashboard.settings.publicPage.matchProgram.uploading")
+                          : t("dashboard.settings.publicPage.matchProgram.replacePdf")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void deletePdf()}
+                        disabled={deleting}
+                        className={ppDangerButtonClass}
+                      >
+                        {deleting ? (
+                          <Loader className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash className="h-3.5 w-3.5" />
+                        )}
+                        {t("dashboard.settings.publicPage.matchProgram.deletePdf")}
+                      </button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                ) : (
+                  <div>
+                    <p className="mb-3 text-sm text-slate-600">
+                      {t("dashboard.settings.publicPage.matchProgram.pdfEmpty")}
+                    </p>
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
                       disabled={uploading}
-                      className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/15 disabled:opacity-50"
+                      className={ppDashedButtonClass}
                     >
-                      {uploading
-                        ? t("dashboard.settings.publicPage.matchProgram.uploading")
-                        : t("dashboard.settings.publicPage.matchProgram.replacePdf")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void deletePdf()}
-                      disabled={deleting}
-                      className="inline-flex items-center gap-1 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-100 hover:bg-rose-500/20 disabled:opacity-50"
-                    >
-                      {deleting ? (
-                        <Loader className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Trash className="h-3.5 w-3.5" />
-                      )}
-                      {t("dashboard.settings.publicPage.matchProgram.deletePdf")}
+                      {uploading && <Loader className="h-4 w-4 animate-spin" />}
+                      {t("dashboard.settings.publicPage.matchProgram.uploadPdf")}
                     </button>
                   </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="mb-3 text-sm text-white/70">
-                    {t("dashboard.settings.publicPage.matchProgram.pdfEmpty")}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={uploading}
-                    className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
-                  >
-                    {uploading && <Loader className="h-4 w-4 animate-spin" />}
-                    {t("dashboard.settings.publicPage.matchProgram.uploadPdf")}
-                  </button>
-                </div>
-              )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) void uploadPdf(file);
-                }}
-              />
-            </div>
-          )}
-        </>
-      )}
+                )}
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadPdf(file);
+                  }}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <p className={ppHintClass}>
+            {t("dashboard.settings.publicPage.matchProgram.disabledHint")}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

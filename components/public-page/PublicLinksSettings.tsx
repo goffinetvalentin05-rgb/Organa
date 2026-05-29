@@ -4,9 +4,20 @@ import { useI18n } from "@/components/I18nProvider";
 import type { PublicPageLink, PublicPageLinkInput, PublicPageLinkType } from "@/lib/public-page/types";
 import { cn } from "@/components/ui";
 import { Trash, Plus } from "@/lib/icons";
-
-const inputClass =
-  "w-full rounded-xl border border-slate-200/80 bg-white/90 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20";
+import {
+  ppCheckboxClass,
+  ppDashedButtonClass,
+  ppDisabledBlockClass,
+  ppHintClass,
+  ppInputClass,
+  ppLinkCardClass,
+  ppPanelClass,
+  ppQrcodeChipAddedClass,
+  ppQrcodeChipClass,
+  ppToggleHintClass,
+  ppToggleRowClass,
+  ppToggleTitleClass,
+} from "./settings-styles";
 
 function toInput(link: PublicPageLink, index: number): PublicPageLinkInput {
   return {
@@ -87,12 +98,12 @@ export default function PublicLinksSettings({
 
   return (
     <div className="space-y-4">
-      <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
+      <label className={ppToggleRowClass}>
         <div>
-          <span className="text-sm font-medium text-white">
+          <span className={ppToggleTitleClass}>
             {t("dashboard.settings.publicPage.publicLinks.enabled")}
           </span>
-          <p className="mt-0.5 text-xs text-white/55">
+          <p className={ppToggleHintClass}>
             {t("dashboard.settings.publicPage.publicLinks.enabledHint")}
           </p>
         </div>
@@ -100,129 +111,125 @@ export default function PublicLinksSettings({
           type="checkbox"
           checked={enabled}
           onChange={(e) => onEnabledChange(e.target.checked)}
-          className="h-5 w-5 rounded accent-[#2563EB]"
+          className={ppCheckboxClass}
         />
       </label>
 
-      {enabled && (
-        <>
-          {qrcodeOptions.length > 0 && (
-            <div className="rounded-xl border border-white/15 bg-white/5 p-4">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/60">
-                {t("dashboard.settings.publicPage.publicLinks.fromQrcodes")}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {qrcodeOptions.map((option) => {
-                  const added = existingQrcodeIds.has(option.id);
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      disabled={added}
-                      onClick={() => addFromQrcode(option)}
-                      className={cn(
-                        "rounded-lg px-3 py-1.5 text-xs font-medium transition",
-                        added
-                          ? "cursor-not-allowed border border-white/10 bg-white/5 text-white/40"
-                          : "border border-blue-400/40 bg-blue-500/15 text-blue-100 hover:bg-blue-500/25"
-                      )}
-                    >
-                      + {option.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            {links.length === 0 ? (
-              <p className="text-sm text-white/60">
-                {t("dashboard.settings.publicPage.publicLinks.empty")}
-              </p>
-            ) : (
-              links.map((link, index) => (
-                <div
-                  key={link.id || `new-${index}`}
-                  className="rounded-xl border border-white/15 bg-white/5 p-4 space-y-3"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-white/60">
-                      {t("dashboard.settings.publicPage.publicLinks.linkNumber", {
-                        n: String(index + 1),
-                      })}
-                    </span>
-                    <div className="flex items-center gap-1">
+      <div className={cn(!enabled && ppDisabledBlockClass)}>
+        {enabled ? (
+          <>
+            {qrcodeOptions.length > 0 && (
+              <div className={ppPanelClass}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {t("dashboard.settings.publicPage.publicLinks.fromQrcodes")}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {qrcodeOptions.map((option) => {
+                    const added = existingQrcodeIds.has(option.id);
+                    return (
                       <button
+                        key={option.id}
                         type="button"
-                        disabled={index === 0}
-                        onClick={() => moveLink(index, -1)}
-                        className="rounded px-2 py-1 text-xs text-white/70 hover:bg-white/10 disabled:opacity-30"
+                        disabled={added}
+                        onClick={() => addFromQrcode(option)}
+                        className={added ? ppQrcodeChipAddedClass : ppQrcodeChipClass}
                       >
-                        ↑
+                        + {option.name}
                       </button>
-                      <button
-                        type="button"
-                        disabled={index === links.length - 1}
-                        onClick={() => moveLink(index, 1)}
-                        className="rounded px-2 py-1 text-xs text-white/70 hover:bg-white/10 disabled:opacity-30"
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeLink(index)}
-                        className="rounded p-1.5 text-rose-200 hover:bg-rose-500/20"
-                        aria-label="Supprimer"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <label className="flex items-center gap-2 text-sm text-white/80">
-                    <input
-                      type="checkbox"
-                      checked={link.isActive !== false}
-                      onChange={(e) => updateLink(index, { isActive: e.target.checked })}
-                      className="rounded accent-[#2563EB]"
-                    />
-                    {t("dashboard.settings.publicPage.publicLinks.active")}
-                  </label>
-
-                  <input
-                    className={inputClass}
-                    value={link.title}
-                    onChange={(e) => updateLink(index, { title: e.target.value })}
-                    placeholder={t("dashboard.settings.publicPage.publicLinks.titlePlaceholder")}
-                  />
-                  <input
-                    className={inputClass}
-                    value={link.url}
-                    onChange={(e) => updateLink(index, { url: e.target.value })}
-                    placeholder="https://... ou /inscription/..."
-                  />
-                  <input
-                    className={inputClass}
-                    value={link.description || ""}
-                    onChange={(e) => updateLink(index, { description: e.target.value })}
-                    placeholder={t("dashboard.settings.publicPage.publicLinks.descriptionPlaceholder")}
-                  />
+                    );
+                  })}
                 </div>
-              ))
+              </div>
             )}
-          </div>
 
-          <button
-            type="button"
-            onClick={addManual}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10"
-          >
-            <Plus className="h-4 w-4" />
-            {t("dashboard.settings.publicPage.publicLinks.addManual")}
-          </button>
-        </>
-      )}
+            <div className="space-y-3">
+              {links.length === 0 ? (
+                <p className="text-sm text-slate-600">
+                  {t("dashboard.settings.publicPage.publicLinks.empty")}
+                </p>
+              ) : (
+                links.map((link, index) => (
+                  <div key={link.id || `new-${index}`} className={ppLinkCardClass}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-slate-500">
+                        {t("dashboard.settings.publicPage.publicLinks.linkNumber", {
+                          n: String(index + 1),
+                        })}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={index === 0}
+                          onClick={() => moveLink(index, -1)}
+                          className="rounded px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          disabled={index === links.length - 1}
+                          onClick={() => moveLink(index, 1)}
+                          className="rounded px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeLink(index)}
+                          className="rounded p-1.5 text-rose-600 hover:bg-rose-50"
+                          aria-label="Supprimer"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-slate-800">
+                      <input
+                        type="checkbox"
+                        checked={link.isActive !== false}
+                        onChange={(e) => updateLink(index, { isActive: e.target.checked })}
+                        className={ppCheckboxClass}
+                      />
+                      {t("dashboard.settings.publicPage.publicLinks.active")}
+                    </label>
+
+                    <input
+                      className={ppInputClass}
+                      value={link.title}
+                      onChange={(e) => updateLink(index, { title: e.target.value })}
+                      placeholder={t("dashboard.settings.publicPage.publicLinks.titlePlaceholder")}
+                    />
+                    <input
+                      className={ppInputClass}
+                      value={link.url}
+                      onChange={(e) => updateLink(index, { url: e.target.value })}
+                      placeholder="https://... ou /inscription/..."
+                    />
+                    <input
+                      className={ppInputClass}
+                      value={link.description || ""}
+                      onChange={(e) => updateLink(index, { description: e.target.value })}
+                      placeholder={t(
+                        "dashboard.settings.publicPage.publicLinks.descriptionPlaceholder"
+                      )}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+
+            <button type="button" onClick={addManual} className={ppDashedButtonClass}>
+              <Plus className="h-4 w-4" />
+              {t("dashboard.settings.publicPage.publicLinks.addManual")}
+            </button>
+          </>
+        ) : (
+          <p className={ppHintClass}>
+            {t("dashboard.settings.publicPage.publicLinks.disabledHint")}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { OBILLZ_BRAND_PRIMARY, normalizeHexColor } from "./colors";
 import { fetchActivePublicPageLinksForClub } from "./links-db";
 import {
   getMatchProgramPdfPublicUrl,
   isMatchProgramConfigured,
 } from "./match-program";
-import type { MatchProgramType, PublicClubPageData } from "./types";
+import type { PublicClubPageData } from "./types";
 import { mapProfileToSettings } from "./db";
 
 export type PublicSlugResolution =
@@ -72,11 +73,12 @@ async function mapProfileToPublicClubData(
     external: isExternalHref(link.url),
   }));
 
-  const primaryColor =
+  const primaryColor = normalizeHexColor(
     (typeof profile.public_page_primary_color === "string" &&
       profile.public_page_primary_color) ||
-    (typeof profile.primary_color === "string" && profile.primary_color) ||
-    "#1d4ed8";
+      (typeof profile.primary_color === "string" && profile.primary_color) ||
+      OBILLZ_BRAND_PRIMARY
+  );
 
   const title =
     (typeof profile.public_page_title === "string" && profile.public_page_title.trim()) ||

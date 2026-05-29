@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { OBILLZ_BRAND_PRIMARY, normalizeHexColor } from "./colors";
 import { suggestPublicPageSlug, normalizePublicPageSlug, isValidPublicPageSlug } from "./slug";
 import {
   fetchPublicPageLinks,
@@ -31,11 +32,12 @@ export function mapProfileToSettings(
       ? profile.public_page_slug.trim()
       : null;
 
-  const primaryColor =
+  const primaryColor = normalizeHexColor(
     (typeof profile.public_page_primary_color === "string" &&
       profile.public_page_primary_color) ||
-    (typeof profile.primary_color === "string" && profile.primary_color) ||
-    "#1A23FF";
+      (typeof profile.primary_color === "string" && profile.primary_color) ||
+      OBILLZ_BRAND_PRIMARY
+  );
 
   const title =
     (typeof profile.public_page_title === "string" && profile.public_page_title) ||

@@ -845,6 +845,8 @@
         "titleLabel": "Angezeigter Titel",
         "descriptionLabel": "Kurze Beschreibung",
         "colorLabel": "Hauptfarbe",
+        "colorHint": "Wird auf Ihrer öffentlichen Seite verwendet (Kopfzeile und Buttons). Lesbarer Kontrast wird automatisch angewendet.",
+        "pageDisabledHint": "Aktivieren Sie die öffentliche Seite, um die Adresse zu konfigurieren und den Link zu teilen.",
         "blocksTitle": "Aktionsbuttons",
         "blocksDescription": "Nur die für Besucher nützlichen Blöcke aktivieren.",
         "showBuvette": "Bar reservieren",
@@ -869,7 +871,8 @@
           "previewPdf": "PDF-Vorschau",
           "pdfUploaded": "PDF gespeichert",
           "pdfDeleted": "PDF entfernt",
-          "uploading": "Wird hochgeladen…"
+          "uploading": "Wird hochgeladen…",
+          "disabledHint": "Aktivieren Sie den Block oben, um einen externen Link oder ein PDF einzurichten."
         },
         "publicLinks": {
           "sectionTitle": "Anmeldungen & nützliche Links",
@@ -882,7 +885,8 @@
           "active": "Auf der öffentlichen Seite sichtbar",
           "titlePlaceholder": "Angezeigter Titel (z. B. Anmeldung nach dem Spiel)",
           "descriptionPlaceholder": "Kurze Beschreibung (optional)",
-          "addManual": "Manuellen Link hinzufügen"
+          "addManual": "Manuellen Link hinzufügen",
+          "disabledHint": "Aktivieren Sie den Block oben, um die sichtbaren Links zu wählen."
         }
       }
     },

@@ -905,6 +905,8 @@
         "titleLabel": "Displayed title",
         "descriptionLabel": "Short description",
         "colorLabel": "Primary color",
+        "colorHint": "Used on your public page (header and buttons). Readable contrast is applied automatically.",
+        "pageDisabledHint": "Enable the public page to configure the address and share your link.",
         "blocksTitle": "Action buttons",
         "blocksDescription": "Enable only the blocks that are useful for visitors.",
         "showBuvette": "Book the bar",
@@ -929,7 +931,8 @@
           "previewPdf": "Preview PDF",
           "pdfUploaded": "PDF saved",
           "pdfDeleted": "PDF removed",
-          "uploading": "Uploading…"
+          "uploading": "Uploading…",
+          "disabledHint": "Enable the block above to set an external link or PDF."
         },
         "publicLinks": {
           "sectionTitle": "Registrations & useful links",
@@ -942,7 +945,8 @@
           "active": "Visible on public page",
           "titlePlaceholder": "Displayed title (e.g. Post-match sign-up)",
           "descriptionPlaceholder": "Short description (optional)",
-          "addManual": "Add a manual link"
+          "addManual": "Add a manual link",
+          "disabledHint": "Enable the block above to choose links shown on your page."
         }
       }
     },

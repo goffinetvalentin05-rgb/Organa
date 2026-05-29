@@ -783,6 +783,8 @@
         "titleLabel": "Titre affiché",
         "descriptionLabel": "Courte description",
         "colorLabel": "Couleur principale",
+        "colorHint": "Utilisée sur votre page publique (header et boutons). Un contraste lisible est appliqué automatiquement.",
+        "pageDisabledHint": "Activez la page publique pour configurer l'adresse et partager votre lien.",
         "blocksTitle": "Boutons d'action",
         "blocksDescription": "Activez uniquement les blocs utiles pour vos visiteurs.",
         "showBuvette": "Réserver la buvette",
@@ -807,7 +809,8 @@
           "previewPdf": "Aperçu du PDF",
           "pdfUploaded": "PDF enregistré",
           "pdfDeleted": "PDF supprimé",
-          "uploading": "Téléversement…"
+          "uploading": "Téléversement…",
+          "disabledHint": "Activez le bloc ci-dessus pour configurer un lien externe ou un PDF."
         },
         "publicLinks": {
           "sectionTitle": "Inscriptions & liens utiles",
@@ -820,7 +823,8 @@
           "active": "Visible sur la page publique",
           "titlePlaceholder": "Titre affiché (ex. Inscription après-match)",
           "descriptionPlaceholder": "Courte description (optionnel)",
-          "addManual": "Ajouter un lien manuel"
+          "addManual": "Ajouter un lien manuel",
+          "disabledHint": "Activez le bloc ci-dessus pour choisir les liens visibles sur votre page."
         }
       }
     },

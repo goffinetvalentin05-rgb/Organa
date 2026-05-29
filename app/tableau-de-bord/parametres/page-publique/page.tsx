@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -9,12 +10,55 @@ import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MatchProgramSettings from "@/components/public-page/MatchProgramSettings";
 import PublicLinksSettings, { linksToInputs } from "@/components/public-page/PublicLinksSettings";
+import {
+  ppCheckboxClass,
+  ppHintClass,
+  ppInputClass,
+  ppLabelClass,
+  ppSecondaryButtonClass,
+  ppSuccessBannerClass,
+  ppSuccessBannerTextClass,
+  ppToggleHintClass,
+  ppToggleRowClass,
+  ppToggleTitleClass,
+} from "@/components/public-page/settings-styles";
 import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
 import type { PublicPageLinkInput, PublicPageSettings } from "@/lib/public-page/types";
 import { normalizePublicPageSlug } from "@/lib/public-page/slug";
 
-const inputClass =
-  "w-full rounded-xl border border-slate-200/80 bg-white/90 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20";
+function LogoPreview({
+  logoUrl,
+  title,
+  primaryColor,
+}: {
+  logoUrl: string | null;
+  title: string;
+  primaryColor: string;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = Boolean(logoUrl) && !imgError;
+  const initial = (title.trim().charAt(0) || "C").toUpperCase();
+  const accent = primaryColor || OBILLZ_BRAND_PRIMARY;
+
+  return (
+    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+      {showImage && logoUrl ? (
+        <Image
+          src={logoUrl}
+          alt=""
+          fill
+          className="object-contain p-1.5"
+          sizes="64px"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <span className="text-xl font-bold" style={{ color: accent }}>
+          {initial}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function PublicPageSettingsPage() {
   const { t } = useI18n();
@@ -129,28 +173,30 @@ export default function PublicPageSettingsPage() {
           title={t("dashboard.settings.publicPage.activationTitle")}
           description={t("dashboard.settings.publicPage.activationDescription")}
         >
-          <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
-            <span className="text-sm font-medium text-white">
+          <label className={ppToggleRowClass}>
+            <span className={ppToggleTitleClass}>
               {t("dashboard.settings.publicPage.enabledLabel")}
             </span>
             <input
               type="checkbox"
               checked={form.enabled}
               onChange={(e) => setForm({ ...form, enabled: e.target.checked })}
-              className="h-5 w-5 rounded border-white/30 accent-[#2563EB]"
+              className={ppCheckboxClass}
             />
           </label>
 
-          {form.enabled && (
+          {form.enabled ? (
             <div className="mt-4 space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                <label className={ppLabelClass}>
                   {t("dashboard.settings.publicPage.slugLabel")}
                 </label>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <span className="shrink-0 text-sm text-white/60">obillz.com/p/</span>
+                  <span className="shrink-0 text-sm font-medium text-slate-600">
+                    obillz.com/p/
+                  </span>
                   <input
-                    className={inputClass}
+                    className={ppInputClass}
                     value={form.slug || ""}
                     onChange={(e) => {
                       const nextSlug = normalizePublicPageSlug(e.target.value) || null;
@@ -164,14 +210,12 @@ export default function PublicPageSettingsPage() {
                     placeholder="fc-mon-club"
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-white/50">
-                  {t("dashboard.settings.publicPage.slugHint")}
-                </p>
+                <p className={ppHintClass}>{t("dashboard.settings.publicPage.slugHint")}</p>
               </div>
 
               {form.publicUrlPath && (
-                <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
-                  <span className="min-w-0 flex-1 truncate text-sm text-emerald-100">
+                <div className={ppSuccessBannerClass}>
+                  <span className={ppSuccessBannerTextClass}>
                     {typeof window !== "undefined"
                       ? `${window.location.origin}${form.publicUrlPath}`
                       : form.publicUrlPath}
@@ -179,7 +223,7 @@ export default function PublicPageSettingsPage() {
                   <button
                     type="button"
                     onClick={() => void copyPublicLink()}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/15"
+                    className={ppSecondaryButtonClass}
                   >
                     <Copy className="h-3.5 w-3.5" />
                     {t("dashboard.settings.publicPage.copyLink")}
@@ -189,7 +233,7 @@ export default function PublicPageSettingsPage() {
                       href={form.publicUrlPath}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/15"
+                      className={ppSecondaryButtonClass}
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
                       {t("dashboard.settings.publicPage.preview")}
@@ -198,6 +242,8 @@ export default function PublicPageSettingsPage() {
                 </div>
               )}
             </div>
+          ) : (
+            <p className={ppHintClass}>{t("dashboard.settings.publicPage.pageDisabledHint")}</p>
           )}
         </SectionCard>
 
@@ -206,40 +252,30 @@ export default function PublicPageSettingsPage() {
           description={t("dashboard.settings.publicPage.contentDescription")}
         >
           <div className="space-y-4">
-            {form.logoUrl && (
-              <div className="flex items-center gap-4">
-                <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-white/20 bg-white">
-                  <Image
-                    src={form.logoUrl}
-                    alt=""
-                    fill
-                    className="object-contain p-1"
-                    sizes="56px"
-                  />
-                </div>
-                <p className="text-xs text-white/60">
-                  {t("dashboard.settings.publicPage.logoHint")}
-                </p>
-              </div>
-            )}
+            <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <LogoPreview logoUrl={form.logoUrl} title={form.title} primaryColor={form.primaryColor} />
+              <p className="text-sm leading-relaxed text-slate-600">
+                {t("dashboard.settings.publicPage.logoHint")}
+              </p>
+            </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
+              <label className={ppLabelClass}>
                 {t("dashboard.settings.publicPage.titleLabel")}
               </label>
               <input
-                className={inputClass}
+                className={ppInputClass}
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
+              <label className={ppLabelClass}>
                 {t("dashboard.settings.publicPage.descriptionLabel")}
               </label>
               <textarea
-                className={cn(inputClass, "min-h-[88px] resize-y")}
+                className={cn(ppInputClass, "min-h-[88px] resize-y")}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={3}
@@ -247,7 +283,7 @@ export default function PublicPageSettingsPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
+              <label className={ppLabelClass}>
                 {t("dashboard.settings.publicPage.colorLabel")}
               </label>
               <div className="flex items-center gap-3">
@@ -255,14 +291,17 @@ export default function PublicPageSettingsPage() {
                   type="color"
                   value={form.primaryColor}
                   onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                  className="h-10 w-14 cursor-pointer rounded-lg border border-white/20 bg-transparent"
+                  className="h-10 w-14 cursor-pointer rounded-lg border border-slate-200 bg-white"
                 />
                 <input
-                  className={cn(inputClass, "flex-1")}
+                  className={cn(ppInputClass, "flex-1")}
                   value={form.primaryColor}
                   onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
                 />
               </div>
+              <p className={ppHintClass}>
+                {t("dashboard.settings.publicPage.colorHint")}
+              </p>
             </div>
           </div>
         </SectionCard>
@@ -271,12 +310,12 @@ export default function PublicPageSettingsPage() {
           title={t("dashboard.settings.publicPage.blocksTitle")}
           description={t("dashboard.settings.publicPage.blocksDescription")}
         >
-          <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
+          <label className={ppToggleRowClass}>
             <div>
-              <span className="text-sm font-medium text-white">
+              <span className={ppToggleTitleClass}>
                 {t("dashboard.settings.publicPage.showBuvette")}
               </span>
-              <p className="mt-0.5 text-xs text-white/55">
+              <p className={ppToggleHintClass}>
                 {t("dashboard.settings.publicPage.showBuvetteHint")}
               </p>
             </div>
@@ -284,7 +323,7 @@ export default function PublicPageSettingsPage() {
               type="checkbox"
               checked={form.showBuvette}
               onChange={(e) => setForm({ ...form, showBuvette: e.target.checked })}
-              className="mt-1 h-5 w-5 shrink-0 rounded accent-[#2563EB]"
+              className={ppCheckboxClass}
             />
           </label>
         </SectionCard>
@@ -315,29 +354,29 @@ export default function PublicPageSettingsPage() {
         >
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">Instagram</label>
+              <label className={ppLabelClass}>Instagram</label>
               <input
-                className={inputClass}
+                className={ppInputClass}
                 value={form.instagramUrl}
                 onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })}
                 placeholder="https://instagram.com/..."
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">Facebook</label>
+              <label className={ppLabelClass}>Facebook</label>
               <input
-                className={inputClass}
+                className={ppInputClass}
                 value={form.facebookUrl}
                 onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })}
                 placeholder="https://facebook.com/..."
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
+              <label className={ppLabelClass}>
                 {t("dashboard.settings.publicPage.websiteLabel")}
               </label>
               <input
-                className={inputClass}
+                className={ppInputClass}
                 value={form.websiteUrl}
                 onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })}
                 placeholder="https://..."
@@ -347,7 +386,7 @@ export default function PublicPageSettingsPage() {
         </SectionCard>
 
         <GlassCard className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/60">{t("dashboard.settings.publicPage.saveHint")}</p>
+          <p className="text-sm text-white/80">{t("dashboard.settings.publicPage.saveHint")}</p>
           <DashboardPrimaryButton
             type="button"
             onClick={() => void save()}
