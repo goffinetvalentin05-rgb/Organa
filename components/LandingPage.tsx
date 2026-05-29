@@ -371,40 +371,43 @@ export default function LandingPage() {
           className="mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48"
         >
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 32, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-white/[0.14] via-white/[0.06] to-[#1A23FF]/[0.08] p-8 text-center backdrop-blur-xl md:p-16"
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden rounded-[2rem] border border-white/25 bg-gradient-to-br from-white/[0.16] via-white/[0.07] to-[#1A23FF]/[0.12] p-8 text-center shadow-[0_32px_80px_rgba(2,6,23,0.4)] backdrop-blur-xl md:rounded-[2.25rem] md:p-16"
           >
-            <div
-              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.12] blur-3xl"
+            <motion.div
+              className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/[0.14] blur-3xl"
+              animate={{ opacity: [0.5, 0.85, 0.5], scale: [1, 1.05, 1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#1A23FF]/30 blur-3xl"
+              className="pointer-events-none absolute -bottom-32 -left-28 h-96 w-96 rounded-full bg-[#1A23FF]/35 blur-3xl"
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute inset-x-1/4 -top-px h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              className="pointer-events-none absolute inset-x-[15%] -top-px h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"
               aria-hidden
             />
-            <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-blue-200/90">
-              Prêt à essayer ?
-            </p>
-            <h2 className="relative mt-4 text-3xl font-black text-white md:text-5xl">
-              Simplifiez la gestion de votre club dès aujourd&apos;hui.
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(255,255,255,0.12),transparent_55%)]"
+              aria-hidden
+            />
+            <h2 className="relative text-3xl font-black text-white md:text-5xl">
+              Prêt à simplifier la gestion de votre club ?
             </h2>
-            <p className="relative mx-auto mt-4 max-w-xl text-sm text-blue-100/90 md:text-base">
-              Rejoignez les clubs qui ont choisi une gestion plus claire, plus rapide et plus
-              professionnelle.
+            <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-blue-100/90 md:text-base">
+              Créez votre espace gratuitement et commencez à organiser votre club avec une
+              plateforme claire, moderne et centralisée.
             </p>
             <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <LandingPrimaryButton href="/inscription" className="w-full max-w-md sm:max-w-none">
                 Créer mon club gratuitement
               </LandingPrimaryButton>
               <LandingSecondaryButton href="/connexion" className="w-full max-w-md sm:max-w-none">
-                Connexion
+                Se connecter
               </LandingSecondaryButton>
             </div>
           </motion.div>
@@ -449,6 +452,14 @@ export default function LandingPage() {
                     className="text-slate-700 transition hover:text-[#1A23FF]"
                   >
                     Le problème
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/#centralise"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    La solution
                   </a>
                 </li>
                 <li>

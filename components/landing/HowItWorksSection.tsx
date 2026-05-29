@@ -1,130 +1,170 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import {
-  Building2,
-  CalendarDays,
-  QrCode,
-  TrendingUp,
-  UserPlus,
-  Wallet,
-} from "lucide-react";
+import type { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { Building2, Send, TrendingUp, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import LandingCta from "@/components/landing/LandingCta";
 import LandingSection from "@/components/landing/LandingSection";
-import { easePremium } from "@/components/landing/landing-motion";
+import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
 
 const steps: Array<{
   step: number;
   icon: LucideIcon;
   title: string;
-  description: string;
+  line: string;
+  visual: ReactNode;
 }> = [
   {
     step: 1,
     icon: Building2,
-    title: "Créez votre club",
-    description: "Quelques minutes pour configurer votre espace et être opérationnel.",
+    title: "Créez votre espace club",
+    line: "Quelques minutes pour être opérationnel.",
+    visual: <StepVisualClub />,
   },
   {
     step: 2,
     icon: UserPlus,
-    title: "Ajoutez les membres",
-    description: "Fiches, équipes et coordonnées centralisées dans une base claire.",
+    title: "Ajoutez vos membres et catégories",
+    line: "Fiches, équipes et coordonnées au même endroit.",
+    visual: <StepVisualMembers />,
   },
   {
     step: 3,
-    icon: Wallet,
-    title: "Cotisations & factures",
-    description: "Génération, envoi par email et suivi des paiements en temps réel.",
+    icon: Send,
+    title: "Envoyez cotisations, factures et inscriptions",
+    line: "Envoi par email et liens partageables.",
+    visual: <StepVisualSend />,
   },
   {
     step: 4,
-    icon: CalendarDays,
-    title: "Événements & buvette",
-    description: "Manifestations, bénévoles, réservations et sponsoring au même endroit.",
-  },
-  {
-    step: 5,
     icon: TrendingUp,
-    title: "Suivez les encaissements",
-    description: "Entrées, sorties et situation financière lisible en un coup d'œil.",
-  },
-  {
-    step: 6,
-    icon: QrCode,
-    title: "Liens publics & QR codes",
-    description: "Inscriptions, page publique du club — partageable en quelques secondes.",
+    title: "Suivez les paiements et l'activité du club",
+    line: "Encaissements et suivi en temps réel.",
+    visual: <StepVisualTrack />,
   },
 ];
 
 export default function HowItWorksSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const lineScale = useTransform(scrollYProgress, [0.1, 0.85], [0, 1]);
-
   return (
     <LandingSection
       id="comment-ca-marche"
-      className="mt-20 md:mt-32"
+      className="mt-24 md:mt-36"
       glow
       eyebrow="Comment ça marche"
-      title="Six étapes. Un club mieux organisé."
-      subtitle="Un parcours simple et visuel — de la création du club au partage de vos liens publics."
+      title="De la création du club au suivi des paiements, tout devient plus clair."
     >
-      <div ref={ref} className="relative mt-12 md:mt-16">
-        <div className="pointer-events-none absolute left-7 top-0 bottom-0 hidden w-px overflow-hidden md:block" aria-hidden>
-          <motion.div
-            className="h-full w-full origin-top bg-gradient-to-b from-white via-[#1A23FF]/60 to-emerald-400/50"
-            style={{ scaleY: lineScale }}
-          />
-        </div>
+      <div className="relative mt-12 md:mt-16">
+        <div
+          className="pointer-events-none absolute left-[12%] right-[12%] top-[4.5rem] hidden h-px bg-gradient-to-r from-transparent via-white/25 to-transparent md:block"
+          aria-hidden
+        />
 
-        <ol className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none md:grid md:overflow-visible md:pb-0 md:snap-none md:gap-5">
+        <ol className="grid gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-5">
           {steps.map((item, index) => (
             <motion.li
               key={item.step}
-              initial={{ opacity: 0, x: 24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.55, delay: index * 0.06, ease: easePremium }}
-              className="min-w-[min(100%,300px)] shrink-0 snap-center md:min-w-0"
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ duration: 0.65, delay: index * 0.1, ease: easePremium }}
             >
-              <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/[0.12] via-white/[0.05] to-transparent p-5 shadow-[0_16px_40px_rgba(2,6,23,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-[0_24px_52px_rgba(2,6,23,0.32)] md:flex-row md:items-center md:gap-6 md:p-6">
-                <div className="flex items-center gap-4 md:w-auto">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/30 bg-white/10 text-lg font-black text-white shadow-lg backdrop-blur-md transition group-hover:scale-105 group-hover:border-white/45 md:h-14 md:w-14">
+              <article className="group relative flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-white/18 bg-gradient-to-br from-white/[0.14] via-white/[0.06] to-transparent p-5 shadow-[0_20px_50px_rgba(2,6,23,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:border-white/32 hover:shadow-[0_28px_60px_rgba(2,6,23,0.38)]">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/30 bg-white/10 text-sm font-black text-white shadow-lg">
                     {item.step}
                   </span>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1A23FF]/25 ring-1 ring-[#1A23FF]/40 md:hidden">
-                    <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} aria-hidden />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1A23FF]/30 ring-1 ring-[#1A23FF]/50">
+                    <item.icon className="h-4 w-4 text-white" strokeWidth={1.75} aria-hidden />
+                  </span>
+                </div>
+
+                <div className="mt-4 flex-1">
+                  <div className="overflow-hidden rounded-xl border border-white/20 bg-white/[0.06] p-2 transition group-hover:border-white/30">
+                    {item.visual}
                   </div>
                 </div>
-                <div className="mt-4 min-w-0 md:mt-0 md:flex md:flex-1 md:items-center md:gap-5">
-                  <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#1A23FF]/25 ring-1 ring-[#1A23FF]/40 md:flex">
-                    <item.icon className="h-6 w-6 text-white" strokeWidth={1.75} aria-hidden />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black text-white">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-blue-100/85">{item.description}</p>
-                  </div>
-                </div>
+
+                <h3 className="mt-4 text-base font-black leading-snug text-white md:text-lg">
+                  {item.title}
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-blue-100/85 md:text-sm">
+                  {item.line}
+                </p>
               </article>
             </motion.li>
           ))}
         </ol>
       </div>
-
-      <LandingCta
-        compact
-        title="Commencez gratuitement en quelques minutes"
-        subtitle="Votre club mérite une gestion aussi sérieuse que votre sport."
-        secondaryLabel="Voir les fonctionnalités"
-        secondaryHref="#fonctionnalites"
-      />
     </LandingSection>
+  );
+}
+
+function MiniUi({ children }: { children: ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-slate-200/90 bg-white p-2.5 text-left shadow-sm">
+      {children}
+    </div>
+  );
+}
+
+function StepVisualClub() {
+  return (
+    <MiniUi>
+      <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Nouveau club</p>
+      <p className="mt-1 text-xs font-black text-slate-900">FC Rivière</p>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full w-3/4 rounded-full bg-[#1A23FF]" />
+      </div>
+      <p className="mt-1 text-[9px] text-emerald-600 font-semibold">Configuration · 2 min</p>
+    </MiniUi>
+  );
+}
+
+function StepVisualMembers() {
+  return (
+    <MiniUi>
+      <ul className="space-y-1.5">
+        {["Martin L.", "Dupont A.", "+ Importer"].map((name) => (
+          <li
+            key={name}
+            className="flex items-center justify-between rounded-md bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-800"
+          >
+            {name}
+            {name.startsWith("+") ? (
+              <span className="text-[#1A23FF]">CSV</span>
+            ) : (
+              <span className="text-emerald-600 text-[9px]">Actif</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </MiniUi>
+  );
+}
+
+function StepVisualSend() {
+  return (
+    <MiniUi>
+      <p className="text-[9px] font-bold text-slate-500">Cotisation saison</p>
+      <p className="mt-1 text-xs font-black text-[#1A23FF]">48 emails envoyés</p>
+      <p className="mt-1.5 text-[9px] text-slate-500">Facture buvette · lien inscription</p>
+    </MiniUi>
+  );
+}
+
+function StepVisualTrack() {
+  return (
+    <MiniUi>
+      <div className="grid grid-cols-2 gap-1.5">
+        <div className="rounded-md bg-[#1A23FF]/10 px-2 py-1.5 text-center">
+          <p className="text-[8px] text-slate-500">Payé</p>
+          <p className="text-sm font-black text-[#1A23FF]">92%</p>
+        </div>
+        <div className="rounded-md bg-emerald-50 px-2 py-1.5 text-center">
+          <p className="text-[8px] text-slate-500">Solde</p>
+          <p className="text-sm font-black text-emerald-700">OK</p>
+        </div>
+      </div>
+    </MiniUi>
   );
 }

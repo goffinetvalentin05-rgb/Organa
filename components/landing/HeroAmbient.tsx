@@ -26,7 +26,16 @@ export default function HeroAmbient() {
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_40%,black,transparent)]" />
+      <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(to_right,rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_85%_75%_at_50%_35%,black,transparent)]" />
+
+      <div
+        className="absolute right-[12%] top-[18%] h-24 w-24 rounded-full border border-violet-300/10 opacity-50"
+        aria-hidden
+      />
+      <div
+        className="absolute left-[6%] bottom-[22%] h-16 w-16 rotate-45 border border-white/[0.06] opacity-40"
+        aria-hidden
+      />
 
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
       <div className="absolute inset-x-[10%] bottom-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />

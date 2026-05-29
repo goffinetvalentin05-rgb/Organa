@@ -8,27 +8,27 @@ import { ProductWidgetCard } from "@/components/landing/ProductWidget";
 
 export default function HeroProductComposition() {
   return (
-    <div className="relative mx-auto mt-8 w-full max-w-[1000px] px-1 md:mt-10 md:px-0">
+    <div className="relative mx-auto mt-10 w-full max-w-[1040px] px-1 md:mt-12 md:px-0">
       <div
-        className="pointer-events-none absolute inset-x-[2%] top-[15%] -z-10 h-[60%] rounded-full bg-[radial-gradient(ellipse,rgba(255,255,255,0.28),transparent_65%)] blur-3xl"
+        className="pointer-events-none absolute inset-x-[0%] top-[8%] -z-10 h-[70%] rounded-full bg-[radial-gradient(ellipse,rgba(255,255,255,0.32),transparent_62%)] blur-3xl"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-[15%] bottom-[5%] -z-10 h-24 rounded-full bg-[#1A23FF]/40 blur-[60px]"
+        className="pointer-events-none absolute inset-x-[20%] bottom-[0%] -z-10 h-32 rounded-full bg-[#1A23FF]/50 blur-[72px]"
         aria-hidden
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 48, scale: 0.94 }}
+        initial={{ opacity: 0, y: 56, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.85, delay: 0.45, ease: easePremium }}
-        className="hidden lg:grid lg:grid-cols-[minmax(0,200px)_minmax(0,1fr)_minmax(0,200px)] lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-x-6 lg:gap-y-5"
+        transition={{ duration: 0.9, delay: 0.42, ease: easePremium }}
+        className="hidden lg:grid lg:grid-cols-[minmax(0,210px)_minmax(0,1fr)_minmax(0,210px)] lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-x-5 lg:gap-y-6"
       >
         <div className="lg:col-start-1 lg:row-start-1 lg:justify-self-end">
-          <Satellite widget={heroSatelliteWidgets[0]} delay={0.65} floatDelay="0s" />
+          <Satellite widget={heroSatelliteWidgets[0]} delay={0.68} floatIndex={0} />
         </div>
         <div className="lg:col-start-3 lg:row-start-1 lg:justify-self-start">
-          <Satellite widget={heroSatelliteWidgets[1]} delay={0.72} floatDelay="1.2s" />
+          <Satellite widget={heroSatelliteWidgets[1]} delay={0.76} floatIndex={1} />
         </div>
 
         <div className="relative z-10 lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center">
@@ -36,27 +36,27 @@ export default function HeroProductComposition() {
         </div>
 
         <div className="lg:col-start-1 lg:row-start-2 lg:justify-self-end lg:self-center">
-          <Satellite widget={heroSatelliteWidgets[2]} delay={0.79} floatDelay="0.6s" />
+          <Satellite widget={heroSatelliteWidgets[2]} delay={0.84} floatIndex={2} />
         </div>
         <div className="lg:col-start-3 lg:row-start-2 lg:justify-self-start lg:self-center">
-          <Satellite widget={heroSatelliteWidgets[3]} delay={0.86} floatDelay="1.8s" />
+          <Satellite widget={heroSatelliteWidgets[3]} delay={0.92} floatIndex={3} />
         </div>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 32 }}
+        initial={{ opacity: 0, y: 36 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, delay: 0.5, ease: easePremium }}
+        transition={{ duration: 0.8, delay: 0.48, ease: easePremium }}
         className="lg:hidden"
       >
         <HeroProductPreview embedded />
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {heroSatelliteWidgets.map((widget, index) => (
             <motion.div
               key={widget.id}
-              initial={{ opacity: 0, y: 20, scale: 0.96 }}
+              initial={{ opacity: 0, y: 24, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 + index * 0.08, ease: easePremium }}
+              transition={{ duration: 0.55, delay: 0.62 + index * 0.09, ease: easePremium }}
             >
               <ProductWidgetCard {...widget} icon={widget.icon} compact />
             </motion.div>
@@ -70,21 +70,33 @@ export default function HeroProductComposition() {
 function Satellite({
   widget,
   delay,
-  floatDelay,
+  floatIndex,
 }: {
   widget: (typeof heroSatelliteWidgets)[number];
   delay: number;
-  floatDelay: string;
+  floatIndex: number;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 16 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: easePremium }}
-      className="w-full max-w-[200px] landing-float-subtle"
-      style={{ animationDelay: floatDelay }}
+      initial={{ opacity: 0, scale: 0.88, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+      transition={{
+        opacity: { duration: 0.6, delay, ease: easePremium },
+        scale: { duration: 0.6, delay, ease: easePremium },
+        y: {
+          duration: 5 + floatIndex * 0.35,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay + 0.55,
+        },
+      }}
+      className="w-full max-w-[210px]"
     >
-      <ProductWidgetCard {...widget} icon={widget.icon} />
+      <ProductWidgetCard
+        {...widget}
+        icon={widget.icon}
+        className="shadow-[0_20px_48px_rgba(2,6,23,0.22),0_0_0_1px_rgba(255,255,255,0.6)_inset]"
+      />
     </motion.div>
   );
 }

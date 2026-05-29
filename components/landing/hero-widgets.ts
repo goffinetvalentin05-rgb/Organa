@@ -1,7 +1,7 @@
-import { CalendarDays, Coffee, QrCode, Wallet } from "lucide-react";
+import { CalendarDays, CheckCircle2, Coffee, QrCode, Wallet } from "lucide-react";
 import type { ProductWidgetData } from "@/components/landing/ProductWidget";
 
-/** Max 4 satellites — positionnés via grille dans HeroProductComposition */
+/** 4 satellites hero — composition grille dans HeroProductComposition */
 export const heroSatelliteWidgets: ProductWidgetData[] = [
   {
     id: "cotisation",
@@ -13,9 +13,18 @@ export const heroSatelliteWidgets: ProductWidgetData[] = [
     icon: Wallet,
   },
   {
+    id: "paiement",
+    label: "Paiement",
+    title: "Paiement reçu",
+    value: "CHF 120 · Martin L.",
+    hint: "Cotisation saison",
+    status: "success",
+    icon: CheckCircle2,
+  },
+  {
     id: "inscription",
-    label: "Inscriptions",
-    title: "Après-match",
+    label: "Inscription",
+    title: "Inscription après-match",
     value: "42 participants",
     hint: "Lien ou QR code",
     icon: QrCode,
@@ -23,18 +32,10 @@ export const heroSatelliteWidgets: ProductWidgetData[] = [
   {
     id: "buvette",
     label: "Buvette",
-    title: "Créneau validé",
+    title: "Buvette réservée",
     value: "Samedi 14h–18h",
-    hint: "Facture générée",
+    hint: "Créneau confirmé",
     icon: Coffee,
-  },
-  {
-    id: "evenement",
-    label: "Événement",
-    title: "Soirée du club",
-    value: "8 bénévoles",
-    hint: "Organisation simplifiée",
-    icon: CalendarDays,
   },
 ];
 
