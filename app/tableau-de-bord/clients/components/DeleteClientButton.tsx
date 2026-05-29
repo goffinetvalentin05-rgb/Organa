@@ -40,9 +40,12 @@ export default function DeleteClientButton({
       }
 
       onDeleted?.(clientId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[DeleteClientButton] Erreur lors de la suppression", err);
-      alert(err.message || t("dashboard.clients.deleteErrorDetail"));
+      alert(
+        (err instanceof Error ? err.message : null) ||
+          t("dashboard.clients.deleteErrorDetail")
+      );
     } finally {
       setIsDeleting(false);
     }

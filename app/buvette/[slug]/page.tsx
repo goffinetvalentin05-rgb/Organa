@@ -12,7 +12,8 @@ function currentMonthKey() {
 export default function PublicBuvettePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [month, setMonth] = useState(currentMonthKey());
-  const [clubName, setClubName] = useState("Club");
+  const [clubFound, setClubFound] = useState(false);
+  const [clubName, setClubName] = useState("");
   const [clubLogoUrl, setClubLogoUrl] = useState<string | null>(null);
   const [clubColor, setClubColor] = useState("#1d4ed8");
   const [days, setDays] = useState<Record<string, "available" | "occupied" | "reserved">>({});
@@ -37,6 +38,7 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setClubFound(false);
     try {
       const [clubRes, calendarRes] = await Promise.all([
         fetch(`/api/public/buvette/${slug}`, { cache: "no-store" }),
@@ -46,6 +48,7 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
       if (!calendarRes.ok) throw new Error("Impossible de charger le calendrier");
       const clubData = await clubRes.json();
       const calendarData = await calendarRes.json();
+      setClubFound(true);
       setClubName(clubData.clubName || "Club");
       setClubLogoUrl(clubData.logoUrl || null);
       setClubColor(clubData.primaryColor || "#1d4ed8");
@@ -121,8 +124,17 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
     }
   };
 
-  if (error && !clubName) {
-    return <div className="p-8 text-center text-red-600">{error}</div>;
+  if (!loading && !clubFound) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+        <div className="max-w-md rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-slate-900">Réservation indisponible</p>
+          <p className="mt-2 text-sm text-slate-600">
+            {error || "Ce lien de réservation n'existe pas ou n'est plus actif."}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

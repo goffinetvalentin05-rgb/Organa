@@ -1,44 +1,31 @@
 import { NextResponse } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
-import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getDocumentPdfData } from "@/lib/utils/pdf-data";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { renderInvoicePdfBuffer } from "@/lib/pdf/renderDocumentPdf";
+import { getErrorMessage } from "@/lib/utils/error-message";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json(
-        { error: "ID de la facture manquant" },
-        { status: 400 }
-      );
-    }
-
-    const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
-    if ("error" in guard) return guard.error;
-
-    const data = await getDocumentPdfData(id, "invoice", { dataUserId: guard.clubId });
-
-    // Générer le PDF avec @react-pdf/renderer
-    const pdfBuffer = await renderToBuffer(
-      <FacturePdf
-        company={data.company}
-        client={data.client}
-        document={data.document}
-        lines={data.lines}
-        totals={data.totals}
-        primaryColor={data.primaryColor}
-      />
+  if (!id) {
+    return NextResponse.json(
+      { error: "ID de la facture manquant" },
+      { status: 400 }
     );
+  }
 
-    // Nom du fichier avec la date
+  const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+  if ("error" in guard) return guard.error;
+
+  try {
+    const data = await getDocumentPdfData(id, "invoice", { dataUserId: guard.clubId });
+    const pdfBuffer = await renderInvoicePdfBuffer(data);
+
     const filename = `facture-${data.document.number || id}-${new Date().toISOString().split("T")[0]}.pdf`;
 
-    // Retourner le PDF pour téléchargement (attachment)
     return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
@@ -46,16 +33,14 @@ export async function GET(request: Request) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de la génération du PDF facture:", error);
     return NextResponse.json(
       {
         error: "Erreur lors de la génération du PDF",
-        details: error.message,
+        details: getErrorMessage(error),
       },
       { status: 500 }
     );
   }
 }
-
-

@@ -92,11 +92,11 @@ export function usePermissions(): MyPermissionsState {
         isOwner: !!data.isOwner,
         permissions: safeMap,
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("[usePermissions] fetch KO:", e);
       setState({
         loading: false,
-        error: e?.message ?? "Erreur",
+        error: e instanceof Error ? e.message : "Erreur",
         clubId: null,
         role: null,
         isOwner: false,

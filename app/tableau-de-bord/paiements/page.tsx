@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { calculerTotalTTC } from "@/lib/utils/calculations";
+import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
 import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
 import { PageLayout, PageHeader, TableCard, EmptyState, DataCard, dashboardListRowClass, cn } from "@/components/ui";
 
@@ -18,7 +19,7 @@ interface DocumentItem {
   statut: string;
   dateCreation: string;
   datePaiement?: string | null;
-  lignes: any[];
+  lignes: LigneDocument[];
   totalTTC?: number;
   client?: DocumentClient;
 }
@@ -44,7 +45,8 @@ export default function PaiementsPage() {
       try {
         const res = await fetch("/api/documents", { cache: "no-store" });
         if (!res.ok) {
-          console.error("Erreur lors du chargement des documents");
+          console.error("[Paiements] Erreur chargement documents:", res.status);
+          toast.error(t("dashboard.payments.loadError"));
           return;
         }
 
@@ -74,6 +76,7 @@ export default function PaiementsPage() {
         setPayments(paymentsList);
       } catch (error) {
         console.error("[Paiements] Erreur chargement:", error);
+        toast.error(t("dashboard.payments.loadError"));
       } finally {
         setLoading(false);
       }

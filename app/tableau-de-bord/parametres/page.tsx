@@ -25,6 +25,24 @@ import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 import UsersAccessCard from "@/components/billing/UsersAccessCard";
+import { getErrorMessage } from "@/lib/utils/error-message";
+
+type ApiErrorBody = {
+  error?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+};
+
+type MeApiBody = {
+  subscription?: SubscriptionInfo | null;
+  product?: { canManageTeamAccess?: boolean };
+};
+
+type SimpleMessageBody = {
+  error?: string;
+};
 
 // Types pour les infos d'abonnement
 interface SubscriptionInfo {
@@ -104,7 +122,7 @@ export default function ParametresPage() {
    * @param response - Response object à parser
    * @returns Promise<any> - Données parsées (JSON ou texte)
    */
-  const parseResponseBody = async (response: Response): Promise<any> => {
+  const parseResponseBody = async (response: Response): Promise<unknown> => {
     const contentType = response.headers.get("content-type");
 
     try {
@@ -245,7 +263,7 @@ export default function ParametresPage() {
       setLoadingPlan(true);
       const response = await fetch("/api/me");
       if (response.ok) {
-        const data = await parseResponseBody(response);
+        const data = (await parseResponseBody(response)) as MeApiBody;
         setSubscription(data.subscription || null);
         setCanManageTeamAccess(
           data.product?.canManageTeamAccess === true
@@ -295,11 +313,11 @@ export default function ParametresPage() {
           })
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur lors de l'appel à Stripe:", error);
       alert(
         t("dashboard.settings.notifications.stripeOpenError", {
-          message: error.message || t("dashboard.common.unknownError"),
+          message: getErrorMessage(error),
         })
       );
     } finally {
@@ -418,7 +436,7 @@ export default function ParametresPage() {
 
       if (!response.ok) {
         // Utiliser le body déjà parsé
-        const errorData = result;
+        const errorData = result as ApiErrorBody;
         
         // LOGS DÉVELOPPEUR COMPLETS
         console.error("[PARAMETRES] Erreur backend complète:", {
@@ -449,7 +467,7 @@ export default function ParametresPage() {
       setSaved(true);
       toast.success(t("dashboard.settings.saveSuccess"));
       setTimeout(() => setSaved(false), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur lors de la sauvegarde:", error);
       // Ne pas afficher de toast ici car on l'a déjà fait dans le if (!response.ok)
     }
@@ -470,7 +488,7 @@ export default function ParametresPage() {
       });
 
       // Lire le body UNE SEULE FOIS avec le helper
-      const data = await parseResponseBody(response);
+      const data = (await parseResponseBody(response)) as SimpleMessageBody;
 
       if (!response.ok) {
         throw new Error(data.error || t("dashboard.settings.notifications.uploadError"));
@@ -481,8 +499,8 @@ export default function ParametresPage() {
       await loadSettingsFromDB();
 
       toast.success(t("dashboard.settings.notifications.logoUploaded"));
-    } catch (error: any) {
-      toast.error(error.message || t("dashboard.settings.notifications.uploadLogoError"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.settings.notifications.uploadLogoError"));
     } finally {
       setUploading(false);
       // Réinitialiser l'input
@@ -502,7 +520,7 @@ export default function ParametresPage() {
       });
 
       // Lire le body UNE SEULE FOIS avec le helper
-      const data = await parseResponseBody(response);
+      const data = (await parseResponseBody(response)) as SimpleMessageBody;
 
       if (!response.ok) {
         throw new Error(data.error || t("dashboard.settings.notifications.deleteError"));
@@ -513,8 +531,8 @@ export default function ParametresPage() {
       await loadSettingsFromDB();
 
       toast.success(t("dashboard.settings.notifications.logoDeleted"));
-    } catch (error: any) {
-      toast.error(error.message || t("dashboard.settings.notifications.deleteError"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.settings.notifications.deleteError"));
     } finally {
       setDeleting(false);
     }

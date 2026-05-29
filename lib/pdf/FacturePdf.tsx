@@ -124,12 +124,12 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
                   <Text>{document.number}</Text>
                 </View>
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Date d'émission</Text>
+                  <Text style={styles.metaLabel}>{"Date d'émission"}</Text>
                   <Text>{formatPdfDateLong(document.date)}</Text>
                 </View>
                 {document.dueDate && (
                   <View style={styles.metaRow}>
-                    <Text style={styles.metaLabel}>Date d'échéance</Text>
+                    <Text style={styles.metaLabel}>{"Date d'échéance"}</Text>
                     <Text>{formatPdfDateLong(document.dueDate)}</Text>
                   </View>
                 )}

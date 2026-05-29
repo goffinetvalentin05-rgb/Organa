@@ -68,8 +68,9 @@ export default function ConnexionPage() {
         await new Promise(resolve => setTimeout(resolve, 100));
         window.location.href = "/tableau-de-bord";
       }
-    } catch (err: any) {
-      const msg = err?.message || "Erreur lors de la connexion";
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Erreur lors de la connexion";
       setErrorMessage(msg);
       toast.error(msg);
     } finally {

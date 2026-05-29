@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
+import {
+  mapClubRevenueToApi,
+  type ClubRevenueDbRow,
+} from "@/lib/club-revenues/types";
+import { getErrorMessage } from "@/lib/utils/error-message";
 
 export const runtime = "nodejs";
 
@@ -58,23 +63,15 @@ export async function GET(
       return NextResponse.json({ error: "Introuvable" }, { status: 404 });
     }
 
-    const row: any = data;
-    const event = await fetchEventLabelForRevenue(supabase, row.event_id);
+    const event = await fetchEventLabelForRevenue(
+      supabase,
+      (data as ClubRevenueDbRow).event_id
+    );
     return NextResponse.json({
-      revenue: {
-        id: row.id,
-        name: row.name,
-        amount: Number(row.amount) || 0,
-        revenue_date: row.revenue_date,
-        description: row.description,
-        event_id: row.event_id,
-        event,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-      },
+      revenue: mapClubRevenueToApi(data as ClubRevenueDbRow, event),
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }
 
@@ -167,22 +164,11 @@ export async function PUT(
     if (newEventId) revalidatePath(`/tableau-de-bord/evenements/${newEventId}`);
 
     const event = await fetchEventLabelForRevenue(supabase, updated.event_id);
-    const row: any = updated;
     return NextResponse.json({
-      revenue: {
-        id: row.id,
-        name: row.name,
-        amount: Number(row.amount) || 0,
-        revenue_date: row.revenue_date,
-        description: row.description,
-        event_id: row.event_id,
-        event,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-      },
+      revenue: mapClubRevenueToApi(updated as ClubRevenueDbRow, event),
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }
 
@@ -229,7 +215,7 @@ export async function DELETE(
     if (ev) revalidatePath(`/tableau-de-bord/evenements/${ev}`);
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }

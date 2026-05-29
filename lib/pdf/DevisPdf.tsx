@@ -139,7 +139,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
                   <Text>{document.number}</Text>
                 </View>
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaLabel}>Date d'émission</Text>
+                  <Text style={styles.metaLabel}>{"Date d'émission"}</Text>
                   <Text>{formatPdfDateLong(document.date)}</Text>
                 </View>
                 <View style={[styles.metaRow, { marginBottom: 0 }]}>

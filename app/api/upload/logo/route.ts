@@ -179,10 +179,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       logoUrl,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][upload-logo] POST - Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'upload du logo", details: error.message },
+      {
+        error: "Erreur lors de l'upload du logo",
+        details: error instanceof Error ? error.message : "Erreur inconnue",
+      },
       { status: 500 }
     );
   }
@@ -275,10 +278,13 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: "Logo supprimé avec succès",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][upload-logo] DELETE - Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la suppression du logo", details: error.message },
+      {
+        error: "Erreur lors de la suppression du logo",
+        details: error instanceof Error ? error.message : "Erreur inconnue",
+      },
       { status: 500 }
     );
   }

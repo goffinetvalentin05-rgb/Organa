@@ -8,7 +8,9 @@ import {
   calculerTotalHT,
   calculerTVA,
   calculerTotalTTC,
+  type LigneDocument,
 } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -27,7 +29,7 @@ interface Devis {
   title?: string;
   clientId?: string | null;
   client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
-  lignes: any[];
+  lignes: LigneDocument[];
   statut: "brouillon" | "envoye" | "accepte" | "refuse";
   dateCreation: string;
   dateEcheance?: string | null;
@@ -115,8 +117,8 @@ export default function DevisDetailPage() {
         throw new Error(t("dashboard.quotes.detail.deleteError"));
       }
       router.push("/tableau-de-bord/devis");
-    } catch (error: any) {
-      toast.error(error?.message || t("dashboard.quotes.detail.deleteErrorFallback"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.quotes.detail.deleteErrorFallback"));
     }
   };
 
@@ -138,8 +140,8 @@ export default function DevisDetailPage() {
       }
 
       setDevis({ ...devis, statut: nouveauStatut });
-    } catch (error: any) {
-      toast.error(error?.message || t("dashboard.quotes.detail.statusUpdateError"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.quotes.detail.statusUpdateError"));
     }
   };
 
@@ -179,10 +181,10 @@ export default function DevisDetailPage() {
       if (devis.statut === "brouillon") {
         handleChangerStatut("envoye");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[Devis][Email] Erreur envoi:", error);
       if (typeof toast !== "undefined" && toast.error) {
-        const errorMessage = error?.message || t("dashboard.quotes.detail.sendErrorFallback");
+        const errorMessage = getErrorMessage(error) || t("dashboard.quotes.detail.sendErrorFallback");
         toast.error(String(errorMessage));
       }
     } finally {

@@ -71,8 +71,8 @@ export default function ClientsPage() {
         }
         const data = await res.json();
         setClients(data.clients || []);
-      } catch (err: any) {
-        setError(err.message || "Erreur inconnue");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
       } finally {
         setLoading(false);
       }

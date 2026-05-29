@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { calculerTotalTTC } from "@/lib/utils/calculations";
+import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { Eye, Trash, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -21,7 +22,7 @@ interface Devis {
   numero: string;
   title?: string;
   client?: { nom?: string };
-  lignes: any[];
+  lignes: LigneDocument[];
   statut: string;
   dateCreation: string;
 }
@@ -48,8 +49,8 @@ export default function DevisPage() {
       }
       const data = await response.json();
       setDevis(data.documents || []);
-    } catch (error: any) {
-      setErrorMessage(error?.message || t("dashboard.quotes.loadError"));
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error) || t("dashboard.quotes.loadError"));
       setDevis([]);
     } finally {
       setLoading(false);

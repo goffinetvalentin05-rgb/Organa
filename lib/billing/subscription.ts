@@ -174,7 +174,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
     : null;
 
   const billingCycle = profile.billing_cycle as BillingCycle;
-  let status = profile.subscription_status as SubscriptionStatus;
+  const status = profile.subscription_status as SubscriptionStatus;
 
   // 6. Si le statut est 'active', vérifier que l'abonnement n'est pas expiré
   if (status === "active") {

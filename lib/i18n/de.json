@@ -1507,6 +1507,7 @@
     "payments": {
       "title": "Zahlungseingänge",
       "subtitle": "Eingegangene Beträge Ihres Vereins: bezahlte Beiträge und Rechnungen.",
+      "loadError": "Zahlungseingänge konnten nicht geladen werden. Bitte versuchen Sie es gleich erneut.",
       "emptyState": "Noch keine Zahlungseingänge erfasst.",
       "stats": {
         "totalReceived": "Summe eingegangen",

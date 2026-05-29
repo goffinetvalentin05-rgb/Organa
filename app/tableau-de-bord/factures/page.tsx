@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { calculerTotalTTC } from "@/lib/utils/calculations";
+import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { Eye, Trash, Download, Receipt } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -21,7 +22,7 @@ interface Facture {
   numero: string;
   title?: string;
   client?: { nom?: string };
-  lignes: any[];
+  lignes: LigneDocument[];
   statut: string;
   dateCreation: string;
 }
@@ -54,8 +55,8 @@ export default function FacturesPage() {
       }
       const data = await response.json();
       setFactures(data.documents || []);
-    } catch (error: any) {
-      setErrorMessage(error?.message || t("dashboard.invoices.loadError"));
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error) || t("dashboard.invoices.loadError"));
       setFactures([]);
     } finally {
       setLoading(false);

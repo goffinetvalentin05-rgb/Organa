@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { fetchEventLabelForRevenue } from "@/lib/club-revenues/eventLabel";
+import {
+  mapClubRevenueToApi,
+  type ClubRevenueDbRow,
+} from "@/lib/club-revenues/types";
+import { getErrorMessage } from "@/lib/utils/error-message";
 
 export const runtime = "nodejs";
 
@@ -82,22 +87,18 @@ export async function GET() {
       }
     }
 
-    const revenues = (rows || []).map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      amount: Number(row.amount) || 0,
-      revenue_date: row.revenue_date,
-      description: row.description,
-      event_id: row.event_id,
-      event: row.event_id ? eventsById.get(row.event_id) ?? null : null,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    }));
+    const revenues = (rows || []).map((row) => {
+      const r = row as ClubRevenueDbRow;
+      return mapClubRevenueToApi(
+        r,
+        r.event_id ? eventsById.get(r.event_id) ?? null : null
+      );
+    });
 
     return NextResponse.json({ revenues }, { status: 200 });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("[API][club-revenues][GET]", e);
-    return NextResponse.json({ error: e?.message || "Erreur" }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }
 
@@ -178,25 +179,14 @@ export async function POST(request: NextRequest) {
     }
 
     const event = await fetchEventLabelForRevenue(supabase, inserted.event_id);
-    const row: any = inserted;
     return NextResponse.json(
       {
-        revenue: {
-          id: row.id,
-          name: row.name,
-          amount: Number(row.amount) || 0,
-          revenue_date: row.revenue_date,
-          description: row.description,
-          event_id: row.event_id,
-          event,
-          created_at: row.created_at,
-          updated_at: row.updated_at,
-        },
+        revenue: mapClubRevenueToApi(inserted as ClubRevenueDbRow, event),
       },
       { status: 201 }
     );
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("[API][club-revenues][POST]", e);
-    return NextResponse.json({ error: e?.message || "Erreur" }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }

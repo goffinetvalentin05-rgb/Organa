@@ -87,8 +87,10 @@ function ProduitsPageInner() {
       }
       const data = await res.json();
       setRevenues(data.revenues || []);
-    } catch (e: any) {
-      setErrorMessage(e.message);
+    } catch (e: unknown) {
+      setErrorMessage(
+        e instanceof Error ? e.message : t("dashboard.productRevenues.loadError")
+      );
       setRevenues([]);
     } finally {
       setLoading(false);
@@ -170,8 +172,11 @@ function ProduitsPageInner() {
       }
       await loadRevenues();
       closeForm();
-    } catch (err: any) {
-      setErrorMessage(err.message || t("dashboard.productRevenues.saveError"));
+    } catch (err: unknown) {
+      setErrorMessage(
+        (err instanceof Error ? err.message : null) ||
+          t("dashboard.productRevenues.saveError")
+      );
     } finally {
       setSaving(false);
     }
@@ -183,8 +188,10 @@ function ProduitsPageInner() {
       const res = await fetch(`/api/club-revenues/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(t("dashboard.productRevenues.deleteError"));
       await loadRevenues();
-    } catch (e: any) {
-      setErrorMessage(e.message);
+    } catch (e: unknown) {
+      setErrorMessage(
+        e instanceof Error ? e.message : t("dashboard.productRevenues.loadError")
+      );
     }
   };
 

@@ -9,6 +9,7 @@ import {
   calculerTVA,
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -66,7 +67,7 @@ function NouvelleFacturePageContent() {
         const data = await res.json();
         console.log(`[Facture] Clients source: API /api/clients, count=${data.clients?.length || 0}`);
         setClients(data.clients || []);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("[Facture] Erreur chargement clients:", error);
         toast.error(t("dashboard.invoices.form.clientsLoadError"));
       } finally {
@@ -81,7 +82,7 @@ function NouvelleFacturePageContent() {
           const data = await res.json();
           setEvents(data.events || []);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("[Facture] Erreur chargement événements:", error);
       }
     };
@@ -169,10 +170,10 @@ function NouvelleFacturePageContent() {
       setDocumentId(data.id);
       console.log("[Facture] Facture créée via API avec ID:", data.id, "Numéro:", data.numero);
       router.push(`/tableau-de-bord/factures/${data.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[Facture] Erreur lors de la création:", error);
       toast.error(
-        `${t("dashboard.invoices.form.createError")}: ${error.message || t("dashboard.common.unknownError")}`
+        `${t("dashboard.invoices.form.createError")}: ${getErrorMessage(error)}`
       );
     }
   };
@@ -273,10 +274,10 @@ function NouvelleFacturePageContent() {
       } else {
         window.open(url, "_blank");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur lors de la sauvegarde pour PDF:", error);
       toast.error(
-        `${t("dashboard.invoices.form.saveForPdfError")}: ${error.message || t("dashboard.common.unknownError")}`
+        `${t("dashboard.invoices.form.saveForPdfError")}: ${getErrorMessage(error)}`
       );
     } finally {
       setSavingForPdf(false);

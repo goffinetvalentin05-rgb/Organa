@@ -1,0 +1,560 @@
+﻿
+> organa@0.1.0 lint
+> eslint
+
+
+C:\Users\Goffi\organa\app\api\clients\[id]\route.ts
+  126:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\api\clients\route.ts
+  196:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\api\club\invitations\route.ts
+  126:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\depenses\route.ts
+   47:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\event-types\[id]\route.ts
+  46:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\event-types\route.ts
+  33:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\events\[id]\route.ts
+  103:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  279:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\events\route.ts
+   77:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\export\accounting\route.tsx
+  244:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\export\route.ts
+  104:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  210:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\invitations\[token]\account-status\route.ts
+  55:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\invitations\[token]\route.ts
+   72:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   73:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   74:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   75:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\invitations\[token]\signup\route.ts
+  39:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\me\permissions\route.ts
+  21:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\me\route.ts
+   44:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\pdf\planning\download\route.tsx
+   74:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  140:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  187:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  188:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  233:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\plannings\[id]\assignments\route.ts
+  302:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  405:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\plannings\[id]\public-link\route.ts
+  157:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\plannings\[id]\route.ts
+   72:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  191:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  320:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  376:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\plannings\[id]\slots\route.ts
+  147:19  error    Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  217:26  warning  '_omit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  282:19  error    Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  346:19  error    Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\plannings\route.ts
+   51:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   53:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   54:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  181:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  224:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  231:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\settings\route.ts
+   57:27  warning  'request' is defined but never used                    @typescript-eslint/no-unused-vars
+   70:33  error    'fetchError' is never reassigned. Use 'const' instead  prefer-const
+  383:29  warning  '_omit' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  439:31  warning  '_e' is assigned a value but never used                @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\api\storage\sign\route.ts
+  35:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\api\upload\logo\route.ts
+   56:33  error    'profileError' is never reassigned. Use 'const' instead  prefer-const
+  110:19  warning  'uploadData' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  200:30  warning  'request' is defined but never used                      @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\conditions-utilisation\page.tsx
+   58:55  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   58:66  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   69:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   69:53  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   80:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   80:34  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   81:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   82:47  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   93:58  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  103:44  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  116:47  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  116:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  117:46  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  117:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  127:71  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  128:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  145:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  148:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  157:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  170:43  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\inscription\[code]\page.tsx
+  38:6  warning  React Hook useEffect has a missing dependency: 'loadEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\inscription\page.tsx
+  129:73  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  273:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\invitations\[token]\page.tsx
+  104:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  199:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  221:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  238:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  259:26  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  280:25  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  332:62  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  355:37  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\layout.tsx
+  2:8  warning  'Image' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\mentions-legales\page.tsx
+   59:37  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   60:47  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   61:56  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   96:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  110:45  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  118:32  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\p\[slug]\confirmation\confirmation-client.tsx
+  151:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Goffi\organa\app\p\[slug]\confirmation\confirmation-client.tsx:151:7
+  149 |   useEffect(() => {
+  150 |     if (!payload?.slotDate) {
+> 151 |       setIcsHref(null);
+      |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  152 |       return;
+  153 |     }
+  154 |     const ics = buildIcs();  react-hooks/set-state-in-effect
+
+C:\Users\Goffi\organa\app\politique-confidentialite\page.tsx
+   82:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   93:30  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   94:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   95:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  104:49  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  105:44  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  105:70  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  118:56  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  119:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  129:28  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  154:75  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  155:36  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  155:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  165:66  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  166:35  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  166:64  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  176:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  177:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\politique-cookies\page.tsx
+   60:55  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   80:40  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   95:29  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  105:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\tableau-de-bord\depenses\page.tsx
+  136:6   warning  React Hook useEffect has a missing dependency: 'loadDepenses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  172:19  error    Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  198:69  error    Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  212:21  error    Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\devis\[id]\page.tsx
+  236:9   warning  'getStatutColor' is assigned a value but never used                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  336:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Goffi\organa\app\tableau-de-bord\devis\page.tsx
+  38:6  warning  React Hook useEffect has a missing dependency: 'loadDevis'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\[id]\EventFinancialChart.tsx
+  13:3   warning  'Legend' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  49:47  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  93:32  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\[id]\EventFinancialChart.tsx:93:32
+  91 |               tickFormatter={(value) => formatValue(value)}
+  92 |             />
+> 93 |             <Tooltip content={<CustomTooltip />} />
+     |                                ^^^^^^^^^^^^^ This component is created during render
+  94 |             <Bar
+  95 |               dataKey="value"
+  96 |               radius={[8, 8, 0, 0]}
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\[id]\EventFinancialChart.tsx:49:25
+  47 |   };
+  48 |
+> 49 |   const CustomTooltip = ({ active, payload }: any) => {
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |     if (active && payload && payload.length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |       return (
+     ÔÇª
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |     return null;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |   };
+     | ^^^^ The component is created during render here
+  62 |
+  63 |   return (
+  64 |     <div>  react-hooks/static-components
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\[id]\page.tsx
+  128:6   warning  React Hook useEffect has a missing dependency: 'loadEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  154:21  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  182:21  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  209:21  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  268:19  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\nouveau\page.tsx
+  112:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\evenements\page.tsx
+  43:24  warning  'setLimitReached' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+  61:6   warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\factures\[id]\page.tsx
+  275:9   warning  'handleImprimer' is assigned a value but never used                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  435:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Goffi\organa\app\tableau-de-bord\factures\nouvelle\page.tsx
+  92:6  warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\factures\page.tsx
+  44:6  warning  React Hook useEffect has a missing dependency: 'loadFactures'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\layout.tsx
+  107:9  warning  'getPageTitle' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\tableau-de-bord\page.tsx
+   53:11  error    Unexpected any. Specify a different type                                                                                                                           @typescript-eslint/no-explicit-any
+  335:6   warning  React Hook useEffect has missing dependencies: 'buildATraiterMaintenant', 'buildRecentActivity', and 'isPast'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\parametres\page.tsx
+   25:47  warning  'GlassCard' is defined but never used                                                                                                        @typescript-eslint/no-unused-vars
+   91:10  warning  'loadingCheckout' is assigned a value but never used                                                                                         @typescript-eslint/no-unused-vars
+  259:6   warning  React Hook useEffect has missing dependencies: 'fetchUserPlan' and 'loadSettingsFromDB'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  279:9   warning  'handleUpgradeToPro' is assigned a value but never used                                                                                      @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\app\tableau-de-bord\parametres\utilisateurs\page.tsx
+    3:21  warning  'useMemo' is defined but never used                              @typescript-eslint/no-unused-vars
+  160:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  304:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  325:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  340:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  379:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  396:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  419:17  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  440:17  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  528:18  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  528:26  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  528:35  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  528:48  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  532:34  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  532:42  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  549:36  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  554:31  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  554:51  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  574:23  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  577:18  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  577:26  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  654:20  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  692:42  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  794:61  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  849:35  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  951:25  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  952:10  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  952:68  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  953:44  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\tableau-de-bord\plannings\[id]\page.tsx
+  228:6   warning  React Hook useEffect has missing dependencies: 'loadPlanning' and 'loadPublicLink'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  242:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  289:26  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  381:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  403:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  457:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  479:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  499:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+  620:21  error    Unexpected any. Specify a different type                                                                                                @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\plannings\nouveau\page.tsx
+  172:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\plannings\page.tsx
+  41:24  warning  'setLimitReached' is assigned a value but never used                                                              @typescript-eslint/no-unused-vars
+  57:6   warning  React Hook useEffect has a missing dependency: 'loadPlannings'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  70:21  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  87:21  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+
+C:\Users\Goffi\organa\app\tableau-de-bord\produits\page.tsx
+  103:6  warning  React Hook useEffect has a missing dependency: 'loadRevenues'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\qrcodes\[id]\page.tsx
+  14:3  warning  'Calendar2' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+  50:6  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\qrcodes\page.tsx
+  58:6  warning  React Hook useEffect has a missing dependency: 'loadQRCodes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\securite\mfa\page.tsx
+    5:8   warning  'Image' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+   35:6   warning  React Hook useEffect has a missing dependency: 'loadFactors'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   52:19  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+   75:19  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  104:19  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  118:19  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  210:58  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                 react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\tableau-de-bord\securite\mfa\verifier\page.tsx
+  48:6  warning  React Hook useEffect has missing dependencies: 'next' and 'router'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\app\tableau-de-bord\securite\page.tsx
+  121:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\app\tableau-de-bord\sponsoring\[id]\modifier\page.tsx
+  49:10  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Goffi\organa\app\tableau-de-bord\sponsoring\[id]\modifier\page.tsx:49:10
+  47 |
+  48 |   useEffect(() => {
+> 49 |     void load();
+     |          ^^^^ Avoid calling setState() directly within an effect
+  50 |   }, [load]);
+  51 |
+  52 |   return (  react-hooks/set-state-in-effect
+
+C:\Users\Goffi\organa\components\DashboardPrimaryButton.tsx
+  46:17  warning  '_lc' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  47:18  warning  '_lcl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  48:13  warning  '_li' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  49:13  warning  '_ls' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  50:18  warning  '_lf' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  61:15  warning  '_c' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  62:16  warning  '_cl' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  63:11  warning  '_i' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  64:11  warning  '_s' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  65:16  warning  '_f' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\components\GetStartedStepsSection.tsx
+  183:21  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\components\Header.tsx
+  20:13  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages              @next/next/no-html-link-for-pages
+  23:13  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages              @next/next/no-html-link-for-pages
+  35:13  error  Do not use an `<a>` element to navigate to `/inscription/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+  64:15  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages              @next/next/no-html-link-for-pages
+  67:15  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages              @next/next/no-html-link-for-pages
+  79:15  error  Do not use an `<a>` element to navigate to `/inscription/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\Users\Goffi\organa\components\I18nProvider.tsx
+  73:5  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `tList`, but the source dependencies were [locale, t]. Inferred different dependency than source.
+
+C:\Users\Goffi\organa\components\I18nProvider.tsx:73:5
+  71 |
+  72 |   const value = useMemo<I18nContextValue>(
+> 73 |     () => ({
+     |     ^^^^^^^^
+> 74 |       locale,
+     | ^^^^^^^^^^^^^
+> 75 |       setLocale,
+     | ^^^^^^^^^^^^^
+> 76 |       t,
+     | ^^^^^^^^^^^^^
+> 77 |       tList,
+     | ^^^^^^^^^^^^^
+> 78 |     }),
+     | ^^^^^^^ Could not preserve existing manual memoization
+  79 |     [locale, t]
+  80 |   );
+  81 |  react-hooks/preserve-manual-memoization
+  79:5  warning  React Hook useMemo has a missing dependency: 'tList'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+
+C:\Users\Goffi\organa\components\LandingPage.tsx
+   382:17  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+  1299:21  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\Users\Goffi\organa\components\LimitReachedAlert.tsx
+  15:54  warning  'resource' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\components\SubscriptionBanner.tsx
+   67:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  108:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  181:14  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Goffi\organa\components\members\MemberCategorySelect.tsx
+  39:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Goffi\organa\components\members\MemberCategorySelect.tsx:39:5
+  37 |   useEffect(() => {
+  38 |     const next = parseCategoryFromDb(value);
+> 39 |     setSelect(next.select);
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  40 |     setCustom(next.custom);
+  41 |   }, [value]);
+  42 |  react-hooks/set-state-in-effect
+
+C:\Users\Goffi\organa\components\ui\ActionButton.tsx
+  41:29  warning  '_c' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  41:42  warning  '_v' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  41:57  warning  '_cl' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  49:21  warning  '_c2' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  49:35  warning  '_v2' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  49:51  warning  '_cl2' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\auth.ts
+  2:10  warning  'redirect' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\auth\mfa-gate.ts
+  19:3  warning  'user' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\auth\permissions.ts
+  5:3  warning  'ALL_PERMISSIONS' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\billing\limits.ts
+  80:32  warning  'info' is defined but never used      @typescript-eslint/no-unused-vars
+  90:3   warning  'resource' is defined but never used  @typescript-eslint/no-unused-vars
+  91:3   warning  'plan' is defined but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\clients\normalizeDbRow.ts
+  65:22  warning  '_a' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  65:39  warning  '_d' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\mock-data.ts
+   92:5  error  'clients' is never reassigned. Use 'const' instead     prefer-const
+   98:5  error  'depenses' is never reassigned. Use 'const' instead    prefer-const
+  100:5  error  'evenements' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Users\Goffi\organa\lib\pdf\DevisPdf.tsx
+  104:19  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\Goffi\organa\lib\pdf\FacturePdf.tsx
+  89:19  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\Goffi\organa\lib\pdf\PlanningPdf.tsx
+  290:17  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+  410:55  warning  'idx' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\lib\pdf\SponsorContractPdf.tsx
+  136:36  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\Goffi\organa\tests\api\documents.regression.test.ts
+  184:21  warning  'log' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Goffi\organa\tests\helpers\thenableSupabaseMock.ts
+  122:14  warning  '_columns' is defined but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 301 problems (229 errors, 72 warnings)
+  3 errors and 0 warnings potentially fixable with the `--fix` option.
+

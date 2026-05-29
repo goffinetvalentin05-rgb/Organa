@@ -3,6 +3,52 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/company-settings";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { getErrorMessage } from "@/lib/utils/error-message";
+
+type SettingsPutBody = Partial<{
+  company_name: string;
+  company_email: string;
+  company_phone: string;
+  company_address: string;
+  primary_color: string;
+  currency: string;
+  logo_url: string;
+  iban: string;
+  bank_name: string;
+  payment_terms: string;
+  email_sender_name: string;
+  email_sender_email: string;
+  resend_api_key: string;
+  email_custom_enabled: boolean;
+}>;
+
+type ProfileSettingsRow = {
+  user_id?: string;
+  plan?: string;
+  company_name?: string | null;
+  company_email?: string | null;
+  company_phone?: string | null;
+  company_address?: string | null;
+  logo_path?: string | null;
+  logo_url?: string | null;
+  primary_color?: string | null;
+  currency?: string | null;
+  currency_symbol?: string | null;
+  iban?: string | null;
+  bank_name?: string | null;
+  payment_terms?: string | null;
+  email_sender_name?: string | null;
+  email_sender_email?: string | null;
+  resend_api_key?: string | null;
+  email_custom_enabled?: boolean | null;
+};
+
+type SupabaseOpError = {
+  message?: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+};
 
 /**
  * API Route pour récupérer les paramètres de l'entreprise
@@ -53,7 +99,7 @@ export async function GET(request: NextRequest) {
           console.error("[API][settings] GET - Erreur création profil:", createError);
           profile = null;
         } else {
-          profile = newProfile as any;
+          profile = newProfile;
         }
       } else {
         console.log(
@@ -129,10 +175,10 @@ export async function GET(request: NextRequest) {
     console.log("[API][settings] GET - Settings récupérés avec succès");
 
     return NextResponse.json({ settings });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][settings] GET - Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des paramètres", details: error.message },
+      { error: "Erreur lors de la récupération des paramètres", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -155,9 +201,9 @@ export async function PUT(request: NextRequest) {
     console.log("[API][settings] PUT - club:", clubId, "actor:", actorId);
 
     // Parser et valider le body
-    let body: any;
+    let body: SettingsPutBody;
     try {
-      body = await request.json();
+      body = (await request.json()) as SettingsPutBody;
       console.log("[API][settings] PUT - Body reçu:", body);
       
       // Validation basique : body doit être un objet
@@ -167,10 +213,13 @@ export async function PUT(request: NextRequest) {
           { status: 400 }
         );
       }
-    } catch (parseError: any) {
+    } catch (parseError: unknown) {
       console.error("[API][settings] PUT - Erreur parsing JSON:", parseError);
       return NextResponse.json(
-        { error: "Format de données invalide", details: parseError.message || "JSON invalide" },
+        {
+          error: "Format de données invalide",
+          details: getErrorMessage(parseError) || "JSON invalide",
+        },
         { status: 400 }
       );
     }
@@ -228,12 +277,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    let updatedProfile: any;
-    let dbError: any = null;
+    let updatedProfile: ProfileSettingsRow | null = null;
+    let dbError: SupabaseOpError | null = null;
 
     // Construire UN SEUL objet avec TOUS les champs du profil
     // Fusionner les valeurs existantes avec les nouvelles valeurs du body
-    const profilePayload: any = {
+    const profilePayload: Record<string, unknown> = {
       user_id: clubId,
       plan: existingProfile?.plan || "free",
       updated_at: new Date().toISOString(),
@@ -286,7 +335,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // Calculer currency_symbol
-    profilePayload.currency_symbol = getCurrencySymbol(profilePayload.currency);
+    profilePayload.currency_symbol = getCurrencySymbol(
+      typeof profilePayload.currency === "string" ? profilePayload.currency : undefined
+    );
 
     // Gérer les champs bancaires
     profilePayload.iban = body.iban !== undefined
@@ -345,9 +396,13 @@ export async function PUT(request: NextRequest) {
       console.log("[API][settings] PUT - Mise à jour du profil existant avec TOUS les champs");
       
       // Exclure user_id et plan de l'update (ils ne doivent pas changer)
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(profilePayload)) {
-        if (key !== 'user_id' && key !== 'plan' && allowedFields.includes(key as any)) {
+        if (
+          key !== "user_id" &&
+          key !== "plan" &&
+          (allowedFields as readonly string[]).includes(key)
+        ) {
           updateData[key] = value;
         }
       }
@@ -430,13 +485,14 @@ export async function PUT(request: NextRequest) {
 
     // Calculer currency_symbol si non défini
     const currency = updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
-    const currency_symbol = (updatedProfile as any)?.currency_symbol || getCurrencySymbol(currency);
+    const currency_symbol =
+      updatedProfile?.currency_symbol || getCurrencySymbol(currency);
 
     // Formater la réponse avec valeurs par défaut robustes
     const rawSettings = {
       primary_color: updatedProfile?.primary_color,
       currency: updatedProfile?.currency,
-      currency_symbol: (updatedProfile as any)?.currency_symbol,
+      currency_symbol: updatedProfile?.currency_symbol,
     };
     
     const companySettings = getCompanySettings(rawSettings);
@@ -468,17 +524,17 @@ export async function PUT(request: NextRequest) {
     console.log("[API][settings] PUT - Settings sauvegardés avec succès");
 
     return NextResponse.json({ settings });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Logger TOUTES les infos de l'erreur
     console.error("[API][settings] PUT - Erreur inattendue:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message: getErrorMessage(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
       fullError: error,
     });
     
     // Construire un message lisible pour l'utilisateur
-    const errorMessage = error.message || "Erreur lors de la sauvegarde des paramètres";
+    const errorMessage = getErrorMessage(error);
     
     return NextResponse.json(
       { 

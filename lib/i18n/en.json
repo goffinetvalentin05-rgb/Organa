@@ -1567,6 +1567,7 @@
     "payments": {
       "title": "Receipts",
       "subtitle": "See amounts collected by your club: paid memberships and invoices.",
+      "loadError": "Could not load receipts. Please try again in a moment.",
       "emptyState": "No receipts recorded yet.",
       "stats": {
         "totalReceived": "Total received",

@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
+import {
+  calculerTotalHT,
+  calculerTVA,
+  calculerTotalTTC,
+  type LigneDocument,
+} from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
@@ -147,11 +153,14 @@ async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
     
     console.log("[pdf-data] Logo converti en base64 avec succès, taille:", Math.round(base64.length / 1024), "KB");
     return dataUrl;
-  } catch (error: any) {
-    if (error.name === "AbortError") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "AbortError") {
       console.error("[pdf-data] Timeout lors du chargement du logo (10s)");
     } else {
-      console.error("[pdf-data] Erreur lors de la conversion du logo en base64:", error.message || error);
+      console.error(
+        "[pdf-data] Erreur lors de la conversion du logo en base64:",
+        getErrorMessage(error)
+      );
     }
     return undefined;
   }
@@ -198,7 +207,7 @@ export async function getDocumentPdfData(
     : document.client;
   
   console.log("[pdf-data] Logo URL finale:", company.logoUrl || "aucun logo défini");
-  const lines = items.map((ligne: any) => {
+  const lines = (items as LigneDocument[]).map((ligne) => {
     const qty = Number(ligne.quantite || 0);
     const unitPrice = Number(ligne.prixUnitaire || 0);
     const total = qty * unitPrice;

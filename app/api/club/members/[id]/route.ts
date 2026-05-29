@@ -47,9 +47,9 @@ export async function PATCH(
   const teamPlan = await requireTeamPlan(guard.clubId);
   if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
-  let body: any;
+  let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    body = (await request.json()) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Body JSON invalide" }, { status: 400 });
   }

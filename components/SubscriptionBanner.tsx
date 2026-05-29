@@ -64,7 +64,7 @@ export function SubscriptionBanner({ subscription, className = "" }: Subscriptio
             href="/tableau-de-bord/abonnement"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white text-red-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
           >
-            Passer à l'abonnement
+            {"Passer à l'abonnement"}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -105,7 +105,7 @@ export function SubscriptionBanner({ subscription, className = "" }: Subscriptio
               />
             </svg>
             <span>
-              <span className="font-medium">Période d'essai</span>
+              <span className="font-medium">{"Période d'essai"}</span>
               <span className="hidden sm:inline"> – </span>
               <span className="font-semibold">{daysText}</span>
               <span className="hidden md:inline text-white/90">
@@ -178,7 +178,7 @@ export function ReadOnlyOverlay({ subscription, children, className = "" }: Read
             href="/tableau-de-bord/abonnement"
             className="inline-flex items-center gap-2 px-4 py-2 accent-bg text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
           >
-            S'abonner
+            {"S'abonner"}
           </Link>
         </div>
       </div>

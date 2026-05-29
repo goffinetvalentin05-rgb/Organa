@@ -30,10 +30,12 @@ export interface CompanySettings {
  * @param settings Paramètres bruts depuis l'API (peuvent être null/undefined)
  * @returns Paramètres entreprise garantis avec valeurs par défaut
  */
-export function getCompanySettings(settings: any): CompanySettings {
+export function getCompanySettings(
+  settings: Record<string, unknown> | null | undefined
+): CompanySettings {
   // Valeurs par défaut
-  let primary_color = DEFAULT_COMPANY_SETTINGS.primary_color;
-  let currency = DEFAULT_COMPANY_SETTINGS.currency;
+  let primary_color: string = DEFAULT_COMPANY_SETTINGS.primary_color;
+  let currency: string = DEFAULT_COMPANY_SETTINGS.currency;
   let currency_symbol: string = DEFAULT_COMPANY_SETTINGS.currency_symbol;
 
   // Si settings existe et contient primary_color, l'utiliser

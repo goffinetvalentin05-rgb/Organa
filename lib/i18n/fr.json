@@ -1418,6 +1418,7 @@
     "payments": {
       "title": "Encaissements",
       "subtitle": "Consultez les montants encaissés par votre club : cotisations et factures payées.",
+      "loadError": "Impossible de charger les encaissements. Réessayez dans un instant.",
       "emptyState": "Aucun encaissement enregistré pour le moment.",
       "stats": {
         "totalReceived": "Total encaissé",

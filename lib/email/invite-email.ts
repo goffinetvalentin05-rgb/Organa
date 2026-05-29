@@ -165,12 +165,14 @@ export async function sendInvitationEmail(
     }
 
     return { ok: true, emailId: data?.id ?? null, mode: delivery.mode };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("[INVITE][email] Exception envoi:", e);
+    const details =
+      e instanceof Error ? e.message : typeof e === "string" ? e : "exception";
     return {
       ok: false,
       reason: "send_failed",
-      details: e?.message ?? "exception",
+      details,
     };
   }
 }

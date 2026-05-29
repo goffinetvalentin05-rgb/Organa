@@ -10,9 +10,70 @@ import {
   DOCUMENT_NUMERO_MAX_LENGTH,
   DOCUMENT_TITLE_MAX_LENGTH,
 } from "@/lib/documents/identityLimits";
+import type { LigneDocument } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
+
+type DocumentDbRow = {
+  id: string;
+  numero?: string | null;
+  title?: string | null;
+  type?: string;
+  status?: string | null;
+  date_creation?: string | null;
+  date_echeance?: string | null;
+  date_paiement?: string | null;
+  items?: unknown;
+  total_ht?: number | string | null;
+  total_tva?: number | string | null;
+  total_ttc?: number | string | null;
+  notes?: string | null;
+  client_id?: string | null;
+  event_id?: string | null;
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  client?: unknown;
+};
+
+type DocumentInsertPayload = {
+  user_id: string;
+  client_id: string;
+  type: string;
+  items: LigneDocument[];
+  status: string;
+  date_creation: string;
+  total_ht: number;
+  total_tva: number;
+  total_ttc: number;
+  numero: string;
+  title: string;
+  created_by: string;
+  updated_by: string;
+  date_echeance?: string;
+  date_paiement?: string;
+  notes?: string;
+  event_id?: string;
+};
+
+type DocumentUpdatePayload = {
+  numero?: string;
+  title?: string;
+  status?: string;
+  date_echeance?: string | null;
+  date_paiement?: string | null;
+  notes?: string | null;
+  items?: LigneDocument[];
+  total_ht?: number;
+  total_tva?: number;
+  total_ttc?: number;
+  event_id?: string | null;
+  client_id?: string;
+  updated_by?: string;
+};
 
 // GET /api/documents - Lister ou récupérer un document
 export async function GET(request: NextRequest) {
@@ -21,7 +82,6 @@ export async function GET(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
-    const user = guard.ctx.user;
 
     const { searchParams } = request.nextUrl;
     const type = searchParams.get("type");
@@ -83,10 +143,10 @@ export async function GET(request: NextRequest) {
       { documents: (data || []).map((doc) => formatDocument(doc)) },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][documents][GET] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors du chargement des documents", details: error.message },
+      { error: "Erreur lors du chargement des documents", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -194,7 +254,7 @@ export async function POST(request: NextRequest) {
 
     // Préparer les données d'insertion avec les noms de colonnes exacts
     // Ne jamais envoyer date_echeance si elle est vide/undefined (laisser le default de la DB)
-    const documentData: any = {
+    const documentData: DocumentInsertPayload = {
       user_id: guard.clubId,
       client_id: clientId,
       type: type, // 'quote' ou 'invoice'
@@ -299,10 +359,10 @@ export async function POST(request: NextRequest) {
       numero: newDocument.numero,
       type: newDocument.type,
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][documents][POST] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création du document", details: error.message },
+      { error: "Erreur lors de la création du document", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -369,21 +429,23 @@ export async function DELETE(request: NextRequest) {
     revalidatePath("/tableau-de-bord/factures");
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][documents][DELETE] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la suppression", details: error.message },
+      { error: "Erreur lors de la suppression", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
+function toNumber(value: unknown): number {
+  return typeof value === "number" ? value : Number(value) || 0;
+}
+
 function formatDocument(
-  doc: any,
+  doc: DocumentDbRow,
   linkedEvent?: { id: string; name: string } | null
 ) {
-  const toNumber = (value: any) =>
-    typeof value === "number" ? value : Number(value) || 0;
 
   const client = Array.isArray(doc.client) ? doc.client[0] : doc.client;
 
@@ -482,7 +544,7 @@ export async function PATCH(request: NextRequest) {
     const previousEventId = existingDoc.event_id as string | null;
 
     // Préparer les données de mise à jour (ne pas écraser le statut si non fourni)
-    const updateData: any = {};
+    const updateData: DocumentUpdatePayload = {};
 
     const identityKeysProvided = numero !== undefined || title !== undefined;
     if (identityKeysProvided) {
@@ -682,10 +744,10 @@ export async function PATCH(request: NextRequest) {
       type: updatedDoc.type,
       eventId: updatedDoc.event_id ?? null,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API][documents][PATCH] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour du document", details: error.message },
+      { error: "Erreur lors de la mise à jour du document", details: getErrorMessage(error) },
       { status: 500 }
     );
   }

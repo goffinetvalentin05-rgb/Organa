@@ -1,7 +1,7 @@
 "use client";
 
 import { useI18n } from "@/components/I18nProvider";
-import type { PublicPageLink, PublicPageLinkInput, PublicPageLinkType } from "@/lib/public-page/types";
+import type { PublicPageLink, PublicPageLinkInput } from "@/lib/public-page/types";
 import { cn } from "@/components/ui";
 import { Trash, Plus } from "@/lib/icons";
 import {

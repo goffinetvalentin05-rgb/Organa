@@ -4,7 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
+import {
+  calculerTotalHT,
+  calculerTVA,
+  calculerTotalTTC,
+  type LigneDocument,
+} from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Eye, Download, Mail, Trash, Calendar, Edit } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -27,7 +33,7 @@ interface Facture {
   title?: string;
   clientId?: string | null;
   client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
-  lignes: any[];
+  lignes: LigneDocument[];
   statut: "brouillon" | "envoye" | "paye" | "en-retard";
   dateCreation: string;
   dateEcheance?: string | null;
@@ -217,8 +223,8 @@ export default function FactureDetailPage() {
         throw new Error(t("dashboard.invoices.detail.deleteError"));
       }
       router.push("/tableau-de-bord/factures");
-    } catch (error: any) {
-      toast.error(error?.message || t("dashboard.invoices.detail.deleteErrorFallback"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.invoices.detail.deleteErrorFallback"));
     }
   };
 
@@ -256,9 +262,9 @@ export default function FactureDetailPage() {
       if (facture.statut === "brouillon") {
         handleChangerStatut("envoye");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (typeof toast !== "undefined" && toast.error) {
-        const errorMessage = error?.message || t("dashboard.invoices.detail.sendErrorFallback");
+        const errorMessage = getErrorMessage(error) || t("dashboard.invoices.detail.sendErrorFallback");
         toast.error(String(errorMessage));
       }
     } finally {
@@ -288,8 +294,8 @@ export default function FactureDetailPage() {
       }
 
       setFacture({ ...facture, statut: nouveauStatut });
-    } catch (error: any) {
-      toast.error(error?.message || t("dashboard.invoices.detail.statusUpdateError"));
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t("dashboard.invoices.detail.statusUpdateError"));
     }
   };
 
