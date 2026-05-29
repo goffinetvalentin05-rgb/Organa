@@ -12,6 +12,8 @@ import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import ProblemSection from "@/components/landing/ProblemSection";
 import SolutionSection from "@/components/landing/SolutionSection";
+import SectionDivider from "@/components/landing/SectionDivider";
+import { LandingPrimaryButton, LandingSecondaryButton } from "@/components/landing/LandingButtons";
 import {
   obillzLandingGridOverlayClass,
   obillzLandingRootClass,
@@ -144,10 +146,15 @@ export default function LandingPage() {
 
       <div className="relative z-10">
         <HeroSection />
+        <SectionDivider />
         <ProblemSection />
+        <SectionDivider />
         <SolutionSection />
+        <SectionDivider />
         <HowItWorksSection />
+        <SectionDivider />
         <FeaturesShowcaseSection />
+        <SectionDivider />
         <BenefitsSection />
 
         <section
@@ -392,19 +399,13 @@ export default function LandingPage() {
               Rejoignez les clubs qui ont choisi une gestion plus claire, plus rapide et plus
               professionnelle.
             </p>
-            <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/inscription"
-                className="hero-cta-button inline-flex w-full max-w-md items-center justify-center rounded-full bg-white px-8 py-4 text-base font-bold text-[#1A23FF] shadow-[0_18px_40px_rgba(2,6,23,0.30)] transition hover:-translate-y-0.5 sm:w-auto"
-              >
+            <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <LandingPrimaryButton href="/inscription" className="w-full max-w-md sm:max-w-none">
                 Créer mon club gratuitement
-              </Link>
-              <Link
-                href="/connexion"
-                className="inline-flex w-full max-w-md items-center justify-center rounded-full border border-white/40 px-8 py-4 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
-              >
+              </LandingPrimaryButton>
+              <LandingSecondaryButton href="/connexion" className="w-full max-w-md sm:max-w-none">
                 Connexion
-              </Link>
+              </LandingSecondaryButton>
             </div>
           </motion.div>
         </section>

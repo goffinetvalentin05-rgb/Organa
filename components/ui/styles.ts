@@ -2,7 +2,7 @@
  * Fond marketing Obillz — identique à `LandingPage` (`<main>`).
  */
 export const obillzLandingRootClass =
-  "relative min-h-screen overflow-x-clip bg-[var(--obillz-hero-blue)] text-white bg-[radial-gradient(ellipse_120%_80%_at_50%_-15%,rgba(255,255,255,0.14),transparent_52%),radial-gradient(ellipse_55%_45%_at_100%_20%,rgba(96,165,250,0.16),transparent_55%),radial-gradient(ellipse_50%_40%_at_0%_90%,rgba(15,23,255,0.35),transparent_50%)]";
+  "relative min-h-screen overflow-x-clip bg-[#1218e8] text-white bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,rgba(255,255,255,0.18),transparent_48%),radial-gradient(ellipse_60%_50%_at_100%_15%,rgba(96,165,250,0.2),transparent_52%),radial-gradient(ellipse_55%_45%_at_0%_85%,rgba(26,35,255,0.55),transparent_48%),linear-gradient(180deg,#1A23FF_0%,#151dd4_45%,#1218c8_100%)]";
 
 /** Grille 32px / opacité 10% — identique à la landing. */
 export const obillzLandingGridOverlayClass =

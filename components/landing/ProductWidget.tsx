@@ -35,7 +35,7 @@ export function ProductWidgetCard({
 
   return (
     <div
-      className={`rounded-2xl border border-slate-200/90 bg-white text-slate-900 shadow-[0_16px_32px_rgba(15,23,42,0.14)] backdrop-blur-sm ${compact ? "p-3" : "p-3.5 md:p-4"} ${className}`}
+      className={`rounded-2xl border border-slate-200/90 bg-white text-slate-900 shadow-[0_16px_32px_rgba(15,23,42,0.14)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#1A23FF]/20 hover:shadow-[0_20px_40px_rgba(26,35,255,0.15)] ${compact ? "p-3" : "p-3.5 md:p-4"} ${className}`}
     >
       <div className="flex items-start justify-between gap-2">
         <p

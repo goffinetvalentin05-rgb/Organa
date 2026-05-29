@@ -487,6 +487,28 @@ h3 {
   animation: landing-float-subtle 5s ease-in-out infinite;
 }
 
+@keyframes landing-cta-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.landing-cta-primary:hover .landing-cta-shimmer {
+  animation: landing-cta-shimmer 0.75s ease;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Bouton CTA hero : léger pulse + apparition */
 @keyframes hero-cta-pulse {
   0%, 100% {
@@ -540,7 +562,12 @@ h3 {
   .animate-float,
   .animate-float-slow,
   .landing-float-subtle,
+  .landing-orb,
   .hero-cta-button {
+    animation: none !important;
+  }
+
+  .landing-cta-primary:hover .landing-cta-shimmer {
     animation: none !important;
   }
 }

@@ -1,13 +1,22 @@
 "use client";
 
-/** Lueurs et matière visuelle partagées entre les sections landing. */
+import { motion } from "framer-motion";
+
+/** Lueurs globales de page — complète le hero sans surcharge */
 export default function LandingBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="absolute -left-[20%] top-[8%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.14),transparent_65%)] blur-3xl" />
-      <div className="absolute -right-[15%] top-[35%] h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.18),transparent_68%)] blur-3xl" />
-      <div className="absolute bottom-[5%] left-1/2 h-[400px] w-[min(100%,720px)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.35),transparent_70%)] blur-3xl" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_50%_-30%,rgba(255,255,255,0.08),transparent_50%)]" />
+      <motion.div
+        className="landing-orb absolute left-[-15%] top-[45%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.12),transparent_70%)] blur-3xl"
+        animate={{ opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="landing-orb absolute right-[-10%] top-[65%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.1),transparent_70%)] blur-3xl"
+        animate={{ opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
     </div>
   );
 }
