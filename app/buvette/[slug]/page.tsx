@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import PublicClubLogo from "@/components/public/PublicClubLogo";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
 
 function currentMonthKey() {
@@ -128,26 +128,17 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center">
-          {clubLogoUrl ? (
-            <Image
-              src={clubLogoUrl}
-              alt={`Logo ${clubName}`}
-              width={64}
-              height={64}
-              className="w-16 h-16 object-cover rounded-full mx-auto mb-3 border border-slate-200"
-            />
-          ) : (
-            <div
-              className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: clubColor }}
-            >
-              {clubName.charAt(0).toUpperCase()}
-            </div>
-          )}
+        <header className="text-center">
+          <PublicClubLogo
+            logoUrl={clubLogoUrl}
+            clubName={clubName}
+            accentColor={clubColor}
+            size="lg"
+            className="mb-4"
+          />
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Réservation de buvette</h1>
-          <p className="text-slate-600 mt-2">{clubName}</p>
-        </div>
+          <p className="mt-2 text-slate-600">{clubName}</p>
+        </header>
 
         {loading && (
           <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-500 text-sm">
