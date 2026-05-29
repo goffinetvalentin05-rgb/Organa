@@ -7,12 +7,15 @@
  * - Abonnement actif: accès complet (active)
  *
  * Tarifs:
- * - Mensuel: 39 CHF/mois
- * - Annuel: 390 CHF/an (2 mois offerts)
+ * - Standard : 39 CHF/mois · 390 CHF/an
+ * - Équipe : 45 CHF/mois · 490 CHF/an
  */
 
 import { createClient } from "@/lib/supabase/server";
 import { getAuthContext } from "@/lib/auth/rbac";
+import { PRICING, STANDARD_PLAN_FEATURES, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
+
+export { PRICING, STANDARD_PLAN_FEATURES, TRIAL_DURATION_DAYS };
 
 // ============================================
 // Types
@@ -36,24 +39,6 @@ export interface SubscriptionInfo {
 // ============================================
 // Constantes
 // ============================================
-
-export const TRIAL_DURATION_DAYS = 7;
-
-export const PRICING = {
-  monthly: {
-    amount: 39,
-    currency: "CHF",
-    label: "Mensuel",
-    period: "mois",
-  },
-  yearly: {
-    amount: 390,
-    currency: "CHF",
-    label: "Annuel",
-    period: "an",
-    savings: "2 mois offerts",
-  },
-} as const;
 
 // ============================================
 // Fonctions principales

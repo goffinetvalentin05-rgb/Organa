@@ -7,42 +7,14 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getAuthContext } from "@/lib/auth/rbac";
+import { STANDARD_PRICING, TEAM_PRICING } from "@/lib/billing/pricing";
 
 export type SubscriptionTier = "standard" | "team";
 
 export const TEAM_PLAN_ERROR_MESSAGE =
   "La gestion des utilisateurs et des accès est disponible avec Obillz Équipe.";
 
-export const TEAM_PRICING = {
-  monthly: {
-    amount: 45,
-    currency: "CHF",
-    label: "Équipe mensuel",
-    period: "mois",
-  },
-  yearly: {
-    amount: 490,
-    currency: "CHF",
-    label: "Équipe annuel",
-    period: "an",
-    savings: "Seulement CHF 100/an de plus que la formule Standard",
-  },
-} as const;
-
-export const STANDARD_PRICING = {
-  monthly: {
-    amount: 39,
-    currency: "CHF",
-    label: "Standard mensuel",
-    period: "mois",
-  },
-  yearly: {
-    amount: 390,
-    currency: "CHF",
-    label: "Standard annuel",
-    period: "an",
-  },
-} as const;
+export { STANDARD_PRICING, TEAM_PRICING };
 
 export interface TeamPlanDeniedResponse {
   error: "TEAM_PLAN_REQUIRED";

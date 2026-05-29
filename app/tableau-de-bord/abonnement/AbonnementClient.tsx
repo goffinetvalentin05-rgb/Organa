@@ -9,6 +9,7 @@ import {
   SectionCard,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { STANDARD_PLAN_FEATURES } from "@/lib/billing/pricing";
 
 interface SubscriptionInfo {
   status: "trial" | "active" | "expired";
@@ -81,8 +82,8 @@ export default function AbonnementClient() {
     }
   };
 
-  const monthlyPrice = pricing?.monthly.amount || 39;
-  const yearlyPrice = pricing?.yearly.amount || 390;
+  const monthlyPrice = pricing?.monthly.amount ?? 39;
+  const yearlyPrice = pricing?.yearly.amount ?? 390;
   const yearlyMonthlyEquivalent = Math.round(yearlyPrice / 12);
 
   return (
@@ -222,16 +223,7 @@ export default function AbonnementClient() {
                 </div>
 
                 <ul className="mx-auto mb-8 max-w-sm space-y-3 text-left">
-                  {[
-                    "Membres illimités",
-                    "Événements illimités",
-                    "Plannings & affectations",
-                    "Factures & devis",
-                    "Gestion des dépenses",
-                    "QR Codes personnalisés",
-                    "Export des données",
-                    "Support prioritaire",
-                  ].map((feature) => (
+                  {STANDARD_PLAN_FEATURES.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <svg
                         className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"

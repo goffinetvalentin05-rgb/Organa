@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import HeroHandVisual from "@/components/landing/HeroHandVisual";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import LandingNav from "@/components/landing/LandingNav";
 import ModulesSection from "@/components/landing/ModulesSection";
 import ProblemSection from "@/components/landing/ProblemSection";
-import StatsShowcaseSection from "@/components/landing/StatsShowcaseSection";
-import TrustSection from "@/components/landing/TrustSection";
+import FaqSection from "@/components/landing/FaqSection";
+import PricingSection from "@/components/landing/PricingSection";
 import {
   obillzLandingGridOverlayClass,
   obillzLandingRootClass,
@@ -41,13 +42,14 @@ export default function LandingPage() {
         <LandingNav />
         <HeroSection />
         <ProblemSection />
-        <StatsShowcaseSection />
         <ModulesSection />
         <HowItWorksSection />
-        <TrustSection />
+        <PricingSection />
+        <FaqSection />
         <FinalCtaSection />
+        <HeroHandVisual />
 
-        <footer className="border-t border-white/[0.06] bg-[#020409]/80 py-10 backdrop-blur-md">
+        <footer className="relative z-10 border-t border-white/[0.06] bg-[#020409]/80 py-10 backdrop-blur-md">
           <div className="mx-auto flex w-[94%] max-w-[1160px] flex-col gap-8 md:flex-row md:items-start md:justify-between">
             <div>
               <Link href="/" className="inline-block opacity-90 transition hover:opacity-100">
