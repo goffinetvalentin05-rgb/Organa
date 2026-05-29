@@ -37,6 +37,8 @@ export const TEAM_PRICING = {
 /** Alias rétrocompatibilité (formule Standard) */
 export const PRICING = STANDARD_PRICING;
 
+export type PlanPricing = typeof STANDARD_PRICING | typeof TEAM_PRICING;
+
 export const STANDARD_PLAN_FEATURES = [
   "Membres illimités",
   "Événements illimités",

@@ -11,6 +11,7 @@ import {
   viewportOnce,
 } from "@/components/landing/landing-motion";
 import {
+  type PlanPricing,
   STANDARD_PLAN_FEATURES,
   STANDARD_PRICING,
   TEAM_PLAN_EXTRA_FEATURES,
@@ -31,7 +32,7 @@ function PlanCard({
 }: {
   name: string;
   description: string;
-  pricing: typeof STANDARD_PRICING;
+  pricing: PlanPricing;
   billingCycle: BillingCycle;
   features: readonly string[];
   extraLabel?: string;
