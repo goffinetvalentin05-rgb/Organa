@@ -1,23 +1,20 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
+import { Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
-import Link from "next/link";
-import Image from "next/image";
-
-/* ----- Grid d'arrière-plan (hero bleu) ----- */
-function GridBackground() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 opacity-30"
-      style={{
-        backgroundImage: `linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)`,
-        backgroundSize: "48px 48px",
-      }}
-    />
-  );
-}
+import AuthPageLayout from "@/components/auth/AuthPageLayout";
+import {
+  AuthCard,
+  AuthError,
+  AuthField,
+  AuthFooterLink,
+  AuthInput,
+  AuthPageMotion,
+  AuthSubmitButton,
+} from "@/components/auth/AuthForm";
 
 export default function ConnexionPage() {
   const [email, setEmail] = useState("");
@@ -65,7 +62,7 @@ export default function ConnexionPage() {
       if (data.user) {
         await supabase.auth.getSession();
         toast.success("Connexion réussie !");
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         window.location.href = "/tableau-de-bord";
       }
     } catch (err: unknown) {
@@ -79,160 +76,80 @@ export default function ConnexionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-md"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 md:px-6">
-          <Link
-            href="/"
-            className="relative flex items-center transition-opacity hover:opacity-90"
-            aria-label="Obillz - Accueil"
-          >
-            <Image
-              src="/logo-obillz.png"
-              alt="Obillz"
-              width={140}
-              height={40}
-              className="h-9 w-auto object-contain object-left md:h-10"
-              priority
-            />
-          </Link>
-
-          <Link
-            href="/inscription"
-            className="rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
-          >
-            Créer un compte
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section avec formulaire */}
-      <section
-        className="relative min-h-screen overflow-hidden px-4 pt-20 md:px-6"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      >
-        <GridBackground />
-
-        <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center justify-center py-16 md:py-24">
-          {/* Titre */}
-          <h1 className="max-w-2xl text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
+    <AuthPageLayout variant="login">
+      <AuthPageMotion>
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
+            Connexion
+          </p>
+          <h1 className="mt-3 text-balance text-2xl font-black text-white md:text-3xl">
             Bon retour sur Obillz
           </h1>
-          <p className="mt-4 max-w-lg text-center text-sm leading-relaxed text-white/80 md:text-base">
-            Connectez-vous pour accéder à votre espace de gestion
+          <p className="mt-3 text-sm text-blue-100/75 md:text-base">
+            Accédez à votre espace de gestion de club
           </p>
+        </div>
 
-          {/* Carte de connexion */}
-          <div className="mt-10 w-full max-w-md">
-            <div className="rounded-3xl border border-white/20 bg-white p-8 shadow-2xl md:p-10">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-slate-900">Connexion</h2>
-                <p className="mt-2 text-sm text-slate-600">
-                  Entrez vos identifiants pour continuer
-                </p>
-              </div>
+        <div className="mt-8">
+          <AuthCard>
+            <div className="text-center">
+              <h2 className="text-lg font-bold text-white">Identifiants</h2>
+              <p className="mt-1 text-sm text-blue-100/65">
+                Entrez votre email et votre mot de passe
+              </p>
+            </div>
 
-              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                {errorMessage && (
-                  <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    {errorMessage}
-                  </div>
-                )}
+            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+              {errorMessage ? <AuthError message={errorMessage} /> : null}
 
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                    Adresse email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                    Mot de passe
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
-
-                <button
-                  type="submit"
+              <AuthField id="email" label="Adresse email">
+                <AuthInput
+                  id="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  className="w-full rounded-xl py-3.5 text-base font-semibold text-white transition-all duration-300 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Connexion en cours...
-                    </span>
-                  ) : (
-                    "Se connecter"
-                  )}
-                </button>
-              </form>
+                  autoComplete="email"
+                />
+              </AuthField>
 
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <p className="text-center text-sm text-slate-600">
-                  Pas encore de compte ?{" "}
-                  <Link
-                    href="/inscription"
-                    className="font-semibold transition-colors hover:underline"
-                    style={{ color: "var(--obillz-hero-blue)" }}
-                  >
-                    Créer un compte gratuitement
-                  </Link>
-                </p>
-              </div>
-            </div>
+              <AuthField id="password" label="Mot de passe">
+                <AuthInput
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  autoComplete="current-password"
+                />
+              </AuthField>
 
-            {/* Badge de confiance */}
-            <div className="mt-6 flex items-center justify-center gap-2 text-white/70">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span className="text-sm">Connexion sécurisée SSL</span>
-            </div>
-          </div>
-        </div>
+              <AuthSubmitButton loading={loading} loadingLabel="Connexion en cours...">
+                Se connecter
+              </AuthSubmitButton>
+            </form>
 
-        {/* Courbe de transition */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 h-20 w-full" aria-hidden>
-          <svg
-            className="h-full w-full"
-            viewBox="0 0 1440 80"
-            preserveAspectRatio="none"
-            fill="none"
-          >
-            <path
-              d="M0 80 L0 40 Q400 0 720 20 Q1040 40 1440 30 L1440 80 Z"
-              fill="white"
+            <AuthFooterLink
+              prompt="Pas encore de compte ?"
+              linkHref="/inscription"
+              linkLabel="Créer un compte gratuitement"
             />
-          </svg>
-        </div>
-      </section>
+          </AuthCard>
 
-    </div>
+          <div className="mt-5 flex items-center justify-center gap-2 text-blue-100/55">
+            <Shield className="h-4 w-4 shrink-0 text-blue-300/70" aria-hidden />
+            <span className="text-xs">Connexion sécurisée · SSL</span>
+          </div>
+
+          <p className="mt-4 text-center sm:hidden">
+            <Link href="/" className="text-xs text-blue-100/50 hover:text-white">
+              ← Retour à l&apos;accueil
+            </Link>
+          </p>
+        </div>
+      </AuthPageMotion>
+    </AuthPageLayout>
   );
 }

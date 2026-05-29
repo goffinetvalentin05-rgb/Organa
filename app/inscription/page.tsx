@@ -1,23 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Check, Clock, CreditCard, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
-import Link from "next/link";
-import Image from "next/image";
-
-/* ----- Grid d'arrière-plan (hero bleu) ----- */
-function GridBackground() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 opacity-30"
-      style={{
-        backgroundImage: `linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)`,
-        backgroundSize: "48px 48px",
-      }}
-    />
-  );
-}
+import AuthPageLayout from "@/components/auth/AuthPageLayout";
+import {
+  AuthCard,
+  AuthError,
+  AuthField,
+  AuthFooterLink,
+  AuthInput,
+  AuthPageMotion,
+  AuthSubmitButton,
+  AuthTrustPills,
+} from "@/components/auth/AuthForm";
+import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 export default function InscriptionPage() {
   const [email, setEmail] = useState("");
@@ -71,278 +70,157 @@ export default function InscriptionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-md"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 md:px-6">
-          <Link
-            href="/"
-            className="relative flex items-center transition-opacity hover:opacity-90"
-            aria-label="Obillz - Accueil"
-          >
-            <Image
-              src="/logo-obillz.png"
-              alt="Obillz"
-              width={140}
-              height={40}
-              className="h-9 w-auto object-contain object-left md:h-10"
-              priority
-            />
-          </Link>
-
-          <Link
-            href="/connexion"
-            className="rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
-          >
-            Se connecter
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section avec formulaire */}
-      <section
-        className="relative min-h-screen overflow-hidden px-4 pt-20 md:px-6"
-        style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-      >
-        <GridBackground />
-
-        <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center justify-center py-12 md:py-20">
-          {/* Titre */}
-          <h1 className="max-w-2xl text-center text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
+    <AuthPageLayout variant="signup">
+      <AuthPageMotion>
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
+            Inscription
+          </p>
+          <h1 className="mt-3 text-balance text-2xl font-black text-white md:text-3xl">
             {registrationComplete ? "Presque terminé" : "Commencez gratuitement"}
           </h1>
-          <p className="mt-4 max-w-lg text-center text-sm leading-relaxed text-white/80 md:text-base">
+          <p className="mt-3 text-sm text-blue-100/75 md:text-base">
             {registrationComplete
               ? "Encore une étape pour activer votre compte"
-              : "Créez votre compte en quelques secondes et découvrez Obillz"}
+              : "Créez votre espace club en quelques secondes"}
           </p>
+          {!registrationComplete ? (
+            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_20px_rgba(52,211,153,0.2)]">
+              <Check className="h-3.5 w-3.5" aria-hidden />
+              {TRIAL_DURATION_DAYS} jours d&apos;essai gratuit
+            </span>
+          ) : null}
+        </div>
 
-          {/* Badge essai gratuit */}
-          {!registrationComplete && (
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2">
-              <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-sm font-medium text-white">7 jours d'essai gratuit</span>
-            </div>
-          )}
-
-          {/* Carte d'inscription ou confirmation */}
-          <div className="mt-8 w-full max-w-md">
-            <div className="rounded-3xl border border-white/20 bg-white p-8 shadow-2xl md:p-10">
-              {registrationComplete ? (
-                <div className="text-center">
-                  <div
-                    className="mx-auto flex h-14 w-14 items-center justify-center rounded-full"
-                    style={{ backgroundColor: "var(--obillz-blue-light)" }}
-                    aria-hidden
-                  >
-                    <svg
-                      className="h-7 w-7"
-                      style={{ color: "var(--obillz-hero-blue)" }}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h2 className="mt-6 text-2xl font-bold text-slate-900">Compte créé avec succès</h2>
-                  <p className="mt-4 text-center text-sm leading-relaxed text-slate-600 md:text-[15px]">
-                    Un email de confirmation vient de vous être envoyé. Veuillez cliquer sur le lien
-                    reçu pour activer votre compte.
-                  </p>
-                  <div className="mt-3 flex items-start justify-center gap-2 text-center">
-                    <svg
-                      className="mt-0.5 h-4 w-4 text-slate-400"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 8h.01" />
-                      <path d="M11 12h1v4h1" />
-                      <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    <p className="text-xs leading-relaxed text-slate-500 sm:text-sm md:text-[13px]">
-                      Pensez à vérifier vos courriers indésirables (spam), il arrive parfois que l’email de confirmation s’y trouve.
-                    </p>
-                  </div>
-                  <Link
-                    href="/connexion"
-                    className="mt-8 flex w-full items-center justify-center rounded-xl py-3.5 text-base font-semibold text-white transition-all duration-300 hover:opacity-90 shadow-lg hover:shadow-xl"
-                    style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-                  >
-                    Retour à la connexion
-                  </Link>
-                </div>
-              ) : (
-                <>
+        <div className="mt-8">
+          <AuthCard>
+            {registrationComplete ? (
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-slate-900">Créer un compte</h2>
-                <p className="mt-2 text-sm text-slate-600">
-                  Remplissez les informations ci-dessous
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1A23FF]/30 text-white shadow-[0_0_28px_rgba(26,35,255,0.45)] ring-1 ring-blue-400/35">
+                  <Check className="h-7 w-7" strokeWidth={2.5} aria-hidden />
+                </span>
+                <h2 className="mt-6 text-xl font-bold text-white">Compte créé avec succès</h2>
+                <p className="mt-4 text-sm leading-relaxed text-blue-100/75">
+                  Un email de confirmation vient de vous être envoyé. Cliquez sur le lien reçu
+                  pour activer votre compte.
                 </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                {errorMessage && (
-                  <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    {errorMessage}
-                  </div>
-                )}
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                    Adresse email *
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                    Mot de passe *
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    placeholder="8 caractères minimum"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
-                    Confirmer le mot de passe *
-                  </label>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)] focus:border-transparent transition-all disabled:opacity-50"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-xl py-3.5 text-base font-semibold text-white transition-all duration-300 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-                  style={{ backgroundColor: "var(--obillz-hero-blue)" }}
+                <p className="mt-3 text-xs leading-relaxed text-blue-100/50">
+                  Pensez à vérifier vos courriers indésirables — l&apos;email peut s&apos;y
+                  trouver.
+                </p>
+                <Link
+                  href="/connexion"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3.5 text-base font-bold text-[#1A23FF] shadow-[0_0_36px_rgba(26,35,255,0.55)] transition hover:shadow-[0_0_48px_rgba(26,35,255,0.7)]"
                 >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Création en cours...
-                    </span>
-                  ) : (
-                    "Créer mon compte"
-                  )}
-                </button>
-
-                <p className="text-xs text-center text-slate-500 leading-relaxed">
-                  En créant un compte, vous acceptez nos{" "}
-                  <Link href="/conditions-utilisation" className="underline hover:text-slate-700">
-                    conditions d'utilisation
-                  </Link>{" "}
-                  et notre{" "}
-                  <Link href="/politique-confidentialite" className="underline hover:text-slate-700">
-                    politique de confidentialité
-                  </Link>
-                </p>
-              </form>
-
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <p className="text-center text-sm text-slate-600">
-                  Déjà un compte ?{" "}
-                  <Link
-                    href="/connexion"
-                    className="font-semibold transition-colors hover:underline"
-                    style={{ color: "var(--obillz-hero-blue)" }}
-                  >
-                    Se connecter
-                  </Link>
-                </p>
+                  Retour à la connexion
+                </Link>
               </div>
-                </>
-              )}
-            </div>
-
-            {/* Avantages */}
-            {!registrationComplete && (
-            <div className="mt-8 grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            ) : (
+              <>
+                <div className="text-center">
+                  <h2 className="text-lg font-bold text-white">Créer un compte</h2>
+                  <p className="mt-1 text-sm text-blue-100/65">
+                    Remplissez les informations ci-dessous
+                  </p>
                 </div>
-                <span className="mt-2 text-xs text-white/80">Inscription en 2 min</span>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                </div>
-                <span className="mt-2 text-xs text-white/80">Sans carte bancaire</span>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <span className="mt-2 text-xs text-white/80">Données sécurisées</span>
-              </div>
-            </div>
+
+                <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+                  {errorMessage ? <AuthError message={errorMessage} /> : null}
+
+                  <AuthField id="email" label="Adresse email *">
+                    <AuthInput
+                      id="email"
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                      autoComplete="email"
+                    />
+                  </AuthField>
+
+                  <AuthField id="password" label="Mot de passe *">
+                    <AuthInput
+                      id="password"
+                      type="password"
+                      placeholder="8 caractères minimum"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      autoComplete="new-password"
+                    />
+                  </AuthField>
+
+                  <AuthField id="confirmPassword" label="Confirmer le mot de passe *">
+                    <AuthInput
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      disabled={loading}
+                      autoComplete="new-password"
+                    />
+                  </AuthField>
+
+                  <AuthSubmitButton loading={loading} loadingLabel="Création en cours...">
+                    Créer mon compte
+                  </AuthSubmitButton>
+
+                  <p className="text-center text-xs leading-relaxed text-blue-100/45">
+                    En créant un compte, vous acceptez nos{" "}
+                    <Link
+                      href="/conditions-utilisation"
+                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
+                    >
+                      conditions d&apos;utilisation
+                    </Link>{" "}
+                    et notre{" "}
+                    <Link
+                      href="/politique-confidentialite"
+                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
+                    >
+                      politique de confidentialité
+                    </Link>
+                    .
+                  </p>
+                </form>
+
+                <AuthFooterLink
+                  prompt="Déjà un compte ?"
+                  linkHref="/connexion"
+                  linkLabel="Se connecter"
+                />
+              </>
             )}
-          </div>
-        </div>
+          </AuthCard>
 
-        {/* Courbe de transition */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 h-20 w-full" aria-hidden>
-          <svg
-            className="h-full w-full"
-            viewBox="0 0 1440 80"
-            preserveAspectRatio="none"
-            fill="none"
-          >
-            <path
-              d="M0 80 L0 40 Q400 0 720 20 Q1040 40 1440 30 L1440 80 Z"
-              fill="white"
+          {!registrationComplete ? (
+            <AuthTrustPills
+              items={[
+                {
+                  label: "Inscription en 2 min",
+                  icon: <Clock className="h-4 w-4" aria-hidden />,
+                },
+                {
+                  label: "Sans carte bancaire",
+                  icon: <CreditCard className="h-4 w-4" aria-hidden />,
+                },
+                {
+                  label: "Données sécurisées",
+                  icon: <Shield className="h-4 w-4" aria-hidden />,
+                },
+              ]}
             />
-          </svg>
-        </div>
-      </section>
+          ) : null}
 
-    </div>
+          <p className="mt-4 text-center sm:hidden">
+            <Link href="/" className="text-xs text-blue-100/50 hover:text-white">
+              ← Retour à l&apos;accueil
+            </Link>
+          </p>
+        </div>
+      </AuthPageMotion>
+    </AuthPageLayout>
   );
 }

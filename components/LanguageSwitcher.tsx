@@ -14,7 +14,7 @@ export default function LanguageSwitcher() {
 
   return (
     <div
-      className="flex items-center rounded-full border border-white/20 bg-white/10 p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md"
+      className="flex items-center rounded-full border border-white/20 bg-white/[0.08] p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md"
       role="group"
       aria-label="Langue"
     >
@@ -28,8 +28,8 @@ export default function LanguageSwitcher() {
             aria-pressed={isActive}
             className={`relative min-w-[2.25rem] rounded-full px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition-all duration-200 ${
               isActive
-                ? "bg-white text-[var(--obillz-hero-blue)] shadow-[0_2px_8px_rgba(15,23,42,0.12)]"
-                : "text-white/75 hover:text-white hover:bg-white/10"
+                ? "bg-white text-[#1A23FF] shadow-[0_0_16px_rgba(26,35,255,0.35)]"
+                : "text-white/75 hover:bg-white/10 hover:text-white"
             }`}
           >
             {option.label}

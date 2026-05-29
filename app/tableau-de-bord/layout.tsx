@@ -226,50 +226,64 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="relative z-10 lg:ml-72 min-h-screen flex flex-col">
-        {/* Topbar */}
-        <header className="sticky top-0 z-30 border-b border-white/10 bg-[var(--obillz-hero-blue)]/80 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-            {/* Left: Mobile menu only */}
-            <div className="flex items-center">
+        {/* Topbar — capsule glass (aligné landing / auth) */}
+        <header className="sticky top-0 z-30 px-3 pt-3 sm:px-4 lg:px-6">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/25 bg-white/[0.12] px-3 py-2 shadow-[0_8px_40px_rgba(26,35,255,0.2),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:gap-4 sm:px-4 sm:py-2.5">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <button
+                type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 -ml-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                className="lg:hidden rounded-full p-2 text-white/85 transition hover:bg-white/10 hover:text-white"
+                aria-label={t("dashboard.navigation.primary")}
               >
-                <Menu className="w-5 h-5" />
+                <Menu className="h-5 w-5" />
               </button>
+              <Link
+                href="/tableau-de-bord"
+                className="hidden shrink-0 transition hover:opacity-90 sm:inline-flex lg:hidden"
+              >
+                <Image
+                  src="/logo-obillz.png"
+                  alt="Obillz"
+                  width={90}
+                  height={22}
+                  className="h-6 w-auto"
+                />
+              </Link>
+              <p className="hidden truncate text-sm font-semibold text-white/90 lg:block lg:max-w-[220px] xl:max-w-none">
+                {getPageTitle()}
+              </p>
             </div>
 
-            {/* Right: Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <LanguageSwitcher />
-              
-              {!loadingUser && (() => {
-                const displayName = clubName || t("dashboard.topbar.clubFallback");
-                const initial = (clubName || t("dashboard.topbar.clubFallback") || "C")
-                  .charAt(0)
-                  .toUpperCase();
-                return (
-                  <div
-                    className="flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5"
-                    aria-label={displayName}
-                    title={displayName}
-                  >
+
+              {!loadingUser &&
+                (() => {
+                  const displayName = clubName || t("dashboard.topbar.clubFallback");
+                  const initial = (clubName || t("dashboard.topbar.clubFallback") || "C")
+                    .charAt(0)
+                    .toUpperCase();
+                  return (
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                      style={{ backgroundColor: "rgba(255,255,255,0.28)" }}
+                      className="flex max-w-[140px] items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-2 py-1 sm:max-w-[200px] sm:px-2.5 sm:py-1.5 md:max-w-none"
+                      aria-label={displayName}
+                      title={displayName}
                     >
-                      {initial}
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/80 text-xs font-bold text-white shadow-[0_0_16px_rgba(26,35,255,0.45)] ring-1 ring-blue-300/30">
+                        {initial}
+                      </div>
+                      <span className="hidden truncate text-sm font-medium text-white md:inline">
+                        {displayName}
+                      </span>
                     </div>
-                    <span className="hidden md:inline text-sm font-medium text-white max-w-[160px] truncate">
-                      {displayName}
-                    </span>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
 
               <button
+                type="button"
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white/85 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white sm:px-4 sm:py-2 sm:text-sm"
               >
                 {t("dashboard.topbar.logout")}
               </button>
