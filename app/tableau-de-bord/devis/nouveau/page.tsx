@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
@@ -19,24 +19,26 @@ import {
   ActionButton,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
-
-interface Client {
-  id: string;
-  nom: string;
-  email: string;
-  telephone: string;
-  adresse: string;
-  role?: string | null;
-}
-
-const ALL_PLAYERS_VALUE = "__all_players__";
+import {
+  type CotisationClient,
+  type RecipientType,
+  type ExistingQuoteSummary,
+  findDuplicateTargets,
+  getCategoryLabel,
+  getPlayers,
+  getTeamsWithCounts,
+  resolveCotisationTargets,
+} from "@/lib/quotes/recipients";
 
 export default function NouveauDevisPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<CotisationClient[]>([]);
+  const [existingQuotes, setExistingQuotes] = useState<ExistingQuoteSummary[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
-  const [clientId, setClientId] = useState("");
+  const [recipientType, setRecipientType] = useState<RecipientType>("individual");
+  const [memberId, setMemberId] = useState("");
+  const [teamCategory, setTeamCategory] = useState("");
   const [lignes, setLignes] = useState<LigneDocument[]>([
     { id: "1", designation: "", quantite: 1, prixUnitaire: 0, tva: 7.7 },
   ]);
@@ -60,30 +62,73 @@ export default function NouveauDevisPage() {
     total: number;
   } | null>(null);
 
-  // Charger les clients depuis l'API Supabase
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(localeToIntl[locale], {
+        style: "currency",
+        currency: "CHF",
+      }),
+    [locale]
+  );
+
+  const translateCategory = useCallback((key: string) => t(key), [t]);
+
   useEffect(() => {
-    const loadClients = async () => {
+    const loadData = async () => {
       try {
         setLoadingClients(true);
-        const res = await fetch("/api/clients", { cache: "no-store" });
-        if (!res.ok) {
-          console.error("[Devis] Erreur chargement clients:", res.statusText);
+        const [clientsRes, quotesRes] = await Promise.all([
+          fetch("/api/clients", { cache: "no-store" }),
+          fetch("/api/documents?type=quote", { cache: "no-store" }),
+        ]);
+
+        if (!clientsRes.ok) {
+          console.error("[Devis] Erreur chargement clients:", clientsRes.statusText);
           toast.error(t("dashboard.quotes.clientsLoadError"));
-          return;
+        } else {
+          const data = await clientsRes.json();
+          setClients(data.clients || []);
         }
-        const data = await res.json();
-        console.log(`[Devis] Clients source: API /api/clients, count=${data.clients?.length || 0}`);
-        setClients(data.clients || []);
-      } catch (error: any) {
-        console.error("[Devis] Erreur chargement clients:", error);
+
+        if (quotesRes.ok) {
+          const quotesData = await quotesRes.json();
+          const summaries: ExistingQuoteSummary[] = (quotesData.documents || []).map(
+            (doc: {
+              clientId?: string | null;
+              dateEcheance?: string | null;
+              totalTTC?: number;
+              statut?: string;
+            }) => ({
+              client_id: doc.clientId || "",
+              date_echeance: doc.dateEcheance ?? null,
+              total_ttc: Number(doc.totalTTC ?? 0),
+              status: doc.statut ?? "brouillon",
+            })
+          );
+          setExistingQuotes(summaries);
+        }
+      } catch (error) {
+        console.error("[Devis] Erreur chargement données:", error);
         toast.error(t("dashboard.quotes.clientsLoadError"));
       } finally {
         setLoadingClients(false);
       }
     };
 
-    loadClients();
-  }, []);
+    loadData();
+  }, [t]);
+
+  const teamsWithCounts = useMemo(() => getTeamsWithCounts(clients), [clients]);
+
+  const targetMembers = useMemo(
+    () => resolveCotisationTargets(recipientType, clients, memberId, teamCategory),
+    [recipientType, clients, memberId, teamCategory]
+  );
+
+  const selectedTeamLabel = useMemo(() => {
+    if (!teamCategory) return "";
+    return getCategoryLabel(teamCategory, translateCategory);
+  }, [teamCategory, translateCategory]);
 
   const ajouterLigne = () => {
     setLignes([
@@ -115,12 +160,6 @@ export default function NouveauDevisPage() {
 
   const getLignesValides = () =>
     lignes.filter((l) => l.designation.trim() !== "");
-
-  const getPlayers = () =>
-    clients.filter((client) => {
-      const role = (client.role || "").toLowerCase().trim();
-      return role === "player" || role === "joueur";
-    });
 
   const createQuoteForClient = async (
     targetClientId: string,
@@ -181,11 +220,12 @@ export default function NouveauDevisPage() {
     }
   };
 
-  const handleBulkSubmit = async (lignesValides: LigneDocument[]) => {
-    const players = getPlayers();
-
-    if (players.length === 0) {
-      toast.error("Aucun joueur disponible pour l'envoi groupé.");
+  const handleBulkSubmit = async (
+    targets: CotisationClient[],
+    lignesValides: LigneDocument[]
+  ) => {
+    if (targets.length === 0) {
+      toast.error(t("dashboard.quotes.recipients.noTargets"));
       return;
     }
 
@@ -193,9 +233,9 @@ export default function NouveauDevisPage() {
     setBulkSummary(null);
     setBulkProgress({
       current: 0,
-      total: players.length,
+      total: targets.length,
       created: 0,
-      message: "Initialisation de l'envoi groupé...",
+      message: t("dashboard.quotes.recipients.bulkInitializing"),
     });
 
     let created = 0;
@@ -203,16 +243,20 @@ export default function NouveauDevisPage() {
     let skippedNoEmail = 0;
     let failed = 0;
 
-    for (let index = 0; index < players.length; index += 1) {
-      const client = players[index];
+    for (let index = 0; index < targets.length; index += 1) {
+      const client = targets[index];
       const step = index + 1;
 
       try {
         setBulkProgress({
           current: index,
-          total: players.length,
+          total: targets.length,
           created,
-          message: `${step}/${players.length} - Création de la cotisation pour ${client.nom}...`,
+          message: t("dashboard.quotes.recipients.bulkCreating", {
+            step: String(step),
+            total: String(targets.length),
+            name: client.nom,
+          }),
         });
 
         const createdQuote = await createQuoteForClient(client.id, lignesValides);
@@ -220,9 +264,13 @@ export default function NouveauDevisPage() {
 
         setBulkProgress({
           current: index,
-          total: players.length,
+          total: targets.length,
           created,
-          message: `${step}/${players.length} - Génération du PDF pour ${client.nom}...`,
+          message: t("dashboard.quotes.recipients.bulkPdf", {
+            step: String(step),
+            total: String(targets.length),
+            name: client.nom,
+          }),
         });
 
         await generateQuotePdf(createdQuote.id);
@@ -230,9 +278,13 @@ export default function NouveauDevisPage() {
         if (client.email && client.email.trim() !== "") {
           setBulkProgress({
             current: index,
-            total: players.length,
+            total: targets.length,
             created,
-            message: `${step}/${players.length} - Envoi email à ${client.nom}...`,
+            message: t("dashboard.quotes.recipients.bulkEmail", {
+              step: String(step),
+              total: String(targets.length),
+              name: client.nom,
+            }),
           });
 
           await sendQuoteEmail(createdQuote.id);
@@ -250,9 +302,12 @@ export default function NouveauDevisPage() {
       } finally {
         setBulkProgress({
           current: step,
-          total: players.length,
+          total: targets.length,
           created,
-          message: `${created}/${players.length} cotisations créées...`,
+          message: t("dashboard.quotes.recipients.bulkProgress", {
+            created: String(created),
+            total: String(targets.length),
+          }),
         });
       }
     }
@@ -262,7 +317,7 @@ export default function NouveauDevisPage() {
       emailed,
       skippedNoEmail,
       failed,
-      total: players.length,
+      total: targets.length,
     };
 
     setBulkSummary(summary);
@@ -270,7 +325,71 @@ export default function NouveauDevisPage() {
     setBulkProgress(null);
 
     toast.success(
-      `Envoi groupé terminé : ${created} cotisations créées, ${emailed} emails envoyés, ${skippedNoEmail} joueurs sans email ignorés.`
+      t("dashboard.quotes.recipients.bulkDoneToast", {
+        created: String(created),
+        emailed: String(emailed),
+        skipped: String(skippedNoEmail),
+      })
+    );
+  };
+
+  const validateRecipients = (): boolean => {
+    if (recipientType === "individual") {
+      if (!memberId) {
+        toast.error(t("dashboard.quotes.selectClientError"));
+        return false;
+      }
+      return true;
+    }
+
+    if (recipientType === "team") {
+      if (teamsWithCounts.length === 0) {
+        toast.error(t("dashboard.quotes.recipients.noTeams"));
+        return false;
+      }
+      if (!teamCategory) {
+        toast.error(t("dashboard.quotes.recipients.selectTeamError"));
+        return false;
+      }
+      if (targetMembers.length === 0) {
+        toast.error(t("dashboard.quotes.recipients.emptyTeam"));
+        return false;
+      }
+      return true;
+    }
+
+    if (getPlayers(clients).length === 0) {
+      toast.error(t("dashboard.quotes.recipients.noPlayers"));
+      return false;
+    }
+
+    return true;
+  };
+
+  const confirmDuplicatesIfNeeded = (targets: CotisationClient[], totalTtc: number) => {
+    const duplicates = findDuplicateTargets(
+      targets,
+      existingQuotes,
+      dateEcheance,
+      totalTtc
+    );
+
+    if (duplicates.length === 0) return true;
+
+    const names = duplicates
+      .slice(0, 5)
+      .map((m) => m.nom)
+      .join(", ");
+    const suffix =
+      duplicates.length > 5
+        ? ` (+${duplicates.length - 5})`
+        : "";
+
+    return window.confirm(
+      t("dashboard.quotes.recipients.duplicateConfirm", {
+        count: String(duplicates.length),
+        names: `${names}${suffix}`,
+      })
     );
   };
 
@@ -281,8 +400,7 @@ export default function NouveauDevisPage() {
       return;
     }
 
-    if (!clientId) {
-      toast.error(t("dashboard.quotes.selectClientError"));
+    if (!validateRecipients()) {
       return;
     }
 
@@ -293,39 +411,40 @@ export default function NouveauDevisPage() {
       return;
     }
 
-    if (clientId === ALL_PLAYERS_VALUE) {
-      await handleBulkSubmit(lignesValides);
+    const totalTtc = calculerTotalTTC(lignesValides);
+
+    if (recipientType !== "individual") {
+      if (!confirmDuplicatesIfNeeded(targetMembers, totalTtc)) {
+        return;
+      }
+      await handleBulkSubmit(targetMembers, lignesValides);
       return;
     }
 
     try {
-      const data = await createQuoteForClient(clientId, lignesValides);
+      const data = await createQuoteForClient(memberId, lignesValides);
       setDocumentId(data.id);
-      console.log("[Devis] Devis créé via API avec ID:", data.id, "Numéro:", data.numero);
       router.push(`/tableau-de-bord/devis/${data.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : t("dashboard.common.unknownError");
       console.error("[Devis] Erreur lors de la création:", error);
-      toast.error(
-        `${t("dashboard.quotes.createError")}: ${error.message || t("dashboard.common.unknownError")}`
-      );
+      toast.error(`${t("dashboard.quotes.createError")}: ${message}`);
     }
   };
 
-  // Fonction pour sauvegarder le document avant de générer le PDF
   const saveAndOpenPdf = async (download: boolean = false) => {
-    // Validation
-    if (!clientId) {
-      toast.error(t("dashboard.quotes.selectClientError"));
-      return;
-    }
-    if (clientId === ALL_PLAYERS_VALUE) {
-      toast.error("La prévisualisation/téléchargement PDF est disponible en mode individuel.");
+    if (recipientType !== "individual") {
+      toast.error(t("dashboard.quotes.recipients.pdfIndividualOnly"));
       return;
     }
 
-    const lignesValides = lignes.filter(
-      (l) => l.designation.trim() !== ""
-    );
+    if (!memberId) {
+      toast.error(t("dashboard.quotes.selectClientError"));
+      return;
+    }
+
+    const lignesValides = getLignesValides();
 
     if (lignesValides.length === 0) {
       toast.error(t("dashboard.quotes.lineRequiredError"));
@@ -338,22 +457,21 @@ export default function NouveauDevisPage() {
       let id = documentId;
       let numero: string | undefined;
 
-      // Si le document n'existe pas encore, le créer via l'API
       if (!id) {
         const response = await fetch("/api/documents", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-        body: JSON.stringify({
-          type: "quote",
-          clientId,
-          lignes: lignesValides,
-          statut,
-          dateCreation: new Date().toISOString().split("T")[0],
-          ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-          ...(notes && notes.trim() !== "" ? { notes } : {}),
-        }),
+          body: JSON.stringify({
+            type: "quote",
+            clientId: memberId,
+            lignes: lignesValides,
+            statut,
+            dateCreation: new Date().toISOString().split("T")[0],
+            ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+            ...(notes && notes.trim() !== "" ? { notes } : {}),
+          }),
         });
 
         if (!response.ok) {
@@ -365,9 +483,7 @@ export default function NouveauDevisPage() {
         id = data.id.toString();
         numero = data.numero;
         setDocumentId(id);
-        console.log("[Devis][PDF] Document créé via API avec ID:", id, "Numéro:", numero);
       } else {
-        // Sinon, mettre à jour le document existant via l'API
         const response = await fetch("/api/documents", {
           method: "PATCH",
           headers: {
@@ -376,10 +492,12 @@ export default function NouveauDevisPage() {
           body: JSON.stringify({
             id,
             type: "quote",
-            clientId,
+            clientId: memberId,
             lignes: lignesValides,
             statut,
-            ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : { dateEcheance: null }),
+            ...(dateEcheance && dateEcheance.trim() !== ""
+              ? { dateEcheance }
+              : { dateEcheance: null }),
             ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
           }),
         });
@@ -391,13 +509,10 @@ export default function NouveauDevisPage() {
 
         const data = await response.json();
         numero = data.numero;
-        console.log("[Devis][PDF] Document mis à jour via API avec ID:", id, "Numéro:", numero);
       }
 
-      // Ouvrir le PDF
       const url = `/api/documents/${id}/pdf?type=quote${download ? "&download=true" : ""}`;
-      console.log("[Devis][PDF] Opening PDF URL:", url, "Document ID:", id);
-      
+
       if (download) {
         const link = document.createElement("a");
         link.href = url;
@@ -408,19 +523,46 @@ export default function NouveauDevisPage() {
       } else {
         window.open(url, "_blank");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : t("dashboard.common.unknownError");
       console.error("Erreur lors de la sauvegarde pour PDF:", error);
-      toast.error(
-        `${t("dashboard.quotes.saveForPdfError")}: ${error.message || t("dashboard.common.unknownError")}`
-      );
+      toast.error(`${t("dashboard.quotes.saveForPdfError")}: ${message}`);
     } finally {
       setSavingForPdf(false);
     }
   };
 
+  const handleRecipientTypeChange = (next: RecipientType) => {
+    setRecipientType(next);
+    setMemberId("");
+    setTeamCategory("");
+    setDocumentId(null);
+    setBulkSummary(null);
+  };
+
   const totalHT = calculerTotalHT(lignes);
   const totalTVA = calculerTVA(lignes);
   const totalTTC = calculerTotalTTC(lignes);
+
+  const recipientTypeLabel =
+    recipientType === "individual"
+      ? t("dashboard.quotes.recipients.individual")
+      : recipientType === "team"
+        ? t("dashboard.quotes.recipients.team")
+        : t("dashboard.quotes.recipients.all");
+
+  const statutLabel = {
+    brouillon: t("dashboard.status.quote.draft"),
+    envoye: t("dashboard.status.quote.sent"),
+    accepte: t("dashboard.status.quote.accepted"),
+    refuse: t("dashboard.status.quote.refused"),
+  }[statut];
+
+  const showSubmitPreview =
+    targetMembers.length > 0 &&
+    getLignesValides().length > 0 &&
+    (recipientType !== "individual" || memberId);
 
   return (
     <PageLayout maxWidth="4xl">
@@ -433,26 +575,106 @@ export default function NouveauDevisPage() {
         <GlassCard padding="lg" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.quotes.fields.client")}
+              {t("dashboard.quotes.recipients.label")}
             </label>
-            <select
-              required
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              disabled={loadingClients || isBulkProcessing}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <option value="">
-                {loadingClients ? t("dashboard.quotes.loadingClients") : t("dashboard.quotes.selectClient")}
-              </option>
-              <option value={ALL_PLAYERS_VALUE}>Tous les joueurs (envoi groupé)</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.nom}
-                </option>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {(
+                [
+                  ["individual", t("dashboard.quotes.recipients.individual")],
+                  ["team", t("dashboard.quotes.recipients.team")],
+                  ["all", t("dashboard.quotes.recipients.all")],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  disabled={loadingClients || isBulkProcessing}
+                  onClick={() => handleRecipientTypeChange(value)}
+                  className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    recipientType === value
+                      ? "border-[#7C5CFF] bg-[#7C5CFF]/15 text-primary"
+                      : "border-subtle-hover bg-surface text-secondary hover:border-[#7C5CFF]/40"
+                  }`}
+                >
+                  {label}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
+
+          {recipientType === "individual" && (
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">
+                {t("dashboard.quotes.recipients.selectMember")}
+              </label>
+              <select
+                required
+                value={memberId}
+                onChange={(e) => setMemberId(e.target.value)}
+                disabled={loadingClients || isBulkProcessing}
+                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {loadingClients
+                    ? t("dashboard.quotes.loadingClients")
+                    : t("dashboard.quotes.selectClient")}
+                </option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {recipientType === "team" && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-primary mb-2">
+                {t("dashboard.quotes.recipients.selectTeam")}
+              </label>
+              {teamsWithCounts.length === 0 ? (
+                <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200/80 rounded-lg px-4 py-3">
+                  {t("dashboard.quotes.recipients.noTeams")}
+                </p>
+              ) : (
+                <>
+                  <select
+                    required
+                    value={teamCategory}
+                    onChange={(e) => setTeamCategory(e.target.value)}
+                    disabled={loadingClients || isBulkProcessing}
+                    className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
+                  >
+                    <option value="">
+                      {t("dashboard.quotes.recipients.selectTeamPlaceholder")}
+                    </option>
+                    {teamsWithCounts.map((team) => (
+                      <option key={team.value} value={team.value}>
+                        {getCategoryLabel(team.value, translateCategory)} ({team.count})
+                      </option>
+                    ))}
+                  </select>
+                  {teamCategory && (
+                    <p className="text-sm text-secondary">
+                      {t("dashboard.quotes.recipients.teamPreview", {
+                        count: String(targetMembers.length),
+                        team: selectedTeamLabel,
+                      })}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {recipientType === "all" && (
+            <p className="text-sm text-secondary">
+              {t("dashboard.quotes.recipients.allPreview", {
+                count: String(getPlayers(clients).length),
+              })}
+            </p>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
@@ -465,7 +687,8 @@ export default function NouveauDevisPage() {
                   e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
                 )
               }
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              disabled={isBulkProcessing}
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
             >
               <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
               <option value="envoye">{t("dashboard.status.quote.sent")}</option>
@@ -482,14 +705,17 @@ export default function NouveauDevisPage() {
               type="date"
               value={dateEcheance}
               onChange={(e) => setDateEcheance(e.target.value)}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+              disabled={isBulkProcessing}
+              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
             />
           </div>
         </GlassCard>
 
         <GlassCard padding="lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-slate-900">{t("dashboard.quotes.lines.title")}</h2>
+            <h2 className="text-xl font-semibold text-slate-900">
+              {t("dashboard.quotes.lines.title")}
+            </h2>
             <ActionButton type="button" onClick={ajouterLigne} className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
               {t("dashboard.quotes.lines.add")}
@@ -497,7 +723,7 @@ export default function NouveauDevisPage() {
           </div>
 
           <div className="space-y-4">
-            {lignes.map((ligne, index) => (
+            {lignes.map((ligne) => (
               <div
                 key={ligne.id}
                 className="p-4 rounded-lg border border-subtle bg-surface-hover space-y-3"
@@ -589,10 +815,7 @@ export default function NouveauDevisPage() {
                   <div className="col-span-2 flex items-center justify-between">
                     <div className="text-sm text-secondary">
                       {t("dashboard.quotes.lines.subtotal")}{" "}
-                      {new Intl.NumberFormat(localeToIntl[locale], {
-                        style: "currency",
-                        currency: "CHF",
-                      }).format(ligne.quantite * ligne.prixUnitaire)}
+                      {currencyFormatter.format(ligne.quantite * ligne.prixUnitaire)}
                     </div>
                     {lignes.length > 1 && (
                       <button
@@ -612,7 +835,9 @@ export default function NouveauDevisPage() {
         </GlassCard>
 
         <GlassCard padding="lg">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">{t("dashboard.quotes.fields.notes")}</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-4">
+            {t("dashboard.quotes.fields.notes")}
+          </h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -626,33 +851,40 @@ export default function NouveauDevisPage() {
           <div className="space-y-2 text-right">
             <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.quotes.summary.totalHT")}</span>
-              <span>
-                {new Intl.NumberFormat(localeToIntl[locale], {
-                  style: "currency",
-                  currency: "CHF",
-                }).format(totalHT)}
-              </span>
+              <span>{currencyFormatter.format(totalHT)}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>{t("dashboard.quotes.summary.vat")}</span>
-              <span>
-                {new Intl.NumberFormat(localeToIntl[locale], {
-                  style: "currency",
-                  currency: "CHF",
-                }).format(totalTVA)}
-              </span>
+              <span>{currencyFormatter.format(totalTVA)}</span>
             </div>
             <div className="flex justify-between text-2xl font-bold pt-2 border-t border-slate-200/70 text-slate-900">
               <span>{t("dashboard.quotes.summary.totalTTC")}</span>
-              <span>
-                {new Intl.NumberFormat(localeToIntl[locale], {
-                  style: "currency",
-                  currency: "CHF",
-                }).format(totalTTC)}
-              </span>
+              <span>{currencyFormatter.format(totalTTC)}</span>
             </div>
           </div>
         </GlassCard>
+
+        {showSubmitPreview && recipientType !== "individual" && (
+          <GlassCard padding="md" className="border-[#7C5CFF]/25 bg-[#7C5CFF]/5 space-y-2">
+            <h3 className="text-sm font-semibold text-primary">
+              {t("dashboard.quotes.recipients.previewTitle")}
+            </h3>
+            <p className="text-sm text-secondary">
+              {t("dashboard.quotes.recipients.previewConfirm", {
+                amount: currencyFormatter.format(totalTTC),
+                count: String(targetMembers.length),
+                team:
+                  recipientType === "team"
+                    ? selectedTeamLabel
+                    : t("dashboard.quotes.recipients.allMembersLabel"),
+                total: currencyFormatter.format(totalTTC * targetMembers.length),
+                due: dateEcheance || t("dashboard.quotes.recipients.noDueDate"),
+                status: statutLabel,
+                type: recipientTypeLabel,
+              })}
+            </p>
+          </GlassCard>
+        )}
 
         {bulkProgress && (
           <GlassCard padding="md" className="space-y-3">
@@ -666,31 +898,54 @@ export default function NouveauDevisPage() {
               />
             </div>
             <p className="text-xs text-slate-600">
-              {bulkProgress.created}/{bulkProgress.total} cotisations créées
+              {bulkProgress.created}/{bulkProgress.total}{" "}
+              {t("dashboard.quotes.recipients.bulkCreatedLabel")}
             </p>
           </GlassCard>
         )}
 
         {bulkSummary && (
           <GlassCard padding="md" className="space-y-2">
-            <h3 className="text-lg font-semibold text-slate-900">Résumé de l&apos;envoi groupé</h3>
-            <p className="text-slate-600">{bulkSummary.created} cotisations créées</p>
-            <p className="text-slate-600">{bulkSummary.emailed} emails envoyés</p>
-            <p className="text-slate-600">{bulkSummary.skippedNoEmail} joueurs sans email ignorés</p>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {t("dashboard.quotes.recipients.bulkSummaryTitle")}
+            </h3>
+            <p className="text-slate-600">
+              {t("dashboard.quotes.recipients.bulkSummaryCreated", {
+                count: String(bulkSummary.created),
+              })}
+            </p>
+            <p className="text-slate-600">
+              {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
+                count: String(bulkSummary.emailed),
+              })}
+            </p>
+            <p className="text-slate-600">
+              {t("dashboard.quotes.recipients.bulkSummaryNoEmail", {
+                count: String(bulkSummary.skippedNoEmail),
+              })}
+            </p>
             {bulkSummary.failed > 0 && (
-              <p className="text-red-600 font-medium">{bulkSummary.failed} traitements en erreur</p>
+              <p className="text-red-600 font-medium">
+                {t("dashboard.quotes.recipients.bulkSummaryFailed", {
+                  count: String(bulkSummary.failed),
+                })}
+              </p>
             )}
           </GlassCard>
         )}
 
         <div className="flex flex-wrap items-center gap-3">
-          <ActionButton type="button" onClick={() => router.back()} className="flex-1 justify-center min-w-[150px]">
+          <ActionButton
+            type="button"
+            onClick={() => router.back()}
+            className="flex-1 justify-center min-w-[150px]"
+          >
             {t("dashboard.common.cancel")}
           </ActionButton>
           <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(false)}
-            disabled={savingForPdf || isBulkProcessing}
+            disabled={savingForPdf || isBulkProcessing || recipientType !== "individual"}
             className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
@@ -708,7 +963,7 @@ export default function NouveauDevisPage() {
           <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(true)}
-            disabled={savingForPdf || isBulkProcessing}
+            disabled={savingForPdf || isBulkProcessing || recipientType !== "individual"}
             className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
@@ -732,7 +987,7 @@ export default function NouveauDevisPage() {
             {isBulkProcessing ? (
               <span className="inline-flex items-center gap-2">
                 <Loader className="w-4 h-4 animate-spin" />
-                Envoi groupé en cours…
+                {t("dashboard.quotes.recipients.bulkInProgress")}
               </span>
             ) : (
               t("dashboard.quotes.createAction")
@@ -743,10 +998,3 @@ export default function NouveauDevisPage() {
     </PageLayout>
   );
 }
-
-
-
-
-
-
-
