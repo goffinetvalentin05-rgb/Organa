@@ -2,76 +2,25 @@
 
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import {
-  CalendarDays,
-  CreditCard,
-  Globe,
-  Megaphone,
-  Receipt,
-  Users,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { easePremium } from "@/components/landing/landing-motion";
+import {
+  buildHubLines,
+  buildHubNodes,
+  HUB_CENTER,
+  type HubLine,
+  type HubNode,
+} from "@/lib/landing/landing-hub-modules";
+import { useLandingHubModules } from "@/lib/landing/use-landing-hub-modules";
 
-const CENTER = 50;
-const RADIUS = 36;
-const HUB_EDGE = 14;
-const NODE_INSET = 5;
 const CYCLE_MS = 2600;
 
-const hubModules: { id: string; label: string; icon: LucideIcon }[] = [
-  { id: "membres", label: "Membres", icon: Users },
-  { id: "cotisations", label: "Cotisations", icon: Wallet },
-  { id: "factures", label: "Factures", icon: Receipt },
-  { id: "paiements", label: "Paiements", icon: CreditCard },
-  { id: "evenements", label: "Événements", icon: CalendarDays },
-  { id: "campagnes", label: "Campagnes", icon: Megaphone },
-  { id: "page-publique", label: "Page publique", icon: Globe },
-];
-
-const nodes = hubModules.map((mod, i) => {
-  const angle = (i / hubModules.length) * 2 * Math.PI - Math.PI / 2;
-  return {
-    ...mod,
-    x: CENTER + RADIUS * Math.cos(angle),
-    y: CENTER + RADIUS * Math.sin(angle),
-    delay: 0.12 + i * 0.09,
-    floatDuration: 3.8 + (i % 4) * 0.55,
-    floatDelay: i * 0.35,
-  };
-});
-
-function lineEndpoints(x: number, y: number) {
-  const dx = x - CENTER;
-  const dy = y - CENTER;
-  const dist = Math.hypot(dx, dy) || 1;
-  const ux = dx / dist;
-  const uy = dy / dist;
-  return {
-    x1: CENTER + ux * HUB_EDGE,
-    y1: CENTER + uy * HUB_EDGE,
-    x2: x - ux * NODE_INSET,
-    y2: y - uy * NODE_INSET,
-  };
-}
-
-const lines = nodes.map((node, i) => {
-  const endpoints = lineEndpoints(node.x, node.y);
-  const length = Math.hypot(endpoints.x2 - endpoints.x1, endpoints.y2 - endpoints.y1);
-  return {
-    id: node.id,
-    ...endpoints,
-    length,
-    delay: 0.08 + i * 0.07,
-    pulseDelay: i * 0.45,
-  };
-});
-
-const membresLine = lines.find((l) => l.id === "membres")!;
-
 export default function HeroHubVisual() {
+  const hubModules = useLandingHubModules();
+  const nodes = useMemo(() => buildHubNodes(hubModules), [hubModules]);
+  const lines = useMemo(() => buildHubLines(nodes), [nodes]);
+  const membresLine = useMemo(() => lines.find((l) => l.id === "membres"), [lines]);
+
   const reduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const inView = useInView(containerRef, { once: true, amount: 0.28 });
@@ -120,8 +69,8 @@ export default function HeroHubVisual() {
         {!reduceMotion ? (
           <>
             <motion.circle
-              cx={CENTER}
-              cy={CENTER}
+              cx={HUB_CENTER}
+              cy={HUB_CENTER}
               r="22"
               fill="none"
               stroke="rgba(147,197,253,0.2)"
@@ -141,11 +90,11 @@ export default function HeroHubVisual() {
                 opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
                 scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
               }}
-              style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
+              style={{ transformOrigin: `${HUB_CENTER}px ${HUB_CENTER}px` }}
             />
             <motion.circle
-              cx={CENTER}
-              cy={CENTER}
+              cx={HUB_CENTER}
+              cy={HUB_CENTER}
               r="28"
               fill="none"
               stroke="rgba(96,165,250,0.14)"
@@ -161,11 +110,11 @@ export default function HeroHubVisual() {
                 ease: "easeInOut",
                 delay: 0.3,
               }}
-              style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
+              style={{ transformOrigin: `${HUB_CENTER}px ${HUB_CENTER}px` }}
             />
             <motion.circle
-              cx={CENTER}
-              cy={CENTER}
+              cx={HUB_CENTER}
+              cy={HUB_CENTER}
               r="34"
               fill="none"
               stroke="rgba(96,165,250,0.1)"
@@ -181,7 +130,7 @@ export default function HeroHubVisual() {
                 ease: "easeInOut",
                 delay: 0.9,
               }}
-              style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
+              style={{ transformOrigin: `${HUB_CENTER}px ${HUB_CENTER}px` }}
             />
           </>
         ) : null}
@@ -268,12 +217,14 @@ export default function HeroHubVisual() {
               isActive={activeId === line.id}
             />
           ))}
-        <MembresConnectorLine
-          line={membresLine}
-          inView={inView}
-          reduceMotion={!!reduceMotion}
-          isActive={activeId === "membres"}
-        />
+        {membresLine ? (
+          <MembresConnectorLine
+            line={membresLine}
+            inView={inView}
+            reduceMotion={!!reduceMotion}
+            isActive={activeId === "membres"}
+          />
+        ) : null}
       </svg>
     </div>
   );
@@ -285,7 +236,7 @@ function MembresConnectorLine({
   reduceMotion,
   isActive,
 }: {
-  line: (typeof lines)[number];
+  line: HubLine;
   inView: boolean;
   reduceMotion: boolean;
   isActive: boolean;
@@ -349,7 +300,7 @@ function HubConnectorLine({
   reduceMotion,
   isActive,
 }: {
-  line: (typeof lines)[number];
+  line: HubLine;
   inView: boolean;
   reduceMotion: boolean;
   isActive: boolean;
@@ -454,7 +405,7 @@ function HubNodeCard({
   onActivate,
   onDeactivate,
 }: {
-  node: (typeof nodes)[number];
+  node: HubNode;
   inView: boolean;
   reduceMotion: boolean;
   isActive: boolean;

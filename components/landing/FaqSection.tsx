@@ -154,19 +154,19 @@ export default function FaqSection() {
               className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-[#1A23FF]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 shadow-[0_0_28px_rgba(26,35,255,0.25)]"
             >
               <HelpCircle className="h-3.5 w-3.5" aria-hidden />
-              FAQ
+              {t("marketing.faq.badge")}
             </motion.p>
             <motion.h2
               variants={staggerItem}
               className="mt-5 text-balance text-2xl font-black leading-[1.15] tracking-[-0.02em] text-white md:text-3xl lg:text-[2.35rem]"
             >
-              <span className="block">Vous avez encore des questions ?</span>
+              <span className="block">{t("marketing.faq.titleLine1")}</span>
               <span className="mt-1 block bg-gradient-to-r from-blue-200 via-white to-blue-300 bg-clip-text text-transparent">
-                On a les réponses.
+                {t("marketing.faq.titleLine2")}
               </span>
             </motion.h2>
             <motion.p variants={staggerItem} className="mt-4 text-sm text-blue-100/70 md:text-base">
-              Les essentiels en un coup d&apos;œil, le détail en un clic.
+              {t("marketing.faq.subtitle")}
             </motion.p>
             <motion.div
               variants={staggerItem}

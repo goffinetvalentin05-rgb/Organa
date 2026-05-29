@@ -18,7 +18,10 @@
     "subtitle": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine.",
     "ctaPrimary": "Obillz kostenlos testen",
     "ctaSecondary": "So funktioniert's",
-    "hubAriaLabel": "Übersicht der Obillz-Module"
+    "hubAriaLabel": "Übersicht der Obillz-Module",
+    "hubModules": {
+      "campagnes": "Kampagnen"
+    }
   },
   "problem": {
     "title": "Vereine verlieren zu viel Zeit mit Verwaltung.",

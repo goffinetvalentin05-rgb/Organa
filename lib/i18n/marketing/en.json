@@ -18,7 +18,10 @@
     "subtitle": "Invoices, members, membership fees, events and payments in one platform built for sports clubs.",
     "ctaPrimary": "Try Obillz for free",
     "ctaSecondary": "See how it works",
-    "hubAriaLabel": "Obillz modules overview"
+    "hubAriaLabel": "Obillz modules overview",
+    "hubModules": {
+      "campagnes": "Campaigns"
+    }
   },
   "problem": {
     "title": "Clubs waste too much time on admin.",

@@ -18,7 +18,10 @@
     "subtitle": "Factures, membres, cotisations, événements et paiements réunis dans un seul logiciel pensé pour les clubs sportifs.",
     "ctaPrimary": "Tester Obillz gratuitement",
     "ctaSecondary": "Voir comment ça marche",
-    "hubAriaLabel": "Aperçu des modules Obillz"
+    "hubAriaLabel": "Aperçu des modules Obillz",
+    "hubModules": {
+      "campagnes": "Campagnes"
+    }
   },
   "problem": {
     "title": "Les clubs perdent trop de temps sur l'administratif.",
