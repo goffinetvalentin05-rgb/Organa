@@ -8,6 +8,8 @@ import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { ArrowRight, Users } from "@/lib/icons";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
+import MemberRoleSelect from "@/components/members/MemberRoleSelect";
+import MemberCategorySelect from "@/components/members/MemberCategorySelect";
 
 interface ClientFormData {
   id: string;
@@ -18,7 +20,7 @@ interface ClientFormData {
   postal_code: string;
   city: string;
   role: string;
-  category: string;
+  category: string | null;
   date_of_birth: string;
   avs_number: string;
 }
@@ -43,7 +45,7 @@ export default function EditClientForm({
     postal_code: initialData.postal_code || "",
     city: initialData.city || "",
     role: initialData.role || "player",
-    category: initialData.category || "",
+    category: initialData.category,
     date_of_birth: initialData.date_of_birth || "",
     avs_number: initialData.avs_number || "",
   });
@@ -84,7 +86,7 @@ export default function EditClientForm({
       postal_code: formData.postal_code.trim(),
       city: formData.city.trim(),
       role: formData.role,
-      category: formData.category.trim() || null,
+      category: formData.category,
       date_of_birth: formData.date_of_birth.trim() || null,
       avs_number: formData.avs_number.trim() || null,
     };
@@ -295,18 +297,10 @@ export default function EditClientForm({
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     {t("dashboard.clients.fields.role")}
                   </label>
-                  <select
+                  <MemberRoleSelect
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="input-obillz"
-                  >
-                    <option value="player">{t("dashboard.clients.roles.player")}</option>
-                    <option value="coach">{t("dashboard.clients.roles.coach")}</option>
-                    <option value="volunteer">
-                      {t("dashboard.clients.roles.volunteer")}
-                    </option>
-                    <option value="staff">{t("dashboard.clients.roles.staff")}</option>
-                  </select>
+                    onChange={(role) => setFormData({ ...formData, role })}
+                  />
                 </div>
               )}
               {vis.category.enabled && (
@@ -314,32 +308,11 @@ export default function EditClientForm({
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     {t("dashboard.clients.fields.category")}
                   </label>
-                  <select
+                  <MemberCategorySelect
                     value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
-                    className="input-obillz"
-                  >
-                    <option value="">{t("dashboard.clients.filters.allCategories")}</option>
-                    <option value="first_team">
-                      {t("dashboard.clients.categories.first_team")}
-                    </option>
-                    <option value="second_team">
-                      {t("dashboard.clients.categories.second_team")}
-                    </option>
-                    <option value="junior">{t("dashboard.clients.categories.junior")}</option>
-                    <option value="president">
-                      {t("dashboard.clients.categories.president")}
-                    </option>
-                    <option value="treasurer">
-                      {t("dashboard.clients.categories.treasurer")}
-                    </option>
-                    <option value="secretary">
-                      {t("dashboard.clients.categories.secretary")}
-                    </option>
-                    <option value="other">{t("dashboard.clients.categories.other")}</option>
-                  </select>
+                    onChange={(category) => setFormData({ ...formData, category })}
+                    allowEmpty
+                  />
                 </div>
               )}
             </div>

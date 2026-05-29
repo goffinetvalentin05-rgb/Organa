@@ -10,6 +10,7 @@ import {
   participationStatusLabelFr,
   type MemberParticipationStatus,
 } from "@/lib/planning/participationStatus";
+import { formatCategoryLabel, formatRoleLabel } from "@/lib/members/taxonomy";
 
 export interface MemberPlanningParticipation {
   id: string;
@@ -211,7 +212,7 @@ export default function MemberDetailView({
                 {t("dashboard.clients.memberDetail.role")}
               </dt>
               <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-                {t(`dashboard.clients.roles.${member.role}`) || member.role}
+                {formatRoleLabel(member.role, t)}
               </dd>
             </div>
           )}
@@ -222,10 +223,7 @@ export default function MemberDetailView({
                 {t("dashboard.clients.memberDetail.category")}
               </dt>
               <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-                {member.category
-                  ? t(`dashboard.clients.categories.${member.category}`) ||
-                    member.category
-                  : missing}
+                {member.category ? formatCategoryLabel(member.category, t) : missing}
               </dd>
             </div>
           )}

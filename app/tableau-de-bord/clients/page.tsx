@@ -7,6 +7,8 @@ import { Edit, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
+import MemberFilterSelects from "@/components/members/MemberFilterSelects";
+import { formatCategoryLabel, formatRoleLabel } from "@/lib/members/taxonomy";
 import {
   PageLayout,
   PageHeader,
@@ -88,15 +90,6 @@ export default function ClientsPage() {
     });
   }, [clients, roleFilter, categoryFilter, vis.role.enabled, vis.category.enabled]);
 
-  // Obtenir les catégories uniques présentes
-  const uniqueCategories = useMemo(() => {
-    const cats = new Set<string>();
-    clients.forEach((c) => {
-      if (c.category) cats.add(c.category);
-    });
-    return Array.from(cats);
-  }, [clients]);
-
   useEffect(() => {
     if (!vis.role.enabled) setRoleFilter("");
     if (!vis.category.enabled) setCategoryFilter("");
@@ -143,36 +136,15 @@ export default function ClientsPage() {
             <span className="text-sm font-medium text-slate-700">{t("dashboard.clients.filtersLabel")}</span>
           </div>
           <div className="flex flex-wrap gap-3">
-            {vis.role.enabled && (
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="rounded-lg border border-slate-200/90 bg-white/90 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
-              >
-                <option value="">{t("dashboard.clients.filters.allRoles")}</option>
-                <option value="player">{t("dashboard.clients.roles.player")}</option>
-                <option value="coach">{t("dashboard.clients.roles.coach")}</option>
-                <option value="volunteer">{t("dashboard.clients.roles.volunteer")}</option>
-                <option value="staff">{t("dashboard.clients.roles.staff")}</option>
-              </select>
-            )}
-
-            {vis.category.enabled && (
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-lg border border-slate-200/90 bg-white/90 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
-              >
-                <option value="">{t("dashboard.clients.filters.allCategories")}</option>
-                <option value="first_team">{t("dashboard.clients.categories.first_team")}</option>
-                <option value="second_team">{t("dashboard.clients.categories.second_team")}</option>
-                <option value="junior">{t("dashboard.clients.categories.junior")}</option>
-                <option value="president">{t("dashboard.clients.categories.president")}</option>
-                <option value="treasurer">{t("dashboard.clients.categories.treasurer")}</option>
-                <option value="secretary">{t("dashboard.clients.categories.secretary")}</option>
-                <option value="other">{t("dashboard.clients.categories.other")}</option>
-              </select>
-            )}
+            <MemberFilterSelects
+              members={clients}
+              roleFilter={roleFilter}
+              categoryFilter={categoryFilter}
+              onRoleFilterChange={setRoleFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              showRole={vis.role.enabled}
+              showCategory={vis.category.enabled}
+            />
 
             {(roleFilter || categoryFilter) && (
               <button
@@ -232,13 +204,12 @@ export default function ClientsPage() {
                           <span
                             className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}
                           >
-                            {t(`dashboard.clients.roles.${client.role}`) || client.role}
+                            {formatRoleLabel(client.role, t)}
                           </span>
                         )}
                         {vis.category.enabled && client.category && (
                           <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
-                            {t(`dashboard.clients.categories.${client.category}`) ||
-                              client.category}
+                            {formatCategoryLabel(client.category, t)}
                           </span>
                         )}
                       </div>

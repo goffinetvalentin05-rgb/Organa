@@ -1,3 +1,5 @@
+import { formatCategoryLabel, isValidTeamCategoryValue } from "@/lib/members/taxonomy";
+
 export type CotisationClient = {
   id: string;
   nom: string;
@@ -35,7 +37,7 @@ export function getTeamsWithCounts(clients: CotisationClient[]): TeamOption[] {
   const map = new Map<string, number>();
   for (const client of clients) {
     const category = client.category?.trim();
-    if (!category) continue;
+    if (!category || !isValidTeamCategoryValue(category)) continue;
     map.set(category, (map.get(category) || 0) + 1);
   }
 
@@ -56,9 +58,7 @@ export function getCategoryLabel(
   category: string,
   translate: (key: string) => string
 ): string {
-  const key = `dashboard.clients.categories.${category}`;
-  const translated = translate(key);
-  return translated !== key ? translated : category;
+  return formatCategoryLabel(category, translate);
 }
 
 export function resolveCotisationTargets(

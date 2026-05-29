@@ -49,7 +49,7 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
     postal_code: n.postal_code ?? "",
     city: n.city ?? "",
     role: n.role,
-    category: n.category ?? "",
+    category: n.category,
     date_of_birth: n.date_of_birth ? n.date_of_birth.slice(0, 10) : "",
     avs_number: n.avs_number ?? "",
   };
