@@ -20,6 +20,11 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import BenefitsSection from "@/components/landing/BenefitsSection";
+import HeroSection from "@/components/landing/HeroSection";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import LandingCta from "@/components/landing/LandingCta";
+import ProblemSection from "@/components/landing/ProblemSection";
 import {
   obillzLandingGridOverlayClass,
   obillzLandingRootClass,
@@ -259,90 +264,6 @@ const pricingPlans = [
   },
 ] as const;
 
-const heroFloatingCardsData = [
-  {
-    title: "Inscriptions ouvertes",
-    line1: "Repas après match",
-    line2: "42 participants",
-    secondary: "Lien ou QR code partagé au club",
-    floatClass:
-      "left-[6%] top-[74%] -rotate-6 md:left-[6%] md:top-[68%] lg:left-[8%] lg:top-[66%] animate-float [animation-delay:120ms]",
-  },
-  {
-    title: "Planning manifestation",
-    line1: "Soirée du club",
-    line2: "8 bénévoles inscrits",
-    secondary: "Organisation simple des bénévoles",
-    floatClass:
-      "right-[6%] top-[72%] rotate-6 md:right-[6%] md:top-[68%] lg:right-[8%] lg:top-[66%] animate-float [animation-delay:260ms]",
-  },
-  {
-    title: "Cotisation annuelle",
-    line1: "Envoyée aux membres",
-    line2: "Équipe 1",
-    secondary: "Envoi en 2 clics",
-    floatClass:
-      "left-1/2 top-[92%] -translate-x-1/2 rotate-[-2deg] md:top-[86%] lg:top-[88%] animate-float [animation-delay:400ms]",
-  },
-] as const;
-
-function HeroCardInner({
-  title,
-  line1,
-  line2,
-  secondary,
-  compact,
-}: {
-  title: string;
-  line1: string;
-  line2: string;
-  secondary: string;
-  compact?: boolean;
-}) {
-  return (
-    <>
-      <p
-        className={`font-semibold uppercase tracking-[0.08em] text-slate-500 ${compact ? "text-[0.65rem]" : "text-xs"}`}
-      >
-        {title}
-      </p>
-      <p
-        className={`font-black leading-tight text-[#1A23FF] ${compact ? "mt-1.5 text-xs" : "mt-2 text-sm"}`}
-      >
-        {line1}
-      </p>
-      <p className={`font-bold leading-tight text-slate-800 ${compact ? "mt-1 text-xs" : "mt-1 text-sm"}`}>
-        {line2}
-      </p>
-      <p className={`mt-2 text-slate-500 ${compact ? "text-[0.65rem] leading-snug" : "text-xs"}`}>
-        {secondary}
-      </p>
-    </>
-  );
-}
-
-function HeroFloatingCard({
-  className,
-  title,
-  line1,
-  line2,
-  secondary,
-}: {
-  className: string;
-  title: string;
-  line1: string;
-  line2: string;
-  secondary: string;
-}) {
-  return (
-    <div
-      className={`pointer-events-none absolute z-[1] hidden max-w-[min(220px,42vw)] rounded-2xl border border-slate-200/90 bg-white p-3 text-slate-900 shadow-[0_16px_32px_rgba(15,23,42,0.16)] backdrop-blur-sm md:block md:scale-[0.94] md:p-3.5 lg:max-w-[260px] lg:scale-100 lg:p-4 lg:shadow-[0_20px_40px_rgba(15,23,42,0.18)] ${className}`}
-    >
-      <HeroCardInner title={title} line1={line1} line2={line2} secondary={secondary} />
-    </div>
-  );
-}
-
 function FeatureTabIcon({ id, className }: { id: FeatureTabId; className?: string }) {
   const Icon = featureIconById[id];
   return <Icon className={className ?? "h-[1.125rem] w-[1.125rem] shrink-0"} strokeWidth={1.75} aria-hidden />;
@@ -372,153 +293,9 @@ export default function LandingPage() {
       <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       <div className="relative z-10">
-        <section className="mt-0 w-full">
-          <div className="w-full px-3 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-12">
-            <header className="mx-auto flex max-w-[1040px] items-center justify-between gap-4">
-              <Link href="/" className="transition hover:opacity-95">
-                <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
-              </Link>
-              <nav className="hidden items-center gap-2 md:flex">
-                <a
-                  href="/#fonctionnalites"
-                  className="rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-xs font-semibold text-blue-50 transition hover:bg-white/20"
-                >
-                  Fonctions
-                </a>
-              </nav>
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/connexion"
-                  className="rounded-full border border-white/45 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
-                >
-                  Connexion
-                </Link>
-                <Link
-                  href="/inscription"
-                  className="rounded-full border border-white/60 px-5 py-2 text-sm font-bold text-white transition hover:bg-white/10"
-                >
-                  Créer mon club gratuitement
-                </Link>
-              </div>
-            </header>
+        <HeroSection />
 
-            <div className="relative mt-4 p-4 pb-16 sm:p-5 md:mt-6 md:pb-48 lg:pb-56">
-              <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.11)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)] [background-size:36px_36px]" />
-              <div className="pointer-events-none absolute inset-0 rounded-t-[26px] border border-b-0 border-white/25" />
-
-              <div className="relative z-20">
-                <div className="mt-10 text-center md:mt-20 lg:mt-24">
-                  <h1 className="text-balance text-3xl font-black uppercase leading-tight md:text-6xl">
-                    GÉRER UN CLUB SPORTIF
-                    <br />
-                    NE DEVRAIT PAS ÊTRE COMPLIQUÉ.
-                  </h1>
-                  <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-blue-100 md:text-lg">
-                    Simplifiez l&apos;administration de votre club, gagnez du temps et offrez une
-                    organisation claire et professionnelle à votre comité.
-                  </p>
-                  <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                    <Link
-                      href="/inscription"
-                      className="inline-flex w-full max-w-md items-center justify-center rounded-full bg-white px-7 py-3 text-base font-bold text-[#1A23FF] shadow-[0_14px_30px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 sm:w-auto"
-                    >
-                      Créer mon club gratuitement
-                    </Link>
-                    <a
-                      href="#comparaison"
-                      className="inline-flex w-full max-w-md items-center justify-center rounded-full border border-white/45 px-7 py-3 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
-                    >
-                      Voir comment ça fonctionne
-                    </a>
-                  </div>
-                </div>
-
-                {/* Mobile : cartes en flux sous le texte (aucun chevauchement) */}
-                <div className="mx-auto mt-10 grid max-w-lg grid-cols-1 gap-4 sm:max-w-2xl sm:grid-cols-2 md:hidden">
-                  {heroFloatingCardsData.map((card, i) => (
-                    <div
-                      key={card.title}
-                      className={`rounded-2xl border border-slate-200/90 bg-white p-4 text-left text-slate-900 shadow-[0_14px_28px_rgba(15,23,42,0.14)] ${i === 2 ? "sm:col-span-2 sm:mx-auto sm:max-w-md" : ""}`}
-                    >
-                      <HeroCardInner
-                        title={card.title}
-                        line1={card.line1}
-                        line2={card.line2}
-                        secondary={card.secondary}
-                        compact
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tablette + desktop : cartes flottantes (md+ uniquement, positions md vs lg) */}
-              {heroFloatingCardsData.map((card) => (
-                <HeroFloatingCard
-                  key={`float-${card.title}`}
-                  className={card.floatClass}
-                  title={card.title}
-                  line1={card.line1}
-                  line2={card.line2}
-                  secondary={card.secondary}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="probleme"
-          className="relative mx-auto mt-24 w-[94%] max-w-[920px] md:mt-36 lg:mt-44"
-        >
-          {/* Décor abstrait : halos + icônes en filigrane */}
-          <div
-            className="pointer-events-none absolute inset-x-[-12%] -top-24 -bottom-16 -z-10 overflow-hidden"
-            aria-hidden
-          >
-            <div className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.10),transparent_60%)]" />
-            <div className="absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[#1A23FF]/30 blur-3xl" />
-            <div className="absolute right-[6%] bottom-[8%] h-48 w-48 rounded-full bg-white/[0.06] blur-3xl" />
-
-            {/* Icônes en filigrane, dispersées et de tailles variables */}
-            <div className="absolute left-[6%] top-[18%] text-white/15 animate-float [animation-delay:120ms]">
-              <Mail className="h-9 w-9" strokeWidth={1.4} />
-            </div>
-            <div className="absolute left-[18%] top-[68%] text-white/10 animate-float [animation-delay:300ms]">
-              <FileText className="h-12 w-12" strokeWidth={1.3} />
-            </div>
-            <div className="absolute right-[10%] top-[22%] text-white/12 animate-float [animation-delay:200ms]">
-              <CalendarDays className="h-10 w-10" strokeWidth={1.4} />
-            </div>
-            <div className="absolute right-[22%] top-[68%] text-white/10 animate-float [animation-delay:420ms]">
-              <Wallet className="h-11 w-11" strokeWidth={1.3} />
-            </div>
-            <div className="absolute left-[44%] top-[8%] text-white/12 animate-float [animation-delay:520ms]">
-              <Users className="h-8 w-8" strokeWidth={1.4} />
-            </div>
-            <div className="absolute right-[40%] bottom-[10%] text-white/10 animate-float [animation-delay:640ms]">
-              <MessageCircle className="h-9 w-9" strokeWidth={1.4} />
-            </div>
-          </div>
-
-          {/* Contenu éditorial centré */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex flex-col items-center text-center"
-          >
-            <h2 className="text-balance text-3xl font-black leading-tight text-white md:text-5xl">
-              Aujourd&apos;hui, gérer un club peut vite devenir un casse-tête.
-            </h2>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-blue-100/85 md:text-lg">
-              Dans beaucoup de clubs, les tâches sont dispersées entre Excel, messages WhatsApp,
-              emails et gestion manuelle. Le comité perd du temps, les informations se dispersent
-              et le suivi des membres devient difficile.
-            </p>
-          </motion.div>
-        </section>
+        <ProblemSection />
 
         <section
           id="comparaison"
@@ -920,7 +697,18 @@ export default function LandingPage() {
               )}
             </AnimatePresence>
           </div>
+
+          <div className="mx-auto mt-14 max-w-[1080px] md:mt-16">
+            <LandingCta
+              compact
+              title="Une seule plateforme pour piloter votre club"
+              secondaryLabel="Voir comment ça marche"
+              secondaryHref="#comment-ca-marche"
+            />
+          </div>
         </section>
+
+        <HowItWorksSection />
 
         <section
           id="fonctionnalites"
@@ -990,30 +778,19 @@ export default function LandingPage() {
                 </motion.article>
               ))}
             </div>
+
+            <div className="mx-auto mt-14 max-w-[1080px]">
+              <LandingCta
+                compact
+                title="Découvrez tout ce qu'Obillz peut faire pour votre club"
+                secondaryLabel="Commencer gratuitement"
+                secondaryHref="/inscription"
+              />
+            </div>
           </div>
         </section>
 
-        <section className="relative mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
-          <div
-            className="pointer-events-none absolute inset-x-0 -top-10 -bottom-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(255,255,255,0.10),transparent_60%)]"
-            aria-hidden
-          />
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto flex max-w-[820px] flex-col items-center px-2 text-center text-white md:px-4"
-          >
-            <h2 className="text-3xl font-black md:text-5xl">
-              Moins d&apos;administratif. Plus de temps pour votre club.
-            </h2>
-            <p className="mt-5 max-w-3xl text-base leading-relaxed text-blue-100 md:text-lg">
-              Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
-              comité sur la vie sportive et les projets du club.
-            </p>
-          </motion.div>
-        </section>
+        <BenefitsSection />
 
         <section
           id="tarifs"
@@ -1295,6 +1072,14 @@ export default function LandingPage() {
                   Explorer
                 </p>
                 <ul className="mt-4 space-y-3 text-sm">
+                  <li>
+                    <a
+                      href="/#comment-ca-marche"
+                      className="text-slate-700 transition hover:text-[#1A23FF]"
+                    >
+                      Comment ça marche
+                    </a>
+                  </li>
                   <li>
                     <a
                       href="/#fonctionnalites"

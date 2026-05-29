@@ -519,6 +519,18 @@ h3 {
   animation: float 6s ease-in-out infinite;
 }
 
+.animate-float-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .hero-cta-button {
+    animation: none !important;
+  }
+}
+
 /* Amélioration des effets hover */
 .hover-glow:hover {
   box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
