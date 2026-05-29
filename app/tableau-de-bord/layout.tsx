@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { obillzLandingGridOverlayClass, obillzLandingRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
+import ClubPublicPageAnnouncementModal from "@/components/public-page/ClubPublicPageAnnouncementModal";
 import {
   LayoutDashboard,
   Users,
@@ -135,12 +136,16 @@ export default function DashboardLayout({
     if (pathname.startsWith("/tableau-de-bord/qrcodes")) return t("dashboard.pageTitles.qrcodes");
     if (pathname.startsWith("/tableau-de-bord/campagnes-marketing")) return t("dashboard.pageTitles.marketing");
     if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
+    if (pathname.startsWith("/tableau-de-bord/parametres/page-publique")) {
+      return t("dashboard.pageTitles.publicPage");
+    }
     if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
     return t("dashboard.pageTitles.dashboard");
   };
 
   return (
     <div className={`dashboard-shell ${obillzLandingRootClass}`}>
+      <ClubPublicPageAnnouncementModal />
       <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       {/* Mobile sidebar backdrop */}

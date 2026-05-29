@@ -26,7 +26,11 @@ export function PublicPlanningConfirmationClient() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = typeof params.token === "string" ? params.token : "";
+  const slug =
+    (typeof params.slug === "string" ? params.slug : "") ||
+    (typeof (params as { token?: string }).token === "string"
+      ? (params as { token: string }).token
+      : "");
   const assignmentIdFromUrl = searchParams.get("assignmentId");
 
   const [payload, setPayload] = useState<PublicPlanningConfirmationPayload | null>(null);
@@ -35,7 +39,7 @@ export function PublicPlanningConfirmationClient() {
   const [icsHref, setIcsHref] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!slug) return;
 
     let cancelled = false;
 
@@ -45,7 +49,7 @@ export function PublicPlanningConfirmationClient() {
       if (assignmentIdFromUrl && /^[0-9a-f-]{36}$/i.test(assignmentIdFromUrl)) {
         try {
           const res = await fetch(
-            `/api/public/plannings/${token}/confirmation?assignmentId=${encodeURIComponent(assignmentIdFromUrl)}`,
+            `/api/public/plannings/${slug}/confirmation?assignmentId=${encodeURIComponent(assignmentIdFromUrl)}`,
             { cache: "no-store" }
           );
           const data = await res.json().catch(() => ({}));
@@ -57,7 +61,7 @@ export function PublicPlanningConfirmationClient() {
           }
           const c = data?.confirmation as PublicPlanningConfirmationPayload | undefined;
           const cSlug = typeof data?.canonicalSlug === "string" ? data.canonicalSlug : null;
-          if (cSlug && cSlug !== token && !cancelled) {
+          if (cSlug && cSlug !== slug && !cancelled) {
             setCanonicalSlug(cSlug);
             router.replace(
               `/p/${encodeURIComponent(cSlug)}/confirmation?assignmentId=${encodeURIComponent(
@@ -67,7 +71,7 @@ export function PublicPlanningConfirmationClient() {
             return;
           }
           if (c && !cancelled) {
-            setCanonicalSlug(cSlug || token);
+            setCanonicalSlug(cSlug || slug);
             setPayload(c);
             return;
           }
@@ -91,7 +95,7 @@ export function PublicPlanningConfirmationClient() {
       }
 
       if (!cancelled) {
-        router.replace(`/p/${token}`);
+        router.replace(`/p/${slug}`);
       }
     };
 
@@ -99,7 +103,7 @@ export function PublicPlanningConfirmationClient() {
     return () => {
       cancelled = true;
     };
-  }, [token, assignmentIdFromUrl, router]);
+  }, [slug, assignmentIdFromUrl, router]);
 
   const googleUrl = useMemo(() => {
     if (!payload?.slotDate) return "";
@@ -171,7 +175,7 @@ export function PublicPlanningConfirmationClient() {
     a.remove();
   };
 
-  if (!token) {
+  if (!slug) {
     return null;
   }
 
@@ -183,7 +187,7 @@ export function PublicPlanningConfirmationClient() {
         </div>
         <div className="max-w-lg mx-auto mt-4">
           <Link
-            href={`/p/${canonicalSlug || token}`}
+            href={`/p/${canonicalSlug || slug}`}
             className="text-sm font-medium text-slate-700 underline"
           >
             Retour à l&apos;événement
@@ -309,7 +313,7 @@ export function PublicPlanningConfirmationClient() {
 
           <div className="mt-8 pt-6 border-t border-slate-100">
             <Link
-              href={`/p/${canonicalSlug || token}`}
+              href={`/p/${canonicalSlug || slug}`}
               className="inline-flex w-full justify-center items-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
             >
               Retour à l&apos;événement

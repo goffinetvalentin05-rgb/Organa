@@ -508,7 +508,8 @@
       "qrcodes": "QR Codes",
       "marketing": "Campagnes marketing",
       "expenses": "Charges du club",
-      "settings": "Paramètres du club"
+      "settings": "Paramètres du club",
+      "publicPage": "Page publique du club"
     },
     "topbar": {
       "upToDate": "Tout est à jour",
@@ -756,6 +757,44 @@
       },
       "confirm": {
         "deleteLogo": "Êtes-vous sûr de vouloir supprimer le logo ?"
+      },
+      "publicPage": {
+        "cardCta": "Configurer la page publique du club →",
+        "title": "Page publique du club",
+        "subtitle": "Un lien unique à partager sur les réseaux sociaux, WhatsApp ou en QR code.",
+        "loading": "Chargement…",
+        "backToSettings": "Retour aux paramètres",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…",
+        "saveSuccess": "Page publique enregistrée",
+        "saveHint": "Les visiteurs ne verront que les informations que vous activez ici.",
+        "linkCopied": "Lien copié dans le presse-papiers",
+        "linkCopyError": "Impossible de copier le lien",
+        "copyLink": "Copier le lien",
+        "preview": "Aperçu",
+        "enabledLabel": "Activer la page publique",
+        "activationTitle": "Publication",
+        "activationDescription": "Quand la page est désactivée, le lien public n'est plus accessible.",
+        "slugLabel": "Adresse de la page",
+        "slugHint": "Lettres minuscules, chiffres et tirets uniquement (ex. fc-mon-club).",
+        "contentTitle": "Contenu affiché",
+        "contentDescription": "Titre, description et couleur visibles par vos visiteurs.",
+        "logoHint": "Le logo est repris depuis l'identité visuelle du club.",
+        "titleLabel": "Titre affiché",
+        "descriptionLabel": "Courte description",
+        "colorLabel": "Couleur principale",
+        "blocksTitle": "Boutons d'action",
+        "blocksDescription": "Choisissez les raccourcis visibles sur votre page.",
+        "showBuvette": "Réserver la buvette",
+        "showBuvetteHint": "Redirige vers votre calendrier de réservation public.",
+        "showMatches": "Planning des matchs",
+        "showMatchesHint": "Affiche les prochains événements planifiés du club.",
+        "showContact": "Contacter le club",
+        "showContactHint": "Utilise le lien de contact renseigné ci-dessous.",
+        "linksTitle": "Réseaux & contact",
+        "linksDescription": "Liens affichés en bas de page (icônes).",
+        "websiteLabel": "Site internet",
+        "contactLabel": "Lien de contact (email ou page web)"
       }
     },
     "clients": {

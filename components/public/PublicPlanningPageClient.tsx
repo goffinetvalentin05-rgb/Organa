@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar, Clock, Plus, Users, X } from "@/lib/icons";
 import {
   PUBLIC_PLANNING_CONFIRM_STORAGE_KEY,
@@ -46,12 +46,7 @@ interface PublicPlanning {
   requireEmail: boolean;
 }
 
-export default function PublicPlanningPage({
-  params,
-}: {
-  params: Promise<{ token: string }>;
-}) {
-  const { token } = use(params);
+export default function PublicPlanningPageClient({ slug }: { slug: string }) {
   const router = useRouter();
   const [planning, setPlanning] = useState<PublicPlanning | null>(null);
   const [publicSlug, setPublicSlug] = useState<string | null>(null);
@@ -69,7 +64,7 @@ export default function PublicPlanningPage({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/public/plannings/${token}`, {
+      const response = await fetch(`/api/public/plannings/${slug}`, {
         cache: "no-store",
       });
       const data = await response.json().catch(() => ({}));
@@ -82,11 +77,10 @@ export default function PublicPlanningPage({
         typeof data?.canonicalSlug === "string" ? data.canonicalSlug : null;
 
       setPlanning(data.planning || null);
-      const nextSlug = canonicalSlug || token;
+      const nextSlug = canonicalSlug || slug;
       setPublicSlug(nextSlug);
 
-      // Si on est tombé sur un ancien token, on redirige vers l'URL canonique.
-      if (canonicalSlug && canonicalSlug !== token) {
+      if (canonicalSlug && canonicalSlug !== slug) {
         router.replace(`/p/${canonicalSlug}`);
       }
     } catch (loadError: unknown) {
@@ -95,7 +89,7 @@ export default function PublicPlanningPage({
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [slug, router]);
 
   useEffect(() => {
     void loadPlanning();
@@ -142,7 +136,7 @@ export default function PublicPlanningPage({
   const submitSignup = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!planning || !selectedSlot) return;
-    const identifier = publicSlug || token;
+    const identifier = publicSlug || slug;
 
     if (planning.requireName && !formData.name.trim()) {
       setError("Le nom est requis.");
@@ -159,9 +153,7 @@ export default function PublicPlanningPage({
     try {
       const response = await fetch(`/api/public/plannings/${identifier}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slotId: selectedSlot.id,
           name: formData.name,
@@ -189,7 +181,7 @@ export default function PublicPlanningPage({
             JSON.stringify(confirmation)
           );
         } catch {
-          /* optionnel : la page de confirmation charge tout via assignmentId */
+          /* ignore */
         }
       }
 
@@ -266,7 +258,9 @@ export default function PublicPlanningPage({
                     <Clock className="w-4 h-4" />
                     {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                   </span>
-                  <span>{slot.assignedCount} / {slot.requiredPeople} bénévoles</span>
+                  <span>
+                    {slot.assignedCount} / {slot.requiredPeople} bénévoles
+                  </span>
                   {slot.isFull && (
                     <span className="px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-semibold">
                       Complet
