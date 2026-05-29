@@ -65,3 +65,13 @@ export const floatY = (delay = 0) => ({
   y: [0, -8, 0],
   transition: { duration: 5 + delay * 0.4, repeat: Infinity, ease: "easeInOut" as const, delay },
 });
+
+export const heroTitleLine = {
+  hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.65, ease: easePremium },
+  },
+};

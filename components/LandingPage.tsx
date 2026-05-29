@@ -368,14 +368,18 @@ export default function LandingPage() {
 
         <section
           id="cta-final"
-          className="mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48"
+          className="relative mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48"
         >
+          <div
+            className="pointer-events-none absolute inset-x-[-8%] -top-20 h-48 bg-[radial-gradient(ellipse_80%_100%_at_50%_100%,rgba(26,35,255,0.45),transparent)]"
+            aria-hidden
+          />
           <motion.div
             initial={{ opacity: 0, y: 32, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="relative overflow-hidden rounded-[2rem] border border-white/25 bg-gradient-to-br from-white/[0.16] via-white/[0.07] to-[#1A23FF]/[0.12] p-8 text-center shadow-[0_32px_80px_rgba(2,6,23,0.4)] backdrop-blur-xl md:rounded-[2.25rem] md:p-16"
+            className="relative overflow-hidden rounded-[2rem] border border-white/28 bg-gradient-to-br from-white/[0.18] via-white/[0.08] to-[#1A23FF]/[0.15] p-8 text-center shadow-[0_40px_100px_rgba(2,6,23,0.45),0_0_80px_rgba(26,35,255,0.2)] backdrop-blur-xl md:rounded-[2.25rem] md:p-16"
           >
             <motion.div
               className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/[0.14] blur-3xl"
@@ -399,15 +403,15 @@ export default function LandingPage() {
               Prêt à simplifier la gestion de votre club ?
             </h2>
             <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-blue-100/90 md:text-base">
-              Créez votre espace gratuitement et commencez à organiser votre club avec une
-              plateforme claire, moderne et centralisée.
+              Créez votre club gratuitement et découvrez une plateforme claire, moderne et pensée
+              pour les clubs sportifs.
             </p>
             <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <LandingPrimaryButton href="/inscription" className="w-full max-w-md sm:max-w-none">
                 Créer mon club gratuitement
               </LandingPrimaryButton>
               <LandingSecondaryButton href="/connexion" className="w-full max-w-md sm:max-w-none">
-                Se connecter
+                Connexion
               </LandingSecondaryButton>
             </div>
           </motion.div>

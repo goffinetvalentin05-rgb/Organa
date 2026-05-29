@@ -13,6 +13,8 @@ import { easePremium } from "@/components/landing/landing-motion";
 
 type HeroProductPreviewProps = {
   embedded?: boolean;
+  /** Toast animé intégré (mobile) */
+  showLiveToast?: boolean;
 };
 
 const stats = [
@@ -22,13 +24,16 @@ const stats = [
   { label: "Solde club", value: "À jour", sub: "Temps réel", accent: true },
 ];
 
-export default function HeroProductPreview({ embedded = false }: HeroProductPreviewProps) {
+export default function HeroProductPreview({
+  embedded = false,
+  showLiveToast = false,
+}: HeroProductPreviewProps) {
   const shell = (
     <div className={`relative w-full ${embedded ? "" : "mx-auto mt-10 max-w-[800px] md:mt-12"}`}>
       <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.25),transparent_70%)] blur-2xl" aria-hidden />
 
-      <div className="relative rounded-[1.25rem] border border-white/30 bg-gradient-to-b from-white/20 to-white/5 p-[3px] shadow-[0_32px_80px_rgba(2,6,23,0.45),0_0_0_1px_rgba(255,255,255,0.1)_inset] backdrop-blur-xl md:rounded-[1.5rem] md:p-1 [transform:perspective(1400px)_rotateX(3deg)]">
-        <div className="overflow-hidden rounded-[1.1rem] border border-white/25 bg-white shadow-[0_24px_64px_rgba(2,6,23,0.3)] md:rounded-[1.35rem]">
+      <div className="relative rounded-[1.25rem] border border-white/30 bg-gradient-to-b from-white/20 to-white/5 p-[3px] shadow-[0_40px_100px_rgba(2,6,23,0.5),0_0_60px_rgba(26,35,255,0.15),0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-xl md:rounded-[1.5rem] md:p-1 [transform:perspective(1400px)_rotateX(4deg)]">
+        <div className="relative overflow-hidden rounded-[1.1rem] border border-white/25 bg-white shadow-[0_24px_64px_rgba(2,6,23,0.3)] md:rounded-[1.35rem]">
           <div className="flex items-center gap-2 border-b border-slate-200/80 bg-slate-100/90 px-3 py-2 md:px-4">
             <span className="flex gap-1" aria-hidden>
               <span className="h-2.5 w-2.5 rounded-full bg-rose-400/90" />
@@ -40,7 +45,22 @@ export default function HeroProductPreview({ embedded = false }: HeroProductPrev
             </span>
           </div>
 
-          <div className="flex min-h-[220px] sm:min-h-[260px]">
+          {showLiveToast ? (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 0.45, ease: easePremium }}
+              className="absolute left-1/2 top-3 z-20 flex w-[min(88%,260px)] -translate-x-1/2 items-center gap-2 rounded-lg border border-[#1A23FF]/20 bg-white px-3 py-2 shadow-lg"
+            >
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#1A23FF]" />
+              <div className="min-w-0 text-left">
+                <p className="text-[8px] font-bold uppercase text-slate-500">Cotisation</p>
+                <p className="truncate text-[10px] font-bold text-slate-900">48 emails envoyés</p>
+              </div>
+            </motion.div>
+          ) : null}
+
+          <div className="flex min-h-[240px] sm:min-h-[280px] md:min-h-[300px]">
             <aside className="hidden w-[140px] shrink-0 border-r border-slate-200 bg-[#F4F7FB] p-3 md:block lg:w-[160px] lg:p-4">
               <div className="mb-4 flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1A23FF] text-[11px] font-black text-white shadow-[0_4px_12px_rgba(26,35,255,0.4)]">
