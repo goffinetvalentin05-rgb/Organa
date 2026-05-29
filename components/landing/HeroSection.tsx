@@ -1,11 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import HeroAmbient from "@/components/landing/HeroAmbient";
-import HeroProductScene from "@/components/landing/HeroProductScene";
+import { motion } from "framer-motion";
+import HeroHubVisual from "@/components/landing/HeroHubVisual";
 import { LandingPrimaryButton, LandingSecondaryButton } from "@/components/landing/LandingButtons";
 import {
   easePremium,
@@ -14,176 +10,73 @@ import {
   staggerItem,
 } from "@/components/landing/landing-motion";
 
-const titleLines = [
-  "Gérer un club sportif",
-  "ne devrait pas être compliqué.",
-];
-
 export default function HeroSection() {
-  const stageRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: stageRef,
-    offset: ["start end", "end start"],
-  });
-  const mockupY = useTransform(scrollYProgress, [0, 1], [0, 64]);
-  const mockupScale = useTransform(scrollYProgress, [0, 0.55], [1, 0.92]);
-  const mockupOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0.85]);
-
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] w-full scroll-mt-0 overflow-hidden pb-10 md:pb-16"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center scroll-mt-0 px-3 pb-16 pt-32 sm:px-4 sm:pb-20 sm:pt-36 md:pb-24 md:pt-40 lg:pt-44"
     >
-      <HeroAmbient />
-
-      <div className="relative w-full px-3 pt-4 md:px-8 md:pt-6 lg:px-12">
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: easePremium }}
-          className="relative z-30 mx-auto flex max-w-[1160px] items-center justify-between gap-4"
-        >
-          <Link href="/" className="transition hover:opacity-95">
-            <Image src="/logo-obillz.png" alt="Obillz" width={124} height={30} priority />
-          </Link>
-          <nav className="hidden items-center gap-2 md:flex" aria-label="Navigation principale">
-            {[
-              { href: "/#probleme", label: "Le problème" },
-              { href: "/#centralise", label: "La solution" },
-              { href: "/#fonctionnalites", label: "Fonctionnalités" },
-            ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="rounded-full border border-white/30 bg-white/[0.08] px-4 py-1.5 text-xs font-semibold text-blue-50 backdrop-blur-sm transition hover:border-white/50 hover:bg-white/15"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/connexion"
-              className="rounded-full border border-white/45 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10 md:px-5"
-            >
-              Connexion
-            </Link>
-            <Link
-              href="/inscription"
-              className="hidden rounded-full bg-white px-5 py-2 text-sm font-bold text-[#1A23FF] shadow-[0_10px_28px_rgba(2,6,23,0.25)] transition hover:-translate-y-0.5 sm:inline-flex"
-            >
-              Créer mon club
-            </Link>
-          </div>
-        </motion.header>
-
-        <div ref={stageRef} className="relative mx-auto mt-7 max-w-[1160px] md:mt-10 lg:mt-12">
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="relative z-10 px-1 text-center sm:px-4 md:px-6"
-          >
-            <motion.div variants={staggerItem} className="mx-auto max-w-4xl">
-              <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-white/[0.1] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-50 shadow-[0_8px_32px_rgba(2,6,23,0.22)] backdrop-blur-md md:text-xs">
-                <span className="relative flex h-2 w-2">
-                  {!reduceMotion ? (
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-200 opacity-45" />
-                  ) : null}
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.85)]" />
-                </span>
-                Clubs sportifs
-              </p>
-            </motion.div>
-
-            <motion.h1
-              variants={staggerContainer}
-              className="mx-auto max-w-[920px] text-balance"
-            >
-              {titleLines.map((line, index) => (
-                <motion.span
-                  key={line}
-                  variants={heroTitleLine}
-                  className={`block font-black leading-[1.04] tracking-[-0.038em] text-white ${
-                    index === 0
-                      ? "text-[1.9rem] sm:text-4xl md:text-[3.25rem] lg:text-[3.65rem]"
-                      : "mt-1 text-[1.9rem] sm:text-4xl md:mt-1.5 md:text-[3.25rem] lg:text-[3.65rem]"
-                  }`}
-                >
-                  {index === 1 ? (
-                    <span className="bg-gradient-to-r from-white via-blue-50 to-white/90 bg-clip-text text-transparent">
-                      {line}
-                    </span>
-                  ) : (
-                    line
-                  )}
-                </motion.span>
-              ))}
-            </motion.h1>
-
-            <motion.p
-              variants={staggerItem}
-              className="mx-auto mt-6 max-w-2xl text-pretty text-sm leading-relaxed text-blue-50/95 md:mt-7 md:text-lg md:leading-relaxed"
-            >
-              Obillz centralise membres, cotisations, factures, événements, buvette et encaissements
-              dans une seule plateforme claire pour votre comité.
-            </motion.p>
-
-            <motion.div
-              variants={staggerItem}
-              className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4 md:mt-10"
-            >
-              <LandingPrimaryButton href="/inscription" className="w-full max-w-md sm:max-w-none">
-                Créer mon club gratuitement
-              </LandingPrimaryButton>
-              <LandingSecondaryButton
-                href="#comment-ca-marche"
-                className="w-full max-w-md sm:max-w-none"
-              >
-                Voir comment ça marche
-              </LandingSecondaryButton>
-            </motion.div>
-
-            <motion.p
-              variants={staggerItem}
-              className="mt-5 text-center text-[11px] font-medium tracking-wide text-blue-100/85 md:text-sm"
-            >
-              Gratuit pour démarrer · Sans engagement · Configuration rapide
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            style={
-              reduceMotion
-                ? undefined
-                : { y: mockupY, scale: mockupScale, opacity: mockupOpacity }
-            }
-            className="relative z-10 mt-11 md:mt-14 lg:mt-16"
-          >
-            <HeroProductScene />
-          </motion.div>
-        </div>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 0.7 }}
-        className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[85%] bg-[radial-gradient(ellipse_75%_55%_at_50%_15%,rgba(26,35,255,0.32),transparent)]"
         aria-hidden
-      >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200/50">
-          Découvrir
-        </span>
+      />
+
+      <div className="relative z-10 flex w-full max-w-[920px] flex-col items-center justify-center text-center">
         <motion.div
-          animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          className="h-9 w-[1.35rem] rounded-full border border-white/28 p-1"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex w-full flex-col items-center"
         >
-          <div className="mx-auto h-1.5 w-1 rounded-full bg-white/75" />
+          <motion.p
+            variants={staggerItem}
+            className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/[0.08] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200/90"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.9)]" />
+            Plateforme tout-en-un · Suisse
+          </motion.p>
+
+          <motion.h1
+            variants={heroTitleLine}
+            className="max-w-[18ch] text-balance text-[2.15rem] font-black leading-[1.05] tracking-[-0.038em] text-white sm:max-w-none sm:text-5xl md:text-6xl lg:text-[4rem] lg:leading-[1.02]"
+          >
+            Gérez votre club sans perdre vos soirées.
+          </motion.h1>
+
+          <motion.p
+            variants={staggerItem}
+            className="mt-5 max-w-2xl text-pretty text-sm leading-relaxed text-blue-100/80 md:mt-6 md:text-lg"
+          >
+            Factures, membres, cotisations, événements et paiements réunis dans un seul logiciel
+            pensé pour les clubs sportifs.
+          </motion.p>
+
+          <motion.div
+            variants={staggerItem}
+            className="mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center"
+          >
+            <LandingPrimaryButton href="/inscription" className="w-full sm:w-auto">
+              Tester Obillz gratuitement
+            </LandingPrimaryButton>
+            <LandingSecondaryButton href="#comment-ca-marche" className="w-full sm:w-auto">
+              Voir comment ça marche
+            </LandingSecondaryButton>
+          </motion.div>
         </motion.div>
-      </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 32, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.35, ease: easePremium }}
+          className="relative mt-14 w-full max-w-[780px] sm:mt-16 md:mt-20 lg:mt-24"
+        >
+          <div
+            className="pointer-events-none absolute inset-x-[10%] top-1/2 -z-10 h-[60%] -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.4),transparent_70%)] blur-3xl"
+            aria-hidden
+          />
+          <HeroHubVisual />
+        </motion.div>
+      </div>
     </section>
   );
 }

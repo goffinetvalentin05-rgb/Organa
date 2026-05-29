@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import LandingPage from "@/components/LandingPage";
 
 export const metadata: Metadata = {
-  title: "Obillz — Logiciel de gestion pour les clubs sportifs",
+  title: "Obillz — Gérez votre club sportif sans perdre vos soirées",
   description:
-    "Obillz centralise joueurs, membres, cotisations, manifestations, calendriers, dépenses, recettes et la communication par e-mail. Un seul outil pour votre club.",
+    "Factures, membres, cotisations, événements et paiements réunis dans un seul logiciel pensé pour les clubs sportifs. Testez Obillz gratuitement.",
 };
 
 export default function Home() {
