@@ -2,11 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, ExternalLink, Globe, Instagram, Facebook } from "@/lib/icons";
+import {
+  Calendar,
+  ExternalLink,
+  Globe,
+  Instagram,
+  Facebook,
+  FileText,
+  QrCode,
+} from "@/lib/icons";
 import type { PublicClubPageData } from "@/lib/public-page/types";
 
 interface ClubPublicPageProps {
-  slug: string;
   initialData: PublicClubPageData;
 }
 
@@ -43,15 +50,19 @@ function ActionCard({
   description,
   color,
   external,
+  icon: Icon,
 }: {
   href: string;
   label: string;
   description: string;
   color: string;
   external?: boolean;
+  icon?: React.ComponentType<{ className?: string }>;
 }) {
   const className =
     "group flex w-full items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-slate-300 hover:shadow-md active:scale-[0.99]";
+
+  const IconComponent = Icon || Calendar;
 
   const content = (
     <>
@@ -59,11 +70,13 @@ function ActionCard({
         className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white"
         style={{ backgroundColor: color }}
       >
-        <Calendar className="h-6 w-6" />
+        <IconComponent className="h-6 w-6" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-slate-900">{label}</p>
-        <p className="mt-0.5 text-sm text-slate-600">{description}</p>
+        {description ? (
+          <p className="mt-0.5 text-sm text-slate-600">{description}</p>
+        ) : null}
       </div>
       <ExternalLink className="h-5 w-5 shrink-0 text-slate-400 transition group-hover:text-slate-600" />
     </>
@@ -84,39 +97,49 @@ function ActionCard({
   );
 }
 
-export default function ClubPublicPage({ slug, initialData }: ClubPublicPageProps) {
+export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
   const color = initialData.primaryColor || "#1A23FF";
   const buvetteHref = initialData.buvetteSlug
     ? `/club/${initialData.buvetteSlug}/buvette`
     : null;
 
-  const actions: { href: string; label: string; description: string; external?: boolean }[] = [];
+  const actions: {
+    key: string;
+    href: string;
+    label: string;
+    description: string;
+    external?: boolean;
+    icon?: React.ComponentType<{ className?: string }>;
+  }[] = [];
 
   if (initialData.showBuvette && buvetteHref) {
     actions.push({
+      key: "buvette",
       href: buvetteHref,
       label: "Réserver la buvette",
       description: "Choisissez une date et envoyez votre demande en ligne.",
     });
   }
 
-  if (initialData.showMatches) {
+  if (initialData.matchProgram) {
     actions.push({
-      href: `/p/${slug}/evenements`,
-      label: "Planning des matchs",
-      description: "Consultez les prochains événements du club.",
+      key: "match-program",
+      href: initialData.matchProgram.href,
+      label: initialData.matchProgram.label,
+      description: "Consultez le calendrier des matchs de la saison.",
+      external: initialData.matchProgram.external,
+      icon: FileText,
     });
   }
 
-  if (initialData.showContact && initialData.contactUrl) {
-    const isExternal =
-      initialData.contactUrl.startsWith("http") ||
-      initialData.contactUrl.startsWith("mailto:");
+  for (const link of initialData.publicLinks) {
     actions.push({
-      href: initialData.contactUrl,
-      label: "Contacter le club",
-      description: "Écrivez-nous pour toute question.",
-      external: isExternal,
+      key: link.id,
+      href: link.url,
+      label: link.title,
+      description: link.description || "Accéder au formulaire ou à l'inscription.",
+      external: link.external,
+      icon: QrCode,
     });
   }
 
@@ -125,6 +148,8 @@ export default function ClubPublicPage({ slug, initialData }: ClubPublicPageProp
     { url: initialData.facebookUrl, label: "Facebook", Icon: Facebook },
     { url: initialData.websiteUrl, label: "Site internet", Icon: Globe },
   ].filter((s) => s.url);
+
+  const hasContent = actions.length > 0 || socials.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -152,23 +177,26 @@ export default function ClubPublicPage({ slug, initialData }: ClubPublicPageProp
           <div className="space-y-3">
             {actions.map((action) => (
               <ActionCard
-                key={action.href}
+                key={action.key}
                 href={action.href}
                 label={action.label}
                 description={action.description}
                 color={color}
                 external={action.external}
+                icon={action.icon}
               />
             ))}
           </div>
-        ) : (
+        ) : null}
+
+        {!hasContent ? (
           <div className="rounded-2xl border border-slate-200 bg-white px-6 py-8 text-center text-sm text-slate-600">
             Aucun lien actif pour le moment. Revenez bientôt.
           </div>
-        )}
+        ) : null}
 
         {socials.length > 0 ? (
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className={`flex items-center justify-center gap-4 ${actions.length > 0 ? "mt-10" : ""}`}>
             {socials.map(({ url, label, Icon }) => (
               <a
                 key={label}

@@ -12,7 +12,7 @@ export default async function PublicSlugPage({
   const resolution = await resolvePublicSlug(slug);
 
   if (resolution.type === "club") {
-    return <ClubPublicPage slug={slug} initialData={resolution.data} />;
+    return <ClubPublicPage initialData={resolution.data} />;
   }
 
   if (resolution.type === "planning") {

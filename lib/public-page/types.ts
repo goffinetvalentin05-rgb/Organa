@@ -1,3 +1,6 @@
+export type MatchProgramType = "external_url" | "pdf";
+export type PublicPageLinkType = "qr_code" | "event" | "buvette" | "custom";
+
 export interface PublicPageSettings {
   enabled: boolean;
   slug: string | null;
@@ -8,12 +11,38 @@ export interface PublicPageSettings {
   instagramUrl: string;
   facebookUrl: string;
   websiteUrl: string;
-  contactUrl: string;
   showBuvette: boolean;
-  showMatches: boolean;
-  showContact: boolean;
+  showMatchProgram: boolean;
+  matchProgramType: MatchProgramType | null;
+  matchProgramUrl: string | null;
+  matchProgramPdfPath: string | null;
+  matchProgramPdfName: string | null;
+  matchProgramPdfUrl: string | null;
+  showPublicLinks: boolean;
   publicUrlPath: string | null;
   buvetteSlug: string | null;
+}
+
+export interface PublicPageLink {
+  id: string;
+  title: string;
+  description: string | null;
+  url: string;
+  type: PublicPageLinkType;
+  qrcodeId: string | null;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface PublicPageLinkInput {
+  id?: string;
+  title: string;
+  description?: string | null;
+  url: string;
+  type: PublicPageLinkType;
+  qrcodeId?: string | null;
+  isActive?: boolean;
+  sortOrder: number;
 }
 
 export interface PublicClubPageData {
@@ -24,18 +53,29 @@ export interface PublicClubPageData {
   instagramUrl: string | null;
   facebookUrl: string | null;
   websiteUrl: string | null;
-  contactUrl: string | null;
   showBuvette: boolean;
-  showMatches: boolean;
-  showContact: boolean;
   buvetteSlug: string | null;
+  matchProgram: {
+    label: string;
+    href: string;
+    external: boolean;
+  } | null;
+  publicLinks: {
+    id: string;
+    title: string;
+    description: string | null;
+    url: string;
+    external: boolean;
+  }[];
 }
 
-export interface PublicClubEvent {
-  id: string;
-  name: string;
-  description: string | null;
-  startDate: string;
-  endDate: string | null;
-  eventTypeName: string | null;
+export interface PublicPageSettingsResponse {
+  settings: PublicPageSettings;
+  links: PublicPageLink[];
+  qrcodeOptions: {
+    id: string;
+    name: string;
+    code: string;
+    registrationPath: string;
+  }[];
 }

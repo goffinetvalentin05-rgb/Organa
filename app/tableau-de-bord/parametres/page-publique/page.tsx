@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import { ArrowLeft, Copy, ExternalLink, Loader } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import MatchProgramSettings from "@/components/public-page/MatchProgramSettings";
+import PublicLinksSettings, { linksToInputs } from "@/components/public-page/PublicLinksSettings";
 import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
-import type { PublicPageSettings } from "@/lib/public-page/types";
+import type { PublicPageLinkInput, PublicPageSettings } from "@/lib/public-page/types";
 import { normalizePublicPageSlug } from "@/lib/public-page/slug";
 
 const inputClass =
@@ -19,6 +21,10 @@ export default function PublicPageSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PublicPageSettings | null>(null);
+  const [links, setLinks] = useState<PublicPageLinkInput[]>([]);
+  const [qrcodeOptions, setQrcodeOptions] = useState<
+    { id: string; name: string; code: string; registrationPath: string }[]
+  >([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -27,6 +33,8 @@ export default function PublicPageSettingsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Erreur de chargement");
       setForm(data.settings);
+      setLinks(linksToInputs(data.links || []));
+      setQrcodeOptions(data.qrcodeOptions || []);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -54,15 +62,19 @@ export default function PublicPageSettingsPage() {
           instagramUrl: form.instagramUrl,
           facebookUrl: form.facebookUrl,
           websiteUrl: form.websiteUrl,
-          contactUrl: form.contactUrl,
           showBuvette: form.showBuvette,
-          showMatches: form.showMatches,
-          showContact: form.showContact,
+          showMatchProgram: form.showMatchProgram,
+          matchProgramType: form.matchProgramType,
+          matchProgramUrl: form.matchProgramUrl,
+          showPublicLinks: form.showPublicLinks,
+          links: links.map((l, i) => ({ ...l, sortOrder: i })),
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Erreur de sauvegarde");
       setForm(data.settings);
+      setLinks(linksToInputs(data.links || []));
+      setQrcodeOptions(data.qrcodeOptions || []);
       toast.success(t("dashboard.settings.publicPage.saveSuccess"));
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Erreur");
@@ -259,46 +271,47 @@ export default function PublicPageSettingsPage() {
           title={t("dashboard.settings.publicPage.blocksTitle")}
           description={t("dashboard.settings.publicPage.blocksDescription")}
         >
-          <div className="space-y-3">
-            {[
-              {
-                key: "showBuvette" as const,
-                label: t("dashboard.settings.publicPage.showBuvette"),
-                hint: t("dashboard.settings.publicPage.showBuvetteHint"),
-              },
-              {
-                key: "showMatches" as const,
-                label: t("dashboard.settings.publicPage.showMatches"),
-                hint: t("dashboard.settings.publicPage.showMatchesHint"),
-              },
-              {
-                key: "showContact" as const,
-                label: t("dashboard.settings.publicPage.showContact"),
-                hint: t("dashboard.settings.publicPage.showContactHint"),
-              },
-            ].map((item) => (
-              <label
-                key={item.key}
-                className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3"
-              >
-                <div>
-                  <span className="text-sm font-medium text-white">{item.label}</span>
-                  <p className="mt-0.5 text-xs text-white/55">{item.hint}</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={form[item.key]}
-                  onChange={(e) => setForm({ ...form, [item.key]: e.target.checked })}
-                  className="mt-1 h-5 w-5 shrink-0 rounded accent-[#2563EB]"
-                />
-              </label>
-            ))}
-          </div>
+          <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/15 bg-white/5 px-4 py-3">
+            <div>
+              <span className="text-sm font-medium text-white">
+                {t("dashboard.settings.publicPage.showBuvette")}
+              </span>
+              <p className="mt-0.5 text-xs text-white/55">
+                {t("dashboard.settings.publicPage.showBuvetteHint")}
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={form.showBuvette}
+              onChange={(e) => setForm({ ...form, showBuvette: e.target.checked })}
+              className="mt-1 h-5 w-5 shrink-0 rounded accent-[#2563EB]"
+            />
+          </label>
         </SectionCard>
 
         <SectionCard
-          title={t("dashboard.settings.publicPage.linksTitle")}
-          description={t("dashboard.settings.publicPage.linksDescription")}
+          title={t("dashboard.settings.publicPage.matchProgram.sectionTitle")}
+          description={t("dashboard.settings.publicPage.matchProgram.sectionDescription")}
+        >
+          <MatchProgramSettings form={form} setForm={setForm} />
+        </SectionCard>
+
+        <SectionCard
+          title={t("dashboard.settings.publicPage.publicLinks.sectionTitle")}
+          description={t("dashboard.settings.publicPage.publicLinks.sectionDescription")}
+        >
+          <PublicLinksSettings
+            enabled={form.showPublicLinks}
+            onEnabledChange={(value) => setForm({ ...form, showPublicLinks: value })}
+            links={links}
+            onLinksChange={setLinks}
+            qrcodeOptions={qrcodeOptions}
+          />
+        </SectionCard>
+
+        <SectionCard
+          title={t("dashboard.settings.publicPage.socialTitle")}
+          description={t("dashboard.settings.publicPage.socialDescription")}
         >
           <div className="space-y-4">
             <div>
@@ -328,17 +341,6 @@ export default function PublicPageSettingsPage() {
                 value={form.websiteUrl}
                 onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })}
                 placeholder="https://..."
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-white/70">
-                {t("dashboard.settings.publicPage.contactLabel")}
-              </label>
-              <input
-                className={inputClass}
-                value={form.contactUrl}
-                onChange={(e) => setForm({ ...form, contactUrl: e.target.value })}
-                placeholder="mailto:contact@club.ch ou https://..."
               />
             </div>
           </div>
