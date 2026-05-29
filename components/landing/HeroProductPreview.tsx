@@ -10,13 +10,15 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function HeroProductPreview() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mx-auto mt-10 w-full max-w-[min(100%,720px)] md:mt-12"
+type HeroProductPreviewProps = {
+  /** Intégré dans HeroProductComposition — pas de marge externe ni animation double */
+  embedded?: boolean;
+};
+
+export default function HeroProductPreview({ embedded = false }: HeroProductPreviewProps) {
+  const shell = (
+    <div
+      className={`relative w-full ${embedded ? "" : "mx-auto mt-10 max-w-[min(100%,720px)] md:mt-12"}`}
     >
       <div className="pointer-events-none absolute inset-x-[8%] top-[20%] -z-10 h-[55%] rounded-full bg-white/20 blur-3xl" />
       <div className="rounded-[1.35rem] border border-white/25 bg-white/[0.08] p-1.5 shadow-[0_28px_60px_rgba(2,6,23,0.35)] backdrop-blur-md md:rounded-[1.5rem] md:p-2 [transform:perspective(1200px)_rotateX(4deg)]">
@@ -105,6 +107,18 @@ export default function HeroProductPreview() {
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  if (embedded) return shell;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {shell}
     </motion.div>
   );
 }

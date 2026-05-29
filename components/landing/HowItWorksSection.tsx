@@ -10,14 +10,16 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import ScrollReveal from "@/components/landing/ScrollReveal";
 import LandingCta from "@/components/landing/LandingCta";
+import LandingSection from "@/components/landing/LandingSection";
+import ScrollReveal from "@/components/landing/ScrollReveal";
 
 const steps: Array<{
   step: number;
   icon: LucideIcon;
   title: string;
   description: string;
+  tag?: string;
 }> = [
   {
     step: 1,
@@ -25,6 +27,7 @@ const steps: Array<{
     title: "Créez l'espace de votre club",
     description:
       "La mise en place prend seulement quelques minutes. Vous configurez votre club et vous êtes prêts à démarrer.",
+    tag: "2 min",
   },
   {
     step: 2,
@@ -59,58 +62,50 @@ const steps: Array<{
     icon: QrCode,
     title: "Partagez liens publics et QR codes",
     description:
-      "Inscriptions aux repas ou événements, page publique du club — tout est partageable en quelques secondes.",
+      "Inscriptions aux repas ou événements, page publique du club — partageable en quelques secondes.",
+    tag: "Gagnez du temps",
   },
 ];
 
 export default function HowItWorksSection() {
   return (
-    <section
+    <LandingSection
       id="comment-ca-marche"
-      className="relative mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 md:mt-36"
+      className="mt-24 md:mt-36"
+      eyebrow="Comment ça fonctionne"
+      title="Une logique simple, du premier jour au quotidien"
+      subtitle="Obillz guide le comité étape par étape : configuration rapide, gestion centralisée et gain de temps au fil des saisons."
     >
-      <ScrollReveal className="text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200/90">Comment ça marche</p>
-        <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">
-          Une logique simple, du premier jour au quotidien
-        </h2>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-blue-100/90 md:text-lg">
-          Obillz guide le comité étape par étape : configuration rapide, gestion centralisée et
-          gain de temps au fil des saisons.
-        </p>
-      </ScrollReveal>
-
       <div className="relative mt-14">
         <div
-          className="pointer-events-none absolute left-[1.65rem] top-8 bottom-8 hidden w-px bg-gradient-to-b from-white/40 via-white/15 to-transparent md:block"
+          className="pointer-events-none absolute left-7 top-4 bottom-4 hidden w-px bg-gradient-to-b from-white/50 via-white/15 to-transparent md:block"
           aria-hidden
         />
-        <ol className="grid gap-5 md:gap-6">
+        <ol className="grid gap-4 md:gap-5">
           {steps.map((item, index) => (
-            <ScrollReveal key={item.step} delay={index * 0.06} y={18}>
-              <li className="group relative flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
-                <div className="flex shrink-0 items-center gap-4 md:w-[4.5rem] md:flex-col md:items-center md:gap-2">
-                  <span className="relative z-10 flex h-[3.3rem] w-[3.3rem] items-center justify-center rounded-2xl border border-white/25 bg-white/10 text-lg font-black text-white shadow-[0_12px_28px_rgba(2,6,23,0.25)] backdrop-blur-md transition group-hover:border-white/40 group-hover:bg-white/15 md:h-14 md:w-14">
+            <ScrollReveal key={item.step} delay={index * 0.05} y={18}>
+              <li className="group relative flex gap-4 md:gap-6">
+                <div className="relative z-10 flex shrink-0 flex-col items-center">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/10 text-lg font-black text-white shadow-[0_12px_28px_rgba(2,6,23,0.28)] backdrop-blur-md transition group-hover:border-white/45 group-hover:bg-white/15">
                     {item.step}
                   </span>
                 </div>
-                <article className="min-w-0 flex-1 overflow-hidden rounded-2xl border border-white/12 bg-gradient-to-br from-white/[0.09] via-white/[0.04] to-transparent p-5 backdrop-blur-xl transition duration-300 hover:border-white/22 md:p-6 lg:flex lg:items-center lg:gap-8">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#1A23FF]/20 ring-1 ring-[#1A23FF]/30">
-                    <item.icon className="h-6 w-6 text-white" strokeWidth={1.75} aria-hidden />
+                <article className="min-w-0 flex-1 overflow-hidden rounded-2xl border border-white/12 bg-gradient-to-br from-white/[0.10] via-white/[0.04] to-transparent p-5 backdrop-blur-xl transition duration-300 hover:border-white/25 md:flex md:items-center md:justify-between md:gap-6 md:p-6">
+                  <div className="flex gap-4 md:items-center">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#1A23FF]/25 ring-1 ring-[#1A23FF]/35">
+                      <item.icon className="h-6 w-6 text-white" strokeWidth={1.75} aria-hidden />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-white md:text-xl">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-blue-100/85">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="mt-4 lg:mt-0">
-                    <h3 className="text-lg font-black text-white md:text-xl">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-blue-100/85 md:text-[0.9375rem]">
-                      {item.description}
-                    </p>
-                  </div>
-                  {index === steps.length - 1 ? (
-                    <div className="mt-5 hidden shrink-0 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 lg:mt-0 lg:block">
+                  {item.tag ? (
+                    <div className="mt-4 shrink-0 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 md:mt-0">
                       <p className="flex items-center gap-2 text-sm font-bold text-emerald-100">
                         <Link2 className="h-4 w-4" aria-hidden />
-                        Gagnez du temps
+                        {item.tag}
                       </p>
-                      <p className="mt-1 text-xs text-emerald-100/80">Moins d&apos;oublis, plus de clarté</p>
                     </div>
                   ) : null}
                 </article>
@@ -126,6 +121,6 @@ export default function HowItWorksSection() {
         secondaryLabel="Voir les fonctionnalités"
         secondaryHref="#fonctionnalites"
       />
-    </section>
+    </LandingSection>
   );
 }

@@ -4,161 +4,18 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  CalendarDays,
-  Check,
-  Coffee,
-  FileText,
-  LayoutDashboard,
-  LineChart,
-  Mail,
-  MessageCircle,
-  Plus,
-  QrCode,
-  Receipt,
-  Users,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import BenefitsSection from "@/components/landing/BenefitsSection";
+import FeaturesShowcaseSection from "@/components/landing/FeaturesShowcaseSection";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import LandingCta from "@/components/landing/LandingCta";
+import LandingBackground from "@/components/landing/LandingBackground";
 import ProblemSection from "@/components/landing/ProblemSection";
+import SolutionSection from "@/components/landing/SolutionSection";
 import {
   obillzLandingGridOverlayClass,
   obillzLandingRootClass,
 } from "@/components/ui/styles";
-
-type ComparisonView = "without" | "with";
-type FeatureTabId =
-  | "membres"
-  | "cotisations"
-  | "manifestations"
-  | "buvette"
-  | "finances"
-  | "factures"
-  | "inscriptions"
-  | "communication";
-
-const featureIconById: Record<FeatureTabId, LucideIcon> = {
-  membres: Users,
-  cotisations: Wallet,
-  manifestations: CalendarDays,
-  buvette: Coffee,
-  finances: LineChart,
-  factures: FileText,
-  inscriptions: QrCode,
-  communication: Mail,
-};
-
-const featureTabs: Array<{
-  id: FeatureTabId;
-  title: string;
-  description: string;
-  details: string;
-  highlights: [string, string, string];
-}> = [
-  {
-    id: "membres",
-    title: "Membres",
-    description:
-      "Centralisez les fiches membres, les équipes et toutes les informations utiles dans une seule base claire et organisée.",
-    details:
-      "Retrouvez rapidement les bonnes informations sans devoir jongler entre plusieurs fichiers.",
-    highlights: [
-      "Fiches et équipes au même endroit",
-      "Coordonnées toujours à jour",
-      "Recherche rapide dans la base",
-    ],
-  },
-  {
-    id: "cotisations",
-    title: "Cotisations",
-    description:
-      "Générez les cotisations en quelques clics et envoyez-les automatiquement aux membres par email.",
-    details:
-      "Suivez facilement les paiements en attente pour garder une vue claire sur les encaissements du club.",
-    highlights: [
-      "Génération en un clic",
-      "Envoi automatique par email",
-      "Suivi des paiements en temps réel",
-    ],
-  },
-  {
-    id: "manifestations",
-    title: "Manifestations",
-    description:
-      "Créez les événements du club et organisez les bénévoles simplement depuis une seule interface.",
-    details:
-      "Partagez un lien d'inscription pour permettre aux personnes de se positionner rapidement.",
-    highlights: [
-      "Calendrier et événements unifiés",
-      "Inscription des bénévoles simplifiée",
-      "Lien partageable en quelques secondes",
-    ],
-  },
-  {
-    id: "buvette",
-    title: "Buvette",
-    description:
-      "Gérez les réservations de la buvette avec un calendrier simple et lisible.",
-    details: "Créez automatiquement une facture lorsque la location est validée.",
-    highlights: [
-      "Calendrier clair des créneaux",
-      "Facturation automatique à la validation",
-      "Moins de gestion manuelle",
-    ],
-  },
-  {
-    id: "finances",
-    title: "Finances",
-    description:
-      "Suivez les entrées et sorties d'argent du club dans une vue claire et structurée.",
-    details: "Gardez en permanence une vision précise de la situation financière.",
-    highlights: [
-      "Entrées et sorties structurées",
-      "Vue d'ensemble du club",
-      "Situation lisible en un coup d’œil",
-    ],
-  },
-  {
-    id: "factures",
-    title: "Factures",
-    description:
-      "Créez des factures propres et professionnelles en quelques secondes.",
-    details: "Envoyez-les immédiatement par email sans devoir passer par un autre outil.",
-    highlights: [
-      "Modèles propres et professionnels",
-      "Envoi par email intégré",
-      "Création en quelques secondes",
-    ],
-  },
-  {
-    id: "inscriptions",
-    title: "Inscriptions",
-    description:
-      "Créez un lien ou un QR code pour permettre aux participants de s'inscrire facilement à un repas, un événement ou une activité.",
-    details: "Les réponses sont centralisées et plus simples à gérer pour le comité.",
-    highlights: [
-      "Lien ou QR code pour s'inscrire",
-      "Réponses centralisées automatiquement",
-      "Moins de relances pour le comité",
-    ],
-  },
-  {
-    id: "communication",
-    title: "Communication",
-    description:
-      "Envoyez facilement des informations importantes aux membres ou aux participants d'un événement.",
-    details: "Le club communique plus clairement sans dépendre uniquement de groupes WhatsApp.",
-    highlights: [
-      "Messages ciblés aux bons groupes",
-      "Moins de dispersion sur WhatsApp",
-      "Informations structurées pour le club",
-    ],
-  },
-];
 
 const faqItems = [
   {
@@ -213,9 +70,7 @@ const faqItems = [
   },
 ];
 
-/** Inscription gratuite ; le checkout Stripe (plan standard/team) se fait dans Paramètres après connexion. */
 const LANDING_PRICING_SIGNUP_STANDARD = "/inscription";
-/** TODO: persister ?plan=team après inscription pour pré-sélectionner Obillz Équipe au checkout. */
 const LANDING_PRICING_SIGNUP_TEAM = "/inscription?plan=team";
 const LANDING_PRICING_ADVICE_MAILTO =
   "mailto:contact@obillz.com?subject=Question%20sur%20les%20formules%20Obillz";
@@ -264,11 +119,6 @@ const pricingPlans = [
   },
 ] as const;
 
-function FeatureTabIcon({ id, className }: { id: FeatureTabId; className?: string }) {
-  const Icon = featureIconById[id];
-  return <Icon className={className ?? "h-[1.125rem] w-[1.125rem] shrink-0"} strokeWidth={1.75} aria-hidden />;
-}
-
 function SwissFlag({ className }: { className?: string }) {
   return (
     <svg
@@ -285,525 +135,38 @@ function SwissFlag({ className }: { className?: string }) {
 }
 
 export default function LandingPage() {
-  const [comparisonView, setComparisonView] = useState<ComparisonView>("with");
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
     <main className={obillzLandingRootClass}>
+      <LandingBackground />
       <div className={obillzLandingGridOverlayClass} aria-hidden />
 
       <div className="relative z-10">
         <HeroSection />
-
         <ProblemSection />
-
-        <section
-          id="comparaison"
-          className="relative mx-auto mt-32 w-[94%] max-w-[1160px] scroll-mt-24 overflow-x-clip md:mt-44 lg:mt-52"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center"
-          >
-            <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
-              Passez d&apos;une gestion compliquée à une organisation claire
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-blue-100/95 md:text-lg">
-              Trop d&apos;outils, trop de tâches manuelles, trop de flou — puis une seule plateforme pour
-              piloter votre club avec une vue nette et une vraie tranquillité d&apos;esprit.
-            </p>
-            <div
-              className="mt-8 inline-flex rounded-full border border-white/30 bg-white/[0.12] p-1.5 shadow-[0_16px_40px_rgba(2,6,23,0.35)] backdrop-blur-md"
-              role="group"
-              aria-label="Comparer sans et avec Obillz"
-            >
-              <button
-                type="button"
-                onClick={() => setComparisonView("without")}
-                className={`rounded-full px-6 py-2.5 text-sm font-bold transition-all duration-200 md:px-8 md:py-3 md:text-[0.9375rem] ${
-                  comparisonView === "without"
-                    ? "bg-white text-[#1A23FF] shadow-[0_4px_20px_rgba(26,35,255,0.35)] ring-2 ring-white/25"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                Sans Obillz
-              </button>
-              <button
-                type="button"
-                onClick={() => setComparisonView("with")}
-                className={`rounded-full px-6 py-2.5 text-sm font-bold transition-all duration-200 md:px-8 md:py-3 md:text-[0.9375rem] ${
-                  comparisonView === "with"
-                    ? "bg-white text-[#1A23FF] shadow-[0_4px_20px_rgba(26,35,255,0.35)] ring-2 ring-white/25"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                Avec Obillz
-              </button>
-            </div>
-          </motion.div>
-
-          <div className="relative mx-auto mt-10 max-w-[1080px] md:mt-12">
-            <div
-              className="pointer-events-none absolute inset-x-[-4%] -top-10 -bottom-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.08),transparent_60%)]"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute -left-6 top-12 hidden h-32 w-32 rounded-full bg-[#1A23FF]/30 blur-3xl md:block"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute -right-8 bottom-8 hidden h-40 w-40 rounded-full bg-white/10 blur-3xl md:block"
-              aria-hidden
-            />
-            <AnimatePresence mode="wait">
-              {comparisonView === "without" ? (
-                <motion.div
-                  key="without"
-                  role="tabpanel"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="space-y-6 md:space-y-8"
-                >
-                  <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
-                    Le quotidien sans outil centralisé
-                  </p>
-
-                  {/* Mobile : pile verticale lisible (pas de chaos) */}
-                  <div className="mx-auto max-w-md space-y-4 md:hidden">
-                    <div className="rounded-[20px] bg-[#0B141A] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
-                      <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366]/20">
-                          <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" strokeWidth={2} />
-                        </div>
-                        <div>
-                          <p className="text-[11px] font-semibold text-white">Comité du club</p>
-                          <p className="text-[9px] text-white/45">Groupe WhatsApp</p>
-                        </div>
-                      </div>
-                      <div className="space-y-2 rounded-lg bg-[#202C33] p-2.5">
-                        <div className="ml-4 max-w-[92%] rounded-lg rounded-tr-sm bg-[#005C4B] px-2.5 py-2 text-[11px] leading-snug text-white/95">
-                          Qui peut tenir la buvette samedi ?
-                        </div>
-                        <div className="ml-4 max-w-[92%] rounded-lg rounded-tr-sm bg-[#005C4B] px-2.5 py-2 text-[11px] leading-snug text-white/95">
-                          On n&apos;a pas la liste des bénévoles <span aria-hidden>😅</span>
-                        </div>
-                        <p className="pr-1 text-right text-[9px] text-[#8696A0]">+12 messages non lus</p>
-                      </div>
-                    </div>
-                    <div className="overflow-hidden rounded-sm border border-slate-400/60 bg-white shadow-[0_6px_24px_rgba(2,6,23,0.18)]">
-                      <div className="flex items-center gap-1.5 bg-[#217346] px-2 py-1.5">
-                        <span className="text-[9px] text-white/90">●●●</span>
-                        <span className="flex-1 truncate text-center text-[10px] font-medium text-white">
-                          membres_2024_FINAL_v3.xlsx
-                        </span>
-                      </div>
-                      <div className="border-b border-slate-200 bg-slate-100 px-2 py-1 font-mono text-[9px] text-slate-600">
-                        A1: Nom <span className="text-slate-300">|</span> B1: Cotis.
-                      </div>
-                      <div className="bg-white p-2 font-mono text-[9px] leading-relaxed text-slate-700">
-                        <div className="grid grid-cols-[1fr_1fr] gap-x-3 border-b border-slate-100 pb-1">
-                          <span>Dupont</span>
-                          <span className="text-right text-slate-400">?</span>
-                        </div>
-                        <p className="mt-2 text-red-600">#REF!</p>
-                        <p className="text-[9px] text-amber-700">Fichier non enregistré</p>
-                      </div>
-                    </div>
-                    <div className="relative -rotate-[0.5deg] border border-amber-200/80 bg-[#FFF8D6] px-3 py-3 shadow-[4px_5px_0_rgba(15,23,42,0.12)]">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-amber-900/70">Note</p>
-                      <p className="mt-1 text-sm font-medium leading-snug text-amber-950">
-                        Relancer Dupont — cotisation pas reçue
-                      </p>
-                    </div>
-                    <div className="border-l-4 border-slate-500 bg-[#FAFAF9] px-3 py-3 shadow-[0_4px_20px_rgba(2,6,23,0.12)]">
-                      <p className="text-[11px] font-semibold text-slate-600">Facture buvette — non envoyée</p>
-                      <p className="mt-3 text-sm font-bold text-slate-900">Match samedi 18h</p>
-                      <p className="mt-1 text-[11px] text-slate-600">3 bénévoles non confirmés</p>
-                      <p className="mt-1 text-[11px] text-amber-800">Sponsor : paiement non suivi</p>
-                    </div>
-                  </div>
-
-                  {/* Desktop : scène bureau — styles variés, chaos maîtrisé */}
-                  <div className="relative mx-auto hidden min-h-[460px] max-w-[900px] md:block lg:min-h-[480px]">
-                    <div
-                      className="absolute left-0 top-2 z-[3] w-[min(100%,340px)] shadow-[0_14px_40px_rgba(2,6,23,0.22)]"
-                      style={{ transform: "rotate(-2.5deg)" }}
-                    >
-                      <div className="overflow-hidden rounded-sm border border-slate-500/40 bg-white">
-                        <div className="flex items-center gap-2 bg-[#217346] px-2.5 py-2">
-                          <span className="text-[10px] text-white/80">● ● ●</span>
-                          <span className="flex-1 truncate text-center text-[11px] font-medium text-white">
-                            membres_2024_FINAL_v3.xlsx
-                          </span>
-                        </div>
-                        <div className="border-b border-slate-200 bg-[#F3F3F3] px-2 py-1.5 font-mono text-[10px] text-slate-600">
-                          Feuille1
-                        </div>
-                        <div className="p-3 font-mono text-[10px] text-slate-800">
-                          <div className="grid grid-cols-4 gap-2 border-b border-slate-200 pb-1 text-slate-400">
-                            <span>A</span>
-                            <span>B</span>
-                            <span>C</span>
-                            <span>D</span>
-                          </div>
-                          <p className="mt-2 font-bold text-red-600">#REF!</p>
-                          <p className="mt-1 text-[9px] text-amber-700">Non enregistré · dernière modif ?</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className="absolute right-0 top-6 z-[4] w-[min(100%,300px)] shadow-[0_16px_44px_rgba(0,0,0,0.28)]"
-                      style={{ transform: "rotate(3.5deg)" }}
-                    >
-                      <div className="rounded-[22px] bg-[#0B141A] p-3">
-                        <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366]/25 text-xs">
-                            <MessageCircle className="h-4 w-4 text-[#25D366]" strokeWidth={2} />
-                          </div>
-                          <div>
-                            <p className="text-[11px] font-semibold text-white">Comité du club</p>
-                            <p className="text-[9px] text-white/45">en ligne</p>
-                          </div>
-                        </div>
-                        <div className="space-y-2 rounded-xl bg-[#202C33] p-2.5">
-                          <div className="ml-6 max-w-[94%] rounded-2xl rounded-tr-md bg-[#005C4B] px-3 py-2 text-[11px] leading-snug text-white">
-                            Qui peut tenir la buvette samedi ?
-                          </div>
-                          <div className="ml-6 max-w-[94%] rounded-2xl rounded-tr-md bg-[#005C4B] px-3 py-2 text-[11px] leading-snug text-white">
-                            On n&apos;a pas la liste des bénévoles <span aria-hidden>😅</span>
-                          </div>
-                          <p className="pr-1 text-right text-[10px] font-medium text-[#8696A0]">+12 messages non lus</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className="absolute left-[8%] top-[210px] z-[5] w-[min(88%,260px)] border border-amber-300/90 bg-[#FFFACD] px-3 py-3 shadow-[5px_6px_0_rgba(15,23,42,0.14)]"
-                      style={{ transform: "rotate(4deg)" }}
-                    >
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-amber-900/55">Post-it</p>
-                      <p className="mt-1.5 text-[12px] font-semibold leading-snug text-amber-950">
-                        Relancer Dupont — cotisation pas reçue
-                      </p>
-                    </div>
-                    <div
-                      className="absolute right-[12%] top-0 z-[2] w-[min(72%,200px)] border border-slate-300 bg-[#F4F4F3] px-2.5 py-2 shadow-[0_8px_20px_rgba(2,6,23,0.15)]"
-                      style={{ transform: "rotate(-4deg)" }}
-                    >
-                      <p className="text-[9px] uppercase tracking-wide text-slate-500">Brouillon</p>
-                      <p className="mt-1 text-[11px] font-semibold text-slate-800">Facture buvette</p>
-                      <p className="text-[10px] text-slate-500">Non envoyée</p>
-                    </div>
-                    <div
-                      className="absolute bottom-4 left-1/2 z-[3] w-[min(94%,360px)] border-l-[5px] border-l-rose-500 bg-white px-4 py-3 shadow-[0_12px_36px_rgba(2,6,23,0.2)]"
-                      style={{ transform: "translateX(-50%) rotate(-1.5deg)" }}
-                    >
-                      <p className="text-[12px] font-black text-slate-900">Match samedi · 18h</p>
-                      <p className="mt-1.5 text-[11px] text-slate-600">3 bénévoles non confirmés</p>
-                      <p className="mt-1 text-[11px] font-medium text-amber-800">Sponsor : paiement non suivi</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="with"
-                  role="tabpanel"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="space-y-6"
-                >
-                  <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/90 md:text-sm">
-                    Une seule plateforme — tout est visible
-                  </p>
-
-                  {/* Mobile : pile verticale, lisible, sans dispersion */}
-                  <div className="relative rounded-[20px] bg-gradient-to-br from-white/[0.10] to-white/[0.02] p-1.5 ring-1 ring-white/15 backdrop-blur-md md:hidden">
-                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_20px_50px_rgba(2,6,23,0.22)]">
-                    <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-4 text-center">
-                      <p className="text-lg font-black text-slate-900">Dashboard du club</p>
-                      <p className="mt-1 text-xs leading-snug text-slate-500">
-                        Vue d&apos;ensemble : membres, cotisations, finances
-                      </p>
-                    </div>
-                    <div className="space-y-4 p-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="text-[11px] font-semibold text-slate-500">Membres</p>
-                          <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">284</p>
-                          <p className="mt-1 text-[10px] text-emerald-600">+12 ce mois</p>
-                        </div>
-                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="text-[11px] font-semibold text-slate-500">Cotisations</p>
-                          <p className="mt-1 text-2xl font-black tabular-nums text-slate-900">92%</p>
-                          <p className="mt-1 text-[10px] text-slate-500">En attente : 8%</p>
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-4">
-                        <p className="text-[11px] font-semibold text-[#1A23FF]">Solde du club</p>
-                        <p className="mt-1 text-2xl font-black text-slate-900">À jour</p>
-                        <p className="mt-0.5 text-[10px] text-slate-500">Vue consolidée en temps réel</p>
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">À traiter</p>
-                        <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/90 p-4">
-                          <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
-                          <p className="mt-1 text-sm font-semibold text-slate-700">Paiement en attente</p>
-                          <p className="mt-2 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800">
-                            À relancer
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Action rapide</p>
-                        <div className="mt-2 flex flex-col gap-2">
-                          <span className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-800">
-                            <Plus className="h-4 w-4 text-[#1A23FF]" strokeWidth={2} />
-                            Ajouter un membre
-                          </span>
-                          <span className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-800">
-                            <Plus className="h-4 w-4 text-[#1A23FF]" strokeWidth={2} />
-                            Envoyer cotisation
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-
-                  {/* Desktop : sidebar + zone principale type produit */}
-                  <div className="relative hidden rounded-[22px] bg-gradient-to-br from-white/[0.10] to-white/[0.02] p-2 ring-1 ring-white/15 backdrop-blur-md md:block">
-                  <div className="overflow-hidden rounded-2xl border border-white/25 bg-white shadow-[0_24px_60px_rgba(2,6,23,0.28)]">
-                    <div className="flex">
-                      <aside className="w-[168px] shrink-0 border-r border-slate-200 bg-[#F4F7FB] px-3 py-4 lg:w-[188px]">
-                        <div className="mb-4 flex items-center gap-2 px-1">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1A23FF] text-[11px] font-black text-white">
-                            O
-                          </div>
-                          <span className="truncate text-xs font-bold text-slate-800">Obillz</span>
-                        </div>
-                        <nav className="space-y-1" aria-label="Navigation">
-                          <div className="flex items-center gap-2 rounded-lg bg-[#1A23FF] px-2.5 py-2 text-xs font-semibold text-white shadow-sm">
-                            <LayoutDashboard className="h-3.5 w-3.5 shrink-0 opacity-95" strokeWidth={2} />
-                            <span className="truncate">Dashboard du club</span>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
-                            <Users className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-                            <span className="truncate">Membres</span>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
-                            <Wallet className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-                            <span className="truncate">Cotisations</span>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
-                            <Receipt className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-                            <span className="truncate">Factures</span>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-600">
-                            <CalendarDays className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-                            <span className="truncate">Événements</span>
-                          </div>
-                        </nav>
-                      </aside>
-                      <div className="min-w-0 flex-1">
-                        <div className="border-b border-slate-100 bg-white px-5 py-4 lg:px-6">
-                          <h4 className="text-lg font-black tracking-tight text-slate-900 lg:text-xl">
-                            Dashboard du club
-                          </h4>
-                          <p className="mt-1 text-xs text-slate-500 lg:text-sm">
-                            Vue d&apos;ensemble : membres, cotisations, finances
-                          </p>
-                        </div>
-                        <div className="space-y-6 p-5 lg:p-6">
-                          <div className="grid grid-cols-4 gap-3 lg:gap-4">
-                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
-                              <div className="flex items-center gap-1.5 text-slate-500">
-                                <Users className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
-                                <span className="text-[10px] font-semibold lg:text-[11px]">Membres</span>
-                              </div>
-                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">284</p>
-                              <p className="mt-1 text-[10px] text-emerald-600">+12 ce mois</p>
-                            </div>
-                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
-                              <div className="flex items-center gap-1.5 text-slate-500">
-                                <Wallet className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
-                                <span className="text-[10px] font-semibold lg:text-[11px]">Cotisations</span>
-                              </div>
-                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">92%</p>
-                              <p className="mt-1 text-[10px] text-slate-500">En attente : 8%</p>
-                            </div>
-                            <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-3 lg:p-4">
-                              <div className="flex items-center gap-1.5 text-slate-500">
-                                <FileText className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" strokeWidth={1.75} />
-                                <span className="text-[10px] font-semibold lg:text-[11px]">Factures</span>
-                              </div>
-                              <p className="mt-2 text-xl font-black tabular-nums text-slate-900 lg:text-2xl">4</p>
-                              <p className="mt-1 text-[10px] text-amber-700">En retard</p>
-                            </div>
-                            <div className="rounded-xl border border-[#1A23FF]/20 bg-[#1A23FF]/[0.06] p-3 lg:p-4">
-                              <p className="text-[10px] font-semibold text-[#1A23FF] lg:text-[11px]">Solde du club</p>
-                              <p className="mt-2 text-lg font-black text-slate-900 lg:text-xl">À jour</p>
-                              <p className="mt-0.5 text-[9px] text-slate-500">Vue consolidée</p>
-                            </div>
-                          </div>
-                          <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
-                            <div>
-                              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                                À traiter maintenant
-                              </p>
-                              <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/90 p-4">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div>
-                                    <p className="text-sm font-bold text-slate-900">Facture #2026-003</p>
-                                    <p className="mt-1 text-sm font-semibold text-slate-700">Paiement en attente</p>
-                                  </div>
-                                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
-                                    À relancer
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                                Actions rapides
-                              </p>
-                              <div className="mt-2 flex flex-col gap-2">
-                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
-                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
-                                  Nouvelle cotisation
-                                </span>
-                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
-                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
-                                  Nouvelle facture
-                                </span>
-                                <span className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 shadow-sm">
-                                  <Plus className="h-3.5 w-3.5 text-[#1A23FF]" strokeWidth={2} />
-                                  Ajouter un membre
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="mx-auto mt-14 max-w-[1080px] md:mt-16">
-            <LandingCta
-              compact
-              title="Une seule plateforme pour piloter votre club"
-              secondaryLabel="Voir comment ça marche"
-              secondaryHref="#comment-ca-marche"
-            />
-          </div>
-        </section>
-
+        <SolutionSection />
         <HowItWorksSection />
-
-        <section
-          id="fonctionnalites"
-          className="relative mx-auto mt-24 w-[94%] max-w-[1200px] scroll-mt-24 pb-4 pt-6 md:mt-32 md:pb-10 md:pt-10"
-        >
-          <div
-            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,255,255,0.10),transparent_55%)]"
-            aria-hidden
-          />
-          <div className="relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <h2 className="text-center text-3xl font-black md:text-5xl">
-                Tous les outils pour gérer votre club
-              </h2>
-              <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-relaxed text-blue-100 md:mt-6 md:text-lg">
-                Tout est centralisé dans une seule plateforme : membres, cotisations, manifestations,
-                finances et communication.
-              </p>
-            </motion.div>
-
-            <div className="mx-auto mt-12 grid max-w-[1100px] grid-cols-1 gap-3 sm:grid-cols-2 md:mt-14 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-              {featureTabs.map((feature, index) => (
-                <motion.article
-                  key={feature.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{
-                    duration: 0.5,
-                    delay: (index % 4) * 0.06,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="group relative overflow-hidden rounded-2xl border border-white/12 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-white/[0.02] p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.08] hover:shadow-[0_22px_50px_rgba(2,6,23,0.30)] md:p-6"
-                >
-                  <div
-                    className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/[0.06] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                    aria-hidden
-                  />
-                  <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15 group-hover:ring-white/25">
-                    <FeatureTabIcon id={feature.id} className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="relative mt-4 text-lg font-black tracking-tight text-white md:text-[1.15rem]">
-                    {feature.title}
-                  </h3>
-                  <p className="relative mt-2 text-sm leading-relaxed text-blue-100/85">
-                    {feature.description}
-                  </p>
-                  <ul className="relative mt-4 space-y-1.5 border-t border-white/10 pt-4">
-                    {feature.highlights.map((line) => (
-                      <li
-                        key={line}
-                        className="flex gap-2 text-[0.8125rem] leading-snug text-blue-100/85"
-                      >
-                        <span
-                          className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-white/70"
-                          aria-hidden
-                        />
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.article>
-              ))}
-            </div>
-
-            <div className="mx-auto mt-14 max-w-[1080px]">
-              <LandingCta
-                compact
-                title="Découvrez tout ce qu'Obillz peut faire pour votre club"
-                secondaryLabel="Commencer gratuitement"
-                secondaryHref="/inscription"
-              />
-            </div>
-          </div>
-        </section>
-
+        <FeaturesShowcaseSection />
         <BenefitsSection />
 
         <section
           id="tarifs"
           className="relative mx-auto mt-24 w-[94%] max-w-[1160px] scroll-mt-24 md:mt-32"
         >
+          <div
+            className="pointer-events-none absolute inset-x-0 -top-12 h-40 bg-[radial-gradient(ellipse_80%_100%_at_50%_0%,rgba(255,255,255,0.08),transparent)]"
+            aria-hidden
+          />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto max-w-[820px] text-center"
+            className="relative mx-auto max-w-[820px] text-center"
           >
-            <h2 className="text-balance text-3xl font-black text-white md:text-5xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200/90">Tarifs</p>
+            <h2 className="mt-4 text-balance text-3xl font-black text-white md:text-5xl">
               Des tarifs simples pour tous les clubs
             </h2>
             <p className="mt-5 text-base leading-relaxed text-blue-100/90 md:text-lg">
@@ -817,7 +180,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto mt-12 grid max-w-[1040px] grid-cols-1 gap-5 md:mt-14 md:grid-cols-2 md:gap-6 lg:gap-8"
+            className="relative mx-auto mt-12 grid max-w-[1040px] grid-cols-1 gap-5 md:mt-14 md:grid-cols-2 md:gap-6 lg:gap-8"
           >
             {pricingPlans.map((plan) => (
               <article
@@ -996,159 +359,174 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48">
+        <section
+          id="cta-final"
+          className="mx-auto mt-28 w-[94%] max-w-[1080px] md:mt-40 lg:mt-48"
+        >
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-white/[0.12] via-white/[0.06] to-white/[0.02] p-8 text-center backdrop-blur-xl md:p-16"
+            className="relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-white/[0.14] via-white/[0.06] to-[#1A23FF]/[0.08] p-8 text-center backdrop-blur-xl md:p-16"
           >
             <div
-              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.10] blur-3xl"
+              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.12] blur-3xl"
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-white/[0.07] blur-3xl"
+              className="pointer-events-none absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#1A23FF]/30 blur-3xl"
               aria-hidden
             />
             <div
               className="pointer-events-none absolute inset-x-1/4 -top-px h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
               aria-hidden
             />
-            <div
-              className="relative mx-auto mb-6 inline-flex items-center gap-2"
-              aria-hidden
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-            </div>
-            <h2 className="relative text-3xl font-black text-white md:text-5xl">
+            <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-blue-200/90">
+              Prêt à essayer ?
+            </p>
+            <h2 className="relative mt-4 text-3xl font-black text-white md:text-5xl">
               Simplifiez la gestion de votre club dès aujourd&apos;hui.
             </h2>
-            <div className="relative mt-8">
+            <p className="relative mx-auto mt-4 max-w-xl text-sm text-blue-100/90 md:text-base">
+              Rejoignez les clubs qui ont choisi une gestion plus claire, plus rapide et plus
+              professionnelle.
+            </p>
+            <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/inscription"
-                className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-base font-bold text-[#1A23FF] shadow-[0_18px_40px_rgba(2,6,23,0.30)] transition hover:-translate-y-0.5"
+                className="hero-cta-button inline-flex w-full max-w-md items-center justify-center rounded-full bg-white px-8 py-4 text-base font-bold text-[#1A23FF] shadow-[0_18px_40px_rgba(2,6,23,0.30)] transition hover:-translate-y-0.5 sm:w-auto"
               >
                 Créer mon club gratuitement
+              </Link>
+              <Link
+                href="/connexion"
+                className="inline-flex w-full max-w-md items-center justify-center rounded-full border border-white/40 px-8 py-4 text-base font-bold text-white transition hover:bg-white/10 sm:w-auto"
+              >
+                Connexion
               </Link>
             </div>
           </motion.div>
         </section>
+      </div>
 
-        </div>
-
-        <footer className="mt-24 w-full rounded-t-[2.5rem] border-t border-white/25 bg-white text-slate-900 shadow-[0_-12px_40px_rgba(2,6,23,0.20)] md:mt-32 md:rounded-t-[3rem]">
-          <div className="mx-auto max-w-[1240px] px-6 pb-10 pt-12 md:px-10 md:pb-14 md:pt-16 lg:px-14 lg:pt-20">
-            <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr] md:gap-12">
-              <div>
-                <Link href="/" className="inline-flex transition hover:opacity-90">
-                  <Image src="/logo-obillz.png" alt="Obillz" width={132} height={32} />
+      <footer className="relative z-10 mt-24 w-full rounded-t-[2.5rem] border-t border-white/25 bg-white text-slate-900 shadow-[0_-12px_40px_rgba(2,6,23,0.20)] md:mt-32 md:rounded-t-[3rem]">
+        <div className="mx-auto max-w-[1240px] px-6 pb-10 pt-12 md:px-10 md:pb-14 md:pt-16 lg:px-14 lg:pt-20">
+          <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr] md:gap-12">
+            <div>
+              <Link href="/" className="inline-flex transition hover:opacity-90">
+                <Image src="/logo-obillz.png" alt="Obillz" width={132} height={32} />
+              </Link>
+              <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-600 md:text-[0.9375rem]">
+                Un logiciel simple pour gérer votre club, vos membres, vos cotisations et vos
+                documents au même endroit.
+              </p>
+              <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                <Link
+                  href="/inscription"
+                  className="inline-flex items-center justify-center rounded-full bg-[#1A23FF] px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_24px_rgba(26,35,255,0.28)] transition hover:-translate-y-0.5"
+                >
+                  Créer mon club gratuitement
                 </Link>
-                <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-600 md:text-[0.9375rem]">
-                  Un logiciel simple pour gérer votre club, vos membres, vos cotisations et vos
-                  documents au même endroit.
-                </p>
-                <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                <Link
+                  href="/connexion"
+                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50"
+                >
+                  Connexion
+                </Link>
+              </div>
+            </div>
+
+            <nav aria-label="Explorer">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                Explorer
+              </p>
+              <ul className="mt-4 space-y-3 text-sm">
+                <li>
+                  <a
+                    href="/#probleme"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    Le problème
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/#comment-ca-marche"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    Comment ça marche
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/#fonctionnalites"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    Fonctionnalités
+                  </a>
+                </li>
+                <li>
                   <Link
                     href="/inscription"
-                    className="inline-flex items-center justify-center rounded-full bg-[#1A23FF] px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_24px_rgba(26,35,255,0.28)] transition hover:-translate-y-0.5"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
                   >
-                    Créer mon club gratuitement
+                    Créer mon club
                   </Link>
+                </li>
+                <li>
                   <Link
                     href="/connexion"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
                   >
                     Connexion
                   </Link>
-                </div>
-              </div>
+                </li>
+              </ul>
+            </nav>
 
-              <nav aria-label="Explorer">
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                  Explorer
-                </p>
-                <ul className="mt-4 space-y-3 text-sm">
-                  <li>
-                    <a
-                      href="/#comment-ca-marche"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Comment ça marche
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/#fonctionnalites"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Fonctionnalités
-                    </a>
-                  </li>
-                  <li>
-                    <Link
-                      href="/inscription"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Créer mon club
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/connexion"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Connexion
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
+            <nav aria-label="Légal">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                Légal
+              </p>
+              <ul className="mt-4 space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/conditions-utilisation"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    Conditions d&apos;utilisation
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/politique-confidentialite"
+                    className="text-slate-700 transition hover:text-[#1A23FF]"
+                  >
+                    Politique de confidentialité
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
 
-              <nav aria-label="Légal">
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                  Légal
-                </p>
-                <ul className="mt-4 space-y-3 text-sm">
-                  <li>
-                    <Link
-                      href="/conditions-utilisation"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Conditions d&apos;utilisation
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/politique-confidentialite"
-                      className="text-slate-700 transition hover:text-[#1A23FF]"
-                    >
-                      Politique de confidentialité
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-
-            <div className="mt-10 flex flex-col items-start gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 md:mt-12">
-              <SwissFlag className="h-6 w-6 shrink-0 rounded-[4px]" />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900">Conçu en Suisse</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-slate-500 md:text-[0.8125rem]">
-                  Obillz est un logiciel suisse, développé et hébergé en Suisse, pensé pour les
-                  clubs locaux.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-col items-center gap-2 border-t border-slate-100 pt-5 text-xs text-slate-500 sm:flex-row sm:justify-between">
-              <span>Obillz · Gestion de clubs sportifs</span>
-              <span>© {new Date().getFullYear()} Obillz</span>
+          <div className="mt-10 flex flex-col items-start gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:gap-4 md:mt-12">
+            <SwissFlag className="h-6 w-6 shrink-0 rounded-[4px]" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-900">Conçu en Suisse</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-slate-500 md:text-[0.8125rem]">
+                Obillz est un logiciel suisse, développé et hébergé en Suisse, pensé pour les clubs
+                locaux.
+              </p>
             </div>
           </div>
-        </footer>
+
+          <div className="mt-6 flex flex-col items-center gap-2 border-t border-slate-100 pt-5 text-xs text-slate-500 sm:flex-row sm:justify-between">
+            <span>Obillz · Gestion de clubs sportifs</span>
+            <span>© {new Date().getFullYear()} Obillz</span>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

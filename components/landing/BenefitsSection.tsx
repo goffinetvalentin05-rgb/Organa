@@ -2,41 +2,33 @@
 
 import { Clock, Eye, Layers, Shield, Sparkles, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import ScrollReveal from "@/components/landing/ScrollReveal";
 import LandingCta from "@/components/landing/LandingCta";
+import LandingSection from "@/components/landing/LandingSection";
+import ScrollReveal from "@/components/landing/ScrollReveal";
 
 const benefits: Array<{ icon: LucideIcon; title: string; line: string }> = [
-  { icon: Clock, title: "Gain de temps", line: "Automatisez l'essentiel pour le comité" },
-  { icon: Layers, title: "Centralisation", line: "Tout le club au même endroit" },
-  { icon: Sparkles, title: "Image pro", line: "Factures et communication soignées" },
-  { icon: Users, title: "Simplicité comité", line: "Prise en main rapide, sans technique" },
+  { icon: Clock, title: "Moins de temps perdu", line: "Automatisez l'essentiel pour le comité" },
+  { icon: Layers, title: "Tout centralisé", line: "Un seul espace pour le club" },
+  { icon: Sparkles, title: "Image plus pro", line: "Factures et communication soignées" },
+  { icon: Users, title: "Comité plus efficace", line: "Prise en main rapide, sans technique" },
   { icon: Shield, title: "Moins d'oublis", line: "Suivi clair des tâches et paiements" },
-  { icon: Eye, title: "Meilleure visibilité", line: "Vue d'ensemble sur le club en direct" },
+  { icon: Eye, title: "Meilleure visibilité", line: "Vue d'ensemble en temps réel" },
 ];
 
 export default function BenefitsSection() {
   return (
-    <section className="relative mx-auto mt-24 w-[94%] max-w-[1160px] md:mt-32">
-      <div
-        className="pointer-events-none absolute inset-x-0 -top-10 -bottom-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(255,255,255,0.10),transparent_60%)]"
-        aria-hidden
-      />
-
-      <ScrollReveal className="mx-auto flex max-w-[820px] flex-col items-center px-2 text-center text-white md:px-4">
-        <h2 className="text-3xl font-black md:text-5xl">
-          Moins d&apos;administratif. Plus de temps pour votre club.
-        </h2>
-        <p className="mt-5 max-w-3xl text-base leading-relaxed text-blue-100 md:text-lg">
-          Automatisez l&apos;essentiel, structurez vos données et concentrez l&apos;énergie du
-          comité sur la vie sportive et les projets du club.
-        </p>
-      </ScrollReveal>
-
+    <LandingSection
+      className="mt-24 md:mt-32"
+      glow
+      eyebrow="Les bénéfices"
+      title="Moins d'administratif. Plus de temps pour votre club."
+      subtitle="Structurez vos données, gagnez en clarté et concentrez l'énergie du comité sur la vie sportive et les projets du club."
+    >
       <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:gap-5">
         {benefits.map((item, index) => (
           <ScrollReveal key={item.title} delay={index * 0.04} y={16}>
-            <div className="group flex h-full flex-col items-center rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-6 text-center backdrop-blur-md transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.09] md:px-5 md:py-8">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15">
+            <div className="group flex h-full flex-col items-center rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-6 text-center backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-white/28 hover:bg-white/[0.10] hover:shadow-[0_16px_40px_rgba(2,6,23,0.22)] md:px-5 md:py-8">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15 group-hover:ring-white/25">
                 <item.icon className="h-5 w-5 text-white" strokeWidth={1.75} aria-hidden />
               </div>
               <p className="mt-4 text-sm font-black text-white md:text-base">{item.title}</p>
@@ -73,6 +65,6 @@ export default function BenefitsSection() {
         title="Offrez une organisation claire à votre comité"
         primaryLabel="Commencer gratuitement"
       />
-    </section>
+    </LandingSection>
   );
 }
