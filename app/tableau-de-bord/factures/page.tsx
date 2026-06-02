@@ -22,6 +22,7 @@ interface Facture {
   numero: string;
   title?: string;
   client?: { nom?: string };
+  recipient?: { name?: string };
   lignes: LigneDocument[];
   statut: string;
   dateCreation: string;
@@ -235,7 +236,7 @@ export default function FacturesPage() {
                           {facture.title || "—"}
                         </td>
                         <td className="max-w-[220px] truncate px-4 py-3 text-slate-700 sm:max-w-[280px] sm:px-6">
-                          {facture.client?.nom || t("dashboard.common.unknownClient")}
+                          {facture.recipient?.name || facture.client?.nom || t("dashboard.common.unknownClient")}
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600 sm:px-6">
                           {formatDate(facture.dateCreation)}

@@ -20,6 +20,7 @@ import {
   ActionButton,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import type { RecipientType } from "@/lib/documents/recipient";
 
 interface Client {
   id: string;
@@ -27,6 +28,14 @@ interface Client {
   email: string;
   telephone: string;
   adresse: string;
+  postal_code?: string | null;
+  city?: string | null;
+}
+
+interface SponsorContract {
+  id: string;
+  sponsorName: string;
+  title: string;
 }
 
 interface Event {
@@ -39,9 +48,21 @@ function NouvelleFacturePageContent() {
   const searchParams = useSearchParams();
   const { t, locale } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
+  const [sponsors, setSponsors] = useState<SponsorContract[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
+  const [loadingSponsors, setLoadingSponsors] = useState(true);
+  const [recipientType, setRecipientType] = useState<RecipientType>("member");
   const [clientId, setClientId] = useState("");
+  const [sponsorContractId, setSponsorContractId] = useState("");
+  const [extName, setExtName] = useState("");
+  const [extContactName, setExtContactName] = useState("");
+  const [extAddress, setExtAddress] = useState("");
+  const [extPostalCode, setExtPostalCode] = useState("");
+  const [extCity, setExtCity] = useState("");
+  const [extCountry, setExtCountry] = useState("");
+  const [extEmail, setExtEmail] = useState("");
+  const [extPhone, setExtPhone] = useState("");
   const [eventId, setEventId] = useState("");
   const [lignes, setLignes] = useState<LigneDocument[]>([
     { id: "1", designation: "", quantite: 1, prixUnitaire: 0, tva: 7.7 },
@@ -87,7 +108,23 @@ function NouvelleFacturePageContent() {
       }
     };
 
+    const loadSponsors = async () => {
+      try {
+        setLoadingSponsors(true);
+        const res = await fetch("/api/sponsor-contracts", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setSponsors(data.contracts || []);
+        }
+      } catch (error: unknown) {
+        console.error("[Facture] Erreur chargement sponsors:", error);
+      } finally {
+        setLoadingSponsors(false);
+      }
+    };
+
     loadClients();
+    loadSponsors();
     loadEvents();
   }, []);
 
@@ -126,12 +163,61 @@ function NouvelleFacturePageContent() {
     );
   };
 
+  const selectedClient = clients.find((c) => c.id === clientId);
+  const selectedSponsor = sponsors.find((s) => s.id === sponsorContractId);
+
+  const inputClassName =
+    "w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]";
+
+  const validateRecipient = (): boolean => {
+    if (recipientType === "member" && !clientId) {
+      toast.error(t("dashboard.invoices.form.selectClientError"));
+      return false;
+    }
+    if (recipientType === "sponsor" && !sponsorContractId) {
+      toast.error(t("dashboard.invoices.form.selectSponsorError"));
+      return false;
+    }
+    if (recipientType === "external") {
+      if (!extName.trim() || !extAddress.trim() || !extPostalCode.trim() || !extCity.trim()) {
+        toast.error(t("dashboard.invoices.form.externalRequiredError"));
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const buildDocumentBody = (lignesValides: LigneDocument[]) => ({
+    type: "invoice" as const,
+    recipientType,
+    ...(recipientType === "member" ? { clientId } : {}),
+    ...(recipientType === "sponsor" ? { sponsorContractId } : {}),
+    ...(recipientType === "external"
+      ? {
+          recipientData: {
+            name: extName.trim(),
+            contactName: extContactName.trim() || undefined,
+            address: extAddress.trim(),
+            postalCode: extPostalCode.trim(),
+            city: extCity.trim(),
+            country: extCountry.trim() || undefined,
+            email: extEmail.trim() || undefined,
+            phone: extPhone.trim() || undefined,
+          },
+        }
+      : {}),
+    lignes: lignesValides,
+    statut,
+    dateCreation: new Date().toISOString().split("T")[0],
+    ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+    ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : {}),
+    ...(notes && notes.trim() !== "" ? { notes } : {}),
+    ...(eventId ? { eventId } : {}),
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientId) {
-      toast.error(t("dashboard.invoices.form.selectClientError"));
-      return;
-    }
+    if (!validateRecipient()) return;
 
     const lignesValides = lignes.filter(
       (l) => l.designation.trim() !== ""
@@ -148,17 +234,7 @@ function NouvelleFacturePageContent() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          type: "invoice",
-          clientId,
-          lignes: lignesValides,
-          statut,
-          dateCreation: new Date().toISOString().split("T")[0],
-          ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-          ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : {}),
-          ...(notes && notes.trim() !== "" ? { notes } : {}),
-          ...(eventId ? { eventId } : {}),
-        }),
+        body: JSON.stringify(buildDocumentBody(lignesValides)),
       });
 
       if (!response.ok) {
@@ -180,11 +256,7 @@ function NouvelleFacturePageContent() {
 
   // Fonction pour sauvegarder le document avant de générer le PDF
   const saveAndOpenPdf = async (download: boolean = false) => {
-    // Validation
-    if (!clientId) {
-      toast.error(t("dashboard.invoices.form.selectClientError"));
-      return;
-    }
+    if (!validateRecipient()) return;
 
     const lignesValides = lignes.filter(
       (l) => l.designation.trim() !== ""
@@ -240,10 +312,7 @@ function NouvelleFacturePageContent() {
           },
           body: JSON.stringify({
             id,
-            type: "invoice",
-            clientId,
-            lignes: lignesValides,
-            statut,
+            ...buildDocumentBody(lignesValides),
             ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : { dateEcheance: null }),
             ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : { datePaiement: null }),
             ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
@@ -299,25 +368,213 @@ function NouvelleFacturePageContent() {
         <GlassCard padding="lg" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
-              {t("dashboard.invoices.form.fields.client")}
+              {t("dashboard.invoices.form.fields.recipientType")}
             </label>
-            <select
-              required
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              disabled={loadingClients}
-              className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <option value="">
-                {loadingClients ? t("dashboard.invoices.form.loadingClients") : t("dashboard.invoices.form.selectClient")}
-              </option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.nom}
-                </option>
+            <div className="flex flex-wrap gap-2">
+              {(["member", "sponsor", "external"] as RecipientType[]).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setRecipientType(type)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                    recipientType === type
+                      ? "bg-[#7C5CFF] text-white border-[#7C5CFF]"
+                      : "bg-surface text-primary border-subtle-hover hover:border-[#7C5CFF]/50"
+                  }`}
+                >
+                  {t(`dashboard.invoices.form.recipientTypes.${type}`)}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
+
+          {recipientType === "member" && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.member")}
+                </label>
+                <select
+                  required
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  disabled={loadingClients}
+                  className={`${inputClassName} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <option value="">
+                    {loadingClients
+                      ? t("dashboard.invoices.form.loadingClients")
+                      : t("dashboard.invoices.form.selectClient")}
+                  </option>
+                  {clients.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.nom}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedClient && (
+                <div className="rounded-lg border border-subtle bg-surface-hover p-3 text-sm text-secondary space-y-1">
+                  <p className="font-medium text-primary">{selectedClient.nom}</p>
+                  {selectedClient.adresse && <p>{selectedClient.adresse}</p>}
+                  {(selectedClient.postal_code || selectedClient.city) && (
+                    <p>
+                      {[selectedClient.postal_code, selectedClient.city]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </p>
+                  )}
+                  {selectedClient.email && <p>{selectedClient.email}</p>}
+                  {selectedClient.telephone && <p>{selectedClient.telephone}</p>}
+                </div>
+              )}
+            </div>
+          )}
+
+          {recipientType === "sponsor" && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.sponsor")}
+                </label>
+                <select
+                  required
+                  value={sponsorContractId}
+                  onChange={(e) => setSponsorContractId(e.target.value)}
+                  disabled={loadingSponsors}
+                  className={`${inputClassName} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <option value="">
+                    {loadingSponsors
+                      ? t("dashboard.invoices.form.loadingSponsors")
+                      : t("dashboard.invoices.form.selectSponsor")}
+                  </option>
+                  {sponsors.map((sponsor) => (
+                    <option key={sponsor.id} value={sponsor.id}>
+                      {sponsor.sponsorName}
+                      {sponsor.title ? ` — ${sponsor.title}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedSponsor && (
+                <div className="rounded-lg border border-subtle bg-surface-hover p-3 text-sm text-secondary space-y-1">
+                  <p className="font-medium text-primary">{selectedSponsor.sponsorName}</p>
+                  {selectedSponsor.title && (
+                    <p>{t("dashboard.invoices.form.sponsorContract")}: {selectedSponsor.title}</p>
+                  )}
+                </div>
+              )}
+              {sponsors.length === 0 && !loadingSponsors && (
+                <p className="text-sm text-secondary">
+                  {t("dashboard.invoices.form.noSponsorsHint")}
+                </p>
+              )}
+            </div>
+          )}
+
+          {recipientType === "external" && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.externalName")}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={extName}
+                  onChange={(e) => setExtName(e.target.value)}
+                  className={inputClassName}
+                  placeholder={t("dashboard.invoices.form.fields.externalNamePlaceholder")}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.externalContact")}
+                </label>
+                <input
+                  type="text"
+                  value={extContactName}
+                  onChange={(e) => setExtContactName(e.target.value)}
+                  className={inputClassName}
+                  placeholder={t("dashboard.invoices.form.fields.externalContactPlaceholder")}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.externalAddress")}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={extAddress}
+                  onChange={(e) => setExtAddress(e.target.value)}
+                  className={inputClassName}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    {t("dashboard.invoices.form.fields.externalPostalCode")}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={extPostalCode}
+                    onChange={(e) => setExtPostalCode(e.target.value)}
+                    className={inputClassName}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    {t("dashboard.invoices.form.fields.externalCity")}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={extCity}
+                    onChange={(e) => setExtCity(e.target.value)}
+                    className={inputClassName}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  {t("dashboard.invoices.form.fields.externalCountry")}
+                </label>
+                <input
+                  type="text"
+                  value={extCountry}
+                  onChange={(e) => setExtCountry(e.target.value)}
+                  className={inputClassName}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    {t("dashboard.invoices.form.fields.externalEmail")}
+                  </label>
+                  <input
+                    type="email"
+                    value={extEmail}
+                    onChange={(e) => setExtEmail(e.target.value)}
+                    className={inputClassName}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    {t("dashboard.invoices.form.fields.externalPhone")}
+                  </label>
+                  <input
+                    type="tel"
+                    value={extPhone}
+                    onChange={(e) => setExtPhone(e.target.value)}
+                    className={inputClassName}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-primary mb-2">

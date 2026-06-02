@@ -12,6 +12,14 @@ import {
 } from "@/lib/documents/identityLimits";
 import type { LigneDocument } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import {
+  parseExternalRecipientData,
+  recipientToApi,
+  resolveDocumentRecipient,
+  validateInvoiceRecipientInput,
+  type ExternalRecipientData,
+  type RecipientType,
+} from "@/lib/documents/recipient";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -68,17 +76,24 @@ type DocumentDbRow = {
   total_ttc?: number | string | null;
   notes?: string | null;
   client_id?: string | null;
+  recipient_type?: string | null;
+  sponsor_contract_id?: string | null;
+  recipient_data?: unknown;
   event_id?: string | null;
   created_by?: string | null;
   updated_by?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   client?: unknown;
+  sponsor?: unknown;
 };
+
+const DOCUMENT_SELECT =
+  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, event_id, created_by, updated_by, created_at, updated_at, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
 
 type DocumentInsertPayload = {
   user_id: string;
-  client_id: string;
+  client_id: string | null;
   type: string;
   items: LigneDocument[];
   status: string;
@@ -94,6 +109,9 @@ type DocumentInsertPayload = {
   date_paiement?: string;
   notes?: string;
   event_id?: string;
+  recipient_type?: RecipientType;
+  sponsor_contract_id?: string | null;
+  recipient_data?: ExternalRecipientData | null;
 };
 
 type DocumentUpdatePayload = {
@@ -108,7 +126,10 @@ type DocumentUpdatePayload = {
   total_tva?: number;
   total_ttc?: number;
   event_id?: string | null;
-  client_id?: string;
+  client_id?: string | null;
+  recipient_type?: RecipientType;
+  sponsor_contract_id?: string | null;
+  recipient_data?: ExternalRecipientData | null;
   updated_by?: string;
 };
 
@@ -126,9 +147,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("documents")
-      .select(
-        "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, event_id, created_by, updated_by, created_at, updated_at, client:clients(*)"
-      )
+      .select(DOCUMENT_SELECT)
       .eq("user_id", guard.clubId);
 
     if (type) {
@@ -207,12 +226,28 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, clientId, lignes, statut, dateCreation, dateEcheance, datePaiement, notes, eventId } = body;
+    const {
+      type,
+      clientId,
+      recipientType,
+      sponsorContractId,
+      recipientData,
+      lignes,
+      statut,
+      dateCreation,
+      dateEcheance,
+      datePaiement,
+      notes,
+      eventId,
+    } = body;
 
     // Log du payload reçu pour debugging
     console.log("[API][documents][POST] Payload reçu:", {
       type,
       clientId: clientId ? "présent" : "absent",
+      recipientType: recipientType || "member",
+      sponsorContractId: sponsorContractId ? "présent" : "absent",
+      recipientData: recipientData ? "présent" : "absent",
       lignes_count: lignes?.length || 0,
       statut,
       dateCreation,
@@ -228,11 +263,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!clientId) {
-      return NextResponse.json(
-        { error: "clientId requis" },
-        { status: 400 }
-      );
+    if (type === "quote") {
+      if (!clientId) {
+        return NextResponse.json(
+          { error: "clientId requis" },
+          { status: 400 }
+        );
+      }
     }
 
     if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
@@ -242,20 +279,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier que le client appartient au club
-    const { data: client, error: clientError } = await supabase
-      .from("clients")
-      .select("id")
-      .eq("id", clientId)
-      .eq("user_id", guard.clubId)
-      .single();
+    let resolvedRecipientType: RecipientType = "member";
+    if (type === "invoice") {
+      const recipientCheck = validateInvoiceRecipientInput({
+        recipientType: recipientType || (clientId ? "member" : undefined),
+        clientId,
+        sponsorContractId,
+        recipientData,
+      });
+      if (!recipientCheck.ok) {
+        return NextResponse.json({ error: recipientCheck.error }, { status: 400 });
+      }
+      resolvedRecipientType = recipientCheck.type;
+    }
 
-    if (clientError || !client) {
-      console.error("[API][documents][POST] Client introuvable ou non autorisé:", clientError);
-      return NextResponse.json(
-        { error: "Client introuvable ou non autorisé" },
-        { status: 404 }
-      );
+    let resolvedClientId: string | null = null;
+    let resolvedSponsorId: string | null = null;
+    let resolvedRecipientData: ExternalRecipientData | null = null;
+
+    if (type === "quote" || resolvedRecipientType === "member") {
+      const memberId = clientId as string;
+      const { data: client, error: clientError } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("id", memberId)
+        .eq("user_id", guard.clubId)
+        .single();
+
+      if (clientError || !client) {
+        console.error("[API][documents][POST] Client introuvable ou non autorisé:", clientError);
+        return NextResponse.json(
+          { error: "Client introuvable ou non autorisé" },
+          { status: 404 }
+        );
+      }
+      resolvedClientId = memberId;
+    } else if (resolvedRecipientType === "sponsor") {
+      const sponsorId = sponsorContractId as string;
+      const { data: sponsor, error: sponsorError } = await supabase
+        .from("sponsor_contracts")
+        .select("id")
+        .eq("id", sponsorId)
+        .eq("club_id", guard.clubId)
+        .single();
+
+      if (sponsorError || !sponsor) {
+        console.error("[API][documents][POST] Sponsor introuvable ou non autorisé:", sponsorError);
+        return NextResponse.json(
+          { error: "Contrat sponsor introuvable ou non autorisé" },
+          { status: 404 }
+        );
+      }
+      resolvedSponsorId = sponsorId;
+    } else {
+      resolvedRecipientData = parseExternalRecipientData(recipientData);
+      if (!resolvedRecipientData) {
+        return NextResponse.json(
+          { error: "Informations du destinataire externe invalides" },
+          { status: 400 }
+        );
+      }
     }
 
     // Calculer les totaux
@@ -311,7 +394,7 @@ export async function POST(request: NextRequest) {
     // Ne jamais envoyer date_echeance si elle est vide/undefined (laisser le default de la DB)
     const documentData: DocumentInsertPayload = {
       user_id: guard.clubId,
-      client_id: clientId,
+      client_id: resolvedClientId,
       type: type, // 'quote' ou 'invoice'
       items: lignes, // jsonb
       status: statut || "brouillon",
@@ -321,6 +404,12 @@ export async function POST(request: NextRequest) {
       total_ttc: totalTTC,
       numero: buildNumero(baseSeq),
     };
+
+    if (type === "invoice") {
+      documentData.recipient_type = resolvedRecipientType;
+      documentData.sponsor_contract_id = resolvedSponsorId;
+      documentData.recipient_data = resolvedRecipientData;
+    }
 
     // Champs “évolutifs” (peuvent ne pas exister si une migration n’a pas été appliquée).
     // On les envoie par défaut, mais on saura les retirer si Supabase renvoie "column does not exist".
@@ -350,7 +439,9 @@ export async function POST(request: NextRequest) {
 
     console.log("[API][documents][POST] Tentative d'insertion dans public.documents:", {
       user_id: user.id,
-      client_id: clientId,
+      client_id: resolvedClientId,
+      recipient_type: type === "invoice" ? resolvedRecipientType : undefined,
+      sponsor_contract_id: resolvedSponsorId,
       type: type,
       date_creation: documentData.date_creation,
       date_echeance: documentData.date_echeance,
@@ -642,6 +733,15 @@ function formatDocument(
 ) {
 
   const client = Array.isArray(doc.client) ? doc.client[0] : doc.client;
+  const sponsor = Array.isArray(doc.sponsor) ? doc.sponsor[0] : doc.sponsor;
+  const recipient = resolveDocumentRecipient({
+    recipient_type: doc.recipient_type,
+    client_id: doc.client_id,
+    sponsor_contract_id: doc.sponsor_contract_id,
+    recipient_data: doc.recipient_data,
+    client: client as Record<string, unknown> | null,
+    sponsor: sponsor as Record<string, unknown> | null,
+  });
 
   return {
     id: doc.id,
@@ -658,6 +758,10 @@ function formatDocument(
     totalTTC: toNumber(doc.total_ttc),
     notes: doc.notes || "",
     clientId: doc.client_id || null,
+    recipientType: recipient.type,
+    sponsorContractId: doc.sponsor_contract_id ?? null,
+    recipientData: parseExternalRecipientData(doc.recipient_data),
+    recipient: recipientToApi(recipient),
     eventId: doc.event_id ?? null,
     linkedEvent:
       linkedEvent !== undefined ? linkedEvent : null,
@@ -675,6 +779,8 @@ function formatDocument(
         email: n.email,
         telephone: n.telephone,
         adresse: n.adresse,
+        postal_code: n.postal_code,
+        city: n.city,
       };
     })(),
   };
@@ -695,8 +801,22 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, type, clientId, lignes, statut, dateEcheance, datePaiement, notes, eventId, numero, title } =
-      body;
+    const {
+      id,
+      type,
+      clientId,
+      recipientType,
+      sponsorContractId,
+      recipientData,
+      lignes,
+      statut,
+      dateEcheance,
+      datePaiement,
+      notes,
+      eventId,
+      numero,
+      title,
+    } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -849,7 +969,76 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    if (clientId) {
+    const recipientFieldsProvided =
+      recipientType !== undefined ||
+      sponsorContractId !== undefined ||
+      recipientData !== undefined ||
+      clientId !== undefined;
+
+    if (type === "invoice" && recipientFieldsProvided) {
+      const nextRecipientType = (recipientType ||
+        (clientId ? "member" : sponsorContractId ? "sponsor" : "external")) as RecipientType;
+      const recipientCheck = validateInvoiceRecipientInput({
+        recipientType: nextRecipientType,
+        clientId,
+        sponsorContractId,
+        recipientData,
+      });
+      if (!recipientCheck.ok) {
+        return NextResponse.json({ error: recipientCheck.error }, { status: 400 });
+      }
+
+      updateData.recipient_type = recipientCheck.type;
+
+      if (recipientCheck.type === "member") {
+        const memberId = clientId as string;
+        const { data: client, error: clientError } = await supabase
+          .from("clients")
+          .select("id")
+          .eq("id", memberId)
+          .eq("user_id", guard.clubId)
+          .single();
+
+        if (clientError || !client) {
+          return NextResponse.json(
+            { error: "Client introuvable ou non autorisé" },
+            { status: 404 }
+          );
+        }
+        updateData.client_id = memberId;
+        updateData.sponsor_contract_id = null;
+        updateData.recipient_data = null;
+      } else if (recipientCheck.type === "sponsor") {
+        const sponsorId = sponsorContractId as string;
+        const { data: sponsor, error: sponsorError } = await supabase
+          .from("sponsor_contracts")
+          .select("id")
+          .eq("id", sponsorId)
+          .eq("club_id", guard.clubId)
+          .single();
+
+        if (sponsorError || !sponsor) {
+          return NextResponse.json(
+            { error: "Contrat sponsor introuvable ou non autorisé" },
+            { status: 404 }
+          );
+        }
+        updateData.client_id = null;
+        updateData.sponsor_contract_id = sponsorId;
+        updateData.recipient_data = null;
+      } else {
+        const ext = parseExternalRecipientData(recipientData);
+        if (!ext) {
+          return NextResponse.json(
+            { error: "Informations du destinataire externe invalides" },
+            { status: 400 }
+          );
+        }
+        updateData.client_id = null;
+        updateData.sponsor_contract_id = null;
+        updateData.recipient_data = ext;
+      }
+    } else if (clientId) {
       // Vérifier que le client appartient au club
       const { data: client, error: clientError } = await supabase
         .from("clients")

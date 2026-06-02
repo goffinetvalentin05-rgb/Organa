@@ -32,6 +32,19 @@ interface Facture {
   numero: string;
   title?: string;
   clientId?: string | null;
+  recipientType?: "member" | "sponsor" | "external";
+  recipient?: {
+    type: "member" | "sponsor" | "external";
+    name: string;
+    contactName?: string | null;
+    address?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    country?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    formattedAddress?: string | null;
+  };
   client?: { nom?: string; email?: string; adresse?: string; telephone?: string };
   lignes: LigneDocument[];
   statut: "brouillon" | "envoye" | "paye" | "en-retard";
@@ -228,8 +241,15 @@ export default function FactureDetailPage() {
     }
   };
 
+  const recipientName =
+    facture?.recipient?.name || facture?.client?.nom || t("dashboard.common.unknownClient");
+  const recipientEmail = facture?.recipient?.email || facture?.client?.email || null;
+  const recipientAddress =
+    facture?.recipient?.formattedAddress || facture?.client?.adresse || null;
+  const recipientPhone = facture?.recipient?.phone || facture?.client?.telephone || null;
+
   const handleEnvoyerEmail = async () => {
-    if (!facture || !facture.client?.email) {
+    if (!facture || !recipientEmail) {
       if (typeof toast !== "undefined" && toast.error) {
         toast.error(t("dashboard.invoices.detail.missingClientEmail"));
       }
@@ -354,7 +374,7 @@ export default function FactureDetailPage() {
 
       <PageHeader
         title={facture.numero}
-        subtitle={`${t("dashboard.common.client")}: ${facture.client?.nom || t("dashboard.common.unknownClient")}${
+        subtitle={`${t("dashboard.invoices.form.fields.recipientType")}: ${recipientName}${
           facture.title ? ` · ${facture.title}` : ""
         }`}
         actions={
@@ -371,7 +391,7 @@ export default function FactureDetailPage() {
             <ActionButton
               type="button"
               onClick={handleEnvoyerEmail}
-              disabled={envoiEmail || !facture.client?.email}
+              disabled={envoiEmail || !recipientEmail}
               className="inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Mail className="w-4 h-4" />
@@ -489,18 +509,24 @@ export default function FactureDetailPage() {
 
         <div className="mt-6 rounded-lg border border-slate-200 p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Client
+            {t("dashboard.invoices.detail.recipientSection")}
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-900">
-            {facture.client?.nom || t("dashboard.common.unknownClient")}
+            {recipientName}
           </p>
-          {facture.client?.adresse && (
+          {facture.recipient?.contactName && (
+            <p className="text-sm text-slate-500">{facture.recipient.contactName}</p>
+          )}
+          {recipientAddress && (
             <p className="text-sm text-slate-500 whitespace-pre-line">
-              {facture.client.adresse}
+              {recipientAddress}
             </p>
           )}
-          {facture.client?.email && (
-            <p className="text-sm text-slate-500">{facture.client.email}</p>
+          {recipientEmail && (
+            <p className="text-sm text-slate-500">{recipientEmail}</p>
+          )}
+          {recipientPhone && (
+            <p className="text-sm text-slate-500">{recipientPhone}</p>
           )}
         </div>
 

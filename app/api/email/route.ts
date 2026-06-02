@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { resolveDocumentRecipient } from "@/lib/documents/recipient";
 
 export const runtime = "nodejs";
 
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
     const { data: documentData, error: documentError } = await supabase
       .from("documents")
       .select(
-        "id, numero, title, type, items, notes, total_ttc, date_echeance, client:clients(id, nom, email, adresse)"
+        "id, numero, title, type, items, notes, total_ttc, date_echeance, client_id, recipient_type, sponsor_contract_id, recipient_data, client:clients(id, nom, email, adresse), sponsor:sponsor_contracts(id, sponsor_name, title)"
       )
       .eq("id", documentId)
       .eq("user_id", guard.clubId)
@@ -120,16 +121,29 @@ export async function POST(request: NextRequest) {
         ? `Ta cotisation n°${document.numero || ""}${docTitle ? ` — ${docTitle}` : ""} - ${parametres.nomEntreprise || "Obillz"}`
         : `Votre facture n°${document.numero || ""}${docTitle ? ` — ${docTitle}` : ""} - ${parametres.nomEntreprise || "Obillz"}`;
 
-    const client = Array.isArray(document.client)
+    const clientRow = Array.isArray(document.client)
       ? document.client[0]
       : document.client;
+    const sponsorRow = Array.isArray(document.sponsor)
+      ? document.sponsor[0]
+      : document.sponsor;
 
-    if (!client?.email) {
-      return NextResponse.json({ error: "Email du client introuvable" }, { status: 404 });
+    const recipient = resolveDocumentRecipient({
+      recipient_type: (document as { recipient_type?: string | null }).recipient_type,
+      client_id: (document as { client_id?: string | null }).client_id,
+      sponsor_contract_id: (document as { sponsor_contract_id?: string | null })
+        .sponsor_contract_id,
+      recipient_data: (document as { recipient_data?: unknown }).recipient_data,
+      client: clientRow as Record<string, unknown> | null,
+      sponsor: sponsorRow as Record<string, unknown> | null,
+    });
+
+    if (!recipient.email) {
+      return NextResponse.json({ error: "Email du destinataire introuvable" }, { status: 404 });
     }
 
-    const clientEmail = client.email;
-    const clientNom = client.nom || "Membre";
+    const clientEmail = recipient.email;
+    const clientNom = recipient.name || "Destinataire";
     const firstName = getFirstName(clientNom);
     const numero = document.numero || "";
     const montant =
@@ -208,7 +222,7 @@ export async function POST(request: NextRequest) {
               <p>Tu trouveras en piece jointe ta cotisation n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
               ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}
               <p><strong>Montant total :</strong> ${montantFormate}</p>
-              <p><strong>Membre :</strong> ${clientNom}</p>
+              <p><strong>Destinataire :</strong> ${clientNom}</p>
               ${dueDateLine}
               <p>Si tu as la moindre question, n'hesite pas a nous contacter.</p>
               <p>A bientot !</p>`
@@ -216,7 +230,7 @@ export async function POST(request: NextRequest) {
               <p>Tu trouveras en piece jointe ta facture n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
               ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}
               <p><strong>Montant total :</strong> ${montantFormate}</p>
-              <p><strong>Membre :</strong> ${clientNom}</p>
+              <p><strong>Destinataire :</strong> ${clientNom}</p>
               ${dueDateLine}
               <p>Si tu as la moindre question, n'hesite pas a nous contacter.</p>
               <p>A bientot !</p>`

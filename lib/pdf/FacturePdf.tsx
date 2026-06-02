@@ -25,6 +25,7 @@ interface FacturePdfProps {
     name: string;
     address?: string;
     email?: string;
+    phone?: string;
   };
   document: {
     number: string;
@@ -156,6 +157,11 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
               {client.email && (
                 <Text style={[styles.companyDetails, styles.wrapText]}>
                   {client.email}
+                </Text>
+              )}
+              {client.phone && (
+                <Text style={[styles.companyDetails, styles.wrapText]}>
+                  {client.phone}
                 </Text>
               )}
             </View>

@@ -11,6 +11,10 @@ import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
 import { formatPdfCurrency } from "@/lib/pdf/clubPdfLayout";
+import {
+  formatRecipientAddress,
+  resolveDocumentRecipient,
+} from "@/lib/documents/recipient";
 
 type DocumentType = "quote" | "invoice";
 
@@ -191,7 +195,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client:clients(*)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -205,7 +209,25 @@ export async function getDocumentPdfData(
   const client = Array.isArray(document.client)
     ? document.client[0]
     : document.client;
-  
+  const sponsor = Array.isArray(document.sponsor)
+    ? document.sponsor[0]
+    : document.sponsor;
+
+  const resolvedRecipient = resolveDocumentRecipient({
+    recipient_type: (document as { recipient_type?: string | null }).recipient_type,
+    client_id: (document as { client_id?: string | null }).client_id,
+    sponsor_contract_id: (document as { sponsor_contract_id?: string | null })
+      .sponsor_contract_id,
+    recipient_data: (document as { recipient_data?: unknown }).recipient_data,
+    client: client as Record<string, unknown> | null,
+    sponsor: sponsor as Record<string, unknown> | null,
+  });
+
+  const clientDisplayName = resolvedRecipient.contactName
+    ? `${resolvedRecipient.name}\n${resolvedRecipient.contactName}`
+    : resolvedRecipient.name;
+  const clientAddress = formatRecipientAddress(resolvedRecipient);
+
   console.log("[pdf-data] Logo URL finale:", company.logoUrl || "aucun logo défini");
   const lines = (items as LigneDocument[]).map((ligne) => {
     const qty = Number(ligne.quantite || 0);
@@ -248,25 +270,12 @@ export async function getDocumentPdfData(
   return {
     company,
     client: {
-      name:
-        (client as { nom?: string; name?: string } | null | undefined)?.nom ||
-        (client as { nom?: string; name?: string } | null | undefined)?.name ||
-        "",
-      email: client?.email || "",
-      phone:
-        (client as { telephone?: string; phone?: string } | null | undefined)
-          ?.telephone ||
-        (client as { telephone?: string; phone?: string } | null | undefined)
-          ?.phone ||
-        "",
-      address:
-        (client as { adresse?: string; address?: string } | null | undefined)
-          ?.adresse ||
-        (client as { adresse?: string; address?: string } | null | undefined)
-          ?.address ||
-        "",
-      postalCode: client?.postal_code || "",
-      city: client?.city || "",
+      name: clientDisplayName,
+      email: resolvedRecipient.email || "",
+      phone: resolvedRecipient.phone || "",
+      address: clientAddress,
+      postalCode: resolvedRecipient.postalCode || "",
+      city: resolvedRecipient.city || "",
     },
     document: {
       number: document.numero || "",
