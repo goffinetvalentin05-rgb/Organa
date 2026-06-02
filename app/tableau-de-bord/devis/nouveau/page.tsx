@@ -601,6 +601,10 @@ export default function NouveauDevisPage() {
         numero = data.numero;
       }
 
+      if (!id) {
+        throw new Error("ID document manquant après sauvegarde");
+      }
+
       // Générer le PDF d’abord (pour capturer l’erreur technique et éviter un doc “à moitié créé”).
       const blob = await fetchQuotePdfBlob(id, download);
       if (download) {
