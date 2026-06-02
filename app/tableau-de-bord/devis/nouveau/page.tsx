@@ -158,6 +158,18 @@ export default function NouveauDevisPage() {
     );
   };
 
+  const parseLocaleNumber = (raw: string, fallback: number) => {
+    const s = String(raw ?? "")
+      .trim()
+      // espaces + séparateurs milliers
+      .replace(/\s/g, "")
+      .replace(/'/g, "")
+      // virgule -> point (fr/CH)
+      .replace(/,/g, ".");
+    const n = Number(s);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
   const getLignesValides = () =>
     lignes.filter((l) => l.designation.trim() !== "");
 
@@ -190,13 +202,23 @@ export default function NouveauDevisPage() {
       } catch {
         // ignore
       }
-      console.error("[Cotisation][createQuoteForClient] Échec API /api/documents", {
-        status: response.status,
-        statusText: response.statusText,
-        payload,
-        errorData,
+      console.error("ERREUR DOCUMENT COTISATION", {
+        step: "frontend.createQuoteForClient.response-not-ok",
+        error: errorData,
+        message: errorData?.details || errorData?.error,
+        stack: undefined,
+        data: null,
+        clubId: undefined,
+        memberId: targetClientId,
+        documentPayload: payload,
+        pdfPayload: null,
+        storagePath: null,
       });
-      throw new Error(errorData?.error || t("dashboard.quotes.createError"));
+      throw new Error(
+        `Erreur document: ${
+          errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
+        }`
+      );
     }
 
     const data = await response.json();
@@ -208,11 +230,17 @@ export default function NouveauDevisPage() {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
       const raw = await response.text();
-      console.error("[Cotisation][PDF] Échec génération PDF", {
-        id,
-        status: response.status,
-        statusText: response.statusText,
-        raw,
+      console.error("ERREUR DOCUMENT COTISATION", {
+        step: "frontend.pdf.fetchQuotePdfBlob.response-not-ok",
+        error: raw,
+        message: raw,
+        stack: undefined,
+        data: null,
+        clubId: undefined,
+        memberId: undefined,
+        documentPayload: { id },
+        pdfPayload: { url, download },
+        storagePath: null,
       });
       // Le backend renvoie souvent du JSON; on garde le texte brut pour la console.
       throw new Error(raw || "Erreur génération PDF");
@@ -547,13 +575,23 @@ export default function NouveauDevisPage() {
           } catch {
             // ignore
           }
-          console.error("[Cotisation][saveAndOpenPdf] Échec API /api/documents (POST)", {
-            status: response.status,
-            statusText: response.statusText,
-            payload,
-            errorData,
+          console.error("ERREUR DOCUMENT COTISATION", {
+            step: "frontend.saveAndOpenPdf.post.response-not-ok",
+            error: errorData,
+            message: errorData?.details || errorData?.error,
+            stack: undefined,
+            data: null,
+            clubId: undefined,
+            memberId,
+            documentPayload: payload,
+            pdfPayload: null,
+            storagePath: null,
           });
-          throw new Error(errorData?.error || t("dashboard.quotes.createDocumentError"));
+          throw new Error(
+            `Erreur document: ${
+              errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
+            }`
+          );
         }
 
         const data = await response.json();
@@ -588,13 +626,23 @@ export default function NouveauDevisPage() {
           } catch {
             // ignore
           }
-          console.error("[Cotisation][saveAndOpenPdf] Échec API /api/documents (PATCH)", {
-            status: response.status,
-            statusText: response.statusText,
-            payload,
-            errorData,
+          console.error("ERREUR DOCUMENT COTISATION", {
+            step: "frontend.saveAndOpenPdf.patch.response-not-ok",
+            error: errorData,
+            message: errorData?.details || errorData?.error,
+            stack: undefined,
+            data: null,
+            clubId: undefined,
+            memberId,
+            documentPayload: payload,
+            pdfPayload: null,
+            storagePath: null,
           });
-          throw new Error(errorData?.error || t("dashboard.quotes.updateDocumentError"));
+          throw new Error(
+            `Erreur document: ${
+              errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
+            }`
+          );
         }
 
         const data = await response.json();
@@ -615,8 +663,20 @@ export default function NouveauDevisPage() {
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : t("dashboard.common.unknownError");
-      console.error("Erreur lors de la sauvegarde pour PDF:", error);
-      toast.error(`${t("dashboard.quotes.saveForPdfError")}: ${message}`);
+      console.error("ERREUR DOCUMENT COTISATION", {
+        step: "frontend.saveAndOpenPdf.catch",
+        error,
+        message,
+        stack: error instanceof Error ? error.stack : undefined,
+        data: null,
+        clubId: undefined,
+        memberId,
+        documentPayload: null,
+        pdfPayload: { download },
+        storagePath: null,
+      });
+      // Toast propre côté utilisateur
+      toast.error(t("dashboard.quotes.saveForPdfError"));
 
       // Si on a créé un document juste pour tenter le PDF, on rollback.
       if (createdDocumentId) {
@@ -867,7 +927,7 @@ export default function NouveauDevisPage() {
                       value={ligne.quantite}
                       onChange={(e) =>
                         modifierLigne(ligne.id, {
-                          quantite: parseFloat(e.target.value) || 0,
+                          quantite: parseLocaleNumber(e.target.value, 1),
                         })
                       }
                       className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
@@ -884,7 +944,7 @@ export default function NouveauDevisPage() {
                       value={ligne.prixUnitaire}
                       onChange={(e) =>
                         modifierLigne(ligne.id, {
-                          prixUnitaire: parseFloat(e.target.value) || 0,
+                          prixUnitaire: parseLocaleNumber(e.target.value, 0),
                         })
                       }
                       className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
@@ -901,7 +961,7 @@ export default function NouveauDevisPage() {
                       value={ligne.tva || 0}
                       onChange={(e) =>
                         modifierLigne(ligne.id, {
-                          tva: parseFloat(e.target.value) || 0,
+                          tva: parseLocaleNumber(e.target.value, 0),
                         })
                       }
                       className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"

@@ -21,7 +21,16 @@ export async function GET(request: Request) {
   if ("error" in guard) return guard.error;
 
   try {
+    const step = "pdf.quote.preview.getDocumentPdfData";
     const data = await getDocumentPdfData(id, "quote", { dataUserId: guard.clubId });
+    const pdfPayload = {
+      type: "quote",
+      id,
+      hasLogo: Boolean(data.company?.logoUrl),
+      clubName: data.company?.name || "Club",
+      memberName: data.client?.name || "Membre",
+    };
+    const step2 = "pdf.quote.preview.render";
     const pdfBuffer = await renderQuotePdfBuffer(data);
 
     return new Response(new Uint8Array(pdfBuffer), {
@@ -32,6 +41,18 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: unknown) {
+    console.error("ERREUR DOCUMENT COTISATION", {
+      step: "pdf.quote.preview.catch",
+      error,
+      message: (error as any)?.message,
+      stack: (error as any)?.stack,
+      data: null,
+      clubId: guard.clubId,
+      memberId: null,
+      documentPayload: { id, type: "quote" },
+      pdfPayload: { kind: "preview" },
+      storagePath: null,
+    });
     console.error("Erreur lors de la génération du PDF devis:", error);
     return NextResponse.json(
       {

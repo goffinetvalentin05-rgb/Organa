@@ -398,6 +398,18 @@ export async function POST(request: NextRequest) {
     const { data: newDocument, error: insertError } = await tryInsertWithFallback(documentData);
 
     if (insertError) {
+      console.error("ERREUR DOCUMENT COTISATION", {
+        step: "documents.post.insert",
+        error: insertError,
+        message: insertError?.message,
+        stack: undefined,
+        data: newDocument,
+        clubId: guard.clubId,
+        memberId: clientId,
+        documentPayload: documentData,
+        pdfPayload: null,
+        storagePath: null,
+      });
       console.error("[API][documents][POST] Erreur Supabase insert:", {
         status: "ERROR",
         code: insertError.code || "UNKNOWN",
@@ -452,9 +464,24 @@ export async function POST(request: NextRequest) {
       type: newDocument.type,
     }, { status: 201 });
   } catch (error: unknown) {
+    console.error("ERREUR DOCUMENT COTISATION", {
+      step: "documents.post.catch",
+      error,
+      message: (error as any)?.message,
+      stack: (error as any)?.stack,
+      data: null,
+      clubId: undefined,
+      memberId: undefined,
+      documentPayload: null,
+      pdfPayload: null,
+      storagePath: null,
+    });
     console.error("[API][documents][POST] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création du document", details: getErrorMessage(error) },
+      {
+        error: "Erreur lors de la création du document",
+        details: `Erreur document: ${getErrorMessage(error)}`,
+      },
       { status: 500 }
     );
   }

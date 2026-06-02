@@ -32,6 +32,18 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: unknown) {
+    console.error("ERREUR DOCUMENT COTISATION", {
+      step: "pdf.invoice.preview.catch",
+      error,
+      message: (error as any)?.message,
+      stack: (error as any)?.stack,
+      data: null,
+      clubId: guard.clubId,
+      memberId: null,
+      documentPayload: { id, type: "invoice" },
+      pdfPayload: { kind: "preview" },
+      storagePath: null,
+    });
     console.error("Erreur lors de la génération du PDF facture:", error);
     return NextResponse.json(
       {
