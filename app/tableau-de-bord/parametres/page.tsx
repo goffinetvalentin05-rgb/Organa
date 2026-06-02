@@ -16,7 +16,6 @@ import {
   Wallet,
   Shield,
   Settings,
-  ExternalLink,
 } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
@@ -595,13 +594,6 @@ export default function ParametresPage() {
             title={t("dashboard.settings.layout.sections.clubInfo")}
             description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
           >
-            <Link
-              href="/tableau-de-bord/parametres/page-publique"
-              className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-blue-200/60 bg-blue-50/80 px-4 py-3 text-sm text-slate-800 transition hover:border-blue-300 hover:bg-blue-50"
-            >
-              <span className="font-medium">{t("dashboard.settings.publicPage.cardCta")}</span>
-              <ExternalLink className="h-4 w-4 shrink-0 text-blue-600" />
-            </Link>
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.visualIdentity")}>
               <div className="mb-6">
                 <label className="mb-2 block text-sm font-medium text-slate-800">

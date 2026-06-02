@@ -30,7 +30,10 @@ import {
   Mail,
   ShoppingBag,
   Handshake,
+  Globe,
 } from "@/lib/icons";
+
+const PUBLIC_PAGE_HREF = "/tableau-de-bord/parametres/page-publique";
 
 export default function DashboardLayout({
   children,
@@ -125,14 +128,22 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.plannings"), href: "/tableau-de-bord/plannings", icon: ClipboardList },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
     { name: t("dashboard.nav.marketing"), href: "/tableau-de-bord/campagnes-marketing", icon: Mail },
+    { name: t("dashboard.nav.publicPage"), href: PUBLIC_PAGE_HREF, icon: Globe },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === "/tableau-de-bord") {
       return pathname === href;
     }
-    return pathname?.startsWith(href);
+    if (href === "/tableau-de-bord/parametres") {
+      return (
+        pathname.startsWith("/tableau-de-bord/parametres") &&
+        !pathname.startsWith(PUBLIC_PAGE_HREF)
+      );
+    }
+    return pathname.startsWith(href);
   };
 
   const getPageTitle = () => {

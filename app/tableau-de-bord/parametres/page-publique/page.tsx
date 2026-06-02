@@ -155,11 +155,11 @@ export default function PublicPageSettingsPage() {
     <PageLayout maxWidth="3xl">
       <div className="mb-4">
         <Link
-          href="/tableau-de-bord/parametres"
+          href="/tableau-de-bord"
           className="inline-flex items-center gap-2 text-sm text-white/75 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("dashboard.settings.publicPage.backToSettings")}
+          {t("dashboard.nav.dashboard")}
         </Link>
       </div>
 
