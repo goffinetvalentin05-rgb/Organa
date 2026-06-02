@@ -63,7 +63,6 @@ export async function PUT(request: NextRequest) {
       description: body.description,
       primaryColor: body.primaryColor,
       accentColor: body.accentColor,
-      bannerUrl: body.bannerUrl,
     });
 
     if (result.error) {

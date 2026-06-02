@@ -291,8 +291,6 @@ N'hésite pas à nous contacter si tu as des questions.
     <PageLayout maxWidth="7xl">
       <PageHeader title="Buvette" subtitle="Gestion des disponibilités et demandes externes." />
 
-      <BuvettePublicSettingsPanel />
-
       <div className="flex items-center gap-2 text-sm">
         <span className="inline-flex items-center gap-1">
           <span className="w-3 h-3 rounded-full bg-green-500" /> {t("dashboard.buvette.legendAvailable")}
@@ -595,6 +593,8 @@ N'hésite pas à nous contacter si tu as des questions.
           </div>
         </div>
       )}
+
+      <BuvettePublicSettingsPanel />
     </PageLayout>
   );
 }

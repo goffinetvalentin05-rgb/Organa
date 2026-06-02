@@ -82,7 +82,6 @@ export type BuvetteSettingsUpdateInput = {
   description?: string | null;
   primaryColor?: string | null;
   accentColor?: string | null;
-  bannerUrl?: string | null;
 };
 
 export async function updateBuvettePublicSettings(
@@ -146,13 +145,6 @@ export async function updateBuvettePublicSettings(
     }
   }
 
-  const bannerUrl =
-    input.bannerUrl !== undefined ? trimOrNull(input.bannerUrl) : trimOrNull(profile.buvette_public_banner_url);
-
-  if (bannerUrl && !/^https?:\/\/.+/i.test(bannerUrl)) {
-    return { error: "L'URL de bannière doit commencer par http:// ou https://", status: 400 };
-  }
-
   const payload: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
     buvette_slug: slug,
@@ -170,7 +162,6 @@ export async function updateBuvettePublicSettings(
       input.accentColor !== undefined
         ? validateHexColor(input.accentColor)
         : validateHexColor(profile.buvette_public_accent_color),
-    buvette_public_banner_url: bannerUrl,
   };
 
   const { error: updateError } = await supabase
