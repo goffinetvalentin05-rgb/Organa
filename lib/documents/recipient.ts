@@ -45,11 +45,19 @@ type SponsorLike = {
   title?: string | null;
 };
 
-type DocumentRecipientSource = {
+export type DocumentRecipientSource = {
   recipient_type?: string | null;
   client_id?: string | null;
   sponsor_contract_id?: string | null;
   recipient_data?: unknown;
+  external_recipient_name?: string | null;
+  external_recipient_contact_name?: string | null;
+  external_recipient_address?: string | null;
+  external_recipient_zip?: string | null;
+  external_recipient_city?: string | null;
+  external_recipient_country?: string | null;
+  external_recipient_email?: string | null;
+  external_recipient_phone?: string | null;
   client?: ClientLike | ClientLike[] | null;
   sponsor?: SponsorLike | SponsorLike[] | null;
 };
@@ -88,6 +96,92 @@ export function parseExternalRecipientData(
   };
 }
 
+/** Lit le destinataire externe depuis les colonnes DB ou le JSONB legacy. */
+export function parseExternalRecipientFromDocument(
+  doc: DocumentRecipientSource | Record<string, unknown>
+): ExternalRecipientData | null {
+  const d = doc as DocumentRecipientSource;
+  const name = firstString(d.external_recipient_name);
+  if (name) {
+    const address = firstString(d.external_recipient_address);
+    const postalCode = firstString(d.external_recipient_zip);
+    const city = firstString(d.external_recipient_city);
+    if (address && postalCode && city) {
+      return {
+        name,
+        contactName: firstString(d.external_recipient_contact_name) || undefined,
+        address,
+        postalCode,
+        city,
+        country: firstString(d.external_recipient_country) || undefined,
+        email: firstString(d.external_recipient_email) || undefined,
+        phone: firstString(d.external_recipient_phone) || undefined,
+      };
+    }
+  }
+  return parseExternalRecipientData(d.recipient_data);
+}
+
+export function externalRecipientToDbColumns(
+  data: ExternalRecipientData
+): Record<string, string | null> {
+  return {
+    external_recipient_name: data.name,
+    external_recipient_contact_name: data.contactName ?? null,
+    external_recipient_address: data.address,
+    external_recipient_zip: data.postalCode,
+    external_recipient_city: data.city,
+    external_recipient_country: data.country ?? null,
+    external_recipient_email: data.email ?? null,
+    external_recipient_phone: data.phone ?? null,
+  };
+}
+
+export function clearExternalRecipientDbColumns(): Record<string, null> {
+  return {
+    external_recipient_name: null,
+    external_recipient_contact_name: null,
+    external_recipient_address: null,
+    external_recipient_zip: null,
+    external_recipient_city: null,
+    external_recipient_country: null,
+    external_recipient_email: null,
+    external_recipient_phone: null,
+  };
+}
+
+export function buildInvoiceRecipientDbFields(input: {
+  type: RecipientType;
+  clientId?: string | null;
+  sponsorContractId?: string | null;
+  external?: ExternalRecipientData | null;
+}): Record<string, unknown> {
+  const base: Record<string, unknown> = {
+    recipient_type: input.type,
+    client_id: null,
+    sponsor_contract_id: null,
+    recipient_data: null,
+    ...clearExternalRecipientDbColumns(),
+  };
+
+  if (input.type === "member") {
+    base.client_id = input.clientId ?? null;
+    return base;
+  }
+
+  if (input.type === "sponsor") {
+    base.sponsor_contract_id = input.sponsorContractId ?? null;
+    return base;
+  }
+
+  if (input.external) {
+    Object.assign(base, externalRecipientToDbColumns(input.external));
+    base.recipient_data = input.external;
+  }
+
+  return base;
+}
+
 export function inferRecipientType(doc: DocumentRecipientSource): RecipientType {
   if (
     doc.recipient_type === "member" ||
@@ -98,7 +192,7 @@ export function inferRecipientType(doc: DocumentRecipientSource): RecipientType 
   }
   if (doc.client_id) return "member";
   if (doc.sponsor_contract_id) return "sponsor";
-  if (parseExternalRecipientData(doc.recipient_data)) return "external";
+  if (parseExternalRecipientFromDocument(doc)) return "external";
   return "member";
 }
 
@@ -122,7 +216,7 @@ export function resolveDocumentRecipient(
   const type = inferRecipientType(doc);
 
   if (type === "external") {
-    const ext = parseExternalRecipientData(doc.recipient_data);
+    const ext = parseExternalRecipientFromDocument(doc);
     return {
       type: "external",
       name: ext?.name || "Destinataire",

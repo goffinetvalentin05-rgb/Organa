@@ -13,7 +13,9 @@ import {
 import type { LigneDocument } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import {
+  buildInvoiceRecipientDbFields,
   parseExternalRecipientData,
+  parseExternalRecipientFromDocument,
   recipientToApi,
   resolveDocumentRecipient,
   validateInvoiceRecipientInput,
@@ -79,6 +81,14 @@ type DocumentDbRow = {
   recipient_type?: string | null;
   sponsor_contract_id?: string | null;
   recipient_data?: unknown;
+  external_recipient_name?: string | null;
+  external_recipient_contact_name?: string | null;
+  external_recipient_address?: string | null;
+  external_recipient_zip?: string | null;
+  external_recipient_city?: string | null;
+  external_recipient_country?: string | null;
+  external_recipient_email?: string | null;
+  external_recipient_phone?: string | null;
   event_id?: string | null;
   created_by?: string | null;
   updated_by?: string | null;
@@ -89,9 +99,9 @@ type DocumentDbRow = {
 };
 
 const DOCUMENT_SELECT =
-  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, event_id, created_by, updated_by, created_at, updated_at, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
+  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
 
-type DocumentInsertPayload = {
+type DocumentInsertPayload = Record<string, unknown> & {
   user_id: string;
   client_id: string | null;
   type: string;
@@ -102,19 +112,9 @@ type DocumentInsertPayload = {
   total_tva: number;
   total_ttc: number;
   numero: string;
-  title?: string;
-  created_by?: string;
-  updated_by?: string;
-  date_echeance?: string;
-  date_paiement?: string;
-  notes?: string;
-  event_id?: string;
-  recipient_type?: RecipientType;
-  sponsor_contract_id?: string | null;
-  recipient_data?: ExternalRecipientData | null;
 };
 
-type DocumentUpdatePayload = {
+type DocumentUpdatePayload = Record<string, unknown> & {
   numero?: string;
   title?: string;
   status?: string;
@@ -127,9 +127,6 @@ type DocumentUpdatePayload = {
   total_ttc?: number;
   event_id?: string | null;
   client_id?: string | null;
-  recipient_type?: RecipientType;
-  sponsor_contract_id?: string | null;
-  recipient_data?: ExternalRecipientData | null;
   updated_by?: string;
 };
 
@@ -244,16 +241,22 @@ export async function POST(request: NextRequest) {
     // Log du payload reçu pour debugging
     console.log("[API][documents][POST] Payload reçu:", {
       type,
-      clientId: clientId ? "présent" : "absent",
-      recipientType: recipientType || "member",
-      sponsorContractId: sponsorContractId ? "présent" : "absent",
-      recipientData: recipientData ? "présent" : "absent",
+      recipientType: recipientType || (clientId ? "member" : "non fourni"),
+      clientId: clientId || null,
+      sponsorContractId: sponsorContractId || null,
+      recipientData:
+        recipientType === "external" && recipientData
+          ? {
+              name: (recipientData as { name?: string })?.name,
+              hasAddress: Boolean((recipientData as { address?: string })?.address),
+              postalCode: (recipientData as { postalCode?: string })?.postalCode,
+              city: (recipientData as { city?: string })?.city,
+              email: (recipientData as { email?: string })?.email || null,
+            }
+          : null,
       lignes_count: lignes?.length || 0,
       statut,
       dateCreation,
-      dateEcheance: dateEcheance || "non fourni",
-      datePaiement: datePaiement || "non fourni",
-      notes: notes ? "présentes" : "absentes",
     });
 
     if (!type || (type !== "invoice" && type !== "quote")) {
@@ -391,25 +394,40 @@ export async function POST(request: NextRequest) {
         : defaultTitle;
 
     // Préparer les données d'insertion avec les noms de colonnes exacts
-    // Ne jamais envoyer date_echeance si elle est vide/undefined (laisser le default de la DB)
+    const recipientDbFields =
+      type === "invoice"
+        ? buildInvoiceRecipientDbFields({
+            type: resolvedRecipientType,
+            clientId: resolvedClientId,
+            sponsorContractId: resolvedSponsorId,
+            external: resolvedRecipientData,
+          })
+        : { client_id: resolvedClientId };
+
+    console.log("[API][documents][POST][recipient-resolved]", {
+      step: "before-insert",
+      documentType: type,
+      recipientType: type === "invoice" ? resolvedRecipientType : "member",
+      clientId: recipientDbFields.client_id ?? null,
+      sponsorContractId: recipientDbFields.sponsor_contract_id ?? null,
+      externalName:
+        (recipientDbFields.external_recipient_name as string | null | undefined) ??
+        null,
+    });
+
     const documentData: DocumentInsertPayload = {
       user_id: guard.clubId,
-      client_id: resolvedClientId,
-      type: type, // 'quote' ou 'invoice'
-      items: lignes, // jsonb
+      type: type,
+      items: lignes,
       status: statut || "brouillon",
       date_creation: dateCreation || new Date().toISOString().split("T")[0],
       total_ht: totalHT,
       total_tva: totalTVA,
       total_ttc: totalTTC,
       numero: buildNumero(baseSeq),
+      ...recipientDbFields,
+      client_id: (recipientDbFields.client_id as string | null) ?? null,
     };
-
-    if (type === "invoice") {
-      documentData.recipient_type = resolvedRecipientType;
-      documentData.sponsor_contract_id = resolvedSponsorId;
-      documentData.recipient_data = resolvedRecipientData;
-    }
 
     // Champs “évolutifs” (peuvent ne pas exister si une migration n’a pas été appliquée).
     // On les envoie par défaut, mais on saura les retirer si Supabase renvoie "column does not exist".
@@ -439,12 +457,12 @@ export async function POST(request: NextRequest) {
 
     console.log("[API][documents][POST] Tentative d'insertion dans public.documents:", {
       user_id: user.id,
-      client_id: resolvedClientId,
-      recipient_type: type === "invoice" ? resolvedRecipientType : undefined,
-      sponsor_contract_id: resolvedSponsorId,
       type: type,
-      date_creation: documentData.date_creation,
-      date_echeance: documentData.date_echeance,
+      recipient_type: documentData.recipient_type ?? null,
+      client_id: documentData.client_id ?? null,
+      sponsor_contract_id: documentData.sponsor_contract_id ?? null,
+      external_recipient_name: documentData.external_recipient_name ?? null,
+      numero: documentData.numero,
       items_count: lignes.length,
     });
 
@@ -473,7 +491,7 @@ export async function POST(request: NextRequest) {
       const working: Record<string, unknown> = { ...payload };
       const removedColumns: string[] = [];
 
-      for (let attempt = 0; attempt < 5; attempt += 1) {
+      for (let attempt = 0; attempt < 12; attempt += 1) {
         const { data, error } = await supabase
           .from("documents")
           .insert(working)
@@ -488,6 +506,16 @@ export async function POST(request: NextRequest) {
         }
 
         const msg = String((error as InsertError | null | undefined)?.message || "");
+        console.error("[API][documents][POST][insert-attempt-failed]", {
+          attempt: attempt + 1,
+          code: (error as InsertError)?.code,
+          message: msg,
+          details: (error as InsertError)?.details,
+          hint: (error as InsertError)?.hint,
+          removedColumns,
+          recipientType: working.recipient_type,
+          clientId: working.client_id,
+        });
         const missingCol = extractMissingColumn(msg);
         if (missingCol && missingCol in working) {
           removedColumns.push(missingCol);
@@ -739,6 +767,14 @@ function formatDocument(
     client_id: doc.client_id,
     sponsor_contract_id: doc.sponsor_contract_id,
     recipient_data: doc.recipient_data,
+    external_recipient_name: doc.external_recipient_name,
+    external_recipient_contact_name: doc.external_recipient_contact_name,
+    external_recipient_address: doc.external_recipient_address,
+    external_recipient_zip: doc.external_recipient_zip,
+    external_recipient_city: doc.external_recipient_city,
+    external_recipient_country: doc.external_recipient_country,
+    external_recipient_email: doc.external_recipient_email,
+    external_recipient_phone: doc.external_recipient_phone,
     client: client as Record<string, unknown> | null,
     sponsor: sponsor as Record<string, unknown> | null,
   });
@@ -760,7 +796,7 @@ function formatDocument(
     clientId: doc.client_id || null,
     recipientType: recipient.type,
     sponsorContractId: doc.sponsor_contract_id ?? null,
-    recipientData: parseExternalRecipientData(doc.recipient_data),
+    recipientData: parseExternalRecipientFromDocument(doc),
     recipient: recipientToApi(recipient),
     eventId: doc.event_id ?? null,
     linkedEvent:
@@ -988,7 +1024,9 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: recipientCheck.error }, { status: 400 });
       }
 
-      updateData.recipient_type = recipientCheck.type;
+      let resolvedClientId: string | null = null;
+      let resolvedSponsorId: string | null = null;
+      let resolvedExternal: ExternalRecipientData | null = null;
 
       if (recipientCheck.type === "member") {
         const memberId = clientId as string;
@@ -1005,9 +1043,7 @@ export async function PATCH(request: NextRequest) {
             { status: 404 }
           );
         }
-        updateData.client_id = memberId;
-        updateData.sponsor_contract_id = null;
-        updateData.recipient_data = null;
+        resolvedClientId = memberId;
       } else if (recipientCheck.type === "sponsor") {
         const sponsorId = sponsorContractId as string;
         const { data: sponsor, error: sponsorError } = await supabase
@@ -1023,21 +1059,26 @@ export async function PATCH(request: NextRequest) {
             { status: 404 }
           );
         }
-        updateData.client_id = null;
-        updateData.sponsor_contract_id = sponsorId;
-        updateData.recipient_data = null;
+        resolvedSponsorId = sponsorId;
       } else {
-        const ext = parseExternalRecipientData(recipientData);
-        if (!ext) {
+        resolvedExternal = parseExternalRecipientData(recipientData);
+        if (!resolvedExternal) {
           return NextResponse.json(
             { error: "Informations du destinataire externe invalides" },
             { status: 400 }
           );
         }
-        updateData.client_id = null;
-        updateData.sponsor_contract_id = null;
-        updateData.recipient_data = ext;
       }
+
+      Object.assign(
+        updateData,
+        buildInvoiceRecipientDbFields({
+          type: recipientCheck.type,
+          clientId: resolvedClientId,
+          sponsorContractId: resolvedSponsorId,
+          external: resolvedExternal,
+        })
+      );
     } else if (clientId) {
       // Vérifier que le client appartient au club
       const { data: client, error: clientError } = await supabase

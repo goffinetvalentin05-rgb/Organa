@@ -239,7 +239,8 @@ function NouvelleFacturePageContent() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || t("dashboard.invoices.form.createError"));
+        const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+        throw new Error(detail || t("dashboard.invoices.form.createError"));
       }
 
       const data = await response.json();
@@ -295,7 +296,8 @@ function NouvelleFacturePageContent() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || t("dashboard.invoices.form.createDocumentError"));
+          const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+          throw new Error(detail || t("dashboard.invoices.form.createDocumentError"));
         }
 
         const data = await response.json();
@@ -321,7 +323,8 @@ function NouvelleFacturePageContent() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || t("dashboard.invoices.form.updateDocumentError"));
+          const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+          throw new Error(detail || t("dashboard.invoices.form.updateDocumentError"));
         }
 
         const data = await response.json();

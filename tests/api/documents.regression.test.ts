@@ -147,6 +147,69 @@ describe("POST /api/documents — facture", () => {
     expect(body.numero).toMatch(/^FAC-/);
     expect(log.some((o) => o.table === "documents" && o.op === "insert")).toBe(true);
   });
+
+  it("crée une facture avec destinataire externe sans client_id", async () => {
+    const { client, log } = createThenableSupabaseMock([
+      sequentialOps([
+        {
+          table: "documents",
+          op: "select",
+          match: (r) => r.countHead === true,
+          result: { count: 2, error: null },
+        },
+        {
+          table: "documents",
+          op: "insert",
+          match: (r) => {
+            const p = r.payload as Record<string, unknown>;
+            return (
+              p.user_id === CLUB &&
+              p.client_id === null &&
+              p.recipient_type === "external" &&
+              p.external_recipient_name === "Entreprise SA" &&
+              p.external_recipient_zip === "1000" &&
+              p.external_recipient_city === "Lausanne"
+            );
+          },
+          result: {
+            data: {
+              id: DOC_ID,
+              numero: "FAC-2026-003",
+              type: "invoice",
+              created_at: "2026-05-01T00:00:00Z",
+            },
+            error: null,
+          },
+        },
+      ]),
+    ]);
+    vi.mocked(createClient).mockResolvedValue(client as never);
+
+    const req = new NextRequest("http://localhost/api/documents", {
+      method: "POST",
+      body: JSON.stringify({
+        type: "invoice",
+        recipientType: "external",
+        recipientData: {
+          name: "Entreprise SA",
+          address: "Rue du Test 1",
+          postalCode: "1000",
+          city: "Lausanne",
+          email: "contact@entreprise.test",
+        },
+        lignes: [ligne],
+        statut: "brouillon",
+        dateCreation: "2026-05-10",
+      }),
+      headers: { "content-type": "application/json" },
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.id).toBe(DOC_ID);
+    expect(log.some((o) => o.table === "documents" && o.op === "insert")).toBe(true);
+  });
 });
 
 describe("PATCH /api/documents — isolation club", () => {

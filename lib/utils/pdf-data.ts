@@ -195,7 +195,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -219,6 +219,23 @@ export async function getDocumentPdfData(
     sponsor_contract_id: (document as { sponsor_contract_id?: string | null })
       .sponsor_contract_id,
     recipient_data: (document as { recipient_data?: unknown }).recipient_data,
+    external_recipient_name: (document as { external_recipient_name?: string | null })
+      .external_recipient_name,
+    external_recipient_contact_name: (
+      document as { external_recipient_contact_name?: string | null }
+    ).external_recipient_contact_name,
+    external_recipient_address: (document as { external_recipient_address?: string | null })
+      .external_recipient_address,
+    external_recipient_zip: (document as { external_recipient_zip?: string | null })
+      .external_recipient_zip,
+    external_recipient_city: (document as { external_recipient_city?: string | null })
+      .external_recipient_city,
+    external_recipient_country: (document as { external_recipient_country?: string | null })
+      .external_recipient_country,
+    external_recipient_email: (document as { external_recipient_email?: string | null })
+      .external_recipient_email,
+    external_recipient_phone: (document as { external_recipient_phone?: string | null })
+      .external_recipient_phone,
     client: client as Record<string, unknown> | null,
     sponsor: sponsor as Record<string, unknown> | null,
   });
