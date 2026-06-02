@@ -207,14 +207,14 @@ export default function DashboardLayout({
       >
         <div className="relative z-10 flex h-full flex-col">
           {/* Logo & close button */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <Link href="/tableau-de-bord" className="flex items-center group">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+            <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
-                width={140}
-                height={40}
-                className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
+                width={180}
+                height={47}
+                className="h-14 w-auto max-w-[190px] object-contain transition-transform group-hover:scale-105"
                 priority
               />
             </Link>
