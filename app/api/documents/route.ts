@@ -16,6 +16,43 @@ import { getErrorMessage } from "@/lib/utils/error-message";
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
 
+async function requireManageDocumentsOrInvoices() {
+  // Backward/forward compatible: certains clubs peuvent avoir manage_invoices sans manage_documents (ou l’inverse).
+  const gDocs = await requirePermission(PERMISSIONS.MANAGE_DOCUMENTS);
+  if (!("error" in gDocs)) return gDocs;
+
+  const gInv = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+  if (!("error" in gInv)) return gInv;
+
+  return {
+    error: NextResponse.json(
+      {
+        error: "Accès refusé",
+        requiredAny: [PERMISSIONS.MANAGE_DOCUMENTS, PERMISSIONS.MANAGE_INVOICES],
+      },
+      { status: 403 }
+    ),
+  } as const;
+}
+
+async function requireViewDocumentsOrInvoices() {
+  const gDocs = await requirePermission(PERMISSIONS.VIEW_DOCUMENTS);
+  if (!("error" in gDocs)) return gDocs;
+
+  const gInv = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+  if (!("error" in gInv)) return gInv;
+
+  return {
+    error: NextResponse.json(
+      {
+        error: "Accès refusé",
+        requiredAny: [PERMISSIONS.VIEW_DOCUMENTS, PERMISSIONS.VIEW_INVOICES],
+      },
+      { status: 403 }
+    ),
+  } as const;
+}
+
 type DocumentDbRow = {
   id: string;
   numero?: string | null;
@@ -78,7 +115,7 @@ type DocumentUpdatePayload = {
 // GET /api/documents - Lister ou récupérer un document
 export async function GET(request: NextRequest) {
   try {
-    const guard = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+    const guard = await requireViewDocumentsOrInvoices();
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
@@ -155,7 +192,7 @@ export async function GET(request: NextRequest) {
 // POST /api/documents - Créer un nouveau document
 export async function POST(request: NextRequest) {
   try {
-    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    const guard = await requireManageDocumentsOrInvoices();
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
@@ -426,8 +463,19 @@ export async function POST(request: NextRequest) {
 // DELETE /api/documents - Supprimer un document
 export async function DELETE(request: NextRequest) {
   try {
-    const guard = await requirePermission(PERMISSIONS.DELETE_INVOICES);
-    if ("error" in guard) return guard.error;
+    // Supprimer un document est plus sensible: exiger delete_documents OU delete_invoices.
+    const gDocs = await requirePermission(PERMISSIONS.DELETE_DOCUMENTS);
+    const guard =
+      "error" in gDocs ? await requirePermission(PERMISSIONS.DELETE_INVOICES) : gDocs;
+    if ("error" in guard) {
+      return NextResponse.json(
+        {
+          error: "Accès refusé",
+          requiredAny: [PERMISSIONS.DELETE_DOCUMENTS, PERMISSIONS.DELETE_INVOICES],
+        },
+        { status: 403 }
+      );
+    }
 
     const supabase = await createClient();
 
@@ -543,7 +591,7 @@ function formatDocument(
 // PATCH /api/documents - Mettre à jour un document existant
 export async function PATCH(request: NextRequest) {
   try {
-    const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
+    const guard = await requireManageDocumentsOrInvoices();
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
