@@ -50,9 +50,9 @@ type DocumentInsertPayload = {
   total_tva: number;
   total_ttc: number;
   numero: string;
-  title: string;
-  created_by: string;
-  updated_by: string;
+  title?: string;
+  created_by?: string;
+  updated_by?: string;
   date_echeance?: string;
   date_paiement?: string;
   notes?: string;
@@ -265,10 +265,13 @@ export async function POST(request: NextRequest) {
       total_tva: totalTVA,
       total_ttc: totalTTC,
       numero: numero,
-      title,
-      created_by: user.id,
-      updated_by: user.id,
     };
+
+    // Champs “évolutifs” (peuvent ne pas exister si une migration n’a pas été appliquée).
+    // On les envoie par défaut, mais on saura les retirer si Supabase renvoie "column does not exist".
+    documentData.title = title;
+    documentData.created_by = user.id;
+    documentData.updated_by = user.id;
 
     // Ajouter date_echeance uniquement si fourni et non vide
     if (dateEcheance && dateEcheance.trim() !== "") {
@@ -299,12 +302,63 @@ export async function POST(request: NextRequest) {
       items_count: lignes.length,
     });
 
-    // Créer le document dans Supabase (table public.documents)
-    const { data: newDocument, error: insertError } = await supabase
-      .from("documents")
-      .insert(documentData)
-      .select("id, numero, type, created_at")
-      .single();
+    const extractMissingColumn = (message: string): string | null => {
+      const m1 = message.match(/Could not find the '([^']+)' column/i);
+      if (m1?.[1]) return m1[1];
+      const m2 = message.match(/column "([^"]+)" of relation "[^"]+" does not exist/i);
+      if (m2?.[1]) return m2[1];
+      const m3 = message.match(/column ([a-zA-Z0-9_]+) does not exist/i);
+      if (m3?.[1]) return m3[1];
+      return null;
+    };
+
+    type InsertRow = { id: string; numero?: string | null; type?: string | null };
+    type InsertError = {
+      code?: string;
+      message?: string;
+      details?: string | null;
+      hint?: string | null;
+    };
+
+    const tryInsertWithFallback = async (
+      payload: DocumentInsertPayload
+    ): Promise<{ data: InsertRow | null; error: InsertError | null }> => {
+      // Clone pour pouvoir retirer des champs sans muter l’original.
+      const working: Record<string, unknown> = { ...payload };
+      const removedColumns: string[] = [];
+
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const { data, error } = await supabase
+          .from("documents")
+          .insert(working)
+          .select("id, numero, type, created_at")
+          .single();
+
+        if (!error) {
+          if (removedColumns.length > 0) {
+            console.warn("[API][documents][POST] Insert réussi après retrait de colonnes:", removedColumns);
+          }
+          return { data: data as InsertRow, error: null };
+        }
+
+        const msg = String((error as InsertError | null | undefined)?.message || "");
+        const missingCol = extractMissingColumn(msg);
+        if (missingCol && missingCol in working) {
+          removedColumns.push(missingCol);
+          delete working[missingCol];
+          console.warn("[API][documents][POST] Colonne absente détectée, retry sans:", missingCol);
+          continue;
+        }
+
+        // Aucune colonne manquante détectée ou impossible de progresser.
+        return { data: null, error: error as InsertError };
+      }
+
+      return { data: null, error: { message: "Insert failed after retries" } };
+    };
+
+    // Créer le document dans Supabase (table public.documents) avec fallback si migrations manquantes
+    const { data: newDocument, error: insertError } = await tryInsertWithFallback(documentData);
 
     if (insertError) {
       console.error("[API][documents][POST] Erreur Supabase insert:", {
@@ -314,7 +368,8 @@ export async function POST(request: NextRequest) {
         details: insertError.details || null,
         hint: insertError.hint || null,
         data_attempted: {
-          user_id: user.id,
+          club_id: guard.clubId,
+          auth_user_id: user.id,
           client_id: clientId,
           type: type,
         },

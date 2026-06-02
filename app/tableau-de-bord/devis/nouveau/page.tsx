@@ -165,40 +165,97 @@ export default function NouveauDevisPage() {
     targetClientId: string,
     lignesValides: LigneDocument[]
   ): Promise<{ id: string; numero?: string }> => {
+    const payload = {
+      type: "quote",
+      clientId: targetClientId,
+      lignes: lignesValides,
+      statut,
+      dateCreation: new Date().toISOString().split("T")[0],
+      ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+      ...(notes && notes.trim() !== "" ? { notes } : {}),
+    };
+
     const response = await fetch("/api/documents", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        type: "quote",
-        clientId: targetClientId,
-        lignes: lignesValides,
-        statut,
-        dateCreation: new Date().toISOString().split("T")[0],
-        ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-        ...(notes && notes.trim() !== "" ? { notes } : {}),
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || t("dashboard.quotes.createError"));
+      let errorData: any = null;
+      try {
+        errorData = await response.json();
+      } catch {
+        // ignore
+      }
+      console.error("[Cotisation][createQuoteForClient] Échec API /api/documents", {
+        status: response.status,
+        statusText: response.statusText,
+        payload,
+        errorData,
+      });
+      throw new Error(errorData?.error || t("dashboard.quotes.createError"));
     }
 
     const data = await response.json();
     return { id: data.id, numero: data.numero };
   };
 
-  const generateQuotePdf = async (id: string): Promise<void> => {
-    const response = await fetch(
-      `/api/documents/${id}/pdf?type=quote&download=true`,
-      { cache: "no-store" }
-    );
-
+  const fetchQuotePdfBlob = async (id: string, download: boolean): Promise<Blob> => {
+    const url = `/api/documents/${id}/pdf?type=quote${download ? "&download=true" : ""}`;
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Erreur génération PDF");
+      const raw = await response.text();
+      console.error("[Cotisation][PDF] Échec génération PDF", {
+        id,
+        status: response.status,
+        statusText: response.statusText,
+        raw,
+      });
+      // Le backend renvoie souvent du JSON; on garde le texte brut pour la console.
+      throw new Error(raw || "Erreur génération PDF");
+    }
+    return await response.blob();
+  };
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  const openBlobInNewTab = (blob: Blob) => {
+    const objectUrl = URL.createObjectURL(blob);
+    window.open(objectUrl, "_blank", "noopener,noreferrer");
+    // On laisse un peu de temps au nouvel onglet de charger.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+  };
+
+  const deleteDocumentSafe = async (id: string) => {
+    try {
+      const res = await fetch(`/api/documents?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const raw = await res.text();
+        console.warn("[Cotisation] Rollback delete document a échoué", {
+          id,
+          status: res.status,
+          raw,
+        });
+      }
+    } catch (error) {
+      console.warn("[Cotisation] Rollback delete document exception", { id, error });
     }
   };
 
@@ -246,6 +303,7 @@ export default function NouveauDevisPage() {
     for (let index = 0; index < targets.length; index += 1) {
       const client = targets[index];
       const step = index + 1;
+      let createdDocumentId: string | null = null;
 
       try {
         setBulkProgress({
@@ -260,6 +318,7 @@ export default function NouveauDevisPage() {
         });
 
         const createdQuote = await createQuoteForClient(client.id, lignesValides);
+        createdDocumentId = createdQuote.id;
         created += 1;
 
         setBulkProgress({
@@ -273,7 +332,7 @@ export default function NouveauDevisPage() {
           }),
         });
 
-        await generateQuotePdf(createdQuote.id);
+        await fetchQuotePdfBlob(createdQuote.id, true);
 
         if (client.email && client.email.trim() !== "") {
           setBulkProgress({
@@ -299,6 +358,10 @@ export default function NouveauDevisPage() {
           memberName: client.nom,
           error,
         });
+        // Rollback best-effort: si le PDF échoue, ne pas laisser un doc incomplet.
+        if (createdDocumentId) {
+          await deleteDocumentSafe(createdDocumentId);
+        }
       } finally {
         setBulkProgress({
           current: step,
@@ -453,81 +516,109 @@ export default function NouveauDevisPage() {
 
     setSavingForPdf(true);
 
+    let createdDocumentId: string | null = null;
+
     try {
       let id = documentId;
       let numero: string | undefined;
 
       if (!id) {
+        const payload = {
+          type: "quote",
+          clientId: memberId,
+          lignes: lignesValides,
+          statut,
+          dateCreation: new Date().toISOString().split("T")[0],
+          ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+          ...(notes && notes.trim() !== "" ? { notes } : {}),
+        };
         const response = await fetch("/api/documents", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            type: "quote",
-            clientId: memberId,
-            lignes: lignesValides,
-            statut,
-            dateCreation: new Date().toISOString().split("T")[0],
-            ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-            ...(notes && notes.trim() !== "" ? { notes } : {}),
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || t("dashboard.quotes.createDocumentError"));
+          let errorData: any = null;
+          try {
+            errorData = await response.json();
+          } catch {
+            // ignore
+          }
+          console.error("[Cotisation][saveAndOpenPdf] Échec API /api/documents (POST)", {
+            status: response.status,
+            statusText: response.statusText,
+            payload,
+            errorData,
+          });
+          throw new Error(errorData?.error || t("dashboard.quotes.createDocumentError"));
         }
 
         const data = await response.json();
         id = data.id.toString();
         numero = data.numero;
         setDocumentId(id);
+        createdDocumentId = id;
       } else {
+        const payload = {
+          id,
+          type: "quote",
+          clientId: memberId,
+          lignes: lignesValides,
+          statut,
+          ...(dateEcheance && dateEcheance.trim() !== ""
+            ? { dateEcheance }
+            : { dateEcheance: null }),
+          ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
+        };
         const response = await fetch("/api/documents", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            id,
-            type: "quote",
-            clientId: memberId,
-            lignes: lignesValides,
-            statut,
-            ...(dateEcheance && dateEcheance.trim() !== ""
-              ? { dateEcheance }
-              : { dateEcheance: null }),
-            ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || t("dashboard.quotes.updateDocumentError"));
+          let errorData: any = null;
+          try {
+            errorData = await response.json();
+          } catch {
+            // ignore
+          }
+          console.error("[Cotisation][saveAndOpenPdf] Échec API /api/documents (PATCH)", {
+            status: response.status,
+            statusText: response.statusText,
+            payload,
+            errorData,
+          });
+          throw new Error(errorData?.error || t("dashboard.quotes.updateDocumentError"));
         }
 
         const data = await response.json();
         numero = data.numero;
       }
 
-      const url = `/api/documents/${id}/pdf?type=quote${download ? "&download=true" : ""}`;
-
+      // Générer le PDF d’abord (pour capturer l’erreur technique et éviter un doc “à moitié créé”).
+      const blob = await fetchQuotePdfBlob(id, download);
       if (download) {
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `obillz-quote-${numero || id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        downloadBlob(blob, `obillz-quote-${numero || id}.pdf`);
       } else {
-        window.open(url, "_blank");
+        openBlobInNewTab(blob);
       }
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : t("dashboard.common.unknownError");
       console.error("Erreur lors de la sauvegarde pour PDF:", error);
       toast.error(`${t("dashboard.quotes.saveForPdfError")}: ${message}`);
+
+      // Si on a créé un document juste pour tenter le PDF, on rollback.
+      if (createdDocumentId) {
+        await deleteDocumentSafe(createdDocumentId);
+        setDocumentId(null);
+      }
     } finally {
       setSavingForPdf(false);
     }
