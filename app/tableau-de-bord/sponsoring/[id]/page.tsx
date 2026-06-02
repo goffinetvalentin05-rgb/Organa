@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ArrowLeft, Edit, Download, Eye } from "@/lib/icons";
+import { ArrowLeft, Edit, Download, Eye, Handshake, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
+import { PageLayout, PageHeader, GlassCard, SectionCard } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 type Contract = {
@@ -175,53 +175,58 @@ export default function ContratSponsorDetailPage() {
 
       {pdfPreviewOpen ? (
         <div ref={previewAnchorRef}>
-          <GlassCard className="overflow-hidden p-0 ring-1 ring-slate-200/90">
-            <p className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
-              {t("dashboard.sponsoring.detail.previewPdf")}
-            </p>
+          <SectionCard
+            title={t("dashboard.sponsoring.detail.previewPdf")}
+            icon={Eye}
+            className="overflow-hidden"
+            bodyClassName="!p-0"
+          >
             <iframe
               title={t("dashboard.sponsoring.detail.previewPdf")}
               src={previewPdfUrl}
               className="h-[min(78vh,920px)] w-full min-h-[420px] border-0 bg-white"
             />
-          </GlassCard>
+          </SectionCard>
         </div>
       ) : null}
 
-      <GlassCard className="p-6 sm:p-8">
-        <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className={`badge-obillz ${statusClass(contract.status)}`}>{statusLabel(contract.status)}</span>
-            <span className="text-sm text-slate-600">
-              {t("dashboard.sponsoring.detail.period")} : {formatDate(contract.startDate)} →{" "}
-              {formatDate(contract.endDate)}
-            </span>
+      <SectionCard
+        title={t("dashboard.sponsoring.detail.title")}
+        description={`${t("dashboard.sponsoring.detail.period")} : ${formatDate(contract.startDate)} → ${formatDate(contract.endDate)}`}
+        icon={Handshake}
+        headerRight={
+          <span className={`badge-obillz ${statusClass(contract.status)}`}>
+            {statusLabel(contract.status)}
+          </span>
+        }
+      >
+        <dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-1.5">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              {t("dashboard.sponsoring.columns.sponsor")}
+            </dt>
+            <dd className="text-base font-semibold text-slate-900">{contract.sponsorName}</dd>
           </div>
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-slate-500">{t("dashboard.sponsoring.columns.sponsor")}</dt>
-              <dd className="font-medium text-slate-900">{contract.sponsorName}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">{t("dashboard.sponsoring.columns.amount")}</dt>
-              <dd className="font-medium text-slate-900">{formatMontant(contract.amount)}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">{t("dashboard.sponsoring.columns.type")}</dt>
-              <dd className="font-medium text-slate-900">{sponsorTypeLabel(contract.sponsorType)}</dd>
-            </div>
-          </dl>
-        </div>
-      </GlassCard>
+          <div className="space-y-1.5">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              {t("dashboard.sponsoring.columns.amount")}
+            </dt>
+            <dd className="text-base font-semibold text-slate-900">{formatMontant(contract.amount)}</dd>
+          </div>
+          <div className="space-y-1.5">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              {t("dashboard.sponsoring.columns.type")}
+            </dt>
+            <dd className="text-base font-semibold text-slate-900">{sponsorTypeLabel(contract.sponsorType)}</dd>
+          </div>
+        </dl>
+      </SectionCard>
 
-      <GlassCard className="p-6 sm:p-8">
-        <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-900">{t("dashboard.sponsoring.detail.contentTitle")}</h2>
-          <pre className="mt-4 whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-800">
-            {contract.content || "—"}
-          </pre>
-        </div>
-      </GlassCard>
+      <SectionCard title={t("dashboard.sponsoring.detail.contentTitle")} icon={FileText}>
+        <p className="whitespace-pre-wrap text-sm leading-7 text-slate-800 sm:text-[0.9375rem] sm:leading-8">
+          {contract.content || "—"}
+        </p>
+      </SectionCard>
 
       <div className="flex flex-wrap gap-3">
         <button
