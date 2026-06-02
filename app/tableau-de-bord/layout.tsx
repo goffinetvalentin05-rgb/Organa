@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { cn } from "@/components/ui/cn";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LandingBackground from "@/components/landing/LandingBackground";
@@ -19,8 +20,10 @@ import {
   Home,
   Menu,
   X,
+  ChevronDown,
   CreditCard,
   Wallet,
+  Building2,
   QrCode,
   Calendar,
   ClipboardList,
@@ -81,20 +84,47 @@ export default function DashboardLayout({
     }
   };
 
-  const navigation = [
+  const FINANCE_ROUTES = [
+    "/tableau-de-bord/devis",
+    "/tableau-de-bord/factures",
+    "/tableau-de-bord/paiements",
+    "/tableau-de-bord/produits",
+    "/tableau-de-bord/depenses",
+  ] as const;
+
+  const isFinanceRoute =
+    pathname != null && FINANCE_ROUTES.some((href) => pathname.startsWith(href));
+
+  const financesSubmenuId = useId();
+
+  const [financesOpen, setFinancesOpen] = useState(isFinanceRoute);
+
+  useEffect(() => {
+    if (isFinanceRoute) {
+      setFinancesOpen(true);
+    }
+  }, [isFinanceRoute]);
+
+  const navigationPrimary = [
     { name: t("dashboard.nav.dashboard"), href: "/tableau-de-bord", icon: LayoutDashboard },
     { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
+  ];
+
+  const navigationFinances = [
     { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
     { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
-    { name: t("dashboard.nav.sponsoring"), href: "/tableau-de-bord/sponsoring", icon: Handshake },
     { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
     { name: t("dashboard.nav.productRevenues"), href: "/tableau-de-bord/produits", icon: ShoppingBag },
+    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Building2 },
+  ];
+
+  const navigationSecondary = [
+    { name: t("dashboard.nav.sponsoring"), href: "/tableau-de-bord/sponsoring", icon: Handshake },
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
     { name: t("dashboard.nav.buvette"), href: "/tableau-de-bord/buvette", icon: Calendar },
     { name: t("dashboard.nav.plannings"), href: "/tableau-de-bord/plannings", icon: ClipboardList },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
     { name: t("dashboard.nav.marketing"), href: "/tableau-de-bord/campagnes-marketing", icon: Mail },
-    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Wallet },
     { name: t("dashboard.nav.settings"), href: "/tableau-de-bord/parametres", icon: Settings },
   ];
 
@@ -191,7 +221,7 @@ export default function DashboardLayout({
               {t("dashboard.navigation.primary")}
             </p>
             <div className="space-y-1">
-              {navigation.map((item) => {
+              {navigationPrimary.map((item) => {
                 const IconComponent = item.icon;
                 const active = isActive(item.href);
                 return (
@@ -199,13 +229,97 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 transition-all duration-200",
                       active
-                        ? "rounded-full bg-white text-[var(--obillz-hero-blue)] font-semibold shadow-lg"
+                        ? "rounded-full bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-lg"
                         : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
-                    }`}
+                    )}
                   >
-                    <IconComponent className={`w-5 h-5 ${active ? "text-[var(--obillz-hero-blue)]" : ""}`} />
+                    <IconComponent className={cn("h-5 w-5", active && "text-[var(--obillz-hero-blue)]")} />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+
+              <div className="pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => setFinancesOpen((open) => !open)}
+                  aria-expanded={financesOpen}
+                  aria-controls={financesSubmenuId}
+                  className={cn(
+                    "flex w-full items-center gap-3 px-4 py-3 transition-all duration-200",
+                    isFinanceRoute
+                      ? "rounded-xl bg-white/15 font-medium text-white ring-1 ring-white/20"
+                      : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  <Wallet className="h-5 w-5 shrink-0" />
+                  <span className="flex-1 text-left font-medium">{t("dashboard.nav.finances")}</span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-white/60 transition-transform duration-200",
+                      financesOpen && "rotate-180"
+                    )}
+                    aria-hidden
+                  />
+                </button>
+
+                <div
+                  id={financesSubmenuId}
+                  role="region"
+                  aria-label={t("dashboard.nav.finances")}
+                  className={cn(
+                    "grid transition-[grid-template-rows] duration-200 ease-out",
+                    financesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <div className="ml-4 mt-1 space-y-0.5 border-l border-white/15 py-1 pl-3">
+                      {navigationFinances.map((item) => {
+                        const IconComponent = item.icon;
+                        const active = isActive(item.href);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className={cn(
+                              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                              active
+                                ? "bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-md"
+                                : "text-white/75 hover:bg-white/10 hover:text-white"
+                            )}
+                          >
+                            <IconComponent
+                              className={cn("h-4 w-4 shrink-0", active && "text-[var(--obillz-hero-blue)]")}
+                            />
+                            <span>{item.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {navigationSecondary.map((item) => {
+                const IconComponent = item.icon;
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 transition-all duration-200",
+                      active
+                        ? "rounded-full bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-lg"
+                        : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    <IconComponent className={cn("h-5 w-5", active && "text-[var(--obillz-hero-blue)]")} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );

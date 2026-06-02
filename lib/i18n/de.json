@@ -527,6 +527,7 @@
     "nav": {
       "dashboard": "Vereins-Dashboard",
       "clients": "Mitglieder",
+      "finances": "Finanzen",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "sponsoring": "Sponsoring",

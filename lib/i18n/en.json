@@ -527,6 +527,7 @@
     "nav": {
       "dashboard": "Club Dashboard",
       "clients": "Members",
+      "finances": "Finances",
       "quotes": "Memberships",
       "invoices": "Invoices",
       "sponsoring": "Sponsoring",
