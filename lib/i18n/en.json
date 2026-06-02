@@ -1812,7 +1812,34 @@
         "Fri",
         "Sat",
         "Sun"
-      ]
+      ],
+      "settings": {
+        "title": "Public page",
+        "subtitle": "Customize the look and shareable booking link for visitors.",
+        "slugLabel": "Public address (slug)",
+        "slugHint": "Lowercase letters, numbers and hyphens only. Must be unique.",
+        "pageTitleLabel": "Displayed title",
+        "pageTitlePlaceholder": "Bar booking",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Pick a slot to help the club during matches and events.",
+        "primaryColorLabel": "Primary color",
+        "accentColorLabel": "Accent color",
+        "accentColorPlaceholder": "Optional — buttons and highlights",
+        "bannerLabel": "Banner (URL)",
+        "bannerHint": "Optional image at the top of the page (https URL).",
+        "logoLabel": "Club logo",
+        "logoHint": "Shown on the public page. Same logo as club settings.",
+        "logoUpload": "Change logo",
+        "logoUploading": "Uploading...",
+        "logoUploadSuccess": "Logo updated",
+        "logoUploadError": "Logo upload failed",
+        "saveAction": "Save public page",
+        "saveSuccess": "Public page saved",
+        "saveError": "Save failed",
+        "loadError": "Could not load settings",
+        "linkCopied": "Link copied",
+        "linkCopyError": "Could not copy link"
+      }
     },
     "marketing": {
       "loading": "Loading...",

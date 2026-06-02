@@ -1663,7 +1663,34 @@
         "Ven",
         "Sam",
         "Dim"
-      ]
+      ],
+      "settings": {
+        "title": "Page publique",
+        "subtitle": "Personnalisez l'apparence et le lien de réservation partagé aux visiteurs.",
+        "slugLabel": "Adresse publique (slug)",
+        "slugHint": "Lettres minuscules, chiffres et tirets uniquement. Doit être unique.",
+        "pageTitleLabel": "Titre affiché",
+        "pageTitlePlaceholder": "Réservation de buvette",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Choisissez votre créneau pour aider le club lors des matchs et événements.",
+        "primaryColorLabel": "Couleur principale",
+        "accentColorLabel": "Couleur d'accent",
+        "accentColorPlaceholder": "Optionnel — boutons et accents",
+        "bannerLabel": "Bannière (URL)",
+        "bannerHint": "Image optionnelle affichée en haut de la page (URL https).",
+        "logoLabel": "Logo du club",
+        "logoHint": "Utilisé sur la page publique. Même logo que dans les paramètres du club.",
+        "logoUpload": "Changer le logo",
+        "logoUploading": "Envoi...",
+        "logoUploadSuccess": "Logo mis à jour",
+        "logoUploadError": "Erreur lors de l'envoi du logo",
+        "saveAction": "Enregistrer la page publique",
+        "saveSuccess": "Page publique enregistrée",
+        "saveError": "Erreur lors de l'enregistrement",
+        "loadError": "Impossible de charger les paramètres",
+        "linkCopied": "Lien copié",
+        "linkCopyError": "Impossible de copier le lien"
+      }
     },
     "marketing": {
       "loading": "Chargement...",

@@ -1,4 +1,4 @@
-import { buildUniqueSlug } from "@/lib/buvette/slug";
+import { suggestBuvetteSlug } from "@/lib/buvette/slug";
 
 type SupabaseLike = {
   from: (table: string) => {
@@ -36,7 +36,7 @@ export async function getOrCreateBuvetteSlug(
     return { slug: profile.buvette_slug, companyName, companyEmail };
   }
 
-  const slug = buildUniqueSlug(companyName, userId);
+  const slug = suggestBuvetteSlug(companyName, userId);
   await supabase
     .from("profiles")
     .update({ buvette_slug: slug, updated_at: new Date().toISOString() })

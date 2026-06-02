@@ -1752,7 +1752,34 @@
         "Fr",
         "Sa",
         "So"
-      ]
+      ],
+      "settings": {
+        "title": "Öffentliche Seite",
+        "subtitle": "Erscheinungsbild und teilbarer Reservierungslink für Besucher anpassen.",
+        "slugLabel": "Öffentliche Adresse (Slug)",
+        "slugHint": "Nur Kleinbuchstaben, Ziffern und Bindestriche. Muss eindeutig sein.",
+        "pageTitleLabel": "Angezeigter Titel",
+        "pageTitlePlaceholder": "Kiosk-Reservierung",
+        "descriptionLabel": "Beschreibung",
+        "descriptionPlaceholder": "Wählen Sie einen Slot, um den Verein bei Spielen und Events zu unterstützen.",
+        "primaryColorLabel": "Hauptfarbe",
+        "accentColorLabel": "Akzentfarbe",
+        "accentColorPlaceholder": "Optional — Schaltflächen und Akzente",
+        "bannerLabel": "Banner (URL)",
+        "bannerHint": "Optionales Bild oben auf der Seite (https-URL).",
+        "logoLabel": "Vereinslogo",
+        "logoHint": "Wird auf der öffentlichen Seite angezeigt. Gleiches Logo wie in den Vereinseinstellungen.",
+        "logoUpload": "Logo ändern",
+        "logoUploading": "Wird hochgeladen...",
+        "logoUploadSuccess": "Logo aktualisiert",
+        "logoUploadError": "Fehler beim Hochladen des Logos",
+        "saveAction": "Öffentliche Seite speichern",
+        "saveSuccess": "Öffentliche Seite gespeichert",
+        "saveError": "Speichern fehlgeschlagen",
+        "loadError": "Einstellungen konnten nicht geladen werden",
+        "linkCopied": "Link kopiert",
+        "linkCopyError": "Link konnte nicht kopiert werden"
+      }
     },
     "marketing": {
       "loading": "Wird geladen...",

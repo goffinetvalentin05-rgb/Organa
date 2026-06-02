@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { buildUniqueSlug } from "@/lib/buvette/slug";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import {
+  mapProfileToBuvetteSettings,
+  BUVETTE_SETTINGS_PROFILE_SELECT,
+} from "@/lib/buvette/settings";
+import { getBuvettePublicUrlPath, suggestBuvetteSlug } from "@/lib/buvette/slug";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
@@ -15,13 +19,15 @@ export async function GET() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("company_name, buvette_slug")
+      .select(BUVETTE_SETTINGS_PROFILE_SELECT)
       .eq("user_id", guard.clubId)
       .maybeSingle();
 
-    let slug = profile?.buvette_slug || null;
+    const companyName = profile?.company_name?.trim() || "Club";
+    let slug = profile?.buvette_slug?.trim() || null;
+
     if (!slug) {
-      slug = buildUniqueSlug(profile?.company_name || "Club", guard.clubId);
+      slug = suggestBuvetteSlug(companyName, guard.clubId);
       const { error: slugErr } = await supabase
         .from("profiles")
         .update({ buvette_slug: slug, updated_at: new Date().toISOString() })
@@ -32,7 +38,11 @@ export async function GET() {
     }
 
     return NextResponse.json(
-      { slug, publicUrlPath: slug ? `/club/${slug}/buvette` : null },
+      {
+        slug,
+        publicUrlPath: slug ? getBuvettePublicUrlPath(slug) : null,
+        settings: mapProfileToBuvetteSettings(profile || { buvette_slug: slug }, guard.clubId),
+      },
       { status: 200 }
     );
   } catch (error: unknown) {

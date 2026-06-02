@@ -77,11 +77,18 @@ export interface ClubBrandPalette {
   headerGradient: string;
 }
 
-export function getClubBrandPalette(primaryRaw: string | null | undefined): ClubBrandPalette {
+export function getClubBrandPalette(
+  primaryRaw: string | null | undefined,
+  accentRaw?: string | null
+): ClubBrandPalette {
   const primary = normalizeHexColor(primaryRaw);
   const primaryDark = darkenHex(primary, 0.28);
   const primarySoft = lightenHex(primary, 0.94);
-  const accent = isLightColor(primary) ? darkenHex(primary, 0.38) : primary;
+  const accent = accentRaw
+    ? normalizeHexColor(accentRaw)
+    : isLightColor(primary)
+      ? darkenHex(primary, 0.38)
+      : primary;
   const accentText = getContrastTextColor(accent);
   const headerText = getContrastTextColor(primary);
   const headerTextMuted =

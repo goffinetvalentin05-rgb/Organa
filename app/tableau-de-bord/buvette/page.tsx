@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
+import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -48,9 +49,6 @@ export default function BuvettePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [publicUrlPath, setPublicUrlPath] = useState<string>("");
-  const [loadingLink, setLoadingLink] = useState(true);
-  const [copying, setCopying] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoMessageDraft, setInfoMessageDraft] = useState("");
   const [sendingInfo, setSendingInfo] = useState(false);
@@ -93,7 +91,6 @@ export default function BuvettePage() {
         if (requestsRes.value.ok) {
           const requestsData = await requestsRes.value.json();
           setRequests(requestsData.requests || []);
-          if (requestsData.publicUrlPath) setPublicUrlPath(requestsData.publicUrlPath);
         } else {
           setMessage(await getApiError(requestsRes.value, "Impossible de charger les demandes"));
         }
@@ -105,30 +102,9 @@ export default function BuvettePage() {
     }
   }, [month]);
 
-  const loadPublicLink = useCallback(async () => {
-    setLoadingLink(true);
-    try {
-      const res = await fetch("/api/buvette/public-link", { cache: "no-store" });
-      if (!res.ok) {
-        setMessage(await getApiError(res, "Impossible de charger le lien public"));
-        return;
-      }
-      const data = await res.json();
-      setPublicUrlPath(data.publicUrlPath || "");
-    } catch (error: unknown) {
-      setMessage(getErrorMessage(error));
-    } finally {
-      setLoadingLink(false);
-    }
-  }, []);
-
   useEffect(() => {
     void loadData();
   }, [loadData]);
-
-  useEffect(() => {
-    void loadPublicLink();
-  }, [loadPublicLink]);
 
   const grid = useMemo(() => buildMonthGrid(month), [month]);
 
@@ -311,67 +287,11 @@ N'hésite pas à nous contacter si tu as des questions.
     }
   };
 
-  const publicUrl =
-    typeof window !== "undefined" && publicUrlPath ? `${window.location.origin}${publicUrlPath}` : "";
-
-  const copyPublicUrl = async () => {
-    if (!publicUrl) return;
-    setCopying(true);
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(publicUrl);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = publicUrl;
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        const copied = document.execCommand("copy");
-        document.body.removeChild(textarea);
-        if (!copied) throw new Error("Copie non supportée");
-      }
-      setMessage("Lien public copié dans le presse-papiers");
-    } catch {
-      setMessage("Impossible de copier automatiquement. Copiez le lien manuellement.");
-    } finally {
-      setCopying(false);
-    }
-  };
-
   return (
     <PageLayout maxWidth="7xl">
-      <PageHeader
-        title="Buvette"
-        subtitle="Gestion des disponibilités et demandes externes."
-        actions={
-          <GlassCard padding="sm" className="max-w-md shrink-0 text-sm shadow-sm">
-            <p className="mb-1 font-medium text-slate-800">Lien public</p>
-            <p className="break-all text-slate-600">{loadingLink ? "Chargement..." : publicUrl || "Indisponible"}</p>
-            {!!publicUrl && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <a
-                  href={publicUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-md border border-slate-200/90 px-2.5 py-1.5 text-xs transition hover:bg-white/80"
-                >
-                  Ouvrir
-                </a>
-                <button
-                  type="button"
-                  onClick={copyPublicUrl}
-                  disabled={copying}
-                  className="rounded-md border border-slate-200/90 px-2.5 py-1.5 text-xs transition hover:bg-white/80 disabled:opacity-50"
-                >
-                  {copying ? "Copie..." : "Copier"}
-                </button>
-              </div>
-            )}
-          </GlassCard>
-        }
-      />
+      <PageHeader title="Buvette" subtitle="Gestion des disponibilités et demandes externes." />
+
+      <BuvettePublicSettingsPanel />
 
       <div className="flex items-center gap-2 text-sm">
         <span className="inline-flex items-center gap-1">
