@@ -26,14 +26,14 @@ export default function LandingNav() {
         transition={{ duration: 0.55, ease: easePremium }}
         className="flex w-full max-w-[920px] items-center justify-between gap-2 rounded-full border border-white/25 bg-white/[0.12] px-3 py-2 shadow-[0_8px_40px_rgba(26,35,255,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-2xl sm:gap-3 sm:px-4 sm:py-2.5 md:px-5 md:py-3"
       >
-        <Link href="/" className="shrink-0 transition hover:opacity-90">
+        <Link href="/" className="flex shrink-0 items-center transition hover:opacity-90">
           <Image
             src="/logo-obillz.png"
             alt="Obillz"
-            width={100}
-            height={24}
+            width={145}
+            height={38}
             priority
-            className="h-6 w-auto sm:h-7"
+            className="h-8 w-auto md:h-10"
           />
         </Link>
 
@@ -53,16 +53,9 @@ export default function LandingNav() {
           <LanguageSwitcher />
           <Link
             href="/connexion"
-            className="hidden rounded-full px-2.5 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white sm:inline sm:px-3.5 sm:py-2 sm:text-sm"
+            className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white sm:px-3.5 sm:py-2 sm:text-sm"
           >
             {t("marketing.nav.login")}
-          </Link>
-          <Link
-            href="/inscription"
-            className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#1A23FF] shadow-[0_0_24px_rgba(26,35,255,0.45),inset_0_1px_0_rgba(255,255,255,0.8)] transition hover:-translate-y-0.5 hover:shadow-[0_0_32px_rgba(26,35,255,0.6)] sm:px-4 sm:py-2 sm:text-sm"
-          >
-            <span className="hidden sm:inline">{t("marketing.nav.cta")}</span>
-            <span className="sm:hidden">{t("marketing.nav.ctaShort")}</span>
           </Link>
         </div>
       </motion.header>
