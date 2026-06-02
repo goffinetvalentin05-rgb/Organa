@@ -263,20 +263,38 @@ export async function POST(request: NextRequest) {
     const totalTVA = calculerTVA(lignes);
     const totalTTC = calculerTotalTTC(lignes);
 
-    // Générer le numéro du document
+    // Générer le numéro du document (unicité: user_id + type + btrim(numero) avec deleted_at IS NULL)
     const year = new Date().getFullYear();
-    const { count: docCount } = await supabase
+    // On compte les documents "actifs" (deleted_at IS NULL) pour coller à l’index unique partiel.
+    const { count: docCount, error: countError } = await supabase
       .from("documents")
       .select("*", { count: "exact", head: true })
       .eq("user_id", guard.clubId)
       .eq("type", type)
+      .is("deleted_at", null)
       .gte("created_at", `${year}-01-01`)
       .lte("created_at", `${year}-12-31`);
-    
-    // Préfixe COT pour les cotisations (quotes), FAC pour les factures
-    const numero = type === "quote" 
-      ? `COT-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`
-      : `FAC-${year}-${String((docCount ?? 0) + 1).padStart(3, "0")}`;
+
+    if (countError) {
+      console.error("ERREUR DOCUMENT COTISATION", {
+        step: "documents.post.count",
+        error: countError,
+        message: (countError as any)?.message,
+        stack: (countError as any)?.stack,
+        data: { docCount },
+        clubId: guard.clubId,
+        memberId: clientId,
+        documentPayload: { type, year },
+        pdfPayload: null,
+        storagePath: null,
+      });
+    }
+
+    // Préfixe COT pour les cotisations (quote), FAC pour les factures (invoice)
+    const prefix = type === "quote" ? "COT" : "FAC";
+    const baseSeq = (docCount ?? 0) + 1;
+    const buildNumero = (seq: number) =>
+      `${prefix}-${year}-${String(seq).padStart(3, "0")}`;
 
     const firstDesignation = lignes
       .map((l: { designation?: string }) => String(l?.designation || "").trim())
@@ -301,7 +319,7 @@ export async function POST(request: NextRequest) {
       total_ht: totalHT,
       total_tva: totalTVA,
       total_ttc: totalTTC,
-      numero: numero,
+      numero: buildNumero(baseSeq),
     };
 
     // Champs “évolutifs” (peuvent ne pas exister si une migration n’a pas été appliquée).
@@ -394,8 +412,47 @@ export async function POST(request: NextRequest) {
       return { data: null, error: { message: "Insert failed after retries" } };
     };
 
-    // Créer le document dans Supabase (table public.documents) avec fallback si migrations manquantes
-    const { data: newDocument, error: insertError } = await tryInsertWithFallback(documentData);
+    // Créer le document dans Supabase (table public.documents) avec fallback colonnes manquantes
+    // + retry automatique sur 23505 (numero déjà pris pour ce club+type)
+    let newDocument: { id: string; numero?: string | null; type?: string | null } | null = null;
+    let insertError: InsertError | null = null;
+
+    for (let retry = 0; retry < 3; retry += 1) {
+      // Recalculer un numéro différent à chaque retry pour éviter duplicate key.
+      documentData.numero = buildNumero(baseSeq + retry);
+
+      const result = await tryInsertWithFallback(documentData);
+      newDocument = result.data;
+      insertError = result.error as InsertError | null;
+
+      if (!insertError) break;
+
+      const code = String((insertError as any)?.code || "");
+      if (code === "23505") {
+        console.error("ERREUR DOCUMENT COTISATION", {
+          step: "documents.post.insert.duplicate-23505",
+          error: insertError,
+          message: (insertError as any)?.message,
+          stack: undefined,
+          data: null,
+          clubId: guard.clubId,
+          memberId: clientId,
+          documentPayload: {
+            ...documentData,
+            number: (documentData as any)?.numero,
+            document_number: (documentData as any)?.document_number,
+            type: documentData.type,
+          },
+          pdfPayload: null,
+          storagePath: null,
+        });
+        // Réessayer avec le prochain numéro
+        continue;
+      }
+
+      // Autre erreur -> stop
+      break;
+    }
 
     if (insertError) {
       console.error("ERREUR DOCUMENT COTISATION", {
@@ -406,29 +463,36 @@ export async function POST(request: NextRequest) {
         data: newDocument,
         clubId: guard.clubId,
         memberId: clientId,
-        documentPayload: documentData,
+        documentPayload: {
+          ...documentData,
+          number: (documentData as any)?.numero,
+          document_number: (documentData as any)?.document_number,
+          type: documentData.type,
+        },
         pdfPayload: null,
         storagePath: null,
       });
       console.error("[API][documents][POST] Erreur Supabase insert:", {
         status: "ERROR",
-        code: insertError.code || "UNKNOWN",
+        code: (insertError as any).code || "UNKNOWN",
         message: insertError.message || "Erreur inconnue",
-        details: insertError.details || null,
-        hint: insertError.hint || null,
+        details: (insertError as any).details || null,
+        hint: (insertError as any).hint || null,
         data_attempted: {
           club_id: guard.clubId,
           auth_user_id: user.id,
           client_id: clientId,
           type: type,
+          numero: documentData.numero,
         },
       });
       return NextResponse.json(
         { 
           error: "Erreur lors de la création du document",
-          details: insertError.message,
-          code: insertError.code,
-          hint: insertError.hint,
+          details: `Erreur document: ${(insertError as any).message || "duplicate"}`,
+          code: (insertError as any).code,
+          hint: (insertError as any).hint,
+          numero: documentData.numero,
         },
         { status: 500 }
       );
