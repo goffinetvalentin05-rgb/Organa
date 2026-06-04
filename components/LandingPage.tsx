@@ -5,7 +5,6 @@ import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import HeroHandVisual from "@/components/landing/HeroHandVisual";
 import HeroSection from "@/components/landing/HeroSection";
-import ObillzFlowSection from "@/components/landing/ObillzFlowSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import LandingNav from "@/components/landing/LandingNav";
@@ -28,7 +27,6 @@ export default function LandingPage() {
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
-        <ObillzFlowSection />
         <ProblemSection />
         <ModulesSection />
         <HowItWorksSection />
