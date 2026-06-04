@@ -37,7 +37,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
             aria-pressed={isActive}
             className={`relative rounded-full font-semibold uppercase transition-all duration-200 ${
               compact
-                ? "min-w-[1.65rem] px-1.5 py-0.5 text-[9px] tracking-[0.08em]"
+                ? "min-w-[1.75rem] px-1.5 py-[3px] text-[10px] leading-none tracking-[0.06em] sm:min-w-[1.85rem] sm:px-[7px] sm:py-0.5 sm:text-[10px]"
                 : "min-w-[2.25rem] px-2.5 py-1.5 text-[11px] tracking-[0.12em]"
             } ${
               isActive

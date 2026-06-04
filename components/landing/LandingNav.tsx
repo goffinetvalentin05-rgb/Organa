@@ -18,26 +18,29 @@ export default function LandingNav() {
   const { t } = useI18n();
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-5 sm:px-8 sm:pt-6 md:pt-7">
+    <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
       <motion.header
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className="grid h-12 w-full max-w-[min(100%,1060px)] grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-5 shadow-[0_12px_48px_rgba(0,0,0,0.35),0_4px_24px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl sm:h-[3.25rem] sm:max-w-[min(100%,1100px)] sm:gap-4 sm:px-7 md:h-14 md:px-8"
+        className="flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-white/20 bg-white/[0.08] px-3.5 shadow-[0_12px_48px_rgba(0,0,0,0.35),0_4px_24px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
       >
-        <Link href="/" className="flex h-full max-h-9 shrink-0 items-center justify-self-start transition hover:opacity-90 sm:max-h-10">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center transition hover:opacity-90 lg:justify-self-start"
+        >
           <Image
             src="/obillz-logo.png"
             alt="Obillz"
             width={200}
             height={48}
             priority
-            className="h-7 w-auto sm:h-8"
+            className="h-8 w-auto sm:h-8 lg:h-9"
           />
         </Link>
 
         <nav
-          className="hidden items-center justify-center gap-6 justify-self-center lg:flex xl:gap-8"
+          className="hidden items-center justify-center gap-6 lg:flex xl:gap-8"
           aria-label="Navigation"
         >
           {linkKeys.map((link) => (
@@ -51,11 +54,11 @@ export default function LandingNav() {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center justify-self-end gap-2.5 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:justify-self-end lg:gap-3">
           <LanguageSwitcher compact />
           <Link
             href="/connexion"
-            className="rounded-full border border-white/30 bg-white/[0.04] px-4 py-1.5 text-[13px] font-medium text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/45 hover:bg-white/[0.1] xl:px-5 xl:py-2 xl:text-sm"
+            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/45 hover:bg-white/[0.1] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
           >
             {t("marketing.nav.login")}
           </Link>
