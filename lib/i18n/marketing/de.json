@@ -15,12 +15,36 @@
   },
   "hero": {
     "title": "Verein verwalten, ohne den Abend zu verlieren.",
+    "titleLine1": "Verein verwalten,",
+    "titleLine2": "ohne den Abend zu verlieren.",
     "subtitle": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine.",
+    "keywords": "Mitglieder • Beiträge • Rechnungen • Events",
     "ctaPrimary": "Obillz kostenlos testen",
     "ctaSecondary": "So funktioniert's",
     "hubAriaLabel": "Übersicht der Obillz-Module",
+    "convergenceAriaLabel": "Vereinsverwaltung vereint in Obillz",
+    "hubBaseline": "Ihr ganzer Verein, an einem Ort.",
+    "fluxLabel": "Zerstreut → zentralisiert",
     "hubModules": {
-      "campagnes": "Kampagnen"
+      "membres": "Zentrale Datenbank",
+      "cotisations": "Echtzeit-Tracking",
+      "factures": "PDF & Erinnerungen",
+      "paiements": "Sichere Eingänge",
+      "evenements": "Anmeldungen & Planung",
+      "page-publique": "Vereinsauftritt"
+    }
+  },
+  "flow": {
+    "ariaLabel": "Vereinsverwaltung zentral in Obillz",
+    "sources": {
+      "membres": { "subtitle": "Daten & Verlauf" },
+      "cotisations": { "subtitle": "Saisons & Mahnungen" },
+      "factures": { "subtitle": "PDF & Versand" },
+      "evenements": { "subtitle": "Vereinskalender" },
+      "paiements": { "subtitle": "Eingänge" },
+      "depenses": { "subtitle": "Buchhaltung" },
+      "buvette": { "subtitle": "Spieltags-Slots" },
+      "page-publique": { "subtitle": "Online-Auftritt" }
     }
   },
   "problem": {

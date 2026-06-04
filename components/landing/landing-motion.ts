@@ -67,11 +67,30 @@ export const floatY = (delay = 0) => ({
 });
 
 export const heroTitleLine = {
-  hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
+  hidden: { opacity: 0, y: 28, filter: "blur(10px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.65, ease: easePremium },
+    transition: { duration: 0.75, ease: easePremium },
+  },
+};
+
+export const heroSubtitleLine = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay: 0.12, ease: easePremium },
+  },
+};
+
+export const heroCtaEnter = {
+  hidden: { opacity: 0, y: 22, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.55, delay: 0.28, ease: easePremium },
   },
 };

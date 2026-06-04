@@ -9,12 +9,21 @@ const options: { code: Locale; label: string }[] = [
   { code: "de", label: "DE" },
 ];
 
-export default function LanguageSwitcher() {
+type LanguageSwitcherProps = {
+  /** Variante discrète pour la navbar landing */
+  compact?: boolean;
+};
+
+export default function LanguageSwitcher({ compact = false }: LanguageSwitcherProps) {
   const { locale, setLocale, t } = useI18n();
 
   return (
     <div
-      className="flex items-center rounded-full border border-white/20 bg-white/[0.08] p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md"
+      className={`flex items-center rounded-full border bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md ${
+        compact
+          ? "border-white/15 p-px"
+          : "border-white/20 p-0.5"
+      }`}
       role="group"
       aria-label={t("common.languageSelector")}
     >
@@ -26,10 +35,16 @@ export default function LanguageSwitcher() {
             type="button"
             onClick={() => setLocale(option.code)}
             aria-pressed={isActive}
-            className={`relative min-w-[2.25rem] rounded-full px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition-all duration-200 ${
+            className={`relative rounded-full font-semibold uppercase transition-all duration-200 ${
+              compact
+                ? "min-w-[1.65rem] px-1.5 py-0.5 text-[9px] tracking-[0.08em]"
+                : "min-w-[2.25rem] px-2.5 py-1.5 text-[11px] tracking-[0.12em]"
+            } ${
               isActive
-                ? "bg-white text-[#1A23FF] shadow-[0_0_16px_rgba(26,35,255,0.35)]"
-                : "text-white/75 hover:bg-white/10 hover:text-white"
+                ? compact
+                  ? "bg-white/95 text-[#1A23FF] shadow-[0_0_8px_rgba(26,35,255,0.25)]"
+                  : "bg-white text-[#1A23FF] shadow-[0_0_16px_rgba(26,35,255,0.35)]"
+                : "text-white/70 hover:bg-white/10 hover:text-white"
             }`}
           >
             {option.label}

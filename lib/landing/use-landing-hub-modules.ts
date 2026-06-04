@@ -16,10 +16,8 @@ export function useLandingHubModules(): HubModuleBase[] {
       LANDING_HUB_MODULE_IDS.map((id) => ({
         id,
         icon: landingHubModuleIcons[id],
-        label:
-          id === "campagnes"
-            ? t("marketing.hero.hubModules.campagnes")
-            : t(`marketing.modules.items.${id}.title`),
+        label: t(`marketing.modules.items.${id}.title`),
+        hint: t(`marketing.hero.hubModules.${id}`),
       })),
     [t]
   );

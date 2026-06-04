@@ -15,12 +15,36 @@
   },
   "hero": {
     "title": "Gérez votre club sans perdre vos soirées.",
+    "titleLine1": "Gérez votre club",
+    "titleLine2": "sans perdre vos soirées.",
     "subtitle": "Factures, membres, cotisations, événements et paiements réunis dans un seul logiciel pensé pour les clubs sportifs.",
+    "keywords": "Membres • Cotisations • Factures • Événements",
     "ctaPrimary": "Tester Obillz gratuitement",
     "ctaSecondary": "Voir comment ça marche",
     "hubAriaLabel": "Aperçu des modules Obillz",
+    "convergenceAriaLabel": "La gestion du club réunie dans Obillz",
+    "hubBaseline": "Tout votre club, au même endroit.",
+    "fluxLabel": "Dispersé → centralisé",
     "hubModules": {
-      "campagnes": "Campagnes"
+      "membres": "Base centralisée",
+      "cotisations": "Suivi en temps réel",
+      "factures": "PDF & relances",
+      "paiements": "Encaissements sécurisés",
+      "evenements": "Inscriptions & planification",
+      "page-publique": "Vitrine de votre club"
+    }
+  },
+  "flow": {
+    "ariaLabel": "Centralisation de la gestion du club dans Obillz",
+    "sources": {
+      "membres": { "subtitle": "Fiches & suivi" },
+      "cotisations": { "subtitle": "Saisons & relances" },
+      "factures": { "subtitle": "PDF & envoi" },
+      "evenements": { "subtitle": "Calendrier club" },
+      "paiements": { "subtitle": "Encaissements" },
+      "depenses": { "subtitle": "Comptabilité" },
+      "buvette": { "subtitle": "Créneaux matchs" },
+      "page-publique": { "subtitle": "Vitrine en ligne" }
     }
   },
   "problem": {

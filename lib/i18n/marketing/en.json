@@ -15,12 +15,36 @@
   },
   "hero": {
     "title": "Run your club without losing your evenings.",
+    "titleLine1": "Run your club",
+    "titleLine2": "without losing your evenings.",
     "subtitle": "Invoices, members, membership fees, events and payments in one platform built for sports clubs.",
+    "keywords": "Members • Fees • Invoices • Events",
     "ctaPrimary": "Try Obillz for free",
     "ctaSecondary": "See how it works",
     "hubAriaLabel": "Obillz modules overview",
+    "convergenceAriaLabel": "Club management unified in Obillz",
+    "hubBaseline": "Your whole club, in one place.",
+    "fluxLabel": "Scattered → centralized",
     "hubModules": {
-      "campagnes": "Campaigns"
+      "membres": "Centralized database",
+      "cotisations": "Real-time tracking",
+      "factures": "PDF & reminders",
+      "paiements": "Secure collections",
+      "evenements": "Sign-ups & scheduling",
+      "page-publique": "Your club showcase"
+    }
+  },
+  "flow": {
+    "ariaLabel": "Club management centralized in Obillz",
+    "sources": {
+      "membres": { "subtitle": "Profiles & tracking" },
+      "cotisations": { "subtitle": "Seasons & reminders" },
+      "factures": { "subtitle": "PDF & sending" },
+      "evenements": { "subtitle": "Club calendar" },
+      "paiements": { "subtitle": "Collections" },
+      "depenses": { "subtitle": "Accounting" },
+      "buvette": { "subtitle": "Match-day slots" },
+      "page-publique": { "subtitle": "Online showcase" }
     }
   },
   "problem": {

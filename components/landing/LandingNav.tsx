@@ -8,7 +8,6 @@ import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
 const linkKeys = [
-  { href: "#probleme", key: "marketing.nav.problem" },
   { href: "#modules", key: "marketing.nav.modules" },
   { href: "#comment-ca-marche", key: "marketing.nav.howItWorks" },
   { href: "#tarifs", key: "marketing.nav.pricing" },
@@ -19,41 +18,44 @@ export default function LandingNav() {
   const { t } = useI18n();
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4 sm:pt-4 md:pt-5">
+    <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-5 sm:px-8 sm:pt-6 md:pt-7">
       <motion.header
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className="flex w-full max-w-[920px] items-center justify-between gap-2 rounded-full border border-white/25 bg-white/[0.12] px-3 py-2 shadow-[0_8px_40px_rgba(26,35,255,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-2xl sm:gap-3 sm:px-4 sm:py-2.5 md:px-5 md:py-3"
+        className="grid h-12 w-full max-w-[min(100%,1060px)] grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-5 shadow-[0_12px_48px_rgba(0,0,0,0.35),0_4px_24px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl sm:h-[3.25rem] sm:max-w-[min(100%,1100px)] sm:gap-4 sm:px-7 md:h-14 md:px-8"
       >
-        <Link href="/" className="flex shrink-0 items-center transition hover:opacity-90">
+        <Link href="/" className="flex h-full max-h-9 shrink-0 items-center justify-self-start transition hover:opacity-90 sm:max-h-10">
           <Image
-            src="/logo-obillz.png"
+            src="/obillz-logo.png"
             alt="Obillz"
-            width={145}
-            height={38}
+            width={200}
+            height={48}
             priority
-            className="h-10 w-auto md:h-12"
+            className="h-7 w-auto sm:h-8"
           />
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Navigation">
+        <nav
+          className="hidden items-center justify-center gap-6 justify-self-center lg:flex xl:gap-8"
+          aria-label="Navigation"
+        >
           {linkKeys.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/15 hover:text-white"
+              className="text-[13px] font-medium text-white/60 transition hover:text-white/95 xl:text-sm"
             >
               {t(link.key)}
             </a>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <LanguageSwitcher />
+        <div className="flex shrink-0 items-center justify-self-end gap-2.5 sm:gap-3">
+          <LanguageSwitcher compact />
           <Link
             href="/connexion"
-            className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white sm:px-3.5 sm:py-2 sm:text-sm"
+            className="rounded-full border border-white/30 bg-white/[0.04] px-4 py-1.5 text-[13px] font-medium text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/45 hover:bg-white/[0.1] xl:px-5 xl:py-2 xl:text-sm"
           >
             {t("marketing.nav.login")}
           </Link>
