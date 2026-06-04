@@ -155,15 +155,6 @@ export const FLOW_SOURCES: FlowSourceDef[] = [
   },
 ];
 
-export const MOBILE_FLOW_SOURCE_IDS: FlowSourceId[] = [
-  "membres",
-  "cotisations",
-  "factures",
-  "paiements",
-  "depenses",
-  "buvette",
-];
-
 export const FLOW_HUB_MODULES = LANDING_MODULE_IDS.map((id) => ({
   id,
   icon: landingModuleIcons[id],

@@ -36,6 +36,7 @@
   },
   "flow": {
     "ariaLabel": "Club management centralized in Obillz",
+    "mobileHint": "All your tools in one place",
     "sources": {
       "membres": { "subtitle": "Profiles & tracking" },
       "cotisations": { "subtitle": "Seasons & reminders" },

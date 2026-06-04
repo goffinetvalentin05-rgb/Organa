@@ -36,6 +36,7 @@
   },
   "flow": {
     "ariaLabel": "Centralisation de la gestion du club dans Obillz",
+    "mobileHint": "Tous vos outils réunis au même endroit",
     "sources": {
       "membres": { "subtitle": "Fiches & suivi" },
       "cotisations": { "subtitle": "Saisons & relances" },

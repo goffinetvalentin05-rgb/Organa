@@ -36,6 +36,7 @@
   },
   "flow": {
     "ariaLabel": "Vereinsverwaltung zentral in Obillz",
+    "mobileHint": "Alle Tools an einem Ort",
     "sources": {
       "membres": { "subtitle": "Daten & Verlauf" },
       "cotisations": { "subtitle": "Saisons & Mahnungen" },
