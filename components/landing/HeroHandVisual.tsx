@@ -18,7 +18,7 @@ export default function HeroHandVisual() {
     >
       <div className="relative h-[min(78vw,640px)] sm:h-[min(68vw,700px)] md:h-[min(60vw,760px)] lg:h-[min(54vw,820px)]">
         <div
-          className="pointer-events-none absolute bottom-[8%] right-0 h-[min(72vw,540px)] w-[min(58vw,460px)] bg-[radial-gradient(ellipse_at_100%_90%,rgba(26,35,255,0.38),transparent_68%)] blur-3xl"
+          className="pointer-events-none absolute bottom-[8%] right-0 h-[min(72vw,540px)] w-[min(58vw,460px)] bg-[radial-gradient(ellipse_at_100%_90%,rgba(26,35,255,0.55),rgba(99,102,241,0.2)_45%,transparent_65%)] blur-3xl"
           aria-hidden
         />
 

@@ -1,14 +1,13 @@
 "use client";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
-import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
-import LandingFooter from "@/components/landing/LandingFooter";
-import HeroHandVisual from "@/components/landing/HeroHandVisual";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingBackground from "@/components/landing/LandingBackground";
+import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
+import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
-import ModulesSection from "@/components/landing/ModulesSection";
+import ModulesOrbitSection from "@/components/landing/ModulesOrbitSection";
 import ProblemSection from "@/components/landing/ProblemSection";
 import FaqSection from "@/components/landing/FaqSection";
 import PricingSection from "@/components/landing/PricingSection";
@@ -28,12 +27,11 @@ export default function LandingPage() {
         <LandingNav />
         <HeroSection />
         <ProblemSection />
-        <ModulesSection />
+        <ModulesOrbitSection />
         <HowItWorksSection />
         <PricingSection />
         <FaqSection />
         <FinalCtaSection />
-        <HeroHandVisual />
 
         <LandingFooter />
       </div>

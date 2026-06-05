@@ -119,6 +119,17 @@
           "chips": ["Brouillon", "Envoyée", "Payée"]
         }
       },
+      "planning": {
+        "title": "Planning",
+        "tagline": "Affectations et créneaux centralisés",
+        "description": "Organisez les plannings du club, les créneaux buvette et les affectations d'équipe depuis un calendrier unique.",
+        "bullets": ["Vue calendrier claire", "Affectations par créneau", "Export PDF"],
+        "preview": {
+          "headline": "12 créneaux",
+          "sub": "3 matchs ce week-end",
+          "chips": ["À venir", "Confirmé", "Passé"]
+        }
+      },
       "evenements": {
         "title": "Événements",
         "tagline": "Inscriptions et plannings simplifiés",
@@ -141,6 +152,17 @@
           "chips": ["Cotisations", "Buvette", "Événements"]
         }
       },
+      "utilisateurs": {
+        "title": "Utilisateurs & accès",
+        "tagline": "Comité multi-utilisateurs",
+        "description": "Invitez les membres du comité avec des rôles et permissions adaptés à chaque module.",
+        "bullets": ["Invitations par e-mail", "Rôles par module", "Traçabilité des actions"],
+        "preview": {
+          "headline": "5 comptes",
+          "sub": "3 admins · 2 trésoriers",
+          "chips": ["Admin", "Trésorier", "Invité"]
+        }
+      },
       "depenses": {
         "title": "Dépenses",
         "tagline": "Charges du club sous contrôle",
@@ -161,6 +183,17 @@
           "headline": "Créneaux buvette",
           "sub": "Samedi 14h–18h · confirmé",
           "chips": ["Demandé", "Confirmé", "Passé"]
+        }
+      },
+      "sponsors": {
+        "title": "Sponsors",
+        "tagline": "Partenaires et contrats suivis",
+        "description": "Gérez vos sponsors, contrats et factures associées sans perdre le fil des engagements.",
+        "bullets": ["Fiches sponsors", "Contrats & factures", "Suivi des paiements"],
+        "preview": {
+          "headline": "8 sponsors",
+          "sub": "2 contrats à renouveler",
+          "chips": ["Actif", "Contrat", "Facturé"]
         }
       },
       "page-publique": {

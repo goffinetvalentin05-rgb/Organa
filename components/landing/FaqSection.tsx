@@ -12,17 +12,23 @@ import {
 } from "@/components/landing/landing-motion";
 import { useI18n } from "@/components/I18nProvider";
 import { useLandingFaq, type LandingFaqItem } from "@/lib/landing/use-landing-faq";
+import {
+  landingFeaturedCardClass,
+  landingGlassCardClass,
+  landingSectionDividerClass,
+  landingSectionShellClass,
+} from "@/components/ui/styles";
 
 function FeaturedCard({ item, reduceMotion }: { item: LandingFaqItem; reduceMotion: boolean | null }) {
   const Icon = item.icon;
   return (
     <motion.article
       variants={staggerItem}
-      whileHover={reduceMotion ? undefined : { y: -2 }}
-      className="group relative overflow-hidden rounded-xl border border-blue-400/25 bg-gradient-to-r from-[#1A23FF]/10 via-white/[0.04] to-transparent px-4 py-3 shadow-[0_0_28px_rgba(26,35,255,0.12)] backdrop-blur-md md:px-4 md:py-3.5"
+      whileHover={reduceMotion ? undefined : { y: -3 }}
+      className={`${landingFeaturedCardClass} px-4 py-3 md:px-4 md:py-3.5`}
     >
       <div className="relative flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1A23FF]/90 text-white shadow-[0_0_16px_rgba(26,35,255,0.4)]">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#1A23FF] to-[#4338ca] text-white shadow-[0_0_20px_rgba(26,35,255,0.45)]">
           <Icon className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
@@ -59,12 +65,12 @@ function AccordionItem({
     <motion.article
       layout={!reduceMotion}
       variants={staggerItem}
-      className={`relative overflow-hidden rounded-2xl border backdrop-blur-md transition-shadow duration-300 ${
+      className={`relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
         isOpen
-          ? "border-blue-400/35 bg-gradient-to-r from-[#1A23FF]/12 to-transparent shadow-[0_0_40px_rgba(26,35,255,0.22)]"
+          ? landingFeaturedCardClass
           : isAlt
-            ? "border-white/[0.06] bg-white/[0.02] ml-0 md:ml-4"
-            : "border-white/[0.08] bg-white/[0.04] mr-0 md:mr-4"
+            ? `${landingGlassCardClass} ml-0 md:ml-4`
+            : `${landingGlassCardClass} mr-0 md:mr-4`
       }`}
     >
       <button
@@ -134,10 +140,7 @@ export default function FaqSection() {
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden
       />
-      <div
-        className="pointer-events-none absolute inset-x-[10%] top-0 h-px bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"
-        aria-hidden
-      />
+      <div className={landingSectionDividerClass} aria-hidden />
 
       <div className="relative mx-auto w-[94%] max-w-[1060px]">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-14 lg:items-start">
@@ -151,7 +154,7 @@ export default function FaqSection() {
           >
             <motion.p
               variants={staggerItem}
-              className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-[#1A23FF]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 shadow-[0_0_28px_rgba(26,35,255,0.25)]"
+              className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-gradient-to-r from-[#1A23FF]/15 to-[#6366f1]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 shadow-[0_0_32px_rgba(26,35,255,0.28),inset_0_1px_0_rgba(255,255,255,0.1)]"
             >
               <HelpCircle className="h-3.5 w-3.5" aria-hidden />
               {t("marketing.faq.badge")}
@@ -200,7 +203,7 @@ export default function FaqSection() {
               initial="hidden"
               whileInView="visible"
               viewport={viewportOnce}
-              className="relative space-y-2.5 rounded-[1.5rem] border border-white/[0.08] bg-white/[0.02] p-3 shadow-[0_0_60px_rgba(26,35,255,0.1)] backdrop-blur-sm md:p-4"
+              className={`${landingSectionShellClass} space-y-2.5 p-3 md:p-4`}
             >
               <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300/70">
                 {t("marketing.faq.otherQuestions")}

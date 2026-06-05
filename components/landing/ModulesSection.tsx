@@ -6,6 +6,12 @@ import { Check, ChevronRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
 import { useLandingModules } from "@/lib/landing/use-landing-modules";
 import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
+import {
+  landingIconBadgeActiveClass,
+  landingInnerPanelClass,
+  landingSectionGlowClass,
+  landingSectionShellClass,
+} from "@/components/ui/styles";
 
 const AUTO_MS = 5200;
 
@@ -36,10 +42,7 @@ export default function ModulesSection() {
 
   return (
     <section id="modules" className="relative scroll-mt-24 py-16 md:py-24">
-      <div
-        className="pointer-events-none absolute inset-x-[5%] top-1/2 h-[min(420px,60vh)] -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.2),transparent_70%)] blur-3xl"
-        aria-hidden
-      />
+      <div className={landingSectionGlowClass} aria-hidden />
 
       <div className="relative mx-auto w-[94%] max-w-[1160px]">
         <motion.div
@@ -65,7 +68,7 @@ export default function ModulesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportOnce}
           transition={{ duration: 0.7, ease: easePremium }}
-          className="mt-10 overflow-hidden rounded-[1.5rem] border border-blue-400/20 bg-gradient-to-br from-[#1A23FF]/[0.12] via-white/[0.04] to-transparent p-4 shadow-[0_0_60px_rgba(26,35,255,0.15)] backdrop-blur-xl md:mt-14 md:rounded-[1.75rem] md:p-6"
+          className={`${landingSectionShellClass} mt-10 p-4 md:mt-14 md:p-6`}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -81,15 +84,15 @@ export default function ModulesSection() {
                     onClick={() => goTo(index)}
                     className={`flex min-w-[148px] shrink-0 items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-all duration-300 lg:min-w-0 lg:w-full lg:px-4 lg:py-3.5 ${
                       isActive
-                        ? "border-blue-400/45 bg-[#1A23FF]/20 shadow-[0_0_28px_rgba(26,35,255,0.35),inset_0_1px_0_rgba(255,255,255,0.12)]"
-                        : "border-white/[0.08] bg-white/[0.03] hover:border-blue-400/25 hover:bg-white/[0.06]"
+                        ? "border-blue-300/55 bg-gradient-to-br from-[#1A23FF]/35 to-[#6366f1]/15 shadow-[0_0_40px_rgba(26,35,255,0.45),inset_0_1px_0_rgba(255,255,255,0.18)]"
+                        : "border-blue-400/20 bg-white/[0.06] hover:-translate-y-0.5 hover:border-blue-300/35 hover:bg-[#1A23FF]/[0.1] hover:shadow-[0_0_32px_rgba(26,35,255,0.2)]"
                     }`}
                   >
                     <span
                       className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-shadow duration-300 ${
                         isActive
-                          ? "bg-[#1A23FF] text-white shadow-[0_0_20px_rgba(26,35,255,0.55)]"
-                          : "bg-[#1A23FF]/15 text-blue-300 ring-1 ring-[#1A23FF]/25"
+                          ? "bg-gradient-to-br from-[#1A23FF] to-[#4338ca] text-white shadow-[0_0_24px_rgba(26,35,255,0.55)]"
+                          : "bg-[#1A23FF]/15 text-blue-300 ring-1 ring-[#1A23FF]/30"
                       }`}
                     >
                       <ModIcon className="h-4 w-4" strokeWidth={2} aria-hidden />
@@ -105,9 +108,9 @@ export default function ModulesSection() {
               })}
             </div>
 
-            <div className="relative min-h-[320px] overflow-hidden rounded-2xl border border-white/10 bg-[#060b1c]/80 md:min-h-[360px]">
+            <div className="landing-glass-card relative min-h-[320px] overflow-hidden rounded-2xl border border-blue-400/30 bg-gradient-to-br from-[#060b1c]/95 via-[#0a1028]/85 to-[#1A23FF]/[0.12] shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_8px_40px_rgba(0,0,0,0.45),0_0_60px_rgba(26,35,255,0.25)] md:min-h-[360px]">
               <div
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(26,35,255,0.25),transparent)]"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(26,35,255,0.35),transparent)]"
                 aria-hidden
               />
 
@@ -123,7 +126,7 @@ export default function ModulesSection() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1A23FF] text-white shadow-[0_0_24px_rgba(26,35,255,0.5)]">
+                        <span className={landingIconBadgeActiveClass}>
                           <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
                         </span>
                         <h3 className="text-xl font-black text-white md:text-2xl">{current.title}</h3>
@@ -147,7 +150,7 @@ export default function ModulesSection() {
                     ))}
                   </ul>
 
-                  <div className="relative mt-6 flex-1 rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:mt-8 md:p-5">
+                  <div className={`${landingInnerPanelClass} mt-6 flex-1 p-4 md:mt-8 md:p-5`}>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-blue-300/70">
                       {t("marketing.modules.previewLabel")}
                     </p>

@@ -23,7 +23,7 @@ export default function LandingNav() {
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className="flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-white/20 bg-white/[0.08] px-3.5 shadow-[0_12px_48px_rgba(0,0,0,0.35),0_4px_24px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
+        className="flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-blue-300/30 bg-gradient-to-r from-white/[0.12] via-[#1A23FF]/[0.08] to-white/[0.1] px-3.5 shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_12px_48px_rgba(0,0,0,0.45),0_0_48px_rgba(26,35,255,0.2),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
       >
         <Link
           href="/"
@@ -58,7 +58,7 @@ export default function LandingNav() {
           <LanguageSwitcher compact />
           <Link
             href="/connexion"
-            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/45 hover:bg-white/[0.1] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
+            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/90 shadow-[0_0_20px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.1)] transition hover:border-white/45 hover:bg-white/[0.12] hover:shadow-[0_0_28px_rgba(26,35,255,0.2)] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
           >
             {t("marketing.nav.login")}
           </Link>

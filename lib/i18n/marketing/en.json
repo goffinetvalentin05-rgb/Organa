@@ -119,6 +119,17 @@
           "chips": ["Draft", "Sent", "Paid"]
         }
       },
+      "planning": {
+        "title": "Scheduling",
+        "tagline": "Slots and assignments in one place",
+        "description": "Organise club schedules, bar slots and team assignments from a single calendar.",
+        "bullets": ["Clear calendar view", "Per-slot assignments", "PDF export"],
+        "preview": {
+          "headline": "12 slots",
+          "sub": "3 matches this weekend",
+          "chips": ["Upcoming", "Confirmed", "Past"]
+        }
+      },
       "evenements": {
         "title": "Events",
         "tagline": "Simpler sign-ups and schedules",
@@ -141,6 +152,17 @@
           "chips": ["Fees", "Bar", "Events"]
         }
       },
+      "utilisateurs": {
+        "title": "Users & access",
+        "tagline": "Multi-user committee",
+        "description": "Invite committee members with roles and permissions tailored to each module.",
+        "bullets": ["Email invitations", "Per-module roles", "Action audit trail"],
+        "preview": {
+          "headline": "5 accounts",
+          "sub": "3 admins · 2 treasurers",
+          "chips": ["Admin", "Treasurer", "Guest"]
+        }
+      },
       "depenses": {
         "title": "Expenses",
         "tagline": "Club costs under control",
@@ -161,6 +183,17 @@
           "headline": "Bar slots",
           "sub": "Saturday 2–6 pm · confirmed",
           "chips": ["Requested", "Confirmed", "Past"]
+        }
+      },
+      "sponsors": {
+        "title": "Sponsors",
+        "tagline": "Partners and contracts tracked",
+        "description": "Manage sponsors, contracts and related invoices without losing track of commitments.",
+        "bullets": ["Sponsor profiles", "Contracts & invoices", "Payment tracking"],
+        "preview": {
+          "headline": "8 sponsors",
+          "sub": "2 contracts to renew",
+          "chips": ["Active", "Contract", "Invoiced"]
         }
       },
       "page-publique": {

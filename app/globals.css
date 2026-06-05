@@ -519,6 +519,96 @@ h3 {
   animation: landing-cta-shimmer 0.75s ease;
 }
 
+/* ------------------------------------------------------------------
+   Landing premium — cartes glass avec relief et lumière
+   ------------------------------------------------------------------ */
+.landing-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 90% 55% at 50% -15%,
+    rgba(147, 197, 253, 0.18),
+    rgba(26, 35, 255, 0.08) 40%,
+    transparent 65%
+  );
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.landing-glass-card::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(147, 197, 253, 0.55),
+    rgba(255, 255, 255, 0.35),
+    rgba(147, 197, 253, 0.55),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.landing-glass-card:hover::before {
+  background: radial-gradient(
+    ellipse 90% 55% at 50% -15%,
+    rgba(147, 197, 253, 0.28),
+    rgba(26, 35, 255, 0.14) 40%,
+    transparent 65%
+  );
+}
+
+.landing-glass-card > *:not([aria-hidden]) {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-glass-card-featured::before {
+  background: radial-gradient(
+    ellipse 100% 65% at 50% -5%,
+    rgba(26, 35, 255, 0.35),
+    rgba(147, 197, 253, 0.12) 45%,
+    transparent 70%
+  );
+}
+
+.landing-glass-card-featured::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(147, 197, 253, 0.65),
+    rgba(255, 255, 255, 0.45),
+    rgba(147, 197, 253, 0.65),
+    transparent
+  );
+}
+
+/* Hero — halo texte et profondeur */
+.landing-hero-title-glow {
+  text-shadow:
+    0 0 40px rgba(26, 35, 255, 0.6),
+    0 0 80px rgba(99, 102, 241, 0.35),
+    0 0 120px rgba(139, 92, 246, 0.2);
+}
+
+.landing-hero-cta {
+  background: linear-gradient(135deg, #1A23FF 0%, #6366f1 40%, #4338ca 70%, #1A23FF 100%);
+  background-size: 200% 200%;
+  transition: background-position 0.4s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+}
+
+.landing-hero-cta:hover {
+  background-position: 100% 100%;
+}
+
 /* Texture grain légère — fond landing premium */
 .landing-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");

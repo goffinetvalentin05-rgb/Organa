@@ -11,6 +11,11 @@ import {
   staggerItem,
   viewportOnce,
 } from "@/components/landing/landing-motion";
+import {
+  landingFeaturedCardClass,
+  landingGlassCardClass,
+  landingSectionGlowClass,
+} from "@/components/ui/styles";
 import { type PlanPricing, STANDARD_PRICING, TEAM_PRICING, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 type BillingCycle = "monthly" | "yearly";
@@ -48,24 +53,30 @@ function PlanCard({
 
   return (
     <article
-      className={`relative flex flex-col rounded-2xl border p-6 backdrop-blur-md md:p-7 ${
+      className={`relative flex w-full flex-col p-6 md:p-7 ${
         highlighted
-          ? "border-blue-400/40 bg-gradient-to-b from-[#1A23FF]/20 via-white/[0.06] to-transparent shadow-[0_0_60px_rgba(26,35,255,0.25)]"
-          : "border-white/[0.1] bg-white/[0.04]"
+          ? `${landingFeaturedCardClass} md:scale-[1.03] md:shadow-[0_0_0_1px_rgba(147,197,253,0.3),0_16px_64px_rgba(0,0,0,0.55),0_0_120px_rgba(26,35,255,0.45)]`
+          : landingGlassCardClass
       }`}
     >
       {highlighted ? (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#1A23FF] px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-[0_0_20px_rgba(26,35,255,0.6)]">
-          {teamBadge}
-        </span>
+        <>
+          <div
+            className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-blue-400/30 via-transparent to-indigo-500/20 opacity-60"
+            aria-hidden
+          />
+          <span className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#1A23FF] via-[#6366f1] to-[#1A23FF] px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-[0_0_32px_rgba(26,35,255,0.75)]">
+            {teamBadge}
+          </span>
+        </>
       ) : null}
 
-      <div className="mb-5">
+      <div className="relative mb-5">
         <h3 className="text-lg font-black text-white">{name}</h3>
         <p className="mt-1 text-sm text-blue-100/65">{description}</p>
       </div>
 
-      <div className="mb-6">
+      <div className="relative mb-6">
         <div className="flex items-baseline gap-2">
           <span className="text-4xl font-black text-white md:text-5xl">{amount}</span>
           <span className="text-base text-blue-100/70">{suffix}</span>
@@ -86,7 +97,7 @@ function PlanCard({
         </p>
       ) : null}
 
-      <ul className="flex flex-1 flex-col gap-2.5">
+      <ul className="relative flex flex-1 flex-col gap-2.5">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2.5 text-sm text-blue-100/85">
             <span
@@ -114,10 +125,7 @@ export default function PricingSection() {
 
   return (
     <section id="tarifs" className="relative scroll-mt-24 py-16 md:py-24">
-      <div
-        className="pointer-events-none absolute inset-x-[10%] top-1/2 h-72 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.2),transparent_70%)] blur-3xl"
-        aria-hidden
-      />
+      <div className={landingSectionGlowClass} aria-hidden />
 
       <div className="relative mx-auto w-[94%] max-w-[1000px]">
         <motion.div
@@ -166,8 +174,8 @@ export default function PricingSection() {
             onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
             className={`relative h-8 w-14 rounded-full transition-colors ${
               billingCycle === "yearly"
-                ? "bg-gradient-to-r from-[#1A23FF] to-blue-500 shadow-[0_0_24px_rgba(26,35,255,0.5)]"
-                : "bg-white/20"
+                ? "bg-gradient-to-r from-[#1A23FF] to-[#6366f1] shadow-[0_0_28px_rgba(26,35,255,0.55),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                : "border border-white/15 bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
             }`}
             aria-label={t("marketing.pricing.billingToggleAria")}
           >
@@ -191,9 +199,9 @@ export default function PricingSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="relative mt-8 grid gap-5 md:grid-cols-2 md:gap-6"
+          className="relative mt-8 grid gap-5 md:grid-cols-2 md:items-stretch md:gap-6"
         >
-          <motion.div variants={staggerItem}>
+          <motion.div variants={staggerItem} className="flex">
             <PlanCard
               name={t("marketing.pricing.standardName")}
               description={t("marketing.pricing.standardDescription")}
@@ -208,7 +216,7 @@ export default function PricingSection() {
               }
             />
           </motion.div>
-          <motion.div variants={staggerItem}>
+          <motion.div variants={staggerItem} className="flex md:-mt-2">
             <PlanCard
               name={t("marketing.pricing.teamName")}
               description={t("marketing.pricing.teamDescription")}

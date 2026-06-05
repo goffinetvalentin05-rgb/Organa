@@ -119,6 +119,17 @@
           "chips": ["Entwurf", "Gesendet", "Bezahlt"]
         }
       },
+      "planning": {
+        "title": "Planung",
+        "tagline": "Slots und Einteilungen zentral",
+        "description": "Vereinspläne, Verzehr-Slots und Team-Einteilungen in einem Kalender organisieren.",
+        "bullets": ["Klare Kalenderansicht", "Einteilung pro Slot", "PDF-Export"],
+        "preview": {
+          "headline": "12 Slots",
+          "sub": "3 Spiele dieses Wochenende",
+          "chips": ["Bevorstehend", "Bestätigt", "Vorbei"]
+        }
+      },
       "evenements": {
         "title": "Events",
         "tagline": "Anmeldungen und Pläne vereinfacht",
@@ -141,6 +152,17 @@
           "chips": ["Beiträge", "Verzehr", "Events"]
         }
       },
+      "utilisateurs": {
+        "title": "Benutzer & Zugriff",
+        "tagline": "Mehrbenutzer-Vorstand",
+        "description": "Vorstandsmitglieder mit Rollen und Berechtigungen pro Modul einladen.",
+        "bullets": ["E-Mail-Einladungen", "Rollen pro Modul", "Nachverfolgung der Aktionen"],
+        "preview": {
+          "headline": "5 Konten",
+          "sub": "3 Admins · 2 Kassierer",
+          "chips": ["Admin", "Kassierer", "Gast"]
+        }
+      },
       "depenses": {
         "title": "Ausgaben",
         "tagline": "Vereinskosten im Griff",
@@ -161,6 +183,17 @@
           "headline": "Verzehr-Slots",
           "sub": "Samstag 14–18 Uhr · bestätigt",
           "chips": ["Angefragt", "Bestätigt", "Vorbei"]
+        }
+      },
+      "sponsors": {
+        "title": "Sponsoren",
+        "tagline": "Partner und Verträge im Blick",
+        "description": "Sponsoren, Verträge und zugehörige Rechnungen ohne den Überblick zu verlieren.",
+        "bullets": ["Sponsor-Profile", "Verträge & Rechnungen", "Zahlungsverfolgung"],
+        "preview": {
+          "headline": "8 Sponsoren",
+          "sub": "2 Verträge zu verlängern",
+          "chips": ["Aktiv", "Vertrag", "Fakturiert"]
         }
       },
       "page-publique": {

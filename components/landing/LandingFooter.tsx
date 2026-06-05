@@ -92,10 +92,10 @@ export default function LandingFooter() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href="/inscription"
-                className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[#1A23FF] px-6 py-3 text-sm font-bold text-white shadow-[0_0_36px_rgba(26,35,255,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_52px_rgba(26,35,255,0.6),inset_0_1px_0_rgba(255,255,255,0.2)] sm:w-auto"
+                className="landing-hero-cta group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-bold text-white shadow-[0_0_40px_rgba(26,35,255,0.5),inset_0_1px_0_rgba(255,255,255,0.18)] transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_56px_rgba(26,35,255,0.65),inset_0_1px_0_rgba(255,255,255,0.22)] sm:w-auto"
               >
                 <span
-                  className="pointer-events-none absolute -inset-1 rounded-full bg-[#1A23FF]/40 opacity-60 blur-xl transition duration-300 group-hover:opacity-90"
+                  className="pointer-events-none absolute -inset-1.5 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.45),transparent_70%)] opacity-60 blur-xl transition duration-300 group-hover:opacity-90"
                   aria-hidden
                 />
                 <span className="relative">{t("marketing.footer.cta")}</span>
@@ -107,7 +107,7 @@ export default function LandingFooter() {
               </Link>
               <Link
                 href="/connexion"
-                className="inline-flex w-full items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/90 transition duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-white sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white/90 shadow-[0_0_20px_rgba(26,35,255,0.1),inset_0_1px_0_rgba(255,255,255,0.08)] transition duration-200 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/[0.1] hover:text-white hover:shadow-[0_0_28px_rgba(26,35,255,0.18)] sm:w-auto"
               >
                 {t("marketing.footer.login")}
               </Link>

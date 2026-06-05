@@ -76,7 +76,7 @@ export default function ConnexionPage() {
   };
 
   return (
-    <AuthPageLayout variant="login">
+    <AuthPageLayout>
       <AuthPageMotion>
         <div className="text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
