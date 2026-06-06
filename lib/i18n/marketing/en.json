@@ -235,7 +235,17 @@
   },
   "pricing": {
     "label": "Pricing",
-    "title": "One plan, everything included.",
+    "title": "One plan. Everything included.",
+    "headline": "Give your committee a tool worthy of their commitment.",
+    "body": "Running a club already takes enough time. Obillz brings members, fees, finances, events, sponsors and committee collaboration together in one easy-to-use platform.",
+    "highlights": [
+      "All features included",
+      "Users & access included",
+      "Updates included",
+      "7-day free trial",
+      "No commitment"
+    ],
+    "reassurance": "For less than CHF 1.35 per day, centralize your entire club management on a single platform.",
     "subtitle": "{days}-day free trial. All features, one price.",
     "planName": "Obillz",
     "planDescription": "Run your club solo or as a committee — every feature included.",

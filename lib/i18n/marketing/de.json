@@ -235,7 +235,17 @@
   },
   "pricing": {
     "label": "Preise",
-    "title": "Ein Tarif, alles inklusive.",
+    "title": "Ein Tarif. Alles inklusive.",
+    "headline": "Geben Sie Ihrem Vorstand ein Werkzeug, das seinem Einsatz gerecht wird.",
+    "body": "Einen Verein zu führen kostet bereits genug Zeit. Obillz bündelt Mitglieder, Beiträge, Finanzen, Events, Sponsoren und die Zusammenarbeit im Vorstand auf einer einfachen Plattform.",
+    "highlights": [
+      "Alle Funktionen inklusive",
+      "Benutzer & Zugänge inklusive",
+      "Updates inklusive",
+      "7 Tage kostenlos testen",
+      "Ohne Bindung"
+    ],
+    "reassurance": "Für weniger als 1,35 CHF pro Tag zentralisieren Sie die gesamte Vereinsverwaltung auf einer Plattform.",
     "subtitle": "{days} Tage kostenlos testen. Alle Funktionen, ein Preis.",
     "planName": "Obillz",
     "planDescription": "Verein allein oder im Vorstand — alle Funktionen inklusive.",

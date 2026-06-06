@@ -235,7 +235,17 @@
   },
   "pricing": {
     "label": "Tarifs",
-    "title": "Une formule, tout compris.",
+    "title": "Une formule. Tout compris.",
+    "headline": "Offrez à votre comité un outil à la hauteur de son engagement.",
+    "body": "Gérer un club demande déjà suffisamment de temps. Obillz centralise les membres, les cotisations, les finances, les événements, les sponsors et la collaboration du comité dans une seule plateforme simple à utiliser.",
+    "highlights": [
+      "Toutes les fonctionnalités incluses",
+      "Utilisateurs et accès inclus",
+      "Mises à jour incluses",
+      "7 jours d'essai gratuit",
+      "Sans engagement"
+    ],
+    "reassurance": "Pour moins de 1,35 CHF par jour, centralisez toute la gestion de votre club sur une seule plateforme.",
     "subtitle": "{days} jours d'essai gratuit. Toutes les fonctionnalités, un seul tarif.",
     "planName": "Obillz",
     "planDescription": "Gérez votre club seul ou en comité — toutes les fonctionnalités incluses.",
