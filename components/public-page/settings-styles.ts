@@ -1,7 +1,10 @@
 /** Styles page publique — alignés sur le thème dashboard sombre / glass. */
 
 export const ppInputClass =
-  "w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20";
+  "w-full rounded-xl border border-white/15 bg-slate-950/50 px-4 py-2.5 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50 [color-scheme:dark]";
+
+export const ppSelectClass =
+  "dashboard-select w-full rounded-xl border border-white/15 bg-slate-950/60 px-4 py-2.5 text-sm text-white shadow-sm backdrop-blur-sm focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50 [color-scheme:dark]";
 
 export const ppLabelClass = "mb-1.5 block text-sm font-medium text-white/85";
 

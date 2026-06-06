@@ -14,6 +14,8 @@ import {
   GlassCard,
   ActionButton,
   dashboardTableHeadRowClass,
+  dashboardSelectLgClass,
+  dashboardPopoverPanelClass,
 } from "@/components/ui";
 
 interface EventType {
@@ -131,7 +133,7 @@ export default function EvenementsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm text-slate-700 shadow-sm backdrop-blur-sm"
+              className={dashboardSelectLgClass}
             >
               <option value="all">{t("dashboard.plannings.filters.all")}</option>
               <option value="planned">{t("dashboard.events.status.planned")}</option>

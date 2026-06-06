@@ -349,12 +349,63 @@ h3 {
 }
 
 /* Champs formulaires : fond semi-transparent lisible sur glass sombre */
+.dashboard-shell {
+  color-scheme: dark;
+}
+
 .dashboard-shell input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
 .dashboard-shell select,
 .dashboard-shell textarea {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(15, 23, 42, 0.55);
   color: rgba(255, 255, 255, 0.95);
   border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Select natif — menu déroulant sombre (options lisibles sans hover) */
+.dashboard-shell select,
+.dashboard-shell .dashboard-select {
+  color-scheme: dark;
+  background-color: rgba(15, 23, 42, 0.65);
+}
+
+.dashboard-shell select option,
+.dashboard-shell select optgroup,
+.dashboard-shell .dashboard-select option,
+.dashboard-shell .dashboard-select optgroup {
+  background-color: #0c1222;
+  color: #f1f5f9;
+}
+
+.dashboard-shell select option:checked,
+.dashboard-shell select option:hover,
+.dashboard-shell select option:focus,
+.dashboard-shell .dashboard-select option:checked,
+.dashboard-shell .dashboard-select option:hover,
+.dashboard-shell .dashboard-select option:focus {
+  background-color: #1a23ff;
+  color: #ffffff;
+}
+
+.dashboard-shell select:disabled,
+.dashboard-shell input:disabled:not([type="checkbox"]):not([type="radio"]),
+.dashboard-shell textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dashboard-shell input:-webkit-autofill,
+.dashboard-shell input:-webkit-autofill:hover,
+.dashboard-shell input:-webkit-autofill:focus,
+.dashboard-shell textarea:-webkit-autofill,
+.dashboard-shell textarea:-webkit-autofill:hover,
+.dashboard-shell textarea:-webkit-autofill:focus,
+.dashboard-shell select:-webkit-autofill,
+.dashboard-shell select:-webkit-autofill:hover,
+.dashboard-shell select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.85) inset;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.95);
+  caret-color: rgba(255, 255, 255, 0.95);
+  transition: background-color 9999s ease-out 0s;
 }
 
 .dashboard-shell input::placeholder,
@@ -374,6 +425,24 @@ h3 {
   background-color: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.95);
   border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Classe legacy `.input-obillz` — harmonisée thème sombre */
+.dashboard-shell .input-obillz {
+  background-color: rgba(15, 23, 42, 0.65) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color-scheme: dark;
+}
+
+.dashboard-shell .input-obillz::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.dashboard-shell .input-obillz:focus {
+  border-color: rgba(147, 197, 253, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.15);
+  outline: none;
 }
 
 .border-subtle {

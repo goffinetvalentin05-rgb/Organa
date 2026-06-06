@@ -83,12 +83,19 @@ export const glassNestedRowClass = sectionListRowClass;
 export const dashboardSecondaryButtonClass =
   "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-white/90 shadow-sm backdrop-blur-sm transition hover:border-blue-400/30 hover:bg-white/[0.14] hover:text-white";
 
-/** Champs texte / select / textarea — style sombre unifié */
+/** Champs texte / textarea — style sombre unifié */
 export const dashboardInputClass =
-  "w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20";
+  "w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50";
 
 export const dashboardInputSmClass =
-  "w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20";
+  "w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50";
+
+/** Select natif — color-scheme dark + classe CSS pour options (globals.css) */
+export const dashboardSelectClass =
+  "dashboard-select w-full rounded-lg border border-white/15 bg-slate-950/60 px-3 py-2 text-sm text-white shadow-sm backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50 [color-scheme:dark]";
+
+export const dashboardSelectLgClass =
+  "dashboard-select w-full rounded-xl border border-white/15 bg-slate-950/60 px-4 py-2.5 text-sm text-white shadow-sm backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20 disabled:cursor-not-allowed disabled:opacity-50 [color-scheme:dark]";
 
 export const dashboardLabelClass = "mb-1.5 block text-sm font-medium text-white/85";
 
@@ -108,6 +115,10 @@ export const dashboardSettingsRowClass =
 
 export const dashboardCheckboxClass =
   "mt-1 h-4 w-4 shrink-0 rounded border-white/25 bg-white/[0.08] text-[#1A23FF] accent-[#1A23FF] focus:ring-[#1A23FF]/35";
+
+/** Panneau popover / menu déroulant ancré */
+export const dashboardPopoverPanelClass =
+  "rounded-xl border border-white/15 bg-slate-950/95 p-4 shadow-[0_16px_48px_rgba(0,0,0,0.55),0_0_40px_rgba(26,35,255,0.1)] backdrop-blur-xl";
 
 /** Modale dashboard */
 export const dashboardModalClass =

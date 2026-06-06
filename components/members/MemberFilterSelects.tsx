@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { dashboardInputSmClass } from "@/components/ui";
+import { dashboardSelectClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import {
   MEMBER_ROLE_SLUGS,
@@ -30,7 +30,7 @@ export default function MemberFilterSelects({
   onCategoryFilterChange,
   showRole = true,
   showCategory = true,
-  className = dashboardInputSmClass,
+  className = dashboardSelectClass,
 }: Props) {
   const { t } = useI18n();
 

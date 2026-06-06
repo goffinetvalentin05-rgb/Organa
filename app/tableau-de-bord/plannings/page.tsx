@@ -13,6 +13,7 @@ import {
   ActionButton,
   dashboardListRowClass,
   dashboardInputClass,
+  dashboardSelectClass,
 } from "@/components/ui";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -132,7 +133,7 @@ export default function PlanningsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className={dashboardInputClass}
+              className={dashboardSelectClass}
             >
               <option value="all">{t("dashboard.plannings.filters.all")}</option>
               <option value="draft">{t("dashboard.plannings.filters.draft")}</option>

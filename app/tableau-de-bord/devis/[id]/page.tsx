@@ -20,6 +20,7 @@ import {
   PageHeader,
   GlassCard,
   ActionButton,
+  dashboardSelectLgClass,
 } from "@/components/ui";
 import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
 
@@ -517,7 +518,7 @@ export default function DevisDetailPage() {
                 e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
               )
             }
-            className="rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60"
+            className={dashboardSelectLgClass}
           >
             <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
             <option value="envoye">{t("dashboard.status.quote.sent")}</option>

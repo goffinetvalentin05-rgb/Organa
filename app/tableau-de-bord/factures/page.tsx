@@ -15,6 +15,9 @@ import {
   ActionButton,
   GlassCard,
   dashboardTableHeadRowClass,
+  dashboardSelectClass,
+  dashboardPopoverPanelClass,
+  dashboardLabelClass,
 } from "@/components/ui";
 
 interface Facture {
@@ -136,14 +139,14 @@ export default function FacturesPage() {
                 {t("dashboard.invoices.exportAccountingAction")}
               </button>
               {showAccountingExport ? (
-                <div className="absolute right-0 z-10 mt-2 w-64 rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-md">
-                  <label className="mb-2 block text-sm text-slate-600">
+                <div className={`absolute right-0 z-10 mt-2 w-64 ${dashboardPopoverPanelClass}`}>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.invoices.exportAccountingYearLabel")}
                   </label>
                   <select
                     value={accountingYear}
                     onChange={(event) => setAccountingYear(event.target.value)}
-                    className="input-obillz"
+                    className={dashboardSelectClass}
                   >
                     {accountingYears.map((year) => (
                       <option key={year} value={year}>

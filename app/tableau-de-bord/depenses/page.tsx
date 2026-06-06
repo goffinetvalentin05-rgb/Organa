@@ -10,6 +10,9 @@ import {
   GlassCard,
   ActionButton,
   dashboardTableHeadRowClass,
+  dashboardSelectClass,
+  dashboardPopoverPanelClass,
+  dashboardLabelClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
@@ -527,14 +530,14 @@ export default function DepensesPage() {
                 {t("dashboard.expenses.exportAccountingAction")}
               </button>
               {showAccountingExport ? (
-                <div className="absolute right-0 z-10 mt-3 w-64 rounded-xl border border-slate-200/90 bg-white/95 p-4 shadow-xl backdrop-blur-md">
-                <label className="block text-sm text-secondary mb-2">
+                <div className={`absolute right-0 z-10 mt-3 w-64 ${dashboardPopoverPanelClass}`}>
+                <label className={`block mb-2 ${dashboardLabelClass}`}>
                   {t("dashboard.expenses.exportAccountingYearLabel")}
                 </label>
                 <select
                   value={accountingYear}
                   onChange={(event) => setAccountingYear(event.target.value)}
-                  className="w-full rounded-lg bg-surface border border-subtle-hover px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
+                  className={dashboardSelectClass}
                 >
                   {accountingYears.map((year) => (
                     <option key={year} value={year}>
