@@ -235,8 +235,10 @@
   },
   "pricing": {
     "label": "Preise",
-    "title": "Zwei Tarife für Ihre Vorstandsgrösse",
-    "subtitle": "{days} Tage kostenlos mit Obillz Standard. Wechsel zu Team, wenn der ganze Vorstand mitmachen soll.",
+    "title": "Ein Tarif, alles inklusive.",
+    "subtitle": "{days} Tage kostenlos testen. Alle Funktionen, ein Preis.",
+    "planName": "Obillz",
+    "planDescription": "Verein allein oder im Vorstand — alle Funktionen inklusive.",
     "monthly": "Monatlich",
     "yearly": "Jährlich",
     "billingToggleAria": "Monatliche oder jährliche Abrechnung wählen",

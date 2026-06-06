@@ -13,10 +13,9 @@ import {
 } from "@/components/landing/landing-motion";
 import {
   landingFeaturedCardClass,
-  landingGlassCardClass,
   landingSectionGlowClass,
 } from "@/components/ui/styles";
-import { type PlanPricing, STANDARD_PRICING, TEAM_PRICING, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
+import { type PlanPricing, TEAM_PRICING, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -26,9 +25,6 @@ function PlanCard({
   pricing,
   billingCycle,
   features,
-  extraLabel,
-  highlighted,
-  teamBadge,
   perMonthSuffix,
   perYearSuffix,
   monthlyEquivalentLabel,
@@ -38,9 +34,6 @@ function PlanCard({
   pricing: PlanPricing;
   billingCycle: BillingCycle;
   features: string[];
-  extraLabel?: string;
-  highlighted?: boolean;
-  teamBadge: string;
   perMonthSuffix: string;
   perYearSuffix: string;
   monthlyEquivalentLabel: (amount: number) => string;
@@ -53,31 +46,20 @@ function PlanCard({
 
   return (
     <article
-      className={`relative flex w-full flex-col p-6 md:p-7 ${
-        highlighted
-          ? `${landingFeaturedCardClass} md:scale-[1.03] md:shadow-[0_0_0_1px_rgba(147,197,253,0.3),0_16px_64px_rgba(0,0,0,0.55),0_0_120px_rgba(26,35,255,0.45)]`
-          : landingGlassCardClass
-      }`}
+      className={`relative mx-auto flex w-full max-w-md flex-col p-6 md:p-8 ${landingFeaturedCardClass}`}
     >
-      {highlighted ? (
-        <>
-          <div
-            className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-blue-400/30 via-transparent to-indigo-500/20 opacity-60"
-            aria-hidden
-          />
-          <span className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#1A23FF] via-[#6366f1] to-[#1A23FF] px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-[0_0_32px_rgba(26,35,255,0.75)]">
-            {teamBadge}
-          </span>
-        </>
-      ) : null}
+      <div
+        className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-blue-400/30 via-transparent to-indigo-500/20 opacity-60"
+        aria-hidden
+      />
 
-      <div className="relative mb-5">
+      <div className="relative mb-5 text-center">
         <h3 className="text-lg font-black text-white">{name}</h3>
         <p className="mt-1 text-sm text-blue-100/65">{description}</p>
       </div>
 
-      <div className="relative mb-6">
-        <div className="flex items-baseline gap-2">
+      <div className="relative mb-6 text-center">
+        <div className="flex items-baseline justify-center gap-2">
           <span className="text-4xl font-black text-white md:text-5xl">{amount}</span>
           <span className="text-base text-blue-100/70">{suffix}</span>
         </div>
@@ -91,22 +73,10 @@ function PlanCard({
         ) : null}
       </div>
 
-      {extraLabel ? (
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-blue-300/80">
-          {extraLabel}
-        </p>
-      ) : null}
-
       <ul className="relative flex flex-1 flex-col gap-2.5">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2.5 text-sm text-blue-100/85">
-            <span
-              className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-1 ${
-                highlighted
-                  ? "bg-[#1A23FF]/35 text-blue-200 ring-blue-400/35"
-                  : "bg-white/10 text-blue-200 ring-white/15"
-              }`}
-            >
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/35 text-blue-200 ring-1 ring-blue-400/35">
               <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
             </span>
             {feature}
@@ -120,8 +90,10 @@ function PlanCard({
 export default function PricingSection() {
   const { t, tList } = useI18n();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
-  const standardFeatures = tList("marketing.pricing.standardFeatures");
-  const teamFeatures = tList("marketing.pricing.teamFeatures");
+  const allFeatures = [
+    ...tList("marketing.pricing.standardFeatures"),
+    ...tList("marketing.pricing.teamFeatures"),
+  ];
 
   return (
     <section id="tarifs" className="relative scroll-mt-24 py-16 md:py-24">
@@ -199,33 +171,15 @@ export default function PricingSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="relative mt-8 grid gap-5 md:grid-cols-2 md:items-stretch md:gap-6"
+          className="relative mt-8 flex justify-center"
         >
-          <motion.div variants={staggerItem} className="flex">
+          <motion.div variants={staggerItem} className="flex w-full justify-center">
             <PlanCard
-              name={t("marketing.pricing.standardName")}
-              description={t("marketing.pricing.standardDescription")}
-              pricing={STANDARD_PRICING}
-              billingCycle={billingCycle}
-              features={standardFeatures}
-              teamBadge={t("marketing.pricing.teamBadge")}
-              perMonthSuffix={t("marketing.pricing.perMonthSuffix")}
-              perYearSuffix={t("marketing.pricing.perYearSuffix")}
-              monthlyEquivalentLabel={(amount) =>
-                t("marketing.pricing.monthlyEquivalent", { amount })
-              }
-            />
-          </motion.div>
-          <motion.div variants={staggerItem} className="flex md:-mt-2">
-            <PlanCard
-              name={t("marketing.pricing.teamName")}
-              description={t("marketing.pricing.teamDescription")}
+              name={t("marketing.pricing.planName")}
+              description={t("marketing.pricing.planDescription")}
               pricing={TEAM_PRICING}
               billingCycle={billingCycle}
-              features={teamFeatures}
-              extraLabel={t("marketing.pricing.teamExtraLabel")}
-              highlighted
-              teamBadge={t("marketing.pricing.teamBadge")}
+              features={allFeatures}
               perMonthSuffix={t("marketing.pricing.perMonthSuffix")}
               perYearSuffix={t("marketing.pricing.perYearSuffix")}
               monthlyEquivalentLabel={(amount) =>

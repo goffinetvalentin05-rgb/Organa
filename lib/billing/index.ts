@@ -50,6 +50,7 @@ export {
   canManageTeamAccess,
   getClubSubscriptionTier,
   requireTeamPlan,
+  SUBSCRIPTION_REQUIRED_MESSAGE,
   TEAM_PLAN_ERROR_MESSAGE,
   TEAM_PRICING,
   STANDARD_PRICING,

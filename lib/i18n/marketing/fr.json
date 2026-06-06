@@ -235,8 +235,10 @@
   },
   "pricing": {
     "label": "Tarifs",
-    "title": "Deux formules, selon la taille de votre comité",
-    "subtitle": "{days} jours d'essai gratuit sur Obillz Standard. Passez à Équipe quand vous voulez inviter tout le comité.",
+    "title": "Une formule, tout compris.",
+    "subtitle": "{days} jours d'essai gratuit. Toutes les fonctionnalités, un seul tarif.",
+    "planName": "Obillz",
+    "planDescription": "Gérez votre club seul ou en comité — toutes les fonctionnalités incluses.",
     "monthly": "Mensuel",
     "yearly": "Annuel",
     "billingToggleAria": "Choisir la facturation mensuelle ou annuelle",

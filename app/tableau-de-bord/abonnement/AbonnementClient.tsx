@@ -30,7 +30,10 @@ interface Pricing {
 export default function AbonnementClient() {
   const { t, tList, locale } = useI18n();
   const searchParams = useSearchParams();
-  const planFeatures = tList("marketing.pricing.standardFeatures");
+  const planFeatures = [
+    ...tList("marketing.pricing.standardFeatures"),
+    ...tList("marketing.pricing.teamFeatures"),
+  ];
   const faqRaw = getTranslationValue(locale, "dashboard.abonnementPage.faq");
   const faqItems = (Array.isArray(faqRaw) ? faqRaw : []) as { q: string; a: string }[];
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -69,7 +72,7 @@ export default function AbonnementClient() {
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ billingInterval: billingCycle }),
+        body: JSON.stringify({ billingInterval: billingCycle, plan: "team" }),
       });
 
       const data = await response.json();
@@ -88,8 +91,8 @@ export default function AbonnementClient() {
     }
   };
 
-  const monthlyPrice = pricing?.monthly.amount ?? 39;
-  const yearlyPrice = pricing?.yearly.amount ?? 390;
+  const monthlyPrice = pricing?.monthly.amount ?? 49;
+  const yearlyPrice = pricing?.yearly.amount ?? 490;
   const yearlyMonthlyEquivalent = Math.round(yearlyPrice / 12);
 
   return (

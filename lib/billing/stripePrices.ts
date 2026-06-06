@@ -18,6 +18,12 @@ const ENV_KEYS: Record<StripeProductPlan, Record<StripeBillingInterval, string>>
   },
 };
 
+/** Alias historiques (anciens noms d'env : 39 / 390 CHF) */
+const LEGACY_STANDARD_ENV_ALIASES: Record<StripeBillingInterval, string[]> = {
+  monthly: ["STRIPE_PRICE_MONTHLY"],
+  yearly: ["STRIPE_PRICE_YEARLY"],
+};
+
 /** Price IDs historiques (formule unique 39/390 CHF = Standard) */
 const LEGACY_STANDARD_PRICES: Record<StripeBillingInterval, string> = {
   monthly: "price_1TQTaxHvElMyrvJkVltPcQUp",
@@ -48,10 +54,15 @@ function buildPriceIdMap(): Map<string, StripePriceResolution> {
 
   for (const plan of ["standard", "team"] as const) {
     for (const interval of ["monthly", "yearly"] as const) {
-      const envKey = ENV_KEYS[plan][interval];
-      const priceId = process.env[envKey];
-      if (isConfiguredPriceId(priceId)) {
-        map.set(priceId, { tier: plan, interval });
+      const envKeys = [
+        ENV_KEYS[plan][interval],
+        ...(plan === "standard" ? LEGACY_STANDARD_ENV_ALIASES[interval] : []),
+      ];
+      for (const envKey of envKeys) {
+        const priceId = process.env[envKey];
+        if (isConfiguredPriceId(priceId)) {
+          map.set(priceId, { tier: plan, interval });
+        }
       }
     }
   }
@@ -80,10 +91,15 @@ export function resolveStripePriceId(
   plan: StripeProductPlan,
   interval: StripeBillingInterval
 ): string | null {
-  const envKey = ENV_KEYS[plan][interval];
-  const fromEnv = process.env[envKey];
-  if (isConfiguredPriceId(fromEnv)) {
-    return fromEnv;
+  const envKeys = [
+    ENV_KEYS[plan][interval],
+    ...(plan === "standard" ? LEGACY_STANDARD_ENV_ALIASES[interval] : []),
+  ];
+  for (const envKey of envKeys) {
+    const fromEnv = process.env[envKey];
+    if (isConfiguredPriceId(fromEnv)) {
+      return fromEnv;
+    }
   }
 
   if (plan === "standard") {

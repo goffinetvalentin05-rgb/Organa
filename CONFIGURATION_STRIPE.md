@@ -14,10 +14,15 @@ STRIPE_SECRET_KEY=sk_test_REMPLACEZ_PAR_VOTRE_CLE_SECRETE_STRIPE
 STRIPE_WEBHOOK_SECRET=whsec_REMPLACEZ_PAR_VOTRE_WEBHOOK_SECRET
 
 # Price IDs Stripe (recommandé — sinon repli legacy pour Standard uniquement) :
+#
+# Nouveaux abonnements (tarif public unique) :
+# STRIPE_PRICE_TEAM_MONTHLY=price_...       (49 CHF/mois)
+# STRIPE_PRICE_TEAM_YEARLY=price_...        (490 CHF/an)
+#
+# Anciens abonnements (à conserver pour la rétrocompatibilité) :
 # STRIPE_PRICE_STANDARD_MONTHLY=price_...   (39 CHF/mois)
 # STRIPE_PRICE_STANDARD_YEARLY=price_...    (390 CHF/an)
-# STRIPE_PRICE_TEAM_MONTHLY=price_...       (45 CHF/mois) — TODO si pas encore créé
-# STRIPE_PRICE_TEAM_YEARLY=price_...        (490 CHF/an) — TODO si pas encore créé
+# Alias historiques acceptés : STRIPE_PRICE_MONTHLY / STRIPE_PRICE_YEARLY
 #
 # Repli legacy (Standard) si les variables Standard ne sont pas définies :
 # - monthly: price_1TQTaxHvElMyrvJkVltPcQUp

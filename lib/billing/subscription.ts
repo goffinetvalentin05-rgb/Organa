@@ -7,8 +7,8 @@
  * - Abonnement actif: accès complet (active)
  *
  * Tarifs:
- * - Standard : 39 CHF/mois · 390 CHF/an
- * - Équipe : 45 CHF/mois · 490 CHF/an
+ * - Public (nouveaux) : 49 CHF/mois · 490 CHF/an (formule Équipe)
+ * - Legacy Standard : 39 CHF/mois · 390 CHF/an (abonnements existants)
  */
 
 import { createClient } from "@/lib/supabase/server";

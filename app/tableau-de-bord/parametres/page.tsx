@@ -25,6 +25,7 @@ import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components
 import SettingsAccordion from "./SettingsAccordion";
 import UsersAccessCard from "@/components/billing/UsersAccessCard";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { TEAM_PRICING } from "@/lib/billing/pricing";
 
 type ApiErrorBody = {
   error?: string;
@@ -282,7 +283,7 @@ export default function ParametresPage() {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ billingInterval: "yearly" }),
+        body: JSON.stringify({ billingInterval: "yearly", plan: "team" }),
       });
 
       // Lire d'abord le texte brut pour debug
@@ -871,16 +872,16 @@ export default function ParametresPage() {
                         <div className="flex-1 rounded-lg border border-slate-200 bg-white p-3">
                           <p className="mb-1 text-xs text-slate-500">Mensuel</p>
                           <p className="text-lg font-bold text-slate-900">
-                            39 CHF<span className="text-sm font-normal text-slate-500">/mois</span>
+                            {TEAM_PRICING.monthly.amount} CHF<span className="text-sm font-normal text-slate-500">/mois</span>
                           </p>
                         </div>
                         <div className="relative flex-1 rounded-lg border-2 border-indigo-500 bg-white p-3">
                           <span className="absolute -top-2 right-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                            2 mois offerts
+                            {TEAM_PRICING.yearly.savings}
                           </span>
                           <p className="mb-1 text-xs text-slate-500">Annuel</p>
                           <p className="text-lg font-bold text-slate-900">
-                            390 CHF<span className="text-sm font-normal text-slate-500">/an</span>
+                            {TEAM_PRICING.yearly.amount} CHF<span className="text-sm font-normal text-slate-500">/an</span>
                           </p>
                         </div>
                       </div>

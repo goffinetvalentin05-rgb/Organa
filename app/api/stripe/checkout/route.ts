@@ -16,11 +16,12 @@ export const runtime = "nodejs";
  *
  * Body attendu:
  * - billingInterval: "monthly" | "yearly" (obligatoire)
- * - plan: "standard" | "team" (optionnel, défaut "standard")
+ * - plan: "standard" | "team" (optionnel, défaut "team" pour les nouveaux abonnements)
  *
  * Variables d'environnement (Price IDs) :
- * - STRIPE_PRICE_STANDARD_MONTHLY / STRIPE_PRICE_STANDARD_YEARLY
- * - STRIPE_PRICE_TEAM_MONTHLY / STRIPE_PRICE_TEAM_YEARLY
+ * - STRIPE_PRICE_TEAM_MONTHLY / STRIPE_PRICE_TEAM_YEARLY (nouveaux abonnements)
+ * - STRIPE_PRICE_STANDARD_MONTHLY / STRIPE_PRICE_STANDARD_YEARLY (legacy)
+ * - Alias legacy : STRIPE_PRICE_MONTHLY / STRIPE_PRICE_YEARLY
  * - STRIPE_SECRET_KEY
  * - NEXT_PUBLIC_APP_URL
  */
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const rawPlan = body.plan;
     const plan: StripeProductPlan =
-      rawPlan === "team" || rawPlan === "standard" ? rawPlan : "standard";
+      rawPlan === "team" || rawPlan === "standard" ? rawPlan : "team";
 
     if (
       !billingInterval ||

@@ -20,22 +20,22 @@ export const STANDARD_PRICING = {
 
 export const TEAM_PRICING = {
   monthly: {
-    amount: 45,
+    amount: 49,
     currency: "CHF",
-    label: "Équipe mensuel",
+    label: "Obillz mensuel",
     period: "mois",
   },
   yearly: {
     amount: 490,
     currency: "CHF",
-    label: "Équipe annuel",
+    label: "Obillz annuel",
     period: "an",
-    savings: "Seulement CHF 100/an de plus que Standard",
+    savings: "2 mois offerts",
   },
 } as const;
 
-/** Alias rétrocompatibilité (formule Standard) */
-export const PRICING = STANDARD_PRICING;
+/** Tarif public actuel (nouveaux abonnements) */
+export const PRICING = TEAM_PRICING;
 
 export type PlanPricing = typeof STANDARD_PRICING | typeof TEAM_PRICING;
 

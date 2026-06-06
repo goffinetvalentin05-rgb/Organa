@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscriptionStatus, PRICING } from "@/lib/billing/subscription";
+import { getSubscriptionStatus } from "@/lib/billing/subscription";
 import {
   canManageTeamAccess,
   getClubSubscriptionTier,
@@ -115,7 +115,7 @@ export async function GET() {
           canWrite: subscription.canWrite,
           subscriptionEndsAt: subscription.subscriptionEndsAt?.toISOString() || null,
         },
-        pricing: PRICING,
+        pricing: TEAM_PRICING,
         product: {
           tier: subscriptionTier,
           canManageTeamAccess: teamAccess,

@@ -13,7 +13,7 @@ import {
   type Permission,
 } from "@/lib/auth/permissions-shared";
 import { usePermissions } from "@/lib/auth/permissions-client";
-import TeamUpgradeModal from "@/components/billing/TeamUpgradeModal";
+import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 interface MemberDTO {
@@ -102,6 +102,7 @@ interface PendingInvite {
 }
 
 export default function UtilisateursPage() {
+  const { t } = useI18n();
   const myPerms = usePermissions();
   const [members, setMembers] = useState<MemberDTO[]>([]);
   const [invitations, setInvitations] = useState<InvitationDTO[]>([]);
@@ -117,8 +118,6 @@ export default function UtilisateursPage() {
   const [canManageTeamAccess, setCanManageTeamAccess] = useState<boolean | null>(
     null
   );
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
-
   const canManage = myPerms.has("manage_users");
 
   useEffect(() => {
@@ -140,9 +139,9 @@ export default function UtilisateursPage() {
       ]);
       if (!resM.ok) {
         const j = await resM.json().catch(() => ({}));
-        if (j?.error === "TEAM_PLAN_REQUIRED") {
+        if (j?.error === "SUBSCRIPTION_REQUIRED" || j?.error === "TEAM_PLAN_REQUIRED") {
           setCanManageTeamAccess(false);
-          throw new Error(j.message || "Obillz Équipe requis");
+          throw new Error(j.message || t("dashboard.settings.usersAccessLocked.description"));
         }
         throw new Error(j?.error || j?.message || `HTTP ${resM.status}`);
       }
@@ -458,32 +457,28 @@ export default function UtilisateursPage() {
 
   if (!canManageTeamAccess) {
     return (
-      <>
-        <div className="rounded-2xl border border-white/20 bg-white/10 p-8 shadow-lg backdrop-blur-md">
-          <span className="inline-flex rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-200">
-            Disponible avec Équipe
-          </span>
-          <h1 className="mt-3 text-2xl font-bold text-white">
-            Utilisateurs & accès
-          </h1>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75">
-            Invitez plusieurs membres du comité et définissez leurs droits selon
-            les modules. Cette fonctionnalité est incluse dans Obillz Équipe.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <DashboardPrimaryButton type="button" onClick={() => setUpgradeOpen(true)}>
-              Découvrir Obillz Équipe
-            </DashboardPrimaryButton>
-            <Link
-              href="/tableau-de-bord/parametres"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              ← Retour aux paramètres
-            </Link>
-          </div>
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-8 shadow-lg backdrop-blur-md">
+        <span className="inline-flex rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-200">
+          {t("dashboard.settings.usersAccessLocked.badge")}
+        </span>
+        <h1 className="mt-3 text-2xl font-bold text-white">
+          {t("dashboard.settings.layout.sections.usersAccess")}
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75">
+          {t("dashboard.settings.usersAccessLocked.description")}
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <DashboardPrimaryButton href="/tableau-de-bord/abonnement">
+            {t("dashboard.settings.usersAccessLocked.cta")}
+          </DashboardPrimaryButton>
+          <Link
+            href="/tableau-de-bord/parametres"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            ← Retour aux paramètres
+          </Link>
         </div>
-        <TeamUpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
-      </>
+      </div>
     );
   }
 

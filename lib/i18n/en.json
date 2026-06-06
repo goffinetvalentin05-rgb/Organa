@@ -776,9 +776,9 @@
           "cta": "Manage access"
         },
         "usersAccessLocked": {
-          "badge": "Available with Team",
-          "description": "Invite several committee members and set their permissions per module.",
-          "cta": "Discover Obillz Team"
+          "badge": "Subscription required",
+          "description": "Invite several committee members and set their permissions per module. This feature is included in your subscription.",
+          "cta": "Subscribe"
         },
         "teamUpgrade": {
           "title": "Work together with Obillz Team",
@@ -788,7 +788,7 @@
           "benefit3": "Avoid sharing a single account",
           "benefit4": "Secure access to club data",
           "benefit5": "Better traceability of actions",
-          "price": "CHF 490/year or CHF 45/month",
+          "price": "CHF 490/year or CHF 49/month",
           "priceHint": "Only CHF 100/year more than the Standard plan.",
           "billingYearly": "Yearly",
           "billingMonthly": "Monthly",

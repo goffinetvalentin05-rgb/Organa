@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { UserCheck, ArrowRight, Shield } from "@/lib/icons";
 import { GlassCard } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
-import TeamUpgradeModal from "./TeamUpgradeModal";
 
 interface UsersAccessCardProps {
   canManageTeamAccess: boolean;
@@ -17,7 +15,6 @@ export default function UsersAccessCard({
   loading = false,
 }: UsersAccessCardProps) {
   const { t } = useI18n();
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (loading) {
     return (
@@ -41,21 +38,14 @@ export default function UsersAccessCard({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setUpgradeOpen(true)}
-        className="group block w-full text-left"
+    <Link href="/tableau-de-bord/abonnement" className="group block">
+      <GlassCard
+        padding="lg"
+        className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
       >
-        <GlassCard
-          padding="lg"
-          className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
-        >
-          <TeamCardContent t={t} locked />
-        </GlassCard>
-      </button>
-      <TeamUpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
-    </>
+        <TeamCardContent t={t} locked />
+      </GlassCard>
+    </Link>
   );
 }
 

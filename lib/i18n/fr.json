@@ -654,9 +654,9 @@
           "cta": "Gérer les accès"
         },
         "usersAccessLocked": {
-          "badge": "Disponible avec Équipe",
-          "description": "Invitez plusieurs membres du comité et définissez leurs droits selon les modules.",
-          "cta": "Découvrir Obillz Équipe"
+          "badge": "Abonnement requis",
+          "description": "Invitez plusieurs membres du comité et définissez leurs droits selon les modules. Cette fonctionnalité est incluse dans votre abonnement.",
+          "cta": "S'abonner"
         },
         "teamUpgrade": {
           "title": "Travaillez à plusieurs avec Obillz Équipe",
@@ -666,7 +666,7 @@
           "benefit3": "Éviter de partager un seul compte",
           "benefit4": "Sécuriser l'accès aux données du club",
           "benefit5": "Garder une meilleure traçabilité des actions",
-          "price": "CHF 490/an ou CHF 45/mois",
+          "price": "CHF 490/an ou CHF 49/mois",
           "priceHint": "Seulement CHF 100/an de plus que la formule Standard.",
           "billingYearly": "Annuel",
           "billingMonthly": "Mensuel",
