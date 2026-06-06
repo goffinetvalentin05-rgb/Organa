@@ -12,6 +12,7 @@ import {
   EmptyState,
   ActionButton,
   dashboardListRowClass,
+  dashboardInputClass,
 } from "@/components/ui";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -131,7 +132,7 @@ export default function PlanningsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-2.5 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/35"
+              className={dashboardInputClass}
             >
               <option value="all">{t("dashboard.plannings.filters.all")}</option>
               <option value="draft">{t("dashboard.plannings.filters.draft")}</option>
@@ -221,7 +222,7 @@ export default function PlanningsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-1.5 border-t border-slate-100 pt-3">
+                  <div className="flex flex-wrap items-center justify-end gap-1.5 border-t border-white/10 pt-3">
                     <ActionButton href={`/tableau-de-bord/plannings/${planning.id}`} className="inline-flex items-center gap-1.5 p-2">
                       <Eye className="h-4 w-4" />
                       <span className="hidden sm:inline">{t("dashboard.plannings.viewManage")}</span>

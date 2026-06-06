@@ -83,6 +83,52 @@ export const glassNestedRowClass = sectionListRowClass;
 export const dashboardSecondaryButtonClass =
   "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-white/90 shadow-sm backdrop-blur-sm transition hover:border-blue-400/30 hover:bg-white/[0.14] hover:text-white";
 
+/** Champs texte / select / textarea — style sombre unifié */
+export const dashboardInputClass =
+  "w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20";
+
+export const dashboardInputSmClass =
+  "w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white shadow-sm placeholder:text-white/40 backdrop-blur-sm transition focus:border-blue-400/45 focus:outline-none focus:ring-2 focus:ring-[#1A23FF]/20";
+
+export const dashboardLabelClass = "mb-1.5 block text-sm font-medium text-white/85";
+
+export const dashboardHintClass = "mt-1.5 text-xs leading-relaxed text-white/55";
+
+/** Panneau / carte interne dans une section */
+export const dashboardInnerPanelClass =
+  "rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-sm";
+
+/** Ligne toggle / option dans un formulaire */
+export const dashboardToggleRowClass =
+  "flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 transition-colors hover:border-blue-400/25 hover:bg-white/[0.08]";
+
+/** Ligne de liste paramètres (checkbox + label) */
+export const dashboardSettingsRowClass =
+  "flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4";
+
+export const dashboardCheckboxClass =
+  "mt-1 h-4 w-4 shrink-0 rounded border-white/25 bg-white/[0.08] text-[#1A23FF] accent-[#1A23FF] focus:ring-[#1A23FF]/35";
+
+/** Modale dashboard */
+export const dashboardModalClass =
+  "overflow-hidden rounded-2xl border border-blue-400/25 bg-gradient-to-br from-[#0a0f2e]/98 via-[#0d1238]/98 to-[#111827]/98 text-white shadow-[0_16px_48px_rgba(0,0,0,0.55),0_0_60px_rgba(26,35,255,0.15)] backdrop-blur-2xl";
+
+/** Calendrier buvette — statuts sombres */
+export const buvetteDayAvailableClass =
+  "border-emerald-400/30 bg-emerald-500/15 text-emerald-200 hover:bg-emerald-500/22";
+
+export const buvetteDayReservedClass =
+  "border-amber-400/30 bg-amber-500/15 text-amber-200 hover:bg-amber-500/22";
+
+export const buvetteDayOccupiedClass =
+  "border-red-400/30 bg-red-500/15 text-red-200 hover:bg-red-500/22";
+
+export const buvetteDayEmptyClass = "border-transparent bg-white/[0.03]";
+
+/** Bloc info / lien public (plannings, etc.) */
+export const dashboardInfoPanelClass =
+  "rounded-[24px] border border-indigo-400/25 bg-gradient-to-br from-indigo-500/15 via-[#1A23FF]/10 to-blue-500/10 backdrop-blur-sm";
+
 /** Badge icône accent — CTA / stats importantes */
 export const iconBadgeClass =
   "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1A23FF]/80 to-[#6366f1]/60 text-white shadow-[0_0_20px_rgba(26,35,255,0.35),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-blue-300/30 sm:h-10 sm:w-10";

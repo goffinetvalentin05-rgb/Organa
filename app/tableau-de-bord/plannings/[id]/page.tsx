@@ -28,16 +28,21 @@ import {
   SectionCard,
   ActionButton,
   cn,
+  dashboardInputClass,
+  dashboardLabelClass,
+  dashboardInfoPanelClass,
+  dashboardInnerPanelClass,
+  dashboardModalClass,
+  sectionListRowClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions-shared";
 import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
 
-const planningInputClass =
-  "w-full rounded-xl border border-slate-200/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200/60";
+const planningInputClass = dashboardInputClass;
 
-const planningLabelClass = "block text-sm font-medium text-slate-700 mb-2";
+const planningLabelClass = dashboardLabelClass;
 
 /** Regroupement des colonnes de grille : uniquement les dates réelles des créneaux (pas plannings.date). */
 const GRID_DAY_MISSING = "__no_slot_date__";
@@ -769,10 +774,10 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {publicLink && (
-        <GlassCard padding="md" className="border-indigo-200/80 bg-gradient-to-br from-indigo-50/80 via-white/95 to-blue-50/70">
-          <p className="text-sm font-semibold text-indigo-900">Lien public de recrutement</p>
-          <p className="mt-1 text-sm font-medium text-indigo-700 break-all">{publicLink.url}</p>
-          <p className="mt-2 text-xs text-indigo-700/80">
+        <GlassCard padding="md" className={dashboardInfoPanelClass}>
+          <p className="text-sm font-semibold text-blue-200">Lien public de recrutement</p>
+          <p className="mt-1 break-all text-sm font-medium text-white/85">{publicLink.url}</p>
+          <p className="mt-2 text-xs text-white/55">
             Partagez ce lien (WhatsApp, email, etc.) pour laisser les bénévoles s&apos;inscrire eux-mêmes.
           </p>
         </GlassCard>
@@ -790,8 +795,8 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
         }
       >
         {(planning.slots?.length ?? 0) === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300/70 bg-white/50 p-10 text-center">
-            <p className="text-slate-600 mb-4">Aucun créneau défini</p>
+          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-10 text-center">
+            <p className="mb-4 text-white/65">Aucun créneau défini</p>
             <DashboardPrimaryButton type="button" onClick={openAddSlotModal} icon="none">
               Créer votre premier créneau
             </DashboardPrimaryButton>
@@ -801,18 +806,18 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             {slotGroups.map(([dayKey, slotsForDay]) => (
               <section
                 key={dayKey}
-                className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm"
+                className={`overflow-hidden ${dashboardInnerPanelClass}`}
               >
-                <header className="border-b border-slate-200/70 bg-gradient-to-r from-slate-50/95 via-white to-slate-50/40 px-4 py-3.5 sm:px-5 sm:py-4">
+                <header className="border-b border-white/10 bg-white/[0.04] px-4 py-3.5 sm:px-5 sm:py-4">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div
-                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 bg-white shadow-sm"
+                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06]"
                       aria-hidden
                     >
                       <Calendar className="w-5 h-5 text-[var(--obillz-hero-blue)] opacity-90" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug">
+                      <h3 className="text-base font-semibold leading-snug text-white/90 sm:text-lg">
                         {dayKey === GRID_DAY_MISSING ? "Date non renseignée" : formatDate(dayKey)}
                       </h3>
                     </div>
@@ -823,12 +828,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
             {slotsForDay.map((slot) => (
               <div
                 key={slot.id}
-                className="overflow-hidden rounded-xl border border-slate-200/70 bg-white/95 shadow-sm"
+                className={`overflow-hidden ${dashboardInnerPanelClass}`}
               >
                 {/* Header du créneau */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/60 bg-slate-50/80 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 bg-white/[0.03] p-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1A23FF]/20">
                       <MapPin className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
                     </div>
                     <div>
@@ -992,7 +997,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {/* Modal d'affectation */}
       {showAssignModal && selectedSlot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden border border-slate-200/70">
+          <div className={`w-full max-w-lg max-h-[80vh] ${dashboardModalClass}`}>
             <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
                 <div>
@@ -1077,7 +1082,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
       {showLinkModal && linkTargetSlot && linkTargetAssignment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden border border-slate-200/70">
+          <div className={`w-full max-w-lg max-h-[80vh] ${dashboardModalClass}`}>
             <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
                 <div>
@@ -1152,7 +1157,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
       {showEditPlanningModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 shadow-2xl backdrop-blur-md">
+          <div className={`w-full max-w-lg ${dashboardModalClass}`}>
             <div className="border-b border-slate-200/70 p-6">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-xl font-semibold text-slate-900">Modifier le planning</h3>
@@ -1240,7 +1245,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {/* Modal ajout / édition créneau */}
       {showSlotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200/70">
+          <div className={`w-full max-w-lg max-h-[90vh] overflow-y-auto ${dashboardModalClass}`}>
             <div className="p-6 border-b border-slate-200/70">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-slate-900">

@@ -5,7 +5,7 @@ import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
+import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass } from "@/components/ui";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 
 type DayData = {
@@ -304,7 +304,7 @@ N'hésite pas à nous contacter si tu as des questions.
       </div>
 
       {message ? (
-        <GlassCard padding="md" className="border-slate-200/80 text-sm text-slate-700">
+        <GlassCard padding="md" className="border-white/10 text-sm text-white/75">
           {message}
         </GlassCard>
       ) : null}
@@ -312,16 +312,16 @@ N'hésite pas à nous contacter si tu as des questions.
       <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-6">
         <GlassCard padding="md">
           <div className="mb-4 flex items-center justify-between">
-            <button onClick={() => goMonth(-1)} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">{"<"}</button>
-            <p className="font-semibold text-slate-800">{month}</p>
-            <button onClick={() => goMonth(1)} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">{">"}</button>
+            <button onClick={() => goMonth(-1)} className={dashboardSecondaryButtonClass}>{"<"}</button>
+            <p className="font-semibold text-white/90">{month}</p>
+            <button onClick={() => goMonth(1)} className={dashboardSecondaryButtonClass}>{">"}</button>
           </div>
 
           {loading ? (
-            <p className="text-slate-500">{t("dashboard.buvette.calendarLoading")}</p>
+            <p className="text-white/55">{t("dashboard.buvette.calendarLoading")}</p>
           ) : (
             <>
-              <div className="grid grid-cols-7 gap-2 mb-2 text-xs text-slate-500">
+              <div className="grid grid-cols-7 gap-2 mb-2 text-xs text-white/50">
                 {(weekdayLabels.length ? weekdayLabels : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]).map((d) => (
                   <div key={d} className="text-center">{d}</div>
                 ))}
@@ -330,14 +330,14 @@ N'hésite pas à nous contacter si tu as des questions.
                 {grid.map((week, idx) => (
                   <div key={idx} className="grid grid-cols-7 gap-2">
                     {week.map((date) => {
-                      if (!date) return <div key={`${idx}-empty`} className="h-14 rounded-lg bg-slate-50" />;
+                      if (!date) return <div key={`${idx}-empty`} className={`h-14 rounded-lg ${buvetteDayEmptyClass}`} />;
                       const data = days[date];
                       const isSelected = selectedDate === date;
                       const color = !data
-                        ? "bg-green-50 border-green-200"
+                        ? buvetteDayAvailableClass
                         : data.status === "reserved"
-                        ? "bg-amber-50 border-amber-300"
-                        : "bg-red-50 border-red-300";
+                        ? buvetteDayReservedClass
+                        : buvetteDayOccupiedClass;
                       return (
                         <button
                           key={date}
@@ -346,7 +346,7 @@ N'hésite pas à nous contacter si tu as des questions.
                             setSelectedRequestId(days[date]?.request?.id || null);
                           }}
                           className={`h-14 rounded-lg border text-sm font-medium transition ${color} ${
-                            isSelected ? "ring-2 ring-slate-700" : ""
+                            isSelected ? "ring-2 ring-blue-400/60 ring-offset-1 ring-offset-transparent" : ""
                           }`}
                         >
                           {date.slice(-2)}
@@ -361,9 +361,9 @@ N'hésite pas à nous contacter si tu as des questions.
         </GlassCard>
 
         <GlassCard padding="md" className="space-y-4">
-          <h2 className="font-semibold text-slate-900">Détails date</h2>
+          <h2 className="font-semibold text-white/90">Détails date</h2>
           {!selectedDate ? (
-            <p className="text-sm text-slate-500">Sélectionne une date dans le calendrier.</p>
+            <p className="text-sm text-white/55">Sélectionne une date dans le calendrier.</p>
           ) : (
             <>
               <p className="text-sm"><span className="font-medium">Date :</span> {selectedDate}</p>
@@ -485,7 +485,7 @@ N'hésite pas à nous contacter si tu as des questions.
 
       {showInfoModal && selectedRequest && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 p-5 space-y-4">
+          <div className={`w-full max-w-2xl p-5 space-y-4 ${dashboardModalClass}`}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Envoyer les infos pratiques</h3>
               <button
@@ -522,7 +522,7 @@ N'hésite pas à nous contacter si tu as des questions.
 
       {showInvoiceModal && selectedRequest && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white border border-slate-200 p-5 space-y-4">
+          <div className={`w-full max-w-lg p-5 space-y-4 ${dashboardModalClass}`}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Envoyer la facture</h3>
               <button

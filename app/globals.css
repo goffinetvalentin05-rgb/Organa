@@ -737,16 +737,144 @@ h3 {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.dashboard-shell main [class*="border-slate-200"] {
+.dashboard-shell main [class*="border-slate-200"],
+.dashboard-shell main [class*="border-slate-300"] {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.dashboard-shell main [class*="bg-slate-50"] {
+.dashboard-shell main .bg-slate-50,
+.dashboard-shell main .bg-gray-50,
+.dashboard-shell main .bg-neutral-50 {
   background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
-.dashboard-shell main [class*="hover:bg-slate-"]:hover {
+.dashboard-shell main .bg-slate-100,
+.dashboard-shell main .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dashboard-shell main .bg-white {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dashboard-shell main .bg-green-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+  color: rgb(167, 243, 208) !important;
+}
+
+.dashboard-shell main .border-green-200 {
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+.dashboard-shell main .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+  color: rgb(253, 230, 138) !important;
+}
+
+.dashboard-shell main .border-amber-300,
+.dashboard-shell main .border-amber-200 {
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+
+.dashboard-shell main .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  color: rgb(254, 202, 202) !important;
+}
+
+.dashboard-shell main .border-red-300,
+.dashboard-shell main .border-red-200 {
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.dashboard-shell main .bg-blue-50,
+.dashboard-shell main .bg-indigo-50 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+.dashboard-shell main .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.dashboard-shell main .bg-rose-50 {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+.dashboard-shell main .hover\:bg-slate-50:hover,
+.dashboard-shell main .hover\:bg-slate-100:hover,
+.dashboard-shell main .hover\:bg-gray-50:hover {
   background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dashboard-shell main .hover\:bg-emerald-50:hover {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+.dashboard-shell main input[type="checkbox"],
+.dashboard-shell main input[type="radio"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  accent-color: #1a23ff;
+}
+
+.dashboard-shell main input[type="color"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Modales dans le contenu dashboard */
+.dashboard-shell main .fixed.inset-0 > .bg-white,
+.dashboard-shell main .fixed.inset-0 > [class*="rounded-2xl"].bg-white,
+.dashboard-shell main .fixed.inset-0 > div[class*="bg-white"] {
+  background: linear-gradient(
+    135deg,
+    rgba(10, 15, 46, 0.98) 0%,
+    rgba(13, 18, 56, 0.98) 50%,
+    rgba(17, 24, 39, 0.98) 100%
+  ) !important;
+  border-color: rgba(147, 197, 253, 0.25) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Textes slate dans main — lisibilité sur fond sombre */
+.dashboard-shell main .text-slate-900,
+.dashboard-shell main .text-gray-900 {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dashboard-shell main .text-slate-800,
+.dashboard-shell main .text-slate-700,
+.dashboard-shell main .text-indigo-900,
+.dashboard-shell main .text-indigo-700 {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dashboard-shell main .text-slate-600,
+.dashboard-shell main .text-slate-500 {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.dashboard-shell main .text-slate-400 {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.dashboard-shell main .text-emerald-800,
+.dashboard-shell main .text-emerald-900 {
+  color: rgb(167, 243, 208) !important;
+}
+
+.dashboard-shell main .text-amber-900 {
+  color: rgb(253, 230, 138) !important;
+}
+
+.dashboard-shell main .text-rose-700 {
+  color: rgb(254, 202, 202) !important;
+}
+
+.dashboard-shell main .text-blue-800 {
+  color: rgb(191, 219, 254) !important;
 }
 
 /* Hero — halo texte et profondeur */

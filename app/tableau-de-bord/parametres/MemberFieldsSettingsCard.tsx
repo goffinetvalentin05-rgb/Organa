@@ -10,6 +10,14 @@ import {
   type MemberFieldsMerged,
 } from "@/lib/member-fields/types";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import {
+  dashboardCardDescriptionClass,
+  dashboardCardTitleClass,
+  dashboardCheckboxClass,
+  dashboardHintClass,
+  dashboardInnerPanelClass,
+  dashboardSettingsRowClass,
+} from "@/components/ui";
 
 const FIELD_ORDER: MemberFieldKey[] = [
   "email",
@@ -118,46 +126,43 @@ export default function MemberFieldsSettingsCard({
 
   const shellClass = embedded
     ? "space-y-5"
-    : "space-y-5 rounded-2xl border border-slate-200 bg-white p-6";
+    : `${dashboardInnerPanelClass} space-y-5 p-6`;
 
   return (
     <div className={shellClass}>
       {!embedded ? (
         <div>
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className={dashboardCardTitleClass}>
             {t("dashboard.settings.memberFields.title")}
           </h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className={dashboardCardDescriptionClass}>
             {t("dashboard.settings.memberFields.subtitle")}
           </p>
         </div>
       ) : (
-        <p className="text-sm text-slate-600">{t("dashboard.settings.memberFields.subtitle")}</p>
+        <p className={dashboardHintClass}>{t("dashboard.settings.memberFields.subtitle")}</p>
       )}
 
       {loading ? (
-        <p className="text-sm text-slate-500">{t("dashboard.common.loading")}</p>
+        <p className={dashboardHintClass}>{t("dashboard.common.loading")}</p>
       ) : (
         <>
           <ul className="space-y-3">
             {FIELD_ORDER.map((key) => (
-              <li
-                key={key}
-                className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4"
-              >
+              <li key={key} className={dashboardSettingsRowClass}>
                 <div className="min-w-0 flex-1">
                   <label className="flex cursor-pointer items-start gap-3">
                     <input
                       type="checkbox"
-                      className="mt-1 h-4 w-4 rounded border-slate-300 bg-white text-[var(--obillz-hero-blue)] focus:ring-[var(--obillz-hero-blue)]/35"
+                      className={dashboardCheckboxClass}
                       checked={fields[key].enabled}
                       disabled={!canSave}
                       onChange={(e) => toggle(key, e.target.checked)}
                     />
                     <span>
-                      <span className="block font-medium text-slate-900">{t(labelKey(key))}</span>
+                      <span className="block font-medium text-white/90">{t(labelKey(key))}</span>
                       {key === "avs_number" && (
-                        <span className="mt-1 block rounded-lg border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-900">
+                        <span className="mt-1 block rounded-lg border border-amber-400/30 bg-amber-500/12 px-2 py-1.5 text-xs text-amber-200">
                           {t("dashboard.settings.memberFields.avsWarning")}
                         </span>
                       )}
@@ -169,7 +174,7 @@ export default function MemberFieldsSettingsCard({
           </ul>
 
           {!canSave && (
-            <p className="text-sm text-slate-600">{t("dashboard.settings.memberFields.readOnlyHint")}</p>
+            <p className={dashboardHintClass}>{t("dashboard.settings.memberFields.readOnlyHint")}</p>
           )}
 
           <div className="pt-2">
