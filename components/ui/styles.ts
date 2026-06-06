@@ -19,21 +19,33 @@ export const dashboardShellRootClass = `dashboard-shell obillz-dashboard ${obill
 export const dashboardGridOverlayClass = obillzLandingGridOverlayClass;
 
 /**
+ * Surface glass dashboard — alignée landing, intégrée au fond bleu nuit.
+ * Classe CSS `.dashboard-glass-card` pour pseudo-éléments (globals.css).
+ */
+export const dashboardGlassCardClass =
+  "dashboard-glass-card relative overflow-hidden rounded-[24px] border border-blue-400/25 bg-gradient-to-br from-white/[0.12] via-[#1A23FF]/[0.08] to-[#6366f1]/[0.06] text-white shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_8px_32px_rgba(0,0,0,0.45),0_0_60px_rgba(26,35,255,0.14)] backdrop-blur-xl";
+
+/**
  * Section / tableau / liste — **une seule carte** (un radius, une bordure, pas de cadre interne).
  */
-export const unifiedSectionShellClass =
-  "overflow-hidden rounded-[24px] border border-white/40 bg-gradient-to-br from-white/95 via-sky-50/80 to-indigo-200/45 text-slate-900 shadow-xl shadow-blue-950/10 backdrop-blur-xl";
+export const unifiedSectionShellClass = dashboardGlassCardClass;
 
-/** Bandeau d’en-tête intégré dans la même carte (léger contraste, pas une 2e boîte). */
+/** Bandeau d'en-tête intégré dans la même carte (léger contraste, pas une 2e boîte). */
 export const unifiedSectionHeaderClass =
-  "border-b border-white/30 bg-gradient-to-r from-white/35 via-blue-50/25 to-indigo-50/20";
+  "border-b border-white/10 bg-gradient-to-r from-white/[0.06] via-[#1A23FF]/[0.04] to-transparent";
 
 /** Corps de section — suite visuelle du même bloc. */
 export const unifiedSectionBodyClass = "px-4 py-4 sm:px-6 sm:py-5";
 
 /** Pied de section optionnel. */
 export const unifiedSectionFooterClass =
-  "border-t border-white/25 bg-gradient-to-r from-white/20 via-blue-50/15 to-transparent";
+  "border-t border-white/10 bg-gradient-to-r from-white/[0.04] via-[#1A23FF]/[0.03] to-transparent";
+
+/** Typographie carte dashboard */
+export const dashboardCardTitleClass = "text-lg font-bold tracking-tight text-white";
+export const dashboardCardDescriptionClass = "mt-1 text-sm font-medium leading-relaxed text-white/65";
+export const dashboardCardLabelClass = "text-sm font-semibold text-white/60";
+export const dashboardCardValueClass = "text-3xl font-bold tracking-tight text-white drop-shadow-sm md:text-4xl";
 
 /**
  * @deprecated Préférez `unifiedSectionShellClass`. Conservé pour imports existants.
@@ -43,8 +55,7 @@ export const glassFrameClass = unifiedSectionShellClass;
 /**
  * Surface glass (cartes autonomes, stats) — même langage visuel que la section unifiée.
  */
-export const glassPanelClass =
-  "overflow-hidden rounded-[24px] border border-white/40 bg-gradient-to-br from-white/95 via-sky-50/80 to-indigo-200/45 text-slate-900 shadow-xl shadow-blue-950/10 backdrop-blur-xl";
+export const glassPanelClass = dashboardGlassCardClass;
 
 export const glassCardClass = glassPanelClass;
 
@@ -55,25 +66,30 @@ export const glassCardHeaderClass = unifiedSectionHeaderClass;
 export const innerContentClass = glassPanelClass;
 
 export const dashboardTableHeadRowClass =
-  "border-b border-slate-200/80 bg-slate-900/[0.04] text-xs font-semibold uppercase tracking-wide text-slate-600";
+  "border-b border-white/10 bg-white/[0.04] text-xs font-semibold uppercase tracking-wide text-white/55";
 
 export const dashboardListRowClass =
-  "p-5 transition-colors hover:bg-indigo-500/[0.06] md:p-6";
+  "p-5 transition-colors hover:bg-white/[0.05] md:p-6";
 
 /**
- * Ligne / tuile cliquable à l’intérieur d’une section — discret, pas une 2e carte épaisse.
+ * Ligne / tuile cliquable à l'intérieur d'une section — discret, pas une 2e carte épaisse.
  */
 export const sectionListRowClass =
-  "flex rounded-xl border border-slate-200/45 bg-white/35 px-4 py-3.5 shadow-sm backdrop-blur-sm transition hover:border-slate-300/55 hover:bg-white/50 sm:px-4";
+  "flex rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 backdrop-blur-sm transition hover:border-blue-400/25 hover:bg-white/[0.08] sm:px-4";
 
 /** @deprecated Utilisez `sectionListRowClass` pour les listes dans une section unifiée. */
 export const glassNestedRowClass = sectionListRowClass;
 
 export const dashboardSecondaryButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/15 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition hover:bg-white/25";
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-white/90 shadow-sm backdrop-blur-sm transition hover:border-blue-400/30 hover:bg-white/[0.14] hover:text-white";
 
+/** Badge icône accent — CTA / stats importantes */
 export const iconBadgeClass =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-md shadow-blue-900/30 sm:h-11 sm:w-11";
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1A23FF]/80 to-[#6366f1]/60 text-white shadow-[0_0_20px_rgba(26,35,255,0.35),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-blue-300/30 sm:h-10 sm:w-10";
+
+/** Badge icône discret — en-têtes de section */
+export const dashboardIconBadgeSubtleClass =
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-blue-200/75 ring-1 ring-white/10 backdrop-blur-sm";
 
 /** Séparateur lumineux entre sections landing */
 export const landingSectionDividerClass =

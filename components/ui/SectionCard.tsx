@@ -6,7 +6,9 @@ import {
   unifiedSectionShellClass,
   unifiedSectionHeaderClass,
   unifiedSectionBodyClass,
-  iconBadgeClass,
+  dashboardIconBadgeSubtleClass,
+  dashboardCardTitleClass,
+  dashboardCardDescriptionClass,
 } from "./styles";
 
 type IconProps = { className?: string };
@@ -39,19 +41,19 @@ export default function SectionCard({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             {Icon ? (
-              <div className={iconBadgeClass}>
-                <Icon className="h-5 w-5" />
+              <div className={dashboardIconBadgeSubtleClass}>
+                <Icon className="h-4 w-4" />
               </div>
             ) : null}
             <div className="min-w-0 pt-0.5">
-              <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2>
+              <h2 className={dashboardCardTitleClass}>{title}</h2>
               {description ? (
-                <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">{description}</p>
+                <p className={dashboardCardDescriptionClass}>{description}</p>
               ) : null}
             </div>
           </div>
           {headerRight ? (
-            <div className="shrink-0 sm:pt-1 [&_a]:font-semibold [&_a]:text-[#2563EB] [&_button]:text-slate-700">
+            <div className="shrink-0 sm:pt-1 [&_a]:font-semibold [&_a]:text-blue-300 [&_a]:hover:text-blue-200 [&_button]:text-white/80">
               {headerRight}
             </div>
           ) : null}
@@ -63,7 +65,7 @@ export default function SectionCard({
       </div>
 
       {footer ? (
-        <footer className="border-t border-white/25 px-4 py-3 sm:px-6 sm:py-3.5">{footer}</footer>
+        <footer className="border-t border-white/10 px-4 py-3 sm:px-6 sm:py-3.5">{footer}</footer>
       ) : null}
     </section>
   );

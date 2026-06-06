@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -24,8 +24,6 @@ export default function ConnexionPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const supabase = useMemo(() => createClient(), []);
-
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (loading) return;
@@ -45,6 +43,7 @@ export default function ConnexionPage() {
     setLoading(true);
 
     try {
+      const supabase = createClient();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

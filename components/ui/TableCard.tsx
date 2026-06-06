@@ -2,7 +2,12 @@
 
 import type { ReactNode } from "react";
 import { cn } from "./cn";
-import { unifiedSectionShellClass, unifiedSectionHeaderClass } from "./styles";
+import {
+  unifiedSectionShellClass,
+  unifiedSectionHeaderClass,
+  dashboardCardTitleClass,
+  dashboardCardDescriptionClass,
+} from "./styles";
 
 const defaultBodyPadding = "px-4 py-4 sm:px-6 sm:py-5";
 
@@ -35,8 +40,8 @@ export default function TableCard({
           )}
         >
           <div className="min-w-0">
-            {title ? <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2> : null}
-            {description ? <p className="mt-1 text-sm font-medium text-slate-600">{description}</p> : null}
+            {title ? <h2 className={dashboardCardTitleClass}>{title}</h2> : null}
+            {description ? <p className={dashboardCardDescriptionClass}>{description}</p> : null}
           </div>
           {toolbar ? <div className="flex shrink-0 flex-wrap items-center gap-2">{toolbar}</div> : null}
         </header>

@@ -576,7 +576,10 @@
       "connectedAs": "Signed in:",
       "userFallback": "User",
       "clubFallback": "Club",
-      "logout": "Sign out"
+      "logout": "Sign out",
+      "notifications": "Notifications",
+      "notificationsEmpty": "No notifications",
+      "notificationsEmptyHint": "Obillz updates and announcements will appear here."
     },
     "assistant": {
       "badge": "Administrative assistant",

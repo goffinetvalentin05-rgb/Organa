@@ -3,6 +3,10 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "./cn";
 import GlassCard from "./GlassCard";
+import {
+  dashboardCardTitleClass,
+  dashboardCardDescriptionClass,
+} from "./styles";
 
 export type DataCardProps = {
   children: ReactNode;
@@ -25,10 +29,10 @@ export default function DataCard({
   return (
     <GlassCard padding={padding} className={cn(className)} {...rest}>
       {hasHead ? (
-        <div className="mb-4 border-b border-white/30 pb-4">
-          {title ? <h3 className="text-base font-bold tracking-tight text-slate-900">{title}</h3> : null}
+        <div className="mb-4 border-b border-white/10 pb-4">
+          {title ? <h3 className={cn(dashboardCardTitleClass, "text-base")}>{title}</h3> : null}
           {description ? (
-            <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">{description}</p>
+            <p className={dashboardCardDescriptionClass}>{description}</p>
           ) : null}
         </div>
       ) : null}

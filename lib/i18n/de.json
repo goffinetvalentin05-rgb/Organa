@@ -574,7 +574,10 @@
       "connectedAs": "Angemeldet:",
       "userFallback": "Benutzer",
       "clubFallback": "Verein",
-      "logout": "Abmelden"
+      "logout": "Abmelden",
+      "notifications": "Benachrichtigungen",
+      "notificationsEmpty": "Keine Benachrichtigungen",
+      "notificationsEmptyHint": "Obillz-Neuigkeiten und Ankündigungen erscheinen hier."
     },
     "assistant": {
       "badge": "Verwaltungsassistent",

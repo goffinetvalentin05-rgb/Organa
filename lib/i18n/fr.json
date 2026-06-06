@@ -569,7 +569,10 @@
       "connectedAs": "Connecté :",
       "userFallback": "Utilisateur",
       "clubFallback": "Club",
-      "logout": "Se déconnecter"
+      "logout": "Se déconnecter",
+      "notifications": "Notifications",
+      "notificationsEmpty": "Aucune notification",
+      "notificationsEmptyHint": "Les nouveautés et annonces Obillz apparaîtront ici."
     },
     "common": {
       "loading": "Chargement...",

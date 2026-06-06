@@ -11,6 +11,7 @@ import LandingBackground from "@/components/landing/LandingBackground";
 import { dashboardShellRootClass, obillzLandingGridOverlayClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import ClubPublicPageAnnouncementModal from "@/components/public-page/ClubPublicPageAnnouncementModal";
+import NotificationBell from "@/components/DashboardNotificationBell";
 import {
   LayoutDashboard,
   Users,
@@ -146,45 +147,6 @@ export default function DashboardLayout({
     return pathname.startsWith(href);
   };
 
-  const getPageTitle = () => {
-    if (!pathname) return t("dashboard.pageTitles.dashboard");
-    if (pathname.startsWith("/tableau-de-bord/clients/nouveau")) return t("dashboard.pageTitles.newClient");
-    if (pathname.startsWith("/tableau-de-bord/clients/") && pathname.includes("/edit")) {
-      return t("dashboard.pageTitles.editClient");
-    }
-    const memberDetailMatch = pathname?.match(/^\/tableau-de-bord\/clients\/([^/]+)$/);
-    if (memberDetailMatch && memberDetailMatch[1] !== "nouveau") {
-      return t("dashboard.pageTitles.memberDetail");
-    }
-    if (pathname.startsWith("/tableau-de-bord/clients")) return t("dashboard.pageTitles.clients");
-    if (pathname.startsWith("/tableau-de-bord/devis")) return t("dashboard.pageTitles.quotes");
-    if (pathname.startsWith("/tableau-de-bord/factures")) return t("dashboard.pageTitles.invoices");
-    if (pathname.startsWith("/tableau-de-bord/sponsoring/nouveau")) {
-      return t("dashboard.pageTitles.sponsoringNew");
-    }
-    if (pathname.includes("/tableau-de-bord/sponsoring/") && pathname.includes("/modifier")) {
-      return t("dashboard.pageTitles.sponsoringEdit");
-    }
-    const sponsorDetailMatch = pathname?.match(/^\/tableau-de-bord\/sponsoring\/([^/]+)$/);
-    if (sponsorDetailMatch && sponsorDetailMatch[1] !== "nouveau") {
-      return t("dashboard.pageTitles.sponsoringContract");
-    }
-    if (pathname.startsWith("/tableau-de-bord/sponsoring")) return t("dashboard.pageTitles.sponsoring");
-    if (pathname.startsWith("/tableau-de-bord/paiements")) return t("dashboard.pageTitles.payments");
-    if (pathname.startsWith("/tableau-de-bord/produits")) return t("dashboard.pageTitles.productRevenues");
-    if (pathname.startsWith("/tableau-de-bord/evenements")) return t("dashboard.pageTitles.events");
-    if (pathname.startsWith("/tableau-de-bord/buvette")) return t("dashboard.pageTitles.buvette");
-    if (pathname.startsWith("/tableau-de-bord/plannings")) return t("dashboard.pageTitles.plannings");
-    if (pathname.startsWith("/tableau-de-bord/qrcodes")) return t("dashboard.pageTitles.qrcodes");
-    if (pathname.startsWith("/tableau-de-bord/campagnes-marketing")) return t("dashboard.pageTitles.marketing");
-    if (pathname.startsWith("/tableau-de-bord/depenses")) return t("dashboard.pageTitles.expenses");
-    if (pathname.startsWith("/tableau-de-bord/parametres/page-publique")) {
-      return t("dashboard.pageTitles.publicPage");
-    }
-    if (pathname.startsWith("/tableau-de-bord/parametres")) return t("dashboard.pageTitles.settings");
-    return t("dashboard.pageTitles.dashboard");
-  };
-
   return (
     <div className={dashboardShellRootClass}>
       <LandingBackground />
@@ -201,7 +163,7 @@ export default function DashboardLayout({
 
       {/* Sidebar — glass sur fond dark (grille du shell visible à travers) */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/10 bg-white/[0.06] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.03] shadow-[inset_-1px_0_0_rgba(147,197,253,0.08),4px_0_40px_rgba(0,0,0,0.25)] backdrop-blur-2xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -241,13 +203,13 @@ export default function DashboardLayout({
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 transition-all duration-200",
+                      "flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
                       active
-                        ? "rounded-full bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-lg"
-                        : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
+                        ? "rounded-full bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_24px_rgba(26,35,255,0.3)]"
+                        : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
                     )}
                   >
-                    <IconComponent className={cn("h-5 w-5", active && "text-[var(--obillz-hero-blue)]")} />
+                    <IconComponent className={cn("h-[18px] w-[18px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
@@ -260,13 +222,13 @@ export default function DashboardLayout({
                   aria-expanded={financesOpen}
                   aria-controls={financesSubmenuId}
                   className={cn(
-                    "flex w-full items-center gap-3 px-4 py-3 transition-all duration-200",
+                    "flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
                     isFinanceRoute
-                      ? "rounded-xl bg-white/15 font-medium text-white ring-1 ring-white/20"
-                      : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
+                      ? "rounded-xl bg-white/[0.1] font-medium text-white ring-1 ring-blue-400/20"
+                      : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
                   )}
                 >
-                  <Wallet className="h-5 w-5 shrink-0" />
+                  <Wallet className="h-[18px] w-[18px] shrink-0" />
                   <span className="flex-1 text-left font-medium">{t("dashboard.nav.finances")}</span>
                   <ChevronDown
                     className={cn(
@@ -289,7 +251,6 @@ export default function DashboardLayout({
                   <div className="overflow-hidden">
                     <div className="ml-4 mt-1 space-y-0.5 border-l border-white/15 py-1 pl-3">
                       {navigationFinances.map((item) => {
-                        const IconComponent = item.icon;
                         const active = isActive(item.href);
                         return (
                           <Link
@@ -297,16 +258,13 @@ export default function DashboardLayout({
                             href={item.href}
                             onClick={() => setSidebarOpen(false)}
                             className={cn(
-                              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                              "block rounded-lg px-3 py-2 text-sm transition-all duration-200",
                               active
-                                ? "bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-md"
-                                : "text-white/75 hover:bg-white/10 hover:text-white"
+                                ? "bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_16px_rgba(26,35,255,0.25)]"
+                                : "text-white/65 hover:bg-white/[0.08] hover:text-white"
                             )}
                           >
-                            <IconComponent
-                              className={cn("h-4 w-4 shrink-0", active && "text-[var(--obillz-hero-blue)]")}
-                            />
-                            <span>{item.name}</span>
+                            {item.name}
                           </Link>
                         );
                       })}
@@ -324,13 +282,13 @@ export default function DashboardLayout({
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 transition-all duration-200",
+                      "flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
                       active
-                        ? "rounded-full bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-lg"
-                        : "rounded-xl text-white/80 hover:bg-white/10 hover:text-white"
+                        ? "rounded-full bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_24px_rgba(26,35,255,0.3)]"
+                        : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
                     )}
                   >
-                    <IconComponent className={cn("h-5 w-5", active && "text-[var(--obillz-hero-blue)]")} />
+                    <IconComponent className={cn("h-[18px] w-[18px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
@@ -339,12 +297,12 @@ export default function DashboardLayout({
           </nav>
 
           {/* Footer sidebar */}
-          <div className="p-4 border-t border-white/10">
+          <div className="border-t border-white/[0.08] p-4">
             <Link
               href="/"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
+              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-white/60 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
             >
-              <Home className="w-5 h-5" />
+              <Home className="h-[18px] w-[18px]" />
               <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
             </Link>
           </div>
@@ -353,38 +311,21 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="relative z-10 lg:ml-72 flex min-h-[100dvh] flex-col">
-        {/* Topbar — capsule glass (aligné landing / auth) */}
-        <header className="sticky top-0 z-30 px-3 pt-3 sm:px-4 lg:px-6">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/25 bg-white/[0.12] px-3 py-2 shadow-[0_8px_40px_rgba(26,35,255,0.2),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:gap-4 sm:px-4 sm:py-2.5">
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        {/* Topbar — compacte, éléments utiles uniquement */}
+        <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#020617]/75 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden rounded-full p-2 text-white/85 transition hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-2 text-white/70 transition hover:bg-white/[0.08] hover:text-white lg:hidden"
                 aria-label={t("dashboard.navigation.primary")}
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <Link
-                href="/tableau-de-bord"
-                className="hidden shrink-0 transition hover:opacity-90 sm:inline-flex lg:hidden"
-              >
-                <Image
-                  src="/logo-obillz.png"
-                  alt="Obillz"
-                  width={90}
-                  height={22}
-                  className="h-6 w-auto"
-                />
-              </Link>
-              <p className="hidden truncate text-sm font-semibold text-white/90 lg:block lg:max-w-[220px] xl:max-w-none">
-                {getPageTitle()}
-              </p>
             </div>
 
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              <LanguageSwitcher />
-
               {!loadingUser &&
                 (() => {
                   const displayName = clubName || t("dashboard.topbar.clubFallback");
@@ -393,24 +334,28 @@ export default function DashboardLayout({
                     .toUpperCase();
                   return (
                     <div
-                      className="flex max-w-[140px] items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-2 py-1 sm:max-w-[200px] sm:px-2.5 sm:py-1.5 md:max-w-none"
+                      className="flex max-w-[140px] items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-2 py-1 sm:max-w-[200px] sm:px-2.5 sm:py-1.5 md:max-w-none"
                       aria-label={displayName}
                       title={displayName}
                     >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1A23FF]/80 text-xs font-bold text-white shadow-[0_0_16px_rgba(26,35,255,0.45)] ring-1 ring-blue-300/30">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#6366f1] text-xs font-bold text-white shadow-[0_0_16px_rgba(26,35,255,0.4)] ring-1 ring-blue-300/25">
                         {initial}
                       </div>
-                      <span className="hidden truncate text-sm font-medium text-white md:inline">
+                      <span className="hidden truncate text-sm font-medium text-white/85 md:inline">
                         {displayName}
                       </span>
                     </div>
                   );
                 })()}
 
+              <LanguageSwitcher compact />
+
+              <NotificationBell />
+
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-full px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white sm:px-4 sm:py-2 sm:text-sm"
+                className="rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-white/75 transition hover:border-white/20 hover:bg-white/[0.1] hover:text-white sm:px-3.5 sm:py-2 sm:text-sm"
               >
                 {t("dashboard.topbar.logout")}
               </button>
