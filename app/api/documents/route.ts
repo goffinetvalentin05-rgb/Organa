@@ -900,49 +900,82 @@ export async function PATCH(request: NextRequest) {
     if (identityKeysProvided) {
       const currentNum = String(existingDoc.numero ?? "").trim();
       const currentTitle = String((existingDoc as { title?: string | null }).title ?? "").trim();
-      const nextNumero = numero !== undefined ? String(numero).trim() : currentNum;
-      const nextTitle = title !== undefined ? String(title).trim() : currentTitle;
 
-      if (!nextNumero || !nextTitle) {
-        return NextResponse.json(
-          { error: "Le numéro et le titre sont obligatoires" },
-          { status: 400 }
-        );
-      }
-      if (
-        nextNumero.length > DOCUMENT_NUMERO_MAX_LENGTH ||
-        nextTitle.length > DOCUMENT_TITLE_MAX_LENGTH
-      ) {
-        return NextResponse.json(
-          { error: "Le numéro ou le titre dépasse la longueur maximale autorisée" },
-          { status: 400 }
-        );
-      }
-
-      if (nextNumero !== currentNum) {
-        const { data: dupRow } = await supabase
-          .from("documents")
-          .select("id")
-          .eq("user_id", guard.clubId)
-          .eq("type", existingDoc.type)
-          .neq("id", id)
-          .is("deleted_at", null)
-          .eq("numero", nextNumero)
-          .maybeSingle();
-
-        if (dupRow?.id) {
+      if (type === "quote") {
+        if (title === undefined) {
           return NextResponse.json(
-            {
-              error:
-                "Ce numéro est déjà utilisé pour un autre document du même type dans votre club",
-            },
-            { status: 409 }
+            { error: "Le titre est obligatoire" },
+            { status: 400 }
           );
         }
-      }
 
-      updateData.numero = nextNumero;
-      updateData.title = nextTitle;
+        const nextTitle = String(title).trim();
+
+        if (!nextTitle) {
+          return NextResponse.json(
+            { error: "Le titre est obligatoire" },
+            { status: 400 }
+          );
+        }
+        if (nextTitle.length > DOCUMENT_TITLE_MAX_LENGTH) {
+          return NextResponse.json(
+            { error: "Le titre dépasse la longueur maximale autorisée" },
+            { status: 400 }
+          );
+        }
+        if (!currentNum) {
+          return NextResponse.json(
+            { error: "Référence de cotisation introuvable" },
+            { status: 400 }
+          );
+        }
+
+        updateData.title = nextTitle;
+      } else {
+        const nextNumero = numero !== undefined ? String(numero).trim() : currentNum;
+        const nextTitle = title !== undefined ? String(title).trim() : currentTitle;
+
+        if (!nextNumero || !nextTitle) {
+          return NextResponse.json(
+            { error: "Le numéro et le titre sont obligatoires" },
+            { status: 400 }
+          );
+        }
+        if (
+          nextNumero.length > DOCUMENT_NUMERO_MAX_LENGTH ||
+          nextTitle.length > DOCUMENT_TITLE_MAX_LENGTH
+        ) {
+          return NextResponse.json(
+            { error: "Le numéro ou le titre dépasse la longueur maximale autorisée" },
+            { status: 400 }
+          );
+        }
+
+        if (nextNumero !== currentNum) {
+          const { data: dupRow } = await supabase
+            .from("documents")
+            .select("id")
+            .eq("user_id", guard.clubId)
+            .eq("type", existingDoc.type)
+            .neq("id", id)
+            .is("deleted_at", null)
+            .eq("numero", nextNumero)
+            .maybeSingle();
+
+          if (dupRow?.id) {
+            return NextResponse.json(
+              {
+                error:
+                  "Ce numéro est déjà utilisé pour un autre document du même type dans votre club",
+              },
+              { status: 409 }
+            );
+          }
+        }
+
+        updateData.numero = nextNumero;
+        updateData.title = nextTitle;
+      }
     }
 
     if (statut !== undefined) {
