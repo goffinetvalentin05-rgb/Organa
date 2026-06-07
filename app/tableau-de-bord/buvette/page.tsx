@@ -7,6 +7,8 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass } from "@/components/ui";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
+import BuvetteRequestsPanel from "@/components/buvette/BuvetteRequestsPanel";
+import type { BuvetteRequest } from "@/lib/buvette/requests";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -18,19 +20,6 @@ type DayData = {
     name: string;
     eventType: string;
   } | null;
-};
-
-type BuvetteRequest = {
-  id: string;
-  reservation_date: string;
-  status: "pending" | "accepted" | "refused";
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone?: string | null;
-  event_type: string;
-  message?: string | null;
-  created_at: string;
 };
 
 function currentMonthKey() {
@@ -186,6 +175,26 @@ export default function BuvettePage() {
       setMessage(decision === "accepted" ? "Demande acceptée" : "Demande refusée");
     } catch (error: unknown) {
       setMessage(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const archiveRequest = async (id: string) => {
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/buvette/requests/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await getApiError(res, "Impossible d'archiver la demande"));
+      if (selectedRequestId === id) {
+        setSelectedRequestId(null);
+        setSelectedDate(null);
+      }
+      await loadData();
+      toast.success("Demande archivée");
+    } catch (error: unknown) {
+      setMessage(getErrorMessage(error));
+      throw error;
     } finally {
       setSubmitting(false);
     }
@@ -453,6 +462,14 @@ N'hésite pas à nous contacter si tu as des questions.
                       </button>
                     </div>
                   )}
+
+                  <button
+                    onClick={() => void archiveRequest(selectedRequest.id)}
+                    disabled={submitting}
+                    className={`w-full px-3 py-2 ${dashboardSecondaryButtonClass} disabled:opacity-50`}
+                  >
+                    Archiver
+                  </button>
                 </div>
               )}
             </>
@@ -460,28 +477,20 @@ N'hésite pas à nous contacter si tu as des questions.
         </GlassCard>
       </div>
 
-      <GlassCard padding="md">
-        <h2 className="mb-3 font-semibold text-white/90">Demandes récentes</h2>
-        <div className="space-y-2">
-          {requests.length === 0 && <p className="text-sm text-slate-500">Aucune demande pour le moment.</p>}
-          {requests.slice(0, 8).map((r) => (
-            <button
-              key={r.id}
-              onClick={() => {
-                setSelectedDate(r.reservation_date);
-                setSelectedRequestId(r.id);
-              }}
-              className={`w-full text-left p-3 ${dashboardInnerPanelClass} transition hover:border-blue-400/25 hover:bg-white/[0.08]`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-medium text-sm">{r.first_name} {r.last_name}</p>
-                <span className="text-xs text-slate-500">{r.status}</span>
-              </div>
-              <p className="text-xs text-slate-500">{r.reservation_date} • {r.event_type}</p>
-            </button>
-          ))}
-        </div>
-      </GlassCard>
+      <BuvetteRequestsPanel
+        requests={requests}
+        loading={loading}
+        submitting={submitting}
+        formatDate={formatDateFr}
+        onSelectRequest={(request) => {
+          setSelectedDate(request.reservation_date);
+          setSelectedRequestId(request.id);
+          const [year, monthNum] = request.reservation_date.split("-");
+          setMonth(`${year}-${monthNum}`);
+        }}
+        onDecide={decideRequest}
+        onArchive={archiveRequest}
+      />
 
       {showInfoModal && selectedRequest && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">

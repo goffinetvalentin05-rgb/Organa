@@ -19,6 +19,7 @@ export async function GET() {
         "id, reservation_date, status, first_name, last_name, email, phone, event_type, message, created_at"
       )
       .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) {

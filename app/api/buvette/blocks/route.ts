@@ -62,7 +62,8 @@ export async function POST(request: NextRequest) {
       })
       .eq("user_id", guard.clubId)
       .eq("reservation_date", date)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .is("deleted_at", null);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: unknown) {

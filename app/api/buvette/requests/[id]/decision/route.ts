@@ -28,6 +28,7 @@ export async function POST(
       .select("id, reservation_date, status, first_name, last_name, email")
       .eq("id", id)
       .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .single();
 
     if (reqError || !reqData) {

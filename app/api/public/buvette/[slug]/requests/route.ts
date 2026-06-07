@@ -79,6 +79,7 @@ export async function POST(
       .eq("user_id", profile.user_id)
       .eq("reservation_date", date)
       .eq("status", "pending")
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (existingPending) {

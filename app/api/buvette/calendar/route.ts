@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
       .from("buvette_requests")
       .select("id, reservation_date, status, first_name, last_name, event_type")
       .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .gte("reservation_date", start)
       .lte("reservation_date", end);
 
