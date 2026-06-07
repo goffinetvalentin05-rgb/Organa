@@ -831,37 +831,39 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 className={`overflow-hidden ${dashboardInnerPanelClass}`}
               >
                 {/* Header du créneau */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 bg-white/[0.03] p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1A23FF]/20">
-                      <MapPin className="w-5 h-5 text-[var(--obillz-hero-blue)]" />
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-3.5 sm:px-5 sm:py-4">
+                  <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-3.5">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1A23FF]/25 bg-[#1A23FF]/15 ring-1 ring-white/5">
+                      <MapPin className="w-4 h-4 text-[var(--obillz-hero-blue)] opacity-90" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-slate-900 text-[15px] sm:text-base">{slot.location}</h3>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 mt-0.5">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                          {slot.slotDate?.trim()
-                            ? formatDate(slot.slotDate.trim())
-                            : "Date non renseignée"}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 shrink-0" />
-                          {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5" />
-                          {slot.assignedCount} / {slot.requiredPeople}
-                        </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-[15px] font-semibold text-white/90 sm:text-base">{slot.location}</h3>
                         {slot.isFull && (
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">
+                          <span className="inline-flex items-center rounded-md border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0 text-[10px] font-semibold text-emerald-200">
                             Complet
                           </span>
                         )}
                       </div>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-300/90 sm:text-sm">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 shrink-0 text-white/45" />
+                          {slot.slotDate?.trim()
+                            ? formatDate(slot.slotDate.trim())
+                            : "Date non renseignée"}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-white/45" />
+                          {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Users className="h-3.5 w-3.5 shrink-0 text-white/45" />
+                          {slot.assignedCount} / {slot.requiredPeople}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                     {!slot.isFull && (
                       <DashboardPrimaryButton
                         type="button"
@@ -877,7 +879,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     <button
                       type="button"
                       onClick={() => openEditSlotModal(slot)}
-                      className="p-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                      className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white/90"
                       title="Modifier ce créneau"
                     >
                       <Edit className="w-4 h-4" />
@@ -885,7 +887,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     <button
                       type="button"
                       onClick={() => handleDeleteSlot(slot.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      className="rounded-lg p-2 text-red-400/80 transition-colors hover:bg-red-500/15 hover:text-red-300"
                       title="Supprimer ce créneau"
                     >
                       <Trash className="w-4 h-4" />
@@ -894,11 +896,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 {/* Grille des affectations */}
-                <div className="p-4">
+                <div className="p-4 sm:p-5">
                   {slot.notes && (
-                    <p className="text-sm text-secondary mb-4 italic">{slot.notes}</p>
+                    <p className="mb-4 text-sm italic text-white/50">{slot.notes}</p>
                   )}
-                  
+
                   <div className="flex flex-wrap gap-3">
                     {/* Affectations existantes */}
                     {slot.assignments.map((assignment) => {
@@ -907,19 +909,19 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       const showLinkButton = isPublic && !assignment.clientId;
                       const linkBadge =
                         !isPublic ? (
-                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-slate-200/80 text-slate-700">
+                          <span className="inline-flex items-center rounded-md border border-white/15 bg-white/[0.08] px-1.5 py-0 text-[10px] font-medium text-white/70">
                             Membre club
                           </span>
                         ) : linkStatus === "pending_review" ? (
-                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-amber-100 text-amber-900">
+                          <span className="inline-flex items-center rounded-md border border-amber-400/20 bg-amber-400/10 px-1.5 py-0 text-[10px] font-medium text-amber-200">
                             À vérifier
                           </span>
                         ) : linkStatus === "linked" || assignment.clientId ? (
-                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-emerald-100 text-emerald-900">
+                          <span className="inline-flex items-center rounded-md border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0 text-[10px] font-medium text-emerald-200">
                             Lié à un membre
                           </span>
                         ) : (
-                          <span className="mt-1 inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium bg-slate-200/80 text-slate-700">
+                          <span className="inline-flex items-center rounded-md border border-slate-400/20 bg-slate-400/10 px-1.5 py-0 text-[10px] font-medium text-slate-300">
                             Non lié
                           </span>
                         );
@@ -927,39 +929,41 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       return (
                         <div
                           key={assignment.id}
-                          className="group relative flex flex-col gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-lg min-w-[200px]"
+                          className="group relative flex min-w-[200px] flex-col gap-2.5 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3.5 shadow-[0_0_20px_rgba(52,211,153,0.06)] backdrop-blur-sm"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center shrink-0">
-                              <CheckCircle className="w-4 h-4 text-green-700" />
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 ring-1 ring-emerald-400/25">
+                              <CheckCircle className="h-4 w-4 text-emerald-300" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-medium text-green-900 break-words">{assignment.member.nom}</p>
+                              <p className="break-words font-medium text-white">{assignment.member.nom}</p>
                               {assignment.member.email && (
-                                <p className="text-xs text-green-700 break-all">{assignment.member.email}</p>
+                                <p className="mt-0.5 break-all text-xs text-slate-300">{assignment.member.email}</p>
                               )}
-                              {linkBadge}
-                              {assignment.notifiedAt && (
-                                <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
-                                  <Mail className="w-3 h-3 shrink-0" />
-                                  Notifié
-                                </p>
-                              )}
+                              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                                {linkBadge}
+                                {assignment.notifiedAt && (
+                                  <span className="inline-flex items-center gap-1 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0 text-[10px] font-medium text-emerald-200">
+                                    <Mail className="h-3 w-3 shrink-0 opacity-80" />
+                                    Notifié
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <button
                               type="button"
                               onClick={() => handleRemoveAssignment(assignment.id)}
-                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                              className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/90 text-white opacity-0 shadow-lg shadow-red-500/20 ring-1 ring-red-400/30 transition-opacity group-hover:opacity-100"
                               title="Retirer"
                             >
-                              <X className="w-3 h-3" />
+                              <X className="h-3 w-3" />
                             </button>
                           </div>
                           {showLinkButton && (
                             <button
                               type="button"
                               onClick={() => openLinkModal(slot, assignment)}
-                              className="text-left text-xs font-medium text-violet-700 hover:text-violet-900 underline-offset-2 hover:underline"
+                              className="inline-flex w-fit items-center gap-1 rounded-lg border border-indigo-400/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200/90 transition hover:border-indigo-400/35 hover:bg-indigo-500/15 hover:text-indigo-100"
                             >
                               Rattacher à un membre
                             </button>
@@ -973,12 +977,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                       <button
                         key={`empty-${index}`}
                         onClick={() => openAssignModal(slot)}
-                        className="group flex items-center gap-3 rounded-lg border-2 border-dashed border-slate-300 px-4 py-3 transition-all hover:border-blue-300 hover:bg-blue-50/40"
+                        className="group flex min-w-[200px] items-center gap-3 rounded-xl border border-dashed border-white/15 bg-white/[0.02] px-4 py-3.5 backdrop-blur-sm transition-all hover:border-blue-400/30 hover:bg-white/[0.05]"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 transition-colors group-hover:bg-blue-100">
-                          <Plus className="w-4 h-4 text-slate-400 group-hover:text-[var(--obillz-hero-blue)]" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/10 transition-colors group-hover:bg-blue-500/15 group-hover:ring-blue-400/25">
+                          <Plus className="h-4 w-4 text-white/40 transition-colors group-hover:text-blue-300" />
                         </div>
-                        <span className="text-sm text-slate-500 group-hover:text-[var(--obillz-hero-blue)]">
+                        <span className="text-sm text-white/50 transition-colors group-hover:text-blue-200/90">
                           Affecter un membre
                         </span>
                       </button>
