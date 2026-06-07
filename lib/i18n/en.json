@@ -1246,7 +1246,11 @@
         "bulkSummaryCreated": "{count} memberships created",
         "bulkSummaryEmailed": "{count} emails sent",
         "bulkSummaryNoEmail": "{count} members without email",
-        "bulkSummaryFailed": "{count} failed"
+        "bulkSummaryFailed": "{count} failed",
+        "successTitle": "Memberships created successfully",
+        "successMessage": "The memberships have been created and the emails have been sent.",
+        "viewQuotes": "View memberships",
+        "createAnother": "Create another membership"
       }
     },
     "invoices": {

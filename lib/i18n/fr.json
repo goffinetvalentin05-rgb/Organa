@@ -1124,7 +1124,11 @@
         "bulkSummaryCreated": "{count} cotisations créées",
         "bulkSummaryEmailed": "{count} emails envoyés",
         "bulkSummaryNoEmail": "{count} membres sans adresse email",
-        "bulkSummaryFailed": "{count} traitements en erreur"
+        "bulkSummaryFailed": "{count} traitements en erreur",
+        "successTitle": "Cotisations créées avec succès",
+        "successMessage": "Les cotisations ont été créées et les emails ont été envoyés.",
+        "viewQuotes": "Voir les cotisations",
+        "createAnother": "Créer une autre cotisation"
       }
     },
     "invoices": {

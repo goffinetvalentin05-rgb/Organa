@@ -1186,7 +1186,11 @@
         "bulkSummaryCreated": "{count} Beiträge erstellt",
         "bulkSummaryEmailed": "{count} E-Mails gesendet",
         "bulkSummaryNoEmail": "{count} Mitglieder ohne E-Mail",
-        "bulkSummaryFailed": "{count} fehlgeschlagen"
+        "bulkSummaryFailed": "{count} fehlgeschlagen",
+        "successTitle": "Beiträge erfolgreich erstellt",
+        "successMessage": "Die Beiträge wurden erstellt und die E-Mails wurden gesendet.",
+        "viewQuotes": "Beiträge anzeigen",
+        "createAnother": "Weiteren Beitrag erstellen"
       }
     },
     "invoices": {

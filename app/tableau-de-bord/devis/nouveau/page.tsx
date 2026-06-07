@@ -30,6 +30,16 @@ import {
   resolveCotisationTargets,
 } from "@/lib/quotes/recipients";
 
+const COTISATIONS_LIST_PATH = "/tableau-de-bord/devis";
+
+type BulkResultSummary = {
+  created: number;
+  emailed: number;
+  skippedNoEmail: number;
+  failed: number;
+  total: number;
+};
+
 export default function NouveauDevisPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
@@ -55,13 +65,8 @@ export default function NouveauDevisPage() {
     created: number;
     message: string;
   } | null>(null);
-  const [bulkSummary, setBulkSummary] = useState<{
-    created: number;
-    emailed: number;
-    skippedNoEmail: number;
-    failed: number;
-    total: number;
-  } | null>(null);
+  const [bulkSummary, setBulkSummary] = useState<BulkResultSummary | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<BulkResultSummary | null>(null);
 
   const currencyFormatter = useMemo(
     () =>
@@ -118,6 +123,11 @@ export default function NouveauDevisPage() {
 
     loadData();
   }, [t]);
+
+  useEffect(() => {
+    if (!submitSuccess) return;
+    router.replace(COTISATIONS_LIST_PATH);
+  }, [submitSuccess, router]);
 
   const teamsWithCounts = useMemo(() => getTeamsWithCounts(clients), [clients]);
 
@@ -404,7 +414,7 @@ export default function NouveauDevisPage() {
       }
     }
 
-    const summary = {
+    const summary: BulkResultSummary = {
       created,
       emailed,
       skippedNoEmail,
@@ -412,11 +422,11 @@ export default function NouveauDevisPage() {
       total: targets.length,
     };
 
-    setBulkSummary(summary);
     setIsBulkProcessing(false);
     setBulkProgress(null);
 
     if (failed > 0) {
+      setBulkSummary(summary);
       toast.error(
         t("dashboard.quotes.recipients.bulkSummaryFailed", {
           count: String(failed),
@@ -426,6 +436,7 @@ export default function NouveauDevisPage() {
     }
 
     if (created === 0) {
+      setBulkSummary(summary);
       toast.error(t("dashboard.quotes.createError"));
       return;
     }
@@ -437,7 +448,7 @@ export default function NouveauDevisPage() {
         skipped: String(skippedNoEmail),
       })
     );
-    router.push("/tableau-de-bord/devis");
+    setSubmitSuccess(summary);
   };
 
   const validateRecipients = (): boolean => {
@@ -707,6 +718,20 @@ export default function NouveauDevisPage() {
     }
   };
 
+  const resetForm = () => {
+    setSubmitSuccess(null);
+    setBulkSummary(null);
+    setBulkProgress(null);
+    setRecipientType("individual");
+    setMemberId("");
+    setTeamCategory("");
+    setLignes([{ id: "1", designation: "", quantite: 1, prixUnitaire: 0, tva: 7.7 }]);
+    setStatut("brouillon");
+    setDateEcheance("");
+    setNotes("");
+    setDocumentId(null);
+  };
+
   const handleRecipientTypeChange = (next: RecipientType) => {
     setRecipientType(next);
     setMemberId("");
@@ -737,6 +762,53 @@ export default function NouveauDevisPage() {
     targetMembers.length > 0 &&
     getLignesValides().length > 0 &&
     (recipientType !== "individual" || memberId);
+
+  if (submitSuccess) {
+    return (
+      <PageLayout maxWidth="4xl">
+        <GlassCard padding="lg" className="space-y-6 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <span className="text-2xl font-bold" aria-hidden>
+              ✓
+            </span>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold text-slate-900">
+              {t("dashboard.quotes.recipients.successTitle")}
+            </h2>
+            <p className="text-secondary">
+              {t("dashboard.quotes.recipients.successMessage")}
+            </p>
+          </div>
+          <div className="rounded-lg border border-subtle bg-surface-hover px-4 py-3 text-left text-sm text-secondary space-y-1">
+            <p>
+              {t("dashboard.quotes.recipients.bulkSummaryCreated", {
+                count: String(submitSuccess.created),
+              })}
+            </p>
+            <p>
+              {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
+                count: String(submitSuccess.emailed),
+              })}
+            </p>
+            <p>
+              {t("dashboard.quotes.recipients.bulkSummaryNoEmail", {
+                count: String(submitSuccess.skippedNoEmail),
+              })}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <DashboardPrimaryButton href={COTISATIONS_LIST_PATH} icon="none">
+              {t("dashboard.quotes.recipients.viewQuotes")}
+            </DashboardPrimaryButton>
+            <ActionButton type="button" onClick={resetForm}>
+              {t("dashboard.quotes.recipients.createAnother")}
+            </ActionButton>
+          </div>
+        </GlassCard>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout maxWidth="4xl">
