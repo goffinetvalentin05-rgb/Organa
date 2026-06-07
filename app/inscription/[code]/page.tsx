@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { CheckCircle, Calendar2, Users } from "@/lib/icons";
+import { formatEventDate, formatEventDateTime, formatEventTime } from "@/lib/qrcodes/eventDateTime";
 
 interface EventData {
   id: string;
@@ -10,6 +11,7 @@ interface EventData {
   description?: string;
   eventType: string;
   eventDate?: string;
+  eventTime?: string;
   isActive: boolean;
 }
 
@@ -104,12 +106,17 @@ export default function PublicRegistrationPage({ params }: { params: Promise<{ c
     }
   };
 
-  const formatDate = (value?: string) => {
-    if (!value) return null;
-    return new Date(value).toLocaleDateString(
-      locale === "fr" ? "fr-FR" : locale === "de" ? "de-DE" : "en-US",
-      { weekday: "long", day: "numeric", month: "long", year: "numeric" }
-    );
+  const formatEventSchedule = (eventDate?: string, eventTime?: string) => {
+    const longDateOptions: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    const date = formatEventDate(eventDate, locale as "fr" | "de" | "en", longDateOptions);
+    const time = formatEventTime(eventTime, locale as "fr" | "de" | "en");
+    if (date && time) return `${date} · ${time}`;
+    return date || time || formatEventDateTime(eventDate, eventTime, locale as "fr" | "de" | "en", longDateOptions);
   };
 
   const getEventTypeLabel = (type: string) => {
@@ -180,8 +187,8 @@ export default function PublicRegistrationPage({ params }: { params: Promise<{ c
           </p>
           <div className="bg-emerald-50 rounded-xl p-4">
             <p className="font-medium text-emerald-800">{event?.name}</p>
-            {event?.eventDate && (
-              <p className="text-sm text-emerald-600 mt-1">{formatDate(event.eventDate)}</p>
+            {(event?.eventDate || event?.eventTime) && (
+              <p className="text-sm text-emerald-600 mt-1">{formatEventSchedule(event?.eventDate, event?.eventTime)}</p>
             )}
           </div>
         </div>
@@ -221,10 +228,10 @@ export default function PublicRegistrationPage({ params }: { params: Promise<{ c
               <Users className="w-4 h-4" />
               {getEventTypeLabel(event.eventType)}
             </div>
-            {event.eventDate && (
+            {(event.eventDate || event.eventTime) && (
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Calendar2 className="w-4 h-4" />
-                {formatDate(event.eventDate)}
+                {formatEventSchedule(event.eventDate, event.eventTime)}
               </div>
             )}
           </div>

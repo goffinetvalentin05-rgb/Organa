@@ -1704,8 +1704,14 @@
         "description": "Description (optional)",
         "descriptionPlaceholder": "Additional information for attendees...",
         "eventType": "Event type",
-        "eventDate": "Event date (optional)"
+        "eventDate": "Event date (optional)",
+        "eventTime": "Event time (optional)"
       },
+      "editTitle": "Edit event information",
+      "editSubtitle": "The public link and QR code stay the same",
+      "editSave": "Save",
+      "editSuccess": "Information updated",
+      "editError": "Error updating information",
       "eventTypes": {
         "meal": "Meal",
         "match": "Match",

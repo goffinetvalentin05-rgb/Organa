@@ -1644,8 +1644,14 @@
         "description": "Beschreibung (optional)",
         "descriptionPlaceholder": "Zusätzliche Informationen für Teilnehmer...",
         "eventType": "Veranstaltungsart",
-        "eventDate": "Datum (optional)"
+        "eventDate": "Datum (optional)",
+        "eventTime": "Uhrzeit (optional)"
       },
+      "editTitle": "Informationen bearbeiten",
+      "editSubtitle": "Der öffentliche Link und QR-Code bleiben unverändert",
+      "editSave": "Speichern",
+      "editSuccess": "Informationen aktualisiert",
+      "editError": "Fehler beim Aktualisieren",
       "eventTypes": {
         "meal": "Essen",
         "match": "Spiel",

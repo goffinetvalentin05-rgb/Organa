@@ -20,6 +20,7 @@ export async function GET(
         description,
         event_type,
         event_date,
+        event_time,
         code,
         is_active,
         user_id
@@ -49,6 +50,7 @@ export async function GET(
         description: qrcode.description,
         eventType: qrcode.event_type,
         eventDate: qrcode.event_date,
+        eventTime: qrcode.event_time,
         isActive: qrcode.is_active,
       },
       clubName: profile?.company_name || "Club",

@@ -14,6 +14,8 @@ import {
   Calendar2,
   Mail,
   QrCode,
+  Edit,
+  X,
 } from "@/lib/icons";
 import {
   PageLayout,
@@ -22,7 +24,20 @@ import {
   dashboardSecondaryButtonClass,
   dashboardCardTitleClass,
   sectionListRowClass,
+  dashboardModalClass,
+  dashboardInputClass,
+  dashboardSelectLgClass,
+  dashboardLabelClass,
+  cn,
 } from "@/components/ui";
+import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import {
+  formatEventDate,
+  formatEventDateTime,
+  formatEventTime,
+  normalizeEventTimeForInput,
+  normalizeEventTimeForApi,
+} from "@/lib/qrcodes/eventDateTime";
 
 interface QRCodeData {
   id: string;
@@ -30,6 +45,7 @@ interface QRCodeData {
   description?: string;
   event_type: string;
   event_date?: string;
+  event_time?: string;
   code: string;
   is_active: boolean;
   created_at: string;
@@ -52,6 +68,15 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
   const [qrcode, setQrcode] = useState<QRCodeData | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    eventType: "other",
+    eventDate: "",
+    eventTime: "",
+  });
 
   useEffect(() => {
     loadData();
@@ -73,6 +98,52 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
       router.push("/tableau-de-bord/qrcodes");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openEditModal = () => {
+    if (!qrcode) return;
+    setEditForm({
+      name: qrcode.name,
+      description: qrcode.description || "",
+      eventType: qrcode.event_type,
+      eventDate: qrcode.event_date || "",
+      eventTime: normalizeEventTimeForInput(qrcode.event_time),
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editForm.name.trim()) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/qrcodes/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description,
+          eventType: editForm.eventType,
+          eventDate: editForm.eventDate || null,
+          eventTime: normalizeEventTimeForApi(editForm.eventTime),
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error);
+      }
+
+      toast.success(t("dashboard.qrcodes.editSuccess"));
+      setShowEditModal(false);
+      loadData();
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("dashboard.qrcodes.editError");
+      toast.error(message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -148,7 +219,7 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
       r.email,
       r.phone || "",
       r.comment || "",
-      formatDate(r.created_at),
+      formatRegistrationDate(r.created_at),
     ]);
 
     const csvContent = [
@@ -165,12 +236,16 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
     URL.revokeObjectURL(url);
   };
 
-  const formatDate = (value?: string) => {
+  const formatRegistrationDate = (value?: string) => {
     if (!value) return "-";
     return new Date(value).toLocaleDateString(
       locale === "fr" ? "fr-FR" : locale === "de" ? "de-DE" : "en-US",
       { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }
     );
+  };
+
+  const formatEventSchedule = (eventDate?: string, eventTime?: string) => {
+    return formatEventDateTime(eventDate, eventTime, locale as "fr" | "de" | "en");
   };
 
   const getEventTypeLabel = (type: string) => {
@@ -256,27 +331,41 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
 
           {/* Event Info */}
           <div className={`${dashboardInnerPanelClass} p-6`}>
-            <h2 className={`${dashboardCardTitleClass} mb-4`}>
-              {t("dashboard.qrcodes.detail.eventInfo")}
-            </h2>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className={dashboardCardTitleClass}>
+                {t("dashboard.qrcodes.detail.eventInfo")}
+              </h2>
+              <button
+                type="button"
+                onClick={openEditModal}
+                className={`${dashboardSecondaryButtonClass} px-3 py-2 text-xs`}
+              >
+                <Edit className="w-4 h-4" />
+                {t("dashboard.common.edit")}
+              </button>
+            </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-white/55">Nom</p>
+                <p className="text-sm text-white/55">{t("dashboard.qrcodes.fields.name")}</p>
                 <p className="font-medium text-white/90">{qrcode.name}</p>
               </div>
               <div>
-                <p className="text-sm text-white/55">Type</p>
+                <p className="text-sm text-white/55">{t("dashboard.qrcodes.fields.eventType")}</p>
                 <p className="font-medium text-white/90">{getEventTypeLabel(qrcode.event_type)}</p>
               </div>
-              {qrcode.event_date && (
+              {(qrcode.event_date || qrcode.event_time) && (
                 <div>
-                  <p className="text-sm text-white/55">Date</p>
-                  <p className="font-medium text-white/90">{formatDate(qrcode.event_date)}</p>
+                  <p className="text-sm text-white/55">{t("dashboard.qrcodes.fields.eventDate")}</p>
+                  <p className="font-medium text-white/90">
+                    {formatEventSchedule(qrcode.event_date, qrcode.event_time) ||
+                      formatEventDate(qrcode.event_date, locale as "fr" | "de" | "en") ||
+                      formatEventTime(qrcode.event_time, locale as "fr" | "de" | "en")}
+                  </p>
                 </div>
               )}
               {qrcode.description && (
                 <div>
-                  <p className="text-sm text-white/55">Description</p>
+                  <p className="text-sm text-white/55">{t("dashboard.qrcodes.fields.description")}</p>
                   <p className="text-white/75">{qrcode.description}</p>
                 </div>
               )}
@@ -365,7 +454,7 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
                           </p>
                         )}
                         <p className="ml-13 mt-2 text-xs text-white/40">
-                          {formatDate(reg.created_at)}
+                          {formatRegistrationDate(reg.created_at)}
                         </p>
                       </div>
                       <button
@@ -384,6 +473,109 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
       </div>
+
+      {showEditModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+            onClick={() => setShowEditModal(false)}
+          />
+          <div className={`relative w-full max-w-lg max-h-[90vh] overflow-y-auto ${dashboardModalClass}`}>
+            <div className="sticky top-0 z-[1] flex items-center justify-between border-b border-white/10 bg-[#0a0f2e]/95 p-6 backdrop-blur-md">
+              <div>
+                <h2 className="text-xl font-bold text-white">{t("dashboard.qrcodes.editTitle")}</h2>
+                <p className="mt-1 text-sm text-white/55">{t("dashboard.qrcodes.editSubtitle")}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="rounded-xl p-2 text-white/55 transition hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-5 p-6">
+              <div>
+                <label className={dashboardLabelClass}>{t("dashboard.qrcodes.fields.name")}</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder={t("dashboard.qrcodes.fields.namePlaceholder")}
+                  className={dashboardInputClass}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className={dashboardLabelClass}>{t("dashboard.qrcodes.fields.eventType")}</label>
+                <select
+                  value={editForm.eventType}
+                  onChange={(e) => setEditForm({ ...editForm, eventType: e.target.value })}
+                  className={dashboardSelectLgClass}
+                >
+                  <option value="meal">{t("dashboard.qrcodes.eventTypes.meal")}</option>
+                  <option value="match">{t("dashboard.qrcodes.eventTypes.match")}</option>
+                  <option value="tournament">{t("dashboard.qrcodes.eventTypes.tournament")}</option>
+                  <option value="party">{t("dashboard.qrcodes.eventTypes.party")}</option>
+                  <option value="other">{t("dashboard.qrcodes.eventTypes.other")}</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={dashboardLabelClass}>{t("dashboard.qrcodes.fields.eventDate")}</label>
+                  <input
+                    type="date"
+                    value={editForm.eventDate}
+                    onChange={(e) => setEditForm({ ...editForm, eventDate: e.target.value })}
+                    className={cn(dashboardInputClass, "[color-scheme:dark]")}
+                  />
+                </div>
+                <div>
+                  <label className={dashboardLabelClass}>{t("dashboard.qrcodes.fields.eventTime")}</label>
+                  <input
+                    type="time"
+                    value={editForm.eventTime}
+                    onChange={(e) => setEditForm({ ...editForm, eventTime: e.target.value })}
+                    className={cn(dashboardInputClass, "[color-scheme:dark]")}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={dashboardLabelClass}>{t("dashboard.qrcodes.fields.description")}</label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  placeholder={t("dashboard.qrcodes.fields.descriptionPlaceholder")}
+                  className={cn(dashboardInputClass, "min-h-[6rem] resize-y")}
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className={`${dashboardSecondaryButtonClass} justify-center px-4 py-2.5`}
+                >
+                  {t("dashboard.common.cancel")}
+                </button>
+                <DashboardPrimaryButton
+                  type="submit"
+                  disabled={saving || !editForm.name.trim()}
+                  icon="none"
+                  className="justify-center"
+                >
+                  {saving ? t("dashboard.common.saving") : t("dashboard.qrcodes.editSave")}
+                </DashboardPrimaryButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </PageLayout>
   );
 }

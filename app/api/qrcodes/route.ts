@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     const body = await request.json();
-    const { name, description, eventType, eventDate } = body;
+    const { name, description, eventType, eventDate, eventTime } = body;
 
     if (!name?.trim()) {
       return NextResponse.json({ error: "Le nom est obligatoire" }, { status: 400 });
@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
         description: description?.trim() || null,
         event_type: eventType || "other",
         event_date: eventDate || null,
+        event_time: eventTime || null,
         code,
         is_active: true,
       })

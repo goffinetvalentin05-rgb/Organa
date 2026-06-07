@@ -1555,8 +1555,14 @@
         "description": "Description (optionnel)",
         "descriptionPlaceholder": "Informations complémentaires pour les inscrits...",
         "eventType": "Type d'événement",
-        "eventDate": "Date de l'événement (optionnel)"
+        "eventDate": "Date de l'événement (optionnel)",
+        "eventTime": "Heure de l'événement (optionnel)"
       },
+      "editTitle": "Modifier les informations",
+      "editSubtitle": "Le lien public et le QR code restent identiques",
+      "editSave": "Enregistrer",
+      "editSuccess": "Informations mises à jour",
+      "editError": "Erreur lors de la mise à jour",
       "eventTypes": {
         "meal": "Repas",
         "match": "Match",

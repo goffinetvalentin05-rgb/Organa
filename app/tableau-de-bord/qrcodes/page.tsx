@@ -26,6 +26,7 @@ import {
   dashboardSecondaryButtonClass,
   cn,
 } from "@/components/ui";
+import { formatEventDateTime, normalizeEventTimeForApi } from "@/lib/qrcodes/eventDateTime";
 
 interface QRCodeItem {
   id: string;
@@ -33,6 +34,7 @@ interface QRCodeItem {
   description?: string;
   event_type: string;
   event_date?: string;
+  event_time?: string;
   code: string;
   is_active: boolean;
   created_at: string;
@@ -52,6 +54,7 @@ export default function QRCodesPage() {
     description: "",
     eventType: "other",
     eventDate: "",
+    eventTime: "",
   });
 
   useEffect(() => {
@@ -81,7 +84,10 @@ export default function QRCodesPage() {
       const res = await fetch("/api/qrcodes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          eventTime: normalizeEventTimeForApi(formData.eventTime),
+        }),
       });
 
       if (!res.ok) {
@@ -91,7 +97,7 @@ export default function QRCodesPage() {
 
       toast.success(t("dashboard.qrcodes.createSuccess"));
       setShowCreateModal(false);
-      setFormData({ name: "", description: "", eventType: "other", eventDate: "" });
+      setFormData({ name: "", description: "", eventType: "other", eventDate: "", eventTime: "" });
       loadQRCodes();
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : t("dashboard.qrcodes.createError");
@@ -142,9 +148,8 @@ export default function QRCodesPage() {
     img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
   };
 
-  const formatDate = (value?: string) => {
-    if (!value) return null;
-    return new Date(value).toLocaleDateString(locale === "fr" ? "fr-FR" : locale === "de" ? "de-DE" : "en-US");
+  const formatEventSchedule = (eventDate?: string, eventTime?: string) => {
+    return formatEventDateTime(eventDate, eventTime, locale as "fr" | "de" | "en");
   };
 
   const getEventTypeLabel = (type: string) => {
@@ -244,7 +249,7 @@ export default function QRCodesPage() {
                   {qr.event_date ? (
                     <div className="flex items-center gap-2">
                       <Calendar2 className="h-4 w-4 shrink-0 text-[#2563EB]" />
-                      <span className="font-medium">{formatDate(qr.event_date)}</span>
+                      <span className="font-medium">{formatEventSchedule(qr.event_date, qr.event_time)}</span>
                     </div>
                   ) : null}
                 </div>
@@ -358,17 +363,30 @@ export default function QRCodesPage() {
                 </select>
               </div>
 
-              {/* Event Date */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  {t("dashboard.qrcodes.fields.eventDate")}
-                </label>
-                <input
-                  type="date"
-                  value={formData.eventDate}
-                  onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                  className="input-obillz"
-                />
+              {/* Event Date & Time */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.qrcodes.fields.eventDate")}
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.eventDate}
+                    onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
+                    className="input-obillz"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("dashboard.qrcodes.fields.eventTime")}
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.eventTime}
+                    onChange={(e) => setFormData({ ...formData, eventTime: e.target.value })}
+                    className="input-obillz"
+                  />
+                </div>
               </div>
 
               {/* Description */}

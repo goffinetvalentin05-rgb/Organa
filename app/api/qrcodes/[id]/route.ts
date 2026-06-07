@@ -58,13 +58,14 @@ export async function PATCH(
     const supabase = await createClient();
 
     const body = await request.json();
-    const { name, description, eventType, eventDate, isActive } = body;
+    const { name, description, eventType, eventDate, eventTime, isActive } = body;
 
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) updateData.name = name.trim();
     if (description !== undefined) updateData.description = description?.trim() || null;
     if (eventType !== undefined) updateData.event_type = eventType;
     if (eventDate !== undefined) updateData.event_date = eventDate || null;
+    if (eventTime !== undefined) updateData.event_time = eventTime || null;
     if (isActive !== undefined) updateData.is_active = isActive;
 
     const { data: qrcode, error } = await supabase
