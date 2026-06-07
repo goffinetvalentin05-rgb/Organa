@@ -10,6 +10,7 @@ import { ArrowRight, Users } from "@/lib/icons";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import MemberRoleSelect from "@/components/members/MemberRoleSelect";
 import MemberCategorySelect from "@/components/members/MemberCategorySelect";
+import { dashboardInnerPanelClass, dashboardLabelClass, dashboardSecondaryButtonClass } from "@/components/ui";
 
 export default function NouveauClientPage() {
   const router = useRouter();
@@ -152,15 +153,15 @@ export default function NouveauClientPage() {
       )}
 
       {error?.type === "OTHER" && (
-        <div className="bg-red-50 rounded-xl border border-red-200 p-4">
-          <p className="text-red-700 text-sm">{error.message}</p>
+        <div className="rounded-xl border border-red-400/25 bg-red-500/12 p-4">
+          <p className="text-sm text-red-200">{error.message}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
+        <div className={`${dashboardInnerPanelClass} space-y-5 p-6`}>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className={`block mb-2 ${dashboardLabelClass}`}>
               {t("dashboard.clients.fields.name")} <span className="text-red-500">*</span>
             </label>
             <input
@@ -175,7 +176,7 @@ export default function NouveauClientPage() {
 
           {vis.email.enabled && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className={`block mb-2 ${dashboardLabelClass}`}>
                 {t("dashboard.clients.fields.email")} <span className="text-red-500">*</span>
               </label>
               <input
@@ -191,7 +192,7 @@ export default function NouveauClientPage() {
 
           {vis.phone.enabled && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className={`block mb-2 ${dashboardLabelClass}`}>
                 {t("dashboard.clients.fields.phone")}
               </label>
               <input
@@ -207,7 +208,7 @@ export default function NouveauClientPage() {
           {vis.address.enabled && (
             <>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className={`block mb-2 ${dashboardLabelClass}`}>
                   {t("dashboard.clients.fields.address")}
                 </label>
                 <textarea
@@ -221,7 +222,7 @@ export default function NouveauClientPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className={`block mb-2 ${dashboardLabelClass}`}>
                     Code postal
                   </label>
                   <input
@@ -234,7 +235,7 @@ export default function NouveauClientPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className={`block mb-2 ${dashboardLabelClass}`}>
                     Localité
                   </label>
                   <input
@@ -251,7 +252,7 @@ export default function NouveauClientPage() {
 
           {vis.birth_date.enabled && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className={`block mb-2 ${dashboardLabelClass}`}>
                 {t("dashboard.clients.fields.dateOfBirth")}
               </label>
               <input
@@ -265,7 +266,7 @@ export default function NouveauClientPage() {
 
           {vis.avs_number.enabled && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className={`block mb-2 ${dashboardLabelClass}`}>
                 {t("dashboard.clients.fields.avsNumber")}
               </label>
               <input
@@ -285,7 +286,7 @@ export default function NouveauClientPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {vis.role.enabled && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className={`block mb-2 ${dashboardLabelClass}`}>
                     {t("dashboard.clients.fields.role")}
                   </label>
                   <MemberRoleSelect
@@ -297,7 +298,7 @@ export default function NouveauClientPage() {
 
               {vis.category.enabled && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className={`block mb-2 ${dashboardLabelClass}`}>
                     {t("dashboard.clients.fields.category")}
                   </label>
                   <MemberCategorySelect
@@ -315,7 +316,7 @@ export default function NouveauClientPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-all"
+            className={`flex-1 px-6 py-3 ${dashboardSecondaryButtonClass}`}
           >
             {t("dashboard.common.cancel")}
           </button>

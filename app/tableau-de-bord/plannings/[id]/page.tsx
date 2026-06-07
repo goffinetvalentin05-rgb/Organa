@@ -33,6 +33,7 @@ import {
   dashboardInfoPanelClass,
   dashboardInnerPanelClass,
   dashboardModalClass,
+  dashboardCheckboxClass,
   sectionListRowClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -757,15 +758,15 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <GlassCard padding="md">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Créneaux</p>
-          <p className="text-3xl font-bold text-slate-900">{planning.slots?.length ?? 0}</p>
+          <p className="text-3xl font-bold text-white/90">{planning.slots?.length ?? 0}</p>
         </GlassCard>
         <GlassCard padding="md">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Personnes requises</p>
-          <p className="text-3xl font-bold text-slate-900">{planning.totalRequired}</p>
+          <p className="text-3xl font-bold text-white/90">{planning.totalRequired}</p>
         </GlassCard>
         <GlassCard padding="md">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Affectations</p>
-          <p className="text-3xl font-bold text-slate-900">{planning.totalAssigned}</p>
+          <p className="text-3xl font-bold text-white/90">{planning.totalAssigned}</p>
         </GlassCard>
         <GlassCard padding="md">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Taux de remplissage</p>
@@ -1002,11 +1003,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {showAssignModal && selectedSlot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className={`w-full max-w-lg max-h-[80vh] ${dashboardModalClass}`}>
-            <div className="p-6 border-b border-slate-200/70">
+            <div className="border-b border-white/10 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-slate-900">Affecter un membre</h3>
-                  <p className="text-slate-600 text-sm mt-1">
+                  <h3 className="text-xl font-semibold text-white/95">Affecter un membre</h3>
+                  <p className="mt-1 text-sm text-white/65">
                     {selectedSlot.location} •{" "}
                     {selectedSlot.slotDate?.trim()
                       ? formatDate(selectedSlot.slotDate)
@@ -1017,14 +1018,14 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <button
                   onClick={() => setShowAssignModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
+                  className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white/90"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 border-b border-slate-200/70">
+            <div className="border-b border-white/10 p-4">
               <input
                 type="text"
                 placeholder="Rechercher un membre..."
@@ -1033,48 +1034,48 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                 className={planningInputClass}
                 autoFocus
               />
-              <label className="flex items-center gap-2 mt-3 text-sm text-slate-600">
+              <label className="mt-3 flex items-center gap-2 text-sm text-white/65">
                 <input
                   type="checkbox"
                   checked={sendNotification}
                   onChange={(e) => setSendNotification(e.target.checked)}
-                  className="rounded border-slate-300 text-[var(--obillz-hero-blue)] focus:ring-blue-200"
+                  className={dashboardCheckboxClass}
                 />
                 Envoyer une notification par email
               </label>
             </div>
 
-            <div className="overflow-y-auto max-h-[40vh]">
+            <div className="max-h-[40vh] overflow-y-auto">
               {availableMembers.length === 0 ? (
-                <div className="p-8 text-center text-slate-600">
+                <div className="p-8 text-center text-white/55">
                   {searchTerm ? "Aucun membre trouvé" : "Aucun membre disponible"}
                 </div>
               ) : (
-                <div className="divide-y divide-slate-200/60">
+                <div className="divide-y divide-white/10">
                   {availableMembers.map((member) => (
                     <button
                       key={member.id}
                       onClick={() => handleAssign(member.id)}
                       disabled={assigning}
-                      className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left disabled:opacity-50"
+                      className="flex w-full items-center gap-4 p-4 text-left transition-colors hover:bg-white/[0.06] disabled:opacity-50"
                     >
-                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                        <span className="text-[var(--obillz-hero-blue)] font-semibold">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-400/25 bg-blue-500/15">
+                        <span className="font-semibold text-blue-200">
                           {member.nom.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900">{member.nom}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-white/90">{member.nom}</p>
                         {member.email && (
-                          <p className="text-sm text-slate-500 truncate">{member.email}</p>
+                          <p className="truncate text-sm text-white/55">{member.email}</p>
                         )}
                         {member.role && (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
+                          <span className="mt-1 inline-block rounded-md border border-white/15 bg-white/[0.08] px-2 py-0.5 text-xs text-white/65">
                             {member.role}
                           </span>
                         )}
                       </div>
-                      <ArrowRight className="w-5 h-5 text-slate-400" />
+                      <ArrowRight className="h-5 w-5 text-white/40" />
                     </button>
                   ))}
                 </div>
@@ -1087,11 +1088,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {showLinkModal && linkTargetSlot && linkTargetAssignment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className={`w-full max-w-lg max-h-[80vh] ${dashboardModalClass}`}>
-            <div className="p-6 border-b border-slate-200/70">
+            <div className="border-b border-white/10 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-slate-900">Rattacher à un membre</h3>
-                  <p className="text-slate-600 text-sm mt-1">
+                  <h3 className="text-xl font-semibold text-white/95">Rattacher à un membre</h3>
+                  <p className="mt-1 text-sm text-white/65">
                     {linkTargetAssignment.member.nom} — {linkTargetSlot.location} •{" "}
                     {linkTargetSlot.slotDate?.trim()
                       ? formatDate(linkTargetSlot.slotDate)
@@ -1107,14 +1108,14 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     setLinkTargetAssignment(null);
                     setLinkTargetSlot(null);
                   }}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
+                  className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white/90"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 border-b border-slate-200/70">
+            <div className="border-b border-white/10 p-4">
               <input
                 type="text"
                 placeholder="Rechercher un membre..."
@@ -1125,31 +1126,31 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               />
             </div>
 
-            <div className="overflow-y-auto max-h-[40vh]">
+            <div className="max-h-[40vh] overflow-y-auto">
               {membersAvailableForLink.length === 0 ? (
-                <div className="p-8 text-center text-slate-600">
+                <div className="p-8 text-center text-white/55">
                   {linkSearchTerm ? "Aucun membre trouvé" : "Aucun membre disponible"}
                 </div>
               ) : (
-                <div className="divide-y divide-slate-200/60">
+                <div className="divide-y divide-white/10">
                   {membersAvailableForLink.map((member) => (
                     <button
                       key={member.id}
                       type="button"
                       onClick={() => handleLinkToMember(member.id)}
                       disabled={linkAssigning}
-                      className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left disabled:opacity-50"
+                      className="flex w-full items-center gap-4 p-4 text-left transition-colors hover:bg-white/[0.06] disabled:opacity-50"
                     >
-                      <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
-                        <span className="text-violet-800 font-semibold">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-indigo-400/25 bg-indigo-500/15">
+                        <span className="font-semibold text-indigo-200">
                           {member.nom.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900">{member.nom}</p>
-                        {member.email && <p className="text-sm text-slate-500 truncate">{member.email}</p>}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-white/90">{member.nom}</p>
+                        {member.email && <p className="truncate text-sm text-white/55">{member.email}</p>}
                       </div>
-                      <ArrowRight className="w-5 h-5 text-slate-400" />
+                      <ArrowRight className="h-5 w-5 text-white/40" />
                     </button>
                   ))}
                 </div>
@@ -1162,19 +1163,19 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {showEditPlanningModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className={`w-full max-w-lg ${dashboardModalClass}`}>
-            <div className="border-b border-slate-200/70 p-6">
+            <div className="border-b border-white/10 p-6">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-xl font-semibold text-slate-900">Modifier le planning</h3>
+                <h3 className="text-xl font-semibold text-white/95">Modifier le planning</h3>
                 <button
                   type="button"
                   onClick={() => setShowEditPlanningModal(false)}
-                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white/90"
                   aria-label="Fermer"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="mt-2 text-sm text-white/65">
                 La date ci-dessous est la date générale du planning (référence, listes, sous-titre). Elle ne modifie
                 jamais la date enregistrée sur chaque créneau : la grille, le lien public et le PDF utilisent uniquement
                 la date de chaque créneau. Les affectations, horaires et capacités ne sont pas modifiés.
@@ -1224,7 +1225,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 border-t border-slate-200/70 p-6">
+            <div className="flex justify-end gap-3 border-t border-white/10 p-6">
               <ActionButton type="button" onClick={() => setShowEditPlanningModal(false)} disabled={savingPlanningMeta}>
                 Annuler
               </ActionButton>
@@ -1250,9 +1251,9 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
       {showSlotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className={`w-full max-w-lg max-h-[90vh] overflow-y-auto ${dashboardModalClass}`}>
-            <div className="p-6 border-b border-slate-200/70">
+            <div className="border-b border-white/10 p-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-slate-900">
+                <h3 className="text-xl font-semibold text-white/95">
                   {editingSlotId ? "Modifier le créneau" : "Ajouter un créneau"}
                 </h3>
                 <button
@@ -1261,7 +1262,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     setShowSlotModal(false);
                     setEditingSlotId(null);
                   }}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900"
+                  className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white/90"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1292,7 +1293,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                   onChange={(e) => setSlotForm({ ...slotForm, slotDate: e.target.value })}
                   className={planningInputClass}
                 />
-                <p className="text-xs text-slate-500 mt-1.5">
+                <p className="mt-1.5 text-xs text-white/50">
                   Peut être différente de la date principale du planning (préparation, rangement…).
                 </p>
               </div>
@@ -1350,7 +1351,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <div className="p-6 border-t border-slate-200/70 flex justify-end gap-3">
+            <div className="flex justify-end gap-3 border-t border-white/10 p-6">
               <ActionButton
                 type="button"
                 onClick={() => {

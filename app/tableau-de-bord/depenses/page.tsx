@@ -13,6 +13,7 @@ import {
   dashboardSelectClass,
   dashboardPopoverPanelClass,
   dashboardLabelClass,
+  dashboardSecondaryButtonClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { createClient } from "@/lib/supabase/client";
@@ -524,7 +525,7 @@ export default function DepensesPage() {
               <button
                 type="button"
                 onClick={() => setShowAccountingExport((value) => !value)}
-                className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900"
+                className={`${dashboardSecondaryButtonClass} px-4 py-3`}
               >
                 <Download className="h-5 w-5" />
                 {t("dashboard.expenses.exportAccountingAction")}

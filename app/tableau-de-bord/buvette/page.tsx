@@ -5,7 +5,7 @@ import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass } from "@/components/ui";
+import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass } from "@/components/ui";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 
 type DayData = {
@@ -395,14 +395,14 @@ N'hésite pas à nous contacter si tu as des questions.
                 <button
                   onClick={unblockDate}
                   disabled={submitting}
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-50"
+                  className={`w-full px-4 py-2 ${dashboardSecondaryButtonClass} disabled:opacity-50`}
                 >
                   Débloquer la date
                 </button>
               )}
 
               {selectedRequest && (
-                <div className="rounded-lg border border-slate-200 p-3 space-y-2">
+                <div className={`${dashboardInnerPanelClass} space-y-2 p-3`}>
                   <p className="font-medium text-sm">Réservation sélectionnée</p>
                   <p className="text-sm">
                     {selectedRequest.first_name} {selectedRequest.last_name}
@@ -441,7 +441,7 @@ N'hésite pas à nous contacter si tu as des questions.
                     <div className="flex gap-2">
                       <button
                         onClick={openInfoModal}
-                        className="flex-1 px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                        className={`flex-1 px-3 py-2 ${dashboardSecondaryButtonClass}`}
                       >
                         Envoyer les infos
                       </button>
@@ -461,7 +461,7 @@ N'hésite pas à nous contacter si tu as des questions.
       </div>
 
       <GlassCard padding="md">
-        <h2 className="font-semibold text-slate-900 mb-3">Demandes récentes</h2>
+        <h2 className="mb-3 font-semibold text-white/90">Demandes récentes</h2>
         <div className="space-y-2">
           {requests.length === 0 && <p className="text-sm text-slate-500">Aucune demande pour le moment.</p>}
           {requests.slice(0, 8).map((r) => (
@@ -471,7 +471,7 @@ N'hésite pas à nous contacter si tu as des questions.
                 setSelectedDate(r.reservation_date);
                 setSelectedRequestId(r.id);
               }}
-              className="w-full text-left rounded-lg border border-slate-200 p-3 hover:bg-slate-50"
+              className={`w-full text-left p-3 ${dashboardInnerPanelClass} transition hover:border-blue-400/25 hover:bg-white/[0.08]`}
             >
               <div className="flex items-center justify-between">
                 <p className="font-medium text-sm">{r.first_name} {r.last_name}</p>
@@ -490,7 +490,7 @@ N'hésite pas à nous contacter si tu as des questions.
               <h3 className="text-lg font-semibold">Envoyer les infos pratiques</h3>
               <button
                 onClick={() => setShowInfoModal(false)}
-                className="px-2 py-1 rounded-md hover:bg-slate-100"
+                className="rounded-md px-2 py-1 text-white/55 transition hover:bg-white/10 hover:text-white/90"
               >
                 ✕
               </button>
@@ -499,12 +499,12 @@ N'hésite pas à nous contacter si tu as des questions.
               value={infoMessageDraft}
               onChange={(e) => setInfoMessageDraft(e.target.value)}
               rows={14}
-              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              className={`${dashboardInputClass} min-h-[14rem] resize-y`}
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowInfoModal(false)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                className={dashboardSecondaryButtonClass}
               >
                 Annuler
               </button>
@@ -527,7 +527,7 @@ N'hésite pas à nous contacter si tu as des questions.
               <h3 className="text-lg font-semibold">Envoyer la facture</h3>
               <button
                 onClick={() => setShowInvoiceModal(false)}
-                className="px-2 py-1 rounded-md hover:bg-slate-100"
+                className="rounded-md px-2 py-1 text-white/55 transition hover:bg-white/10 hover:text-white/90"
               >
                 ✕
               </button>
@@ -541,12 +541,12 @@ N'hésite pas à nous contacter si tu as des questions.
                   value={invoiceMessageDraft}
                   onChange={(e) => setInvoiceMessageDraft(e.target.value)}
                   rows={10}
-                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  className={`${dashboardInputClass} min-h-[14rem] resize-y`}
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setShowInvoiceModal(false)}
-                    className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                    className={dashboardSecondaryButtonClass}
                   >
                     Annuler
                   </button>
@@ -571,12 +571,12 @@ N'hésite pas à nous contacter si tu as des questions.
                   value={invoiceAmount}
                   onChange={(e) => setInvoiceAmount(e.target.value)}
                   placeholder="Montant en CHF"
-                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  className={`${dashboardInputClass} min-h-[14rem] resize-y`}
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setInvoiceStep("message")}
-                    className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50"
+                    className={dashboardSecondaryButtonClass}
                   >
                     Retour
                   </button>

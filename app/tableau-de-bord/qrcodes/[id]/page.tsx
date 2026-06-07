@@ -15,6 +15,14 @@ import {
   Mail,
   QrCode,
 } from "@/lib/icons";
+import {
+  PageLayout,
+  GlassCard,
+  dashboardInnerPanelClass,
+  dashboardSecondaryButtonClass,
+  dashboardCardTitleClass,
+  sectionListRowClass,
+} from "@/components/ui";
 
 interface QRCodeData {
   id: string;
@@ -178,17 +186,17 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <div className="inline-flex items-center gap-3 text-slate-500">
+      <PageLayout maxWidth="7xl">
+        <GlassCard padding="lg" className="text-center">
+          <div className="inline-flex items-center gap-3 text-white/55">
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {t("dashboard.common.loading")}
           </div>
-        </div>
-      </div>
+        </GlassCard>
+      </PageLayout>
     );
   }
 
@@ -197,7 +205,7 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
   const registrationUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/inscription/${qrcode.code}`;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <PageLayout maxWidth="7xl">
       {/* Back link */}
       <Link
         href="/tableau-de-bord/qrcodes"
@@ -212,29 +220,33 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
         {/* QR Code & Info */}
         <div className="lg:col-span-1 space-y-6">
           {/* QR Code Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+          <div className={`${dashboardInnerPanelClass} p-6`}>
+            <h2 className={`${dashboardCardTitleClass} mb-4`}>
               {t("dashboard.qrcodes.detail.qrCodeLabel")}
             </h2>
-            <div className="flex justify-center p-4 bg-gradient-to-br from-slate-50 to-white rounded-xl mb-4">
-              <QRCodeSVG
-                id={`qr-detail-${qrcode.code}`}
-                value={registrationUrl}
-                size={200}
-                level="M"
-              />
+            <div className="mb-4 flex justify-center rounded-xl border border-white/10 bg-white/[0.04] p-4">
+              <div className="qr-code-surface rounded-xl p-4 shadow-lg ring-1 ring-white/20">
+                <QRCodeSVG
+                  id={`qr-detail-${qrcode.code}`}
+                  value={registrationUrl}
+                  size={200}
+                  level="M"
+                />
+              </div>
             </div>
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={() => downloadQR("png")}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                className={`flex-1 ${dashboardSecondaryButtonClass} px-3 py-2 text-sm`}
               >
                 <Download className="w-4 h-4" />
                 {t("dashboard.qrcodes.detail.downloadPng")}
               </button>
               <button
+                type="button"
                 onClick={() => downloadQR("svg")}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                className={`flex-1 ${dashboardSecondaryButtonClass} px-3 py-2 text-sm`}
               >
                 <Download className="w-4 h-4" />
                 {t("dashboard.qrcodes.detail.downloadSvg")}
@@ -243,45 +255,46 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
           </div>
 
           {/* Event Info */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+          <div className={`${dashboardInnerPanelClass} p-6`}>
+            <h2 className={`${dashboardCardTitleClass} mb-4`}>
               {t("dashboard.qrcodes.detail.eventInfo")}
             </h2>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-slate-500">Nom</p>
-                <p className="font-medium text-slate-900">{qrcode.name}</p>
+                <p className="text-sm text-white/55">Nom</p>
+                <p className="font-medium text-white/90">{qrcode.name}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">Type</p>
-                <p className="font-medium text-slate-900">{getEventTypeLabel(qrcode.event_type)}</p>
+                <p className="text-sm text-white/55">Type</p>
+                <p className="font-medium text-white/90">{getEventTypeLabel(qrcode.event_type)}</p>
               </div>
               {qrcode.event_date && (
                 <div>
-                  <p className="text-sm text-slate-500">Date</p>
-                  <p className="font-medium text-slate-900">{formatDate(qrcode.event_date)}</p>
+                  <p className="text-sm text-white/55">Date</p>
+                  <p className="font-medium text-white/90">{formatDate(qrcode.event_date)}</p>
                 </div>
               )}
               {qrcode.description && (
                 <div>
-                  <p className="text-sm text-slate-500">Description</p>
-                  <p className="text-slate-700">{qrcode.description}</p>
+                  <p className="text-sm text-white/55">Description</p>
+                  <p className="text-white/75">{qrcode.description}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Registration Link */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+          <div className={`${dashboardInnerPanelClass} p-6`}>
+            <h2 className={`${dashboardCardTitleClass} mb-4`}>
               {t("dashboard.qrcodes.detail.registrationLink")}
             </h2>
-            <div className="bg-slate-50 rounded-lg p-3 mb-3">
-              <p className="text-sm text-slate-600 break-all font-mono">{registrationUrl}</p>
+            <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.04] p-3">
+              <p className="break-all font-mono text-sm text-white/65">{registrationUrl}</p>
             </div>
             <button
+              type="button"
               onClick={copyLink}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[var(--obillz-blue-light)] text-[var(--obillz-hero-blue)] text-sm font-medium hover:bg-blue-100 transition-colors"
+              className={`w-full ${dashboardSecondaryButtonClass} px-3 py-2 text-sm`}
             >
               <QrCode className="w-4 h-4" />
               {t("dashboard.qrcodes.card.copyLink")}
@@ -291,20 +304,21 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
 
         {/* Registrations */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+          <div className={`${dashboardInnerPanelClass} overflow-hidden`}>
+            <div className="flex items-center justify-between border-b border-white/10 p-6">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className={dashboardCardTitleClass}>
                   {t("dashboard.qrcodes.detail.registrations")}
                 </h2>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="mt-1 text-sm text-white/55">
                   {t("dashboard.qrcodes.detail.registrationsCount").replace("{count}", String(registrations.length))}
                 </p>
               </div>
               {registrations.length > 0 && (
                 <button
+                  type="button"
                   onClick={exportCSV}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                  className={`${dashboardSecondaryButtonClass} px-4 py-2 text-sm`}
                 >
                   <Download className="w-4 h-4" />
                   {t("dashboard.qrcodes.detail.exportCsv")}
@@ -314,52 +328,53 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
 
             {registrations.length === 0 ? (
               <div className="p-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-slate-400" />
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]">
+                  <Users className="h-8 w-8 text-white/40" />
                 </div>
-                <p className="text-slate-500">{t("dashboard.qrcodes.detail.noRegistrations")}</p>
+                <p className="text-white/55">{t("dashboard.qrcodes.detail.noRegistrations")}</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-white/10">
                 {registrations.map((reg) => (
                   <div
                     key={reg.id}
-                    className="p-5 hover:bg-slate-50 transition-colors"
+                    className={`${sectionListRowClass} rounded-none border-0 hover:border-transparent`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 rounded-full bg-[var(--obillz-blue-light)] flex items-center justify-center text-[var(--obillz-hero-blue)] font-semibold">
+                    <div className="flex w-full items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-400/25 bg-blue-500/15 font-semibold text-blue-200">
                             {reg.first_name.charAt(0)}{reg.last_name.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium text-slate-900">
+                            <p className="font-medium text-white/90">
                               {reg.first_name} {reg.last_name}
                             </p>
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
-                              <Mail className="w-3.5 h-3.5" />
+                            <div className="flex items-center gap-2 text-sm text-white/55">
+                              <Mail className="h-3.5 w-3.5" />
                               {reg.email}
                             </div>
                           </div>
                         </div>
                         {reg.phone && (
-                          <p className="text-sm text-slate-500 ml-13">📞 {reg.phone}</p>
+                          <p className="ml-13 text-sm text-white/55">📞 {reg.phone}</p>
                         )}
                         {reg.comment && (
-                          <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-2 mt-2 ml-13">
+                          <p className="ml-13 mt-2 rounded-lg border border-white/10 bg-white/[0.04] p-2 text-sm text-white/65">
                             {reg.comment}
                           </p>
                         )}
-                        <p className="text-xs text-slate-400 mt-2 ml-13">
+                        <p className="ml-13 mt-2 text-xs text-white/40">
                           {formatDate(reg.created_at)}
                         </p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleDeleteRegistration(reg.id)}
-                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        className="rounded-lg border border-red-400/20 bg-red-500/10 p-2 text-red-300 transition-colors hover:bg-red-500/18"
                         title={t("dashboard.qrcodes.detail.deleteRegistration")}
                       >
-                        <Trash className="w-4 h-4" />
+                        <Trash className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -369,6 +384,6 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

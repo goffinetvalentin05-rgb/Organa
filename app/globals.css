@@ -946,6 +946,175 @@ h3 {
   color: rgb(191, 219, 254) !important;
 }
 
+/* ------------------------------------------------------------------
+   Passe QA finale — patterns legacy non encore remappés
+   ------------------------------------------------------------------ */
+
+/* Badges statut colorés (hors dashboard-glass-card) */
+.dashboard-shell main .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: rgb(167, 243, 208) !important;
+}
+
+.dashboard-shell main .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: rgb(167, 243, 208) !important;
+}
+
+.dashboard-shell main .bg-yellow-100 {
+  background-color: rgba(234, 179, 8, 0.15) !important;
+  color: rgb(253, 224, 71) !important;
+}
+
+.dashboard-shell main .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: rgb(253, 230, 138) !important;
+}
+
+.dashboard-shell main .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: rgb(254, 202, 202) !important;
+}
+
+.dashboard-shell main .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: rgb(191, 219, 254) !important;
+}
+
+.dashboard-shell main .bg-purple-100 {
+  background-color: rgba(168, 85, 247, 0.15) !important;
+  color: rgb(216, 180, 254) !important;
+}
+
+/* Variantes avec opacité (échappent aux sélecteurs exacts) */
+.dashboard-shell main [class*="bg-red-50/"] {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.dashboard-shell main [class*="bg-green-50/"],
+.dashboard-shell main [class*="bg-emerald-50/"] {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.dashboard-shell main [class*="bg-amber-50/"] {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.dashboard-shell main [class*="bg-blue-50/"] {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+.dashboard-shell main [class*="bg-emerald-100/"],
+.dashboard-shell main [class*="bg-green-100/"],
+.dashboard-shell main [class*="bg-amber-100/"],
+.dashboard-shell main [class*="bg-red-100/"],
+.dashboard-shell main [class*="bg-blue-100/"],
+.dashboard-shell main [class*="bg-purple-100/"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Textes sémantiques colorés */
+.dashboard-shell main .text-green-600,
+.dashboard-shell main .text-green-700,
+.dashboard-shell main .text-green-800,
+.dashboard-shell main .text-green-900 {
+  color: rgb(167, 243, 208) !important;
+}
+
+.dashboard-shell main .text-emerald-600,
+.dashboard-shell main .text-emerald-700 {
+  color: rgb(110, 231, 183) !important;
+}
+
+.dashboard-shell main .text-red-600,
+.dashboard-shell main .text-red-700,
+.dashboard-shell main .text-red-800 {
+  color: rgb(254, 202, 202) !important;
+}
+
+.dashboard-shell main .text-amber-600,
+.dashboard-shell main .text-amber-700,
+.dashboard-shell main .text-amber-800 {
+  color: rgb(253, 230, 138) !important;
+}
+
+.dashboard-shell main .text-yellow-600,
+.dashboard-shell main .text-yellow-700 {
+  color: rgb(253, 224, 71) !important;
+}
+
+.dashboard-shell main .text-blue-600,
+.dashboard-shell main .text-blue-700 {
+  color: rgb(147, 197, 253) !important;
+}
+
+.dashboard-shell main .text-purple-600,
+.dashboard-shell main .text-purple-700 {
+  color: rgb(216, 180, 254) !important;
+}
+
+.dashboard-shell main .text-sky-700 {
+  color: rgb(186, 230, 253) !important;
+}
+
+.dashboard-shell main .text-violet-700,
+.dashboard-shell main .text-violet-800,
+.dashboard-shell main .text-violet-900 {
+  color: rgb(196, 181, 253) !important;
+}
+
+.dashboard-shell main .text-indigo-600 {
+  color: rgb(165, 180, 252) !important;
+}
+
+/* Hovers legacy */
+.dashboard-shell main .hover\:bg-white:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dashboard-shell main .hover\:bg-slate-200:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard-shell main .hover\:bg-red-100:hover {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+}
+
+.dashboard-shell main .hover\:bg-amber-100:hover,
+.dashboard-shell main .hover\:bg-amber-200:hover {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+.dashboard-shell main .hover\:bg-emerald-100:hover,
+.dashboard-shell main [class*="hover:bg-emerald-100"]:hover {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+.dashboard-shell main .hover\:text-slate-900:hover,
+.dashboard-shell main .hover\:text-slate-800:hover {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dashboard-shell main .group:hover .group-hover\:text-blue-700,
+.dashboard-shell main .group-hover\:text-blue-700 {
+  color: rgb(147, 197, 253) !important;
+}
+
+/* Séparateurs de listes */
+.dashboard-shell main .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard-shell main .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Surface blanche intentionnelle (QR codes, aperçus) */
+.dashboard-shell main .qr-code-surface {
+  background-color: #ffffff !important;
+}
+
 /* Hero — halo texte et profondeur */
 .landing-hero-title-glow {
   text-shadow:
