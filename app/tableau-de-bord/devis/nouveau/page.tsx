@@ -47,6 +47,7 @@ export default function NouveauDevisPage() {
   const [notes, setNotes] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{
     current: number;
@@ -415,6 +416,20 @@ export default function NouveauDevisPage() {
     setIsBulkProcessing(false);
     setBulkProgress(null);
 
+    if (failed > 0) {
+      toast.error(
+        t("dashboard.quotes.recipients.bulkSummaryFailed", {
+          count: String(failed),
+        })
+      );
+      return;
+    }
+
+    if (created === 0) {
+      toast.error(t("dashboard.quotes.createError"));
+      return;
+    }
+
     toast.success(
       t("dashboard.quotes.recipients.bulkDoneToast", {
         created: String(created),
@@ -422,6 +437,7 @@ export default function NouveauDevisPage() {
         skipped: String(skippedNoEmail),
       })
     );
+    router.push("/tableau-de-bord/devis");
   };
 
   const validateRecipients = (): boolean => {
@@ -487,7 +503,7 @@ export default function NouveauDevisPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isBulkProcessing) {
+    if (isBulkProcessing || isSubmitting) {
       return;
     }
 
@@ -512,6 +528,7 @@ export default function NouveauDevisPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const data = await createQuoteForClient(memberId, lignesValides);
       setDocumentId(data.id);
@@ -521,6 +538,8 @@ export default function NouveauDevisPage() {
         error instanceof Error ? error.message : t("dashboard.common.unknownError");
       console.error("[Devis] Erreur lors de la création:", error);
       toast.error(`${t("dashboard.quotes.createError")}: ${message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1135,7 +1154,7 @@ export default function NouveauDevisPage() {
           </ActionButton>
           <DashboardPrimaryButton
             type="submit"
-            disabled={isBulkProcessing}
+            disabled={isBulkProcessing || isSubmitting}
             icon="none"
             className="flex-1 justify-center min-w-[180px] rounded-xl"
           >
@@ -1143,6 +1162,11 @@ export default function NouveauDevisPage() {
               <span className="inline-flex items-center gap-2">
                 <Loader className="w-4 h-4 animate-spin" />
                 {t("dashboard.quotes.recipients.bulkInProgress")}
+              </span>
+            ) : isSubmitting ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader className="w-4 h-4 animate-spin" />
+                {t("dashboard.quotes.saving")}
               </span>
             ) : (
               t("dashboard.quotes.createAction")
