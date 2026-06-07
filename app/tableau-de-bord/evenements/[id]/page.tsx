@@ -555,7 +555,7 @@ export default function EventDetailPage() {
             title={t("dashboard.events.detail.linkedExpenses")}
             headerRight={
               <Link
-                href="/tableau-de-bord/depenses"
+                href={`/tableau-de-bord/depenses?eventId=${eventId}`}
                 className="text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
               >
                 + {t("dashboard.events.detail.linkExpense")}

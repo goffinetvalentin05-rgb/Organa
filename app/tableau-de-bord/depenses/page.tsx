@@ -118,6 +118,7 @@ export default function DepensesPage() {
     notes: "",
     pieceJointe: null as File | null,
     attachmentUrl: "",
+    eventId: "",
   });
 
   const formatMontant = (montant: number) => {
@@ -134,10 +135,27 @@ export default function DepensesPage() {
     return date.toLocaleDateString(localeToIntl[locale]);
   };
 
+  const resolveValidEventId = (eventId: string) =>
+    eventId && events.some((event) => event.id === eventId) ? eventId : "";
+
+  const getEventIdFromUrl = () => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("eventId") || "";
+  };
+
   useEffect(() => {
     void loadDepenses();
     void loadEvents();
   }, []);
+
+  useEffect(() => {
+    const eventIdFromUrl = getEventIdFromUrl();
+    if (!eventIdFromUrl || events.length === 0) return;
+    const validEventId = resolveValidEventId(eventIdFromUrl);
+    if (validEventId) {
+      setFormData((prev) => ({ ...prev, eventId: validEventId }));
+    }
+  }, [events]);
 
   const loadEvents = async () => {
     try {
@@ -210,6 +228,7 @@ export default function DepensesPage() {
         status: (depense.status || "a_payer") as DepenseStatut,
         notes: depense.notes || undefined,
         attachmentUrl: depense.attachmentUrl || undefined,
+        eventId: depense.eventId || undefined,
       }));
 
       setDepenses(depensesChargees);
@@ -253,6 +272,7 @@ export default function DepensesPage() {
       notes: "",
       pieceJointe: null,
       attachmentUrl: "",
+      eventId: "",
     });
   };
 
@@ -308,7 +328,16 @@ export default function DepensesPage() {
   // Cause du bug: les boutons dépendaient du submit HTML et étaient recouverts par un overlay,
   // ce qui empêchait le clic de remonter. On force un handler explicite + z-index/pointer-events.
   const openCreateForm = () => {
-    console.log("CLICK OUVRIR FORMULAIRE DEPENSE");
+    const validEventId = resolveValidEventId(getEventIdFromUrl());
+    setFormData({
+      label: "",
+      amount: "",
+      date: "",
+      status: "a_payer",
+      notes: "",
+      pieceJointe: null,
+      eventId: validEventId,
+    });
     setShowForm(true);
   };
 
@@ -428,6 +457,7 @@ export default function DepensesPage() {
         );
       }
 
+      const nextEventId = editFormData.eventId || null;
       const { error } = await supabase
         .from("expenses")
         .update({
@@ -437,6 +467,7 @@ export default function DepensesPage() {
           status: editFormData.status,
           notes: editFormData.notes.trim() || null,
           attachment_url: attachmentUrl,
+          event_id: nextEventId,
         })
         .eq("id", selectedDepense.id)
         .eq("user_id", user.id);
@@ -504,6 +535,7 @@ export default function DepensesPage() {
       notes: depense.notes || "",
       pieceJointe: null,
       attachmentUrl: depense.attachmentUrl || "",
+      eventId: depense.eventId || "",
     });
     setShowEditModal(true);
   };
@@ -559,7 +591,13 @@ export default function DepensesPage() {
             <DashboardPrimaryButton
               type="button"
               onClick={() => {
-                setShowForm((value) => !value);
+                setShowForm((value) => {
+                  if (!value) {
+                    const validEventId = resolveValidEventId(getEventIdFromUrl());
+                    setFormData((prev) => ({ ...prev, eventId: validEventId }));
+                  }
+                  return !value;
+                });
               }}
               className="relative z-50"
               style={{ pointerEvents: "auto" }}
@@ -659,27 +697,25 @@ export default function DepensesPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
             />
           </div>
-          {events.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                {t("dashboard.events.fields.type")} (optionnel)
-              </label>
-              <select
-                value={formData.eventId}
-                onChange={(event) =>
-                  setFormData({ ...formData, eventId: event.target.value })
-                }
-                className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
-              >
-                <option value="">— Aucun événement lié —</option>
-                {events.map((evt) => (
-                  <option key={evt.id} value={evt.id}>
-                    {evt.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div>
+            <label className={`block mb-2 ${dashboardLabelClass}`}>
+              {t("dashboard.expenses.fields.linkedEvent")}
+            </label>
+            <select
+              value={formData.eventId}
+              onChange={(event) =>
+                setFormData({ ...formData, eventId: event.target.value })
+              }
+              className={dashboardSelectClass}
+            >
+              <option value="">{t("dashboard.expenses.fields.linkedEventNone")}</option>
+              {events.map((evt) => (
+                <option key={evt.id} value={evt.id}>
+                  {evt.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
               {t("dashboard.expenses.fields.attachment")}
@@ -1002,6 +1038,25 @@ export default function DepensesPage() {
                   rows={4}
                   className="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500"
                 />
+              </div>
+              <div>
+                <label className={`block mb-2 ${dashboardLabelClass}`}>
+                  {t("dashboard.expenses.fields.linkedEvent")}
+                </label>
+                <select
+                  value={editFormData.eventId}
+                  onChange={(event) =>
+                    setEditFormData({ ...editFormData, eventId: event.target.value })
+                  }
+                  className={dashboardSelectClass}
+                >
+                  <option value="">{t("dashboard.expenses.fields.linkedEventNone")}</option>
+                  {events.map((evt) => (
+                    <option key={evt.id} value={evt.id}>
+                      {evt.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">

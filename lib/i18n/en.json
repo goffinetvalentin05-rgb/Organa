@@ -1600,7 +1600,9 @@
         "supplier": "Supplier",
         "dueDate": "Due date",
         "noteOptional": "Note (optional)",
-        "attachment": "Add attachment"
+        "attachment": "Add attachment",
+        "linkedEvent": "Linked event",
+        "linkedEventNone": "No event"
       },
       "status": {
         "toPay": "To pay",

@@ -1540,7 +1540,9 @@
         "supplier": "Lieferant",
         "dueDate": "Fälligkeitsdatum",
         "noteOptional": "Notiz (optional)",
-        "attachment": "Anhang hinzufügen"
+        "attachment": "Anhang hinzufügen",
+        "linkedEvent": "Verknüpfte Veranstaltung",
+        "linkedEventNone": "Keine Veranstaltung"
       },
       "status": {
         "toPay": "Zu zahlen",

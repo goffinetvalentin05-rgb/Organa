@@ -1473,7 +1473,9 @@
         "supplier": "Fournisseur / Prestataire",
         "dueDate": "Date d'échéance",
         "noteOptional": "Note (optionnel)",
-        "attachment": "Ajouter une pièce jointe"
+        "attachment": "Ajouter une pièce jointe",
+        "linkedEvent": "Événement lié",
+        "linkedEventNone": "Aucun événement"
       },
       "status": {
         "toPay": "À payer",

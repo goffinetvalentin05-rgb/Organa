@@ -6,6 +6,30 @@ import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit"
 
 export const runtime = "nodejs";
 
+async function assertEventOwnedByClub(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  clubId: string,
+  eventId: string | null | undefined
+) {
+  if (!eventId) return { ok: true as const };
+  const { data, error } = await supabase
+    .from("events")
+    .select("id")
+    .eq("id", eventId)
+    .eq("user_id", clubId)
+    .maybeSingle();
+  if (error || !data) {
+    return {
+      ok: false as const,
+      response: NextResponse.json(
+        { error: "Événement introuvable" },
+        { status: 400 }
+      ),
+    };
+  }
+  return { ok: true as const };
+}
+
 export async function GET() {
   try {
     const guard = await requirePermission(PERMISSIONS.VIEW_EXPENSES);
@@ -90,6 +114,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const resolvedEventId = event_id ?? eventId ?? null;
+    const eventCheck = await assertEventOwnedByClub(
+      supabase,
+      guard.clubId,
+      resolvedEventId
+    );
+    if (!eventCheck.ok) return eventCheck.response;
+
     const payload = {
       user_id: guard.clubId,
       description: String(descriptionValue).trim(),
@@ -98,7 +130,7 @@ export async function POST(request: NextRequest) {
       status: status === "paye" ? "paye" : "a_payer",
       notes: notes || null,
       attachment_url: attachment_url ?? attachmentUrl ?? null,
-      event_id: event_id ?? eventId ?? null,
+      event_id: resolvedEventId,
       created_by: user.id,
       updated_by: user.id,
     };
@@ -106,7 +138,9 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from("expenses")
       .insert(payload)
-      .select("id, description, amount, date, status, notes, attachment_url, created_by, updated_by, created_at")
+      .select(
+        "id, description, amount, date, status, notes, attachment_url, event_id, created_by, updated_by, created_at"
+      )
       .single();
 
     if (error) {
@@ -146,6 +180,9 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/depenses");
+    if (payload.event_id) {
+      revalidatePath(`/tableau-de-bord/evenements/${payload.event_id}`);
+    }
 
     return NextResponse.json(
       { depense: formatDepense(data) },
@@ -243,6 +280,7 @@ function formatDepense(depense: any) {
     status: depense.status || "a_payer",
     notes: depense.notes || undefined,
     attachmentUrl: depense.attachment_url || undefined,
+    eventId: depense.event_id ?? null,
     createdBy: depense.created_by ?? null,
     updatedBy: depense.updated_by ?? null,
     createdAt: depense.created_at ?? null,
