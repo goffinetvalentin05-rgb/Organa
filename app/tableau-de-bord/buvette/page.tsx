@@ -46,6 +46,8 @@ export default function BuvettePage() {
   const [invoiceStep, setInvoiceStep] = useState<"message" | "amount">("message");
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [sendingInvoice, setSendingInvoice] = useState(false);
+  const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null);
+  const [archiving, setArchiving] = useState(false);
 
   const getErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Erreur";
@@ -59,8 +61,8 @@ export default function BuvettePage() {
     }
   };
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) setLoading(true);
     try {
       const [calendarRes, requestsRes] = await Promise.allSettled([
         fetch(`/api/buvette/calendar?month=${month}`, { cache: "no-store" }),
@@ -87,7 +89,7 @@ export default function BuvettePage() {
     } catch (error: unknown) {
       setMessage(getErrorMessage(error));
     } finally {
-      setLoading(false);
+      if (!options?.silent) setLoading(false);
     }
   }, [month]);
 
@@ -180,22 +182,46 @@ export default function BuvettePage() {
     }
   };
 
-  const archiveRequest = async (id: string) => {
+  const archiveTarget = archiveTargetId
+    ? requests.find((r) => r.id === archiveTargetId) || null
+    : null;
+
+  const requestArchive = (id: string) => {
+    setArchiveTargetId(id);
+  };
+
+  const executeArchive = async () => {
+    if (!archiveTargetId) return;
+    const id = archiveTargetId;
+    const previousRequests = requests;
+
+    setArchiving(true);
     setSubmitting(true);
     setMessage(null);
+    setArchiveTargetId(null);
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+
+    if (selectedRequestId === id) {
+      setSelectedRequestId(null);
+      setSelectedDate(null);
+    }
+
     try {
-      const res = await fetch(`/api/buvette/requests/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/buvette/requests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "archive" }),
+      });
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'archiver la demande"));
-      if (selectedRequestId === id) {
-        setSelectedRequestId(null);
-        setSelectedDate(null);
-      }
-      await loadData();
       toast.success("Demande archivée");
+      void loadData({ silent: true });
     } catch (error: unknown) {
-      setMessage(getErrorMessage(error));
-      throw error;
+      setRequests(previousRequests);
+      const errMsg = getErrorMessage(error);
+      setMessage(errMsg);
+      toast.error(errMsg);
     } finally {
+      setArchiving(false);
       setSubmitting(false);
     }
   };
@@ -464,7 +490,7 @@ N'hésite pas à nous contacter si tu as des questions.
                   )}
 
                   <button
-                    onClick={() => void archiveRequest(selectedRequest.id)}
+                    onClick={() => requestArchive(selectedRequest.id)}
                     disabled={submitting}
                     className={`w-full px-3 py-2 ${dashboardSecondaryButtonClass} disabled:opacity-50`}
                   >
@@ -489,8 +515,50 @@ N'hésite pas à nous contacter si tu as des questions.
           setMonth(`${year}-${monthNum}`);
         }}
         onDecide={decideRequest}
-        onArchive={archiveRequest}
+        onRequestArchive={requestArchive}
       />
+
+      {archiveTarget ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            aria-label="Fermer"
+            onClick={() => !archiving && setArchiveTargetId(null)}
+          />
+          <div className={`relative w-full max-w-md space-y-4 p-5 ${dashboardModalClass}`}>
+            <div>
+              <h3 className="text-lg font-semibold text-white/95">Archiver cette demande ?</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/65">
+                La demande de{" "}
+                <span className="font-medium text-white/85">
+                  {archiveTarget.first_name} {archiveTarget.last_name}
+                </span>{" "}
+                ({formatDateFr(archiveTarget.reservation_date)}) sera retirée de la liste. Les
+                réservations déjà acceptées restent visibles dans le calendrier.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setArchiveTargetId(null)}
+                disabled={archiving}
+                className={dashboardSecondaryButtonClass}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => void executeArchive()}
+                disabled={archiving}
+                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-700 disabled:opacity-50"
+              >
+                {archiving ? "Archivage…" : "Archiver"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {showInfoModal && selectedRequest && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
