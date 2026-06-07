@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
+import { getSlotTimeRangeError } from "@/lib/planning/slotTimeRange";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
@@ -191,6 +192,13 @@ export async function PUT(
         { error: "L'ID du créneau est requis" },
         { status: 400 }
       );
+    }
+
+    if (startTime !== undefined && endTime !== undefined) {
+      const timeError = getSlotTimeRangeError(startTime, endTime);
+      if (timeError) {
+        return NextResponse.json({ error: timeError }, { status: 400 });
+      }
     }
 
     const updatePayload: Record<string, unknown> = {};

@@ -1,3 +1,4 @@
+import { getSlotEndDateYmd } from "@/lib/planning/slotTimeRange";
 import { parseWallClockInEuropeZurich } from "@/lib/planning/zurichWallTime";
 
 /** Bloc VTIMEZONE Europe/Zurich (règles fin XXe → aujourd’hui, usage courant ICS). */
@@ -54,7 +55,8 @@ export function buildGoogleCalendarUrl(input: {
   endTimeHm: string;
 }): string {
   const start = parseWallClockInEuropeZurich(input.dateYmd, normalizeHms(input.startTimeHm));
-  const end = parseWallClockInEuropeZurich(input.dateYmd, normalizeHms(input.endTimeHm));
+  const endDateYmd = getSlotEndDateYmd(input.dateYmd, input.startTimeHm, input.endTimeHm);
+  const end = parseWallClockInEuropeZurich(endDateYmd, normalizeHms(input.endTimeHm));
   const fmt = (d: Date) =>
     d
       .toISOString()
@@ -88,7 +90,8 @@ export function buildPublicPlanningSignupIcs(input: {
   endTimeHm: string;
 }): string {
   const dtStart = formatIcsDateTimeZurich(input.dateYmd, input.startTimeHm);
-  const dtEnd = formatIcsDateTimeZurich(input.dateYmd, input.endTimeHm);
+  const endDateYmd = getSlotEndDateYmd(input.dateYmd, input.startTimeHm, input.endTimeHm);
+  const dtEnd = formatIcsDateTimeZurich(endDateYmd, input.endTimeHm);
   const dtStamp = (() => {
     const d = new Date();
     return d

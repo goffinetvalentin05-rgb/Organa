@@ -18,6 +18,7 @@ import {
   dashboardLabelClass,
   dashboardInnerPanelClass,
 } from "@/components/ui";
+import { getSlotTimeRangeError, isOvernightSlot } from "@/lib/planning/slotTimeRange";
 
 interface Event {
   id: string;
@@ -127,12 +128,9 @@ export default function NouveauPlanningPage() {
         toast.error("Chaque créneau doit avoir une date");
         return;
       }
-      if (!slot.startTime || !slot.endTime) {
-        toast.error("Chaque créneau doit avoir des horaires");
-        return;
-      }
-      if (slot.startTime >= slot.endTime) {
-        toast.error("L'heure de fin doit être après l'heure de début");
+      const timeError = getSlotTimeRangeError(slot.startTime, slot.endTime);
+      if (timeError) {
+        toast.error(timeError);
         return;
       }
     }
@@ -360,6 +358,11 @@ export default function NouveauPlanningPage() {
                       className={compactInputClass}
                       required
                     />
+                    {isOvernightSlot(slot.startTime, slot.endTime) && (
+                      <p className="mt-1 text-xs text-white/50">
+                        Ce créneau se termine le lendemain.
+                      </p>
+                    )}
                   </div>
 
                   <div>

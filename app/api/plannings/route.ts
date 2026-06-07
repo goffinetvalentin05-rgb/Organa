@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
+import { getSlotTimeRangeError } from "@/lib/planning/slotTimeRange";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
@@ -178,6 +179,13 @@ export async function POST(request: NextRequest) {
 
     // Créer les slots si fournis
     if (slots && Array.isArray(slots) && slots.length > 0) {
+      for (const slot of slots) {
+        const timeError = getSlotTimeRangeError(slot.startTime, slot.endTime);
+        if (timeError) {
+          return NextResponse.json({ error: timeError }, { status: 400 });
+        }
+      }
+
       const slotsPayload = slots.map((slot: any, index: number) => ({
         planning_id: newPlanning.id,
         location: slot.location || "Poste",

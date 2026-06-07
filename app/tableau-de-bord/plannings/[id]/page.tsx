@@ -40,6 +40,7 @@ import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions-shared";
 import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
+import { getSlotTimeRangeError, isOvernightSlot } from "@/lib/planning/slotTimeRange";
 
 const planningInputClass = dashboardInputClass;
 
@@ -419,6 +420,12 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     }
     if (!slotForm.slotDate) {
       toast.error("La date du créneau est requise");
+      return;
+    }
+
+    const timeError = getSlotTimeRangeError(slotForm.startTime, slotForm.endTime);
+    if (timeError) {
+      toast.error(timeError);
       return;
     }
 
@@ -1320,6 +1327,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
                     onChange={(e) => setSlotForm({ ...slotForm, endTime: e.target.value })}
                     className={planningInputClass}
                   />
+                  {isOvernightSlot(slotForm.startTime, slotForm.endTime) && (
+                    <p className="mt-1.5 text-xs text-white/50">
+                      Ce créneau se termine le lendemain.
+                    </p>
+                  )}
                 </div>
               </div>
 
