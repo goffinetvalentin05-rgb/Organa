@@ -6,6 +6,7 @@ import { getCurrencySymbol } from "@/lib/utils/currency";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
+import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
 
 export const runtime = "nodejs";
 
@@ -17,32 +18,6 @@ function getErrorMessage(error: unknown): string {
     if (typeof message === "string") return message;
   }
   return "Erreur inconnue";
-}
-
-async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
-  try {
-    if (!url.startsWith("https://")) return undefined;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    const response = await fetch(url, {
-      method: "GET",
-      headers: { Accept: "image/*" },
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (!response.ok) return undefined;
-    const contentType = response.headers.get("content-type") || "image/png";
-    if (!contentType.startsWith("image/")) return undefined;
-
-    const arrayBuffer = await response.arrayBuffer();
-    if (!arrayBuffer.byteLength) return undefined;
-
-    return `data:${contentType};base64,${Buffer.from(arrayBuffer).toString("base64")}`;
-  } catch {
-    return undefined;
-  }
 }
 
 export async function POST(
@@ -123,16 +98,7 @@ export async function POST(
     const resendInstance = delivery.resend;
     const fromEmail = delivery.from;
 
-    let logoSourceUrl: string | undefined;
-    if (profile?.logo_url) {
-      logoSourceUrl = profile.logo_url;
-    } else if (profile?.logo_path) {
-      const { data: urlData } = supabase.storage
-        .from("Logos")
-        .getPublicUrl(profile.logo_path);
-      logoSourceUrl = urlData.publicUrl;
-    }
-    const logoUrl = logoSourceUrl ? await fetchImageAsDataUrl(logoSourceUrl) : undefined;
+    const logoUrl = await getClubLogoDataUrlForPdf(supabase, profile, guard.clubId);
 
     const currency = profile?.currency || "CHF";
     const currencySymbol = profile?.currency_symbol || getCurrencySymbol(currency);

@@ -4,6 +4,7 @@ import { getCurrencySymbol } from "@/lib/utils/currency";
 import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/company-settings";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { resolveClubLogoUrlForClient } from "@/lib/club/resolveClubLogoUrl";
 
 type SettingsPutBody = Partial<{
   company_name: string;
@@ -122,19 +123,9 @@ export async function GET(request: NextRequest) {
       console.log("[API][settings] GET - Utilisation des valeurs par défaut");
     }
 
-    // Utiliser logo_url depuis la DB si disponible, sinon construire depuis logo_path
-    let logoUrl: string | null = null;
-    if (profile?.logo_url) {
-      // Utiliser logo_url stocké en DB
-      logoUrl = profile.logo_url;
-      console.log("[API][settings] GET - Logo URL depuis DB:", logoUrl);
-    } else if (profile?.logo_path) {
-      // Fallback: construire l'URL depuis logo_path si logo_url n'est pas en DB
-      const { data: urlData } = supabase.storage
-        .from("Logos")
-        .getPublicUrl(profile.logo_path);
-      logoUrl = urlData.publicUrl;
-      console.log("[API][settings] GET - Logo URL construite depuis logo_path:", logoUrl);
+    const logoUrl = await resolveClubLogoUrlForClient(supabase, profile, clubId);
+    if (logoUrl) {
+      console.log("[API][settings] GET - Logo URL résolue:", logoUrl);
     }
 
     // Calculer currency_symbol si non défini
@@ -472,16 +463,11 @@ export async function PUT(request: NextRequest) {
 
     console.log("[API][settings] PUT - Profil sauvegardé avec succès via UPDATE/INSERT");
 
-    // Utiliser logo_url depuis la DB si disponible, sinon construire depuis logo_path
-    let logoUrl: string | null = null;
-    if (updatedProfile?.logo_url) {
-      logoUrl = updatedProfile.logo_url;
-    } else if (updatedProfile?.logo_path) {
-      const { data: urlData } = supabase.storage
-        .from("Logos")
-        .getPublicUrl(updatedProfile.logo_path);
-      logoUrl = urlData.publicUrl;
-    }
+    const logoUrl = await resolveClubLogoUrlForClient(
+      supabase,
+      updatedProfile,
+      clubId
+    );
 
     // Calculer currency_symbol si non défini
     const currency = updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;

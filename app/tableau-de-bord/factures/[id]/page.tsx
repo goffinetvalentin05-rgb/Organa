@@ -19,6 +19,7 @@ import LinkInvoiceToEventModal, {
   type EventListItem,
 } from "./LinkInvoiceToEventModal";
 import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
+import ClubDocumentLogo from "@/components/documents/ClubDocumentLogo";
 import {
   PageLayout,
   PageHeader,
@@ -452,13 +453,10 @@ export default function FactureDetailPage() {
       <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl shadow-blue-950/10">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-4">
-            {companySettings?.logo_url && (
-              <img
-                src={companySettings.logo_url}
-                alt={companySettings.company_name || "Logo"}
-                className="h-12 w-auto object-contain"
-              />
-            )}
+            <ClubDocumentLogo
+              logoUrl={companySettings?.logo_url}
+              clubName={companySettings?.company_name}
+            />
             <div>
               <p className="text-lg font-semibold text-slate-900">
                 {companySettings?.company_name || ""}

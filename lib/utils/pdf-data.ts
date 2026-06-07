@@ -6,7 +6,6 @@ import {
   calculerTotalTTC,
   type LigneDocument,
 } from "@/lib/utils/calculations";
-import { getErrorMessage } from "@/lib/utils/error-message";
 import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
@@ -15,6 +14,7 @@ import {
   formatRecipientAddress,
   resolveDocumentRecipient,
 } from "@/lib/documents/recipient";
+import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
 
 type DocumentType = "quote" | "invoice";
 
@@ -56,26 +56,7 @@ export async function getClubCompanyPdfData(
     .eq("user_id", scopeUserId)
     .maybeSingle();
 
-  let logoSourceUrl: string | undefined;
-  if (profile?.logo_url) {
-    logoSourceUrl = profile.logo_url;
-  } else if (profile?.logo_path) {
-    const { data: urlData } = supabase.storage.from("Logos").getPublicUrl(profile.logo_path);
-    logoSourceUrl = urlData.publicUrl;
-  }
-
-  if (logoSourceUrl && !logoSourceUrl.startsWith("https://")) {
-    console.warn("[pdf-data] Logo URL n'est pas HTTPS, ignorée:", logoSourceUrl);
-    logoSourceUrl = undefined;
-  }
-
-  let logoUrl: string | undefined;
-  if (logoSourceUrl) {
-    logoUrl = await fetchImageAsDataUrl(logoSourceUrl);
-    if (!logoUrl) {
-      console.warn("[pdf-data] Impossible de charger le logo, PDF généré sans logo");
-    }
-  }
+  const logoUrl = await getClubLogoDataUrlForPdf(supabase, profile, scopeUserId);
 
   const currency = profile?.currency || "CHF";
   const currencySymbol =
@@ -102,72 +83,6 @@ export async function getClubCompanyPdfData(
     currency,
     currencySymbol,
   };
-}
-
-/**
- * Convertit une URL d'image en Data URL (base64) pour @react-pdf/renderer.
- */
-async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
-  try {
-    // Vérifier que l'URL est bien HTTPS (sécurité)
-    if (!url.startsWith("https://")) {
-      console.warn("[pdf-data] Logo URL n'est pas HTTPS, ignorée pour sécurité:", url);
-      return undefined;
-    }
-    
-    console.log("[pdf-data] Chargement du logo depuis:", url);
-    
-    // Timeout de 10 secondes pour éviter les blocages
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Accept": "image/*",
-      },
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      console.warn("[pdf-data] Erreur HTTP lors du chargement du logo:", response.status, response.statusText);
-      return undefined;
-    }
-
-    const contentType = response.headers.get("content-type") || "image/png";
-    
-    // Vérifier que c'est bien une image
-    if (!contentType.startsWith("image/")) {
-      console.warn("[pdf-data] Le fichier n'est pas une image valide:", contentType);
-      return undefined;
-    }
-    
-    const arrayBuffer = await response.arrayBuffer();
-    
-    // Vérifier que l'image n'est pas vide
-    if (arrayBuffer.byteLength === 0) {
-      console.warn("[pdf-data] L'image est vide");
-      return undefined;
-    }
-    
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-    const dataUrl = `data:${contentType};base64,${base64}`;
-    
-    console.log("[pdf-data] Logo converti en base64 avec succès, taille:", Math.round(base64.length / 1024), "KB");
-    return dataUrl;
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === "AbortError") {
-      console.error("[pdf-data] Timeout lors du chargement du logo (10s)");
-    } else {
-      console.error(
-        "[pdf-data] Erreur lors de la conversion du logo en base64:",
-        getErrorMessage(error)
-      );
-    }
-    return undefined;
-  }
 }
 
 export async function getDocumentPdfData(
