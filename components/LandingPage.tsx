@@ -8,6 +8,7 @@ import LandingBackground from "@/components/landing/LandingBackground";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
+import ClubReassuranceSection from "@/components/landing/ClubReassuranceSection";
 import ModulesOrbitSection from "@/components/landing/ModulesOrbitSection";
 import ProblemSection from "@/components/landing/ProblemSection";
 import FaqSection from "@/components/landing/FaqSection";
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <HeroSection />
         <ProblemSection />
         <ModulesOrbitSection />
+        <ClubReassuranceSection />
         <HowItWorksSection />
         <AskChatGptSection />
         <PricingSection />

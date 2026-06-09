@@ -209,6 +209,24 @@
       }
     }
   },
+  "clubReassurance": {
+    "title": "Built with clubs, for clubs.",
+    "subtitle": "Obillz isn't just admin software. The platform is built from real club life, committee needs and feedback from clubs using it.",
+    "cards": [
+      {
+        "title": "Real knowledge of club life",
+        "description": "The founder has been involved in sports clubs since childhood and understands the daily challenges faced by volunteers and committees."
+      },
+      {
+        "title": "Concrete needs",
+        "description": "Obillz addresses situations clubs actually face: managing members, tracking fees, organising events, renewing sponsors and centralising documents."
+      },
+      {
+        "title": "A platform that evolves",
+        "description": "Feedback from clubs using Obillz drives continuous improvements, so the platform stays simple, useful and grounded in real club life."
+      }
+    ]
+  },
   "howItWorks": {
     "label": "How it works",
     "title": "Easy to get started.",

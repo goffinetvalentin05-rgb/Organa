@@ -209,6 +209,24 @@
       }
     }
   },
+  "clubReassurance": {
+    "title": "Mit Vereinen gedacht, für Vereine gemacht.",
+    "subtitle": "Obillz ist keine reine Verwaltungssoftware. Die Plattform basiert auf dem Vereinsalltag, den Bedürfnissen des Vorstands und dem Feedback aktiver Vereine.",
+    "cards": [
+      {
+        "title": "Echte Kenntnis des Vereinsalltags",
+        "description": "Der Gründer ist seit jungen Jahren in Sportvereinen aktiv und kennt die täglichen Herausforderungen von Ehrenamtlichen und Vorständen."
+      },
+      {
+        "title": "Konkrete Bedürfnisse",
+        "description": "Obillz beantwortet Situationen, die Vereine wirklich erleben: Mitglieder verwalten, Beiträge verfolgen, Events organisieren, Sponsoren erneuern und Dokumente zentralisieren."
+      },
+      {
+        "title": "Eine Plattform, die sich weiterentwickelt",
+        "description": "Das Feedback der Vereine fließt laufend in Obillz ein, damit die Plattform einfach, nützlich und nah am Vereinsalltag bleibt."
+      }
+    ]
+  },
   "howItWorks": {
     "label": "So funktioniert's",
     "title": "Einfach einzurichten.",

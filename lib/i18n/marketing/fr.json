@@ -209,6 +209,24 @@
       }
     }
   },
+  "clubReassurance": {
+    "title": "Pensé avec les clubs, pour les clubs.",
+    "subtitle": "Obillz n'est pas un simple logiciel administratif. La plateforme est construite à partir de la réalité du terrain, des besoins des comités et des retours des clubs utilisateurs.",
+    "cards": [
+      {
+        "title": "Une vraie connaissance du terrain",
+        "description": "Le fondateur a évolué dans différents clubs sportifs depuis son plus jeune âge et connaît les défis quotidiens des bénévoles et des comités."
+      },
+      {
+        "title": "Des besoins concrets",
+        "description": "Obillz répond aux situations que vivent réellement les clubs : membres à gérer, cotisations à suivre, événements à organiser, sponsors à renouveler et documents à centraliser."
+      },
+      {
+        "title": "Une plateforme qui évolue",
+        "description": "Les retours des clubs utilisateurs permettent d'améliorer continuellement Obillz, afin que la plateforme reste simple, utile et adaptée au terrain."
+      }
+    ]
+  },
   "howItWorks": {
     "label": "Comment ça marche",
     "title": "Simple à mettre en place.",
