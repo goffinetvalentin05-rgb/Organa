@@ -233,6 +233,13 @@
       }
     ]
   },
+  "askChatGpt": {
+    "title": "Toujours pas sûr qu'Obillz soit fait pour votre club ?",
+    "subtitle": "Décrivez votre club à ChatGPT et découvrez si Obillz peut réellement vous faire gagner du temps au quotidien.",
+    "cta": "Demander à ChatGPT",
+    "prompt": "J'ai un club sportif. Analyse si Obillz est adapté à mes besoins. Obillz est une plateforme de gestion qui centralise les membres, cotisations, événements, sponsors, documents et tâches administratives. Explique-moi dans quels cas Obillz pourrait me faire gagner du temps et améliorer l'organisation de mon comité.",
+    "logoAlt": "Obillz"
+  },
   "pricing": {
     "label": "Tarifs",
     "title": "Une formule. Tout compris.",

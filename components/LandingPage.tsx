@@ -2,6 +2,7 @@
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import HeroSection from "@/components/landing/HeroSection";
+import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <ProblemSection />
         <ModulesOrbitSection />
         <HowItWorksSection />
+        <AskChatGptSection />
         <PricingSection />
         <FaqSection />
         <FinalCtaSection />
