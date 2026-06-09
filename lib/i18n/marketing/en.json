@@ -235,9 +235,10 @@
   },
   "askChatGpt": {
     "title": "Still not sure Obillz is right for your club?",
-    "subtitle": "Describe your club to ChatGPT and find out if Obillz can really save you time day to day.",
-    "cta": "Ask ChatGPT",
-    "prompt": "We're looking for a better way to organise our sports club. Can you look into Obillz and tell me if it seems like a good fit for a volunteer committee?",
+    "subtitle": "Talk directly with the founder. Ask your questions and find out how Obillz can simplify your club management.",
+    "cta": "Talk to the founder",
+    "message": "Hello, I'd like to learn more about Obillz.",
+    "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
   },
   "pricing": {

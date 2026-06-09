@@ -235,9 +235,10 @@
   },
   "askChatGpt": {
     "title": "Toujours pas sûr qu'Obillz soit fait pour votre club ?",
-    "subtitle": "Décrivez votre club à ChatGPT et découvrez si Obillz peut réellement vous faire gagner du temps au quotidien.",
-    "cta": "Demander à ChatGPT",
-    "prompt": "Nous cherchons un moyen de mieux organiser la gestion de notre club sportif. Peux-tu analyser Obillz et me dire si cette solution semble adaptée à un comité bénévole ?",
+    "subtitle": "Échangez directement avec le fondateur. Posez vos questions et découvrez comment Obillz peut simplifier la gestion de votre club.",
+    "cta": "Parler au fondateur",
+    "message": "Bonjour, je souhaite en savoir plus sur Obillz.",
+    "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
   },
   "pricing": {

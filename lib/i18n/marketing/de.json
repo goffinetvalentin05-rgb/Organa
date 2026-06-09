@@ -235,9 +235,10 @@
   },
   "askChatGpt": {
     "title": "Noch unsicher, ob Obillz zu Ihrem Verein passt?",
-    "subtitle": "Beschreiben Sie Ihren Verein ChatGPT und finden Sie heraus, ob Obillz Ihnen im Alltag wirklich Zeit sparen kann.",
-    "cta": "ChatGPT fragen",
-    "prompt": "Wir suchen einen besseren Weg, die Verwaltung unseres Sportvereins zu organisieren. Kannst du Obillz analysieren und mir sagen, ob diese Lösung für einen ehrenamtlichen Vorstand geeignet scheint?",
+    "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus. Stellen Sie Ihre Fragen und erfahren Sie, wie Obillz die Verwaltung Ihres Vereins vereinfachen kann.",
+    "cta": "Mit dem Gründer sprechen",
+    "message": "Hallo, ich möchte mehr über Obillz erfahren.",
+    "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
   },
   "pricing": {
