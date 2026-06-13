@@ -1,9 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, LayoutDashboard, ToggleRight, UserPlus, Building2 } from "lucide-react";
+import { Building2, Compass, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { LandingPrimaryButton } from "@/components/landing/LandingButtons";
 import { useI18n } from "@/components/I18nProvider";
 import { getTranslationValue } from "@/lib/i18n";
 import {
@@ -11,11 +10,178 @@ import {
   scrollReveal,
   viewportOnce,
 } from "@/components/landing/landing-motion";
-import { landingSectionGlowClass, landingSectionShellClass } from "@/components/ui/styles";
+import { landingIconBadgeClass, landingSectionGlowClass } from "@/components/ui/styles";
 
 type Step = { title: string; description: string };
 
-const stepIcons: LucideIcon[] = [Building2, UserPlus, ToggleRight, LayoutDashboard];
+const stepIcons: LucideIcon[] = [UserPlus, Building2, Compass];
+const stepNumbers = ["01", "02", "03"];
+
+/** Décalage vertical alterné — rythme éditorial desktop */
+const desktopStagger = ["pt-0", "pt-14 md:pt-20", "pt-4 md:pt-6"];
+
+const markerBaseClass =
+  "group/marker relative z-10 flex h-10 w-[3.25rem] items-center justify-center rounded-lg border border-blue-300/25 bg-white/[0.04] text-sm font-bold tracking-wider text-white shadow-[0_0_0_1px_rgba(147,197,253,0.08),0_0_24px_rgba(26,35,255,0.18)] backdrop-blur-md transition-[border-color,box-shadow,transform] duration-300 hover:border-blue-200/45 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.2),0_0_36px_rgba(26,35,255,0.38)]";
+
+const connectorClass =
+  "w-px shrink-0 bg-gradient-to-b from-blue-200/55 via-blue-300/35 to-blue-400/20 shadow-[0_0_10px_rgba(96,165,250,0.35)]";
+
+function TimelineMarker({
+  number,
+  delay,
+  reduceMotion,
+}: {
+  number: string;
+  delay: number;
+  reduceMotion: boolean;
+}) {
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.88 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.5, delay, ease: easePremium }}
+      whileHover={reduceMotion ? undefined : { scale: 1.06, y: -2 }}
+      className={markerBaseClass}
+      aria-hidden
+    >
+      <span className="relative z-10">{number}</span>
+      <span
+        className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-[#1A23FF]/10 via-transparent to-[#6366f1]/10 opacity-0 transition-opacity duration-300 group-hover/marker:opacity-100"
+        aria-hidden
+      />
+    </motion.div>
+  );
+}
+
+function DesktopTimeline({
+  steps,
+  reduceMotion,
+}: {
+  steps: Step[];
+  reduceMotion: boolean;
+}) {
+  return (
+    <div className="relative mt-16 hidden lg:block">
+      <div
+        className="pointer-events-none absolute left-1/2 top-[38%] h-[min(380px,42vw)] w-[min(860px,88%)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.28),rgba(99,102,241,0.1)_50%,transparent_72%)] blur-3xl"
+        aria-hidden
+      />
+
+      <div className="relative mx-auto max-w-5xl px-4 pb-2">
+        <div className="grid grid-cols-3 gap-6 xl:gap-10">
+          {steps.map((step, index) => {
+            const Icon = stepIcons[index] ?? UserPlus;
+            const number = stepNumbers[index] ?? String(index + 1).padStart(2, "0");
+            const stepDelay = 0.18 + index * 0.14;
+
+            return (
+              <div
+                key={step.title}
+                className={`flex flex-col items-center text-center ${desktopStagger[index] ?? ""}`}
+              >
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={viewportOnce}
+                  transition={{ duration: 0.65, delay: stepDelay, ease: easePremium }}
+                  className="flex max-w-[17rem] flex-col items-center"
+                >
+                  <span className={`${landingIconBadgeClass} mb-4 h-9 w-9 opacity-80`}>
+                    <Icon className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </span>
+                  <h3 className="text-lg font-bold text-white xl:text-xl">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-blue-100/68">{step.description}</p>
+                </motion.div>
+
+                <motion.div
+                  initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
+                  whileInView={{ scaleY: 1, opacity: 1 }}
+                  viewport={viewportOnce}
+                  transition={{ duration: 0.55, delay: stepDelay + 0.12, ease: easePremium }}
+                  style={{ transformOrigin: "top" }}
+                  className={`${connectorClass} my-5 min-h-[3.5rem] flex-1 xl:min-h-[4.5rem] xl:my-6`}
+                  aria-hidden
+                />
+
+                <TimelineMarker number={number} delay={stepDelay + 0.22} reduceMotion={reduceMotion} />
+              </div>
+            );
+          })}
+        </div>
+
+        <motion.div
+          initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={viewportOnce}
+          transition={{ duration: 1.1, delay: 0.1, ease: easePremium }}
+          style={{ transformOrigin: "left center" }}
+          className="pointer-events-none absolute inset-x-4 bottom-5 z-0 h-px xl:inset-x-0"
+          aria-hidden
+        >
+          <div className="h-full w-full bg-[repeating-linear-gradient(to_right,rgba(147,197,253,0.55)_0px,rgba(147,197,253,0.55)_1px,transparent_1px,transparent_10px)] opacity-70" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/25 to-transparent blur-[1px]" />
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function MobileTimeline({
+  steps,
+  reduceMotion,
+}: {
+  steps: Step[];
+  reduceMotion: boolean;
+}) {
+  return (
+    <div className="relative mt-12 lg:hidden">
+      <motion.div
+        initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
+        whileInView={{ scaleY: 1, opacity: 1 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.9, delay: 0.08, ease: easePremium }}
+        style={{ transformOrigin: "top center" }}
+        className="pointer-events-none absolute bottom-4 left-[1.625rem] top-4 w-px"
+        aria-hidden
+      >
+        <div className="h-full w-full bg-[repeating-linear-gradient(to_bottom,rgba(147,197,253,0.5)_0px,rgba(147,197,253,0.5)_1px,transparent_1px,transparent_10px)] opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-300/20 to-transparent blur-[1px]" />
+      </motion.div>
+
+      <ol className="relative space-y-10 sm:space-y-12">
+        {steps.map((step, index) => {
+          const Icon = stepIcons[index] ?? UserPlus;
+          const number = stepNumbers[index] ?? String(index + 1).padStart(2, "0");
+          const stepDelay = 0.12 + index * 0.12;
+
+          return (
+            <motion.li
+              key={step.title}
+              initial={reduceMotion ? false : { opacity: 0, x: -16 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={viewportOnce}
+              transition={{ duration: 0.6, delay: stepDelay, ease: easePremium }}
+              className="relative flex gap-5 sm:gap-6"
+            >
+              <div className="relative z-10 shrink-0 pt-0.5">
+                <TimelineMarker number={number} delay={stepDelay + 0.06} reduceMotion={reduceMotion} />
+              </div>
+
+              <div className="min-w-0 flex-1 pb-1">
+                <span className={`${landingIconBadgeClass} mb-3 inline-flex h-8 w-8 opacity-75`}>
+                  <Icon className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+                </span>
+                <h3 className="text-base font-bold text-white sm:text-lg">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-blue-100/68">{step.description}</p>
+              </div>
+            </motion.li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
 
 export default function HowItWorksSection() {
   const { t, locale } = useI18n();
@@ -24,7 +190,7 @@ export default function HowItWorksSection() {
   const steps = (Array.isArray(raw) ? raw : []) as Step[];
 
   return (
-    <section id="comment-ca-marche" className="relative scroll-mt-24 py-16 md:py-28">
+    <section id="comment-ca-marche" className="relative scroll-mt-24 overflow-x-hidden py-16 md:py-28">
       <div className={landingSectionGlowClass} aria-hidden />
 
       <div className="relative mx-auto w-[94%] max-w-[1100px]">
@@ -33,142 +199,25 @@ export default function HowItWorksSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="text-center"
+          className="mx-auto max-w-3xl text-center"
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
             {t("marketing.howItWorks.label")}
           </p>
-          <h2 className="mt-3 text-2xl font-black text-white md:text-4xl">
-            {t("marketing.howItWorks.title")}
+          <h2 className="mt-4 text-balance text-3xl font-black leading-tight text-white md:text-4xl lg:text-[2.75rem]">
+            {t("marketing.howItWorks.titleLead")}{" "}
+            <span className="bg-gradient-to-r from-blue-200 via-white to-indigo-200 bg-clip-text text-transparent">
+              {t("marketing.howItWorks.titleAccent")}
+            </span>
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-sm text-blue-100/70 md:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-blue-100/70 md:text-base">
             {t("marketing.howItWorks.subtitle")}
           </p>
         </motion.div>
 
-        {/* Parcours onboarding — progression horizontale */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
-          className={`${landingSectionShellClass} relative mt-12 overflow-visible p-6 md:mt-14 md:p-8 lg:p-10`}
-        >
-          {/* Ligne de progression — du centre étape 1 au centre étape 4 */}
-          <div
-            className="pointer-events-none absolute left-[12.5%] top-[3.25rem] hidden h-0.5 w-[75%] lg:block"
-            aria-hidden
-          >
-            <div className="h-full w-full rounded-full bg-white/10" />
-            {!reduceMotion ? (
-              <motion.div
-                className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#1A23FF] via-[#93c5fd] to-[#6366f1]"
-                initial={{ width: "0%" }}
-                whileInView={{ width: "100%" }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 1.6, ease: easePremium, delay: 0.2 }}
-              />
-            ) : (
-              <div className="absolute left-0 top-0 h-full w-full rounded-full bg-gradient-to-r from-[#1A23FF] via-[#93c5fd] to-[#6366f1] opacity-60" />
-            )}
-          </div>
-
-          <div className="relative grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {steps.map((step, i) => {
-              const Icon = stepIcons[i] ?? Building2;
-              const isLast = i === steps.length - 1;
-
-              return (
-                <SetupStep
-                  key={step.title}
-                  step={step}
-                  index={i}
-                  Icon={Icon}
-                  isLast={isLast}
-                  reduceMotion={!!reduceMotion}
-                />
-              );
-            })}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewportOnce}
-          transition={{ duration: 0.5, ease: easePremium }}
-          className="mt-10 flex justify-center md:mt-12"
-        >
-          <LandingPrimaryButton href="/inscription">{t("marketing.howItWorks.cta")}</LandingPrimaryButton>
-        </motion.div>
+        <DesktopTimeline steps={steps} reduceMotion={!!reduceMotion} />
+        <MobileTimeline steps={steps} reduceMotion={!!reduceMotion} />
       </div>
     </section>
-  );
-}
-
-function SetupStep({
-  step,
-  index,
-  Icon,
-  isLast,
-  reduceMotion,
-}: {
-  step: Step;
-  index: number;
-  Icon: LucideIcon;
-  isLast: boolean;
-  reduceMotion: boolean;
-}) {
-  return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.55, delay: index * 0.12, ease: easePremium }}
-      className="relative flex flex-col items-center text-center"
-    >
-      {/* Connecteur mobile / tablette — vertical entre les étapes */}
-      {!isLast ? (
-        <div
-          className="pointer-events-none absolute -bottom-4 left-1/2 h-8 w-px -translate-x-1/2 bg-gradient-to-b from-blue-400/40 to-transparent sm:hidden"
-          aria-hidden
-        />
-      ) : null}
-      {!isLast ? (
-        <div
-          className="pointer-events-none absolute -right-4 top-8 hidden h-px w-8 bg-gradient-to-r from-blue-400/40 to-transparent sm:block lg:hidden"
-          aria-hidden
-        />
-      ) : null}
-
-      {/* Numéro + icône */}
-      <div className="relative mb-4 flex flex-col items-center">
-        <motion.span
-          initial={reduceMotion ? false : { scale: 0.8, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.45, delay: index * 0.1, ease: easePremium }}
-          className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-blue-300/40 bg-gradient-to-br from-[#1A23FF] to-[#6366f1] text-sm font-black text-white shadow-[0_0_28px_rgba(26,35,255,0.5)]"
-        >
-          {index + 1}
-        </motion.span>
-        <span className="mt-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#1A23FF]/20 text-blue-300 ring-1 ring-[#1A23FF]/30">
-          <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
-        </span>
-      </div>
-
-      {/* Contenu */}
-      <h3 className="text-base font-bold text-white md:text-[0.9375rem] lg:text-base">
-        {step.title}
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-blue-100/65">{step.description}</p>
-
-      {/* Flèche suivante — desktop entre les colonnes */}
-      {!isLast ? (
-        <ArrowRight
-          className="pointer-events-none absolute -right-3 top-8 hidden h-4 w-4 text-blue-400/35 lg:block"
-          aria-hidden
-        />
-      ) : null}
-    </motion.div>
   );
 }

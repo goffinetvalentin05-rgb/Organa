@@ -80,17 +80,21 @@
   },
   "modules": {
     "label": "Fonctionnalités",
-    "title": "Tout le club au même endroit.",
-    "subtitle": "Cliquez sur un module pour explorer — la présentation défile aussi toute seule.",
+    "title": "Tout ce que votre comité gère déjà. Enfin au même endroit.",
+    "subtitle": "Membres, cotisations, factures, plannings, événements, sponsors, buvette, paiements, accès et page publique : Obillz centralise l'administratif du club dans une seule plateforme claire et moderne.",
     "previewLabel": "Aperçu",
+    "activeBadge": "Module actif",
+    "closing": "Moins d'administratif. Plus de temps pour faire vivre le club.",
+    "cta": "Essayer Obillz gratuitement",
+    "ctaNote": "7 jours gratuits, sans carte bancaire.",
     "scrollHint": "Faites défiler les modules",
     "showModule": "Afficher {name}",
     "items": {
       "membres": {
         "title": "Membres",
-        "tagline": "Toute votre équipe, une seule liste",
-        "description": "Centralisez les joueurs, licenciés et comité. Chaque membre a sa fiche, ses cotisations et son historique au même endroit.",
-        "bullets": ["Fiches claires et à jour", "Import depuis Excel", "Export pour l'AG en un clic"],
+        "tagline": "Centralisez vos fiches membres.",
+        "description": "Gardez les contacts et informations importantes au même endroit.",
+        "bullets": ["Fiches claires", "Infos centralisées", "Suivi simplifié"],
         "preview": {
           "headline": "284 membres",
           "sub": "12 nouveaux ce mois",
@@ -99,9 +103,9 @@
       },
       "cotisations": {
         "title": "Cotisations",
-        "tagline": "Envoyez et suivez sans relances manuelles",
-        "description": "Générez les cotisations de saison, envoyez-les par e-mail et voyez immédiatement qui a payé ou qui est en attente.",
-        "bullets": ["Envoi groupé par e-mail", "Relances ciblées", "Statut en temps réel"],
+        "tagline": "Suivez vos cotisations plus simplement.",
+        "description": "Créez, envoyez et visualisez les paiements en un coup d'œil.",
+        "bullets": ["Création rapide", "Envoi facile", "Statuts visibles"],
         "preview": {
           "headline": "92% payées",
           "sub": "8% en attente · saison 25/26",
@@ -110,9 +114,9 @@
       },
       "factures": {
         "title": "Factures",
-        "tagline": "Des documents pro, envoyés vite",
-        "description": "Créez des factures propres pour sponsors ou prestataires et suivez les paiements sans quitter Obillz.",
-        "bullets": ["Modèles prêts à l'emploi", "Envoi PDF par e-mail", "Suivi payé / impayé"],
+        "tagline": "Gérez vos factures sans complexité.",
+        "description": "Créez des documents clairs et gardez un suivi propre.",
+        "bullets": ["Documents propres", "Suivi centralisé", "Gain de temps"],
         "preview": {
           "headline": "17 factures",
           "sub": "4 en attente de paiement",
@@ -121,9 +125,9 @@
       },
       "planning": {
         "title": "Planning",
-        "tagline": "Affectations et créneaux centralisés",
-        "description": "Organisez les plannings du club, les créneaux buvette et les affectations d'équipe depuis un calendrier unique.",
-        "bullets": ["Vue calendrier claire", "Affectations par créneau", "Export PDF"],
+        "tagline": "Organisez les bénévoles sans 50 messages.",
+        "description": "Créez des créneaux et partagez-les facilement.",
+        "bullets": ["Créneaux clairs", "Lien partagé", "Organisation fluide"],
         "preview": {
           "headline": "12 créneaux",
           "sub": "3 matchs ce week-end",
@@ -132,9 +136,9 @@
       },
       "evenements": {
         "title": "Événements",
-        "tagline": "Inscriptions et plannings simplifiés",
-        "description": "Tournois, repas de club, corvées : partagez un lien ou un QR code et récupérez toutes les réponses au même endroit.",
-        "bullets": ["Lien ou QR code public", "Liste des inscrits", "Plannings après-match"],
+        "tagline": "Pilotez vos événements plus sereinement.",
+        "description": "Centralisez l'organisation autour de vos manifestations.",
+        "bullets": ["Vue d'ensemble", "Organisation simplifiée", "Moins d'oublis"],
         "preview": {
           "headline": "3 événements",
           "sub": "42 inscriptions cette semaine",
@@ -143,9 +147,9 @@
       },
       "paiements": {
         "title": "Paiements",
-        "tagline": "Encaissements visibles en direct",
-        "description": "Cotisations, buvette, événements : suivez les entrées d'argent et gardez une vue claire sur la trésorerie du club.",
-        "bullets": ["Solde club en direct", "Historique des encaissements", "Vue par catégorie"],
+        "tagline": "Suivez les encaissements clairement.",
+        "description": "Retrouvez les paiements dans une vue simple et structurée.",
+        "bullets": ["Lisibilité immédiate", "Suivi rapide", "Vue centralisée"],
         "preview": {
           "headline": "CHF 8'420",
           "sub": "encaissés · 30 derniers jours",
@@ -154,9 +158,9 @@
       },
       "utilisateurs": {
         "title": "Utilisateurs & accès",
-        "tagline": "Comité multi-utilisateurs",
-        "description": "Invitez les membres du comité avec des rôles et permissions adaptés à chaque module.",
-        "bullets": ["Invitations par e-mail", "Rôles par module", "Traçabilité des actions"],
+        "tagline": "Donnez les bons accès aux bonnes personnes.",
+        "description": "Gérez les rôles et les permissions facilement.",
+        "bullets": ["Rôles clairs", "Accès sécurisés", "Gestion simple"],
         "preview": {
           "headline": "5 comptes",
           "sub": "3 admins · 2 trésoriers",
@@ -176,9 +180,9 @@
       },
       "buvette": {
         "title": "Buvette",
-        "tagline": "Réservations sans chaos",
-        "description": "Gérez les créneaux buvette, les demandes et les confirmations pour les matchs et événements du club.",
-        "bullets": ["Calendrier des créneaux", "Demandes centralisées", "Moins de messages perdus"],
+        "tagline": "Simplifiez la gestion des demandes.",
+        "description": "Gardez une vue claire sur les demandes et leur suivi.",
+        "bullets": ["Demandes centralisées", "Suivi clair", "Traitement simplifié"],
         "preview": {
           "headline": "Créneaux buvette",
           "sub": "Samedi 14h–18h · confirmé",
@@ -187,9 +191,9 @@
       },
       "sponsors": {
         "title": "Sponsors",
-        "tagline": "Partenaires et contrats suivis",
-        "description": "Gérez vos sponsors, contrats et factures associées sans perdre le fil des engagements.",
-        "bullets": ["Fiches sponsors", "Contrats & factures", "Suivi des paiements"],
+        "tagline": "Gardez vos partenaires bien organisés.",
+        "description": "Contrats, montants et échéances au même endroit.",
+        "bullets": ["Partenaires suivis", "Échéances visibles", "Gestion plus pro"],
         "preview": {
           "headline": "8 sponsors",
           "sub": "2 contrats à renouveler",
@@ -198,9 +202,9 @@
       },
       "page-publique": {
         "title": "Page publique",
-        "tagline": "Votre vitrine en ligne",
-        "description": "Une page web du club pour présenter l'équipe, le programme des matchs et les liens utiles aux membres.",
-        "bullets": ["URL personnalisée", "Logo et couleurs du club", "Liens inscriptions & buvette"],
+        "tagline": "Montrez votre club en ligne simplement.",
+        "description": "Partagez une page claire pour présenter votre activité.",
+        "bullets": ["Présentation du club", "Image plus pro", "Partage facile"],
         "preview": {
           "headline": "Page du club",
           "sub": "Matchs · contact · liens utiles",
@@ -229,25 +233,24 @@
   },
   "howItWorks": {
     "label": "Comment ça marche",
-    "title": "Simple à mettre en place.",
-    "subtitle": "Pas besoin de tout configurer d'un coup — avancez à votre rythme, module par module.",
-    "cta": "Tester Obillz gratuitement",
+    "titleLead": "Lancez votre club en",
+    "titleAccent": "quelques minutes.",
+    "subtitle": "Créez votre espace, configurez votre club, puis utilisez Obillz à votre rythme.",
+    "reassurance": "Pas besoin de tout préparer dès le premier jour : Obillz s'adapte à la réalité de votre comité.",
+    "cta": "Créer mon club gratuitement",
+    "ctaNote": "7 jours gratuits, sans carte bancaire.",
     "steps": [
       {
-        "title": "Créez votre club",
-        "description": "Quelques minutes pour configurer votre espace."
+        "title": "Créez votre compte",
+        "description": "Inscrivez-vous gratuitement et accédez à votre espace Obillz en quelques minutes."
       },
       {
-        "title": "Ajoutez vos membres",
-        "description": "Import ou saisie quand vous le souhaitez — vous pouvez démarrer sans liste complète."
+        "title": "Configurez votre club",
+        "description": "Ajoutez les informations de base de votre club et invitez les personnes du comité si vous le souhaitez."
       },
       {
-        "title": "Activez ce dont vous avez besoin",
-        "description": "Cotisations, événements, buvette, factures, page publique, campagnes… activez les modules utiles à votre club."
-      },
-      {
-        "title": "Pilotez au quotidien",
-        "description": "Envoyez, suivez, communiquez et encaissez depuis un seul tableau de bord, sur ordinateur ou mobile."
+        "title": "Avancez à votre rythme",
+        "description": "Commencez par les modules utiles à votre club : membres, cotisations, factures, plannings, événements ou sponsors. Tout est déjà inclus."
       }
     ]
   },
@@ -261,7 +264,7 @@
   },
   "pricing": {
     "label": "Tarifs",
-    "title": "Une formule. Tout compris.",
+    "title": "Une seule formule. Tout Obillz inclus.",
     "headline": "Offrez à votre comité un outil à la hauteur de son engagement.",
     "body": "Gérer un club demande déjà suffisamment de temps. Obillz centralise les membres, les cotisations, les finances, les événements, les sponsors et la collaboration du comité dans une seule plateforme simple à utiliser.",
     "highlights": [
@@ -272,9 +275,26 @@
       "Sans engagement"
     ],
     "reassurance": "Pour moins de 1,35 CHF par jour, centralisez toute la gestion de votre club sur une seule plateforme.",
-    "subtitle": "{days} jours d'essai gratuit. Toutes les fonctionnalités, un seul tarif.",
-    "planName": "Obillz",
-    "planDescription": "Gérez votre club seul ou en comité — toutes les fonctionnalités incluses.",
+    "subtitle": "Tous les outils pour gérer votre club, sans modules cachés ni frais compliqués.",
+    "planName": "Formule Club",
+    "planDescription": "Tout ce qu'il faut pour gérer votre club.",
+    "includedLabel": "Tout est inclus",
+    "monthlyBillingNote": "facturation mensuelle",
+    "cardReassurance": "Pensé pour les comités bénévoles qui veulent centraliser leur gestion sans multiplier les outils.",
+    "includedFeatures": [
+      "Membres",
+      "Cotisations",
+      "Factures",
+      "Plannings",
+      "Événements",
+      "Buvette",
+      "Sponsors",
+      "Paiements",
+      "Utilisateurs & accès",
+      "Page publique",
+      "QR codes",
+      "Support"
+    ],
     "monthly": "Mensuel",
     "yearly": "Annuel",
     "billingToggleAria": "Choisir la facturation mensuelle ou annuelle",
@@ -289,7 +309,7 @@
     "monthlyEquivalent": "soit {amount} CHF/mois",
     "yearlySavingsBadge": "2 mois offerts",
     "cta": "Tester {days} jours gratuitement",
-    "footnote": "Paiement sécurisé par Stripe · Annulation possible à tout moment",
+    "footnote": "Sans carte bancaire. Sans engagement.",
     "standardFeatures": [
       "Membres illimités",
       "Événements illimités",
@@ -309,9 +329,10 @@
   },
   "faq": {
     "badge": "FAQ",
-    "titleLine1": "Vous avez encore des questions ?",
+    "titleLine1": "Des questions ?",
     "titleLine2": "On a les réponses.",
-    "subtitle": "Les essentiels en un coup d'œil, le détail en un clic.",
+    "subtitle": "Retrouvez ici les réponses aux questions les plus fréquentes sur Obillz, son fonctionnement et l'abonnement.",
+    "reassurance": "Des réponses claires, sans jargon — pour avancer sereinement.",
     "themesCount": "{count} thèmes",
     "themesList": "Démarrage · Abonnement · Sécurité",
     "otherQuestions": "Autres questions",

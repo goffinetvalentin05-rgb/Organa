@@ -80,17 +80,21 @@
   },
   "modules": {
     "label": "Features",
-    "title": "Your whole club in one place.",
-    "subtitle": "Click a module to explore — the presentation also auto-plays.",
+    "title": "Everything your committee already manages. Finally in one place.",
+    "subtitle": "Members, fees, invoices, schedules, events, sponsors, bar, payments, access and public page: Obillz centralises club admin in one clear, modern platform.",
     "previewLabel": "Preview",
+    "activeBadge": "Active module",
+    "closing": "Less admin. More time to bring the club to life.",
+    "cta": "Try Obillz for free",
+    "ctaNote": "7 days free, no credit card required.",
     "scrollHint": "Scroll through modules",
     "showModule": "Show {name}",
     "items": {
       "membres": {
         "title": "Members",
-        "tagline": "Your whole team, one list",
-        "description": "Centralise players, licensed members and committee. Each member has their profile, fees and history in one place.",
-        "bullets": ["Clear, up-to-date profiles", "Import from Excel", "One-click AGM export"],
+        "tagline": "Centralise your member profiles.",
+        "description": "Keep contacts and important information in one place.",
+        "bullets": ["Clear profiles", "Centralised info", "Simpler tracking"],
         "preview": {
           "headline": "284 members",
           "sub": "12 new this month",
@@ -99,9 +103,9 @@
       },
       "cotisations": {
         "title": "Membership fees",
-        "tagline": "Send and track without manual chasing",
-        "description": "Generate season fees, email them out and see instantly who has paid or is still pending.",
-        "bullets": ["Bulk email sending", "Targeted reminders", "Real-time status"],
+        "tagline": "Track fees more simply.",
+        "description": "Create, send and view payments at a glance.",
+        "bullets": ["Quick creation", "Easy sending", "Visible statuses"],
         "preview": {
           "headline": "92% paid",
           "sub": "8% pending · season 25/26",
@@ -110,9 +114,9 @@
       },
       "factures": {
         "title": "Invoices",
-        "tagline": "Professional documents, sent fast",
-        "description": "Create clean invoices for sponsors or suppliers and track payments without leaving Obillz.",
-        "bullets": ["Ready-made templates", "PDF by email", "Paid / unpaid tracking"],
+        "tagline": "Manage invoices without complexity.",
+        "description": "Create clear documents and keep clean tracking.",
+        "bullets": ["Clean documents", "Centralised tracking", "Time saved"],
         "preview": {
           "headline": "17 invoices",
           "sub": "4 awaiting payment",
@@ -121,9 +125,9 @@
       },
       "planning": {
         "title": "Scheduling",
-        "tagline": "Slots and assignments in one place",
-        "description": "Organise club schedules, bar slots and team assignments from a single calendar.",
-        "bullets": ["Clear calendar view", "Per-slot assignments", "PDF export"],
+        "tagline": "Organise volunteers without 50 messages.",
+        "description": "Create slots and share them easily.",
+        "bullets": ["Clear slots", "Shared link", "Smooth organisation"],
         "preview": {
           "headline": "12 slots",
           "sub": "3 matches this weekend",
@@ -132,9 +136,9 @@
       },
       "evenements": {
         "title": "Events",
-        "tagline": "Simpler sign-ups and schedules",
-        "description": "Tournaments, club dinners, work parties: share a link or QR code and collect every response in one place.",
-        "bullets": ["Public link or QR code", "Attendee list", "Post-match schedules"],
+        "tagline": "Run events more calmly.",
+        "description": "Centralise organisation around your events.",
+        "bullets": ["Overview", "Simpler organisation", "Fewer oversights"],
         "preview": {
           "headline": "3 events",
           "sub": "42 sign-ups this week",
@@ -143,9 +147,9 @@
       },
       "paiements": {
         "title": "Payments",
-        "tagline": "Income visible in real time",
-        "description": "Fees, bar sales, events: track money in and keep a clear view of club finances.",
-        "bullets": ["Live club balance", "Payment history", "View by category"],
+        "tagline": "Track income clearly.",
+        "description": "Find payments in a simple, structured view.",
+        "bullets": ["Instant readability", "Quick tracking", "Centralised view"],
         "preview": {
           "headline": "CHF 8,420",
           "sub": "collected · last 30 days",
@@ -154,9 +158,9 @@
       },
       "utilisateurs": {
         "title": "Users & access",
-        "tagline": "Multi-user committee",
-        "description": "Invite committee members with roles and permissions tailored to each module.",
-        "bullets": ["Email invitations", "Per-module roles", "Action audit trail"],
+        "tagline": "Give the right access to the right people.",
+        "description": "Manage roles and permissions easily.",
+        "bullets": ["Clear roles", "Secure access", "Simple management"],
         "preview": {
           "headline": "5 accounts",
           "sub": "3 admins · 2 treasurers",
@@ -176,9 +180,9 @@
       },
       "buvette": {
         "title": "Bar",
-        "tagline": "Bookings without chaos",
-        "description": "Manage bar slots, requests and confirmations for matches and club events.",
-        "bullets": ["Slot calendar", "Centralised requests", "Fewer lost messages"],
+        "tagline": "Simplify request management.",
+        "description": "Keep a clear view of requests and their follow-up.",
+        "bullets": ["Centralised requests", "Clear tracking", "Simpler processing"],
         "preview": {
           "headline": "Bar slots",
           "sub": "Saturday 2–6 pm · confirmed",
@@ -187,9 +191,9 @@
       },
       "sponsors": {
         "title": "Sponsors",
-        "tagline": "Partners and contracts tracked",
-        "description": "Manage sponsors, contracts and related invoices without losing track of commitments.",
-        "bullets": ["Sponsor profiles", "Contracts & invoices", "Payment tracking"],
+        "tagline": "Keep partners well organised.",
+        "description": "Contracts, amounts and deadlines in one place.",
+        "bullets": ["Tracked partners", "Visible deadlines", "More professional management"],
         "preview": {
           "headline": "8 sponsors",
           "sub": "2 contracts to renew",
@@ -198,9 +202,9 @@
       },
       "page-publique": {
         "title": "Public page",
-        "tagline": "Your club online",
-        "description": "A club web page to present the team, match schedule and useful links for members.",
-        "bullets": ["Custom URL", "Club logo and colours", "Sign-up & bar links"],
+        "tagline": "Show your club online simply.",
+        "description": "Share a clear page to present your activity.",
+        "bullets": ["Club presentation", "More professional image", "Easy sharing"],
         "preview": {
           "headline": "Club page",
           "sub": "Matches · contact · useful links",
@@ -229,25 +233,24 @@
   },
   "howItWorks": {
     "label": "How it works",
-    "title": "Easy to get started.",
-    "subtitle": "No need to set everything up at once — go at your own pace, module by module.",
-    "cta": "Try Obillz for free",
+    "titleLead": "Launch your club in",
+    "titleAccent": "just a few minutes.",
+    "subtitle": "Create your workspace, set up your club, then use Obillz at your own pace.",
+    "reassurance": "No need to prepare everything on day one — Obillz adapts to how your committee actually runs.",
+    "cta": "Create my club for free",
+    "ctaNote": "7 days free, no credit card required.",
     "steps": [
       {
-        "title": "Create your club",
-        "description": "A few minutes to set up your workspace."
+        "title": "Create your account",
+        "description": "Sign up for free and access your Obillz workspace in just a few minutes."
       },
       {
-        "title": "Add your members",
-        "description": "Import or enter when you want — you can start without a full list."
+        "title": "Set up your club",
+        "description": "Add your club's basic information and invite committee members if you wish."
       },
       {
-        "title": "Enable what you need",
-        "description": "Fees, events, bar, invoices, public page, campaigns… turn on the modules your club needs."
-      },
-      {
-        "title": "Run day to day",
-        "description": "Send, track, communicate and collect from one dashboard, on desktop or mobile."
+        "title": "Progress at your own pace",
+        "description": "Start with the modules useful to your club: members, fees, invoices, schedules, events or sponsors. Everything is already included."
       }
     ]
   },
@@ -261,7 +264,7 @@
   },
   "pricing": {
     "label": "Pricing",
-    "title": "One plan. Everything included.",
+    "title": "One plan. All of Obillz included.",
     "headline": "Give your committee a tool worthy of their commitment.",
     "body": "Running a club already takes enough time. Obillz brings members, fees, finances, events, sponsors and committee collaboration together in one easy-to-use platform.",
     "highlights": [
@@ -272,9 +275,26 @@
       "No commitment"
     ],
     "reassurance": "For less than CHF 1.35 per day, centralize your entire club management on a single platform.",
-    "subtitle": "{days}-day free trial. All features, one price.",
-    "planName": "Obillz",
-    "planDescription": "Run your club solo or as a committee — every feature included.",
+    "subtitle": "Every tool to run your club — no hidden modules or complicated fees.",
+    "planName": "Club Plan",
+    "planDescription": "Everything you need to run your club.",
+    "includedLabel": "Everything included",
+    "monthlyBillingNote": "billed monthly",
+    "cardReassurance": "Built for volunteer committees who want one place for club management — not a pile of separate tools.",
+    "includedFeatures": [
+      "Members",
+      "Membership fees",
+      "Invoices",
+      "Schedules",
+      "Events",
+      "Bar",
+      "Sponsors",
+      "Payments",
+      "Users & access",
+      "Public page",
+      "QR codes",
+      "Support"
+    ],
     "monthly": "Monthly",
     "yearly": "Yearly",
     "billingToggleAria": "Choose monthly or yearly billing",
@@ -289,7 +309,7 @@
     "monthlyEquivalent": "i.e. {amount} CHF/month",
     "yearlySavingsBadge": "2 months free",
     "cta": "Try {days} days for free",
-    "footnote": "Secure payment via Stripe · Cancel anytime",
+    "footnote": "No credit card. No commitment.",
     "standardFeatures": [
       "Unlimited members",
       "Unlimited events",
@@ -309,9 +329,10 @@
   },
   "faq": {
     "badge": "FAQ",
-    "titleLine1": "Still have questions?",
+    "titleLine1": "Questions?",
     "titleLine2": "We've got answers.",
-    "subtitle": "The essentials at a glance, details in one click.",
+    "subtitle": "Find answers to the most common questions about Obillz, how it works, and your subscription.",
+    "reassurance": "Clear answers, no jargon — so you can move forward with confidence.",
     "themesCount": "{count} topics",
     "themesList": "Getting started · Subscription · Security",
     "otherQuestions": "More questions",

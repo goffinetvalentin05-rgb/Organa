@@ -2,232 +2,147 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import {
   easePremium,
-  scrollReveal,
   staggerContainer,
   staggerItem,
   viewportOnce,
 } from "@/components/landing/landing-motion";
 import { useI18n } from "@/components/I18nProvider";
-import { useLandingFaq, type LandingFaqItem } from "@/lib/landing/use-landing-faq";
-import {
-  landingFeaturedCardClass,
-  landingGlassCardClass,
-  landingSectionDividerClass,
-  landingSectionShellClass,
-} from "@/components/ui/styles";
+import { useLandingFaq } from "@/lib/landing/use-landing-faq";
+import { landingSectionGlowClass, landingSectionShellClass } from "@/components/ui/styles";
 
-function FeaturedCard({ item, reduceMotion }: { item: LandingFaqItem; reduceMotion: boolean | null }) {
-  const Icon = item.icon;
-  return (
-    <motion.article
-      variants={staggerItem}
-      whileHover={reduceMotion ? undefined : { y: -3 }}
-      className={`${landingFeaturedCardClass} px-4 py-3 md:px-4 md:py-3.5`}
-    >
-      <div className="relative flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#1A23FF] to-[#4338ca] text-white shadow-[0_0_20px_rgba(26,35,255,0.45)]">
-          <Icon className="h-4 w-4" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-300/70">
-            {item.groupLabel}
-          </p>
-          <p className="mt-0.5 text-[13px] font-medium leading-snug text-white/95">
-            {item.question}
-          </p>
-          <p className="mt-1 text-xs leading-relaxed text-blue-100/65">{item.answer}</p>
-        </div>
-      </div>
-    </motion.article>
-  );
-}
-
-function AccordionItem({
-  item,
-  index,
+function FaqAccordionItem({
+  question,
+  answer,
   isOpen,
   onToggle,
   reduceMotion,
+  isLast,
 }: {
-  item: LandingFaqItem;
-  index: number;
+  question: string;
+  answer: string;
   isOpen: boolean;
   onToggle: () => void;
   reduceMotion: boolean | null;
+  isLast: boolean;
 }) {
-  const Icon = item.icon;
-  const isAlt = index % 2 === 1;
-
   return (
-    <motion.article
-      layout={!reduceMotion}
-      variants={staggerItem}
-      className={`relative overflow-hidden backdrop-blur-md transition-all duration-300 ${
-        isOpen
-          ? landingFeaturedCardClass
-          : isAlt
-            ? `${landingGlassCardClass} ml-0 md:ml-4`
-            : `${landingGlassCardClass} mr-0 md:mr-4`
-      }`}
-    >
+    <div className={isLast ? undefined : "border-b border-white/[0.08]"}>
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left md:px-4 md:py-3.5"
         aria-expanded={isOpen}
+        className={`group flex w-full items-start gap-4 px-5 py-5 text-left transition-colors duration-300 md:px-6 md:py-5 ${
+          isOpen ? "bg-white/[0.04]" : "hover:bg-white/[0.025]"
+        }`}
       >
+        <span className="min-w-0 flex-1 pt-0.5 text-[0.9375rem] font-semibold leading-snug text-white/95 md:text-base">
+          {question}
+        </span>
         <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-300 ${
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
             isOpen
-              ? "bg-[#1A23FF] text-white shadow-[0_0_18px_rgba(26,35,255,0.5)]"
-              : "bg-white/[0.06] text-blue-200 ring-1 ring-white/10"
-          }`}
-        >
-          <Icon className="h-4 w-4" aria-hidden />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-blue-300/60">
-            {item.groupLabel}
-          </span>
-          <span className="mt-0.5 block text-[13px] font-medium leading-snug text-white/95">
-            {item.question}
-          </span>
-        </span>
-        <motion.span
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
-            isOpen ? "border-blue-400/40 bg-[#1A23FF]/25 text-white" : "border-white/12 text-blue-200"
+              ? "border-blue-400/35 bg-[#1A23FF]/20 text-white shadow-[0_0_20px_rgba(26,35,255,0.25)]"
+              : "border-white/12 bg-white/[0.04] text-blue-200/75 group-hover:border-blue-400/25 group-hover:text-blue-100"
           }`}
           aria-hidden
         >
-          <ChevronDown className="h-4 w-4" />
-        </motion.span>
+          {isOpen ? <Minus className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />}
+        </span>
       </button>
+
       <AnimatePresence initial={false}>
         {isOpen ? (
           <motion.div
             initial={reduceMotion ? false : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: easePremium }}
+            transition={{ duration: 0.32, ease: easePremium }}
+            className="overflow-hidden"
           >
-            <p className="border-t border-white/[0.06] px-4 pb-4 pt-2 text-sm leading-relaxed text-blue-100/70 md:pl-[4.25rem] md:pr-5 md:pb-5">
-              {item.answer}
+            <p className="px-5 pb-5 text-sm leading-relaxed text-blue-100/72 md:px-6 md:pb-6 md:text-[0.9375rem] md:leading-relaxed">
+              {answer}
             </p>
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </motion.article>
+    </div>
   );
 }
 
 export default function FaqSection() {
   const { t } = useI18n();
   const faqItems = useLandingFaq();
-  const featuredItems = faqItems.filter((item) => item.featured);
-  const accordionItems = faqItems.filter((item) => !item.featured);
   const [openIndex, setOpenIndex] = useState<number>(0);
   const reduceMotion = useReducedMotion();
 
   return (
     <section id="faq" className="relative scroll-mt-24 overflow-hidden py-16 md:py-28">
-      <motion.div
-        className="pointer-events-none absolute left-[5%] top-[20%] h-72 w-72 rounded-full bg-[#1A23FF]/18 blur-[100px]"
-        animate={reduceMotion ? undefined : { x: [0, 20, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        aria-hidden
-      />
-      <div className={landingSectionDividerClass} aria-hidden />
+      <div className={landingSectionGlowClass} aria-hidden />
 
-      <div className="relative mx-auto w-[94%] max-w-[1060px]">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-14 lg:items-start">
-          {/* Titre — colonne gauche, toujours visible */}
+      <div className="relative mx-auto w-[94%] max-w-[1100px]">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16 lg:items-start">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className="relative z-10 text-center lg:sticky lg:top-28 lg:text-left"
+            className="text-center lg:sticky lg:top-28 lg:text-left"
           >
             <motion.p
               variants={staggerItem}
-              className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-gradient-to-r from-[#1A23FF]/15 to-[#6366f1]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 shadow-[0_0_32px_rgba(26,35,255,0.28),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/70"
             >
-              <HelpCircle className="h-3.5 w-3.5" aria-hidden />
               {t("marketing.faq.badge")}
             </motion.p>
+
             <motion.h2
               variants={staggerItem}
-              className="mt-5 text-balance text-2xl font-black leading-[1.15] tracking-[-0.02em] text-white md:text-3xl lg:text-[2.35rem]"
+              className="mt-4 text-balance text-3xl font-black leading-[1.08] tracking-[-0.025em] text-white sm:text-4xl lg:mt-5 lg:text-[2.85rem] xl:text-[3.1rem]"
             >
               <span className="block">{t("marketing.faq.titleLine1")}</span>
-              <span className="mt-1 block bg-gradient-to-r from-blue-200 via-white to-blue-300 bg-clip-text text-transparent">
+              <span className="mt-1 block bg-gradient-to-r from-blue-200 via-white to-indigo-200 bg-clip-text text-transparent">
                 {t("marketing.faq.titleLine2")}
               </span>
             </motion.h2>
-            <motion.p variants={staggerItem} className="mt-4 text-sm text-blue-100/70 md:text-base">
+
+            <motion.p
+              variants={staggerItem}
+              className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-blue-100/70 md:text-base lg:mx-0 lg:max-w-none"
+            >
               {t("marketing.faq.subtitle")}
             </motion.p>
-            <motion.div
+
+            <motion.p
               variants={staggerItem}
-              className="mt-6 hidden items-center gap-3 lg:flex"
-              aria-hidden
+              className="mx-auto mt-6 max-w-md text-sm text-blue-100/45 lg:mx-0 lg:max-w-none"
             >
-              <span className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-blue-100/60">
-                {t("marketing.faq.themesCount", { count: faqItems.length })}
-              </span>
-              <span className="h-1 w-1 rounded-full bg-blue-400/50" />
-              <span className="text-xs text-blue-100/50">{t("marketing.faq.themesList")}</span>
-            </motion.div>
+              {t("marketing.faq.reassurance")}
+            </motion.p>
           </motion.div>
 
-          {/* Contenu — colonne droite */}
-          <div className="relative z-10 space-y-6">
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={viewportOnce}
-              className="flex flex-col gap-2"
-            >
-              {featuredItems.map((item) => (
-                <FeaturedCard key={item.question} item={item} reduceMotion={reduceMotion} />
-              ))}
-            </motion.div>
-
-            <motion.div
-              variants={scrollReveal}
-              initial="hidden"
-              whileInView="visible"
-              viewport={viewportOnce}
-              className={`${landingSectionShellClass} space-y-2.5 p-3 md:p-4`}
-            >
-              <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300/70">
-                {t("marketing.faq.otherQuestions")}
-              </p>
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={viewportOnce}
-                className="space-y-2"
-              >
-                {accordionItems.map((item, index) => (
-                  <AccordionItem
-                    key={item.question}
-                    item={item}
-                    index={index}
-                    isOpen={openIndex === index}
-                    onToggle={() => setOpenIndex(openIndex === index ? -1 : index)}
-                    reduceMotion={reduceMotion}
-                  />
-                ))}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className={`${landingSectionShellClass} overflow-hidden`}
+          >
+            {faqItems.map((item, index) => (
+              <motion.div key={item.question} variants={staggerItem}>
+                <FaqAccordionItem
+                  question={item.question}
+                  answer={item.answer}
+                  isOpen={openIndex === index}
+                  onToggle={() => setOpenIndex(openIndex === index ? -1 : index)}
+                  reduceMotion={reduceMotion}
+                  isLast={index === faqItems.length - 1}
+                />
               </motion.div>
-            </motion.div>
-          </div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

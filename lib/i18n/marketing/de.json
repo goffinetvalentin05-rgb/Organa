@@ -80,17 +80,21 @@
   },
   "modules": {
     "label": "Funktionen",
-    "title": "Der ganze Verein an einem Ort.",
-    "subtitle": "Modul anklicken zum Entdecken — die Präsentation läuft auch von selbst.",
+    "title": "Alles, was Ihr Vorstand bereits verwaltet. Endlich an einem Ort.",
+    "subtitle": "Mitglieder, Beiträge, Rechnungen, Pläne, Events, Sponsoren, Verzehr, Zahlungen, Zugriffe und öffentliche Seite: Obillz bündelt die Vereinsverwaltung in einer klaren, modernen Plattform.",
     "previewLabel": "Vorschau",
+    "activeBadge": "Aktives Modul",
+    "closing": "Weniger Verwaltung. Mehr Zeit, den Verein lebendig zu halten.",
+    "cta": "Obillz kostenlos testen",
+    "ctaNote": "7 Tage gratis, ohne Kreditkarte.",
     "scrollHint": "Module durchscrollen",
     "showModule": "{name} anzeigen",
     "items": {
       "membres": {
         "title": "Mitglieder",
-        "tagline": "Das ganze Team, eine Liste",
-        "description": "Spieler, Lizenznehmer und Vorstand zentral. Jedes Mitglied mit Profil, Beiträgen und Historie an einem Ort.",
-        "bullets": ["Klare, aktuelle Profile", "Import aus Excel", "Export für die GV per Klick"],
+        "tagline": "Mitgliederprofile zentral bündeln.",
+        "description": "Kontakte und wichtige Informationen an einem Ort behalten.",
+        "bullets": ["Klare Profile", "Zentrale Infos", "Einfachere Nachverfolgung"],
         "preview": {
           "headline": "284 Mitglieder",
           "sub": "12 neu diesen Monat",
@@ -99,9 +103,9 @@
       },
       "cotisations": {
         "title": "Beiträge",
-        "tagline": "Versenden und nachverfolgen ohne manuelles Mahnen",
-        "description": "Saisonbeiträge erstellen, per E-Mail senden und sofort sehen, wer bezahlt hat oder aussteht.",
-        "bullets": ["Sammelversand per E-Mail", "Gezielte Erinnerungen", "Status in Echtzeit"],
+        "tagline": "Beiträge einfacher nachverfolgen.",
+        "description": "Erstellen, versenden und Zahlungen auf einen Blick sehen.",
+        "bullets": ["Schnelle Erstellung", "Einfaches Versenden", "Sichtbare Status"],
         "preview": {
           "headline": "92% bezahlt",
           "sub": "8% ausstehend · Saison 25/26",
@@ -110,9 +114,9 @@
       },
       "factures": {
         "title": "Rechnungen",
-        "tagline": "Professionelle Dokumente, schnell versendet",
-        "description": "Saubere Rechnungen für Sponsoren oder Lieferanten und Zahlungsverfolgung in Obillz.",
-        "bullets": ["Fertige Vorlagen", "PDF per E-Mail", "Bezahlt / offen"],
+        "tagline": "Rechnungen ohne Komplexität verwalten.",
+        "description": "Klare Dokumente erstellen und saubere Nachverfolgung behalten.",
+        "bullets": ["Saubere Dokumente", "Zentrale Nachverfolgung", "Zeit gespart"],
         "preview": {
           "headline": "17 Rechnungen",
           "sub": "4 Zahlung ausstehend",
@@ -121,9 +125,9 @@
       },
       "planning": {
         "title": "Planung",
-        "tagline": "Slots und Einteilungen zentral",
-        "description": "Vereinspläne, Verzehr-Slots und Team-Einteilungen in einem Kalender organisieren.",
-        "bullets": ["Klare Kalenderansicht", "Einteilung pro Slot", "PDF-Export"],
+        "tagline": "Helfer organisieren ohne 50 Nachrichten.",
+        "description": "Slots erstellen und einfach teilen.",
+        "bullets": ["Klare Slots", "Geteilter Link", "Flüssige Organisation"],
         "preview": {
           "headline": "12 Slots",
           "sub": "3 Spiele dieses Wochenende",
@@ -132,9 +136,9 @@
       },
       "evenements": {
         "title": "Events",
-        "tagline": "Anmeldungen und Pläne vereinfacht",
-        "description": "Turniere, Vereinsessen, Arbeitseinsätze: Link oder QR-Code teilen und alle Antworten an einem Ort.",
-        "bullets": ["Öffentlicher Link oder QR", "Teilnehmerliste", "Pläne nach dem Spiel"],
+        "tagline": "Events gelassener steuern.",
+        "description": "Organisation rund um Ihre Veranstaltungen zentral bündeln.",
+        "bullets": ["Gesamtüberblick", "Vereinfachte Organisation", "Weniger Vergessen"],
         "preview": {
           "headline": "3 Events",
           "sub": "42 Anmeldungen diese Woche",
@@ -143,9 +147,9 @@
       },
       "paiements": {
         "title": "Zahlungen",
-        "tagline": "Einnahmen live sichtbar",
-        "description": "Beiträge, Verzehr, Events: Eingänge verfolgen und klare Sicht auf die Vereinskasse.",
-        "bullets": ["Live-Vereinskonto", "Zahlungshistorie", "Ansicht nach Kategorie"],
+        "tagline": "Einnahmen klar nachverfolgen.",
+        "description": "Zahlungen in einer einfachen, strukturierten Ansicht finden.",
+        "bullets": ["Sofortige Lesbarkeit", "Schnelle Nachverfolgung", "Zentrale Ansicht"],
         "preview": {
           "headline": "CHF 8'420",
           "sub": "eingegangen · letzte 30 Tage",
@@ -154,9 +158,9 @@
       },
       "utilisateurs": {
         "title": "Benutzer & Zugriff",
-        "tagline": "Mehrbenutzer-Vorstand",
-        "description": "Vorstandsmitglieder mit Rollen und Berechtigungen pro Modul einladen.",
-        "bullets": ["E-Mail-Einladungen", "Rollen pro Modul", "Nachverfolgung der Aktionen"],
+        "tagline": "Den richtigen Personen den richtigen Zugriff geben.",
+        "description": "Rollen und Berechtigungen einfach verwalten.",
+        "bullets": ["Klare Rollen", "Sicherer Zugriff", "Einfache Verwaltung"],
         "preview": {
           "headline": "5 Konten",
           "sub": "3 Admins · 2 Kassierer",
@@ -176,9 +180,9 @@
       },
       "buvette": {
         "title": "Verzehr",
-        "tagline": "Reservierungen ohne Chaos",
-        "description": "Verzehr-Slots, Anfragen und Bestätigungen für Spiele und Vereinsanlässe verwalten.",
-        "bullets": ["Slot-Kalender", "Zentrale Anfragen", "Weniger verlorene Nachrichten"],
+        "tagline": "Anfragenverwaltung vereinfachen.",
+        "description": "Klare Sicht auf Anfragen und deren Nachverfolgung behalten.",
+        "bullets": ["Zentrale Anfragen", "Klare Nachverfolgung", "Einfachere Bearbeitung"],
         "preview": {
           "headline": "Verzehr-Slots",
           "sub": "Samstag 14–18 Uhr · bestätigt",
@@ -187,9 +191,9 @@
       },
       "sponsors": {
         "title": "Sponsoren",
-        "tagline": "Partner und Verträge im Blick",
-        "description": "Sponsoren, Verträge und zugehörige Rechnungen ohne den Überblick zu verlieren.",
-        "bullets": ["Sponsor-Profile", "Verträge & Rechnungen", "Zahlungsverfolgung"],
+        "tagline": "Partner gut organisiert halten.",
+        "description": "Verträge, Beträge und Fristen an einem Ort.",
+        "bullets": ["Verfolgte Partner", "Sichtbare Fristen", "Professionellere Verwaltung"],
         "preview": {
           "headline": "8 Sponsoren",
           "sub": "2 Verträge zu verlängern",
@@ -198,9 +202,9 @@
       },
       "page-publique": {
         "title": "Öffentliche Seite",
-        "tagline": "Ihr Verein online",
-        "description": "Eine Vereinswebseite für Team, Spielplan und nützliche Links für Mitglieder.",
-        "bullets": ["Eigene URL", "Logo und Vereinsfarben", "Links Anmeldung & Verzehr"],
+        "tagline": "Ihren Verein einfach online präsentieren.",
+        "description": "Eine klare Seite teilen, um Ihre Aktivität zu präsentieren.",
+        "bullets": ["Vereinspräsentation", "Professionelleres Image", "Einfaches Teilen"],
         "preview": {
           "headline": "Vereinsseite",
           "sub": "Spiele · Kontakt · Links",
@@ -229,25 +233,24 @@
   },
   "howItWorks": {
     "label": "So funktioniert's",
-    "title": "Einfach einzurichten.",
-    "subtitle": "Nicht alles auf einmal — Schritt für Schritt, Modul für Modul.",
-    "cta": "Obillz kostenlos testen",
+    "titleLead": "Starten Sie Ihren Verein in",
+    "titleAccent": "wenigen Minuten.",
+    "subtitle": "Erstellen Sie Ihren Bereich, richten Sie Ihren Verein ein und nutzen Sie Obillz in Ihrem eigenen Tempo.",
+    "reassurance": "Sie müssen nicht alles am ersten Tag vorbereiten: Obillz passt sich der Realität Ihres Vorstands an.",
+    "cta": "Meinen Verein kostenlos erstellen",
+    "ctaNote": "7 Tage gratis, ohne Kreditkarte.",
     "steps": [
       {
-        "title": "Verein anlegen",
-        "description": "Ein paar Minuten für Ihren Bereich."
+        "title": "Konto erstellen",
+        "description": "Registrieren Sie sich kostenlos und greifen Sie in wenigen Minuten auf Ihren Obillz-Bereich zu."
       },
       {
-        "title": "Mitglieder hinzufügen",
-        "description": "Import oder Eingabe wann Sie wollen — Start auch ohne vollständige Liste."
+        "title": "Verein einrichten",
+        "description": "Tragen Sie die Grunddaten Ihres Vereins ein und laden Sie bei Bedarf Vorstandsmitglieder ein."
       },
       {
-        "title": "Was Sie brauchen aktivieren",
-        "description": "Beiträge, Events, Verzehr, Rechnungen, öffentliche Seite, Kampagnen… nur die passenden Module."
-      },
-      {
-        "title": "Im Alltag steuern",
-        "description": "Senden, verfolgen, kommunizieren und kassieren von einem Dashboard — Desktop oder Mobil."
+        "title": "In Ihrem Tempo vorangehen",
+        "description": "Beginnen Sie mit den Modulen, die Ihrem Verein nützen: Mitglieder, Beiträge, Rechnungen, Pläne, Events oder Sponsoren. Alles ist bereits inklusive."
       }
     ]
   },
@@ -261,7 +264,7 @@
   },
   "pricing": {
     "label": "Preise",
-    "title": "Ein Tarif. Alles inklusive.",
+    "title": "Ein Tarif. Alles von Obillz inklusive.",
     "headline": "Geben Sie Ihrem Vorstand ein Werkzeug, das seinem Einsatz gerecht wird.",
     "body": "Einen Verein zu führen kostet bereits genug Zeit. Obillz bündelt Mitglieder, Beiträge, Finanzen, Events, Sponsoren und die Zusammenarbeit im Vorstand auf einer einfachen Plattform.",
     "highlights": [
@@ -272,9 +275,26 @@
       "Ohne Bindung"
     ],
     "reassurance": "Für weniger als 1,35 CHF pro Tag zentralisieren Sie die gesamte Vereinsverwaltung auf einer Plattform.",
-    "subtitle": "{days} Tage kostenlos testen. Alle Funktionen, ein Preis.",
-    "planName": "Obillz",
-    "planDescription": "Verein allein oder im Vorstand — alle Funktionen inklusive.",
+    "subtitle": "Alle Tools für Ihren Verein — ohne versteckte Module oder komplizierte Gebühren.",
+    "planName": "Vereins-Tarif",
+    "planDescription": "Alles, was Sie brauchen, um Ihren Verein zu führen.",
+    "includedLabel": "Alles inklusive",
+    "monthlyBillingNote": "monatliche Abrechnung",
+    "cardReassurance": "Für ehrenamtliche Vorstände, die ihre Verwaltung zentralisieren wollen — ohne dutzende separate Tools.",
+    "includedFeatures": [
+      "Mitglieder",
+      "Beiträge",
+      "Rechnungen",
+      "Pläne",
+      "Events",
+      "Buvette",
+      "Sponsoren",
+      "Zahlungen",
+      "Benutzer & Zugänge",
+      "Öffentliche Seite",
+      "QR-Codes",
+      "Support"
+    ],
     "monthly": "Monatlich",
     "yearly": "Jährlich",
     "billingToggleAria": "Monatliche oder jährliche Abrechnung wählen",
@@ -289,7 +309,7 @@
     "monthlyEquivalent": "entspricht {amount} CHF/Monat",
     "yearlySavingsBadge": "2 Monate geschenkt",
     "cta": "{days} Tage kostenlos testen",
-    "footnote": "Sichere Zahlung via Stripe · Jederzeit kündbar",
+    "footnote": "Ohne Kreditkarte. Ohne Bindung.",
     "standardFeatures": [
       "Unbegrenzte Mitglieder",
       "Unbegrenzte Events",
@@ -309,9 +329,10 @@
   },
   "faq": {
     "badge": "FAQ",
-    "titleLine1": "Noch Fragen?",
+    "titleLine1": "Fragen?",
     "titleLine2": "Wir haben Antworten.",
-    "subtitle": "Das Wichtigste auf einen Blick, Details per Klick.",
+    "subtitle": "Antworten auf die häufigsten Fragen zu Obillz, der Funktionsweise und dem Abonnement.",
+    "reassurance": "Klare Antworten, ohne Fachjargon — damit Sie sicher entscheiden können.",
     "themesCount": "{count} Themen",
     "themesList": "Einstieg · Abo · Sicherheit",
     "otherQuestions": "Weitere Fragen",
