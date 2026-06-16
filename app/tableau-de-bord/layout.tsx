@@ -11,7 +11,8 @@ import LandingBackground from "@/components/landing/LandingBackground";
 import { dashboardShellRootClass, obillzLandingGridOverlayClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import ClubPublicPageAnnouncementModal from "@/components/public-page/ClubPublicPageAnnouncementModal";
-import NotificationBell from "@/components/DashboardNotificationBell";
+import { NewFeaturesAnnouncementProvider } from "@/components/announcements/NewFeaturesAnnouncementProvider";
+import DashboardNotificationBellConnected from "@/components/announcements/DashboardNotificationBellConnected";
 import {
   LayoutDashboard,
   Users,
@@ -150,6 +151,7 @@ export default function DashboardLayout({
   };
 
   return (
+    <NewFeaturesAnnouncementProvider>
     <div className={dashboardShellRootClass}>
       <LandingBackground />
       <ClubPublicPageAnnouncementModal />
@@ -352,7 +354,7 @@ export default function DashboardLayout({
 
               <LanguageSwitcher compact />
 
-              <NotificationBell />
+              <DashboardNotificationBellConnected />
 
               <button
                 type="button"
@@ -384,5 +386,6 @@ export default function DashboardLayout({
         </footer>
       </div>
     </div>
+    </NewFeaturesAnnouncementProvider>
   );
 }

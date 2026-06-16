@@ -16,10 +16,15 @@ export type DashboardNotification = {
 type NotificationBellProps = {
   /** Notifications à afficher — vide par défaut (état UI prêt pour le backend). */
   notifications?: DashboardNotification[];
+  onNotificationClick?: (id: string) => void;
   className?: string;
 };
 
-export default function NotificationBell({ notifications = [], className }: NotificationBellProps) {
+export default function NotificationBell({
+  notifications = [],
+  onNotificationClick,
+  className,
+}: NotificationBellProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,20 +93,35 @@ export default function NotificationBell({ notifications = [], className }: Noti
           ) : (
             <ul className="max-h-80 overflow-y-auto py-1">
               {notifications.map((notification) => (
-                <li
-                  key={notification.id}
-                  className={cn(
-                    "border-b border-white/[0.06] px-4 py-3 transition hover:bg-white/[0.04]",
-                    !notification.read && "bg-[#1A23FF]/[0.06]"
-                  )}
-                >
-                  <p className="text-sm font-semibold text-white/90">{notification.title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-white/55">{notification.message}</p>
-                  {notification.date ? (
-                    <p className="mt-1.5 text-[10px] font-medium uppercase tracking-wider text-white/35">
-                      {notification.date}
-                    </p>
-                  ) : null}
+                <li key={notification.id} className="border-b border-white/[0.06] last:border-b-0">
+                  <button
+                    type="button"
+                    onClick={() => onNotificationClick?.(notification.id)}
+                    className={cn(
+                      "w-full px-4 py-3 text-left transition hover:bg-white/[0.04]",
+                      !notification.read && "bg-[#1A23FF]/[0.06]"
+                    )}
+                  >
+                    <div className="flex items-start gap-2">
+                      {!notification.read ? (
+                        <span
+                          className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1A23FF] shadow-[0_0_8px_rgba(26,35,255,0.8)]"
+                          aria-hidden
+                        />
+                      ) : null}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-white/90">{notification.title}</p>
+                        <p className="mt-0.5 text-xs leading-relaxed text-white/55">
+                          {notification.message}
+                        </p>
+                        {notification.date ? (
+                          <p className="mt-1.5 text-[10px] font-medium uppercase tracking-wider text-white/35">
+                            {notification.date}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </button>
                 </li>
               ))}
             </ul>
