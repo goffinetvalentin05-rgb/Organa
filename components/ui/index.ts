@@ -1,3 +1,4 @@
+export { default as BodyPortal } from "./BodyPortal";
 export { cn } from "./cn";
 export {
   glassCardClass,

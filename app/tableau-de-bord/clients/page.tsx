@@ -116,10 +116,12 @@ export default function ClientsPage() {
     if (!vis.category.enabled) setCategoryFilter("");
   }, [vis.role.enabled, vis.category.enabled]);
 
+  const handleCloseImport = useCallback(() => setImportOpen(false), []);
+
   const importModal = (
     <ImportMembersModal
       open={importOpen}
-      onClose={() => setImportOpen(false)}
+      onClose={handleCloseImport}
       existingMembers={clients.map((c) => ({ nom: c.nom, email: c.email }))}
       onImported={fetchClients}
       onSuccess={handleImportSuccess}
@@ -164,7 +166,11 @@ export default function ClientsPage() {
             {!permissionsLoading && canManageMembers && (
               <button
                 type="button"
-                onClick={() => setImportOpen(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setImportOpen(true);
+                }}
                 className={dashboardSecondaryButtonClass}
               >
                 {t("dashboard.clients.import.action")}

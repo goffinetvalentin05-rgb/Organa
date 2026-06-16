@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { X, Upload, CheckCircle, AlertCircle, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -15,6 +14,7 @@ import {
   dashboardHintClass,
   dashboardLabelClass,
   cn,
+  BodyPortal,
 } from "@/components/ui";
 import type { MemberFieldKey } from "@/lib/member-fields/types";
 import {
@@ -238,21 +238,20 @@ export default function ImportMembersModal({
     });
   };
 
-  if (!open) return null;
-
-  return createPortal(
-    <ModalOverlay onClose={step === "success" ? handleSuccessClose : handleClose}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="import-members-modal-title"
-        className={cn(
-          "pointer-events-auto relative z-[2] flex w-full min-h-0 flex-col",
-          "max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-1.5rem))]",
-          "max-w-[calc(100vw-1.5rem)] sm:max-w-2xl",
-          dashboardModalClass
-        )}
-      >
+  return (
+    <BodyPortal open={open}>
+      <ModalOverlay onClose={step === "success" ? handleSuccessClose : handleClose}>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="import-members-modal-title"
+          className={cn(
+            "pointer-events-auto flex w-full min-h-0 flex-col",
+            "max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-1.5rem))]",
+            "max-w-[calc(100vw-1.5rem)] sm:max-w-2xl",
+            dashboardModalClass
+          )}
+        >
         <ModalHeader
           step={step}
           onClose={step === "success" ? handleSuccessClose : handleClose}
@@ -307,9 +306,9 @@ export default function ImportMembersModal({
           importing={step === "importing"}
           t={t}
         />
-      </div>
-    </ModalOverlay>,
-    document.body
+        </div>
+      </ModalOverlay>
+    </BodyPortal>
   );
 }
 
@@ -322,16 +321,16 @@ function ModalOverlay({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
+      className="pointer-events-auto fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4"
       role="presentation"
     >
       <button
         type="button"
-        className="absolute inset-0 z-0 bg-slate-950/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
         aria-label="Fermer"
         onClick={onClose}
       />
-      <div className="relative z-[1] flex w-full max-w-2xl min-h-0 items-center justify-center pointer-events-none">
+      <div className="relative z-10 flex w-full max-w-2xl min-h-0 items-center justify-center">
         {children}
       </div>
     </div>

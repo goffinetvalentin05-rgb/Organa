@@ -61,6 +61,7 @@ export default function RootLayout({
             },
           }}
         />
+        <div id="obillz-portal-root" className="fixed inset-0 z-[9999] pointer-events-none" />
       </body>
     </html>
   );
