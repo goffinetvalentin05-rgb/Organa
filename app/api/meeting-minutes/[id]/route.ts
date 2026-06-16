@@ -13,7 +13,7 @@ import {
 export const runtime = "nodejs";
 
 const SELECT_FIELDS =
-  "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_by, created_at, updated_at";
+  "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, points, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_by, created_at, updated_at";
 
 async function readId(params: Promise<{ id: string }> | { id: string }): Promise<string> {
   const resolved = await Promise.resolve(params);
@@ -114,14 +114,7 @@ export async function PATCH(
       attendees: body?.attendees !== undefined ? body.attendees : current.attendees,
       excused: body?.excused !== undefined ? body.excused : current.excused,
       absent: body?.absent !== undefined ? body.absent : current.absent,
-      agendaItems:
-        body?.agendaItems !== undefined ? body.agendaItems : current.agendaItems,
-      discussionPoints:
-        body?.discussionPoints !== undefined
-          ? body.discussionPoints
-          : current.discussionPoints,
-      decisions: body?.decisions !== undefined ? body.decisions : current.decisions,
-      tasks: body?.tasks !== undefined ? body.tasks : current.tasks,
+      points: body?.points !== undefined ? body.points : current.points,
       miscellaneous:
         body?.miscellaneous !== undefined ? body.miscellaneous : current.miscellaneous,
       nextMeeting:

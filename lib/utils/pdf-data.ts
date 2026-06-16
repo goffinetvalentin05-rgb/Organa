@@ -326,7 +326,7 @@ export async function getMeetingMinutesPdfData(
   const { data: row, error } = await supabase
     .from("meeting_minutes")
     .select(
-      "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_at, updated_at"
+      "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, points, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_at, updated_at"
     )
     .eq("id", minuteId)
     .eq("club_id", scopeUserId)
@@ -359,10 +359,7 @@ export async function getMeetingMinutesPdfData(
       attendees: minute.attendees,
       excused: minute.excused,
       absent: minute.absent,
-      agendaItems: minute.agendaItems,
-      discussionPoints: minute.discussionPoints,
-      decisions: minute.decisions,
-      tasks: minute.tasks,
+      points: minute.points,
       miscellaneous: minute.miscellaneous,
       nextMeeting: minute.nextMeeting,
       generatedAt,

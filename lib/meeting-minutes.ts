@@ -22,19 +22,18 @@ export type ParticipantEntry = {
   name: string;
 };
 
-export type AgendaItem = {
-  text: string;
-};
-
-export type DecisionEntry = {
-  text: string;
-};
-
 export type TaskEntry = {
   description: string;
   responsible: string;
   deadline: string;
   status: TaskStatus;
+};
+
+export type MeetingPoint = {
+  title: string;
+  discussion: string;
+  decisions: string[];
+  tasks: TaskEntry[];
 };
 
 export type MeetingMinutesPayload = {
@@ -50,16 +49,17 @@ export type MeetingMinutesPayload = {
   attendees: ParticipantEntry[];
   excused: ParticipantEntry[];
   absent: ParticipantEntry[];
-  agendaItems: AgendaItem[];
-  discussionPoints: string;
-  decisions: DecisionEntry[];
-  tasks: TaskEntry[];
+  points: MeetingPoint[];
   miscellaneous: string;
   nextMeeting: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+export function createEmptyMeetingPoint(): MeetingPoint {
+  return { title: "", discussion: "", decisions: [], tasks: [] };
 }
 
 function normalizeParticipantEntry(raw: unknown): ParticipantEntry | null {
@@ -80,28 +80,6 @@ function normalizeParticipants(input: unknown): ParticipantEntry[] {
     .filter((p): p is ParticipantEntry => p != null);
 }
 
-function normalizeAgendaItems(input: unknown): AgendaItem[] {
-  if (!Array.isArray(input)) return [];
-  return input
-    .map((raw) => {
-      if (!isRecord(raw)) return null;
-      const text = typeof raw.text === "string" ? raw.text.trim() : "";
-      return text ? { text } : null;
-    })
-    .filter((item): item is AgendaItem => item != null);
-}
-
-function normalizeDecisions(input: unknown): DecisionEntry[] {
-  if (!Array.isArray(input)) return [];
-  return input
-    .map((raw) => {
-      if (!isRecord(raw)) return null;
-      const text = typeof raw.text === "string" ? raw.text.trim() : "";
-      return text ? { text } : null;
-    })
-    .filter((item): item is DecisionEntry => item != null);
-}
-
 function normalizeTaskStatus(raw: unknown): TaskStatus {
   if (raw === "in_progress" || raw === "done") return raw;
   return "todo";
@@ -115,15 +93,104 @@ function normalizeTasks(input: unknown): TaskEntry[] {
       const description =
         typeof raw.description === "string" ? raw.description.trim() : "";
       if (!description) return null;
+      const deadlineRaw =
+        typeof raw.deadline === "string"
+          ? raw.deadline
+          : typeof raw.dueDate === "string"
+            ? raw.dueDate
+            : "";
       return {
         description,
         responsible:
           typeof raw.responsible === "string" ? raw.responsible.trim() : "",
-        deadline: typeof raw.deadline === "string" ? raw.deadline.trim() : "",
+        deadline: deadlineRaw.trim(),
         status: normalizeTaskStatus(raw.status),
       };
     })
     .filter((item): item is TaskEntry => item != null);
+}
+
+function normalizeDecisionText(raw: unknown): string | null {
+  if (typeof raw === "string") {
+    const text = raw.trim();
+    return text || null;
+  }
+  if (isRecord(raw) && typeof raw.text === "string") {
+    const text = raw.text.trim();
+    return text || null;
+  }
+  return null;
+}
+
+function normalizeDecisionsList(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map(normalizeDecisionText)
+    .filter((text): text is string => text != null);
+}
+
+export function normalizeMeetingPoints(input: unknown): MeetingPoint[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((raw) => {
+      if (!isRecord(raw)) return null;
+      const title = typeof raw.title === "string" ? raw.title.trim() : "";
+      const discussion =
+        typeof raw.discussion === "string" ? raw.discussion : "";
+      const decisions = normalizeDecisionsList(raw.decisions);
+      const tasks = normalizeTasks(raw.tasks);
+      if (!title && !discussion.trim() && decisions.length === 0 && tasks.length === 0) {
+        return null;
+      }
+      return { title, discussion, decisions, tasks };
+    })
+    .filter((item): item is MeetingPoint => item != null);
+}
+
+/** Compatibilité : anciens champs agenda_items, discussion_points, decisions, tasks */
+export function migrateLegacyToPoints(row: Record<string, unknown>): MeetingPoint[] {
+  const fromPoints = normalizeMeetingPoints(row.points);
+  if (fromPoints.length > 0) return fromPoints;
+
+  const agendaItems = Array.isArray(row.agenda_items)
+    ? row.agenda_items
+        .map((raw) => {
+          if (!isRecord(raw)) return null;
+          const text = typeof raw.text === "string" ? raw.text.trim() : "";
+          return text || null;
+        })
+        .filter((t): t is string => t != null)
+    : [];
+
+  const discussion = String(row.discussion_points ?? "").trim();
+  const legacyDecisions = normalizeDecisionsList(row.decisions);
+  const legacyTasks = normalizeTasks(row.tasks);
+
+  const hasLegacy =
+    agendaItems.length > 0 ||
+    discussion ||
+    legacyDecisions.length > 0 ||
+    legacyTasks.length > 0;
+
+  if (!hasLegacy) return [createEmptyMeetingPoint()];
+
+  if (agendaItems.length === 0) {
+    return [
+      {
+        title: "",
+        discussion,
+        decisions: legacyDecisions,
+        tasks: legacyTasks,
+      },
+    ];
+  }
+
+  return agendaItems.map((agendaTitle, index) => ({
+    title: agendaTitle,
+    discussion: index === 0 ? discussion : "",
+    decisions: index === 0 ? legacyDecisions : [],
+    tasks: index === 0 ? legacyTasks : [],
+  }));
 }
 
 export function normalizeMeetingType(raw: unknown): MeetingType | null {
@@ -162,6 +229,8 @@ export function parseMeetingMinutesBody(body: unknown): {
   const meetingType = normalizeMeetingType(body.meetingType) ?? "other";
   const status = normalizeMeetingStatus(body.status) ?? "draft";
 
+  const points = normalizeMeetingPoints(body.points);
+
   return {
     payload: {
       title,
@@ -180,11 +249,7 @@ export function parseMeetingMinutesBody(body: unknown): {
       attendees: normalizeParticipants(body.attendees),
       excused: normalizeParticipants(body.excused),
       absent: normalizeParticipants(body.absent),
-      agendaItems: normalizeAgendaItems(body.agendaItems),
-      discussionPoints:
-        typeof body.discussionPoints === "string" ? body.discussionPoints : "",
-      decisions: normalizeDecisions(body.decisions),
-      tasks: normalizeTasks(body.tasks),
+      points: points.length > 0 ? points : [createEmptyMeetingPoint()],
       miscellaneous:
         typeof body.miscellaneous === "string" ? body.miscellaneous : "",
       nextMeeting: typeof body.nextMeeting === "string" ? body.nextMeeting : "",
@@ -210,10 +275,7 @@ export function mapMeetingMinutesRow(row: Record<string, unknown> | null) {
     attendees: normalizeParticipants(row.attendees),
     excused: normalizeParticipants(row.excused),
     absent: normalizeParticipants(row.absent),
-    agendaItems: normalizeAgendaItems(row.agenda_items),
-    discussionPoints: String(row.discussion_points ?? ""),
-    decisions: normalizeDecisions(row.decisions),
-    tasks: normalizeTasks(row.tasks),
+    points: migrateLegacyToPoints(row),
     miscellaneous: String(row.miscellaneous ?? ""),
     nextMeeting: String(row.next_meeting ?? ""),
     createdBy: (row.created_by as string | null) ?? null,
@@ -225,6 +287,7 @@ export function mapMeetingMinutesRow(row: Record<string, unknown> | null) {
 export function meetingMinutesToDbPayload(
   payload: MeetingMinutesPayload
 ): Record<string, unknown> {
+  const points = normalizeMeetingPoints(payload.points);
   return {
     title: payload.title,
     meeting_date: payload.meetingDate,
@@ -238,10 +301,11 @@ export function meetingMinutesToDbPayload(
     attendees: payload.attendees,
     excused: payload.excused,
     absent: payload.absent,
-    agenda_items: payload.agendaItems,
-    discussion_points: payload.discussionPoints,
-    decisions: payload.decisions,
-    tasks: payload.tasks,
+    points: points.length > 0 ? points : [createEmptyMeetingPoint()],
+    agenda_items: [],
+    discussion_points: "",
+    decisions: [],
+    tasks: [],
     miscellaneous: payload.miscellaneous,
     next_meeting: payload.nextMeeting,
   };

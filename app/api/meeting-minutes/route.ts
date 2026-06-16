@@ -11,7 +11,7 @@ import {
 export const runtime = "nodejs";
 
 const SELECT_FIELDS =
-  "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_by, created_at, updated_at";
+  "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, points, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_by, created_at, updated_at";
 
 export async function GET() {
   try {

@@ -223,75 +223,95 @@ export default function PvSeanceDetailPage() {
         </dl>
       </SectionCard>
 
-      <SectionCard title={t("dashboard.meetingMinutes.form.content")} icon={ClipboardList}>
+      <SectionCard title={t("dashboard.meetingMinutes.form.pvPoints")} icon={ClipboardList}>
+        <div className="space-y-8 text-sm text-white/90">
+          {minute.points.filter(
+            (p) =>
+              p.title.trim() ||
+              p.discussion.trim() ||
+              p.decisions.length > 0 ||
+              p.tasks.length > 0
+          ).length === 0 ? (
+            <p className="text-white/50">—</p>
+          ) : (
+            minute.points.map((point, pointIndex) => {
+              const hasContent =
+                point.title.trim() ||
+                point.discussion.trim() ||
+                point.decisions.length > 0 ||
+                point.tasks.length > 0;
+              if (!hasContent) return null;
+
+              return (
+                <div
+                  key={pointIndex}
+                  className="space-y-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:p-5"
+                >
+                  <h3 className="text-base font-bold text-white">
+                    {t("dashboard.meetingMinutes.form.pointLabel", { n: pointIndex + 1 })}
+                    {point.title.trim() ? ` — ${point.title}` : ""}
+                  </h3>
+
+                  <div>
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
+                      {t("dashboard.meetingMinutes.form.discussion")}
+                    </h4>
+                    <p className="whitespace-pre-wrap">{point.discussion.trim() || "—"}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-white/50">
+                      {t("dashboard.meetingMinutes.form.decisions")}
+                    </h4>
+                    {point.decisions.length ? (
+                      <ul className="list-disc space-y-1 pl-5">
+                        {point.decisions.map((decision, i) => (
+                          <li key={i}>{decision}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-white/50">—</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
+                      {t("dashboard.meetingMinutes.form.tasks")}
+                    </h4>
+                    {point.tasks.length ? (
+                      <div className="space-y-3">
+                        {point.tasks.map((task, i) => (
+                          <div
+                            key={i}
+                            className="rounded-lg border border-white/10 bg-white/[0.03] p-3"
+                          >
+                            <p className="font-medium text-white">{task.description}</p>
+                            <p className="mt-1 text-sm text-white/70">
+                              {t("dashboard.meetingMinutes.form.taskResponsible")} :{" "}
+                              {task.responsible || "—"}
+                              {" · "}
+                              {t("dashboard.meetingMinutes.form.taskDeadline")} :{" "}
+                              {task.deadline ? formatDate(task.deadline) : "—"}
+                              {" · "}
+                              {t("dashboard.meetingMinutes.form.taskStatus")} :{" "}
+                              {t(`dashboard.meetingMinutes.taskStatus.${task.status}`)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-white/50">—</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard title={t("dashboard.meetingMinutes.form.closing")} icon={ClipboardList}>
         <div className="space-y-6 text-sm text-white/90">
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("dashboard.meetingMinutes.form.agenda")}
-            </h3>
-            {minute.agendaItems.length ? (
-              <ol className="list-decimal space-y-1 pl-5">
-                {minute.agendaItems.map((item, i) => (
-                  <li key={i}>{item.text}</li>
-                ))}
-              </ol>
-            ) : (
-              <p className="text-white/50">—</p>
-            )}
-          </div>
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("dashboard.meetingMinutes.form.discussion")}
-            </h3>
-            <p className="whitespace-pre-wrap">{minute.discussionPoints.trim() || "—"}</p>
-          </div>
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("dashboard.meetingMinutes.form.decisions")}
-            </h3>
-            {minute.decisions.length ? (
-              <ul className="list-disc space-y-1 pl-5">
-                {minute.decisions.map((item, i) => (
-                  <li key={i}>{item.text}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-white/50">—</p>
-            )}
-          </div>
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
-              {t("dashboard.meetingMinutes.form.tasks")}
-            </h3>
-            {minute.tasks.length ? (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[480px] text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-xs uppercase text-white/50">
-                      <th className="py-2 pr-3">{t("dashboard.meetingMinutes.form.taskDescription")}</th>
-                      <th className="py-2 pr-3">{t("dashboard.meetingMinutes.form.taskResponsible")}</th>
-                      <th className="py-2 pr-3">{t("dashboard.meetingMinutes.form.taskDeadline")}</th>
-                      <th className="py-2">{t("dashboard.meetingMinutes.form.taskStatus")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {minute.tasks.map((task, i) => (
-                      <tr key={i} className="border-b border-white/5">
-                        <td className="py-2 pr-3">{task.description}</td>
-                        <td className="py-2 pr-3">{task.responsible || "—"}</td>
-                        <td className="py-2 pr-3">
-                          {task.deadline ? formatDate(task.deadline) : "—"}
-                        </td>
-                        <td className="py-2">{t(`dashboard.meetingMinutes.taskStatus.${task.status}`)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-white/50">—</p>
-            )}
-          </div>
           <div>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">
               {t("dashboard.meetingMinutes.form.miscellaneous")}

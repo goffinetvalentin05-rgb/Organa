@@ -10,20 +10,24 @@ import {
   dashboardSelectClass,
   dashboardLabelClass,
   dashboardHintClass,
+  dashboardInnerPanelClass,
 } from "@/components/ui";
 import { FileText, Users, Plus, Trash, ClipboardList } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import type {
-  AgendaItem,
-  DecisionEntry,
   MeetingMinutesPayload,
+  MeetingPoint,
   MeetingStatus,
   MeetingType,
   ParticipantEntry,
   TaskEntry,
   TaskStatus,
 } from "@/lib/meeting-minutes";
-import { MEETING_TYPES, TASK_STATUSES } from "@/lib/meeting-minutes";
+import {
+  MEETING_TYPES,
+  TASK_STATUSES,
+  createEmptyMeetingPoint,
+} from "@/lib/meeting-minutes";
 
 export type MeetingMinutesFormValues = {
   title: string;
@@ -38,10 +42,7 @@ export type MeetingMinutesFormValues = {
   attendees: ParticipantEntry[];
   excused: ParticipantEntry[];
   absent: ParticipantEntry[];
-  agendaItems: AgendaItem[];
-  discussionPoints: string;
-  decisions: DecisionEntry[];
-  tasks: TaskEntry[];
+  points: MeetingPoint[];
   miscellaneous: string;
   nextMeeting: string;
 };
@@ -59,10 +60,7 @@ const defaultForm: MeetingMinutesFormValues = {
   attendees: [],
   excused: [],
   absent: [],
-  agendaItems: [{ text: "" }],
-  discussionPoints: "",
-  decisions: [{ text: "" }],
-  tasks: [],
+  points: [createEmptyMeetingPoint()],
   miscellaneous: "",
   nextMeeting: "",
 };
@@ -271,13 +269,41 @@ export default function MeetingMinutesForm({
     attendees: values.attendees,
     excused: values.excused,
     absent: values.absent,
-    agendaItems: values.agendaItems.filter((a) => a.text.trim()),
-    discussionPoints: values.discussionPoints,
-    decisions: values.decisions.filter((d) => d.text.trim()),
-    tasks: values.tasks.filter((task) => task.description.trim()),
+    points: values.points
+      .map((point) => ({
+        title: point.title.trim(),
+        discussion: point.discussion,
+        decisions: point.decisions.map((d) => d.trim()).filter(Boolean),
+        tasks: point.tasks.filter((task) => task.description.trim()),
+      }))
+      .filter(
+        (point) =>
+          point.title ||
+          point.discussion.trim() ||
+          point.decisions.length > 0 ||
+          point.tasks.length > 0
+      ),
     miscellaneous: values.miscellaneous,
     nextMeeting: values.nextMeeting,
   });
+
+  const updatePoint = (index: number, patch: Partial<MeetingPoint>) => {
+    setValues((prev) => {
+      const next = [...prev.points];
+      next[index] = { ...next[index], ...patch };
+      return { ...prev, points: next };
+    });
+  };
+
+  const removePoint = (index: number) => {
+    setValues((prev) => ({
+      ...prev,
+      points:
+        prev.points.length > 1
+          ? prev.points.filter((_, i) => i !== index)
+          : [createEmptyMeetingPoint()],
+    }));
+  };
 
   const handleSave = async (status: MeetingStatus) => {
     if (!values.title.trim()) {
@@ -476,215 +502,235 @@ export default function MeetingMinutesForm({
         </div>
       </SectionCard>
 
-      <SectionCard title={t("dashboard.meetingMinutes.form.content")} icon={ClipboardList}>
-        <div className="space-y-6">
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <span className={dashboardLabelClass}>{t("dashboard.meetingMinutes.form.agenda")}</span>
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  setField("agendaItems", [...values.agendaItems, { text: "" }])
-                }
-              >
-                <Plus className="h-4 w-4" />
-                {t("dashboard.meetingMinutes.form.addPoint")}
-              </ActionButton>
-            </div>
-            <div className="space-y-2">
-              {values.agendaItems.map((item, i) => (
-                <div key={`agenda-${i}`} className="flex gap-2">
-                  <span className="mt-2.5 w-6 shrink-0 text-sm text-white/50">{i + 1}.</span>
-                  <input
-                    className={dashboardInputClass}
-                    value={item.text}
-                    onChange={(e) => {
-                      const next = [...values.agendaItems];
-                      next[i] = { text: e.target.value };
-                      setField("agendaItems", next);
-                    }}
-                    placeholder={t("dashboard.meetingMinutes.form.agendaPlaceholder")}
-                  />
-                  {values.agendaItems.length > 1 ? (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setField(
-                          "agendaItems",
-                          values.agendaItems.filter((_, j) => j !== i)
-                        )
-                      }
-                      className="mt-1 rounded-lg p-2 text-red-300 hover:bg-red-500/10"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <label className="block">
-            <span className={dashboardLabelClass}>{t("dashboard.meetingMinutes.form.discussion")}</span>
-            <textarea
-              className={`${dashboardInputClass} min-h-[120px]`}
-              value={values.discussionPoints}
-              onChange={(e) => setField("discussionPoints", e.target.value)}
-            />
-          </label>
-
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <span className={dashboardLabelClass}>{t("dashboard.meetingMinutes.form.decisions")}</span>
-              <ActionButton
-                type="button"
-                onClick={() => setField("decisions", [...values.decisions, { text: "" }])}
-              >
-                <Plus className="h-4 w-4" />
-                {t("dashboard.meetingMinutes.form.addDecision")}
-              </ActionButton>
-            </div>
-            <div className="space-y-2">
-              {values.decisions.map((item, i) => (
-                <div key={`decision-${i}`} className="flex gap-2">
-                  <input
-                    className={dashboardInputClass}
-                    value={item.text}
-                    onChange={(e) => {
-                      const next = [...values.decisions];
-                      next[i] = { text: e.target.value };
-                      setField("decisions", next);
-                    }}
-                    placeholder={t("dashboard.meetingMinutes.form.decisionPlaceholder")}
-                  />
-                  {values.decisions.length > 1 ? (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setField(
-                          "decisions",
-                          values.decisions.filter((_, j) => j !== i)
-                        )
-                      }
-                      className="rounded-lg p-2 text-red-300 hover:bg-red-500/10"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <span className={dashboardLabelClass}>{t("dashboard.meetingMinutes.form.tasks")}</span>
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  setField("tasks", [
-                    ...values.tasks,
-                    { description: "", responsible: "", deadline: "", status: "todo" },
-                  ])
-                }
-              >
-                <Plus className="h-4 w-4" />
-                {t("dashboard.meetingMinutes.form.addTask")}
-              </ActionButton>
-            </div>
-            {values.tasks.length === 0 ? (
-              <p className={dashboardHintClass}>{t("dashboard.meetingMinutes.form.noTasks")}</p>
-            ) : (
-              <div className="space-y-3">
-                {values.tasks.map((task, i) => (
-                  <div
-                    key={`task-${i}`}
-                    className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:grid-cols-2"
+      <SectionCard
+        title={t("dashboard.meetingMinutes.form.pvPoints")}
+        icon={ClipboardList}
+        headerRight={
+          <ActionButton
+            type="button"
+            onClick={() =>
+              setField("points", [...values.points, createEmptyMeetingPoint()])
+            }
+          >
+            <Plus className="h-4 w-4" />
+            {t("dashboard.meetingMinutes.form.addPoint")}
+          </ActionButton>
+        }
+      >
+        <div className="space-y-5">
+          {values.points.map((point, pointIndex) => (
+            <div key={`point-${pointIndex}`} className={`${dashboardInnerPanelClass} space-y-4 p-4 sm:p-5`}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-white">
+                  {t("dashboard.meetingMinutes.form.pointLabel", { n: pointIndex + 1 })}
+                </h3>
+                {values.points.length > 1 ? (
+                  <ActionButton
+                    type="button"
+                    variant="dangerSoft"
+                    onClick={() => removePoint(pointIndex)}
                   >
-                    <label className="block sm:col-span-2">
-                      <span className={dashboardLabelClass}>
-                        {t("dashboard.meetingMinutes.form.taskDescription")}
-                      </span>
-                      <input
-                        className={dashboardInputClass}
-                        value={task.description}
-                        onChange={(e) => {
-                          const next = [...values.tasks];
-                          next[i] = { ...task, description: e.target.value };
-                          setField("tasks", next);
-                        }}
-                      />
-                    </label>
-                    <label className="block">
-                      <span className={dashboardLabelClass}>
-                        {t("dashboard.meetingMinutes.form.taskResponsible")}
-                      </span>
-                      <input
-                        className={dashboardInputClass}
-                        value={task.responsible}
-                        onChange={(e) => {
-                          const next = [...values.tasks];
-                          next[i] = { ...task, responsible: e.target.value };
-                          setField("tasks", next);
-                        }}
-                      />
-                    </label>
-                    <label className="block">
-                      <span className={dashboardLabelClass}>
-                        {t("dashboard.meetingMinutes.form.taskDeadline")}
-                      </span>
-                      <input
-                        type="date"
-                        className={dashboardInputClass}
-                        value={task.deadline}
-                        onChange={(e) => {
-                          const next = [...values.tasks];
-                          next[i] = { ...task, deadline: e.target.value };
-                          setField("tasks", next);
-                        }}
-                      />
-                    </label>
-                    <label className="block sm:col-span-2">
-                      <span className={dashboardLabelClass}>
-                        {t("dashboard.meetingMinutes.form.taskStatus")}
-                      </span>
-                      <select
-                        className={dashboardSelectClass}
-                        value={task.status}
-                        onChange={(e) => {
-                          const next = [...values.tasks];
-                          next[i] = { ...task, status: e.target.value as TaskStatus };
-                          setField("tasks", next);
-                        }}
-                      >
-                        {TASK_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {t(`dashboard.meetingMinutes.taskStatus.${s}`)}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <div className="sm:col-span-2">
-                      <ActionButton
-                        type="button"
-                        variant="dangerSoft"
-                        onClick={() =>
-                          setField(
-                            "tasks",
-                            values.tasks.filter((_, j) => j !== i)
-                          )
-                        }
-                      >
-                        <Trash className="h-4 w-4" />
-                        {t("dashboard.common.delete")}
-                      </ActionButton>
-                    </div>
-                  </div>
-                ))}
+                    <Trash className="h-4 w-4" />
+                    {t("dashboard.meetingMinutes.form.removePoint")}
+                  </ActionButton>
+                ) : null}
               </div>
-            )}
-          </div>
 
+              <label className="block">
+                <span className={dashboardLabelClass}>
+                  {t("dashboard.meetingMinutes.form.pointTitle")}
+                </span>
+                <input
+                  className={dashboardInputClass}
+                  value={point.title}
+                  onChange={(e) => updatePoint(pointIndex, { title: e.target.value })}
+                  placeholder={t("dashboard.meetingMinutes.form.pointTitlePlaceholder")}
+                />
+              </label>
+
+              <label className="block">
+                <span className={dashboardLabelClass}>
+                  {t("dashboard.meetingMinutes.form.discussion")}
+                </span>
+                <textarea
+                  className={`${dashboardInputClass} min-h-[120px]`}
+                  value={point.discussion}
+                  onChange={(e) => updatePoint(pointIndex, { discussion: e.target.value })}
+                  placeholder={t("dashboard.meetingMinutes.form.discussionPlaceholder")}
+                />
+              </label>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <span className={dashboardLabelClass}>
+                    {t("dashboard.meetingMinutes.form.decisions")}
+                  </span>
+                  <ActionButton
+                    type="button"
+                    onClick={() =>
+                      updatePoint(pointIndex, {
+                        decisions: [...point.decisions, ""],
+                      })
+                    }
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t("dashboard.meetingMinutes.form.addDecision")}
+                  </ActionButton>
+                </div>
+                {point.decisions.length === 0 ? (
+                  <p className={dashboardHintClass}>{t("dashboard.meetingMinutes.form.noDecisions")}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {point.decisions.map((decision, decisionIndex) => (
+                      <div key={`decision-${decisionIndex}`} className="flex gap-2">
+                        <input
+                          className={dashboardInputClass}
+                          value={decision}
+                          onChange={(e) => {
+                            const next = [...point.decisions];
+                            next[decisionIndex] = e.target.value;
+                            updatePoint(pointIndex, { decisions: next });
+                          }}
+                          placeholder={t("dashboard.meetingMinutes.form.decisionPlaceholder")}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updatePoint(pointIndex, {
+                              decisions: point.decisions.filter((_, j) => j !== decisionIndex),
+                            })
+                          }
+                          className="rounded-lg p-2 text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <span className={dashboardLabelClass}>
+                    {t("dashboard.meetingMinutes.form.tasks")}
+                  </span>
+                  <ActionButton
+                    type="button"
+                    onClick={() =>
+                      updatePoint(pointIndex, {
+                        tasks: [
+                          ...point.tasks,
+                          { description: "", responsible: "", deadline: "", status: "todo" },
+                        ],
+                      })
+                    }
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t("dashboard.meetingMinutes.form.addTask")}
+                  </ActionButton>
+                </div>
+                {point.tasks.length === 0 ? (
+                  <p className={dashboardHintClass}>{t("dashboard.meetingMinutes.form.noTasks")}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {point.tasks.map((task, taskIndex) => (
+                      <div
+                        key={`task-${taskIndex}`}
+                        className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2"
+                      >
+                        <label className="block sm:col-span-2">
+                          <span className={dashboardLabelClass}>
+                            {t("dashboard.meetingMinutes.form.taskDescription")}
+                          </span>
+                          <input
+                            className={dashboardInputClass}
+                            value={task.description}
+                            onChange={(e) => {
+                              const next = [...point.tasks];
+                              next[taskIndex] = { ...task, description: e.target.value };
+                              updatePoint(pointIndex, { tasks: next });
+                            }}
+                          />
+                        </label>
+                        <label className="block">
+                          <span className={dashboardLabelClass}>
+                            {t("dashboard.meetingMinutes.form.taskResponsible")}
+                          </span>
+                          <input
+                            className={dashboardInputClass}
+                            value={task.responsible}
+                            onChange={(e) => {
+                              const next = [...point.tasks];
+                              next[taskIndex] = { ...task, responsible: e.target.value };
+                              updatePoint(pointIndex, { tasks: next });
+                            }}
+                          />
+                        </label>
+                        <label className="block">
+                          <span className={dashboardLabelClass}>
+                            {t("dashboard.meetingMinutes.form.taskDeadline")}
+                          </span>
+                          <input
+                            type="date"
+                            className={dashboardInputClass}
+                            value={task.deadline}
+                            onChange={(e) => {
+                              const next = [...point.tasks];
+                              next[taskIndex] = { ...task, deadline: e.target.value };
+                              updatePoint(pointIndex, { tasks: next });
+                            }}
+                          />
+                        </label>
+                        <label className="block sm:col-span-2">
+                          <span className={dashboardLabelClass}>
+                            {t("dashboard.meetingMinutes.form.taskStatus")}
+                          </span>
+                          <select
+                            className={dashboardSelectClass}
+                            value={task.status}
+                            onChange={(e) => {
+                              const next = [...point.tasks];
+                              next[taskIndex] = {
+                                ...task,
+                                status: e.target.value as TaskStatus,
+                              };
+                              updatePoint(pointIndex, { tasks: next });
+                            }}
+                          >
+                            {TASK_STATUSES.map((s) => (
+                              <option key={s} value={s}>
+                                {t(`dashboard.meetingMinutes.taskStatus.${s}`)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <div className="sm:col-span-2">
+                          <ActionButton
+                            type="button"
+                            variant="dangerSoft"
+                            onClick={() =>
+                              updatePoint(pointIndex, {
+                                tasks: point.tasks.filter((_, j) => j !== taskIndex),
+                              })
+                            }
+                          >
+                            <Trash className="h-4 w-4" />
+                            {t("dashboard.common.delete")}
+                          </ActionButton>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title={t("dashboard.meetingMinutes.form.closing")} icon={FileText}>
+        <div className="space-y-6">
           <label className="block">
             <span className={dashboardLabelClass}>{t("dashboard.meetingMinutes.form.miscellaneous")}</span>
             <textarea

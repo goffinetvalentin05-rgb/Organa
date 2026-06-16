@@ -6,8 +6,7 @@ import {
   pdfHyphenationCallback,
 } from "@/lib/pdf/clubPdfLayout";
 import type {
-  AgendaItem,
-  DecisionEntry,
+  MeetingPoint,
   MeetingStatus,
   MeetingType,
   ParticipantEntry,
@@ -45,10 +44,7 @@ export type MeetingMinutesPdfProps = {
     attendees: ParticipantEntry[];
     excused: ParticipantEntry[];
     absent: ParticipantEntry[];
-    agendaItems: AgendaItem[];
-    discussionPoints: string;
-    decisions: DecisionEntry[];
-    tasks: TaskEntry[];
+    points: MeetingPoint[];
     miscellaneous: string;
     nextMeeting: string;
     generatedAt: string;
@@ -69,11 +65,10 @@ const L = {
     attendees: "Présents",
     excused: "Excusés",
     absent: "Absents",
-    agenda: "Ordre du jour",
-    discussion: "Points discutés",
-    decisions: "Décisions prises",
-    tasks: "Tâches à faire",
-    taskDescription: "Tâche",
+    point: "Point",
+    discussion: "Discussion",
+    decisions: "Décisions",
+    tasks: "Tâches",
     taskResponsible: "Responsable",
     taskDeadline: "Délai",
     taskStatus: "Statut",
@@ -95,11 +90,10 @@ const L = {
     attendees: "Present",
     excused: "Excused",
     absent: "Absent",
-    agenda: "Agenda",
-    discussion: "Discussion points",
+    point: "Item",
+    discussion: "Discussion",
     decisions: "Decisions",
     tasks: "Action items",
-    taskDescription: "Task",
     taskResponsible: "Owner",
     taskDeadline: "Deadline",
     taskStatus: "Status",
@@ -121,11 +115,10 @@ const L = {
     attendees: "Anwesend",
     excused: "Entschuldigt",
     absent: "Abwesend",
-    agenda: "Tagesordnung",
-    discussion: "Besprochene Punkte",
+    point: "Punkt",
+    discussion: "Besprechung",
     decisions: "Beschlüsse",
     tasks: "Aufgaben",
-    taskDescription: "Aufgabe",
     taskResponsible: "Verantwortlich",
     taskDeadline: "Frist",
     taskStatus: "Status",
@@ -172,12 +165,10 @@ function TextSection({ title, content, none }: { title: string; content: string;
 function ParticipantBlock({
   title,
   list,
-  none,
   noItems,
 }: {
   title: string;
   list: ParticipantEntry[];
-  none: string;
   noItems: string;
 }) {
   const names = participantNames(list);
@@ -193,10 +184,108 @@ function ParticipantBlock({
   );
 }
 
+function PointTasksBlock({
+  tasks,
+  labels,
+  locale,
+}: {
+  tasks: TaskEntry[];
+  labels: (typeof L)[MeetingMinutesPdfLocale];
+  locale: MeetingMinutesPdfLocale;
+}) {
+  if (!tasks.length) {
+    return (
+      <Text style={[styles.contractBodyText, { marginTop: 4 }]}>{labels.noItems}</Text>
+    );
+  }
+
+  return (
+    <View style={{ marginTop: 4 }}>
+      {tasks.map((task, i) => (
+        <View key={`task-${i}`} style={{ marginBottom: 8 }}>
+          <Text style={styles.contractBodyText} hyphenationCallback={pdfHyphenationCallback}>
+            • {task.description}
+          </Text>
+          <Text style={[styles.notesText, { marginTop: 2, paddingLeft: 8 }]}>
+            {labels.taskResponsible} : {task.responsible || labels.none}
+            {"  ·  "}
+            {labels.taskDeadline} :{" "}
+            {task.deadline ? formatPdfDateLong(task.deadline) : labels.none}
+            {"  ·  "}
+            {labels.taskStatus} : {taskStatusLabel(task.status, locale)}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function MeetingPointBlock({
+  point,
+  index,
+  labels,
+  locale,
+}: {
+  point: MeetingPoint;
+  index: number;
+  labels: (typeof L)[MeetingMinutesPdfLocale];
+  locale: MeetingMinutesPdfLocale;
+}) {
+  const pointTitle = point.title.trim() || labels.none;
+  const header = `${labels.point} ${index + 1} — ${pointTitle}`;
+
+  return (
+    <View style={[styles.notesSection, { marginBottom: 16 }]} wrap={false}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "bold",
+          marginBottom: 8,
+          color: "#0F172A",
+        }}
+      >
+        {header}
+      </Text>
+
+      <SectionTitle>{labels.discussion}</SectionTitle>
+      <Text style={[styles.contractBodyText, { marginBottom: 8 }]} hyphenationCallback={pdfHyphenationCallback}>
+        {point.discussion.trim() || labels.noItems}
+      </Text>
+
+      <SectionTitle>{labels.decisions}</SectionTitle>
+      {point.decisions.length ? (
+        point.decisions.map((decision, i) => (
+          <Text
+            key={`decision-${i}`}
+            style={[styles.contractBodyText, { marginBottom: 3 }]}
+            hyphenationCallback={pdfHyphenationCallback}
+          >
+            • {decision}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.contractBodyText}>{labels.noItems}</Text>
+      )}
+
+      <View style={{ marginTop: 8 }}>
+        <SectionTitle>{labels.tasks}</SectionTitle>
+        <PointTasksBlock tasks={point.tasks} labels={labels} locale={locale} />
+      </View>
+    </View>
+  );
+}
+
 export function MeetingMinutesPdf({ company, primaryColor, minute, locale }: MeetingMinutesPdfProps) {
   const labels = L[locale];
   const accent = primaryColor || "#1A23FF";
   const timeLabel = formatTimeRange(minute.startTime, minute.endTime, labels.none);
+  const visiblePoints = minute.points.filter(
+    (p) =>
+      p.title.trim() ||
+      p.discussion.trim() ||
+      p.decisions.length > 0 ||
+      p.tasks.length > 0
+  );
 
   return (
     <Document>
@@ -256,12 +345,12 @@ export function MeetingMinutesPdf({ company, primaryColor, minute, locale }: Mee
           </Text>
 
           <View style={styles.clientSection}>
-            <View style={{ flexDirection: "row", gap: 12 }}>
-              <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 1, marginRight: 12 }}>
                 <SectionTitle>{labels.location}</SectionTitle>
                 <Text style={styles.wrapText}>{minute.location?.trim() || labels.none}</Text>
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, marginRight: 12 }}>
                 <SectionTitle>{labels.chairman}</SectionTitle>
                 <Text style={styles.wrapText}>{minute.chairman?.trim() || labels.none}</Text>
               </View>
@@ -272,100 +361,23 @@ export function MeetingMinutesPdf({ company, primaryColor, minute, locale }: Mee
             </View>
           </View>
 
-          <ParticipantBlock
-            title={labels.attendees}
-            list={minute.attendees}
-            none={labels.none}
-            noItems={labels.noItems}
-          />
-          <ParticipantBlock
-            title={labels.excused}
-            list={minute.excused}
-            none={labels.none}
-            noItems={labels.noItems}
-          />
-          <ParticipantBlock
-            title={labels.absent}
-            list={minute.absent}
-            none={labels.none}
-            noItems={labels.noItems}
-          />
+          <ParticipantBlock title={labels.attendees} list={minute.attendees} noItems={labels.noItems} />
+          <ParticipantBlock title={labels.excused} list={minute.excused} noItems={labels.noItems} />
+          <ParticipantBlock title={labels.absent} list={minute.absent} noItems={labels.noItems} />
 
-          <View style={styles.notesSection}>
-            <SectionTitle>{labels.agenda}</SectionTitle>
-            {minute.agendaItems.length ? (
-              minute.agendaItems.map((item, i) => (
-                <Text
-                  key={`agenda-${i}`}
-                  style={[styles.contractBodyText, { marginBottom: 4 }]}
-                  hyphenationCallback={pdfHyphenationCallback}
-                >
-                  {i + 1}. {item.text}
-                </Text>
-              ))
-            ) : (
-              <Text style={styles.contractBodyText}>{labels.noItems}</Text>
-            )}
-          </View>
-
-          <TextSection title={labels.discussion} content={minute.discussionPoints} none={labels.noItems} />
-
-          <View style={styles.notesSection}>
-            <SectionTitle>{labels.decisions}</SectionTitle>
-            {minute.decisions.length ? (
-              minute.decisions.map((item, i) => (
-                <Text
-                  key={`decision-${i}`}
-                  style={[styles.contractBodyText, { marginBottom: 4 }]}
-                  hyphenationCallback={pdfHyphenationCallback}
-                >
-                  • {item.text}
-                </Text>
-              ))
-            ) : (
-              <Text style={styles.contractBodyText}>{labels.noItems}</Text>
-            )}
-          </View>
-
-          <View style={styles.notesSection}>
-            <SectionTitle>{labels.tasks}</SectionTitle>
-            {minute.tasks.length ? (
-              <View style={styles.table}>
-                <View style={styles.tableHeader}>
-                  <Text style={[styles.tableHeaderCell, { width: "40%" }]}>
-                    {labels.taskDescription}
-                  </Text>
-                  <Text style={[styles.tableHeaderCell, { width: "22%" }]}>
-                    {labels.taskResponsible}
-                  </Text>
-                  <Text style={[styles.tableHeaderCell, { width: "18%" }]}>
-                    {labels.taskDeadline}
-                  </Text>
-                  <Text style={[styles.tableHeaderCell, { width: "20%", textAlign: "right" }]}>
-                    {labels.taskStatus}
-                  </Text>
-                </View>
-                {minute.tasks.map((task, i) => (
-                  <View key={`task-${i}`} style={styles.tableRow}>
-                    <Text style={[styles.tableCell, { width: "40%" }]}>{task.description}</Text>
-                    <Text style={[styles.tableCell, { width: "22%" }]}>
-                      {task.responsible || labels.none}
-                    </Text>
-                    <Text style={[styles.tableCell, { width: "18%" }]}>
-                      {task.deadline
-                        ? formatPdfDateLong(task.deadline)
-                        : labels.none}
-                    </Text>
-                    <Text style={[styles.tableCell, { width: "20%", textAlign: "right" }]}>
-                      {taskStatusLabel(task.status, locale)}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <Text style={styles.contractBodyText}>{labels.noItems}</Text>
-            )}
-          </View>
+          {visiblePoints.length ? (
+            visiblePoints.map((point, i) => (
+              <MeetingPointBlock
+                key={`point-${i}`}
+                point={point}
+                index={i}
+                labels={labels}
+                locale={locale}
+              />
+            ))
+          ) : (
+            <Text style={styles.contractBodyText}>{labels.noItems}</Text>
+          )}
 
           <TextSection title={labels.miscellaneous} content={minute.miscellaneous} none={labels.noItems} />
           <TextSection title={labels.nextMeeting} content={minute.nextMeeting} none={labels.noItems} />

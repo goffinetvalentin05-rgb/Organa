@@ -8,6 +8,7 @@ import { ArrowLeft } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { PageLayout, PageHeader, GlassCard } from "@/components/ui";
 import MeetingMinutesForm, { type MeetingMinutesFormValues } from "../../MeetingMinutesForm";
+import { createEmptyMeetingPoint } from "@/lib/meeting-minutes";
 
 export default function ModifierPvSeancePage() {
   const { t } = useI18n();
@@ -40,10 +41,7 @@ export default function ModifierPvSeancePage() {
         attendees: m.attendees || [],
         excused: m.excused || [],
         absent: m.absent || [],
-        agendaItems: m.agendaItems?.length ? m.agendaItems : [{ text: "" }],
-        discussionPoints: m.discussionPoints || "",
-        decisions: m.decisions?.length ? m.decisions : [{ text: "" }],
-        tasks: m.tasks || [],
+        points: m.points?.length ? m.points : [createEmptyMeetingPoint()],
         miscellaneous: m.miscellaneous || "",
         nextMeeting: m.nextMeeting || "",
       });
