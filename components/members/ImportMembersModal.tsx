@@ -547,6 +547,12 @@ function MappingStep({
     <div className="space-y-5">
       <p className={dashboardHintClass}>{t("dashboard.clients.import.mappingHint")}</p>
 
+      {availableFields.includes("adresse") && (
+        <p className={cn(dashboardHintClass, "rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-3")}>
+          {t("dashboard.clients.import.addressParseHint")}
+        </p>
+      )}
+
       <div className="space-y-3">
         {parsed.headers.map((header) => (
           <div
@@ -639,6 +645,8 @@ function PreviewStep({
     duplicate: t("dashboard.clients.import.status.duplicate"),
   };
 
+  const showAddress = rows.some((row) => row.adresse || row.postal_code || row.city);
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
@@ -646,6 +654,12 @@ function PreviewStep({
           {t("dashboard.clients.import.confirmBanner")}
         </p>
       </div>
+
+      {showAddress && (
+        <p className={cn(dashboardHintClass, "rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-3")}>
+          {t("dashboard.clients.import.addressParseHint")}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <SummaryCard label={t("dashboard.clients.import.summary.total")} value={summary.total} />
@@ -674,6 +688,13 @@ function PreviewStep({
               <th className="px-3 py-2">{t("dashboard.clients.import.fields.prenom")}</th>
               <th className="px-3 py-2">{t("dashboard.clients.import.fields.nom")}</th>
               <th className="px-3 py-2">Email</th>
+              {showAddress && (
+                <>
+                  <th className="px-3 py-2">{t("dashboard.clients.import.fields.adresse")}</th>
+                  <th className="px-3 py-2">{t("dashboard.clients.import.fields.postalCode")}</th>
+                  <th className="px-3 py-2">{t("dashboard.clients.import.fields.city")}</th>
+                </>
+              )}
               <th className="px-3 py-2">{t("dashboard.common.status")}</th>
             </tr>
           </thead>
@@ -686,6 +707,17 @@ function PreviewStep({
                 <td className="max-w-[140px] truncate px-3 py-2 text-white/70">
                   {row.email || "—"}
                 </td>
+                {showAddress && (
+                  <>
+                    <td className="max-w-[120px] truncate px-3 py-2 text-white/70">
+                      {row.adresse || "—"}
+                    </td>
+                    <td className="px-3 py-2 text-white/70">{row.postal_code || "—"}</td>
+                    <td className="max-w-[100px] truncate px-3 py-2 text-white/70">
+                      {row.city || "—"}
+                    </td>
+                  </>
+                )}
                 <td className={cn("px-3 py-2 text-xs font-medium", statusClass[row.status])}>
                   {statusLabel[row.status]}
                   {row.errors.length > 0 && (

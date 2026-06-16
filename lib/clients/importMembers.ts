@@ -1,4 +1,5 @@
 import type { MemberFieldKey, MemberFieldsMerged } from "@/lib/member-fields/types";
+import { mergeImportAddressFields } from "@/lib/clients/parseSwissAddress";
 import {
   isKnownCategorySlug,
   isKnownRoleSlug,
@@ -323,15 +324,21 @@ export function buildImportRows(
       else errors.push("invalid_birth_date");
     }
 
+    const mergedAddress = mergeImportAddressFields(
+      values.adresse || "",
+      values.postal_code || "",
+      values.city || ""
+    );
+
     rows.push({
       rowIndex,
       prenom,
       nom,
       email,
       telephone: values.telephone || "",
-      adresse: values.adresse || "",
-      postal_code: values.postal_code || "",
-      city: values.city || "",
+      adresse: mergedAddress.adresse,
+      postal_code: mergedAddress.postal_code,
+      city: mergedAddress.city,
       role: values.role || "",
       category: values.category || "",
       date_of_birth,

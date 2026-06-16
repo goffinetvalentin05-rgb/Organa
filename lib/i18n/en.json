@@ -1131,6 +1131,7 @@
         "uploadHint": "Accepted formats: CSV or Excel (.csv, .xlsx)",
         "downloadTemplate": "Download a CSV template",
         "mappingHint": "Map each file column to Obillz member fields. First name and last name are required.",
+        "addressParseHint": "If your file contains a full address with postal code and city, Obillz will try to split them automatically.",
         "mappingNextHint": "Next step: a summary lets you review the data and confirm the import.",
         "stepLabels": {
           "upload": "File",
@@ -1155,6 +1156,7 @@
         "fields": {
           "prenom": "First name",
           "nom": "Last name",
+          "adresse": "Address",
           "postalCode": "Postal code",
           "city": "City"
         },
