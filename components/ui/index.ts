@@ -43,6 +43,7 @@ export {
   obillzLandingGridOverlayClass,
   dashboardShellRootClass,
   dashboardGridOverlayClass,
+  documentPreviewSurfaceClass,
 } from "./styles";
 export { default as PageLayout } from "./PageLayout";
 export type { PageLayoutProps } from "./PageLayout";

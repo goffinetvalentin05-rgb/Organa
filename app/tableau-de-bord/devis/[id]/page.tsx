@@ -21,6 +21,7 @@ import {
   GlassCard,
   ActionButton,
   dashboardSelectLgClass,
+  documentPreviewSurfaceClass,
 } from "@/components/ui";
 import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
 import ClubDocumentLogo from "@/components/documents/ClubDocumentLogo";
@@ -331,7 +332,7 @@ export default function DevisDetailPage() {
         }
       />
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl shadow-blue-950/10">
+      <div className={documentPreviewSurfaceClass}>
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-4">
             <ClubDocumentLogo

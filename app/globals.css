@@ -1110,9 +1110,57 @@ h3 {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Surface blanche intentionnelle (QR codes, aperçus) */
+/* Surface blanche intentionnelle (QR codes) */
 .dashboard-shell main .qr-code-surface {
   background-color: #ffffff !important;
+}
+
+/* Aperçu cotisation / facture — carte document opaque sur fond dashboard */
+.dashboard-shell main .document-preview-surface {
+  border-radius: 1rem;
+  border-color: rgba(147, 197, 253, 0.28) !important;
+  background: linear-gradient(165deg, #0b1028 0%, #0e1638 42%, #101828 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(147, 197, 253, 0.12),
+    0 16px 48px rgba(0, 0, 0, 0.62),
+    0 0 80px rgba(26, 35, 255, 0.16) !important;
+}
+
+.dashboard-shell main .document-preview-surface .bg-slate-50 {
+  background-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+.dashboard-shell main .document-preview-surface thead.bg-slate-50 {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="border-slate"] {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.dashboard-shell main .document-preview-surface .divide-slate-200\/70 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dashboard-shell main .document-preview-surface .text-slate-900 {
+  color: rgba(255, 255, 255, 0.97) !important;
+}
+
+.dashboard-shell main .document-preview-surface .text-slate-700 {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.dashboard-shell main .document-preview-surface .text-slate-600 {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.dashboard-shell main .document-preview-surface .text-slate-500 {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.dashboard-shell main .document-preview-surface .text-slate-400,
+.dashboard-shell main .document-preview-surface thead.text-slate-500 {
+  color: rgba(255, 255, 255, 0.54) !important;
 }
 
 /* Hero — halo texte et profondeur */

@@ -179,3 +179,10 @@ export const landingIconBadgeActiveClass =
 /** Panneau intérieur (preview, sous-bloc) */
 export const landingInnerPanelClass =
   "relative overflow-hidden rounded-xl border border-blue-400/25 bg-gradient-to-br from-white/[0.14] to-[#1A23FF]/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_0_40px_rgba(26,35,255,0.15)] backdrop-blur-sm";
+
+/**
+ * Aperçu écran cotisation / facture — surface quasi pleine, détachée du fond dashboard.
+ * Styles complémentaires dans globals.css (`.document-preview-surface`).
+ */
+export const documentPreviewSurfaceClass =
+  "document-preview-surface rounded-2xl border border-blue-400/25 p-6";
