@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { X, Upload, CheckCircle, AlertCircle, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -79,6 +80,20 @@ export default function ImportMembersModal({
   const [importRows, setImportRows] = useState<ImportMemberRow[]>([]);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
 
   const availableFields = useMemo(() => getAvailableImportFields(vis), [vis]);
 
@@ -228,13 +243,18 @@ export default function ImportMembersModal({
     });
   };
 
-  if (!open) return null;
+  if (!open || !portalReady) return null;
 
-  return (
-    <ModalOverlay onClose={handleClose}>
+  return createPortal(
+    <ModalOverlay onClose={step === "success" ? handleSuccessClose : handleClose}>
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="import-members-modal-title"
         className={cn(
-          "flex max-h-[90vh] w-full max-w-2xl flex-col",
+          "relative z-[1] flex w-full min-h-0 flex-col",
+          "max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-1.5rem))]",
+          "max-w-[calc(100vw-1.5rem)] sm:max-w-2xl",
           dashboardModalClass
         )}
       >
@@ -245,7 +265,7 @@ export default function ImportMembersModal({
           subtitle={t(`dashboard.clients.import.steps.${step === "importing" ? "preview" : step}`)}
         />
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
           {step === "upload" && (
             <UploadStep
               fileError={fileError}
@@ -293,7 +313,8 @@ export default function ImportMembersModal({
           t={t}
         />
       </div>
-    </ModalOverlay>
+    </ModalOverlay>,
+    document.body
   );
 }
 
@@ -305,14 +326,16 @@ function ModalOverlay({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
         aria-label="Fermer"
         onClick={onClose}
       />
-      <div className="relative w-full">{children}</div>
+      <div className="relative flex w-full max-w-2xl items-center justify-center min-h-0">
+        {children}
+      </div>
     </div>
   );
 }
@@ -332,13 +355,15 @@ function ModalHeader({
   const stepIndex = steps.indexOf(step === "importing" ? "preview" : step);
 
   return (
-    <div className="border-b border-white/10 p-6">
+    <div className="shrink-0 border-b border-white/10 p-4 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-blue-300">
             {subtitle}
           </p>
-          <h2 className="mt-1 text-xl font-bold text-white">{title}</h2>
+          <h2 id="import-members-modal-title" className="mt-1 text-xl font-bold text-white">
+            {title}
+          </h2>
         </div>
         <button
           type="button"
@@ -680,7 +705,7 @@ function ModalFooter({
 }) {
   if (step === "upload") {
     return (
-      <div className="flex justify-end border-t border-white/10 p-4">
+      <div className="shrink-0 flex justify-end border-t border-white/10 p-3 sm:p-4">
         <button type="button" onClick={onClose} className={dashboardSecondaryButtonClass}>
           {t("dashboard.common.cancel")}
         </button>
@@ -690,7 +715,7 @@ function ModalFooter({
 
   if (step === "success") {
     return (
-      <div className="flex justify-end border-t border-white/10 p-4">
+      <div className="shrink-0 flex justify-end border-t border-white/10 p-3 sm:p-4">
         <DashboardPrimaryButton type="button" onClick={onNext} icon="none">
           {t("dashboard.clients.import.close")}
         </DashboardPrimaryButton>
@@ -699,7 +724,7 @@ function ModalFooter({
   }
 
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-white/10 p-4 sm:flex-row sm:justify-between">
+    <div className="shrink-0 flex flex-col-reverse gap-3 border-t border-white/10 p-3 sm:flex-row sm:justify-between sm:p-4">
       <button
         type="button"
         onClick={step === "preview" ? onBack : onBack}
