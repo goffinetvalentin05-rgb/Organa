@@ -116,25 +116,41 @@ export default function ClientsPage() {
     if (!vis.category.enabled) setCategoryFilter("");
   }, [vis.role.enabled, vis.category.enabled]);
 
+  const importModal = (
+    <ImportMembersModal
+      open={importOpen}
+      onClose={() => setImportOpen(false)}
+      existingMembers={clients.map((c) => ({ nom: c.nom, email: c.email }))}
+      onImported={fetchClients}
+      onSuccess={handleImportSuccess}
+    />
+  );
+
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl">
-        <div className="animate-pulse space-y-6">
-          <div className="h-10 w-1/3 rounded-xl bg-slate-200/80" />
-          <div className={cn("h-64 animate-pulse rounded-2xl bg-slate-200/50", glassCardClass)} />
+      <>
+        <div className="mx-auto max-w-7xl">
+          <div className="animate-pulse space-y-6">
+            <div className="h-10 w-1/3 rounded-xl bg-slate-200/80" />
+            <div className={cn("h-64 animate-pulse rounded-2xl bg-slate-200/50", glassCardClass)} />
+          </div>
         </div>
-      </div>
+        {importModal}
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-7xl">
-        <GlassCard className="border-red-200/90 bg-gradient-to-br from-red-50/90 to-white text-center">
-          <p className="font-medium text-red-700">{t("dashboard.clients.loadError")}</p>
-          <p className="mt-2 text-sm text-red-600/90">{error}</p>
-        </GlassCard>
-      </div>
+      <>
+        <div className="mx-auto max-w-7xl">
+          <GlassCard className="border-red-200/90 bg-gradient-to-br from-red-50/90 to-white text-center">
+            <p className="font-medium text-red-700">{t("dashboard.clients.loadError")}</p>
+            <p className="mt-2 text-sm text-red-600/90">{error}</p>
+          </GlassCard>
+        </div>
+        {importModal}
+      </>
     );
   }
 
@@ -311,13 +327,7 @@ export default function ClientsPage() {
         </div>
       )}
 
-      <ImportMembersModal
-        open={importOpen}
-        onClose={() => setImportOpen(false)}
-        existingMembers={clients.map((c) => ({ nom: c.nom, email: c.email }))}
-        onImported={fetchClients}
-        onSuccess={handleImportSuccess}
-      />
+      {importModal}
     </PageLayout>
   );
 }

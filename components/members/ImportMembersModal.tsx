@@ -80,11 +80,6 @@ export default function ImportMembersModal({
   const [importRows, setImportRows] = useState<ImportMemberRow[]>([]);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
-
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -128,13 +123,13 @@ export default function ImportMembersModal({
   }, [onClose, reset]);
 
   const handleSuccessClose = useCallback(() => {
+    reset();
     if (importResult && onSuccess) {
       onSuccess(importResult.imported, importResult.duplicates);
     } else {
-      handleClose();
+      onClose();
     }
-    reset();
-  }, [handleClose, importResult, onSuccess, reset]);
+  }, [importResult, onClose, onSuccess, reset]);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -243,7 +238,7 @@ export default function ImportMembersModal({
     });
   };
 
-  if (!open || !portalReady) return null;
+  if (!open) return null;
 
   return createPortal(
     <ModalOverlay onClose={step === "success" ? handleSuccessClose : handleClose}>
@@ -252,7 +247,7 @@ export default function ImportMembersModal({
         aria-modal="true"
         aria-labelledby="import-members-modal-title"
         className={cn(
-          "relative z-[1] flex w-full min-h-0 flex-col",
+          "pointer-events-auto relative z-[2] flex w-full min-h-0 flex-col",
           "max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-1.5rem))]",
           "max-w-[calc(100vw-1.5rem)] sm:max-w-2xl",
           dashboardModalClass
@@ -326,14 +321,17 @@ function ModalOverlay({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
+      role="presentation"
+    >
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+        className="absolute inset-0 z-0 bg-slate-950/70 backdrop-blur-sm"
         aria-label="Fermer"
         onClick={onClose}
       />
-      <div className="relative flex w-full max-w-2xl items-center justify-center min-h-0">
+      <div className="relative z-[1] flex w-full max-w-2xl min-h-0 items-center justify-center pointer-events-none">
         {children}
       </div>
     </div>
