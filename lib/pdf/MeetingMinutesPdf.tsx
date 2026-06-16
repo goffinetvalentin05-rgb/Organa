@@ -54,7 +54,7 @@ export type MeetingMinutesPdfProps = {
 
 const L = {
   fr: {
-    docTitle: "PROCÈS-VERBAL DE SÉANCE",
+    docTitleLines: ["PROCÈS-VERBAL", "DE SÉANCE"],
     date: "Date",
     time: "Horaire",
     location: "Lieu",
@@ -74,12 +74,11 @@ const L = {
     taskStatus: "Statut",
     miscellaneous: "Divers",
     nextMeeting: "Prochaine séance",
-    generated: "Document généré le",
     none: "—",
     noItems: "Aucun élément",
   },
   en: {
-    docTitle: "MEETING MINUTES",
+    docTitleLines: ["MEETING", "MINUTES"],
     date: "Date",
     time: "Time",
     location: "Location",
@@ -99,12 +98,11 @@ const L = {
     taskStatus: "Status",
     miscellaneous: "Miscellaneous",
     nextMeeting: "Next meeting",
-    generated: "Generated on",
     none: "—",
     noItems: "No items",
   },
   de: {
-    docTitle: "SITZUNGSPROTOKOLL",
+    docTitleLines: ["SITZUNGS", "PROTOKOLL"],
     date: "Datum",
     time: "Uhrzeit",
     location: "Ort",
@@ -124,7 +122,6 @@ const L = {
     taskStatus: "Status",
     miscellaneous: "Verschiedenes",
     nextMeeting: "Nächste Sitzung",
-    generated: "Erstellt am",
     none: "—",
     noItems: "Keine Einträge",
   },
@@ -148,6 +145,29 @@ function participantNames(list: ParticipantEntry[]): string {
 
 function SectionTitle({ children }: { children: string }) {
   return <Text style={styles.sectionTitle}>{children}</Text>;
+}
+
+/** Titre document — lignes explicites pour éviter les césures intempestives (ex. PROCÈS-VER-|BAL). */
+function DocumentTypeTitle({ lines, color }: { lines: readonly string[]; color: string }) {
+  return (
+    <View style={{ alignItems: "flex-end", marginBottom: 8, width: "100%" }}>
+      {lines.map((line, index) => (
+        <Text
+          key={index}
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            color,
+            textAlign: "right",
+            lineHeight: 1.2,
+          }}
+          hyphenationCallback={(word) => [word]}
+        >
+          {line}
+        </Text>
+      ))}
+    </View>
+  );
 }
 
 function TextSection({ title, content, none }: { title: string; content: string; none: string }) {
@@ -310,8 +330,8 @@ export function MeetingMinutesPdf({ company, primaryColor, minute, locale }: Mee
                 </View>
               </View>
             </View>
-            <View style={styles.documentBlock}>
-              <Text style={[styles.documentType, { color: accent }]}>{labels.docTitle}</Text>
+            <View style={[styles.documentBlock, { width: "40%" }]}>
+              <DocumentTypeTitle lines={labels.docTitleLines} color={accent} />
               <View style={styles.metaBox}>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{labels.date}</Text>
@@ -381,12 +401,6 @@ export function MeetingMinutesPdf({ company, primaryColor, minute, locale }: Mee
 
           <TextSection title={labels.miscellaneous} content={minute.miscellaneous} none={labels.noItems} />
           <TextSection title={labels.nextMeeting} content={minute.nextMeeting} none={labels.noItems} />
-        </View>
-
-        <View style={styles.footer} fixed>
-          <Text style={styles.footerText} hyphenationCallback={pdfHyphenationCallback}>
-            {labels.generated} {formatPdfDateLong(minute.generatedAt)}
-          </Text>
         </View>
       </Page>
     </Document>
