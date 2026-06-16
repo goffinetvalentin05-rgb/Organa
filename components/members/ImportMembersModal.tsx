@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import toast from "react-hot-toast";
 import { X, Upload, CheckCircle, AlertCircle } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -80,6 +80,7 @@ export default function ImportMembersModal({
   const [importRows, setImportRows] = useState<ImportMemberRow[]>([]);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -115,6 +116,7 @@ export default function ImportMembersModal({
     setImportRows([]);
     setImportResult(null);
     setDragOver(false);
+    setLoadedFileName(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -141,6 +143,7 @@ export default function ImportMembersModal({
       try {
         const data = await parseSpreadsheetFile(file);
         const mapping = guessColumnMapping(data.headers);
+        setLoadedFileName(file.name);
         setParsed(data);
         setColumnMapping(mapping);
         setStep("mapping");
@@ -161,9 +164,13 @@ export default function ImportMembersModal({
       toast.error(t("dashboard.clients.import.errors.mappingRequired"));
       return;
     }
-    const rows = buildImportRows(parsed, columnMapping, existingMembers);
-    setImportRows(rows);
-    setStep("preview");
+    try {
+      const rows = buildImportRows(parsed, columnMapping, existingMembers);
+      setImportRows(rows);
+      setStep("preview");
+    } catch {
+      toast.error(t("dashboard.clients.import.errors.importFailed"));
+    }
   }, [columnMapping, existingMembers, parsed, t]);
 
   const handleImport = useCallback(async () => {
@@ -240,7 +247,10 @@ export default function ImportMembersModal({
 
   return (
     <BodyPortal open={open}>
-      <ModalOverlay onClose={step === "success" ? handleSuccessClose : handleClose}>
+      <ModalOverlay
+        onClose={step === "success" ? handleSuccessClose : handleClose}
+        closeOnBackdrop={step === "upload"}
+      >
         <div
           role="dialog"
           aria-modal="true"
@@ -251,6 +261,8 @@ export default function ImportMembersModal({
             "max-w-[calc(100vw-1.5rem)] sm:max-w-2xl",
             dashboardModalClass
           )}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
         <ModalHeader
           step={step}
@@ -261,13 +273,22 @@ export default function ImportMembersModal({
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
-          {step === "upload" && (
+          {step === "upload" && !parsed && (
             <UploadStep
               fileError={fileError}
               dragOver={dragOver}
               onDragOver={(v) => setDragOver(v)}
               onFile={handleFile}
               onDownloadTemplate={handleDownloadTemplate}
+              t={t}
+            />
+          )}
+
+          {step === "upload" && parsed && (
+            <FileLoadedStep
+              fileName={loadedFileName}
+              rowCount={parsed.rows.length}
+              onContinue={() => setStep("mapping")}
               t={t}
             />
           )}
@@ -294,12 +315,14 @@ export default function ImportMembersModal({
         <ModalFooter
           step={step}
           summary={summary}
+          hasParsedFile={!!parsed}
           onBack={() => {
             if (step === "mapping") setStep("upload");
             else if (step === "preview") setStep("mapping");
           }}
           onNext={() => {
-            if (step === "mapping") handleMappingNext();
+            if (step === "upload" && parsed) setStep("mapping");
+            else if (step === "mapping") handleMappingNext();
             else if (step === "preview") handleImport();
             else if (step === "success") handleSuccessClose();
           }}
@@ -315,25 +338,56 @@ export default function ImportMembersModal({
 
 function ModalOverlay({
   onClose,
+  closeOnBackdrop = true,
   children,
 }: {
   onClose: () => void;
+  closeOnBackdrop?: boolean;
   children: ReactNode;
 }) {
+  const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!closeOnBackdrop) return;
+    if (event.target !== event.currentTarget) return;
+    onClose();
+  };
+
   return (
     <div
-      className="pointer-events-auto fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4"
+      className="pointer-events-auto fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:p-4"
       role="presentation"
+      onClick={handleBackdropClick}
     >
-      <button
-        type="button"
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
-        aria-label="Fermer"
-        onClick={onClose}
-      />
-      <div className="relative z-10 flex w-full max-w-2xl min-h-0 items-center justify-center">
+      <div className="relative flex max-h-full w-full max-w-2xl min-h-0 items-center justify-center">
         {children}
       </div>
+    </div>
+  );
+}
+
+function FileLoadedStep({
+  fileName,
+  rowCount,
+  onContinue,
+  t,
+}: {
+  fileName: string | null;
+  rowCount: number;
+  onContinue: () => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className={cn(dashboardInnerPanelClass, "space-y-4 p-5 text-center")}>
+      <CheckCircle className="mx-auto h-10 w-10 text-emerald-300" />
+      <div>
+        <p className="font-medium text-white">{t("dashboard.clients.import.fileLoadedTitle")}</p>
+        {fileName ? <p className="mt-1 text-sm text-white/70">{fileName}</p> : null}
+        <p className={cn("mt-2", dashboardHintClass)}>
+          {t("dashboard.clients.import.fileLoadedRows").replace("{count}", String(rowCount))}
+        </p>
+      </div>
+      <button type="button" onClick={onContinue} className={dashboardSecondaryButtonClass}>
+        {t("dashboard.clients.import.fileLoadedContinue")}
+      </button>
     </div>
   );
 }
@@ -716,6 +770,7 @@ function SuccessStep({
 function ModalFooter({
   step,
   summary,
+  hasParsedFile,
   onBack,
   onNext,
   onClose,
@@ -724,18 +779,30 @@ function ModalFooter({
 }: {
   step: Step;
   summary: ReturnType<typeof summarizeImportRows>;
+  hasParsedFile: boolean;
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
   importing: boolean;
   t: (key: string) => string;
 }) {
+  const handleAction = (action: () => void) => (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    action();
+  };
+
   if (step === "upload") {
     return (
-      <div className="shrink-0 flex justify-end border-t border-white/10 p-3 sm:p-4">
-        <button type="button" onClick={onClose} className={dashboardSecondaryButtonClass}>
+      <div className="shrink-0 flex justify-end gap-3 border-t border-white/10 p-3 sm:p-4">
+        <button type="button" onClick={handleAction(onClose)} className={dashboardSecondaryButtonClass}>
           {t("dashboard.common.cancel")}
         </button>
+        {hasParsedFile && (
+          <DashboardPrimaryButton type="button" onClick={handleAction(onNext)} icon="none">
+            {t("dashboard.clients.import.fileLoadedContinue")}
+          </DashboardPrimaryButton>
+        )}
       </div>
     );
   }
@@ -743,7 +810,7 @@ function ModalFooter({
   if (step === "success") {
     return (
       <div className="shrink-0 flex justify-end border-t border-white/10 p-3 sm:p-4">
-        <DashboardPrimaryButton type="button" onClick={onNext} icon="none">
+        <DashboardPrimaryButton type="button" onClick={handleAction(onNext)} icon="none">
           {t("dashboard.clients.import.close")}
         </DashboardPrimaryButton>
       </div>
@@ -754,7 +821,7 @@ function ModalFooter({
     <div className="shrink-0 flex flex-col-reverse gap-3 border-t border-white/10 p-3 sm:flex-row sm:justify-between sm:p-4">
       <button
         type="button"
-        onClick={step === "preview" ? onBack : onBack}
+        onClick={handleAction(onBack)}
         disabled={importing}
         className={cn(dashboardSecondaryButtonClass, "sm:min-w-[120px]")}
       >
@@ -762,7 +829,7 @@ function ModalFooter({
       </button>
       <DashboardPrimaryButton
         type="button"
-        onClick={onNext}
+        onClick={handleAction(onNext)}
         disabled={importing || (step === "preview" && summary.valid === 0)}
         icon="none"
         className="justify-center sm:min-w-[160px]"

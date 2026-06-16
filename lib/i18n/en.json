@@ -1124,6 +1124,9 @@
           "preview": "Step 3 — Review and import",
           "success": "Import complete"
         },
+        "fileLoadedTitle": "File loaded",
+        "fileLoadedRows": "{count} row(s) detected",
+        "fileLoadedContinue": "Continue to mapping",
         "uploadLabel": "Drag a file here or click to browse",
         "uploadHint": "Accepted formats: CSV or Excel (.csv, .xlsx)",
         "downloadTemplate": "Download a CSV template",

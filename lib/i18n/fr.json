@@ -1002,6 +1002,9 @@
           "preview": "Étape 3 — Validation et import",
           "success": "Import terminé"
         },
+        "fileLoadedTitle": "Fichier chargé",
+        "fileLoadedRows": "{count} ligne(s) détectée(s)",
+        "fileLoadedContinue": "Continuer vers le mapping",
         "uploadLabel": "Glissez un fichier ici ou cliquez pour parcourir",
         "uploadHint": "Formats acceptés : CSV ou Excel (.csv, .xlsx)",
         "downloadTemplate": "Télécharger un modèle CSV",
