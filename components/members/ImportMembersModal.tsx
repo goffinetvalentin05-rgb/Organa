@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import toast from "react-hot-toast";
-import { X, Upload, CheckCircle, AlertCircle, FileText } from "@/lib/icons";
+import { X, Upload, CheckCircle, AlertCircle } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -257,6 +257,7 @@ export default function ImportMembersModal({
           onClose={step === "success" ? handleSuccessClose : handleClose}
           title={t("dashboard.clients.import.title")}
           subtitle={t(`dashboard.clients.import.steps.${step === "importing" ? "preview" : step}`)}
+          t={t}
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
@@ -342,11 +343,13 @@ function ModalHeader({
   onClose,
   title,
   subtitle,
+  t,
 }: {
   step: Step;
   onClose: () => void;
   title: string;
   subtitle: string;
+  t: (key: string) => string;
 }) {
   const steps: Step[] = ["upload", "mapping", "preview", "success"];
   const stepIndex = steps.indexOf(step === "importing" ? "preview" : step);
@@ -372,16 +375,29 @@ function ModalHeader({
         </button>
       </div>
       {step !== "success" && step !== "importing" && (
-        <div className="mt-4 flex gap-2">
-          {steps.slice(0, 3).map((s, i) => (
-            <div
-              key={s}
-              className={cn(
-                "h-1 flex-1 rounded-full transition-colors",
-                i <= stepIndex ? "bg-blue-500" : "bg-white/10"
-              )}
-            />
-          ))}
+        <div className="mt-4 space-y-2">
+          <div className="flex gap-2">
+            {steps.slice(0, 3).map((s, i) => (
+              <div
+                key={s}
+                className={cn(
+                  "h-1 flex-1 rounded-full transition-colors",
+                  i <= stepIndex ? "bg-blue-500" : "bg-white/10"
+                )}
+              />
+            ))}
+          </div>
+          <div className="flex justify-between text-[10px] font-medium uppercase tracking-wide text-white/45">
+            <span className={stepIndex >= 0 ? "text-blue-300" : ""}>
+              1. {t("dashboard.clients.import.stepLabels.upload")}
+            </span>
+            <span className={stepIndex >= 1 ? "text-blue-300" : ""}>
+              2. {t("dashboard.clients.import.stepLabels.mapping")}
+            </span>
+            <span className={stepIndex >= 2 ? "text-blue-300" : ""}>
+              3. {t("dashboard.clients.import.stepLabels.preview")}
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -540,6 +556,10 @@ function MappingStep({
           </div>
         </div>
       )}
+
+      <p className={cn(dashboardHintClass, "rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-3")}>
+        {t("dashboard.clients.import.mappingNextHint")}
+      </p>
     </div>
   );
 }
@@ -567,6 +587,12 @@ function PreviewStep({
 
   return (
     <div className="space-y-4">
+      <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
+        <p className="text-sm font-medium text-emerald-100">
+          {t("dashboard.clients.import.confirmBanner")}
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <SummaryCard label={t("dashboard.clients.import.summary.total")} value={summary.total} />
         <SummaryCard
@@ -627,9 +653,13 @@ function PreviewStep({
         )}
       </div>
 
-      {summary.valid > 0 && (
+      {summary.valid > 0 ? (
         <p className={dashboardHintClass}>
           {t("dashboard.clients.import.confirmHint").replace("{count}", String(summary.valid))}
+        </p>
+      ) : (
+        <p className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          {t("dashboard.clients.import.noValidRowsHint")}
         </p>
       )}
     </div>
@@ -740,12 +770,12 @@ function ModalFooter({
         {importing ? (
           t("dashboard.clients.import.importing")
         ) : step === "mapping" ? (
-          <span className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            {t("dashboard.clients.import.continueToPreview")}
-          </span>
+          t("dashboard.clients.import.continueToPreview")
         ) : (
-          t("dashboard.clients.import.confirmImport").replace("{count}", String(summary.valid))
+          <span className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            {t("dashboard.clients.import.confirmImport").replace("{count}", String(summary.valid))}
+          </span>
         )}
       </DashboardPrimaryButton>
     </div>
