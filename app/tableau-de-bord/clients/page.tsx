@@ -22,6 +22,7 @@ import {
   ActionButton,
   glassCardClass,
   dashboardListRowClass,
+  dashboardTableDivideClass,
   dashboardSecondaryButtonClass,
   cn,
 } from "@/components/ui";
@@ -234,7 +235,7 @@ export default function ClientsPage() {
         />
       ) : (
         <TableCard bodyClassName="overflow-hidden p-0">
-          <div className="divide-y divide-slate-100">
+          <div className={dashboardTableDivideClass}>
             {filteredClients.map((client) => (
               <div key={client.id} className={dashboardListRowClass}>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -326,10 +327,9 @@ export default function ClientsPage() {
       {/* Footer avec compteur */}
       {clients.length > 0 && (
         <div className="text-center text-sm text-slate-400">
-          {filteredClients.length === clients.length 
+          {filteredClients.length === clients.length
             ? `${clients.length} membre${clients.length > 1 ? "s" : ""} au total`
-            : `${filteredClients.length} sur ${clients.length} membre${clients.length > 1 ? "s" : ""}`
-          }
+            : `${filteredClients.length} sur ${clients.length} membre${clients.length > 1 ? "s" : ""}`}
         </div>
       )}
 

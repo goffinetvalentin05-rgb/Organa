@@ -68,6 +68,16 @@ export const innerContentClass = glassPanelClass;
 export const dashboardTableHeadRowClass =
   "border-b border-white/10 bg-white/[0.04] text-xs font-semibold uppercase tracking-wide text-white/55";
 
+/** Séparateurs de lignes — discrets, sans trait blanc parasite (cotisations, factures, membres…) */
+export const dashboardTableDivideClass = "dashboard-table-divide divide-y";
+
+/** En-tête de colonnes + séparation harmonisée avec le corps du tableau */
+export const dashboardDataTableClass = "dashboard-data-table w-full text-left text-sm";
+
+/** Pied de tableau (ex. « X cotisations au total ») — fond premium sombre */
+export const dashboardTableFooterClass =
+  "dashboard-table-footer px-4 py-3 sm:px-6";
+
 export const dashboardListRowClass =
   "p-5 transition-colors hover:bg-white/[0.05] md:p-6";
 

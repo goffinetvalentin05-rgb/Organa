@@ -15,6 +15,9 @@ import {
   ActionButton,
   GlassCard,
   dashboardTableHeadRowClass,
+  dashboardTableDivideClass,
+  dashboardDataTableClass,
+  dashboardTableFooterClass,
 } from "@/components/ui";
 
 interface Devis {
@@ -148,7 +151,7 @@ export default function DevisPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-left text-sm">
+              <table className={`${dashboardDataTableClass} min-w-[800px]`}>
                 <thead>
                   <tr className={dashboardTableHeadRowClass}>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.number")}</th>
@@ -160,7 +163,7 @@ export default function DevisPage() {
                     <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className={dashboardTableDivideClass}>
                   {devis.map((devisItem) => {
                     const montant = calculerTotalTTC(devisItem.lignes);
                     return (
@@ -213,8 +216,8 @@ export default function DevisPage() {
               </table>
             </div>
 
-            <div className="border-t border-slate-100 bg-slate-50/90 px-4 py-3 sm:px-6">
-              <p className="text-center text-sm text-slate-600">
+            <div className={dashboardTableFooterClass}>
+              <p className="text-center text-sm">
                 {t("dashboard.quotes.totalCount", { count: devis.length })}
               </p>
             </div>

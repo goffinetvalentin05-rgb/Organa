@@ -15,6 +15,9 @@ import {
   ActionButton,
   GlassCard,
   dashboardTableHeadRowClass,
+  dashboardTableDivideClass,
+  dashboardDataTableClass,
+  dashboardTableFooterClass,
   dashboardSelectClass,
   dashboardPopoverPanelClass,
   dashboardLabelClass,
@@ -214,7 +217,7 @@ export default function FacturesPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-left text-sm">
+              <table className={`${dashboardDataTableClass} min-w-[800px]`}>
                 <thead>
                   <tr className={dashboardTableHeadRowClass}>
                     <th className="px-4 py-3 sm:px-6">{t("dashboard.common.number")}</th>
@@ -226,7 +229,7 @@ export default function FacturesPage() {
                     <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className={dashboardTableDivideClass}>
                   {factures.map((facture) => {
                     const montant = calculerTotalTTC(facture.lignes);
                     return (
@@ -279,8 +282,8 @@ export default function FacturesPage() {
               </table>
             </div>
 
-            <div className="border-t border-slate-100 bg-slate-50/90 px-4 py-3 sm:px-6">
-              <p className="text-center text-sm text-slate-600">
+            <div className={dashboardTableFooterClass}>
+              <p className="text-center text-sm">
                 {t("dashboard.invoices.listTotal", { count: factures.length })}
               </p>
             </div>
