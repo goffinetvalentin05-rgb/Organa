@@ -9,6 +9,7 @@ import {
 import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
+import { mapMeetingMinutesRow } from "@/lib/meeting-minutes";
 import { formatPdfCurrency } from "@/lib/pdf/clubPdfLayout";
 import {
   formatRecipientAddress,
@@ -24,6 +25,8 @@ export type GetDocumentPdfDataOptions = {
 };
 
 export type SponsorContractPdfLocale = "fr" | "en" | "de";
+
+export type MeetingMinutesPdfLocale = "fr" | "en" | "de";
 
 export type ClubCompanyPdfPayload = {
   company: {
@@ -298,6 +301,73 @@ export async function getSponsorContractPdfData(
       sponsorType,
       emissionDate,
     },
+  };
+}
+
+export async function getMeetingMinutesPdfData(
+  minuteId: string,
+  options?: GetDocumentPdfDataOptions & { locale?: MeetingMinutesPdfLocale }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user || !user.id) {
+    throw new Error("Non authentifié");
+  }
+
+  const scopeUserId = options?.dataUserId ?? user.id;
+  const locale: MeetingMinutesPdfLocale = options?.locale ?? "fr";
+
+  const { company, primaryColor } = await getClubCompanyPdfData(supabase, scopeUserId);
+
+  const { data: row, error } = await supabase
+    .from("meeting_minutes")
+    .select(
+      "id, club_id, title, meeting_date, start_time, end_time, location, meeting_type, status, chairman, secretary, attendees, excused, absent, agenda_items, discussion_points, decisions, tasks, miscellaneous, next_meeting, created_at, updated_at"
+    )
+    .eq("id", minuteId)
+    .eq("club_id", scopeUserId)
+    .maybeSingle();
+
+  if (error || !row) {
+    throw new Error("PV introuvable");
+  }
+
+  const minute = mapMeetingMinutesRow(row as Record<string, unknown>);
+  if (!minute) {
+    throw new Error("PV introuvable");
+  }
+
+  const generatedAt = new Date().toISOString().slice(0, 10);
+
+  return {
+    company,
+    primaryColor,
+    minute: {
+      title: minute.title,
+      meetingDate: minute.meetingDate,
+      startTime: minute.startTime,
+      endTime: minute.endTime,
+      location: minute.location,
+      meetingType: minute.meetingType,
+      status: minute.status,
+      chairman: minute.chairman,
+      secretary: minute.secretary,
+      attendees: minute.attendees,
+      excused: minute.excused,
+      absent: minute.absent,
+      agendaItems: minute.agendaItems,
+      discussionPoints: minute.discussionPoints,
+      decisions: minute.decisions,
+      tasks: minute.tasks,
+      miscellaneous: minute.miscellaneous,
+      nextMeeting: minute.nextMeeting,
+      generatedAt,
+    },
+    locale,
   };
 }
 

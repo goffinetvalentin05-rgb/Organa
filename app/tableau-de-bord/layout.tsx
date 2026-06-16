@@ -32,6 +32,7 @@ import {
   ShoppingBag,
   Handshake,
   Globe,
+  FilePlus,
 } from "@/lib/icons";
 
 const PUBLIC_PAGE_HREF = "/tableau-de-bord/parametres/page-publique";
@@ -127,6 +128,7 @@ export default function DashboardLayout({
     { name: t("dashboard.nav.events"), href: "/tableau-de-bord/evenements", icon: Calendar },
     { name: t("dashboard.nav.buvette"), href: "/tableau-de-bord/buvette", icon: Calendar },
     { name: t("dashboard.nav.plannings"), href: "/tableau-de-bord/plannings", icon: ClipboardList },
+    { name: t("dashboard.nav.meetingMinutes"), href: "/tableau-de-bord/pv-seances", icon: FilePlus },
     { name: t("dashboard.nav.qrcodes"), href: "/tableau-de-bord/qrcodes", icon: QrCode },
     { name: t("dashboard.nav.marketing"), href: "/tableau-de-bord/campagnes-marketing", icon: Mail },
     { name: t("dashboard.nav.publicPage"), href: PUBLIC_PAGE_HREF, icon: Globe },

@@ -28,6 +28,9 @@ export const PERMISSIONS = {
   VIEW_PLANNINGS: "view_plannings",
   MANAGE_PLANNINGS: "manage_plannings",
 
+  VIEW_MEETING_MINUTES: "view_meeting_minutes",
+  MANAGE_MEETING_MINUTES: "manage_meeting_minutes",
+
   ACCESS_SETTINGS: "access_settings",
   MANAGE_USERS: "manage_users",
 } as const;
@@ -51,6 +54,8 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   delete_documents: "Supprimer des documents",
   view_plannings: "Voir les plannings",
   manage_plannings: "Modifier les plannings",
+  view_meeting_minutes: "Voir les PV de séances",
+  manage_meeting_minutes: "Créer / modifier les PV de séances",
   access_settings: "Accéder aux paramètres",
   manage_users: "Gérer les utilisateurs / accès",
 };
@@ -96,6 +101,13 @@ export const PERMISSION_GROUPS: Array<{
     permissions: [PERMISSIONS.VIEW_PLANNINGS, PERMISSIONS.MANAGE_PLANNINGS],
   },
   {
+    title: "PV de séances",
+    permissions: [
+      PERMISSIONS.VIEW_MEETING_MINUTES,
+      PERMISSIONS.MANAGE_MEETING_MINUTES,
+    ],
+  },
+  {
     title: "Paramètres",
     permissions: [PERMISSIONS.ACCESS_SETTINGS, PERMISSIONS.MANAGE_USERS],
   },
@@ -128,6 +140,7 @@ export function suggestedDefaultPermissions(): Record<Permission, boolean> {
   map.view_invoices = true;
   map.view_documents = true;
   map.view_plannings = true;
+  map.view_meeting_minutes = true;
   return map;
 }
 
