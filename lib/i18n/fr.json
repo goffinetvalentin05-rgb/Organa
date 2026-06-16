@@ -993,6 +993,63 @@
         "allCategories": "Toutes les catégories",
         "resetFilters": "Réinitialiser"
       },
+      "import": {
+        "action": "Importer une liste",
+        "title": "Importer des membres",
+        "steps": {
+          "upload": "Étape 1 — Fichier",
+          "mapping": "Étape 2 — Correspondance",
+          "preview": "Étape 3 — Vérification",
+          "success": "Import terminé"
+        },
+        "uploadLabel": "Glissez un fichier ici ou cliquez pour parcourir",
+        "uploadHint": "Formats acceptés : CSV ou Excel (.csv, .xlsx)",
+        "downloadTemplate": "Télécharger un modèle CSV",
+        "mappingHint": "Associez chaque colonne du fichier aux champs membres d'Obillz. Le prénom et le nom sont obligatoires.",
+        "ignoreColumn": "— Ignorer —",
+        "previewSample": "Aperçu du fichier",
+        "continueToPreview": "Voir la prévisualisation",
+        "confirmImport": "Importer {count} membre(s)",
+        "confirmHint": "{count} membre(s) seront créés après confirmation. Les lignes en erreur et les doublons seront ignorés.",
+        "importing": "Import en cours…",
+        "back": "Retour",
+        "close": "Fermer",
+        "previewTruncated": "… et {count} lignes au total (aperçu limité à 50)",
+        "successTitle": "Import réussi",
+        "successMessage": "{imported} membre(s) importé(s) avec succès. {duplicates} doublon(s) ignoré(s).",
+        "successErrors": "{count} ligne(s) en erreur n'ont pas été importées.",
+        "toastSuccess": "{imported} membre(s) importé(s) avec succès. {duplicates} doublon(s) ignoré(s).",
+        "fields": {
+          "prenom": "Prénom",
+          "nom": "Nom",
+          "postalCode": "Code postal",
+          "city": "Localité"
+        },
+        "summary": {
+          "total": "Détectés",
+          "valid": "Valides",
+          "errors": "Erreurs",
+          "duplicates": "Doublons"
+        },
+        "status": {
+          "valid": "Valide",
+          "error": "Erreur",
+          "duplicate": "Doublon"
+        },
+        "errors": {
+          "invalidFormat": "Format non supporté. Utilisez un fichier CSV ou Excel (.xlsx).",
+          "emptyFile": "Le fichier est vide.",
+          "noColumns": "Aucune colonne détectée dans le fichier.",
+          "noRows": "Aucune ligne de données trouvée.",
+          "invalidCsv": "Impossible de lire le fichier CSV.",
+          "mappingRequired": "Veuillez mapper au minimum les colonnes Prénom et Nom.",
+          "noValidRows": "Aucune ligne valide à importer.",
+          "importFailed": "L'import a échoué. Réessayez ou contactez le support.",
+          "missingPrenom": "Prénom manquant",
+          "missingNom": "Nom manquant",
+          "invalidBirthDate": "Date de naissance invalide"
+        }
+      },
       "memberDetail": {
         "title": "Fiche membre",
         "back": "Retour à la liste",

@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import DeleteClientButton from "./components/DeleteClientButton";
 import { Edit, Users, Filter } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import ImportMembersModal from "@/components/members/ImportMembersModal";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import MemberFilterSelects from "@/components/members/MemberFilterSelects";
 import { formatCategoryLabel, formatRoleLabel } from "@/lib/members/taxonomy";
 import {
@@ -19,6 +22,7 @@ import {
   ActionButton,
   glassCardClass,
   dashboardListRowClass,
+  dashboardSecondaryButtonClass,
   cn,
 } from "@/components/ui";
 
@@ -47,38 +51,55 @@ const roleColors: Record<string, string> = {
 export default function ClientsPage() {
   const { t } = useI18n();
   const vis = useMemberFieldSettings();
+  const { has: hasPermission, loading: permissionsLoading } = usePermissions();
+  const canManageMembers = hasPermission("manage_members");
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
   
   // Filtres
   const [roleFilter, setRoleFilter] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
 
+  const fetchClients = useCallback(async () => {
+    try {
+      const res = await fetch("/api/clients", { cache: "no-store" });
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error(t("dashboard.clients.authError"));
+        }
+        if (res.status === 403) {
+          throw new Error(t("dashboard.clients.loadForbidden"));
+        }
+        throw new Error(t("dashboard.clients.loadErrorDetail"));
+      }
+      const data = await res.json();
+      setClients(data.clients || []);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
   // Charger les clients
   useEffect(() => {
-    async function fetchClients() {
-      try {
-        const res = await fetch("/api/clients", { cache: "no-store" });
-        if (!res.ok) {
-          if (res.status === 401) {
-            throw new Error(t("dashboard.clients.authError"));
-          }
-          if (res.status === 403) {
-            throw new Error(t("dashboard.clients.loadForbidden"));
-          }
-          throw new Error(t("dashboard.clients.loadErrorDetail"));
-        }
-        const data = await res.json();
-        setClients(data.clients || []);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchClients();
-  }, [t]);
+  }, [fetchClients]);
+
+  const handleImportSuccess = useCallback(
+    (imported: number, duplicates: number) => {
+      toast.success(
+        t("dashboard.clients.import.toastSuccess")
+          .replace("{imported}", String(imported))
+          .replace("{duplicates}", String(duplicates))
+      );
+      setImportOpen(false);
+      fetchClients();
+    },
+    [fetchClients, t]
+  );
 
   // Filtrer les clients
   const filteredClients = useMemo(() => {
@@ -123,9 +144,20 @@ export default function ClientsPage() {
         title={t("dashboard.clients.title")}
         subtitle={t("dashboard.clients.subtitle")}
         actions={
-          <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau">
-            {t("dashboard.clients.newClient")}
-          </DashboardPrimaryButton>
+          <div className="flex flex-wrap items-center gap-2">
+            {!permissionsLoading && canManageMembers && (
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className={dashboardSecondaryButtonClass}
+              >
+                {t("dashboard.clients.import.action")}
+              </button>
+            )}
+            <DashboardPrimaryButton href="/tableau-de-bord/clients/nouveau">
+              {t("dashboard.clients.newClient")}
+            </DashboardPrimaryButton>
+          </div>
         }
       />
 
@@ -278,6 +310,14 @@ export default function ClientsPage() {
           }
         </div>
       )}
+
+      <ImportMembersModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        existingMembers={clients.map((c) => ({ nom: c.nom, email: c.email }))}
+        onImported={fetchClients}
+        onSuccess={handleImportSuccess}
+      />
     </PageLayout>
   );
 }

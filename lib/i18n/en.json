@@ -1115,6 +1115,63 @@
         "allCategories": "All categories",
         "resetFilters": "Reset"
       },
+      "import": {
+        "action": "Import a list",
+        "title": "Import members",
+        "steps": {
+          "upload": "Step 1 — File",
+          "mapping": "Step 2 — Mapping",
+          "preview": "Step 3 — Review",
+          "success": "Import complete"
+        },
+        "uploadLabel": "Drag a file here or click to browse",
+        "uploadHint": "Accepted formats: CSV or Excel (.csv, .xlsx)",
+        "downloadTemplate": "Download a CSV template",
+        "mappingHint": "Map each file column to Obillz member fields. First name and last name are required.",
+        "ignoreColumn": "— Ignore —",
+        "previewSample": "File preview",
+        "continueToPreview": "View preview",
+        "confirmImport": "Import {count} member(s)",
+        "confirmHint": "{count} member(s) will be created after confirmation. Error rows and duplicates will be skipped.",
+        "importing": "Importing…",
+        "back": "Back",
+        "close": "Close",
+        "previewTruncated": "… and {count} rows total (preview limited to 50)",
+        "successTitle": "Import successful",
+        "successMessage": "{imported} member(s) imported successfully. {duplicates} duplicate(s) skipped.",
+        "successErrors": "{count} row(s) with errors were not imported.",
+        "toastSuccess": "{imported} member(s) imported successfully. {duplicates} duplicate(s) skipped.",
+        "fields": {
+          "prenom": "First name",
+          "nom": "Last name",
+          "postalCode": "Postal code",
+          "city": "City"
+        },
+        "summary": {
+          "total": "Detected",
+          "valid": "Valid",
+          "errors": "Errors",
+          "duplicates": "Duplicates"
+        },
+        "status": {
+          "valid": "Valid",
+          "error": "Error",
+          "duplicate": "Duplicate"
+        },
+        "errors": {
+          "invalidFormat": "Unsupported format. Use a CSV or Excel file (.xlsx).",
+          "emptyFile": "The file is empty.",
+          "noColumns": "No columns detected in the file.",
+          "noRows": "No data rows found.",
+          "invalidCsv": "Unable to read the CSV file.",
+          "mappingRequired": "Please map at least First name and Last name columns.",
+          "noValidRows": "No valid rows to import.",
+          "importFailed": "Import failed. Please try again or contact support.",
+          "missingPrenom": "Missing first name",
+          "missingNom": "Missing last name",
+          "invalidBirthDate": "Invalid date of birth"
+        }
+      },
       "memberDetail": {
         "title": "Member profile",
         "back": "Back to list",
