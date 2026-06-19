@@ -9,8 +9,7 @@ import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
 import ClubReassuranceSection from "@/components/landing/ClubReassuranceSection";
-import ModulesOrbitSection from "@/components/landing/ModulesOrbitSection";
-import ProblemSection from "@/components/landing/ProblemSection";
+import FeaturesSection from "@/components/landing/FeaturesSection";
 import FaqSection from "@/components/landing/FaqSection";
 import PricingSection from "@/components/landing/PricingSection";
 import {
@@ -28,8 +27,7 @@ export default function LandingPage() {
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
-        <ProblemSection />
-        <ModulesOrbitSection />
+        <FeaturesSection />
         <ClubReassuranceSection />
         <HowItWorksSection />
         <AskChatGptSection />

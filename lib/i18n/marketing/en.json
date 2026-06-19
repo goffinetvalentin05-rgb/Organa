@@ -49,43 +49,78 @@
     }
   },
   "problem": {
-    "title": "Clubs waste too much time on admin.",
-    "subtitle": "Between spreadsheets, WhatsApp messages, fee reminders and invoice tracking, running a club quickly gets messy.",
+    "title": "Clearer management, less time wasted.",
+    "subtitle": "Obillz helps your committee centralise important information, cut repetitive tasks and keep a clear view of the club.",
+    "cta": "Try for free",
     "cards": [
       {
-        "title": "Forgotten membership fees",
-        "description": "Manual reminders, unclear tracking, members paying late."
+        "title": "Save time every week",
+        "description": "Centralise repetitive tasks and stop bouncing between spreadsheets, WhatsApp and scattered documents."
       },
       {
-        "title": "Scattered invoices",
-        "description": "Excel files, lost emails, no clear view of what's been paid."
+        "title": "Keep a clear overview",
+        "description": "Track members, payments, events and key documents from a single workspace."
       },
       {
-        "title": "Overloaded committee",
-        "description": "WhatsApp, spreadsheets and paperwork — volunteering becomes unmanageable."
+        "title": "Work better as a committee",
+        "description": "Invite the right people, assign the right access and make collaboration easier."
       },
       {
-        "title": "Poorly tracked events",
-        "description": "Sign-ups across multiple channels, incomplete lists, no central follow-up."
+        "title": "Avoid missed deadlines",
+        "description": "Stay on top of fees, contracts, due dates and other important club information."
       },
       {
-        "title": "Too many separate tools",
-        "description": "Excel, WhatsApp, email, shared files… every task has its own tool, nothing connects."
+        "title": "Modernise your organisation",
+        "description": "Give your club cleaner, more structured and more professional management."
       },
       {
-        "title": "Everyone on a different screen",
-        "description": "Phone, tablet or PC — the committee checks in from everywhere without the same up-to-date view."
+        "title": "Grow at your own pace",
+        "description": "Start with the essentials, then use Obillz based on your club's real needs."
       }
     ]
   },
   "modules": {
-    "label": "Features",
-    "title": "Everything your committee already manages. Finally in one place.",
-    "subtitle": "Members, fees, invoices, schedules, events, sponsors, bar, payments, access and public page: Obillz centralises club admin in one clear, modern platform.",
+    "label": "Club management",
+    "titleLine1": "Move to clearer",
+    "titleLine2": "club management",
+    "title": "Move to clearer club management",
+    "subtitle": "Obillz brings together your members, fees, events, sponsors and documents to help your committee save time every week.",
+    "cta": "Try for free",
+    "gridCards": [
+      {
+        "id": "membres",
+        "title": "Centralise your members",
+        "description": "Keep a clean, up-to-date database accessible to the right people on your committee."
+      },
+      {
+        "id": "cotisations",
+        "title": "Track membership fees",
+        "description": "Create fees, track payments and keep a clear view of collections."
+      },
+      {
+        "id": "evenements",
+        "title": "Organise your events",
+        "description": "Share a sign-up link and easily track participation."
+      },
+      {
+        "id": "sponsors",
+        "title": "Manage your sponsors",
+        "description": "Centralise contracts, deadlines and important renewals."
+      },
+      {
+        "id": "documents",
+        "title": "Find your documents",
+        "description": "File invoices, contracts, receipts and minutes in one place."
+      },
+      {
+        "id": "acces",
+        "title": "Work better as a committee",
+        "description": "Invite the right people and assign the right access for each role."
+      }
+    ],
     "previewLabel": "Preview",
     "activeBadge": "Active module",
     "closing": "Less admin. More time to bring the club to life.",
-    "cta": "Try Obillz for free",
     "ctaNote": "7 days free, no credit card required.",
     "scrollHint": "Scroll through modules",
     "showModule": "Show {name}",

@@ -14,10 +14,10 @@
     "ctaShort": "Tester"
   },
   "hero": {
-    "title": "La plateforme qui simplifie la gestion de votre club sportif.",
-    "titleLine1": "La plateforme qui simplifie",
-    "titleLine2": "la gestion de votre club sportif.",
-    "subtitle": "Centralisez l'administration de votre club et libérez du temps pour ce qui compte vraiment : vos membres, vos équipes et le développement de votre club.",
+    "title": "Gérez votre club sans perdre vos soirées.",
+    "titleLine1": "Gérez votre club",
+    "titleLine2": "sans perdre vos soirées.",
+    "subtitle": "Obillz centralise vos membres, cotisations, événements, sponsors et documents dans une plateforme simple, pensée pour les clubs sportifs.",
     "keywords": "Membres • Cotisations • Factures • Événements",
     "ctaPrimary": "Tester Obillz gratuitement",
     "ctaSecondary": "Voir comment ça marche",
@@ -49,43 +49,78 @@
     }
   },
   "problem": {
-    "title": "Les clubs perdent trop de temps sur l'administratif.",
-    "subtitle": "Entre les fichiers Excel, les messages WhatsApp, les cotisations à relancer et les factures à suivre, la gestion d'un club devient vite compliquée.",
+    "title": "Une gestion plus claire, moins de temps perdu.",
+    "subtitle": "Obillz aide votre comité à centraliser les informations importantes, réduire les tâches répétitives et garder une vision claire du club.",
+    "cta": "Tester gratuitement",
     "cards": [
       {
-        "title": "Cotisations oubliées",
-        "description": "Relances manuelles, suivi flou, membres qui paient en retard."
+        "title": "Gagnez du temps chaque semaine",
+        "description": "Centralisez les tâches répétitives et évitez les allers-retours entre Excel, WhatsApp et les documents dispersés."
       },
       {
-        "title": "Factures dispersées",
-        "description": "Fichiers Excel, mails perdus, aucune vue claire sur ce qui est payé."
+        "title": "Gardez une vision claire",
+        "description": "Suivez les membres, paiements, événements et documents importants depuis un espace unique."
       },
       {
-        "title": "Comité surchargé",
-        "description": "WhatsApp, tableurs et paperasse — le bénévolat devient ingérable."
+        "title": "Travaillez mieux en comité",
+        "description": "Invitez les bonnes personnes, attribuez les bons accès et facilitez la collaboration."
       },
       {
-        "title": "Événements mal suivis",
-        "description": "Inscriptions sur plusieurs canaux, listes incomplètes, aucun suivi central."
+        "title": "Évitez les oublis",
+        "description": "Gardez le suivi des cotisations, contrats, échéances et informations importantes du club."
       },
       {
-        "title": "Trop d'outils séparés",
-        "description": "Excel, WhatsApp, mails, fichiers partagés… chaque tâche a son outil, rien n'est relié."
+        "title": "Modernisez votre organisation",
+        "description": "Offrez à votre club une gestion plus propre, plus structurée et plus professionnelle."
       },
       {
-        "title": "Chacun sur son écran",
-        "description": "Téléphone, tablette ou PC — le comité consulte depuis partout, sans la même vue à jour."
+        "title": "Avancez progressivement",
+        "description": "Commencez avec les modules essentiels, puis utilisez Obillz selon les besoins réels de votre club."
       }
     ]
   },
   "modules": {
-    "label": "Fonctionnalités",
-    "title": "Tout ce que votre comité gère déjà. Enfin au même endroit.",
-    "subtitle": "Membres, cotisations, factures, plannings, événements, sponsors, buvette, paiements, accès et page publique : Obillz centralise l'administratif du club dans une seule plateforme claire et moderne.",
+    "label": "Gestion du club",
+    "titleLine1": "Passez à une gestion",
+    "titleLine2": "de club plus claire",
+    "title": "Passez à une gestion de club plus claire",
+    "subtitle": "Obillz rassemble vos membres, cotisations, événements, sponsors et documents pour aider votre comité à gagner du temps chaque semaine.",
+    "cta": "Tester gratuitement",
+    "gridCards": [
+      {
+        "id": "membres",
+        "title": "Centralisez vos membres",
+        "description": "Gardez une base propre, à jour et accessible aux bonnes personnes du comité."
+      },
+      {
+        "id": "cotisations",
+        "title": "Suivez vos cotisations",
+        "description": "Créez vos cotisations, suivez les paiements et gardez une vision claire des encaissements."
+      },
+      {
+        "id": "evenements",
+        "title": "Organisez vos événements",
+        "description": "Partagez un lien d'inscription et suivez facilement les participations."
+      },
+      {
+        "id": "sponsors",
+        "title": "Gérez vos sponsors",
+        "description": "Centralisez les contrats, les échéances et les renouvellements importants."
+      },
+      {
+        "id": "documents",
+        "title": "Retrouvez vos documents",
+        "description": "Rangez factures, contrats, justificatifs et procès-verbaux dans un seul espace."
+      },
+      {
+        "id": "acces",
+        "title": "Travaillez mieux en comité",
+        "description": "Invitez les bonnes personnes et attribuez les bons accès selon les responsabilités de chacun."
+      }
+    ],
     "previewLabel": "Aperçu",
     "activeBadge": "Module actif",
     "closing": "Moins d'administratif. Plus de temps pour faire vivre le club.",
-    "cta": "Essayer Obillz gratuitement",
     "ctaNote": "7 jours gratuits, sans carte bancaire.",
     "scrollHint": "Faites défiler les modules",
     "showModule": "Afficher {name}",

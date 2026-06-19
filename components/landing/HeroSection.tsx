@@ -58,7 +58,7 @@ export default function HeroSection() {
 
           <motion.p
             variants={heroSubtitleLine}
-            className="mt-6 max-w-[36rem] text-pretty text-[0.9375rem] leading-[1.65] text-blue-100/60 sm:mt-7 sm:text-base md:mt-8 md:max-w-[40rem] md:text-[1.0625rem] md:leading-[1.7] lg:text-lg"
+            className="mt-6 max-w-[36rem] text-pretty text-[0.9375rem] leading-[1.65] text-blue-100/60 sm:mt-7 sm:text-base md:mt-8 md:max-w-[44rem] md:text-[1.0625rem] md:leading-[1.7] lg:max-w-[46rem] lg:text-lg"
           >
             {t("marketing.hero.subtitle")}
           </motion.p>

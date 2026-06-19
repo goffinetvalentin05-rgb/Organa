@@ -49,43 +49,78 @@
     }
   },
   "problem": {
-    "title": "Vereine verlieren zu viel Zeit mit Verwaltung.",
-    "subtitle": "Zwischen Excel, WhatsApp, Beitragserinnerungen und Rechnungen wird die Vereinsarbeit schnell unübersichtlich.",
+    "title": "Klarere Verwaltung, weniger Zeitverlust.",
+    "subtitle": "Obillz hilft Ihrem Vorstand, wichtige Informationen zu bündeln, repetitive Aufgaben zu reduzieren und den Verein klar im Blick zu behalten.",
+    "cta": "Kostenlos testen",
     "cards": [
       {
-        "title": "Vergessene Beiträge",
-        "description": "Manuelle Mahnungen, unklare Übersicht, Mitglieder zahlen zu spät."
+        "title": "Jede Woche Zeit sparen",
+        "description": "Bündeln Sie repetitive Aufgaben und vermeiden Sie Wechsel zwischen Excel, WhatsApp und verstreuten Dokumenten."
       },
       {
-        "title": "Verstreute Rechnungen",
-        "description": "Excel-Dateien, verlorene Mails, kein klarer Überblick über Bezahltes."
+        "title": "Den Überblick behalten",
+        "description": "Verfolgen Sie Mitglieder, Zahlungen, Events und wichtige Dokumente in einem einzigen Bereich."
       },
       {
-        "title": "Überlasteter Vorstand",
-        "description": "WhatsApp, Tabellen und Papierkram — Ehrenamt wird zur Belastung."
+        "title": "Besser im Vorstand arbeiten",
+        "description": "Laden Sie die richtigen Personen ein, vergeben Sie passende Zugriffe und erleichtern Sie die Zusammenarbeit."
       },
       {
-        "title": "Schlecht verfolgte Events",
-        "description": "Anmeldungen über mehrere Kanäle, unvollständige Listen, keine zentrale Übersicht."
+        "title": "Nichts vergessen",
+        "description": "Behalten Sie Beiträge, Verträge, Fristen und wichtige Vereinsinformationen im Blick."
       },
       {
-        "title": "Zu viele getrennte Tools",
-        "description": "Excel, WhatsApp, Mails, geteilte Dateien — jedes Thema hat sein Tool, nichts hängt zusammen."
+        "title": "Ihre Organisation modernisieren",
+        "description": "Bieten Sie Ihrem Verein eine sauberere, strukturiertere und professionellere Verwaltung."
       },
       {
-        "title": "Jeder auf seinem Gerät",
-        "description": "Handy, Tablet oder PC — der Vorstand schaut von überall, ohne dieselbe aktuelle Sicht."
+        "title": "Schritt für Schritt vorankommen",
+        "description": "Starten Sie mit den wichtigsten Modulen und nutzen Sie Obillz nach den echten Bedürfnissen Ihres Vereins."
       }
     ]
   },
   "modules": {
-    "label": "Funktionen",
-    "title": "Alles, was Ihr Vorstand bereits verwaltet. Endlich an einem Ort.",
-    "subtitle": "Mitglieder, Beiträge, Rechnungen, Pläne, Events, Sponsoren, Verzehr, Zahlungen, Zugriffe und öffentliche Seite: Obillz bündelt die Vereinsverwaltung in einer klaren, modernen Plattform.",
+    "label": "Vereinsverwaltung",
+    "titleLine1": "Wechseln Sie zu klarerer",
+    "titleLine2": "Vereinsverwaltung",
+    "title": "Wechseln Sie zu klarerer Vereinsverwaltung",
+    "subtitle": "Obillz bündelt Mitglieder, Beiträge, Events, Sponsoren und Dokumente, damit Ihr Vorstand jede Woche Zeit spart.",
+    "cta": "Kostenlos testen",
+    "gridCards": [
+      {
+        "id": "membres",
+        "title": "Mitglieder zentral bündeln",
+        "description": "Behalten Sie eine saubere, aktuelle Datenbank — zugänglich für die richtigen Personen im Vorstand."
+      },
+      {
+        "id": "cotisations",
+        "title": "Beiträge im Blick behalten",
+        "description": "Erstellen Sie Beiträge, verfolgen Sie Zahlungen und behalten Sie Eingänge klar im Überblick."
+      },
+      {
+        "id": "evenements",
+        "title": "Events organisieren",
+        "description": "Teilen Sie einen Anmeldelink und verfolgen Sie Teilnahmen ganz einfach."
+      },
+      {
+        "id": "sponsors",
+        "title": "Sponsoren verwalten",
+        "description": "Bündeln Sie Verträge, Fristen und wichtige Verlängerungen an einem Ort."
+      },
+      {
+        "id": "documents",
+        "title": "Dokumente wiederfinden",
+        "description": "Ordnen Sie Rechnungen, Verträge, Belege und Protokolle in einem einzigen Bereich."
+      },
+      {
+        "id": "acces",
+        "title": "Besser im Vorstand arbeiten",
+        "description": "Laden Sie die richtigen Personen ein und vergeben Sie passende Zugriffe je nach Verantwortung."
+      }
+    ],
     "previewLabel": "Vorschau",
     "activeBadge": "Aktives Modul",
     "closing": "Weniger Verwaltung. Mehr Zeit, den Verein lebendig zu halten.",
-    "cta": "Obillz kostenlos testen",
     "ctaNote": "7 Tage gratis, ohne Kreditkarte.",
     "scrollHint": "Module durchscrollen",
     "showModule": "{name} anzeigen",
