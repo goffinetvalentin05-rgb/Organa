@@ -7,13 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
-const linkKeys = [
-  { href: "/#probleme", key: "marketing.nav.problem" },
-  { href: "/#modules", key: "marketing.nav.modules" },
-  { href: "/#comment-ca-marche", key: "marketing.nav.howItWorks" },
-  { href: "/#tarifs", key: "marketing.nav.pricing" },
-  { href: "/#faq", key: "marketing.nav.faq" },
-] as const;
+const linkKeys = [{ href: "/tarifs", key: "marketing.nav.pricing" }] as const;
 
 export default function LegalLandingNav() {
   const { t } = useI18n();

@@ -8,12 +8,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
-const linkKeys = [
-  { href: "#modules", key: "marketing.nav.modules" },
-  { href: "#comment-ca-marche", key: "marketing.nav.howItWorks" },
-  { href: "#tarifs", key: "marketing.nav.pricing" },
-  { href: "#faq", key: "marketing.nav.faq" },
-] as const;
+const linkKeys = [{ href: "/tarifs", key: "marketing.nav.pricing" }] as const;
 
 const menuItemVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -77,13 +72,13 @@ export default function LandingNav() {
           aria-label="Navigation"
         >
           {linkKeys.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-[13px] font-medium text-white/60 transition hover:text-white/95 xl:text-sm"
             >
               {t(link.key)}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -210,13 +205,13 @@ export default function LandingNav() {
                     animate="visible"
                     exit="exit"
                   >
-                    <a
+                    <Link
                       href={link.href}
                       onClick={closeMenu}
                       className="flex items-center rounded-xl px-3 py-3 text-[15px] font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white active:bg-white/[0.08]"
                     >
                       {t(link.key)}
-                    </a>
+                    </Link>
                   </motion.div>
                 ))}
               </div>

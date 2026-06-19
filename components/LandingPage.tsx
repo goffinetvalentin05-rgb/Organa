@@ -8,10 +8,8 @@ import LandingBackground from "@/components/landing/LandingBackground";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
-import ClubReassuranceSection from "@/components/landing/ClubReassuranceSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import FaqSection from "@/components/landing/FaqSection";
-import PricingSection from "@/components/landing/PricingSection";
 import {
   obillzLandingGridOverlayClass,
   obillzLandingRootClass,
@@ -28,10 +26,8 @@ export default function LandingPage() {
         <LandingNav />
         <HeroSection />
         <FeaturesSection />
-        <ClubReassuranceSection />
         <HowItWorksSection />
         <AskChatGptSection />
-        <PricingSection />
         <FaqSection />
         <FinalCtaSection />
 

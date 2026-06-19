@@ -81,16 +81,16 @@
   },
   "modules": {
     "label": "Gestion du club",
+    "title": "Passez à une gestion de club plus claire",
     "titleLine1": "Passez à une gestion",
     "titleLine2": "de club plus claire",
-    "title": "Passez à une gestion de club plus claire",
-    "subtitle": "Obillz rassemble vos membres, cotisations, événements, sponsors et documents pour aider votre comité à gagner du temps chaque semaine.",
+    "subtitle": "Obillz centralise les informations importantes de votre club pour aider votre comité à gagner du temps, mieux s'organiser et éviter les oublis.",
     "cta": "Tester gratuitement",
     "gridCards": [
       {
         "id": "membres",
         "title": "Centralisez vos membres",
-        "description": "Gardez une base propre, à jour et accessible aux bonnes personnes du comité."
+        "description": "Gardez une base claire, à jour et accessible aux bonnes personnes du comité."
       },
       {
         "id": "cotisations",
@@ -105,7 +105,7 @@
       {
         "id": "sponsors",
         "title": "Gérez vos sponsors",
-        "description": "Centralisez les contrats, les échéances et les renouvellements importants."
+        "description": "Centralisez les contrats, échéances et renouvellements importants."
       },
       {
         "id": "documents",
@@ -268,24 +268,25 @@
   },
   "howItWorks": {
     "label": "Comment ça marche",
-    "titleLead": "Lancez votre club en",
-    "titleAccent": "quelques minutes.",
-    "subtitle": "Créez votre espace, configurez votre club, puis utilisez Obillz à votre rythme.",
-    "reassurance": "Pas besoin de tout préparer dès le premier jour : Obillz s'adapte à la réalité de votre comité.",
-    "cta": "Créer mon club gratuitement",
-    "ctaNote": "7 jours gratuits, sans carte bancaire.",
+    "title": "Commencez simplement avec Obillz.",
+    "subtitle": "Obillz a été pensé pour être utilisable rapidement, sans formation compliquée ni changement brutal dans l'organisation du club.",
+    "cta": "Tester gratuitement",
     "steps": [
       {
-        "title": "Créez votre compte",
-        "description": "Inscrivez-vous gratuitement et accédez à votre espace Obillz en quelques minutes."
+        "title": "Créez votre club",
+        "description": "Configurez votre espace en quelques minutes."
       },
       {
-        "title": "Configurez votre club",
-        "description": "Ajoutez les informations de base de votre club et invitez les personnes du comité si vous le souhaitez."
+        "title": "Ajoutez vos membres",
+        "description": "Importez votre liste ou ajoutez vos membres progressivement."
       },
       {
-        "title": "Avancez à votre rythme",
-        "description": "Commencez par les modules utiles à votre club : membres, cotisations, factures, plannings, événements ou sponsors. Tout est déjà inclus."
+        "title": "Pilotez selon les besoins de votre club",
+        "description": "Utilisez les fonctionnalités utiles à votre comité, selon l'organisation et les priorités de votre club."
+      },
+      {
+        "title": "Tout est centralisé",
+        "description": "Votre comité garde une vision claire de la gestion du club."
       }
     ]
   },
@@ -299,7 +300,7 @@
   },
   "pricing": {
     "label": "Tarifs",
-    "title": "Une seule formule. Tout Obillz inclus.",
+    "title": "Une formule simple. Tout est inclus.",
     "headline": "Offrez à votre comité un outil à la hauteur de son engagement.",
     "body": "Gérer un club demande déjà suffisamment de temps. Obillz centralise les membres, les cotisations, les finances, les événements, les sponsors et la collaboration du comité dans une seule plateforme simple à utiliser.",
     "highlights": [
@@ -310,9 +311,9 @@
       "Sans engagement"
     ],
     "reassurance": "Pour moins de 1,35 CHF par jour, centralisez toute la gestion de votre club sur une seule plateforme.",
-    "subtitle": "Tous les outils pour gérer votre club, sans modules cachés ni frais compliqués.",
+    "subtitle": "Obillz donne accès aux fonctionnalités essentielles pour gérer votre club plus simplement, sans modules bloqués ni frais cachés.",
     "planName": "Formule Club",
-    "planDescription": "Tout ce qu'il faut pour gérer votre club.",
+    "planDescription": "Tout ce qu'il faut pour gérer votre club au quotidien.",
     "includedLabel": "Tout est inclus",
     "monthlyBillingNote": "facturation mensuelle",
     "cardReassurance": "Pensé pour les comités bénévoles qui veulent centraliser leur gestion sans multiplier les outils.",
@@ -320,11 +321,11 @@
       "Membres",
       "Cotisations",
       "Factures",
-      "Plannings",
       "Événements",
-      "Buvette",
       "Sponsors",
-      "Paiements",
+      "Documents",
+      "Procès-verbaux",
+      "Buvette",
       "Utilisateurs & accès",
       "Page publique",
       "QR codes",
@@ -361,6 +362,19 @@
       "Comptes séparés pour le comité",
       "Traçabilité des actions"
     ]
+  },
+  "pricingPage": {
+    "reassuranceBlocks": [
+      "Essai gratuit|Testez Obillz pendant 7 jours, sans carte bancaire.",
+      "Tout est inclus|Votre club accède aux modules essentiels sans devoir choisir entre plusieurs plans.",
+      "Accompagnement|Vous pouvez contacter le fondateur pour poser vos questions ou demander une démonstration."
+    ],
+    "finalCta": {
+      "title": "Vous hésitez encore ?",
+      "subtitle": "Échangez directement avec le fondateur pour voir si Obillz correspond à votre club.",
+      "ctaTrial": "Tester gratuitement",
+      "ctaFounder": "Parler au fondateur"
+    }
   },
   "faq": {
     "badge": "FAQ",

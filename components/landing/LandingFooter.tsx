@@ -62,7 +62,7 @@ export default function LandingFooter() {
   const productLinks = [
     { href: "#comment-ca-marche", label: t("marketing.nav.howItWorks") },
     { href: "#modules", label: t("marketing.nav.modules") },
-    { href: "#tarifs", label: t("marketing.nav.pricing") },
+    { href: "/tarifs", label: t("marketing.nav.pricing") },
     { href: "#faq", label: t("marketing.nav.faq") },
   ];
 

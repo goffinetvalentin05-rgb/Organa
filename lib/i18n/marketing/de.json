@@ -84,13 +84,13 @@
     "titleLine1": "Wechseln Sie zu klarerer",
     "titleLine2": "Vereinsverwaltung",
     "title": "Wechseln Sie zu klarerer Vereinsverwaltung",
-    "subtitle": "Obillz bündelt Mitglieder, Beiträge, Events, Sponsoren und Dokumente, damit Ihr Vorstand jede Woche Zeit spart.",
+    "subtitle": "Obillz bündelt die wichtigen Informationen Ihres Vereins, damit Ihr Vorstand Zeit spart, besser organisiert bleibt und nichts vergisst.",
     "cta": "Kostenlos testen",
     "gridCards": [
       {
         "id": "membres",
         "title": "Mitglieder zentral bündeln",
-        "description": "Behalten Sie eine saubere, aktuelle Datenbank — zugänglich für die richtigen Personen im Vorstand."
+        "description": "Behalten Sie eine klare, aktuelle Datenbank — zugänglich für die richtigen Personen im Vorstand."
       },
       {
         "id": "cotisations",
@@ -268,24 +268,25 @@
   },
   "howItWorks": {
     "label": "So funktioniert's",
-    "titleLead": "Starten Sie Ihren Verein in",
-    "titleAccent": "wenigen Minuten.",
-    "subtitle": "Erstellen Sie Ihren Bereich, richten Sie Ihren Verein ein und nutzen Sie Obillz in Ihrem eigenen Tempo.",
-    "reassurance": "Sie müssen nicht alles am ersten Tag vorbereiten: Obillz passt sich der Realität Ihres Vorstands an.",
-    "cta": "Meinen Verein kostenlos erstellen",
-    "ctaNote": "7 Tage gratis, ohne Kreditkarte.",
+    "title": "Starten Sie einfach mit Obillz.",
+    "subtitle": "Obillz ist darauf ausgelegt, schnell einsatzbereit zu sein — ohne komplizierte Schulung oder tiefgreifende Umstellung in der Vereinsorganisation.",
+    "cta": "Kostenlos testen",
     "steps": [
       {
-        "title": "Konto erstellen",
-        "description": "Registrieren Sie sich kostenlos und greifen Sie in wenigen Minuten auf Ihren Obillz-Bereich zu."
+        "title": "Verein anlegen",
+        "description": "Richten Sie Ihren Bereich in wenigen Minuten ein."
       },
       {
-        "title": "Verein einrichten",
-        "description": "Tragen Sie die Grunddaten Ihres Vereins ein und laden Sie bei Bedarf Vorstandsmitglieder ein."
+        "title": "Mitglieder hinzufügen",
+        "description": "Importieren Sie Ihre Liste oder ergänzen Sie Mitglieder schrittweise."
       },
       {
-        "title": "In Ihrem Tempo vorangehen",
-        "description": "Beginnen Sie mit den Modulen, die Ihrem Verein nützen: Mitglieder, Beiträge, Rechnungen, Pläne, Events oder Sponsoren. Alles ist bereits inklusive."
+        "title": "Steuern Sie nach den Bedürfnissen Ihres Vereins",
+        "description": "Nutzen Sie die Funktionen, die für Ihren Vorstand nützlich sind — je nach Organisation und Prioritäten Ihres Vereins."
+      },
+      {
+        "title": "Alles zentralisiert",
+        "description": "Ihr Vorstand behält einen klaren Überblick über die Vereinsverwaltung."
       }
     ]
   },
@@ -299,7 +300,7 @@
   },
   "pricing": {
     "label": "Preise",
-    "title": "Ein Tarif. Alles von Obillz inklusive.",
+    "title": "Ein einfacher Tarif. Alles inklusive.",
     "headline": "Geben Sie Ihrem Vorstand ein Werkzeug, das seinem Einsatz gerecht wird.",
     "body": "Einen Verein zu führen kostet bereits genug Zeit. Obillz bündelt Mitglieder, Beiträge, Finanzen, Events, Sponsoren und die Zusammenarbeit im Vorstand auf einer einfachen Plattform.",
     "highlights": [
@@ -310,9 +311,9 @@
       "Ohne Bindung"
     ],
     "reassurance": "Für weniger als 1,35 CHF pro Tag zentralisieren Sie die gesamte Vereinsverwaltung auf einer Plattform.",
-    "subtitle": "Alle Tools für Ihren Verein — ohne versteckte Module oder komplizierte Gebühren.",
+    "subtitle": "Obillz bietet die wesentlichen Funktionen, um Ihren Verein einfacher zu verwalten — ohne gesperrte Module oder versteckte Gebühren.",
     "planName": "Vereins-Tarif",
-    "planDescription": "Alles, was Sie brauchen, um Ihren Verein zu führen.",
+    "planDescription": "Alles, was Sie brauchen, um Ihren Verein im Alltag zu führen.",
     "includedLabel": "Alles inklusive",
     "monthlyBillingNote": "monatliche Abrechnung",
     "cardReassurance": "Für ehrenamtliche Vorstände, die ihre Verwaltung zentralisieren wollen — ohne dutzende separate Tools.",
@@ -320,11 +321,11 @@
       "Mitglieder",
       "Beiträge",
       "Rechnungen",
-      "Pläne",
       "Events",
-      "Buvette",
       "Sponsoren",
-      "Zahlungen",
+      "Dokumente",
+      "Protokolle",
+      "Buvette",
       "Benutzer & Zugänge",
       "Öffentliche Seite",
       "QR-Codes",
@@ -361,6 +362,19 @@
       "Getrennte Vorstandskonten",
       "Nachvollziehbarkeit der Aktionen"
     ]
+  },
+  "pricingPage": {
+    "reassuranceBlocks": [
+      "Kostenlos testen|Testen Sie Obillz 7 Tage lang — ohne Kreditkarte.",
+      "Alles inklusive|Ihr Verein erhält alle wesentlichen Module — ohne Wahl zwischen mehreren Tarifen.",
+      "Persönliche Begleitung|Kontaktieren Sie den Gründer für Fragen oder eine Demo."
+    ],
+    "finalCta": {
+      "title": "Noch unsicher?",
+      "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus, um zu sehen, ob Obillz zu Ihrem Verein passt.",
+      "ctaTrial": "Kostenlos testen",
+      "ctaFounder": "Mit dem Gründer sprechen"
+    }
   },
   "faq": {
     "badge": "FAQ",

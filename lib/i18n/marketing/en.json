@@ -84,13 +84,13 @@
     "titleLine1": "Move to clearer",
     "titleLine2": "club management",
     "title": "Move to clearer club management",
-    "subtitle": "Obillz brings together your members, fees, events, sponsors and documents to help your committee save time every week.",
+    "subtitle": "Obillz centralises your club's important information to help your committee save time, stay organised and avoid missed deadlines.",
     "cta": "Try for free",
     "gridCards": [
       {
         "id": "membres",
         "title": "Centralise your members",
-        "description": "Keep a clean, up-to-date database accessible to the right people on your committee."
+        "description": "Keep a clear, up-to-date database accessible to the right people on your committee."
       },
       {
         "id": "cotisations",
@@ -268,24 +268,25 @@
   },
   "howItWorks": {
     "label": "How it works",
-    "titleLead": "Launch your club in",
-    "titleAccent": "just a few minutes.",
-    "subtitle": "Create your workspace, set up your club, then use Obillz at your own pace.",
-    "reassurance": "No need to prepare everything on day one — Obillz adapts to how your committee actually runs.",
-    "cta": "Create my club for free",
-    "ctaNote": "7 days free, no credit card required.",
+    "title": "Start simply with Obillz.",
+    "subtitle": "Obillz was designed to be up and running quickly, with no complicated training or disruptive changes to how your club is organized.",
+    "cta": "Try for free",
     "steps": [
       {
-        "title": "Create your account",
-        "description": "Sign up for free and access your Obillz workspace in just a few minutes."
+        "title": "Create your club",
+        "description": "Set up your workspace in just a few minutes."
       },
       {
-        "title": "Set up your club",
-        "description": "Add your club's basic information and invite committee members if you wish."
+        "title": "Add your members",
+        "description": "Import your list or add members gradually."
       },
       {
-        "title": "Progress at your own pace",
-        "description": "Start with the modules useful to your club: members, fees, invoices, schedules, events or sponsors. Everything is already included."
+        "title": "Steer based on your club's needs",
+        "description": "Use the features that matter to your committee, based on how your club is organized and its priorities."
+      },
+      {
+        "title": "Everything centralized",
+        "description": "Your committee keeps a clear view of club management."
       }
     ]
   },
@@ -299,7 +300,7 @@
   },
   "pricing": {
     "label": "Pricing",
-    "title": "One plan. All of Obillz included.",
+    "title": "One simple plan. Everything included.",
     "headline": "Give your committee a tool worthy of their commitment.",
     "body": "Running a club already takes enough time. Obillz brings members, fees, finances, events, sponsors and committee collaboration together in one easy-to-use platform.",
     "highlights": [
@@ -310,9 +311,9 @@
       "No commitment"
     ],
     "reassurance": "For less than CHF 1.35 per day, centralize your entire club management on a single platform.",
-    "subtitle": "Every tool to run your club — no hidden modules or complicated fees.",
+    "subtitle": "Obillz gives you the essential features to manage your club more simply — no locked modules or hidden fees.",
     "planName": "Club Plan",
-    "planDescription": "Everything you need to run your club.",
+    "planDescription": "Everything you need to run your club day to day.",
     "includedLabel": "Everything included",
     "monthlyBillingNote": "billed monthly",
     "cardReassurance": "Built for volunteer committees who want one place for club management — not a pile of separate tools.",
@@ -320,11 +321,11 @@
       "Members",
       "Membership fees",
       "Invoices",
-      "Schedules",
       "Events",
-      "Bar",
       "Sponsors",
-      "Payments",
+      "Documents",
+      "Meeting minutes",
+      "Bar",
       "Users & access",
       "Public page",
       "QR codes",
@@ -361,6 +362,19 @@
       "Separate committee accounts",
       "Action audit trail"
     ]
+  },
+  "pricingPage": {
+    "reassuranceBlocks": [
+      "Free trial|Try Obillz for 7 days — no credit card required.",
+      "Everything included|Your club gets all essential modules without choosing between multiple plans.",
+      "Personal support|Contact the founder to ask questions or request a demo."
+    ],
+    "finalCta": {
+      "title": "Still unsure?",
+      "subtitle": "Talk directly with the founder to see if Obillz is right for your club.",
+      "ctaTrial": "Try for free",
+      "ctaFounder": "Talk to the founder"
+    }
   },
   "faq": {
     "badge": "FAQ",

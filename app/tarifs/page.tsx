@@ -1,48 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+import PricingPage from "@/components/landing/PricingPage";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Tarifs | Obillz",
+  description:
+    "Une formule simple pour gérer votre club sportif : membres, cotisations, factures, événements et plus — sans modules bloqués ni frais cachés.",
+};
 
 export default function TarifsPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/inscription");
-  }, [router]);
-
-  return null;
+  return <PricingPage />;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
