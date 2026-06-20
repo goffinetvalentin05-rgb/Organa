@@ -38,7 +38,7 @@ export default function FeaturesSection() {
   const cards = (Array.isArray(raw) ? raw : []) as FeatureCard[];
 
   return (
-    <section id="modules" className="relative scroll-mt-24 py-16 md:py-28">
+    <section id="modules" className="relative scroll-mt-24 pb-16 pt-4 md:pb-28 md:pt-8">
       <div className={landingSectionGlowClass} aria-hidden />
       <div
         className="pointer-events-none absolute inset-x-[4%] top-[6%] h-[min(560px,60vh)] rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.22),rgba(34,211,238,0.05)_42%,transparent_74%)] blur-3xl"

@@ -27,7 +27,7 @@ export default function AskChatGptSection() {
   );
 
   return (
-    <section id="demander-chatgpt" className="relative scroll-mt-24 py-16 md:py-28">
+    <section id="demander-chatgpt" className="relative scroll-mt-24 pt-8 pb-20 md:pt-8 md:pb-28">
       <div className={landingSectionGlowClass} aria-hidden />
 
       <motion.div

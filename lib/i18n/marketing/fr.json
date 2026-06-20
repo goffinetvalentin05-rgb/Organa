@@ -4,7 +4,7 @@
     "description": "Factures, membres, cotisations, événements et paiements réunis dans un seul logiciel pensé pour les clubs sportifs."
   },
   "nav": {
-    "problem": "Problème",
+    "platform": "Plateforme",
     "modules": "Modules",
     "howItWorks": "Comment ça marche",
     "pricing": "Tarifs",
@@ -47,37 +47,6 @@
       "buvette": { "subtitle": "Créneaux matchs" },
       "page-publique": { "subtitle": "Vitrine en ligne" }
     }
-  },
-  "problem": {
-    "title": "Une gestion plus claire, moins de temps perdu.",
-    "subtitle": "Obillz aide votre comité à centraliser les informations importantes, réduire les tâches répétitives et garder une vision claire du club.",
-    "cta": "Tester gratuitement",
-    "cards": [
-      {
-        "title": "Gagnez du temps chaque semaine",
-        "description": "Centralisez les tâches répétitives et évitez les allers-retours entre Excel, WhatsApp et les documents dispersés."
-      },
-      {
-        "title": "Gardez une vision claire",
-        "description": "Suivez les membres, paiements, événements et documents importants depuis un espace unique."
-      },
-      {
-        "title": "Travaillez mieux en comité",
-        "description": "Invitez les bonnes personnes, attribuez les bons accès et facilitez la collaboration."
-      },
-      {
-        "title": "Évitez les oublis",
-        "description": "Gardez le suivi des cotisations, contrats, échéances et informations importantes du club."
-      },
-      {
-        "title": "Modernisez votre organisation",
-        "description": "Offrez à votre club une gestion plus propre, plus structurée et plus professionnelle."
-      },
-      {
-        "title": "Avancez progressivement",
-        "description": "Commencez avec les modules essentiels, puis utilisez Obillz selon les besoins réels de votre club."
-      }
-    ]
   },
   "modules": {
     "label": "Gestion du club",

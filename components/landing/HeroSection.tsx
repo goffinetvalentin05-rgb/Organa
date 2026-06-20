@@ -37,7 +37,7 @@ export default function HeroSection() {
         aria-hidden
       />
 
-      <div className="flex flex-1 flex-col items-center justify-center pb-16 pt-24 sm:pb-20 sm:pt-28 md:pt-32">
+      <div className="flex flex-1 flex-col items-center justify-center pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-32">
         <motion.div
           variants={staggerContainer}
           initial="hidden"

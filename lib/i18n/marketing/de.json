@@ -4,7 +4,7 @@
     "description": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine."
   },
   "nav": {
-    "problem": "Problem",
+    "platform": "Plattform",
     "modules": "Module",
     "howItWorks": "So funktioniert's",
     "pricing": "Preise",
@@ -47,37 +47,6 @@
       "buvette": { "subtitle": "Spieltags-Slots" },
       "page-publique": { "subtitle": "Online-Auftritt" }
     }
-  },
-  "problem": {
-    "title": "Klarere Verwaltung, weniger Zeitverlust.",
-    "subtitle": "Obillz hilft Ihrem Vorstand, wichtige Informationen zu bündeln, repetitive Aufgaben zu reduzieren und den Verein klar im Blick zu behalten.",
-    "cta": "Kostenlos testen",
-    "cards": [
-      {
-        "title": "Jede Woche Zeit sparen",
-        "description": "Bündeln Sie repetitive Aufgaben und vermeiden Sie Wechsel zwischen Excel, WhatsApp und verstreuten Dokumenten."
-      },
-      {
-        "title": "Den Überblick behalten",
-        "description": "Verfolgen Sie Mitglieder, Zahlungen, Events und wichtige Dokumente in einem einzigen Bereich."
-      },
-      {
-        "title": "Besser im Vorstand arbeiten",
-        "description": "Laden Sie die richtigen Personen ein, vergeben Sie passende Zugriffe und erleichtern Sie die Zusammenarbeit."
-      },
-      {
-        "title": "Nichts vergessen",
-        "description": "Behalten Sie Beiträge, Verträge, Fristen und wichtige Vereinsinformationen im Blick."
-      },
-      {
-        "title": "Ihre Organisation modernisieren",
-        "description": "Bieten Sie Ihrem Verein eine sauberere, strukturiertere und professionellere Verwaltung."
-      },
-      {
-        "title": "Schritt für Schritt vorankommen",
-        "description": "Starten Sie mit den wichtigsten Modulen und nutzen Sie Obillz nach den echten Bedürfnissen Ihres Vereins."
-      }
-    ]
   },
   "modules": {
     "label": "Vereinsverwaltung",

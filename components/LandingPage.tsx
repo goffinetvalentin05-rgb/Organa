@@ -1,6 +1,5 @@
 "use client";
 
-import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import HeroSection from "@/components/landing/HeroSection";
 import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
@@ -27,9 +26,8 @@ export default function LandingPage() {
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
-        <AskChatGptSection />
         <FaqSection />
-        <FinalCtaSection />
+        <AskChatGptSection />
 
         <LandingFooter />
       </div>

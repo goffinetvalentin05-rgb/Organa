@@ -4,7 +4,7 @@
     "description": "Invoices, members, fees, events and payments in one platform built for sports clubs."
   },
   "nav": {
-    "problem": "The problem",
+    "platform": "Platform",
     "modules": "Modules",
     "howItWorks": "How it works",
     "pricing": "Pricing",
@@ -47,37 +47,6 @@
       "buvette": { "subtitle": "Match-day slots" },
       "page-publique": { "subtitle": "Online showcase" }
     }
-  },
-  "problem": {
-    "title": "Clearer management, less time wasted.",
-    "subtitle": "Obillz helps your committee centralise important information, cut repetitive tasks and keep a clear view of the club.",
-    "cta": "Try for free",
-    "cards": [
-      {
-        "title": "Save time every week",
-        "description": "Centralise repetitive tasks and stop bouncing between spreadsheets, WhatsApp and scattered documents."
-      },
-      {
-        "title": "Keep a clear overview",
-        "description": "Track members, payments, events and key documents from a single workspace."
-      },
-      {
-        "title": "Work better as a committee",
-        "description": "Invite the right people, assign the right access and make collaboration easier."
-      },
-      {
-        "title": "Avoid missed deadlines",
-        "description": "Stay on top of fees, contracts, due dates and other important club information."
-      },
-      {
-        "title": "Modernise your organisation",
-        "description": "Give your club cleaner, more structured and more professional management."
-      },
-      {
-        "title": "Grow at your own pace",
-        "description": "Start with the essentials, then use Obillz based on your club's real needs."
-      }
-    ]
   },
   "modules": {
     "label": "Club management",
