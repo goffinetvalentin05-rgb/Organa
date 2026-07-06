@@ -1,6 +1,7 @@
 "use client";
 
 import HeroSection from "@/components/landing/HeroSection";
+import TrustStatsSection from "@/components/landing/TrustStatsSection";
 import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
@@ -18,6 +19,7 @@ export default function LandingPage() {
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
+        <TrustStatsSection />
         <div className="landing-light-zone">
           <FeaturesSection />
           <HowItWorksSection />

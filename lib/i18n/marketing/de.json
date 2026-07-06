@@ -34,6 +34,37 @@
       "page-publique": "Vereinsauftritt"
     }
   },
+  "trustStats": {
+    "ariaLabel": "Vertrauensindikatoren",
+    "items": [
+      {
+        "id": "swiss",
+        "value": "In der Schweiz entwickelt",
+        "description": "Für Schweizer Sportvereine gedacht"
+      },
+      {
+        "id": "support",
+        "value": "7 Tage die Woche",
+        "counterFrom": 1,
+        "counterTo": 7,
+        "counterTemplate": "{n}/7",
+        "description": "Support verfügbar"
+      },
+      {
+        "id": "percent",
+        "value": "100%",
+        "counterFrom": 0,
+        "counterTo": 100,
+        "counterTemplate": "{n}%",
+        "description": "Für eine einfachere Vereinsverwaltung"
+      },
+      {
+        "id": "simple",
+        "value": "Einfach",
+        "description": "Schneller Einstieg und klare Bedienung"
+      }
+    ]
+  },
   "flow": {
     "ariaLabel": "Vereinsverwaltung zentral in Obillz",
     "mobileHint": "Alle Tools an einem Ort",

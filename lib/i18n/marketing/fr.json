@@ -34,6 +34,37 @@
       "page-publique": "Vitrine de votre club"
     }
   },
+  "trustStats": {
+    "ariaLabel": "Indicateurs de confiance",
+    "items": [
+      {
+        "id": "swiss",
+        "value": "Conçu en Suisse",
+        "description": "Logiciel pensé pour les clubs sportifs suisses"
+      },
+      {
+        "id": "support",
+        "value": "7j/7",
+        "counterFrom": 1,
+        "counterTo": 7,
+        "counterTemplate": "{n}j/7",
+        "description": "Support disponible"
+      },
+      {
+        "id": "percent",
+        "value": "100%",
+        "counterFrom": 0,
+        "counterTo": 100,
+        "counterTemplate": "{n}%",
+        "description": "Pensé pour simplifier la gestion du club"
+      },
+      {
+        "id": "simple",
+        "value": "Simple",
+        "description": "Mise en place rapide et prise en main claire"
+      }
+    ]
+  },
   "flow": {
     "ariaLabel": "Centralisation de la gestion du club dans Obillz",
     "mobileHint": "Tous vos outils réunis au même endroit",

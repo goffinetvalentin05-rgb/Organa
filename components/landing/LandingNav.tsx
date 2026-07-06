@@ -2,18 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
-
-const PRICING_SECTION_ID = "tarifs";
-
-const navLinks = [
-  { href: "/#tarifs", sectionId: PRICING_SECTION_ID, key: "marketing.nav.pricing" },
-] as const;
 
 const menuItemVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -25,23 +18,57 @@ const menuItemVariants = {
   exit: { opacity: 0, y: 8, transition: { duration: 0.2, ease: easePremium } },
 };
 
+type NavTheme = "dark" | "light";
+
+function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
+  const [theme, setTheme] = useState<NavTheme>("dark");
+
+  useEffect(() => {
+    const update = () => {
+      const probe = headerRef.current?.getBoundingClientRect().bottom ?? 72;
+      const footer = document.querySelector(".landing-footer-shell");
+      const lightZone = document.querySelector(".landing-light-zone");
+
+      const footerTop = footer?.getBoundingClientRect().top;
+      if (footerTop !== undefined && footerTop <= probe + 6) {
+        setTheme("dark");
+        return;
+      }
+
+      const lightRect = lightZone?.getBoundingClientRect();
+      if (
+        lightRect &&
+        lightRect.top <= probe + 10 &&
+        lightRect.bottom > probe
+      ) {
+        setTheme("light");
+        return;
+      }
+
+      setTheme("dark");
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [headerRef]);
+
+  return theme;
+}
+
 export default function LandingNav() {
   const { t } = useI18n();
-  const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+  const navTheme = useLandingNavTheme(headerRef);
+  const isLight = navTheme === "light";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
-
-  const scrollToSection = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
-      closeMenu();
-      if (pathname !== "/") return;
-      event.preventDefault();
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    },
-    [pathname, closeMenu],
-  );
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -63,14 +90,17 @@ export default function LandingNav() {
   return (
     <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
       <motion.header
+        ref={headerRef}
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className="relative flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-blue-300/28 bg-gradient-to-r from-white/[0.12] via-[#2563EB]/[0.06] to-white/[0.1] px-3.5 shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_12px_48px_rgba(10,31,77,0.35),0_0_40px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
+        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
+          isLight ? "landing-nav-header--light" : "landing-nav-header--dark"
+        }`}
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center transition hover:opacity-90 lg:justify-self-start"
+          className="flex shrink-0 items-center transition hover:opacity-90"
           onClick={closeMenu}
         >
           <Image
@@ -79,31 +109,19 @@ export default function LandingNav() {
             width={200}
             height={48}
             priority
-            className="h-8 w-auto sm:h-8 lg:h-9"
+            className={`h-8 w-auto sm:h-8 lg:h-9 ${isLight ? "landing-nav-logo--on-light" : ""}`}
           />
         </Link>
 
-        <nav
-          className="hidden items-center justify-center gap-6 lg:flex xl:gap-8"
-          aria-label="Navigation"
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={(event) => scrollToSection(event, link.sectionId)}
-              className="text-[13px] font-medium text-white/60 transition hover:text-white/95 xl:text-sm"
-            >
-              {t(link.key)}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="hidden shrink-0 items-center gap-1.5 sm:gap-2 lg:flex lg:justify-self-end lg:gap-3">
-          <LanguageSwitcher compact />
+        <div className="hidden shrink-0 items-center gap-1.5 sm:gap-2 lg:flex lg:gap-3">
+          <LanguageSwitcher compact theme={navTheme} />
           <Link
             href="/connexion"
-            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/90 shadow-[0_0_16px_rgba(37,99,235,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] transition hover:border-white/45 hover:bg-white/[0.12] hover:shadow-[0_0_24px_rgba(37,99,235,0.16)] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium transition sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm ${
+              isLight
+                ? "border-slate-200/90 bg-white/70 text-slate-800 shadow-sm hover:border-slate-300 hover:bg-white"
+                : "border-white/30 bg-white/[0.06] text-white/90 shadow-[0_0_16px_rgba(37,99,235,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-white/45 hover:bg-white/[0.12] hover:shadow-[0_0_24px_rgba(37,99,235,0.16)]"
+            }`}
           >
             {t("marketing.nav.login")}
           </Link>
@@ -112,7 +130,11 @@ export default function LandingNav() {
         <button
           type="button"
           onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/[0.08] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition hover:bg-white/[0.14] lg:hidden"
+          className={`relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition lg:hidden ${
+            isLight
+              ? "border-slate-200/90 bg-slate-900/[0.04] text-slate-800 hover:bg-slate-900/[0.08]"
+              : "border-white/20 bg-white/[0.08] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] hover:bg-white/[0.14]"
+          }`}
           aria-expanded={isMenuOpen}
           aria-controls="landing-mobile-menu"
           aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -205,32 +227,8 @@ export default function LandingNav() {
                   exit="exit"
                   className="mt-3 flex justify-center"
                 >
-                  <LanguageSwitcher />
+                  <LanguageSwitcher theme="dark" />
                 </motion.div>
-
-                <div
-                  className="my-3 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  aria-hidden
-                />
-
-                {navLinks.map((link, index) => (
-                  <motion.div
-                    key={link.href}
-                    custom={index + 3}
-                    variants={menuItemVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={(event) => scrollToSection(event, link.sectionId)}
-                      className="flex items-center rounded-xl px-3 py-3 text-[15px] font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white active:bg-white/[0.08]"
-                    >
-                      {t(link.key)}
-                    </Link>
-                  </motion.div>
-                ))}
               </div>
             </motion.nav>
           </>

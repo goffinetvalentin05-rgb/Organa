@@ -170,6 +170,42 @@ body.app-bg:has(.obillz-dashboard) {
   display: none;
 }
 
+/* Navbar landing — thème sombre / clair selon le scroll */
+.landing-nav-header {
+  transition:
+    background 0.32s ease,
+    border-color 0.32s ease,
+    box-shadow 0.32s ease;
+}
+
+.landing-nav-header--dark {
+  border-color: rgba(147, 197, 253, 0.28);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(37, 99, 235, 0.06) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(147, 197, 253, 0.1),
+    0 12px 48px rgba(10, 31, 77, 0.35),
+    0 0 40px rgba(37, 99, 235, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px);
+}
+
+.landing-nav-header--light {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.landing-nav-logo--on-light {
+  filter: brightness(0) saturate(100%);
+  opacity: 0.9;
+}
+
 /* Hero — dégradé bleu premium (navy → bleu lumineux en bas) */
 .landing-hero-shell {
   position: relative;
@@ -227,6 +263,66 @@ body.app-bg:has(.obillz-dashboard) {
 /* Retire le glow bas statique du hero */
 .landing-hero-shell > div.pointer-events-none.absolute.inset-x-0.bottom-0 {
   display: none;
+}
+
+/* Bande réassurance — intégrée au fond du hero */
+.landing-trust-strip {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--hero-sheet-gap) + 0.75rem);
+  padding-bottom: calc(var(--sheet-overlap-pull) + 2.75rem);
+}
+
+.landing-trust-strip__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .landing-trust-strip__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .landing-trust-strip__item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 12%;
+    right: 0;
+    height: 76%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(255, 255, 255, 0.14) 22%,
+      rgba(255, 255, 255, 0.14) 78%,
+      transparent
+    );
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-trust-strip__item:nth-child(odd)::after {
+    content: "";
+    position: absolute;
+    top: 8%;
+    right: 0;
+    height: 84%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(255, 255, 255, 0.1) 30%,
+      rgba(255, 255, 255, 0.1) 70%,
+      transparent
+    );
+  }
+
+  .landing-trust-strip__item:nth-child(-n + 2) {
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }
 
 /* Feuille blanche — grande carte de contenu, chevauche le hero au scroll */

@@ -34,6 +34,37 @@
       "page-publique": "Your club showcase"
     }
   },
+  "trustStats": {
+    "ariaLabel": "Trust indicators",
+    "items": [
+      {
+        "id": "swiss",
+        "value": "Made in Switzerland",
+        "description": "Built for Swiss sports clubs"
+      },
+      {
+        "id": "support",
+        "value": "7 days a week",
+        "counterFrom": 1,
+        "counterTo": 7,
+        "counterTemplate": "{n}/7",
+        "description": "Support available"
+      },
+      {
+        "id": "percent",
+        "value": "100%",
+        "counterFrom": 0,
+        "counterTo": 100,
+        "counterTemplate": "{n}%",
+        "description": "Designed to simplify club management"
+      },
+      {
+        "id": "simple",
+        "value": "Simple",
+        "description": "Quick setup and clear onboarding"
+      }
+    ]
+  },
   "flow": {
     "ariaLabel": "Club management centralized in Obillz",
     "mobileHint": "All your tools in one place",
