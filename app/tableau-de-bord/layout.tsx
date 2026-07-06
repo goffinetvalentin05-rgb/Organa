@@ -7,8 +7,7 @@ import { useEffect, useId, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import LandingBackground from "@/components/landing/LandingBackground";
-import { dashboardShellRootClass, obillzLandingGridOverlayClass } from "@/components/ui";
+import { dashboardGridOverlayClass, dashboardShellRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import ClubPublicPageAnnouncementModal from "@/components/public-page/ClubPublicPageAnnouncementModal";
 import { NewFeaturesAnnouncementProvider } from "@/components/announcements/NewFeaturesAnnouncementProvider";
@@ -153,9 +152,8 @@ export default function DashboardLayout({
   return (
     <NewFeaturesAnnouncementProvider>
     <div className={dashboardShellRootClass}>
-      <LandingBackground />
       <ClubPublicPageAnnouncementModal />
-      <div className={obillzLandingGridOverlayClass} aria-hidden />
+      <div className={dashboardGridOverlayClass} aria-hidden />
 
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (

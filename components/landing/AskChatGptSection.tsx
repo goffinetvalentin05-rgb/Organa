@@ -4,7 +4,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useI18n } from "@/components/I18nProvider";
 import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
-import { landingSectionGlowClass } from "@/components/ui/styles";
+import { landingPremiumCardClass, landingPremiumCardDescClass } from "@/components/ui/styles";
+import { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -27,9 +28,7 @@ export default function AskChatGptSection() {
   );
 
   return (
-    <section id="demander-chatgpt" className="relative scroll-mt-24 pt-8 pb-20 md:pt-8 md:pb-28">
-      <div className={landingSectionGlowClass} aria-hidden />
-
+    <section id="demander-chatgpt" className={landingSectionShellClass()}>
       <motion.div
         variants={scrollReveal}
         initial="hidden"
@@ -37,27 +36,9 @@ export default function AskChatGptSection() {
         viewport={viewportOnce}
         className="relative mx-auto w-[94%] max-w-[820px]"
       >
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-blue-400/30 bg-gradient-to-br from-[#0a0f2e]/95 via-[#0d1238]/98 to-[#111827]/95 px-6 py-10 text-center shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_12px_56px_rgba(0,0,0,0.55),0_0_100px_rgba(26,35,255,0.22)] backdrop-blur-2xl sm:px-8 sm:py-12 md:px-12 md:py-14">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle,rgba(148,163,184,0.9)_1px,transparent_1px)] [background-size:24px_24px]"
-            aria-hidden
-          />
-
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[#1A23FF]/20 bg-[radial-gradient(circle,rgba(26,35,255,0.18),transparent_70%)]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full border border-indigo-400/15 bg-[radial-gradient(circle,rgba(99,102,241,0.14),transparent_70%)]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[min(420px,80%)] w-[min(520px,95%)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.2),transparent_65%)] blur-3xl"
-            aria-hidden
-          />
-
+        <div className={`${landingPremiumCardClass} landing-premium-card--flat-shadow px-6 py-10 text-center sm:px-8 sm:py-12 md:px-12 md:py-14`}>
           <div className="relative z-10 flex flex-col items-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/[0.06] px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
               <Image
                 src="/obillz-logo.png"
                 alt={t("marketing.askChatGpt.logoAlt")}
@@ -67,11 +48,11 @@ export default function AskChatGptSection() {
               />
             </span>
 
-            <h2 className="mt-6 max-w-xl text-balance text-2xl font-black leading-[1.12] tracking-tight text-white md:text-3xl lg:text-4xl">
+            <h2 className="mt-6 max-w-xl text-balance text-2xl font-black leading-[1.12] tracking-tight text-[#F8FAFC] md:text-3xl lg:text-4xl">
               {t("marketing.askChatGpt.title")}
             </h2>
 
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-blue-100/75 md:text-base">
+            <p className={`mt-4 max-w-lg text-sm md:text-base ${landingPremiumCardDescClass}`}>
               {t("marketing.askChatGpt.subtitle")}
             </p>
 
@@ -80,14 +61,10 @@ export default function AskChatGptSection() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center gap-2.5 rounded-full border border-white/20 bg-gradient-to-b from-slate-900 to-[#0a0f1e] px-7 py-3.5 text-base font-bold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_48px_rgba(26,35,255,0.45),0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] transition-[box-shadow,transform,border-color] duration-300 hover:-translate-y-0.5 hover:border-blue-300/40 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.25),0_0_64px_rgba(26,35,255,0.6),0_12px_40px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.18)] md:px-8 md:py-4"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-white/16 bg-[linear-gradient(180deg,#030B1F_0%,#06122E_100%)] px-7 py-3.5 text-base font-bold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-white/22 md:px-8 md:py-4"
               >
-                <span
-                  className="pointer-events-none absolute -inset-1 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.5),transparent_70%)] opacity-60 blur-xl transition-opacity duration-300 group-hover:opacity-100"
-                  aria-hidden
-                />
-                <WhatsAppIcon className="relative h-5 w-5 shrink-0" />
-                <span className="relative">{t("marketing.askChatGpt.cta")}</span>
+                <WhatsAppIcon className="h-5 w-5 shrink-0" />
+                <span>{t("marketing.askChatGpt.cta")}</span>
               </a>
             </div>
           </div>

@@ -333,14 +333,66 @@
     ]
   },
   "pricingPage": {
+    "headerTitleLine1": "Ein einfacher Tarif.",
+    "headerTitleLine2": "Alles inklusive.",
+    "planBadge": "Club-Tarif",
+    "reassurancePills": [
+      "Ohne Bindung",
+      "Kostenlos testen",
+      "Support inklusive",
+      "Einfache Einrichtung"
+    ],
+    "planFeatures": [
+      "Unbegrenzte Mitglieder",
+      "Beitragsverwaltung",
+      "Zahlungsverfolgung",
+      "Event-Verwaltung",
+      "Sponsoren-Verwaltung",
+      "Zentralisierte Dokumente",
+      "Support inklusive"
+    ],
+    "everythingIncluded": {
+      "title": "Alles, was Ihr Verein braucht — in einem Tarif.",
+      "subtitle": "Obillz bündelt die wesentlichen Funktionen zur Vereinsverwaltung — ohne unnötige Komplexität."
+    },
+    "overviewItems": [
+      "Mitgliederverwaltung",
+      "Beiträge & Zahlungen",
+      "Events",
+      "Sponsoren",
+      "Dokumente",
+      "Zentrale Übersicht"
+    ],
+    "faq": {
+      "label": "FAQ",
+      "title": "Häufige Fragen",
+      "items": [
+        {
+          "question": "Gibt es versteckte Gebühren?",
+          "answer": "Nein. Ein Tarif, ein klarer Preis. Alle wesentlichen Funktionen sind inklusive — ohne gesperrte Module oder Überraschungen."
+        },
+        {
+          "question": "Kann ich Obillz vor der Bindung testen?",
+          "answer": "Ja. Sie erhalten 7 Tage kostenlos testen — ohne Kreditkarte und ohne Bindung."
+        },
+        {
+          "question": "Sind alle Funktionen im Tarif enthalten?",
+          "answer": "Ja. Der Vereins-Tarif gibt Zugang zu allen wesentlichen Modulen für den Vereinsalltag."
+        },
+        {
+          "question": "Ist Obillz für alle Vereine geeignet?",
+          "answer": "Ja. Ob kleiner lokaler Verein oder strukturiertere Organisation — Obillz passt sich Ihren Bedürfnissen an."
+        }
+      ]
+    },
     "reassuranceBlocks": [
       "Kostenlos testen|Testen Sie Obillz 7 Tage lang — ohne Kreditkarte.",
       "Alles inklusive|Ihr Verein erhält alle wesentlichen Module — ohne Wahl zwischen mehreren Tarifen.",
       "Persönliche Begleitung|Kontaktieren Sie den Gründer für Fragen oder eine Demo."
     ],
     "finalCta": {
-      "title": "Noch unsicher?",
-      "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus, um zu sehen, ob Obillz zu Ihrem Verein passt.",
+      "title": "Bereit, Ihre Vereinsverwaltung zu vereinfachen?",
+      "subtitle": "Testen Sie Obillz kostenlos und entdecken Sie eine klarere Art, Ihren Verein zu führen.",
       "ctaTrial": "Kostenlos testen",
       "ctaFounder": "Mit dem Gründer sprechen"
     }

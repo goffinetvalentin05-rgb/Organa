@@ -43,6 +43,7 @@ export {
   buvetteDayOccupiedClass,
   buvetteDayEmptyClass,
   obillzLandingRootClass,
+  obillzLandingHomeClass,
   obillzLandingGridOverlayClass,
   dashboardShellRootClass,
   dashboardGridOverlayClass,

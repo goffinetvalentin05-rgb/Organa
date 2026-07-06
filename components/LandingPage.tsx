@@ -3,31 +3,28 @@
 import HeroSection from "@/components/landing/HeroSection";
 import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import LandingBackground from "@/components/landing/LandingBackground";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
 import FeaturesSection from "@/components/landing/FeaturesSection";
+import PricingSection from "@/components/landing/PricingSection";
 import FaqSection from "@/components/landing/FaqSection";
-import {
-  obillzLandingGridOverlayClass,
-  obillzLandingRootClass,
-} from "@/components/ui/styles";
+import { obillzLandingHomeClass } from "@/components/ui/styles";
 
 export default function LandingPage() {
   return (
-    <main className={obillzLandingRootClass}>
-      <LandingBackground />
-      <div className={obillzLandingGridOverlayClass} aria-hidden />
-
+    <main className={obillzLandingHomeClass}>
       <div className="relative z-10">
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <FaqSection />
-        <AskChatGptSection />
+        <div className="landing-light-zone">
+          <FeaturesSection />
+          <HowItWorksSection />
+          <PricingSection />
+          <FaqSection />
+          <AskChatGptSection />
+        </div>
 
         <LandingFooter />
       </div>

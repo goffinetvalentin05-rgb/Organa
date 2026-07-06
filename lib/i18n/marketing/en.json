@@ -333,14 +333,66 @@
     ]
   },
   "pricingPage": {
+    "headerTitleLine1": "One simple plan.",
+    "headerTitleLine2": "Everything included.",
+    "planBadge": "Club Plan",
+    "reassurancePills": [
+      "No commitment",
+      "Free trial",
+      "Support included",
+      "Easy setup"
+    ],
+    "planFeatures": [
+      "Unlimited members",
+      "Membership fee management",
+      "Payment tracking",
+      "Event management",
+      "Sponsor management",
+      "Centralized documents",
+      "Support included"
+    ],
+    "everythingIncluded": {
+      "title": "Everything your club needs, in one plan.",
+      "subtitle": "Obillz brings together the essential features to simplify your club management — without unnecessary complexity."
+    },
+    "overviewItems": [
+      "Member management",
+      "Fees & payments",
+      "Events",
+      "Sponsors",
+      "Documents",
+      "Centralized view"
+    ],
+    "faq": {
+      "label": "FAQ",
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "question": "Are there hidden fees?",
+          "answer": "No. One plan, one clear price. All essential features are included — no locked modules or surprises."
+        },
+        {
+          "question": "Can I try Obillz before committing?",
+          "answer": "Yes. You get a 7-day free trial with no credit card and no commitment."
+        },
+        {
+          "question": "Does the plan include all features?",
+          "answer": "Yes. The Club Plan gives you access to all essential modules to run your club day to day."
+        },
+        {
+          "question": "Is Obillz suitable for all clubs?",
+          "answer": "Yes. Whether you run a small local club or a more structured organization, Obillz adapts to your needs."
+        }
+      ]
+    },
     "reassuranceBlocks": [
       "Free trial|Try Obillz for 7 days — no credit card required.",
       "Everything included|Your club gets all essential modules without choosing between multiple plans.",
       "Personal support|Contact the founder to ask questions or request a demo."
     ],
     "finalCta": {
-      "title": "Still unsure?",
-      "subtitle": "Talk directly with the founder to see if Obillz is right for your club.",
+      "title": "Ready to simplify your club management?",
+      "subtitle": "Try Obillz for free and discover a clearer way to run your club.",
       "ctaTrial": "Try for free",
       "ctaFounder": "Talk to the founder"
     }

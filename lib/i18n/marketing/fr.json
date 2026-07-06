@@ -333,14 +333,66 @@
     ]
   },
   "pricingPage": {
+    "headerTitleLine1": "Une formule simple.",
+    "headerTitleLine2": "Tout est inclus.",
+    "planBadge": "Formule Club",
+    "reassurancePills": [
+      "Sans engagement",
+      "Essai gratuit",
+      "Support inclus",
+      "Mise en place simple"
+    ],
+    "planFeatures": [
+      "Membres illimités",
+      "Gestion des cotisations",
+      "Suivi des paiements",
+      "Gestion des événements",
+      "Gestion des sponsors",
+      "Documents centralisés",
+      "Support inclus"
+    ],
+    "everythingIncluded": {
+      "title": "Tout ce dont votre club a besoin, dans une seule formule.",
+      "subtitle": "Obillz regroupe les fonctionnalités essentielles pour simplifier la gestion de votre club, sans complexité inutile."
+    },
+    "overviewItems": [
+      "Gestion des membres",
+      "Cotisations et paiements",
+      "Événements",
+      "Sponsors",
+      "Documents",
+      "Vue centralisée"
+    ],
+    "faq": {
+      "label": "FAQ",
+      "title": "Questions fréquentes",
+      "items": [
+        {
+          "question": "Y a-t-il des frais cachés ?",
+          "answer": "Non. Une formule, un prix clair. Toutes les fonctionnalités essentielles sont incluses, sans module bloqué ni surprise."
+        },
+        {
+          "question": "Puis-je tester Obillz avant de m'engager ?",
+          "answer": "Oui. Vous bénéficiez de 7 jours d'essai gratuit, sans carte bancaire et sans engagement."
+        },
+        {
+          "question": "L'offre inclut-elle toutes les fonctionnalités ?",
+          "answer": "Oui. La Formule Club donne accès à l'ensemble des modules essentiels pour gérer votre club au quotidien."
+        },
+        {
+          "question": "Obillz est-il adapté à tous les clubs ?",
+          "answer": "Oui. Que vous gériez un petit club local ou une structure plus organisée, Obillz s'adapte à vos besoins."
+        }
+      ]
+    },
     "reassuranceBlocks": [
       "Essai gratuit|Testez Obillz pendant 7 jours, sans carte bancaire.",
       "Tout est inclus|Votre club accède aux modules essentiels sans devoir choisir entre plusieurs plans.",
       "Accompagnement|Vous pouvez contacter le fondateur pour poser vos questions ou demander une démonstration."
     ],
     "finalCta": {
-      "title": "Vous hésitez encore ?",
-      "subtitle": "Échangez directement avec le fondateur pour voir si Obillz correspond à votre club.",
+      "title": "Prêt à simplifier la gestion de votre club ?",
+      "subtitle": "Essayez Obillz gratuitement et découvrez une façon plus claire de gérer votre club.",
       "ctaTrial": "Tester gratuitement",
       "ctaFounder": "Parler au fondateur"
     }

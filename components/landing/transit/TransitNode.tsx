@@ -29,7 +29,7 @@ export function TransitNode({ source, variant = "anchor", className = "" }: Tran
     <div
       className={`group flex items-center gap-1.5 rounded-lg border backdrop-blur-md transition-shadow ${
         isTravel
-          ? "border-white/20 bg-[#0c1229]/95 px-1.5 py-1 shadow-[0_0_24px_rgba(26,35,255,0.35),0_8px_24px_rgba(0,0,0,0.4)]"
+          ? "border-white/20 bg-[#0B1D40]/95 px-1.5 py-1 shadow-[0_0_24px_rgba(37,99,235,0.28),0_8px_24px_rgba(10,31,77,0.4)]"
           : "border-white/[0.08] bg-white/[0.04] px-1.5 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.25)]"
       } ${className}`}
     >
@@ -37,7 +37,7 @@ export function TransitNode({ source, variant = "anchor", className = "" }: Tran
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
           source.brand === "whatsapp"
             ? "bg-[#25D366]/15 ring-1 ring-[#25D366]/25"
-            : "bg-[#1A23FF]/15 ring-1 ring-[#1A23FF]/20"
+            : "bg-[#2563EB]/15 ring-1 ring-[#2563EB]/22"
         }`}
       >
         {source.brand === "whatsapp" ? (

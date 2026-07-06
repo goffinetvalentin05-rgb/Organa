@@ -106,10 +106,345 @@ body.app-bg {
   position: relative;
 }
 
-body.app-bg:has(.obillz-landing),
+body.app-bg:has(.obillz-landing-home) {
+  background-color: #020617 !important;
+}
+
+body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
+  background-color: #020817 !important;
+}
+
 body.app-bg:has(.dashboard-shell),
 body.app-bg:has(.obillz-dashboard) {
   background-color: #020617 !important;
+}
+
+/* ------------------------------------------------------------------
+   Landing marketing (tarifs, légal, auth) — fond navy uniforme
+   ------------------------------------------------------------------ */
+.obillz-landing:not(.obillz-landing-home)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 50% at 0% 100%, rgba(30, 91, 255, 0.2) 0%, rgba(18, 60, 255, 0.07) 34%, transparent 64%),
+    radial-gradient(ellipse 75% 50% at 100% 100%, rgba(30, 91, 255, 0.2) 0%, rgba(18, 60, 255, 0.07) 34%, transparent 64%),
+    radial-gradient(ellipse 80% 45% at 50% 100%, rgba(18, 60, 255, 0.1) 0%, transparent 58%),
+    linear-gradient(180deg, #020817 0%, #030b22 55%, #040e28 100%);
+}
+
+.obillz-landing:not(.obillz-landing-home)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 65% 38% at 50% 8%,
+    rgba(30, 91, 255, 0.07) 0%,
+    transparent 62%
+  );
+}
+
+/* ------------------------------------------------------------------
+   Landing accueil — hero bleu + feuille blanche + footer sombre
+   ------------------------------------------------------------------ */
+.obillz-landing-home {
+  --hero-sheet-gap: clamp(9rem, 22vh, 15rem);
+  --sheet-overlap-pull: clamp(4rem, 8vh, 5.5rem);
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+@media (min-width: 1024px) {
+  .obillz-landing-home {
+    --hero-sheet-gap: 16rem;
+    --sheet-overlap-pull: 5.5rem;
+  }
+}
+
+.obillz-landing-home::before,
+.obillz-landing-home::after {
+  display: none;
+}
+
+/* Hero — dégradé bleu premium (navy → bleu lumineux en bas) */
+.landing-hero-shell {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100svh + var(--hero-sheet-gap));
+  padding-bottom: var(--hero-sheet-gap);
+  background-color: #020617;
+}
+
+.landing-hero-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.1) 24%, transparent 46%),
+    radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.18) 0%, rgba(56, 189, 248, 0.1) 20%, transparent 42%),
+    radial-gradient(ellipse 55% 35% at 50% 72%, rgba(37, 99, 235, 0.12) 0%, transparent 58%),
+    linear-gradient(180deg, #020617 0%, #030b1f 20%, #0a1f4d 48%, #1d4ed8 76%, #38bdf8 100%);
+}
+
+/* Grille discrète — profondeur */
+.landing-hero-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.14) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%);
+}
+
+/* Exactement 1 viewport — padding inclus, pas de débordement */
+.landing-hero-content {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+}
+
+/* Retire le glow bas statique du hero */
+.landing-hero-shell > div.pointer-events-none.absolute.inset-x-0.bottom-0 {
+  display: none;
+}
+
+/* Feuille blanche — grande carte de contenu, chevauche le hero au scroll */
+.landing-light-zone {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--sheet-overlap-pull));
+  background: #ffffff;
+  border-radius: 2.5rem 2.5rem 0 0;
+  box-shadow:
+    0 -8px 32px rgba(2, 6, 23, 0.08),
+    0 -1px 0 rgba(2, 6, 23, 0.04);
+}
+
+@media (min-width: 640px) {
+  .landing-light-zone {
+    border-radius: 2.5rem 2.5rem 0 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .landing-light-zone {
+    border-radius: 2.5rem 2.5rem 0 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-light-zone {
+    border-radius: 2.5rem 2.5rem 0 0;
+    box-shadow:
+      0 -12px 48px rgba(2, 6, 23, 0.1),
+      0 -2px 0 rgba(2, 6, 23, 0.04);
+  }
+}
+
+/* Retire les atmosphères sombres des sections claires */
+.landing-light-zone > section > [aria-hidden="true"].pointer-events-none {
+  display: none;
+}
+
+/* Footer sombre — transition courte, sans brume */
+.landing-footer-shell {
+  position: relative;
+  z-index: 3;
+  overflow: visible;
+  margin-top: 0;
+  padding-top: 2.5rem;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 34%),
+    linear-gradient(180deg, #06122e 0%, #030b1f 45%, #020617 100%);
+}
+
+.landing-footer-shell::before {
+  content: "";
+  position: absolute;
+  top: -3.5rem;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  height: 3.5rem;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    rgba(248, 251, 255, 0.96) 35%,
+    rgba(6, 18, 46, 0.32) 100%
+  );
+}
+
+.landing-footer-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-footer-bottom {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.landing-footer-bottom__watermark {
+  pointer-events: none;
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 0;
+  display: flex;
+  height: clamp(3.5rem, 10vw, 5.5rem);
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.landing-footer-bottom__watermark span {
+  margin-bottom: -0.08em;
+  font-size: clamp(4rem, 18vw, 10rem);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.028);
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Carte CTA fondateur — ombre légère, sans glow bas */
+.landing-premium-card--flat-shadow {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 40%),
+    linear-gradient(180deg, #020617 0%, #030b1f 42%, #06122e 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.landing-premium-card--flat-shadow:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 60px rgba(15, 23, 42, 0.12);
+  transform: none;
+}
+
+/* ------------------------------------------------------------------
+   Landing — design system en-têtes de section (fond clair)
+   ------------------------------------------------------------------ */
+.landing-section {
+  padding-top: clamp(4rem, 8vw, 5.5rem);
+}
+
+.landing-section--first {
+  padding-top: clamp(4.75rem, 11vh, 7.5rem);
+}
+
+@media (min-width: 768px) {
+  .landing-section--first {
+    padding-top: clamp(5.75rem, 12vh, 8.5rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-section {
+    padding-top: clamp(4.5rem, 7vw, 6rem);
+  }
+
+  .landing-section--first {
+    padding-top: clamp(7rem, 13vh, 9rem);
+  }
+}
+
+.landing-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+
+@media (min-width: 640px) {
+  .landing-section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+  }
+}
+
+.landing-section-title {
+  margin-top: 0.875rem;
+  font-size: clamp(2rem, 4.8vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+  text-wrap: balance;
+}
+
+.landing-section-intro--centered .landing-section-title {
+  margin-top: 1rem;
+}
+
+.landing-section-desc {
+  margin-top: 1.25rem;
+  max-width: 36rem;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.65;
+  color: #475569;
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .landing-section-desc {
+    margin-top: 1.5rem;
+  }
+}
+
+.landing-section-desc-secondary {
+  margin-top: 1rem;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+.landing-section-content {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+}
+
+.landing-light-zone .text-center .landing-section-desc,
+.landing-light-zone .text-center .landing-section-desc-secondary {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 1024px) {
+  .landing-light-zone .lg\:text-left .landing-section-desc,
+  .landing-light-zone .lg\:text-left .landing-section-desc-secondary {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 body.app-bg::before {
@@ -605,18 +940,141 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Landing premium — cartes glass avec relief et lumière
+   Landing premium — carte référence (navy sombre + glow bas cyan/bleu)
    ------------------------------------------------------------------ */
+.landing-premium-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(103, 232, 249, 0.32) 0%,
+      rgba(56, 189, 248, 0.2) 16%,
+      rgba(37, 99, 235, 0.18) 34%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #020617 0%, #030b1f 35%, #06122e 70%, #0a245c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(2, 6, 23, 0.28);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.landing-premium-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 18%,
+    transparent 72%,
+    rgba(56, 189, 248, 0.04) 100%
+  );
+  pointer-events: none;
+}
+
+.landing-premium-card::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.22),
+    rgba(147, 197, 253, 0.35),
+    rgba(255, 255, 255, 0.22),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.landing-premium-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 72px rgba(2, 6, 23, 0.32),
+    0 0 48px rgba(37, 99, 235, 0.1);
+}
+
+.landing-premium-card > *:not([aria-hidden]) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Variante compacte (barres process, panneaux internes larges) */
+.landing-premium-card--compact {
+  border-radius: 1.35rem;
+}
+
+/* Panneau interne — pills, rows, widgets */
+.landing-premium-inner {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.landing-premium-inner:hover,
+.landing-premium-card:hover .landing-premium-inner {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+/* Typo cartes landing */
+.landing-premium-card-title {
+  color: #f8fafc;
+}
+
+.landing-premium-card-desc {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+/* ------------------------------------------------------------------
+   Landing premium — cartes glass (alias → premium card)
+   ------------------------------------------------------------------ */
+.landing-glass-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(103, 232, 249, 0.32) 0%,
+      rgba(56, 189, 248, 0.2) 16%,
+      rgba(37, 99, 235, 0.18) 34%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #020617 0%, #030b1f 35%, #06122e 70%, #0a245c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(2, 6, 23, 0.28);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
 .landing-glass-card::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(
-    ellipse 90% 55% at 50% -15%,
-    rgba(147, 197, 253, 0.18),
-    rgba(26, 35, 255, 0.08) 40%,
-    transparent 65%
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 18%,
+    transparent 72%,
+    rgba(56, 189, 248, 0.04) 100%
   );
   pointer-events: none;
   opacity: 1;
@@ -626,28 +1084,37 @@ h3 {
 .landing-glass-card::after {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
+  left: 10%;
+  right: 10%;
   top: 0;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(147, 197, 253, 0.55),
-    rgba(255, 255, 255, 0.35),
-    rgba(147, 197, 253, 0.55),
+    rgba(255, 255, 255, 0.22),
+    rgba(147, 197, 253, 0.35),
+    rgba(255, 255, 255, 0.22),
     transparent
   );
   pointer-events: none;
 }
 
 .landing-glass-card:hover::before {
-  background: radial-gradient(
-    ellipse 90% 55% at 50% -15%,
-    rgba(147, 197, 253, 0.28),
-    rgba(26, 35, 255, 0.14) 40%,
-    transparent 65%
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 18%,
+    transparent 68%,
+    rgba(56, 189, 248, 0.08) 100%
   );
+}
+
+.landing-glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 72px rgba(2, 6, 23, 0.32),
+    0 0 48px rgba(37, 99, 235, 0.1);
 }
 
 .landing-glass-card > *:not([aria-hidden]) {
@@ -656,11 +1123,12 @@ h3 {
 }
 
 .landing-glass-card-featured::before {
-  background: radial-gradient(
-    ellipse 100% 65% at 50% -5%,
-    rgba(26, 35, 255, 0.35),
-    rgba(147, 197, 253, 0.12) 45%,
-    transparent 70%
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 20%,
+    transparent 65%,
+    rgba(103, 232, 249, 0.1) 100%
   );
 }
 
@@ -668,11 +1136,81 @@ h3 {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(147, 197, 253, 0.65),
-    rgba(255, 255, 255, 0.45),
-    rgba(147, 197, 253, 0.65),
+    rgba(255, 255, 255, 0.28),
+    rgba(147, 197, 253, 0.45),
+    rgba(255, 255, 255, 0.28),
     transparent
   );
+}
+
+/* Hero compact — pages marketing (tarifs, etc.) */
+.landing-pricing-hero {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: clamp(6.5rem, 16vh, 8.5rem);
+  padding-bottom: clamp(3.5rem, 9vh, 5.5rem);
+  background-color: #020617;
+}
+
+.landing-pricing-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.1) 24%, transparent 46%),
+    radial-gradient(circle at 50% 100%, rgba(56, 189, 248, 0.2) 0%, rgba(37, 99, 235, 0.12) 28%, transparent 58%),
+    linear-gradient(180deg, #020617 0%, #030b1f 28%, #0a1f4d 62%, #1d4ed8 100%);
+}
+
+.landing-pricing-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.12) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 100% 80% at 50% 45%, black 5%, transparent 72%);
+}
+
+.landing-pricing-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-pricing-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  background: #ffffff;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.06);
+}
+
+.landing-pricing-overview-item {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(2, 6, 23, 0.04);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.landing-pricing-overview-item:hover {
+  border-color: rgba(37, 99, 235, 0.18);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.08);
 }
 
 /* ------------------------------------------------------------------

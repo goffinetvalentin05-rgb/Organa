@@ -2,13 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
-const linkKeys = [{ href: "/tarifs", key: "marketing.nav.pricing" }] as const;
+const PRICING_SECTION_ID = "tarifs";
+
+const navLinks = [
+  { href: "/#tarifs", sectionId: PRICING_SECTION_ID, key: "marketing.nav.pricing" },
+] as const;
 
 const menuItemVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -22,10 +27,21 @@ const menuItemVariants = {
 
 export default function LandingNav() {
   const { t } = useI18n();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
+  const scrollToSection = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+      closeMenu();
+      if (pathname !== "/") return;
+      event.preventDefault();
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+    [pathname, closeMenu],
+  );
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -50,7 +66,7 @@ export default function LandingNav() {
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className="relative flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-blue-300/30 bg-gradient-to-r from-white/[0.12] via-[#1A23FF]/[0.08] to-white/[0.1] px-3.5 shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_12px_48px_rgba(0,0,0,0.45),0_0_48px_rgba(26,35,255,0.2),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
+        className="relative flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full border border-blue-300/28 bg-gradient-to-r from-white/[0.12] via-[#2563EB]/[0.06] to-white/[0.1] px-3.5 shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_12px_48px_rgba(10,31,77,0.35),0_0_40px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:grid lg:h-14 lg:max-w-[min(100%,1060px)] lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)]"
       >
         <Link
           href="/"
@@ -71,10 +87,11 @@ export default function LandingNav() {
           className="hidden items-center justify-center gap-6 lg:flex xl:gap-8"
           aria-label="Navigation"
         >
-          {linkKeys.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
+              onClick={(event) => scrollToSection(event, link.sectionId)}
               className="text-[13px] font-medium text-white/60 transition hover:text-white/95 xl:text-sm"
             >
               {t(link.key)}
@@ -86,7 +103,7 @@ export default function LandingNav() {
           <LanguageSwitcher compact />
           <Link
             href="/connexion"
-            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/90 shadow-[0_0_20px_rgba(26,35,255,0.12),inset_0_1px_0_rgba(255,255,255,0.1)] transition hover:border-white/45 hover:bg-white/[0.12] hover:shadow-[0_0_28px_rgba(26,35,255,0.2)] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
+            className="shrink-0 whitespace-nowrap rounded-full border border-white/30 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/90 shadow-[0_0_16px_rgba(37,99,235,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] transition hover:border-white/45 hover:bg-white/[0.12] hover:shadow-[0_0_24px_rgba(37,99,235,0.16)] sm:px-3.5 sm:py-1.5 sm:text-[13px] lg:px-5 lg:py-2 lg:text-sm"
           >
             {t("marketing.nav.login")}
           </Link>
@@ -144,7 +161,7 @@ export default function LandingNav() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.98 }}
               transition={{ duration: reduceMotion ? 0 : 0.38, ease: easePremium }}
-              className="fixed inset-x-4 top-[calc(1rem+2.75rem+0.5rem)] z-50 overflow-hidden rounded-[1.35rem] border border-blue-300/30 bg-gradient-to-b from-white/[0.14] via-[#1A23FF]/[0.1] to-[#0f172a]/[0.92] p-4 shadow-[0_0_0_1px_rgba(147,197,253,0.12),0_20px_60px_rgba(0,0,0,0.5),0_0_48px_rgba(26,35,255,0.22),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:inset-x-6 sm:top-[calc(1.25rem+3rem+0.5rem)] sm:p-5 md:inset-x-8 md:top-[calc(1.5rem+3rem+0.5rem)] lg:hidden"
+              className="fixed inset-x-4 top-[calc(1rem+2.75rem+0.5rem)] z-50 overflow-hidden rounded-[1.35rem] border border-blue-300/28 bg-gradient-to-b from-white/[0.14] via-[#2563EB]/[0.08] to-[#0A1F4D]/[0.92] p-4 shadow-[0_0_0_1px_rgba(147,197,253,0.12),0_20px_60px_rgba(10,31,77,0.45),0_0_40px_rgba(37,99,235,0.16),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:inset-x-6 sm:top-[calc(1.25rem+3rem+0.5rem)] sm:p-5 md:inset-x-8 md:top-[calc(1.5rem+3rem+0.5rem)] lg:hidden"
               aria-label="Menu mobile"
             >
               <div className="flex flex-col gap-1">
@@ -158,7 +175,7 @@ export default function LandingNav() {
                   <Link
                     href="/inscription"
                     onClick={closeMenu}
-                    className="flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-[#1A23FF] shadow-[0_0_24px_rgba(26,35,255,0.45),inset_0_1px_0_rgba(255,255,255,0.8)] transition active:scale-[0.98]"
+                    className="flex w-full items-center justify-center rounded-full border border-[rgba(37,99,235,0.14)] bg-white px-5 py-3 text-sm font-bold text-[#1D4ED8] shadow-[0_10px_30px_rgba(37,99,235,0.10)] transition active:scale-[0.98]"
                   >
                     {t("marketing.nav.cta")}
                   </Link>
@@ -196,7 +213,7 @@ export default function LandingNav() {
                   aria-hidden
                 />
 
-                {linkKeys.map((link, index) => (
+                {navLinks.map((link, index) => (
                   <motion.div
                     key={link.href}
                     custom={index + 3}
@@ -207,7 +224,7 @@ export default function LandingNav() {
                   >
                     <Link
                       href={link.href}
-                      onClick={closeMenu}
+                      onClick={(event) => scrollToSection(event, link.sectionId)}
                       className="flex items-center rounded-xl px-3 py-3 text-[15px] font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white active:bg-white/[0.08]"
                     >
                       {t(link.key)}

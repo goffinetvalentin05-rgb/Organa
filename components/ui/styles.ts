@@ -5,18 +5,22 @@
 const obillzAppShellBackgroundClass =
   "relative isolate min-h-[100dvh] w-full overflow-x-clip bg-[#020617] text-white bg-[radial-gradient(ellipse_120%_80%_at_50%_-15%,rgba(26,35,255,0.55),transparent_50%),radial-gradient(ellipse_70%_50%_at_0%_40%,rgba(37,99,235,0.22),transparent_48%),radial-gradient(ellipse_60%_45%_at_100%_60%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(ellipse_50%_40%_at_50%_50%,rgba(139,92,246,0.12),transparent_58%),linear-gradient(180deg,#050816_0%,#020617_50%,#020409_100%)]";
 
-/** Fond marketing Obillz — landing dark premium */
-export const obillzLandingRootClass = `obillz-landing ${obillzAppShellBackgroundClass}`;
+/** Fond marketing Obillz — pages marketing (tarifs, légal, auth) */
+export const obillzLandingRootClass =
+  "obillz-landing relative isolate min-h-[100dvh] w-full overflow-x-clip bg-[#020817] text-white";
 
-/** Grille technique discrète — landing / dashboard dark */
-export const obillzLandingGridOverlayClass =
-  "pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(to_right,rgba(96,165,250,0.55)_1px,transparent_1px),linear-gradient(to_bottom,rgba(96,165,250,0.55)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_100%_80%_at_50%_30%,black,transparent)]";
+/** Accueil landing — hero sombre + feuille blanche + footer (voir globals.css `.obillz-landing-home`) */
+export const obillzLandingHomeClass = `${obillzLandingRootClass} obillz-landing-home`;
 
-/** Shell tableau de bord — même fond dark que la landing (plus de bleu #1A23FF plein écran). */
+/** Grille discrète — dashboard uniquement (landing sans grille) */
+export const dashboardGridOverlayClass =
+  "pointer-events-none absolute inset-0 z-[2] [background-image:linear-gradient(rgba(90,120,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(90,120,255,0.035)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(ellipse_110%_90%_at_50%_38%,black_15%,transparent_78%)]";
+
+/** @deprecated Landing sans grille — utiliser `dashboardGridOverlayClass` pour le dashboard */
+export const obillzLandingGridOverlayClass = dashboardGridOverlayClass;
+
+/** Shell tableau de bord — fond dark existant */
 export const dashboardShellRootClass = `dashboard-shell obillz-dashboard ${obillzAppShellBackgroundClass}`;
-
-/** @deprecated Alias — grille identique à la landing */
-export const dashboardGridOverlayClass = obillzLandingGridOverlayClass;
 
 /**
  * Surface glass dashboard — alignée landing, intégrée au fond bleu nuit.
@@ -164,31 +168,50 @@ export const landingSectionDividerClass =
 
 /** Halo diffus derrière une section */
 export const landingSectionGlowClass =
-  "pointer-events-none absolute inset-x-[5%] top-1/2 h-[min(480px,60vh)] -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.35),rgba(99,102,241,0.15)_45%,transparent_70%)] blur-3xl";
+  "pointer-events-none absolute inset-x-[5%] top-1/2 h-[min(480px,60vh)] -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(37,99,235,0.22),rgba(56,189,248,0.1)_45%,transparent_70%)] blur-3xl";
 
-/** Carte glass — bordure bleue + glow externe visible */
+/** Carte premium landing — référence navy + glow bas (voir globals.css `.landing-premium-card`) */
+export const landingPremiumCardClass =
+  "landing-premium-card group/card relative overflow-hidden rounded-[1.75rem] transition-[border-color,box-shadow,transform] duration-[550ms] ease-out hover:-translate-y-1";
+
+/** Carte showcase modules — même DA, radius 32px */
+export const landingShowcaseCardClass =
+  "landing-premium-card group/card relative flex h-full flex-col overflow-hidden rounded-[2rem] transition-[border-color,box-shadow,transform] duration-[550ms] ease-out hover:-translate-y-1.5";
+
+/** Barre / bloc compact (comment ça marche) */
+export const landingPremiumCardCompactClass =
+  "landing-premium-card landing-premium-card--compact group/bar relative overflow-hidden";
+
+/** Titre & description dans les cartes */
+export const landingPremiumCardTitleClass = "landing-premium-card-title font-bold tracking-tight text-[#F8FAFC]";
+export const landingPremiumCardDescClass = "landing-premium-card-desc text-[13px] leading-relaxed sm:text-sm";
+
+/** Panneau interne mockup */
+export const landingPremiumInnerClass =
+  "landing-premium-inner relative overflow-hidden rounded-xl backdrop-blur-sm";
+
+/** Carte glass — alias premium */
 export const landingGlassCardClass =
-  "landing-glass-card group relative overflow-hidden rounded-2xl border border-blue-400/30 bg-gradient-to-br from-white/[0.14] via-[#1A23FF]/[0.1] to-[#6366f1]/[0.06] shadow-[0_0_0_1px_rgba(147,197,253,0.12),0_8px_32px_rgba(0,0,0,0.55),0_0_60px_rgba(26,35,255,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-300/50 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.25),0_16px_48px_rgba(0,0,0,0.55),0_0_80px_rgba(26,35,255,0.38)]";
+  "landing-glass-card group relative overflow-hidden rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1";
 
-/** Carte mise en avant — glow bleu/violet fort */
+/** Carte mise en avant */
 export const landingFeaturedCardClass =
-  "landing-glass-card landing-glass-card-featured relative overflow-hidden rounded-2xl border border-blue-300/45 bg-gradient-to-br from-[#1A23FF]/[0.28] via-white/[0.1] to-[#6366f1]/[0.12] shadow-[0_0_0_1px_rgba(147,197,253,0.2),0_8px_40px_rgba(0,0,0,0.5),0_0_80px_rgba(26,35,255,0.4),0_0_120px_rgba(99,102,241,0.15)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200/55 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.35),0_16px_56px_rgba(0,0,0,0.55),0_0_100px_rgba(26,35,255,0.5),0_0_140px_rgba(99,102,241,0.2)]";
+  "landing-glass-card landing-glass-card-featured relative overflow-hidden rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1";
 
-/** Conteneur section large — modules, FAQ, CTA final */
-export const landingSectionShellClass =
-  "landing-glass-card relative overflow-hidden rounded-[1.75rem] border border-blue-400/35 bg-gradient-to-br from-[#1A23FF]/[0.22] via-white/[0.08] to-[#6366f1]/[0.1] shadow-[0_0_0_1px_rgba(147,197,253,0.15),0_12px_56px_rgba(0,0,0,0.5),0_0_100px_rgba(26,35,255,0.28)] backdrop-blur-2xl";
+/** Conteneur section large — FAQ accordion shell */
+export const landingSectionShellClass = "landing-glass-card relative overflow-hidden rounded-[1.75rem]";
 
 /** Badge icône — état repos */
 export const landingIconBadgeClass =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1A23FF]/50 to-[#6366f1]/30 text-blue-200 shadow-[0_0_28px_rgba(26,35,255,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-blue-300/40";
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/16 bg-gradient-to-br from-[#2563EB]/70 to-[#1D4ED8]/50 text-white shadow-[0_0_20px_rgba(37,99,235,0.35),inset_0_1px_0_rgba(255,255,255,0.15)]";
 
 /** Badge icône — état actif */
 export const landingIconBadgeActiveClass =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1A23FF] to-[#6366f1] text-white shadow-[0_0_36px_rgba(26,35,255,0.7),inset_0_1px_0_rgba(255,255,255,0.2)]";
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-white shadow-[0_0_28px_rgba(56,189,248,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]";
 
 /** Panneau intérieur (preview, sous-bloc) */
 export const landingInnerPanelClass =
-  "relative overflow-hidden rounded-xl border border-blue-400/25 bg-gradient-to-br from-white/[0.14] to-[#1A23FF]/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_0_40px_rgba(26,35,255,0.15)] backdrop-blur-sm";
+  "landing-premium-inner relative overflow-hidden rounded-xl p-3 backdrop-blur-sm";
 
 /**
  * Aperçu écran cotisation / facture — surface quasi pleine, détachée du fond dashboard.

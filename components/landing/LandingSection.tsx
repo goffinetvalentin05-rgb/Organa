@@ -24,22 +24,10 @@ export function LandingSectionHeader({
   const alignClass = align === "center" ? "text-center mx-auto" : "text-left";
 
   return (
-    <ScrollReveal className={`max-w-3xl ${alignClass}`}>
-      {eyebrow ? (
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-200/90">{eyebrow}</p>
-      ) : null}
-      {title ? (
-        <h2
-          className={`text-balance text-3xl font-black leading-[1.08] text-white md:text-5xl ${
-            eyebrow ? "mt-4" : ""
-          }`}
-        >
-          {title}
-        </h2>
-      ) : null}
-      {subtitle ? (
-        <p className="mt-5 text-base leading-relaxed text-blue-100/90 md:text-lg">{subtitle}</p>
-      ) : null}
+    <ScrollReveal className={`landing-section-intro max-w-3xl ${alignClass}`}>
+      {eyebrow ? <p className="landing-section-label">{eyebrow}</p> : null}
+      {title ? <h2 className="landing-section-title">{title}</h2> : null}
+      {subtitle ? <p className="landing-section-desc">{subtitle}</p> : null}
     </ScrollReveal>
   );
 }
