@@ -156,15 +156,13 @@ body.app-bg:has(.obillz-dashboard) {
    Landing accueil — hero bleu + feuille blanche + footer sombre
    ------------------------------------------------------------------ */
 .obillz-landing-home {
-  --hero-sheet-gap: clamp(9rem, 22vh, 15rem);
-  --sheet-overlap-pull: clamp(4rem, 8vh, 5.5rem);
+  --sheet-overlap-pull: 4.5rem; /* 72px — remontée de la feuille blanche */
   background-color: #ffffff !important;
   color: #0f172a;
 }
 
 @media (min-width: 1024px) {
   .obillz-landing-home {
-    --hero-sheet-gap: 16rem;
     --sheet-overlap-pull: 5.5rem;
   }
 }
@@ -210,7 +208,6 @@ body.app-bg:has(.obillz-dashboard) {
   opacity: 0.9;
 }
 
-/* CTA navbar — jamais affiché hors du menu burger sur mobile */
 @media (max-width: 1023px) {
   .landing-nav-header .landing-nav-cta,
   .landing-nav-header .navbar-cta {
@@ -218,18 +215,20 @@ body.app-bg:has(.obillz-dashboard) {
   }
 }
 
-/* Hero — dégradé bleu premium (navy → bleu lumineux en bas) */
+/* ------------------------------------------------------------------
+   Hero — fond bleu continu (titre + stats)
+   ------------------------------------------------------------------ */
 .landing-hero-shell {
   position: relative;
   z-index: 1;
   isolation: isolate;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  overflow: hidden;
   box-sizing: border-box;
   min-height: 100svh;
-  padding-bottom: 0;
-  background-color: #020617;
+  background-color: #071634;
 }
 
 .landing-hero-shell::before {
@@ -239,13 +238,21 @@ body.app-bg:has(.obillz-dashboard) {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 38%, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.1) 24%, transparent 46%),
-    radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.18) 0%, rgba(56, 189, 248, 0.1) 20%, transparent 42%),
-    radial-gradient(ellipse 55% 35% at 50% 72%, rgba(37, 99, 235, 0.12) 0%, transparent 58%),
-    linear-gradient(180deg, #020617 0%, #030b1f 20%, #0a1f4d 48%, #1d4ed8 76%, #38bdf8 100%);
+    radial-gradient(
+      ellipse 80% 42% at 50% 45%,
+      rgba(50, 91, 255, 0.32),
+      transparent 70%
+    ),
+    radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.16) 0%, transparent 42%),
+    linear-gradient(
+      180deg,
+      #071634 0%,
+      #102d78 38%,
+      #175dd4 68%,
+      #37b9ed 100%
+    );
 }
 
-/* Grille discrète — profondeur */
 .landing-hero-shell::after {
   content: "";
   position: absolute;
@@ -260,181 +267,261 @@ body.app-bg:has(.obillz-dashboard) {
   mask-image: radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%);
 }
 
-/* Contenu principal du hero — s’étire pour pousser les stats en bas du viewport */
-/* Contenu principal du hero — s’étire pour pousser les stats en bas du viewport */
-.landing-hero-content {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  box-sizing: border-box;
-  width: 100%;
-  height: auto;
-  min-height: 0;
-  max-height: none;
-}
-
-/* Retire le glow bas statique du hero */
 .landing-hero-shell > div.pointer-events-none.absolute.inset-x-0.bottom-0 {
   display: none;
 }
 
-/* Bande réassurance — dans le flux normal du hero (fond bleu) */
+/* Bloc principal — titre, description, CTA */
+.landing-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 7.5rem 1.25rem 2.5rem;
+  text-align: center;
+}
+
+.landing-hero-title {
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.landing-hero-title-line {
+  display: block;
+  font-size: clamp(2.75rem, 8vw, 5.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.landing-hero-title-line + .landing-hero-title-line {
+  margin-top: 0.25rem;
+}
+
+.landing-hero-description {
+  max-width: 36rem;
+  margin: 1.5rem auto 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.landing-hero-cta-wrap {
+  position: relative;
+  z-index: 20;
+  margin-top: 2rem;
+}
+
+/* Stats — dans le flux du hero, fond bleu continu */
 .landing-trust-strip {
   position: relative;
   z-index: 2;
-  inset: auto;
-  transform: none;
   flex: 0 0 auto;
-  margin-top: 0;
-  padding-bottom: calc(var(--sheet-overlap-pull) + 2.75rem);
+  width: 100%;
+  padding: 0 0 calc(var(--sheet-overlap-pull) + 2.5rem);
 }
 
 .landing-trust-strip__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  width: calc(100% - 32px);
+  width: 94%;
   max-width: 1100px;
-  margin: 5rem auto 0;
+  margin: 0 auto;
 }
 
 .landing-trust-strip__item {
-  min-height: 170px;
-  padding: 26px 14px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  min-width: 0;
+  padding: 0.75rem 1.5rem;
   text-align: center;
 }
 
-.landing-trust-strip__item:nth-child(odd) {
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+.landing-trust-strip__item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 12%;
+  right: 0;
+  height: 76%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 255, 255, 0.14) 22%,
+    rgba(255, 255, 255, 0.14) 78%,
+    transparent
+  );
 }
 
-.landing-trust-strip__item:nth-child(-n + 2) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.landing-trust-strip__item > p:first-child {
-  margin: 0 0 14px;
-}
-
-.landing-trust-strip__item > p:last-child {
+.landing-trust-strip__value {
   margin: 0;
-  max-width: 150px;
+  font-size: clamp(1.5rem, 2.4vw, 2.35rem);
+  line-height: 1;
 }
 
-@media (min-width: 768px) {
-  .landing-trust-strip {
-    margin-top: -0.25rem;
-  }
-
-  .landing-trust-strip__grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    width: 94%;
-    margin-top: 0;
-    gap: 0;
-  }
-
-  .landing-trust-strip__item {
-    min-height: 0;
-    padding: 0.75rem 1.5rem;
-  }
-
-  .landing-trust-strip__item:nth-child(odd),
-  .landing-trust-strip__item:nth-child(-n + 2) {
-    border-right: none;
-    border-bottom: none;
-  }
-
-  .landing-trust-strip__item:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 12%;
-    right: 0;
-    height: 76%;
-    width: 1px;
-    background: linear-gradient(
-      180deg,
-      transparent,
-      rgba(255, 255, 255, 0.14) 22%,
-      rgba(255, 255, 255, 0.14) 78%,
-      transparent
-    );
-  }
-
-  .landing-trust-strip__item > p:first-child {
-    margin: 0;
-  }
-
-  .landing-trust-strip__item > p:last-child {
-    margin-top: 0.625rem;
-    max-width: 12rem;
-  }
+.landing-trust-strip__value--long {
+  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  line-height: 1.12;
+  max-width: 14rem;
 }
 
-/* Feuille blanche — grande carte de contenu, chevauche le hero au scroll */
+.landing-trust-strip__desc {
+  margin: 0.625rem 0 0;
+  max-width: 12rem;
+  font-size: 0.8125rem;
+  line-height: 1.625;
+}
+
+/* Feuille blanche — remonte au-dessus du bas du hero */
 .landing-light-zone {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   margin-top: calc(-1 * var(--sheet-overlap-pull));
+  padding-top: 0;
   background: #ffffff;
-  border-radius: 2.5rem 2.5rem 0 0;
+  border-radius: 58px 58px 0 0;
   box-shadow:
     0 -8px 32px rgba(2, 6, 23, 0.08),
     0 -1px 0 rgba(2, 6, 23, 0.04);
 }
 
-@media (min-width: 640px) {
-  .landing-light-zone {
-    border-radius: 2.5rem 2.5rem 0 0;
-  }
-}
-
-@media (min-width: 768px) {
-  .landing-light-zone {
-    border-radius: 2.5rem 2.5rem 0 0;
-  }
-}
-
 @media (min-width: 1024px) {
   .landing-light-zone {
-    border-radius: 2.5rem 2.5rem 0 0;
     box-shadow:
       0 -12px 48px rgba(2, 6, 23, 0.1),
       0 -2px 0 rgba(2, 6, 23, 0.04);
   }
-}
 
-@media (max-width: 767px) {
-  .landing-hero-shell {
-    height: auto;
-    min-height: 100svh;
-    padding-bottom: 70px;
-    overflow: hidden;
-  }
-
-  .landing-trust-strip {
-    position: relative;
-    inset: auto;
-    transform: none;
-    margin-top: 0;
-    /* Espace pour les coins arrondis de la feuille — sans recouvrir les stats */
+  .landing-hero-content {
+    padding-top: 8rem;
     padding-bottom: 2.5rem;
   }
 
-  .landing-trust-strip__grid {
-    margin-top: 5rem;
+  .landing-hero-description {
+    max-width: 46rem;
+    margin-top: 2rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
   }
 
-  /* Feuille blanche : pas de remontée au-dessus des statistiques */
-  .landing-light-zone {
-    position: relative;
+  .landing-hero-cta-wrap {
+    margin-top: 2.5rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Hero mobile — une seule définition responsive
+   ------------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .landing-hero-shell {
+    min-height: auto;
+    padding: 0;
+  }
+
+  .landing-hero-content {
     z-index: 2;
-    margin-top: 0;
-    top: auto;
-    transform: none;
+    flex: 0 0 auto;
+    min-height: calc(100svh - 110px);
+    padding: 140px 22px 70px;
+  }
+
+  .landing-hero-title {
+    max-width: 650px;
+  }
+
+  .landing-hero-title-line {
+    font-size: clamp(48px, 12.5vw, 68px);
+    line-height: 1.06;
+    letter-spacing: -0.055em;
+  }
+
+  .landing-hero-title-line + .landing-hero-title-line {
+    margin-top: 0.15rem;
+  }
+
+  .landing-hero-description {
+    max-width: 590px;
+    margin-top: 42px;
+    font-size: clamp(17px, 4.5vw, 22px);
+    line-height: 1.55;
+  }
+
+  .landing-hero-cta-wrap {
+    width: min(100%, 505px);
+    margin-top: 52px;
+  }
+
+  .landing-hero-cta-wrap .landing-hero-cta {
+    width: 100%;
+  }
+
+  .landing-trust-strip {
+    z-index: 2;
+    padding: 0;
+  }
+
+  .landing-trust-strip__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: calc(100% - 40px);
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 15px 0 115px;
+  }
+
+  .landing-trust-strip__item {
+    min-height: 190px;
+    padding: 28px 16px;
+  }
+
+  .landing-trust-strip__item:not(:last-child)::after {
+    display: none;
+  }
+
+  .landing-trust-strip__item:nth-child(odd) {
+    border-right: 1px solid rgba(255, 255, 255, 0.13);
+  }
+
+  .landing-trust-strip__item:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  }
+
+  .landing-trust-strip__value {
+    margin: 0 0 18px;
+    font-size: clamp(36px, 10vw, 50px);
+    line-height: 1.05;
+  }
+
+  .landing-trust-strip__value--long {
+    max-width: 180px;
+    font-size: clamp(28px, 7.5vw, 40px);
+    line-height: 1.12;
+  }
+
+  .landing-trust-strip__desc {
+    max-width: 170px;
+    margin: 0;
+    font-size: clamp(15px, 4.2vw, 19px);
+    line-height: 1.5;
+  }
+
+  .landing-light-zone {
+    z-index: 5;
+    margin-top: -72px;
+    padding-top: 145px;
+    border-radius: 52px 52px 0 0;
+  }
+
+  .landing-light-zone .landing-section--first {
+    padding-top: 0;
   }
 }
 

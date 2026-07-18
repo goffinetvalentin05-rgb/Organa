@@ -96,7 +96,7 @@ export default function LandingNav() {
   }, [isMenuOpen, closeMenu]);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
+    <div className="landing-nav fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-7 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
       <motion.header
         ref={headerRef}
         initial={{ opacity: 0, y: -14 }}

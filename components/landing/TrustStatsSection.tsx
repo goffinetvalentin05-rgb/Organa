@@ -130,19 +130,19 @@ function TrustStatItem({
     stat.counterFrom != null;
 
   const valueClass = isLongLabel
-    ? "text-xl font-bold leading-[1.12] tracking-tight text-[#F8FAFC] sm:text-2xl lg:text-[1.85rem]"
-    : "text-2xl font-bold leading-none tracking-tight text-[#F8FAFC] sm:text-3xl lg:text-[2.35rem]";
+    ? "landing-trust-strip__value landing-trust-strip__value--long font-bold tracking-tight text-[#F8FAFC]"
+    : "landing-trust-strip__value font-bold tracking-tight text-[#F8FAFC]";
 
   const motionState = active || reduceMotion ? "visible" : "hidden";
 
   return (
-    <div className="landing-trust-strip__item group relative text-center">
+    <div className="landing-trust-strip__item group">
       <motion.p
         custom={delay}
         initial="hidden"
         animate={motionState}
         variants={titleMotion}
-        className={`${valueClass} transition-[color,text-shadow] duration-300 group-hover:text-white group-hover:[text-shadow:0_0_28px_rgba(96,165,250,0.22)] max-md:text-[clamp(1.875rem,9vw,2.625rem)] max-md:leading-[1.05]`}
+        className={`${valueClass} transition-[color,text-shadow] duration-300 group-hover:text-white group-hover:[text-shadow:0_0_28px_rgba(96,165,250,0.22)]`}
       >
         {hasCounter ? (
           <CountUpStat
@@ -161,7 +161,7 @@ function TrustStatItem({
         initial="hidden"
         animate={motionState}
         variants={descMotion}
-        className="text-xs leading-relaxed text-blue-100/50 transition-colors duration-300 group-hover:text-blue-100/68 max-md:text-[15px] max-md:leading-normal sm:text-[0.8125rem]"
+        className="landing-trust-strip__desc text-blue-100/50 transition-colors duration-300 group-hover:text-blue-100/68"
       >
         {stat.description}
       </motion.p>
