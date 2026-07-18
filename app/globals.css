@@ -156,7 +156,7 @@ body.app-bg:has(.obillz-dashboard) {
    Landing accueil — hero bleu + feuille blanche + footer sombre
    ------------------------------------------------------------------ */
 .obillz-landing-home {
-  --sheet-overlap-pull: 76px;
+  --sheet-overlap-pull: 48px;
   background-color: #ffffff !important;
   color: #0f172a;
 }
@@ -219,7 +219,7 @@ body.app-bg:has(.obillz-dashboard) {
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   box-sizing: border-box;
   background-color: #071634;
@@ -326,7 +326,7 @@ body.app-bg:has(.obillz-dashboard) {
   gap: 0;
   width: min(1100px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 10px 0 115px;
+  padding: 10px 0 90px;
 }
 
 .landing-trust-strip__item {
@@ -365,11 +365,11 @@ body.app-bg:has(.obillz-dashboard) {
   line-height: 1.45;
 }
 
-/* Feuille blanche — légère superposition au bas du hero (desktop) */
+/* Feuille blanche — superposition légère (desktop via min-width: 769px) */
 .landing-light-zone {
   position: relative;
   z-index: 5;
-  margin-top: -76px;
+  margin-top: 0;
   padding-top: 135px;
   background: #ffffff;
   border-radius: 48px 48px 0 0;
@@ -382,8 +382,14 @@ body.app-bg:has(.obillz-dashboard) {
   padding-top: 0;
 }
 
-@media (min-width: 1024px) {
+/* Desktop : hero légèrement plus haut que le viewport pour masquer la feuille */
+@media (min-width: 769px) {
+  .landing-hero-shell {
+    min-height: calc(100svh + 48px);
+  }
+
   .landing-light-zone {
+    margin-top: -48px;
     box-shadow:
       0 -12px 48px rgba(2, 6, 23, 0.1),
       0 -2px 0 rgba(2, 6, 23, 0.04);
