@@ -43,7 +43,7 @@ export default function HeroSection() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="relative z-10 flex w-full max-w-[56rem] flex-col items-center text-center lg:max-w-[68rem]"
+          className="relative z-10 flex w-full flex-col items-center text-center"
         >
           <motion.h1
             variants={heroTitleLine}
