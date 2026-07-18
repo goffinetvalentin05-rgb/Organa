@@ -21,26 +21,34 @@ const menuItemVariants = {
 type NavTheme = "dark" | "light";
 
 function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
-  const [theme, setTheme] = useState<NavTheme>("dark");
+  const [theme, setTheme] = useState<NavTheme>(() =>
+    typeof document !== "undefined" && document.querySelector(".legal-page")
+      ? "light"
+      : "dark"
+  );
 
   useEffect(() => {
     const update = () => {
       const probe = headerRef.current?.getBoundingClientRect().bottom ?? 72;
-      const footer = document.querySelector(".landing-footer-shell");
+      const footerContent = document.querySelector(".footer-content");
       const lightZone = document.querySelector(".landing-light-zone");
 
-      const footerTop = footer?.getBoundingClientRect().top;
-      if (footerTop !== undefined && footerTop <= probe + 6) {
+      /* Thème sombre dès que les colonnes du footer (zone bleue) arrivent sous la nav. */
+      const footerContentTop = footerContent?.getBoundingClientRect().top;
+      if (footerContentTop !== undefined && footerContentTop <= probe + 6) {
         setTheme("dark");
         return;
       }
 
       const lightRect = lightZone?.getBoundingClientRect();
-      if (
-        lightRect &&
-        lightRect.top <= probe + 10 &&
-        lightRect.bottom > probe
-      ) {
+      /* Zone claire + haut du footer (encore blanc) → thème clair. */
+      if (lightRect && lightRect.top <= probe + 10) {
+        setTheme("light");
+        return;
+      }
+
+      /* Pages légales — fond clair dès le chargement. */
+      if (document.querySelector(".legal-page")) {
         setTheme("light");
         return;
       }
@@ -94,7 +102,7 @@ export default function LandingNav() {
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] items-center justify-between gap-2 rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
+        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] flex-nowrap items-center justify-between gap-2 overflow-hidden rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
           isLight ? "landing-nav-header--light" : "landing-nav-header--dark"
         }`}
       >
@@ -113,7 +121,7 @@ export default function LandingNav() {
           />
         </Link>
 
-        <div className="hidden shrink-0 items-center gap-1.5 sm:gap-2 lg:flex lg:gap-3">
+        <div className="landing-nav-actions hidden shrink-0 items-center gap-1.5 sm:gap-2 lg:flex lg:gap-3">
           <LanguageSwitcher compact theme={navTheme} />
           <Link
             href="/connexion"

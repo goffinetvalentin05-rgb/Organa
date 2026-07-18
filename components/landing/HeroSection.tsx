@@ -11,6 +11,7 @@ import {
   heroTitleLine,
   staggerContainer,
 } from "@/components/landing/landing-motion";
+import TrustStatsSection from "@/components/landing/TrustStatsSection";
 
 export default function HeroSection() {
   const { t } = useI18n();
@@ -37,7 +38,7 @@ export default function HeroSection() {
         aria-hidden
       />
 
-      <div className="landing-hero-content flex flex-1 flex-col items-center justify-center pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-32">
+      <div className="landing-hero-content flex flex-col items-center justify-center pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-32">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -98,6 +99,8 @@ export default function HeroSection() {
           </motion.div>
         </motion.div>
       </div>
+
+      <TrustStatsSection />
     </section>
   );
 }

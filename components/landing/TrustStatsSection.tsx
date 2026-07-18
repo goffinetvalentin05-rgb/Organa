@@ -136,13 +136,13 @@ function TrustStatItem({
   const motionState = active || reduceMotion ? "visible" : "hidden";
 
   return (
-    <div className="landing-trust-strip__item group relative flex flex-col items-center px-3 py-2 text-center sm:px-5 sm:py-3 md:px-6">
+    <div className="landing-trust-strip__item group relative text-center">
       <motion.p
         custom={delay}
         initial="hidden"
         animate={motionState}
         variants={titleMotion}
-        className={`${valueClass} transition-[color,text-shadow] duration-300 group-hover:text-white group-hover:[text-shadow:0_0_28px_rgba(96,165,250,0.22)]`}
+        className={`${valueClass} transition-[color,text-shadow] duration-300 group-hover:text-white group-hover:[text-shadow:0_0_28px_rgba(96,165,250,0.22)] max-md:text-[clamp(1.875rem,9vw,2.625rem)] max-md:leading-[1.05]`}
       >
         {hasCounter ? (
           <CountUpStat
@@ -161,7 +161,7 @@ function TrustStatItem({
         initial="hidden"
         animate={motionState}
         variants={descMotion}
-        className="mt-2 max-w-[12rem] text-xs leading-relaxed text-blue-100/50 transition-colors duration-300 group-hover:text-blue-100/68 sm:mt-2.5 sm:text-[0.8125rem]"
+        className="text-xs leading-relaxed text-blue-100/50 transition-colors duration-300 group-hover:text-blue-100/68 max-md:text-[15px] max-md:leading-normal sm:text-[0.8125rem]"
       >
         {stat.description}
       </motion.p>
@@ -185,7 +185,7 @@ export default function TrustStatsSection() {
       className="landing-trust-strip"
       aria-label={t("marketing.trustStats.ariaLabel")}
     >
-      <div className="landing-trust-strip__grid mx-auto w-[94%] max-w-[1100px]">
+      <div className="landing-trust-strip__grid">
         {items.map((stat) => (
           <TrustStatItem
             key={stat.id}
