@@ -19,15 +19,15 @@ export default function PageHeader({ title, subtitle, actions, className }: Page
       )}
     >
       <div className="min-w-0 flex-1 space-y-2 md:pr-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-[#10172A] md:text-3xl">{title}</h1>
         {subtitle ? (
-          <div className="max-w-xl space-y-1 text-sm leading-relaxed text-white/55 md:text-[0.9375rem] [&>p]:m-0">
+          <div className="max-w-xl space-y-1 text-sm leading-relaxed text-[#667085] md:text-[0.9375rem] [&>p]:m-0">
             {subtitle}
           </div>
         ) : null}
       </div>
       {actions ? (
-        <div className="flex w-full shrink-0 flex-wrap items-center gap-3 md:w-auto md:justify-end [&_label]:text-white/90">
+        <div className="flex w-full shrink-0 flex-wrap items-center gap-3 md:w-auto md:justify-end">
           {actions}
         </div>
       ) : null}

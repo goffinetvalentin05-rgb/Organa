@@ -5,7 +5,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { Plus } from "@/lib/icons";
 
 const baseClass =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#6366f1] font-semibold text-white shadow-[0_4px_24px_rgba(26,35,255,0.35),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 hover:opacity-95 hover:shadow-[0_6px_32px_rgba(26,35,255,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#6366f1] font-semibold text-white shadow-[0_4px_14px_rgba(26,35,255,0.25)] transition-all duration-200 hover:opacity-95 hover:shadow-[0_6px_20px_rgba(26,35,255,0.35)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]/50 disabled:pointer-events-none disabled:opacity-50";
 
 const sizeClass = {
   default: "px-5 py-2.5 text-sm",

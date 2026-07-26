@@ -17,8 +17,8 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Colors - Dashboard (fond dark premium, aligné landing) */
-  --bg-dashboard: #020617;
+  /* Colors - Dashboard (thème clair premium) */
+  --bg-dashboard: #F6F8FC;
   --bg-surface: #FFFFFF;
   --bg-surface-hover: #F1F5F9;
   --border: rgba(15, 23, 42, 0.08);
@@ -59,10 +59,10 @@
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-card-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
 
-  /* Dashboard glass surfaces — plus sobres, premium SaaS */
-  --dashboard-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 48%, rgba(6, 18, 46, 0.35) 100%);
-  --dashboard-glass-border: rgba(255, 255, 255, 0.12);
-  --dashboard-glass-glow: 0 12px 40px rgba(0, 0, 0, 0.28);
+  /* Dashboard surfaces — cartes blanches, ombre douce */
+  --dashboard-glass-bg: #ffffff;
+  --dashboard-glass-border: #E7EBF3;
+  --dashboard-glass-glow: 0 2px 12px rgba(16, 24, 40, 0.04);
 }
 
 @theme inline {
@@ -120,7 +120,11 @@ body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
 
 body.app-bg:has(.dashboard-shell),
 body.app-bg:has(.obillz-dashboard) {
-  background-color: #020617 !important;
+  background-color: #F6F8FC !important;
+}
+
+html:has(.dashboard-shell) {
+  background-color: #F6F8FC;
 }
 
 /* ------------------------------------------------------------------
@@ -942,19 +946,19 @@ h3 {
   }
 }
 
-/* Titres principaux des pages dashboard sur fond dark */
+/* Titres principaux des pages dashboard — texte bleu nuit sur fond clair */
 .dashboard-shell main h1 {
-  color: #ffffff !important;
+  color: #10172A !important;
 }
 
 /* Sous-titre directement sous le titre principal */
 .dashboard-shell main h1 + p {
-  color: rgba(255, 255, 255, 0.82) !important;
+  color: #667085 !important;
 }
 
-/* Cartes glass dans le contenu : titres internes (MFA, modales…) sur surface sombre */
+/* Cartes dans le contenu : titres internes (MFA, modales…) */
 .dashboard-shell main .dashboard-card-surface h1 {
-  color: rgba(255, 255, 255, 0.95) !important;
+  color: #10172A !important;
   font-size: 1.25rem !important;
   line-height: 1.35 !important;
   letter-spacing: -0.02em !important;
@@ -967,7 +971,7 @@ h3 {
 }
 
 .dashboard-shell main .dashboard-card-surface h1 + p {
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: #667085 !important;
   font-size: 0.875rem !important;
   line-height: 1.625 !important;
 }
@@ -978,140 +982,86 @@ h3 {
   }
 }
 
-.dashboard-shell .accent-bg:hover {
-  background: var(--accent-hover);
-}
-
-.dashboard-shell .accent-bg {
-  border: 1px solid var(--accent-border);
-}
-
-/* Contraste lisible des cartes sur fond dark */
-.dashboard-shell .shadow-premium {
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
-}
-
 /* ------------------------------------------------------------------
-   Harmonisation legacy → design system (dashboard-shell).
-   Beaucoup d'écrans dashboard utilisent encore d'anciennes classes
-   (`bg-surface`, `bg-surface/80`, `border-subtle`, `text-secondary`…).
-   Sur le fond dark, ces surfaces transparentes devenaient
-   illisibles. On les remappe ici vers la même
-   surface claire glass utilisée par le Dashboard du club.
+   Harmonisation legacy → design system clair (dashboard-shell).
+   Les anciennes classes (`bg-surface`, `text-secondary`, slate…)
+   sont désormais nativement lisibles sur fond clair : on ne remappe
+   que ce qui doit être unifié (cartes, bouton accent, formulaires).
    ------------------------------------------------------------------ */
 
-/* Cartes / panneaux legacy → surface glass sombre intégrée au fond */
+/* Cartes / panneaux legacy → carte blanche unifiée */
 .dashboard-shell main .bg-surface,
 .dashboard-shell main [class*="bg-surface/"] {
-  background: var(--dashboard-glass-bg) !important;
-  border-color: var(--dashboard-glass-border) !important;
-  color: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4), var(--dashboard-glass-glow) !important;
+  background: #ffffff !important;
+  border-color: #E7EBF3 !important;
+  color: #10172A;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 12px rgba(16, 24, 40, 0.04) !important;
 }
 
 .dashboard-shell main .bg-surface-hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(26, 35, 255, 0.1) 100%) !important;
-  color: rgba(255, 255, 255, 0.92);
+  background: #F6F8FC !important;
 }
 
 .dashboard-shell main .bg-surface-hover:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(26, 35, 255, 0.12) 100%) !important;
+  background: #EEF2F8 !important;
 }
 
-/* Bordures discrètes sur surface glass */
-.dashboard-shell main .border-subtle {
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-.dashboard-shell main .border-subtle-hover {
-  border-color: rgba(147, 197, 253, 0.3) !important;
-}
-
-/* Textes legacy → couleurs lisibles sur surface glass sombre */
-.dashboard-shell main .text-primary {
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.dashboard-shell main .text-secondary {
-  color: rgba(255, 255, 255, 0.65) !important;
-}
-
-.dashboard-shell main .text-tertiary {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Bouton primaire legacy `accent-bg` : on garde le bleu Obillz mais on
-   l'aligne visuellement aux DashboardPrimaryButton (gradient + ombre). */
+/* Bouton primaire legacy `accent-bg` : bleu Obillz aligné au CTA landing. */
 .dashboard-shell main .accent-bg {
   background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%) !important;
   color: #ffffff !important;
   border: 1px solid rgba(37, 99, 235, 0.4) !important;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
 }
 
 .dashboard-shell main .accent-bg:hover {
   background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3) !important;
 }
 
-/* Cartes anciennes : ombre glass premium */
+/* Cartes anciennes : ombre douce */
 .dashboard-shell main .shadow-premium {
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45), var(--dashboard-glass-glow) !important;
-  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06) !important;
 }
 
-/* Titres inside legacy glass cards */
-.dashboard-shell main .bg-surface h1,
-.dashboard-shell main .bg-surface h2,
-.dashboard-shell main .bg-surface h3,
-.dashboard-shell main [class*="bg-surface/"] h2,
-.dashboard-shell main [class*="bg-surface/"] h3 {
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-/* Champs formulaires : fond semi-transparent lisible sur glass sombre */
+/* Champs formulaires — thème clair */
 .dashboard-shell {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .dashboard-shell input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
 .dashboard-shell select,
 .dashboard-shell textarea {
-  background-color: rgba(15, 23, 42, 0.55);
-  color: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: #ffffff;
+  color: #10172A;
+  border-color: #DDE3EE;
 }
 
-/* Select natif — menu déroulant sombre (options lisibles sans hover) */
 .dashboard-shell select,
 .dashboard-shell .dashboard-select {
-  color-scheme: dark;
-  background-color: rgba(15, 23, 42, 0.65);
+  color-scheme: light;
+  background-color: #ffffff;
 }
 
 .dashboard-shell select option,
 .dashboard-shell select optgroup,
 .dashboard-shell .dashboard-select option,
 .dashboard-shell .dashboard-select optgroup {
-  background-color: #0c1222;
-  color: #f1f5f9;
+  background-color: #ffffff;
+  color: #10172A;
 }
 
 .dashboard-shell select option:checked,
-.dashboard-shell select option:hover,
-.dashboard-shell select option:focus,
-.dashboard-shell .dashboard-select option:checked,
-.dashboard-shell .dashboard-select option:hover,
-.dashboard-shell .dashboard-select option:focus {
-  background-color: #1a23ff;
-  color: #ffffff;
+.dashboard-shell .dashboard-select option:checked {
+  background-color: #eef2ff;
+  color: #10172A;
 }
 
 .dashboard-shell select:disabled,
 .dashboard-shell input:disabled:not([type="checkbox"]):not([type="radio"]),
 .dashboard-shell textarea:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
+  background-color: #F6F8FC;
   cursor: not-allowed;
 }
 
@@ -1124,46 +1074,46 @@ h3 {
 .dashboard-shell select:-webkit-autofill,
 .dashboard-shell select:-webkit-autofill:hover,
 .dashboard-shell select:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.85) inset;
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.95);
-  caret-color: rgba(255, 255, 255, 0.95);
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #10172A;
+  caret-color: #10172A;
   transition: background-color 9999s ease-out 0s;
 }
 
 .dashboard-shell input::placeholder,
 .dashboard-shell textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #98A2B3;
 }
 
 .dashboard-shell input:focus,
 .dashboard-shell select:focus,
 .dashboard-shell textarea:focus {
-  border-color: rgba(147, 197, 253, 0.45);
-  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.15);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   outline: none;
 }
 
 .dashboard-shell [contenteditable="true"] {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: #ffffff;
+  color: #10172A;
+  border-color: #DDE3EE;
 }
 
-/* Classe legacy `.input-obillz` — harmonisée thème sombre */
+/* Classe legacy `.input-obillz` — harmonisée thème clair */
 .dashboard-shell .input-obillz {
-  background-color: rgba(15, 23, 42, 0.65) !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  color-scheme: dark;
+  background-color: #ffffff !important;
+  color: #10172A !important;
+  border-color: #DDE3EE !important;
+  color-scheme: light;
 }
 
 .dashboard-shell .input-obillz::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #98A2B3;
 }
 
 .dashboard-shell .input-obillz:focus {
-  border-color: rgba(147, 197, 253, 0.45) !important;
-  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.15);
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   outline: none;
 }
 
@@ -1601,474 +1551,153 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Dashboard glass — cartes sombres intégrées au fond bleu nuit
+   Dashboard clair — compat pages écrites pour l'ancien thème sombre.
+   Les classes « texte blanc / surfaces translucides » utilisées par
+   les écrans non encore migrés sont remappées vers la palette claire.
+   (Couche transitoire : à supprimer une fois toutes les pages migrées.)
    ------------------------------------------------------------------ */
-.dashboard-glass-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    ellipse 80% 50% at 50% -10%,
-    rgba(147, 197, 253, 0.08),
-    rgba(26, 35, 255, 0.04) 42%,
-    transparent 68%
-  );
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.3s ease;
+
+/* Textes blancs (toutes opacités) → bleu nuit / gris */
+.dashboard-shell main [class*="text-white"] {
+  color: #1D2939 !important;
 }
 
-.dashboard-glass-card::after {
-  content: "";
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(147, 197, 253, 0.22),
-    rgba(255, 255, 255, 0.14),
-    rgba(147, 197, 253, 0.22),
-    transparent
-  );
-  pointer-events: none;
+.dashboard-shell main [class*="text-white/6"],
+.dashboard-shell main [class*="text-white/5"],
+.dashboard-shell main [class*="text-white/7"] {
+  color: #667085 !important;
 }
 
-.dashboard-glass-card > *:not([aria-hidden]) {
-  position: relative;
-  z-index: 1;
+.dashboard-shell main [class*="text-white/4"],
+.dashboard-shell main [class*="text-white/3"],
+.dashboard-shell main [class*="text-white/2"] {
+  color: #98A2B3 !important;
 }
 
-/* Remap couleurs slate hardcodées → palette glass (pages legacy) */
-.dashboard-shell main .dashboard-glass-card .text-slate-900 {
-  color: rgba(255, 255, 255, 0.95) !important;
+/* Exceptions : texte blanc conservé sur boutons/bandeaux à fond plein */
+.dashboard-shell main [class*="bg-gradient"][class*="text-white"],
+.dashboard-shell main [class*="bg-gradient"] [class*="text-white"],
+.dashboard-shell main .accent-bg[class*="text-white"],
+.dashboard-shell main .accent-bg [class*="text-white"],
+.dashboard-shell main [class*="bg-blue-6"][class*="text-white"],
+.dashboard-shell main [class*="bg-blue-6"] [class*="text-white"],
+.dashboard-shell main [class*="bg-indigo-6"][class*="text-white"],
+.dashboard-shell main [class*="bg-red-6"][class*="text-white"],
+.dashboard-shell main [class*="bg-rose-6"][class*="text-white"],
+.dashboard-shell main [class*="bg-emerald-6"][class*="text-white"],
+.dashboard-shell main [class*="bg-[#1A23FF]"][class*="text-white"],
+.dashboard-shell main [class*="bg-[#2563EB]"][class*="text-white"] {
+  color: #ffffff !important;
 }
 
-.dashboard-shell main .dashboard-glass-card .text-slate-800,
-.dashboard-shell main .dashboard-glass-card .text-slate-700 {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .text-slate-600 {
-  color: rgba(255, 255, 255, 0.65) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .text-slate-500 {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .text-slate-400 {
-  color: rgba(255, 255, 255, 0.45) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .bg-slate-100,
-.dashboard-shell main .dashboard-glass-card .bg-slate-50 {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .bg-slate-200 {
-  background-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card [class*="border-slate"] {
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .hover\:bg-slate-50:hover,
-.dashboard-shell main .dashboard-glass-card .hover\:bg-slate-100:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .hover\:bg-indigo-500\/\[0\.06\]:hover {
-  background-color: rgba(26, 35, 255, 0.1) !important;
-}
-
-/* Badges statut legacy sur fond glass */
-.dashboard-shell main .dashboard-glass-card .bg-emerald-100 {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: rgb(167, 243, 208) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .bg-amber-100 {
-  background-color: rgba(245, 158, 11, 0.15) !important;
-  color: rgb(253, 230, 138) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .bg-red-100 {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  color: rgb(254, 202, 202) !important;
-}
-
-.dashboard-shell main .dashboard-glass-card .bg-blue-100 {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-  color: rgb(191, 219, 254) !important;
-}
-
-/* Surfaces semi-transparentes legacy → glass (pages hors design system). */
-.dashboard-shell main [class*="bg-white/9"],
-.dashboard-shell main [class*="bg-white/8"],
-.dashboard-shell main [class*="bg-white/5"] {
-  background: var(--dashboard-glass-bg) !important;
-  border-color: var(--dashboard-glass-border) !important;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4), var(--dashboard-glass-glow) !important;
-}
-
-.dashboard-shell main [class*="bg-white/9"] .text-slate-900,
-.dashboard-shell main [class*="bg-white/8"] .text-slate-900,
-.dashboard-shell main [class*="bg-white/5"] .text-slate-900 {
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.dashboard-shell main [class*="bg-white/9"] .text-slate-600,
-.dashboard-shell main [class*="bg-white/8"] .text-slate-600,
-.dashboard-shell main [class*="bg-white/5"] .text-slate-600,
-.dashboard-shell main [class*="bg-white/9"] .text-slate-500,
-.dashboard-shell main [class*="bg-white/8"] .text-slate-500,
-.dashboard-shell main [class*="bg-white/5"] .text-slate-500 {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-/* À l'intérieur d'une carte glass : ne pas re-transformer les sous-blocs en cartes. */
-.dashboard-shell main .dashboard-glass-card [class*="bg-white/9"],
-.dashboard-shell main .dashboard-glass-card [class*="bg-white/8"],
-.dashboard-shell main .dashboard-glass-card [class*="bg-white/5"],
-.dashboard-shell main .dashboard-glass-card [class*="bg-white/[0."] {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+/* Surfaces translucides blanches → surfaces claires plates */
+.dashboard-shell main [class*="bg-white/"] {
+  background-color: #F6F8FC !important;
   backdrop-filter: none !important;
-  box-shadow: none !important;
 }
 
-.dashboard-shell main [class*="border-slate-200"],
-.dashboard-shell main [class*="border-slate-300"] {
-  border-color: rgba(255, 255, 255, 0.12) !important;
+/* Panneaux sombres résiduels → carte blanche */
+.dashboard-shell main [class*="bg-slate-950"],
+.dashboard-shell main [class*="bg-slate-900"] {
+  background-color: #ffffff !important;
+  color: #10172A !important;
 }
 
-.dashboard-shell main .bg-slate-50,
-.dashboard-shell main .bg-gray-50,
-.dashboard-shell main .bg-neutral-50 {
-  background-color: rgba(255, 255, 255, 0.04) !important;
+/* Bordures / anneaux / séparateurs blancs translucides → bordure claire */
+.dashboard-shell main [class*="border-white"] {
+  border-color: #E7EBF3 !important;
 }
 
-.dashboard-shell main .bg-slate-100,
-.dashboard-shell main .bg-gray-100 {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+.dashboard-shell main [class*="ring-white"] {
+  --tw-ring-color: #E7EBF3 !important;
 }
 
-.dashboard-shell main .bg-white {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+.dashboard-shell main [class*="divide-white"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #EEF2F7 !important;
 }
 
-.dashboard-shell main .bg-green-50 {
-  background-color: rgba(16, 185, 129, 0.12) !important;
-  border-color: rgba(52, 211, 153, 0.35) !important;
-  color: rgb(167, 243, 208) !important;
+/* Teintes pastel « dark » (texte -200/-300) → équivalents lisibles sur clair */
+.dashboard-shell main .text-emerald-200,
+.dashboard-shell main .text-emerald-300 {
+  color: #047857 !important;
 }
 
-.dashboard-shell main .border-green-200 {
-  border-color: rgba(52, 211, 153, 0.35) !important;
+.dashboard-shell main .text-amber-200,
+.dashboard-shell main .text-amber-300 {
+  color: #B45309 !important;
 }
 
-.dashboard-shell main .bg-amber-50 {
-  background-color: rgba(245, 158, 11, 0.12) !important;
-  border-color: rgba(251, 191, 36, 0.35) !important;
-  color: rgb(253, 230, 138) !important;
+.dashboard-shell main .text-red-200,
+.dashboard-shell main .text-rose-200,
+.dashboard-shell main .text-rose-300 {
+  color: #B42318 !important;
 }
 
-.dashboard-shell main .border-amber-300,
-.dashboard-shell main .border-amber-200 {
-  border-color: rgba(251, 191, 36, 0.35) !important;
+.dashboard-shell main .text-blue-200,
+.dashboard-shell main .text-blue-300,
+.dashboard-shell main [class*="text-blue-200/"],
+.dashboard-shell main [class*="text-blue-300/"] {
+  color: #1D4ED8 !important;
 }
 
-.dashboard-shell main .bg-red-50 {
-  background-color: rgba(239, 68, 68, 0.12) !important;
-  border-color: rgba(248, 113, 113, 0.35) !important;
-  color: rgb(254, 202, 202) !important;
+.dashboard-shell main .text-indigo-200,
+.dashboard-shell main .text-violet-200,
+.dashboard-shell main .text-purple-200 {
+  color: #6D28D9 !important;
 }
 
-.dashboard-shell main .border-red-300,
-.dashboard-shell main .border-red-200 {
-  border-color: rgba(248, 113, 113, 0.35) !important;
+.dashboard-shell main .text-sky-200,
+.dashboard-shell main .text-sky-300 {
+  color: #0369A1 !important;
 }
 
-.dashboard-shell main .bg-blue-50,
-.dashboard-shell main .bg-indigo-50 {
-  background-color: rgba(59, 130, 246, 0.12) !important;
+/* Fonds translucides colorés (badges dark) → pastilles claires */
+.dashboard-shell main [class*="bg-emerald-500/"] {
+  background-color: #ECFDF3 !important;
+  border-color: #ABEFC6 !important;
 }
 
-.dashboard-shell main .bg-emerald-50 {
-  background-color: rgba(16, 185, 129, 0.12) !important;
+.dashboard-shell main [class*="bg-amber-500/"] {
+  background-color: #FFFAEB !important;
+  border-color: #FEDF89 !important;
 }
 
-.dashboard-shell main .bg-rose-50 {
-  background-color: rgba(244, 63, 94, 0.12) !important;
+.dashboard-shell main [class*="bg-red-500/"],
+.dashboard-shell main [class*="bg-rose-500/"] {
+  background-color: #FEF3F2 !important;
+  border-color: #FECDCA !important;
 }
 
-.dashboard-shell main .hover\:bg-slate-50:hover,
-.dashboard-shell main .hover\:bg-slate-100:hover,
-.dashboard-shell main .hover\:bg-gray-50:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+.dashboard-shell main [class*="bg-blue-500/"],
+.dashboard-shell main [class*="bg-indigo-500/"],
+.dashboard-shell main [class*="bg-[#1A23FF]/"] {
+  background-color: #EFF4FF !important;
+  border-color: #C7D7FE !important;
 }
 
-.dashboard-shell main .hover\:bg-emerald-50:hover {
-  background-color: rgba(16, 185, 129, 0.18) !important;
-}
-
+/* Checkbox / radio — accent bleu Obillz */
 .dashboard-shell main input[type="checkbox"],
 .dashboard-shell main input[type="radio"] {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
   accent-color: #1a23ff;
 }
 
-.dashboard-shell main input[type="color"] {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Modales dans le contenu dashboard */
-.dashboard-shell main .fixed.inset-0 > .bg-white,
-.dashboard-shell main .fixed.inset-0 > [class*="rounded-2xl"].bg-white,
-.dashboard-shell main .fixed.inset-0 > div[class*="bg-white"] {
-  background: linear-gradient(
-    135deg,
-    rgba(10, 15, 46, 0.98) 0%,
-    rgba(13, 18, 56, 0.98) 50%,
-    rgba(17, 24, 39, 0.98) 100%
-  ) !important;
-  border-color: rgba(147, 197, 253, 0.25) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-/* Textes slate dans main — lisibilité sur fond sombre */
-.dashboard-shell main .text-slate-900,
-.dashboard-shell main .text-gray-900 {
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.dashboard-shell main .text-slate-800,
-.dashboard-shell main .text-slate-700,
-.dashboard-shell main .text-indigo-900,
-.dashboard-shell main .text-indigo-700 {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.dashboard-shell main .text-slate-600,
-.dashboard-shell main .text-slate-500 {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-.dashboard-shell main .text-slate-400 {
-  color: rgba(255, 255, 255, 0.45) !important;
-}
-
-.dashboard-shell main .text-emerald-800,
-.dashboard-shell main .text-emerald-900 {
-  color: rgb(167, 243, 208) !important;
-}
-
-.dashboard-shell main .text-amber-900 {
-  color: rgb(253, 230, 138) !important;
-}
-
-.dashboard-shell main .text-rose-700 {
-  color: rgb(254, 202, 202) !important;
-}
-
-.dashboard-shell main .text-blue-800 {
-  color: rgb(191, 219, 254) !important;
-}
-
-/* ------------------------------------------------------------------
-   Passe QA finale — patterns legacy non encore remappés
-   ------------------------------------------------------------------ */
-
-/* Badges statut colorés (hors dashboard-glass-card) */
-.dashboard-shell main .bg-green-100 {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: rgb(167, 243, 208) !important;
-}
-
-.dashboard-shell main .bg-emerald-100 {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: rgb(167, 243, 208) !important;
-}
-
-.dashboard-shell main .bg-yellow-100 {
-  background-color: rgba(234, 179, 8, 0.15) !important;
-  color: rgb(253, 224, 71) !important;
-}
-
-.dashboard-shell main .bg-amber-100 {
-  background-color: rgba(245, 158, 11, 0.15) !important;
-  color: rgb(253, 230, 138) !important;
-}
-
-.dashboard-shell main .bg-red-100 {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  color: rgb(254, 202, 202) !important;
-}
-
-.dashboard-shell main .bg-blue-100 {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-  color: rgb(191, 219, 254) !important;
-}
-
-.dashboard-shell main .bg-purple-100 {
-  background-color: rgba(168, 85, 247, 0.15) !important;
-  color: rgb(216, 180, 254) !important;
-}
-
-/* Variantes avec opacité (échappent aux sélecteurs exacts) */
-.dashboard-shell main [class*="bg-red-50/"] {
-  background-color: rgba(239, 68, 68, 0.12) !important;
-  border-color: rgba(248, 113, 113, 0.35) !important;
-}
-
-.dashboard-shell main [class*="bg-green-50/"],
-.dashboard-shell main [class*="bg-emerald-50/"] {
-  background-color: rgba(16, 185, 129, 0.12) !important;
-}
-
-.dashboard-shell main [class*="bg-amber-50/"] {
-  background-color: rgba(245, 158, 11, 0.12) !important;
-}
-
-.dashboard-shell main [class*="bg-blue-50/"] {
-  background-color: rgba(59, 130, 246, 0.12) !important;
-}
-
-.dashboard-shell main [class*="bg-emerald-100/"],
-.dashboard-shell main [class*="bg-green-100/"],
-.dashboard-shell main [class*="bg-amber-100/"],
-.dashboard-shell main [class*="bg-red-100/"],
-.dashboard-shell main [class*="bg-blue-100/"],
-.dashboard-shell main [class*="bg-purple-100/"] {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* Textes sémantiques colorés */
-.dashboard-shell main .text-green-600,
-.dashboard-shell main .text-green-700,
-.dashboard-shell main .text-green-800,
-.dashboard-shell main .text-green-900 {
-  color: rgb(167, 243, 208) !important;
-}
-
-.dashboard-shell main .text-emerald-600,
-.dashboard-shell main .text-emerald-700 {
-  color: rgb(110, 231, 183) !important;
-}
-
-.dashboard-shell main .text-red-600,
-.dashboard-shell main .text-red-700,
-.dashboard-shell main .text-red-800 {
-  color: rgb(254, 202, 202) !important;
-}
-
-.dashboard-shell main .text-amber-600,
-.dashboard-shell main .text-amber-700,
-.dashboard-shell main .text-amber-800 {
-  color: rgb(253, 230, 138) !important;
-}
-
-.dashboard-shell main .text-yellow-600,
-.dashboard-shell main .text-yellow-700 {
-  color: rgb(253, 224, 71) !important;
-}
-
-.dashboard-shell main .text-blue-600,
-.dashboard-shell main .text-blue-700 {
-  color: rgb(147, 197, 253) !important;
-}
-
-.dashboard-shell main .text-purple-600,
-.dashboard-shell main .text-purple-700 {
-  color: rgb(216, 180, 254) !important;
-}
-
-.dashboard-shell main .text-sky-700 {
-  color: rgb(186, 230, 253) !important;
-}
-
-.dashboard-shell main .text-violet-700,
-.dashboard-shell main .text-violet-800,
-.dashboard-shell main .text-violet-900 {
-  color: rgb(196, 181, 253) !important;
-}
-
-.dashboard-shell main .text-indigo-600 {
-  color: rgb(165, 180, 252) !important;
-}
-
-/* Hovers legacy */
-.dashboard-shell main .hover\:bg-white:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.dashboard-shell main .hover\:bg-slate-200:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.dashboard-shell main .hover\:bg-red-100:hover {
-  background-color: rgba(239, 68, 68, 0.18) !important;
-}
-
-.dashboard-shell main .hover\:bg-amber-100:hover,
-.dashboard-shell main .hover\:bg-amber-200:hover {
-  background-color: rgba(245, 158, 11, 0.18) !important;
-}
-
-.dashboard-shell main .hover\:bg-emerald-100:hover,
-.dashboard-shell main [class*="hover:bg-emerald-100"]:hover {
-  background-color: rgba(16, 185, 129, 0.18) !important;
-}
-
-.dashboard-shell main .hover\:text-slate-900:hover,
-.dashboard-shell main .hover\:text-slate-800:hover {
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.dashboard-shell main .group:hover .group-hover\:text-blue-700,
-.dashboard-shell main .group-hover\:text-blue-700 {
-  color: rgb(147, 197, 253) !important;
-}
-
-/* Séparateurs de listes */
-.dashboard-shell main .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.dashboard-shell main .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Tableaux / listes dashboard — séparateurs discrets (cotisations, factures, membres…) */
+/* Tableaux / listes dashboard — séparateurs clairs */
 .dashboard-shell main .dashboard-table-divide > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(147, 197, 253, 0.07) !important;
+  border-color: #EEF2F7 !important;
 }
 
 .dashboard-shell main .dashboard-data-table thead tr {
-  border-bottom-color: rgba(147, 197, 253, 0.1) !important;
+  border-bottom-color: #EEF2F7 !important;
 }
 
 .dashboard-shell main .dashboard-table-footer {
-  border-top: 1px solid rgba(147, 197, 253, 0.16) !important;
-  background: linear-gradient(
-    90deg,
-    rgba(26, 35, 255, 0.22) 0%,
-    rgba(99, 102, 241, 0.16) 48%,
-    rgba(26, 35, 255, 0.14) 100%
-  ) !important;
-  color: rgba(255, 255, 255, 0.78) !important;
+  border-top: 1px solid #EEF2F7 !important;
+  background: #FAFBFD !important;
+  color: #667085 !important;
 }
 
 .dashboard-shell main .dashboard-table-footer p {
-  color: rgba(255, 255, 255, 0.78) !important;
+  color: #667085 !important;
 }
 
 /* Surface blanche intentionnelle (QR codes) */
@@ -2076,52 +1705,12 @@ h3 {
   background-color: #ffffff !important;
 }
 
-/* Aperçu cotisation / facture — carte document opaque sur fond dashboard */
+/* Aperçu cotisation / facture — feuille blanche type document */
 .dashboard-shell main .document-preview-surface {
   border-radius: 1rem;
-  border-color: rgba(147, 197, 253, 0.28) !important;
-  background: linear-gradient(165deg, #0b1028 0%, #0e1638 42%, #101828 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(147, 197, 253, 0.12),
-    0 16px 48px rgba(0, 0, 0, 0.62),
-    0 0 80px rgba(26, 35, 255, 0.16) !important;
-}
-
-.dashboard-shell main .document-preview-surface .bg-slate-50 {
-  background-color: rgba(255, 255, 255, 0.09) !important;
-}
-
-.dashboard-shell main .document-preview-surface thead.bg-slate-50 {
-  background-color: rgba(255, 255, 255, 0.07) !important;
-}
-
-.dashboard-shell main .document-preview-surface [class*="border-slate"] {
-  border-color: rgba(255, 255, 255, 0.16) !important;
-}
-
-.dashboard-shell main .document-preview-surface .divide-slate-200\/70 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-.dashboard-shell main .document-preview-surface .text-slate-900 {
-  color: rgba(255, 255, 255, 0.97) !important;
-}
-
-.dashboard-shell main .document-preview-surface .text-slate-700 {
-  color: rgba(255, 255, 255, 0.88) !important;
-}
-
-.dashboard-shell main .document-preview-surface .text-slate-600 {
-  color: rgba(255, 255, 255, 0.72) !important;
-}
-
-.dashboard-shell main .document-preview-surface .text-slate-500 {
-  color: rgba(255, 255, 255, 0.62) !important;
-}
-
-.dashboard-shell main .document-preview-surface .text-slate-400,
-.dashboard-shell main .document-preview-surface thead.text-slate-500 {
-  color: rgba(255, 255, 255, 0.54) !important;
+  border-color: #E7EBF3 !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 28px rgba(16, 24, 40, 0.08) !important;
 }
 
 /* Hero — halo texte et profondeur */

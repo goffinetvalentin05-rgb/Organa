@@ -643,7 +643,7 @@ export default function TableauDeBordPage() {
         subtitle={t("dashboard.overview.subtitle")}
         actions={
           <div className={dashboardStatusPillClass}>
-            <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" />
+            <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
             <span>{t("dashboard.overview.statusNote")}</span>
           </div>
         }
@@ -661,7 +661,7 @@ export default function TableauDeBordPage() {
               stats.totalClients === 0 ? (
                 <p>{t("dashboard.overview.kpis.clientsEmpty")}</p>
               ) : stats.nouveauxMembresMois > 0 ? (
-                <p className="font-medium text-emerald-300/90">
+                <p className="font-medium text-emerald-600">
                   {t("dashboard.overview.kpis.newThisMonth").replace(
                     "{count}",
                     String(stats.nouveauxMembresMois)
@@ -684,17 +684,17 @@ export default function TableauDeBordPage() {
               <div className="space-y-1">
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
                   {stats.devisPayes > 0 ? (
-                    <span className="font-medium text-emerald-300/90">
+                    <span className="font-medium text-emerald-600">
                       {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
                     </span>
                   ) : null}
                   {stats.devisEnRetard > 0 ? (
-                    <span className="font-medium text-rose-300/90">
+                    <span className="font-medium text-rose-600">
                       {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
                     </span>
                   ) : null}
                   {stats.devisEnAttente > 0 ? (
-                    <span className="font-medium text-sky-300/90">
+                    <span className="font-medium text-sky-600">
                       {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
                     </span>
                   ) : null}
@@ -703,9 +703,9 @@ export default function TableauDeBordPage() {
                   ) : null}
                 </div>
                 {stats.montantCotisationsPayees > 0 ? (
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-[#98A2B3]">
                     {t("dashboard.overview.kpis.collected")}{" "}
-                    <span className="font-medium text-white/70">
+                    <span className="font-medium text-[#344054]">
                       {formatMontant(stats.montantCotisationsPayees)}
                     </span>
                   </p>
@@ -725,12 +725,12 @@ export default function TableauDeBordPage() {
               <div className="space-y-1">
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
                   {stats.facturesPayees > 0 ? (
-                    <span className="font-medium text-emerald-300/90">
+                    <span className="font-medium text-emerald-600">
                       {stats.facturesPayees} {t("dashboard.overview.kpis.paidQuotes")}
                     </span>
                   ) : null}
                   {stats.facturesNonPayees > 0 ? (
-                    <span className="font-medium text-rose-300/90">
+                    <span className="font-medium text-rose-600">
                       {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
                     </span>
                   ) : null}
@@ -739,9 +739,9 @@ export default function TableauDeBordPage() {
                   ) : null}
                 </div>
                 {stats.montantFacturesAttente > 0 ? (
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-[#98A2B3]">
                     {t("dashboard.overview.kpis.pendingAmount")}{" "}
-                    <span className="font-medium text-white/70">
+                    <span className="font-medium text-[#344054]">
                       {formatMontant(stats.montantFacturesAttente)}
                     </span>
                   </p>
@@ -756,7 +756,7 @@ export default function TableauDeBordPage() {
           icon={Wallet}
           value={loading ? "-" : formatMontant(stats.soldeClub)}
           footer={
-            <p className="text-xs text-white/40">{t("dashboard.overview.kpis.balanceFormula")}</p>
+            <p className="text-xs text-[#98A2B3]">{t("dashboard.overview.kpis.balanceFormula")}</p>
           }
         />
       </div>
@@ -769,8 +769,8 @@ export default function TableauDeBordPage() {
           headerRight={<span>{t("dashboard.overview.priorities.badge")}</span>}
         >
           {priorities.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100">
-              <CheckCircle className="h-5 w-5 shrink-0 text-emerald-300" />
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
+              <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
               <span>{t("dashboard.overview.priorities.empty")}</span>
             </div>
           ) : (
@@ -784,19 +784,19 @@ export default function TableauDeBordPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-white/95">{item.label}</p>
+                        <p className="text-sm font-medium text-[#10172A]">{item.label}</p>
                         <DashboardBadge variant={item.variant}>{item.badgeLabel}</DashboardBadge>
                       </div>
                       {item.detail ? (
-                        <p className="mt-1 text-xs text-white/45">{item.detail}</p>
+                        <p className="mt-1 text-xs text-[#98A2B3]">{item.detail}</p>
                       ) : null}
                     </div>
                     <div className="flex shrink-0 items-center gap-2 self-center">
-                      <span className="text-xl font-semibold tabular-nums tracking-tight text-white sm:text-2xl">
+                      <span className="text-xl font-semibold tabular-nums tracking-tight text-[#10172A] sm:text-2xl">
                         {item.count ?? "-"}
                       </span>
                       {item.href ? (
-                        <ArrowRight className="h-4 w-4 text-white/25 transition group-hover:text-blue-300/80" />
+                        <ArrowRight className="h-4 w-4 text-[#C7D0E0] transition group-hover:text-[#2563EB]" />
                       ) : null}
                     </div>
                   </div>
@@ -833,25 +833,25 @@ export default function TableauDeBordPage() {
                 )}
               >
                 <div className="flex min-w-0 items-start gap-3.5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.05] ring-1 ring-white/[0.08]">
-                    <Receipt className="h-4 w-4 text-white/45" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F5FA] ring-1 ring-[#E7EBF3]">
+                    <Receipt className="h-4 w-4 text-[#667085]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-white/95">{item.numero}</p>
-                    <p className="text-sm text-white/50">{item.client}</p>
-                    <p className="mt-0.5 text-xs text-white/35">
+                    <p className="font-medium text-[#10172A]">{item.numero}</p>
+                    <p className="text-sm text-[#667085]">{item.client}</p>
+                    <p className="mt-0.5 text-xs text-[#98A2B3]">
                       {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 md:text-right">
                   <div>
-                    <p className="font-semibold tabular-nums text-white/95">
+                    <p className="font-semibold tabular-nums text-[#10172A]">
                       {formatMontant(item.montant)}
                     </p>
                     <span className={`badge-obillz ${item.statutColor}`}>{item.statutLabel}</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-white/25 transition group-hover:text-blue-300/80" />
+                  <ArrowRight className="h-4 w-4 text-[#C7D0E0] transition group-hover:text-[#2563EB]" />
                 </div>
               </Link>
             ))}
@@ -863,42 +863,42 @@ export default function TableauDeBordPage() {
       <SectionCard icon={FilePlus} title={t("dashboard.overview.quickActions.title")}>
         <div className="grid gap-3 md:grid-cols-3">
           <Link href="/tableau-de-bord/devis/nouveau" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB]/15 ring-1 ring-blue-400/25 transition group-hover:bg-[#2563EB]/30">
-              <FilePlus className="h-5 w-5 text-blue-300" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
+              <FilePlus className="h-5 w-5 text-[#2563EB]" />
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-white/95">
+              <p className="font-medium text-[#10172A]">
                 {t("dashboard.overview.quickActions.newQuote")}
               </p>
-              <p className="mt-0.5 text-sm text-white/45">
+              <p className="mt-0.5 text-sm text-[#667085]">
                 {t("dashboard.overview.quickActions.newQuoteText")}
               </p>
             </div>
           </Link>
 
           <Link href="/tableau-de-bord/factures/nouvelle" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB]/15 ring-1 ring-blue-400/25 transition group-hover:bg-[#2563EB]/30">
-              <FilePlus className="h-5 w-5 text-blue-300" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
+              <FilePlus className="h-5 w-5 text-[#2563EB]" />
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-white/95">
+              <p className="font-medium text-[#10172A]">
                 {t("dashboard.overview.quickActions.newInvoice")}
               </p>
-              <p className="mt-0.5 text-sm text-white/45">
+              <p className="mt-0.5 text-sm text-[#667085]">
                 {t("dashboard.overview.quickActions.newInvoiceText")}
               </p>
             </div>
           </Link>
 
           <Link href="/tableau-de-bord/clients/nouveau" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB]/15 ring-1 ring-blue-400/25 transition group-hover:bg-[#2563EB]/30">
-              <UserPlus className="h-5 w-5 text-blue-300" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
+              <UserPlus className="h-5 w-5 text-[#2563EB]" />
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-white/95">
+              <p className="font-medium text-[#10172A]">
                 {t("dashboard.overview.quickActions.newClient")}
               </p>
-              <p className="mt-0.5 text-sm text-white/45">
+              <p className="mt-0.5 text-sm text-[#667085]">
                 {t("dashboard.overview.quickActions.newClientText")}
               </p>
             </div>
@@ -909,11 +909,11 @@ export default function TableauDeBordPage() {
       {/* === Activité récente === */}
       <TableCard title={t("dashboard.overview.lastDocuments.title")}>
         {loading ? (
-          <div className="py-12 text-center text-sm text-white/45">
+          <div className="py-12 text-center text-sm text-[#98A2B3]">
             {t("dashboard.overview.lastDocuments.loading")}
           </div>
         ) : recentActivity.length === 0 ? (
-          <div className="py-12 text-center text-sm text-white/45">
+          <div className="py-12 text-center text-sm text-[#98A2B3]">
             {t("dashboard.overview.lastDocuments.empty")}
           </div>
         ) : (
@@ -928,12 +928,12 @@ export default function TableauDeBordPage() {
                   )}
                 >
                   <div className="flex min-w-0 items-center gap-3.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.05] ring-1 ring-white/[0.08]">
-                      <Icon className="h-4 w-4 text-white/45" />
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F5FA] ring-1 ring-[#E7EBF3]">
+                      <Icon className="h-4 w-4 text-[#667085]" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-white/95">{item.title}</p>
-                      <p className="truncate text-sm text-white/45">{item.subtitle}</p>
+                      <p className="truncate font-medium text-[#10172A]">{item.title}</p>
+                      <p className="truncate text-sm text-[#667085]">{item.subtitle}</p>
                     </div>
                   </div>
                   <div className="shrink-0 text-right">
@@ -941,13 +941,13 @@ export default function TableauDeBordPage() {
                       <p
                         className={cn(
                           "font-medium tabular-nums",
-                          item.amount >= 0 ? "text-white/90" : "text-rose-300/90"
+                          item.amount >= 0 ? "text-[#10172A]" : "text-rose-600"
                         )}
                       >
                         {formatMontant(item.amount)}
                       </p>
                     ) : null}
-                    <p className="text-xs text-white/35">{formatRelativeDate(item.date)}</p>
+                    <p className="text-xs text-[#98A2B3]">{formatRelativeDate(item.date)}</p>
                   </div>
                 </div>
               );

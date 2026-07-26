@@ -4,12 +4,12 @@ import type { ReactNode } from "react";
 import { cn } from "./cn";
 
 const variants = {
-  default: "border border-white/12 bg-white/[0.08] text-white/70",
-  info: "border border-blue-400/25 bg-blue-500/12 text-blue-200",
-  success: "border border-emerald-400/25 bg-emerald-500/12 text-emerald-200",
-  warning: "border border-amber-400/25 bg-amber-500/12 text-amber-200",
-  danger: "border border-red-400/25 bg-red-500/12 text-red-200",
-  neutral: "border border-white/15 bg-white/[0.06] text-white/75",
+  default: "border border-[#E7EBF3] bg-[#F6F8FC] text-[#667085]",
+  info: "border border-blue-200 bg-blue-50 text-blue-700",
+  success: "border border-emerald-200 bg-emerald-50 text-emerald-700",
+  warning: "border border-amber-200 bg-amber-50 text-amber-700",
+  danger: "border border-red-200 bg-red-50 text-red-700",
+  neutral: "border border-[#E7EBF3] bg-white text-[#344054]",
 } as const;
 
 export type DashboardBadgeProps = {

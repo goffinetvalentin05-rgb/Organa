@@ -6,19 +6,19 @@ import { cn } from "./cn";
 
 const variants = {
   surface:
-    "rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white/90 shadow-sm backdrop-blur-sm transition-all hover:border-blue-400/30 hover:bg-white/[0.14] hover:shadow-[0_0_20px_rgba(26,35,255,0.15)]",
+    "rounded-lg border border-[#DDE3EE] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] shadow-sm transition-all hover:border-[#C7D0E0] hover:bg-[#F6F8FC]",
   ghost:
-    "rounded-xl px-3 py-2 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.08] hover:text-white/90",
-  /** Liens discrets sur fond dark (sidebar, topbar). */
+    "rounded-lg px-3 py-2 text-sm font-medium text-[#667085] transition-colors hover:bg-[#F6F8FC] hover:text-[#10172A]",
+  /** Liens discrets (sidebar, topbar). */
   ghostLight:
-    "rounded-xl px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white",
+    "rounded-lg px-3 py-2 text-sm font-medium text-[#344054] transition-colors hover:bg-[#F6F8FC] hover:text-[#10172A]",
   dangerSoft:
-    "rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/18",
+    "rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100",
   premiumInline:
-    "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(37,99,235,0.35)] transition hover:opacity-95 hover:shadow-[0_6px_28px_rgba(37,99,235,0.45)]",
-  /** CTA sombre sur bandeau glass. */
+    "inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-5 py-3 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition hover:opacity-95 hover:shadow-[0_6px_18px_rgba(37,99,235,0.3)]",
+  /** CTA secondaire sur bandeau. */
   solidDark:
-    "inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur-sm transition hover:bg-white/[0.14] hover:border-blue-400/25",
+    "inline-flex items-center justify-center gap-2 rounded-lg border border-[#DDE3EE] bg-white px-5 py-3 text-sm font-semibold text-[#344054] shadow-sm transition hover:bg-[#F6F8FC] hover:border-[#C7D0E0]",
 } as const;
 
 type Base = {

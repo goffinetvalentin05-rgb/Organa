@@ -12,7 +12,7 @@ import {
 type IconProps = { className?: string };
 
 const interactive =
-  "transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_16px_48px_rgba(0,0,0,0.32)]";
+  "transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_4px_20px_rgba(37,99,235,0.1)]";
 
 export type StatCardProps = {
   label: string;
@@ -28,13 +28,13 @@ export default function StatCard({ label, value, icon: Icon, footer, href, class
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <span className={dashboardCardLabelClass}>{label}</span>
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] ring-1 ring-white/[0.08]">
-          <Icon className="h-3.5 w-3.5 text-blue-200/55" aria-hidden />
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
+          <Icon className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden />
         </span>
       </div>
       <div className={dashboardCardValueClass}>{value}</div>
       {footer ? (
-        <div className="mt-auto pt-3 text-sm leading-relaxed text-white/50 [&_.font-medium]:text-white/75 [&_span]:text-inherit">
+        <div className="mt-auto pt-3 text-sm leading-relaxed text-[#667085]">
           {footer}
         </div>
       ) : null}
