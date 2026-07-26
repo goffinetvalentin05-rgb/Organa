@@ -59,10 +59,10 @@
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-card-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
 
-  /* Dashboard glass surfaces */
-  --dashboard-glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(26, 35, 255, 0.08) 50%, rgba(99, 102, 241, 0.06) 100%);
-  --dashboard-glass-border: rgba(147, 197, 253, 0.25);
-  --dashboard-glass-glow: 0 0 60px rgba(26, 35, 255, 0.14);
+  /* Dashboard glass surfaces — plus sobres, premium SaaS */
+  --dashboard-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 48%, rgba(6, 18, 46, 0.35) 100%);
+  --dashboard-glass-border: rgba(255, 255, 255, 0.12);
+  --dashboard-glass-glow: 0 12px 40px rgba(0, 0, 0, 0.28);
 }
 
 @theme inline {
@@ -903,23 +903,43 @@ h3 {
   background: var(--bg-surface-hover);
 }
 
-/* Typographie plus dense pour le SaaS */
+/* Typographie SaaS — titres de page maîtrisés (pas de titres écrasants) */
 .dashboard-shell h1 {
-  font-size: 2.5rem !important;
+  font-size: 1.75rem !important;
   line-height: 1.2 !important;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 .dashboard-shell h2 {
-  font-size: 2rem !important;
-  line-height: 1.25 !important;
+  font-size: 1.25rem !important;
+  line-height: 1.3 !important;
   letter-spacing: -0.015em;
 }
 
 .dashboard-shell h3 {
-  font-size: 1.5rem !important;
-  line-height: 1.3 !important;
+  font-size: 1.05rem !important;
+  line-height: 1.35 !important;
   letter-spacing: -0.01em;
+}
+
+@media (min-width: 768px) {
+  .dashboard-shell h1 {
+    font-size: 1.875rem !important;
+  }
+}
+
+/* Titres de section / cartes — restent lisibles sans concurrencer le H1 */
+.dashboard-shell .dashboard-section-title {
+  font-size: 1rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em !important;
+  font-weight: 600 !important;
+}
+
+@media (min-width: 640px) {
+  .dashboard-shell .dashboard-section-title {
+    font-size: 1.0625rem !important;
+  }
 }
 
 /* Titres principaux des pages dashboard sur fond dark */
@@ -1589,10 +1609,10 @@ h3 {
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(
-    ellipse 90% 55% at 50% -15%,
-    rgba(147, 197, 253, 0.12),
-    rgba(26, 35, 255, 0.06) 40%,
-    transparent 65%
+    ellipse 80% 50% at 50% -10%,
+    rgba(147, 197, 253, 0.08),
+    rgba(26, 35, 255, 0.04) 42%,
+    transparent 68%
   );
   pointer-events: none;
   opacity: 1;
@@ -1602,16 +1622,16 @@ h3 {
 .dashboard-glass-card::after {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
+  left: 12%;
+  right: 12%;
   top: 0;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(147, 197, 253, 0.35),
-    rgba(255, 255, 255, 0.2),
-    rgba(147, 197, 253, 0.35),
+    rgba(147, 197, 253, 0.22),
+    rgba(255, 255, 255, 0.14),
+    rgba(147, 197, 253, 0.22),
     transparent
   );
   pointer-events: none;
@@ -1687,6 +1707,7 @@ h3 {
   color: rgb(191, 219, 254) !important;
 }
 
+/* Surfaces semi-transparentes legacy → glass (pages hors design system). */
 .dashboard-shell main [class*="bg-white/9"],
 .dashboard-shell main [class*="bg-white/8"],
 .dashboard-shell main [class*="bg-white/5"] {
@@ -1709,6 +1730,17 @@ h3 {
 .dashboard-shell main [class*="bg-white/8"] .text-slate-500,
 .dashboard-shell main [class*="bg-white/5"] .text-slate-500 {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* À l'intérieur d'une carte glass : ne pas re-transformer les sous-blocs en cartes. */
+.dashboard-shell main .dashboard-glass-card [class*="bg-white/9"],
+.dashboard-shell main .dashboard-glass-card [class*="bg-white/8"],
+.dashboard-shell main .dashboard-glass-card [class*="bg-white/5"],
+.dashboard-shell main .dashboard-glass-card [class*="bg-white/[0."] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
 }
 
 .dashboard-shell main [class*="border-slate-200"],

@@ -9,7 +9,7 @@ import {
   dashboardCardDescriptionClass,
 } from "./styles";
 
-const defaultBodyPadding = "px-4 py-4 sm:px-6 sm:py-5";
+const defaultBodyPadding = "px-5 py-2 sm:px-6 sm:py-3";
 
 export type TableCardProps = {
   children: ReactNode;
@@ -36,7 +36,7 @@ export default function TableCard({
         <header
           className={cn(
             unifiedSectionHeaderClass,
-            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4"
+            "flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4"
           )}
         >
           <div className="min-w-0">

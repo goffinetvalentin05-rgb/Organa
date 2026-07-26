@@ -14,14 +14,14 @@ export default function PageHeader({ title, subtitle, actions, className }: Page
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-col gap-3 sm:gap-4 md:flex-row md:items-end md:justify-between md:gap-6",
+        "flex w-full min-w-0 flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between md:gap-8",
         className
       )}
     >
-      <div className="min-w-0 flex-1 space-y-1.5 md:pr-4">
-        <h1 className="text-2xl font-bold tracking-tight text-white drop-shadow-sm md:text-3xl">{title}</h1>
+      <div className="min-w-0 flex-1 space-y-2 md:pr-4">
+        <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{title}</h1>
         {subtitle ? (
-          <div className="max-w-2xl space-y-1 text-sm font-medium leading-relaxed text-white/80 md:text-base [&>p]:m-0">
+          <div className="max-w-xl space-y-1 text-sm leading-relaxed text-white/55 md:text-[0.9375rem] [&>p]:m-0">
             {subtitle}
           </div>
         ) : null}

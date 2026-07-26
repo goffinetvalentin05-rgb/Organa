@@ -12,7 +12,7 @@ import {
 type IconProps = { className?: string };
 
 const interactive =
-  "transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/35 hover:shadow-[0_0_0_1px_rgba(147,197,253,0.2),0_12px_40px_rgba(0,0,0,0.5),0_0_80px_rgba(26,35,255,0.2)]";
+  "transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_16px_48px_rgba(0,0,0,0.32)]";
 
 export type StatCardProps = {
   label: string;
@@ -25,14 +25,16 @@ export type StatCardProps = {
 
 export default function StatCard({ label, value, icon: Icon, footer, href, className }: StatCardProps) {
   const inner = () => (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
         <span className={dashboardCardLabelClass}>{label}</span>
-        <Icon className="h-4 w-4 shrink-0 text-blue-300/50" aria-hidden />
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] ring-1 ring-white/[0.08]">
+          <Icon className="h-3.5 w-3.5 text-blue-200/55" aria-hidden />
+        </span>
       </div>
       <div className={dashboardCardValueClass}>{value}</div>
       {footer ? (
-        <div className="mt-auto border-t border-white/10 pt-3 text-sm text-white/60 [&_.font-medium]:text-white/80 [&_span]:text-inherit">
+        <div className="mt-auto pt-3 text-sm leading-relaxed text-white/50 [&_.font-medium]:text-white/75 [&_span]:text-inherit">
           {footer}
         </div>
       ) : null}
@@ -43,7 +45,7 @@ export default function StatCard({ label, value, icon: Icon, footer, href, class
     return (
       <Link
         href={href}
-        className={cn(glassCardClass, "group flex h-full min-h-0 flex-col p-6", interactive, className)}
+        className={cn(glassCardClass, "group flex h-full min-h-0 flex-col p-5 sm:p-6", interactive, className)}
       >
         {inner()}
       </Link>
@@ -51,7 +53,7 @@ export default function StatCard({ label, value, icon: Icon, footer, href, class
   }
 
   return (
-    <div className={cn(glassCardClass, "flex h-full min-h-0 flex-col p-6", className)}>
+    <div className={cn(glassCardClass, "flex h-full min-h-0 flex-col p-5 sm:p-6", className)}>
       {inner()}
     </div>
   );

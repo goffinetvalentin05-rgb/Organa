@@ -163,39 +163,39 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Sidebar — glass sur fond dark (grille du shell visible à travers) */}
+      {/* Sidebar — glass sobre, hiérarchie claire */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/[0.08] bg-gradient-to-b from-white/[0.07] to-white/[0.03] shadow-[inset_-1px_0_0_rgba(147,197,253,0.08),4px_0_40px_rgba(0,0,0,0.25)] backdrop-blur-2xl transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-white/[0.07] bg-[#020617]/80 shadow-[4px_0_40px_rgba(0,0,0,0.2)] backdrop-blur-2xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="relative z-10 flex h-full flex-col">
           {/* Logo & close button */}
-          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-5 py-4">
             <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
                 width={180}
                 height={47}
-                className="h-14 w-auto max-w-[190px] object-contain transition-transform group-hover:scale-105"
+                className="h-12 w-auto max-w-[170px] object-contain transition-opacity group-hover:opacity-90"
                 priority
               />
             </Link>
             <button 
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/[0.08] hover:text-white lg:hidden"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            <p className="px-4 mb-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+          <nav className="flex-1 overflow-y-auto px-3 py-5">
+            <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35">
               {t("dashboard.navigation.primary")}
             </p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {navigationPrimary.map((item) => {
                 const IconComponent = item.icon;
                 const active = isActive(item.href);
@@ -205,36 +205,36 @@ export default function DashboardLayout({
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
+                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all duration-200",
                       active
-                        ? "rounded-full bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_24px_rgba(26,35,255,0.3)]"
-                        : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
+                        ? "rounded-xl bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-[0_4px_20px_rgba(255,255,255,0.12)]"
+                        : "rounded-xl text-white/60 hover:bg-white/[0.06] hover:text-white/90"
                     )}
                   >
-                    <IconComponent className={cn("h-[18px] w-[18px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
+                    <IconComponent className={cn("h-[17px] w-[17px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
               })}
 
-              <div className="pt-0.5">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={() => setFinancesOpen((open) => !open)}
                   aria-expanded={financesOpen}
                   aria-controls={financesSubmenuId}
                   className={cn(
-                    "flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
+                    "flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-all duration-200",
                     isFinanceRoute
-                      ? "rounded-xl bg-white/[0.1] font-medium text-white ring-1 ring-blue-400/20"
-                      : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
+                      ? "rounded-xl bg-white/[0.08] font-medium text-white"
+                      : "rounded-xl text-white/60 hover:bg-white/[0.06] hover:text-white/90"
                   )}
                 >
-                  <Wallet className="h-[18px] w-[18px] shrink-0" />
+                  <Wallet className="h-[17px] w-[17px] shrink-0" />
                   <span className="flex-1 text-left font-medium">{t("dashboard.nav.finances")}</span>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 shrink-0 text-white/60 transition-transform duration-200",
+                      "h-4 w-4 shrink-0 text-white/40 transition-transform duration-200",
                       financesOpen && "rotate-180"
                     )}
                     aria-hidden
@@ -251,7 +251,7 @@ export default function DashboardLayout({
                   )}
                 >
                   <div className="overflow-hidden">
-                    <div className="ml-4 mt-1 space-y-0.5 border-l border-white/15 py-1 pl-3">
+                    <div className="ml-3 mt-1 space-y-0.5 border-l border-white/10 py-1 pl-3">
                       {navigationFinances.map((item) => {
                         const active = isActive(item.href);
                         return (
@@ -262,8 +262,8 @@ export default function DashboardLayout({
                             className={cn(
                               "block rounded-lg px-3 py-2 text-sm transition-all duration-200",
                               active
-                                ? "bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_16px_rgba(26,35,255,0.25)]"
-                                : "text-white/65 hover:bg-white/[0.08] hover:text-white"
+                                ? "bg-white font-semibold text-[var(--obillz-hero-blue)]"
+                                : "text-white/55 hover:bg-white/[0.06] hover:text-white/90"
                             )}
                           >
                             {item.name}
@@ -275,6 +275,8 @@ export default function DashboardLayout({
                 </div>
               </div>
 
+              <div className="my-3 mx-3 border-t border-white/[0.06]" />
+
               {navigationSecondary.map((item) => {
                 const IconComponent = item.icon;
                 const active = isActive(item.href);
@@ -284,13 +286,13 @@ export default function DashboardLayout({
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200",
+                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all duration-200",
                       active
-                        ? "rounded-full bg-white/95 font-semibold text-[var(--obillz-hero-blue)] shadow-[0_0_24px_rgba(26,35,255,0.3)]"
-                        : "rounded-xl text-white/70 hover:bg-white/[0.08] hover:text-white"
+                        ? "rounded-xl bg-white font-semibold text-[var(--obillz-hero-blue)] shadow-[0_4px_20px_rgba(255,255,255,0.12)]"
+                        : "rounded-xl text-white/60 hover:bg-white/[0.06] hover:text-white/90"
                     )}
                   >
-                    <IconComponent className={cn("h-[18px] w-[18px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
+                    <IconComponent className={cn("h-[17px] w-[17px] shrink-0", active && "text-[var(--obillz-hero-blue)]")} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
@@ -299,12 +301,12 @@ export default function DashboardLayout({
           </nav>
 
           {/* Footer sidebar */}
-          <div className="border-t border-white/[0.08] p-4">
+          <div className="border-t border-white/[0.07] p-3">
             <Link
               href="/"
-              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-white/60 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/45 transition-all duration-200 hover:bg-white/[0.06] hover:text-white/80"
             >
-              <Home className="h-[18px] w-[18px]" />
+              <Home className="h-[17px] w-[17px]" />
               <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
             </Link>
           </div>
@@ -365,7 +367,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="relative flex-1 min-w-0 overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="relative min-w-0 flex-1 overflow-x-hidden px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
           <div className="relative w-full min-w-0">{children}</div>
         </main>
 

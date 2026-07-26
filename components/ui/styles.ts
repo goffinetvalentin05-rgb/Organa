@@ -23,11 +23,12 @@ export const obillzLandingGridOverlayClass = dashboardGridOverlayClass;
 export const dashboardShellRootClass = `dashboard-shell obillz-dashboard ${obillzAppShellBackgroundClass}`;
 
 /**
- * Surface glass dashboard — alignée landing, intégrée au fond bleu nuit.
+ * Surface glass dashboard — ADN landing (navy + highlight subtil), adaptée SaaS.
  * Classe CSS `.dashboard-glass-card` pour pseudo-éléments (globals.css).
+ * Intentionnellement plus sobre que l’ancien glow pour réduire la sensation de densité.
  */
 export const dashboardGlassCardClass =
-  "dashboard-glass-card relative overflow-hidden rounded-[24px] border border-blue-400/25 bg-gradient-to-br from-white/[0.12] via-[#1A23FF]/[0.08] to-[#6366f1]/[0.06] text-white shadow-[0_0_0_1px_rgba(147,197,253,0.1),0_8px_32px_rgba(0,0,0,0.45),0_0_60px_rgba(26,35,255,0.14)] backdrop-blur-xl";
+  "dashboard-glass-card relative overflow-hidden rounded-[1.35rem] border border-white/[0.12] bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-[#06122e]/35 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl";
 
 /**
  * Section / tableau / liste — **une seule carte** (un radius, une bordure, pas de cadre interne).
@@ -36,20 +37,36 @@ export const unifiedSectionShellClass = dashboardGlassCardClass;
 
 /** Bandeau d'en-tête intégré dans la même carte (léger contraste, pas une 2e boîte). */
 export const unifiedSectionHeaderClass =
-  "border-b border-white/10 bg-gradient-to-r from-white/[0.06] via-[#1A23FF]/[0.04] to-transparent";
+  "border-b border-white/[0.07] bg-white/[0.02]";
 
 /** Corps de section — suite visuelle du même bloc. */
-export const unifiedSectionBodyClass = "px-4 py-4 sm:px-6 sm:py-5";
+export const unifiedSectionBodyClass = "px-5 py-5 sm:px-6 sm:py-6";
 
 /** Pied de section optionnel. */
 export const unifiedSectionFooterClass =
-  "border-t border-white/10 bg-gradient-to-r from-white/[0.04] via-[#1A23FF]/[0.03] to-transparent";
+  "border-t border-white/[0.07] bg-white/[0.02]";
 
 /** Typographie carte dashboard */
-export const dashboardCardTitleClass = "text-lg font-bold tracking-tight text-white";
-export const dashboardCardDescriptionClass = "mt-1 text-sm font-medium leading-relaxed text-white/65";
-export const dashboardCardLabelClass = "text-sm font-semibold text-white/60";
-export const dashboardCardValueClass = "text-3xl font-bold tracking-tight text-white drop-shadow-sm md:text-4xl";
+export const dashboardCardTitleClass =
+  "dashboard-section-title text-base font-semibold tracking-tight text-white sm:text-lg";
+export const dashboardCardDescriptionClass =
+  "mt-1 text-sm font-normal leading-relaxed text-white/55";
+export const dashboardCardLabelClass =
+  "text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45";
+export const dashboardCardValueClass =
+  "text-[1.75rem] font-semibold tracking-tight text-white tabular-nums sm:text-3xl";
+
+/** Pilule de statut (header de page) — native dark, pas de fond clair legacy. */
+export const dashboardStatusPillClass =
+  "inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3.5 py-1.5 text-sm font-medium text-emerald-200";
+
+/** Tuile action rapide — plat, sans carte dans la carte. */
+export const dashboardQuickActionClass =
+  "group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition-all duration-200 hover:border-blue-400/30 hover:bg-white/[0.06] sm:p-5";
+
+/** Ligne priorité / alerte — surface minimale. */
+export const dashboardPriorityRowClass =
+  "group flex items-start gap-4 rounded-2xl border border-transparent px-3 py-3.5 transition-colors hover:border-white/[0.08] hover:bg-white/[0.05] sm:px-4 sm:py-4";
 
 /**
  * @deprecated Préférez `unifiedSectionShellClass`. Conservé pour imports existants.
@@ -89,10 +106,13 @@ export const dashboardListRowClass =
  * Ligne / tuile cliquable à l'intérieur d'une section — discret, pas une 2e carte épaisse.
  */
 export const sectionListRowClass =
-  "flex rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 backdrop-blur-sm transition hover:border-blue-400/25 hover:bg-white/[0.08] sm:px-4";
+  "flex rounded-xl border border-transparent bg-transparent px-3 py-3.5 transition-colors hover:bg-white/[0.05] sm:px-4";
 
 /** @deprecated Utilisez `sectionListRowClass` pour les listes dans une section unifiée. */
 export const glassNestedRowClass = sectionListRowClass;
+
+/** Liste à séparateurs fins (activité, factures à suivre…). */
+export const dashboardSoftListClass = "divide-y divide-white/[0.06]";
 
 export const dashboardSecondaryButtonClass =
   "inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-white/90 shadow-sm backdrop-blur-sm transition hover:border-blue-400/30 hover:bg-white/[0.14] hover:text-white";
@@ -156,11 +176,11 @@ export const dashboardInfoPanelClass =
 
 /** Badge icône accent — CTA / stats importantes */
 export const iconBadgeClass =
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1A23FF]/80 to-[#6366f1]/60 text-white shadow-[0_0_20px_rgba(26,35,255,0.35),inset_0_1px_0_rgba(255,255,255,0.15)] ring-1 ring-blue-300/30 sm:h-10 sm:w-10";
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB]/70 to-[#1D4ED8]/45 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] ring-1 ring-white/15 sm:h-10 sm:w-10";
 
 /** Badge icône discret — en-têtes de section */
 export const dashboardIconBadgeSubtleClass =
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-blue-200/75 ring-1 ring-white/10 backdrop-blur-sm";
+  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-blue-200/70 ring-1 ring-white/[0.08]";
 
 /** Séparateur lumineux entre sections landing */
 export const landingSectionDividerClass =

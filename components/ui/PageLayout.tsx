@@ -13,8 +13,8 @@ const maxMap = {
 } as const;
 
 const stackMap = {
-  /** Espacement vertical entre blocs (défaut dashboard). */
-  comfortable: "space-y-8",
+  /** Espacement vertical aéré entre blocs (défaut dashboard). */
+  comfortable: "space-y-8 sm:space-y-10",
   compact: "space-y-6",
   none: "",
 } as const;
@@ -37,7 +37,7 @@ export default function PageLayout({
   return (
     <div
       className={cn(
-        "mx-auto w-full min-w-0 px-0 pb-12 sm:pb-14",
+        "mx-auto w-full min-w-0 px-0 pb-14 sm:pb-16",
         maxMap[maxWidth],
         stackMap[stack],
         className
