@@ -37,12 +37,12 @@ export default function SectionCard({
 }: SectionCardProps) {
   return (
     <section className={cn(unifiedSectionShellClass, "flex flex-col", className)}>
-      <header className={cn(unifiedSectionHeaderClass, "px-5 py-4 sm:px-6 sm:py-4")}>
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div className="flex min-w-0 items-center gap-3">
+      <header className={cn(unifiedSectionHeaderClass, "relative px-5 py-4 sm:px-6 sm:py-5")}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="flex min-w-0 items-center gap-3.5">
             {Icon ? (
-              <div className={dashboardIconBadgeSubtleClass}>
-                <Icon className="h-3.5 w-3.5" />
+              <div className={cn(dashboardIconBadgeSubtleClass, "h-10 w-10 rounded-xl")}>
+                <Icon className="h-4.5 w-4.5 h-[18px] w-[18px]" />
               </div>
             ) : null}
             <div className="min-w-0">
@@ -53,19 +53,21 @@ export default function SectionCard({
             </div>
           </div>
           {headerRight ? (
-            <div className="shrink-0 text-xs font-medium uppercase tracking-[0.16em] text-[#98A2B3] [&_a]:font-semibold [&_a]:normal-case [&_a]:tracking-normal [&_a]:text-[#2563EB] [&_a]:hover:text-[#1D4ED8] [&_button]:text-[#344054]">
+            <div className="shrink-0 text-xs font-medium uppercase tracking-[0.16em] text-[#7B8BA5] [&_a]:font-semibold [&_a]:normal-case [&_a]:tracking-normal [&_a]:text-[#1A23FF] [&_a]:hover:text-[#151dd9] [&_button]:text-[#344054]">
               {headerRight}
             </div>
           ) : null}
         </div>
       </header>
 
-      <div className={cn(unifiedSectionBodyClass, "min-w-0 flex-1", bodyClassName)}>
+      <div className={cn(unifiedSectionBodyClass, "relative min-w-0 flex-1", bodyClassName)}>
         {children}
       </div>
 
       {footer ? (
-        <footer className="border-t border-[#EEF2F7] px-5 py-3 sm:px-6 sm:py-3.5">{footer}</footer>
+        <footer className="relative border-t border-[rgba(26,35,255,0.07)] px-5 py-3 sm:px-6 sm:py-3.5">
+          {footer}
+        </footer>
       ) : null}
     </section>
   );

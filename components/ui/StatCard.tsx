@@ -1,18 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentType, ReactNode } from "react";
+import { useId, type ComponentType, type ReactNode } from "react";
 import { cn } from "./cn";
-import {
-  glassCardClass,
-  dashboardCardLabelClass,
-  dashboardCardValueClass,
-} from "./styles";
+import { dashboardCardLabelClass, dashboardCardValueClass } from "./styles";
 
 type IconProps = { className?: string };
 
-const interactive =
-  "transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_4px_20px_rgba(37,99,235,0.1)]";
+export type StatCardAccent = "cyan" | "electric" | "royal" | "navy" | "default";
 
 export type StatCardProps = {
   label: string;
@@ -21,20 +16,137 @@ export type StatCardProps = {
   footer?: ReactNode;
   href?: string;
   className?: string;
+  /** Identité visuelle unique de la carte */
+  accent?: StatCardAccent;
+  /** Badge coloré (ex. tendance) */
+  badge?: ReactNode;
+  /** Mini courbe (valeurs relatives) */
+  sparkline?: number[];
+  /** Anneau de progression 0–100 */
+  progress?: number;
 };
 
-export default function StatCard({ label, value, icon: Icon, footer, href, className }: StatCardProps) {
-  const inner = () => (
-    <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <span className={dashboardCardLabelClass}>{label}</span>
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
-          <Icon className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden />
-        </span>
+function Sparkline({ values, stroke }: { values: number[]; stroke: string }) {
+  const uid = useId().replace(/:/g, "");
+  if (values.length < 2) return null;
+  const max = Math.max(...values, 1);
+  const min = Math.min(...values, 0);
+  const range = Math.max(max - min, 1);
+  const w = 120;
+  const h = 32;
+  const points = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * w;
+      const y = h - ((v - min) / range) * (h - 4) - 2;
+      return `${x},${y}`;
+    })
+    .join(" ");
+  const area = `0,${h} ${points} ${w},${h}`;
+  const gradId = `spark-${uid}`;
+
+  return (
+    <svg className="dashboard-sparkline" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={stroke} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={area} fill={`url(#${gradId})`} />
+      <polyline
+        points={points}
+        fill="none"
+        stroke={stroke}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ProgressRing({ value, color }: { value: number; color: string }) {
+  const clamped = Math.max(0, Math.min(100, value));
+  const r = 18;
+  const c = 2 * Math.PI * r;
+  const offset = c - (clamped / 100) * c;
+
+  return (
+    <svg className="dashboard-progress-ring h-11 w-11 shrink-0" viewBox="0 0 44 44" aria-hidden>
+      <circle cx="22" cy="22" r={r} fill="none" stroke="rgba(26,35,255,0.08)" strokeWidth="4" />
+      <circle
+        cx="22"
+        cy="22"
+        r={r}
+        fill="none"
+        stroke={color}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray={c}
+        strokeDashoffset={offset}
+        style={{ filter: `drop-shadow(0 0 6px ${color}55)` }}
+      />
+    </svg>
+  );
+}
+
+const accentMeta: Record<
+  StatCardAccent,
+  { card: string; spark: string; ring: string }
+> = {
+  cyan: { card: "dashboard-stat-card--cyan", spark: "#0EA5E9", ring: "#0EA5E9" },
+  electric: { card: "dashboard-stat-card--electric", spark: "#1A23FF", ring: "#1A23FF" },
+  royal: { card: "dashboard-stat-card--royal", spark: "#2563EB", ring: "#2563EB" },
+  navy: { card: "dashboard-stat-card--navy", spark: "#1E3A8A", ring: "#1E3A8A" },
+  default: { card: "dashboard-stat-card--electric", spark: "#1A23FF", ring: "#1A23FF" },
+};
+
+export default function StatCard({
+  label,
+  value,
+  icon: Icon,
+  footer,
+  href,
+  className,
+  accent = "default",
+  badge,
+  sparkline,
+  progress,
+}: StatCardProps) {
+  const meta = accentMeta[accent];
+
+  const inner = (
+    <div className="flex h-full min-h-0 flex-col gap-4 p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <span className={dashboardCardLabelClass}>{label}</span>
+          {badge ? <div className="pt-0.5">{badge}</div> : null}
+        </div>
+        <div className="flex items-center gap-2">
+          {typeof progress === "number" ? (
+            <ProgressRing value={progress} color={meta.ring} />
+          ) : null}
+          <span className="dashboard-stat-icon">
+            <Icon className="h-5 w-5" aria-hidden />
+          </span>
+        </div>
       </div>
-      <div className={dashboardCardValueClass}>{value}</div>
+
+      <div className={cn(dashboardCardValueClass, "leading-none")}>{value}</div>
+
+      {sparkline && sparkline.length > 1 ? (
+        <div className="mt-auto opacity-90">
+          <Sparkline values={sparkline} stroke={meta.spark} />
+        </div>
+      ) : null}
+
       {footer ? (
-        <div className="mt-auto pt-3 text-sm leading-relaxed text-[#667085]">
+        <div
+          className={cn(
+            "text-sm leading-relaxed text-[#4A5B78]",
+            sparkline && sparkline.length > 1 ? "pt-1" : "mt-auto pt-1"
+          )}
+        >
           {footer}
         </div>
       ) : null}
@@ -45,16 +157,16 @@ export default function StatCard({ label, value, icon: Icon, footer, href, class
     return (
       <Link
         href={href}
-        className={cn(glassCardClass, "group flex h-full min-h-0 flex-col p-5 sm:p-6", interactive, className)}
+        className={cn("dashboard-stat-card group block h-full min-h-0", meta.card, className)}
       >
-        {inner()}
+        {inner}
       </Link>
     );
   }
 
   return (
-    <div className={cn(glassCardClass, "flex h-full min-h-0 flex-col p-5 sm:p-6", className)}>
-      {inner()}
+    <div className={cn("dashboard-stat-card h-full min-h-0", meta.card, className)}>
+      {inner}
     </div>
   );
 }

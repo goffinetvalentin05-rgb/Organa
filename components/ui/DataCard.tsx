@@ -29,7 +29,7 @@ export default function DataCard({
   return (
     <GlassCard padding={padding} className={cn(className)} {...rest}>
       {hasHead ? (
-        <div className="mb-4 border-b border-[#EEF2F7] pb-4">
+        <div className="mb-4 border-b border-[rgba(26,35,255,0.07)] pb-4">
           {title ? <h3 className={cn(dashboardCardTitleClass, "text-base")}>{title}</h3> : null}
           {description ? (
             <p className={dashboardCardDescriptionClass}>{description}</p>

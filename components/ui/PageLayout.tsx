@@ -14,7 +14,7 @@ const maxMap = {
 
 const stackMap = {
   /** Espacement vertical aéré entre blocs (défaut dashboard). */
-  comfortable: "space-y-8 sm:space-y-10",
+  comfortable: "space-y-9 sm:space-y-11 lg:space-y-12",
   compact: "space-y-6",
   none: "",
 } as const;

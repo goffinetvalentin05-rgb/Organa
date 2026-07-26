@@ -28,12 +28,9 @@ import {
   SectionCard,
   TableCard,
   DashboardBadge,
-  sectionListRowClass,
   iconBadgeClass,
   dashboardStatusPillClass,
   dashboardQuickActionClass,
-  dashboardPriorityRowClass,
-  dashboardSoftListClass,
   cn,
 } from "@/components/ui";
 
@@ -632,8 +629,43 @@ export default function TableauDeBordPage() {
     }
   };
 
+  const quotesPaidPct =
+    stats.totalDevis > 0 ? Math.round((stats.devisPayes / stats.totalDevis) * 100) : 0;
+  const invoicesPaidPct =
+    stats.totalFactures > 0
+      ? Math.round((stats.facturesPayees / stats.totalFactures) * 100)
+      : 0;
+
+  const membersSpark = [
+    Math.max(stats.totalClients - stats.nouveauxMembresMois * 2, 0),
+    Math.max(stats.totalClients - stats.nouveauxMembresMois, 1),
+    Math.max(stats.totalClients - Math.floor(stats.nouveauxMembresMois / 2), 1),
+    Math.max(stats.totalClients, 1),
+  ];
+
+  const quotesSpark = [
+    Math.max(stats.devisPayes - 2, 0),
+    Math.max(stats.devisEnAttente, 1),
+    Math.max(stats.devisPayes, 1),
+    Math.max(stats.totalDevis, 1),
+  ];
+
+  const invoicesSpark = [
+    Math.max(stats.facturesPayees - 1, 0),
+    Math.max(stats.facturesNonPayees, 1),
+    Math.max(stats.facturesPayees, 1),
+    Math.max(stats.totalFactures, 1),
+  ];
+
+  const balanceSpark = [
+    Math.max(stats.soldeClub * 0.55, 0),
+    Math.max(stats.soldeClub * 0.7, 0),
+    Math.max(stats.soldeClub * 0.85, 0),
+    Math.max(Math.abs(stats.soldeClub), 1),
+  ];
+
   return (
-    <PageLayout maxWidth="7xl">
+    <PageLayout maxWidth="7xl" stack="comfortable">
       <Suspense fallback={null}>
         <CheckoutHandler />
       </Suspense>
@@ -643,19 +675,29 @@ export default function TableauDeBordPage() {
         subtitle={t("dashboard.overview.subtitle")}
         actions={
           <div className={dashboardStatusPillClass}>
+            <span className="dashboard-live-dot" />
             <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
             <span>{t("dashboard.overview.statusNote")}</span>
           </div>
         }
       />
 
-      {/* === KPIs principaux === */}
-      <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-4">
+      {/* === KPIs premium === */}
+      <div className="grid grid-cols-1 items-stretch gap-5 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           href="/tableau-de-bord/clients"
           label={t("dashboard.overview.kpis.clients")}
           icon={Users}
+          accent="cyan"
           value={loading ? "-" : stats.totalClients}
+          sparkline={loading ? undefined : membersSpark}
+          badge={
+            !loading && stats.nouveauxMembresMois > 0 ? (
+              <DashboardBadge variant="success">
+                +{stats.nouveauxMembresMois}
+              </DashboardBadge>
+            ) : undefined
+          }
           footer={
             !loading ? (
               stats.totalClients === 0 ? (
@@ -678,7 +720,21 @@ export default function TableauDeBordPage() {
           href="/tableau-de-bord/devis"
           label={t("dashboard.overview.kpis.quotes")}
           icon={FileText}
+          accent="electric"
           value={loading ? "-" : stats.totalDevis}
+          progress={loading ? undefined : quotesPaidPct}
+          sparkline={loading ? undefined : quotesSpark}
+          badge={
+            !loading && stats.devisEnRetard > 0 ? (
+              <DashboardBadge variant="danger">
+                {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
+              </DashboardBadge>
+            ) : !loading && stats.devisEnAttente > 0 ? (
+              <DashboardBadge variant="info">
+                {stats.devisEnAttente} {t("dashboard.overview.kpis.quotesPending")}
+              </DashboardBadge>
+            ) : undefined
+          }
           footer={
             !loading ? (
               <div className="space-y-1">
@@ -686,11 +742,6 @@ export default function TableauDeBordPage() {
                   {stats.devisPayes > 0 ? (
                     <span className="font-medium text-emerald-600">
                       {stats.devisPayes} {t("dashboard.overview.kpis.paidQuotes")}
-                    </span>
-                  ) : null}
-                  {stats.devisEnRetard > 0 ? (
-                    <span className="font-medium text-rose-600">
-                      {stats.devisEnRetard} {t("dashboard.overview.kpis.lateQuotes")}
                     </span>
                   ) : null}
                   {stats.devisEnAttente > 0 ? (
@@ -703,9 +754,9 @@ export default function TableauDeBordPage() {
                   ) : null}
                 </div>
                 {stats.montantCotisationsPayees > 0 ? (
-                  <p className="text-xs text-[#98A2B3]">
+                  <p className="text-xs text-[#7B8BA5]">
                     {t("dashboard.overview.kpis.collected")}{" "}
-                    <span className="font-medium text-[#344054]">
+                    <span className="font-medium text-[#0B1220]">
                       {formatMontant(stats.montantCotisationsPayees)}
                     </span>
                   </p>
@@ -719,7 +770,17 @@ export default function TableauDeBordPage() {
           href="/tableau-de-bord/factures"
           label={t("dashboard.overview.kpis.invoices")}
           icon={Receipt}
+          accent="royal"
           value={loading ? "-" : stats.totalFactures}
+          progress={loading ? undefined : invoicesPaidPct}
+          sparkline={loading ? undefined : invoicesSpark}
+          badge={
+            !loading && stats.facturesNonPayees > 0 ? (
+              <DashboardBadge variant="warning">
+                {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
+              </DashboardBadge>
+            ) : undefined
+          }
           footer={
             !loading ? (
               <div className="space-y-1">
@@ -729,19 +790,14 @@ export default function TableauDeBordPage() {
                       {stats.facturesPayees} {t("dashboard.overview.kpis.paidQuotes")}
                     </span>
                   ) : null}
-                  {stats.facturesNonPayees > 0 ? (
-                    <span className="font-medium text-rose-600">
-                      {stats.facturesNonPayees} {t("dashboard.overview.kpis.unpaid")}
-                    </span>
-                  ) : null}
                   {stats.totalFactures === 0 ? (
                     <span>{t("dashboard.overview.kpis.allClear")}</span>
                   ) : null}
                 </div>
                 {stats.montantFacturesAttente > 0 ? (
-                  <p className="text-xs text-[#98A2B3]">
+                  <p className="text-xs text-[#7B8BA5]">
                     {t("dashboard.overview.kpis.pendingAmount")}{" "}
-                    <span className="font-medium text-[#344054]">
+                    <span className="font-medium text-[#0B1220]">
                       {formatMontant(stats.montantFacturesAttente)}
                     </span>
                   </p>
@@ -754,200 +810,263 @@ export default function TableauDeBordPage() {
         <StatCard
           label={t("dashboard.overview.kpis.balance")}
           icon={Wallet}
+          accent="navy"
           value={loading ? "-" : formatMontant(stats.soldeClub)}
+          sparkline={loading ? undefined : balanceSpark}
+          badge={
+            !loading ? (
+              <DashboardBadge variant={stats.soldeClub >= 0 ? "success" : "danger"}>
+                {stats.soldeClub >= 0 ? "+" : "−"}
+              </DashboardBadge>
+            ) : undefined
+          }
           footer={
-            <p className="text-xs text-[#98A2B3]">{t("dashboard.overview.kpis.balanceFormula")}</p>
+            <p className="text-xs text-[#7B8BA5]">{t("dashboard.overview.kpis.balanceFormula")}</p>
           }
         />
       </div>
 
-      {/* === Actions prioritaires — liste plate, sans cartes imbriquées === */}
-      {!loading ? (
-        <SectionCard
-          icon={AlertTriangle}
-          title={t("dashboard.overview.priorities.title")}
-          headerRight={<span>{t("dashboard.overview.priorities.badge")}</span>}
-        >
-          {priorities.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
-              <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
-              <span>{t("dashboard.overview.priorities.empty")}</span>
-            </div>
-          ) : (
-            <div className={cn(dashboardSoftListClass, "-mx-1")}>
-              {priorities.map((item) => {
-                const Icon = item.icon;
-                const content = (
-                  <div className={dashboardPriorityRowClass}>
-                    <div className={cn(iconBadgeClass, "mt-0.5 shrink-0")}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-[#10172A]">{item.label}</p>
-                        <DashboardBadge variant={item.variant}>{item.badgeLabel}</DashboardBadge>
+      {/* === Priorités + Actions rapides === */}
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12 xl:gap-7">
+        {!loading ? (
+          <SectionCard
+            className="xl:col-span-7"
+            icon={AlertTriangle}
+            title={t("dashboard.overview.priorities.title")}
+            description={t("dashboard.overview.priorities.badge")}
+            headerRight={
+              priorities.length > 0 ? (
+                <DashboardBadge variant="warning">{priorities.length}</DashboardBadge>
+              ) : (
+                <DashboardBadge variant="success">OK</DashboardBadge>
+              )
+            }
+          >
+            {priorities.length === 0 ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-cyan-50/50 px-5 py-5 text-sm text-emerald-800 shadow-[0_0_24px_rgba(16,185,129,0.1)]">
+                <CheckCircle className="h-6 w-6 shrink-0 text-emerald-500" />
+                <span>{t("dashboard.overview.priorities.empty")}</span>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {priorities.map((item, index) => {
+                  const Icon = item.icon;
+                  const maxPriorityCount = Math.max(
+                    ...priorities.map((p) => p.count ?? 0),
+                    1
+                  );
+                  const barPct = Math.round(((item.count ?? 0) / maxPriorityCount) * 100);
+                  const content = (
+                    <div
+                      className={cn(
+                        "dashboard-priority-card",
+                        `dashboard-priority-card--${item.variant}`
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          iconBadgeClass,
+                          "mt-0.5 shrink-0",
+                          item.variant === "danger" &&
+                            "from-rose-500/15 to-rose-400/10 text-rose-600 ring-rose-200",
+                          item.variant === "warning" &&
+                            "from-amber-500/15 to-amber-400/10 text-amber-600 ring-amber-200",
+                          item.variant === "info" &&
+                            "from-[#1A23FF]/12 to-cyan-400/10 text-[#1A23FF]"
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
                       </div>
-                      {item.detail ? (
-                        <p className="mt-1 text-xs text-[#98A2B3]">{item.detail}</p>
-                      ) : null}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-semibold text-[#0B1220]">{item.label}</p>
+                          <DashboardBadge variant={item.variant}>{item.badgeLabel}</DashboardBadge>
+                        </div>
+                        {item.detail ? (
+                          <p className="mt-1 text-xs text-[#7B8BA5]">{item.detail}</p>
+                        ) : null}
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(26,35,255,0.08)]">
+                          <div
+                            className={cn(
+                              "h-full rounded-full transition-all duration-500",
+                              item.variant === "danger" &&
+                                "bg-gradient-to-r from-rose-500 to-rose-400",
+                              item.variant === "warning" &&
+                                "bg-gradient-to-r from-amber-500 to-amber-400",
+                              item.variant === "info" &&
+                                "bg-gradient-to-r from-[#1A23FF] to-[#38BDF8]",
+                              (item.variant === "default" || item.variant === "success") &&
+                                "bg-gradient-to-r from-emerald-500 to-teal-400"
+                            )}
+                            style={{ width: `${Math.max(barPct, 12)}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-2 self-center">
+                        <span className="text-2xl font-semibold tabular-nums tracking-tight text-[#0B1220]">
+                          {item.count ?? "-"}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#7B8BA5]">
+                          #{index + 1}
+                        </span>
+                        {item.href ? (
+                          <ArrowRight className="h-4 w-4 text-[#C7D0E0] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
+                        ) : null}
+                      </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2 self-center">
-                      <span className="text-xl font-semibold tabular-nums tracking-tight text-[#10172A] sm:text-2xl">
-                        {item.count ?? "-"}
-                      </span>
-                      {item.href ? (
-                        <ArrowRight className="h-4 w-4 text-[#C7D0E0] transition group-hover:text-[#2563EB]" />
-                      ) : null}
-                    </div>
-                  </div>
-                );
+                  );
 
-                return item.href ? (
-                  <Link key={item.id} href={item.href} className="block">
-                    {content}
-                  </Link>
-                ) : (
-                  <div key={item.id}>{content}</div>
-                );
-              })}
-            </div>
-          )}
+                  return item.href ? (
+                    <Link key={item.id} href={item.href} className="group block">
+                      {content}
+                    </Link>
+                  ) : (
+                    <div key={item.id}>{content}</div>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+        ) : (
+          <div className="xl:col-span-7" />
+        )}
+
+        <SectionCard
+          className="xl:col-span-5"
+          icon={FilePlus}
+          title={t("dashboard.overview.quickActions.title")}
+        >
+          <div className="space-y-3">
+            <Link href="/tableau-de-bord/devis/nouveau" className={dashboardQuickActionClass}>
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(26,35,255,0.12),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF] to-[#6366f1] text-white shadow-[0_8px_24px_rgba(26,35,255,0.35)]">
+                <FilePlus className="h-5 w-5" />
+              </div>
+              <div className="relative min-w-0">
+                <p className="font-semibold text-[#0B1220]">
+                  {t("dashboard.overview.quickActions.newQuote")}
+                </p>
+                <p className="mt-0.5 text-sm text-[#4A5B78]">
+                  {t("dashboard.overview.quickActions.newQuoteText")}
+                </p>
+              </div>
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#C7D0E0] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
+            </Link>
+
+            <Link href="/tableau-de-bord/factures/nouvelle" className={dashboardQuickActionClass}>
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(37,99,235,0.12),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] text-white shadow-[0_8px_24px_rgba(37,99,235,0.35)]">
+                <FilePlus className="h-5 w-5" />
+              </div>
+              <div className="relative min-w-0">
+                <p className="font-semibold text-[#0B1220]">
+                  {t("dashboard.overview.quickActions.newInvoice")}
+                </p>
+                <p className="mt-0.5 text-sm text-[#4A5B78]">
+                  {t("dashboard.overview.quickActions.newInvoiceText")}
+                </p>
+              </div>
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#C7D0E0] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
+            </Link>
+
+            <Link href="/tableau-de-bord/clients/nouveau" className={dashboardQuickActionClass}>
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(56,189,248,0.14),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] text-white shadow-[0_8px_24px_rgba(14,165,233,0.35)]">
+                <UserPlus className="h-5 w-5" />
+              </div>
+              <div className="relative min-w-0">
+                <p className="font-semibold text-[#0B1220]">
+                  {t("dashboard.overview.quickActions.newClient")}
+                </p>
+                <p className="mt-0.5 text-sm text-[#4A5B78]">
+                  {t("dashboard.overview.quickActions.newClientText")}
+                </p>
+              </div>
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#C7D0E0] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
+            </Link>
+          </div>
         </SectionCard>
-      ) : null}
+      </div>
 
-      {/* === Factures à suivre === */}
+      {/* === Factures à suivre — chips premium === */}
       {aTraiterMaintenant.length > 0 ? (
         <SectionCard
           icon={Receipt}
           title={t("dashboard.overview.now.title")}
-          headerRight={<span>{t("dashboard.overview.now.badge")}</span>}
+          headerRight={
+            <DashboardBadge variant="warning">{aTraiterMaintenant.length}</DashboardBadge>
+          }
         >
-          <div className={cn(dashboardSoftListClass, "-mx-1")}>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {aTraiterMaintenant.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={cn(
-                  sectionListRowClass,
-                  "group flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
-                )}
-              >
-                <div className="flex min-w-0 items-start gap-3.5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F5FA] ring-1 ring-[#E7EBF3]">
-                    <Receipt className="h-4 w-4 text-[#667085]" />
+              <Link key={item.id} href={item.href} className="dashboard-invoice-chip group">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#EEF2FF] to-[#E0EAFF] ring-1 ring-[rgba(26,35,255,0.12)]">
+                      <Receipt className="h-4 w-4 text-[#1A23FF]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-[#0B1220]">{item.numero}</p>
+                      <p className="truncate text-sm text-[#4A5B78]">{item.client}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-[#10172A]">{item.numero}</p>
-                    <p className="text-sm text-[#667085]">{item.client}</p>
-                    <p className="mt-0.5 text-xs text-[#98A2B3]">
-                      {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
-                    </p>
-                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[#C7D0E0] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
                 </div>
-                <div className="flex items-center gap-3 md:text-right">
-                  <div>
-                    <p className="font-semibold tabular-nums text-[#10172A]">
-                      {formatMontant(item.montant)}
-                    </p>
-                    <span className={`badge-obillz ${item.statutColor}`}>{item.statutLabel}</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-[#C7D0E0] transition group-hover:text-[#2563EB]" />
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-[#7B8BA5]">
+                    {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
+                  </p>
+                  <span className={`badge-obillz ${item.statutColor}`}>{item.statutLabel}</span>
                 </div>
+                <p className="text-lg font-semibold tabular-nums tracking-tight text-[#0B1220]">
+                  {formatMontant(item.montant)}
+                </p>
               </Link>
             ))}
           </div>
         </SectionCard>
       ) : null}
 
-      {/* === Actions rapides === */}
-      <SectionCard icon={FilePlus} title={t("dashboard.overview.quickActions.title")}>
-        <div className="grid gap-3 md:grid-cols-3">
-          <Link href="/tableau-de-bord/devis/nouveau" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
-              <FilePlus className="h-5 w-5 text-[#2563EB]" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-medium text-[#10172A]">
-                {t("dashboard.overview.quickActions.newQuote")}
-              </p>
-              <p className="mt-0.5 text-sm text-[#667085]">
-                {t("dashboard.overview.quickActions.newQuoteText")}
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/tableau-de-bord/factures/nouvelle" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
-              <FilePlus className="h-5 w-5 text-[#2563EB]" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-medium text-[#10172A]">
-                {t("dashboard.overview.quickActions.newInvoice")}
-              </p>
-              <p className="mt-0.5 text-sm text-[#667085]">
-                {t("dashboard.overview.quickActions.newInvoiceText")}
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/tableau-de-bord/clients/nouveau" className={dashboardQuickActionClass}>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 ring-1 ring-blue-100 transition group-hover:bg-blue-100">
-              <UserPlus className="h-5 w-5 text-[#2563EB]" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-medium text-[#10172A]">
-                {t("dashboard.overview.quickActions.newClient")}
-              </p>
-              <p className="mt-0.5 text-sm text-[#667085]">
-                {t("dashboard.overview.quickActions.newClientText")}
-              </p>
-            </div>
-          </Link>
-        </div>
-      </SectionCard>
-
-      {/* === Activité récente === */}
+      {/* === Activité récente — timeline === */}
       <TableCard title={t("dashboard.overview.lastDocuments.title")}>
         {loading ? (
-          <div className="py-12 text-center text-sm text-[#98A2B3]">
+          <div className="py-12 text-center text-sm text-[#7B8BA5]">
             {t("dashboard.overview.lastDocuments.loading")}
           </div>
         ) : recentActivity.length === 0 ? (
-          <div className="py-12 text-center text-sm text-[#98A2B3]">
+          <div className="py-12 text-center text-sm text-[#7B8BA5]">
             {t("dashboard.overview.lastDocuments.empty")}
           </div>
         ) : (
-          <div className={cn(dashboardSoftListClass, "-mx-1")}>
+          <div className="dashboard-timeline px-1 py-2 sm:px-2">
             {recentActivity.map((item) => {
               const Icon = activityIcon(item.type);
               const row = (
-                <div
-                  className={cn(
-                    sectionListRowClass,
-                    "flex items-center justify-between gap-3"
-                  )}
-                >
-                  <div className="flex min-w-0 items-center gap-3.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F5FA] ring-1 ring-[#E7EBF3]">
-                      <Icon className="h-4 w-4 text-[#667085]" />
+                <div className="dashboard-timeline-item group">
+                  <span className="dashboard-timeline-dot" />
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-3 py-3 transition-all duration-200 hover:border-[rgba(26,35,255,0.10)] hover:bg-white/80 hover:shadow-[0_8px_24px_rgba(26,35,255,0.08)]">
+                    <div className="flex min-w-0 items-center gap-3.5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#EEF2FF] to-[#E0EAFF] ring-1 ring-[rgba(26,35,255,0.12)]">
+                        <Icon className="h-4 w-4 text-[#1A23FF]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-[#0B1220]">{item.title}</p>
+                        <p className="truncate text-sm text-[#4A5B78]">{item.subtitle}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-[#10172A]">{item.title}</p>
-                      <p className="truncate text-sm text-[#667085]">{item.subtitle}</p>
+                    <div className="shrink-0 text-right">
+                      {typeof item.amount === "number" ? (
+                        <p
+                          className={cn(
+                            "font-semibold tabular-nums",
+                            item.amount >= 0 ? "text-[#0B1220]" : "text-rose-600"
+                          )}
+                        >
+                          {formatMontant(item.amount)}
+                        </p>
+                      ) : null}
+                      <p className="text-xs text-[#7B8BA5]">{formatRelativeDate(item.date)}</p>
                     </div>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    {typeof item.amount === "number" ? (
-                      <p
-                        className={cn(
-                          "font-medium tabular-nums",
-                          item.amount >= 0 ? "text-[#10172A]" : "text-rose-600"
-                        )}
-                      >
-                        {formatMontant(item.amount)}
-                      </p>
-                    ) : null}
-                    <p className="text-xs text-[#98A2B3]">{formatRelativeDate(item.date)}</p>
                   </div>
                 </div>
               );

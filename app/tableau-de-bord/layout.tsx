@@ -149,49 +149,78 @@ export default function DashboardLayout({
     return pathname.startsWith(href);
   };
 
+  const displayName = clubName || t("dashboard.topbar.clubFallback");
+  const initial = (clubName || t("dashboard.topbar.clubFallback") || "C").charAt(0).toUpperCase();
+  const seasonYear = new Date().getFullYear();
+
   return (
     <NewFeaturesAnnouncementProvider>
     <div className={dashboardShellRootClass}>
       <ClubPublicPageAnnouncementModal />
 
-      {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#071634]/55 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar — blanche, navigation SaaS claire */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-[#E7EBF3] bg-white transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0 shadow-[8px_0_40px_rgba(16,24,40,0.08)]" : "-translate-x-full"
-        }`}
+        className={cn(
+          "dashboard-sidebar fixed left-0 top-0 z-50 flex h-screen w-[17.5rem] flex-col transition-transform duration-300 lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
       >
         <div className="relative z-10 flex h-full flex-col">
-          {/* Logo & close button */}
-          <div className="flex items-center justify-between gap-3 border-b border-[#EEF2F7] px-5 py-4">
+          {/* Logo */}
+          <div className="flex items-center justify-between gap-3 px-5 pb-3 pt-5">
             <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
                 width={180}
                 height={47}
-                className="h-11 w-auto max-w-[160px] object-contain opacity-90 transition-opacity [filter:brightness(0)_saturate(100%)] group-hover:opacity-75"
+                className="h-10 w-auto max-w-[150px] object-contain brightness-0 invert opacity-95 transition-opacity group-hover:opacity-80"
                 priority
               />
             </Link>
-            <button 
+            <button
               onClick={() => setSidebarOpen(false)}
-              className="rounded-lg p-2 text-[#98A2B3] transition-colors hover:bg-[#F6F8FC] hover:text-[#344054] lg:hidden"
+              className="rounded-xl p-2 text-blue-100/70 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
+          {/* Club premium card */}
+          <div className="px-4 pb-4">
+            <div className="dashboard-club-card px-3.5 py-3.5">
+              <div className="relative flex items-center gap-3">
+                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF] via-[#2563EB] to-[#38BDF8] text-sm font-bold text-white shadow-[0_0_24px_rgba(26,35,255,0.55)]">
+                  {loadingUser ? "…" : initial}
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0A1A5E] bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-white">
+                    {loadingUser ? "…" : displayName}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
+                      Saison {seasonYear}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Actif
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-3 py-5">
-            <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#98A2B3]">
+          <nav className="flex-1 overflow-y-auto px-3 pb-4">
+            <p className="mb-2.5 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200/45">
               {t("dashboard.navigation.primary")}
             </p>
             <div className="space-y-0.5">
@@ -203,14 +232,14 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
-                      active
-                        ? "bg-blue-50 font-semibold text-[#1D4ED8]"
-                        : "text-[#667085] hover:bg-[#F6F8FC] hover:text-[#10172A]"
-                    )}
+                    className={cn("dashboard-sidebar-nav-link", active && "is-active")}
                   >
-                    <IconComponent className={cn("h-[17px] w-[17px] shrink-0", active ? "text-[#1D4ED8]" : "text-[#98A2B3]")} />
+                    <IconComponent
+                      className={cn(
+                        "h-[17px] w-[17px] shrink-0",
+                        active ? "text-cyan-200" : "text-blue-200/55"
+                      )}
+                    />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
@@ -223,17 +252,20 @@ export default function DashboardLayout({
                   aria-expanded={financesOpen}
                   aria-controls={financesSubmenuId}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
-                    isFinanceRoute
-                      ? "bg-[#F6F8FC] font-medium text-[#10172A]"
-                      : "text-[#667085] hover:bg-[#F6F8FC] hover:text-[#10172A]"
+                    "dashboard-sidebar-nav-link w-full",
+                    isFinanceRoute && !financesOpen && "bg-white/[0.04]"
                   )}
                 >
-                  <Wallet className={cn("h-[17px] w-[17px] shrink-0", isFinanceRoute ? "text-[#1D4ED8]" : "text-[#98A2B3]")} />
+                  <Wallet
+                    className={cn(
+                      "h-[17px] w-[17px] shrink-0",
+                      isFinanceRoute ? "text-cyan-200" : "text-blue-200/55"
+                    )}
+                  />
                   <span className="flex-1 text-left font-medium">{t("dashboard.nav.finances")}</span>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 shrink-0 text-[#98A2B3] transition-transform duration-200",
+                      "h-4 w-4 shrink-0 text-blue-200/45 transition-transform duration-200",
                       financesOpen && "rotate-180"
                     )}
                     aria-hidden
@@ -250,7 +282,7 @@ export default function DashboardLayout({
                   )}
                 >
                   <div className="overflow-hidden">
-                    <div className="ml-3 mt-1 space-y-0.5 border-l border-[#EEF2F7] py-1 pl-3">
+                    <div className="ml-3 mt-1 space-y-0.5 border-l border-white/10 py-1 pl-3">
                       {navigationFinances.map((item) => {
                         const active = isActive(item.href);
                         return (
@@ -259,10 +291,10 @@ export default function DashboardLayout({
                             href={item.href}
                             onClick={() => setSidebarOpen(false)}
                             className={cn(
-                              "block rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                              "block rounded-xl px-3 py-2 text-sm transition-all duration-200",
                               active
-                                ? "bg-blue-50 font-semibold text-[#1D4ED8]"
-                                : "text-[#667085] hover:bg-[#F6F8FC] hover:text-[#10172A]"
+                                ? "bg-white/10 font-semibold text-white shadow-[0_0_16px_rgba(26,35,255,0.2)]"
+                                : "text-blue-100/60 hover:bg-white/[0.05] hover:text-white"
                             )}
                           >
                             {item.name}
@@ -274,7 +306,7 @@ export default function DashboardLayout({
                 </div>
               </div>
 
-              <div className="mx-3 my-3 border-t border-[#EEF2F7]" />
+              <div className="mx-3 my-3 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
               {navigationSecondary.map((item) => {
                 const IconComponent = item.icon;
@@ -284,14 +316,14 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
-                      active
-                        ? "bg-blue-50 font-semibold text-[#1D4ED8]"
-                        : "text-[#667085] hover:bg-[#F6F8FC] hover:text-[#10172A]"
-                    )}
+                    className={cn("dashboard-sidebar-nav-link", active && "is-active")}
                   >
-                    <IconComponent className={cn("h-[17px] w-[17px] shrink-0", active ? "text-[#1D4ED8]" : "text-[#98A2B3]")} />
+                    <IconComponent
+                      className={cn(
+                        "h-[17px] w-[17px] shrink-0",
+                        active ? "text-cyan-200" : "text-blue-200/55"
+                      )}
+                    />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
@@ -299,11 +331,10 @@ export default function DashboardLayout({
             </div>
           </nav>
 
-          {/* Footer sidebar */}
-          <div className="border-t border-[#EEF2F7] p-3">
+          <div className="border-t border-white/10 p-3">
             <Link
               href="/"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-[#98A2B3] transition-all duration-200 hover:bg-[#F6F8FC] hover:text-[#344054]"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-blue-100/55 transition-all duration-200 hover:bg-white/[0.06] hover:text-white"
             >
               <Home className="h-[17px] w-[17px]" />
               <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
@@ -312,16 +343,14 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="relative z-10 lg:ml-72 flex min-h-[100dvh] flex-col">
-        {/* Topbar — blanche, discrète */}
-        <header className="sticky top-0 z-30 border-b border-[#E7EBF3] bg-white/85 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
+      <div className="relative z-10 flex min-h-[100dvh] flex-col lg:ml-[17.5rem]">
+        <header className="dashboard-topbar sticky top-0 z-30">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-lg p-2 text-[#667085] transition hover:bg-[#F6F8FC] hover:text-[#10172A] lg:hidden"
+                className="rounded-xl p-2 text-[#4A5B78] transition hover:bg-white/70 hover:text-[#1A23FF] lg:hidden"
                 aria-label={t("dashboard.navigation.primary")}
               >
                 <Menu className="h-5 w-5" />
@@ -329,27 +358,18 @@ export default function DashboardLayout({
             </div>
 
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              {!loadingUser &&
-                (() => {
-                  const displayName = clubName || t("dashboard.topbar.clubFallback");
-                  const initial = (clubName || t("dashboard.topbar.clubFallback") || "C")
-                    .charAt(0)
-                    .toUpperCase();
-                  return (
-                    <div
-                      className="flex max-w-[140px] items-center gap-2 rounded-full border border-[#E7EBF3] bg-white px-2 py-1 sm:max-w-[200px] sm:px-2.5 sm:py-1.5 md:max-w-none"
-                      aria-label={displayName}
-                      title={displayName}
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] to-[#1A23FF] text-xs font-bold text-white">
-                        {initial}
-                      </div>
-                      <span className="hidden truncate text-sm font-medium text-[#344054] md:inline">
-                        {displayName}
-                      </span>
-                    </div>
-                  );
-                })()}
+              {!loadingUser ? (
+                <div
+                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(26,35,255,0.12)] bg-white/80 px-2.5 py-1.5 shadow-[0_0_20px_rgba(26,35,255,0.06)] backdrop-blur-sm md:flex"
+                  aria-label={displayName}
+                  title={displayName}
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#38BDF8] text-xs font-bold text-white shadow-[0_0_12px_rgba(26,35,255,0.35)]">
+                    {initial}
+                  </div>
+                  <span className="truncate text-sm font-medium text-[#344054]">{displayName}</span>
+                </div>
+              ) : null}
 
               <LanguageSwitcher compact theme="light" />
 
@@ -358,7 +378,7 @@ export default function DashboardLayout({
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[#667085] transition hover:bg-[#F6F8FC] hover:text-[#10172A] sm:px-3.5 sm:py-2 sm:text-sm"
+                className="rounded-xl border border-[rgba(26,35,255,0.10)] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#4A5B78] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] hover:bg-white hover:text-[#1A23FF] sm:px-3.5 sm:py-2 sm:text-sm"
               >
                 {t("dashboard.topbar.logout")}
               </button>
@@ -366,18 +386,18 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="relative min-w-0 flex-1 overflow-x-hidden px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
+        <main className="relative min-w-0 flex-1 overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
           <div className="relative w-full min-w-0">{children}</div>
         </main>
 
-        <footer className="border-t border-[#E7EBF3] bg-transparent">
-          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#98A2B3] sm:flex-row sm:px-6 lg:px-8">
+        <footer className="border-t border-[rgba(26,35,255,0.08)] bg-transparent">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#7B8BA5] sm:flex-row sm:px-6 lg:px-8">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
-              <Link href="/mentions-legales" className="transition-colors hover:text-[#344054]">
+              <Link href="/mentions-legales" className="transition-colors hover:text-[#1A23FF]">
                 {t("dashboard.footer.legal")}
               </Link>
-              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#344054]">
+              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#1A23FF]">
                 {t("dashboard.footer.privacy")}
               </Link>
             </div>

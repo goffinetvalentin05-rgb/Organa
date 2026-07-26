@@ -21,7 +21,7 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
     return (
       <div
         className={cn(
-          "flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDE3EE] bg-[#FAFBFD] px-6 py-12 text-center sm:py-14",
+          "flex flex-col items-center justify-center rounded-2xl border border-dashed border-[rgba(26,35,255,0.16)] bg-[#F5F7FF]/70 px-6 py-12 text-center sm:py-14",
           className
         )}
       >
@@ -30,9 +30,9 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
             <Icon className="h-6 w-6" />
           </div>
         ) : null}
-        <p className="text-base font-semibold text-[#10172A]">{title}</p>
+        <p className="text-base font-semibold text-[#0B1220]">{title}</p>
         {description ? (
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-[#667085]">{description}</p>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-[#4A5B78]">{description}</p>
         ) : null}
         {action ? <div className="mt-6 flex flex-wrap justify-center gap-3">{action}</div> : null}
       </div>
@@ -52,9 +52,9 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
           <Icon className="h-6 w-6" />
         </div>
       ) : null}
-      <p className="text-base font-semibold text-[#10172A]">{title}</p>
+      <p className="text-base font-semibold text-[#0B1220]">{title}</p>
       {description ? (
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-[#667085]">{description}</p>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-[#4A5B78]">{description}</p>
       ) : null}
       {action ? <div className="mt-6 flex flex-wrap justify-center gap-3">{action}</div> : null}
     </div>

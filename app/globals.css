@@ -17,15 +17,15 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Colors - Dashboard (thème clair premium) */
-  --bg-dashboard: #F6F8FC;
+  /* Colors - Dashboard (bleu Obillz premium 2026) */
+  --bg-dashboard: #EEF2FF;
   --bg-surface: #FFFFFF;
-  --bg-surface-hover: #F1F5F9;
-  --border: rgba(15, 23, 42, 0.08);
-  --border-hover: rgba(15, 23, 42, 0.15);
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-tertiary: #94A3B8;
+  --bg-surface-hover: #F0F4FF;
+  --border: rgba(26, 35, 255, 0.10);
+  --border-hover: rgba(26, 35, 255, 0.22);
+  --text-primary: #0B1220;
+  --text-secondary: #4A5B78;
+  --text-tertiary: #7B8BA5;
   
   /* Accent - Obillz Blue */
   --accent: #1A23FF;
@@ -49,20 +49,20 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   
-  /* Shadows - Plus modernes et subtiles */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  /* Shadows - Premium blue */
+  --shadow-sm: 0 1px 2px 0 rgba(26, 35, 255, 0.04);
+  --shadow-md: 0 4px 12px -1px rgba(26, 35, 255, 0.07), 0 2px 4px -2px rgba(11, 18, 32, 0.04);
+  --shadow-lg: 0 12px 28px -3px rgba(26, 35, 255, 0.10), 0 4px 8px -4px rgba(11, 18, 32, 0.05);
+  --shadow-xl: 0 24px 48px -5px rgba(26, 35, 255, 0.14), 0 8px 12px -6px rgba(11, 18, 32, 0.06);
   
   /* Card shadows - Premium */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07);
+  --shadow-card-hover: 0 16px 48px rgba(26, 35, 255, 0.16), 0 2px 8px rgba(26, 35, 255, 0.08);
 
-  /* Dashboard surfaces — cartes blanches, ombre douce */
-  --dashboard-glass-bg: #ffffff;
-  --dashboard-glass-border: #E7EBF3;
-  --dashboard-glass-glow: 0 2px 12px rgba(16, 24, 40, 0.04);
+  /* Dashboard surfaces — glass bleuté + glow */
+  --dashboard-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 247, 255, 0.92) 100%);
+  --dashboard-glass-border: rgba(26, 35, 255, 0.10);
+  --dashboard-glass-glow: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07);
 }
 
 @theme inline {
@@ -120,11 +120,11 @@ body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
 
 body.app-bg:has(.dashboard-shell),
 body.app-bg:has(.obillz-dashboard) {
-  background-color: #F6F8FC !important;
+  background-color: #EEF2FF !important;
 }
 
 html:has(.dashboard-shell) {
-  background-color: #F6F8FC;
+  background-color: #EEF2FF;
 }
 
 /* ------------------------------------------------------------------
@@ -989,21 +989,21 @@ h3 {
    que ce qui doit être unifié (cartes, bouton accent, formulaires).
    ------------------------------------------------------------------ */
 
-/* Cartes / panneaux legacy → carte blanche unifiée */
+/* Cartes / panneaux legacy → carte bleutée unifiée */
 .dashboard-shell main .bg-surface,
 .dashboard-shell main [class*="bg-surface/"] {
   background: #ffffff !important;
-  border-color: #E7EBF3 !important;
-  color: #10172A;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 12px rgba(16, 24, 40, 0.04) !important;
+  border-color: rgba(26, 35, 255, 0.10) !important;
+  color: #0B1220;
+  box-shadow: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07) !important;
 }
 
 .dashboard-shell main .bg-surface-hover {
-  background: #F6F8FC !important;
+  background: #F0F4FF !important;
 }
 
 .dashboard-shell main .bg-surface-hover:hover {
-  background: #EEF2F8 !important;
+  background: #E8EDFF !important;
 }
 
 /* Bouton primaire legacy `accent-bg` : bleu Obillz aligné au CTA landing. */
@@ -1061,7 +1061,7 @@ h3 {
 .dashboard-shell input:disabled:not([type="checkbox"]):not([type="radio"]),
 .dashboard-shell textarea:disabled {
   opacity: 0.6;
-  background-color: #F6F8FC;
+  background-color: #F0F4FF;
   cursor: not-allowed;
 }
 
@@ -1551,6 +1551,355 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
+   Dashboard Obillz Premium — atmosphère, cartes, sidebar, KPI
+   ------------------------------------------------------------------ */
+
+.dashboard-shell {
+  background:
+    radial-gradient(ellipse 70% 45% at 12% -8%, rgba(26, 35, 255, 0.16), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 92% 8%, rgba(56, 189, 248, 0.14), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 70% 95%, rgba(37, 99, 235, 0.10), transparent 55%),
+    linear-gradient(180deg, #E8EDFF 0%, #EEF2FF 38%, #F3F6FF 100%);
+}
+
+.dashboard-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(26, 35, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 35, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 10%, transparent 75%);
+}
+
+.dashboard-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-glass-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(245, 247, 255, 0.94) 100%);
+  border: 1px solid rgba(26, 35, 255, 0.10);
+  box-shadow:
+    0 1px 2px rgba(26, 35, 255, 0.04),
+    0 12px 40px rgba(26, 35, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.dashboard-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(26, 35, 255, 0.07), transparent 60%);
+  opacity: 0.9;
+}
+
+.dashboard-stat-card {
+  position: relative;
+  isolation: isolate;
+  min-height: 11.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(26, 35, 255, 0.10);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 244, 255, 0.92) 100%);
+  box-shadow:
+    0 1px 2px rgba(26, 35, 255, 0.04),
+    0 14px 40px rgba(26, 35, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(26, 35, 255, 0.22);
+  box-shadow:
+    0 8px 24px rgba(26, 35, 255, 0.12),
+    0 24px 56px rgba(26, 35, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.dashboard-stat-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -40% auto;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  filter: blur(28px);
+  transition: opacity 0.35s ease;
+}
+
+.dashboard-stat-card:hover::after {
+  opacity: 0.85;
+}
+
+.dashboard-stat-card--cyan::after {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.45), transparent 70%);
+}
+
+.dashboard-stat-card--electric::after {
+  background: radial-gradient(circle, rgba(26, 35, 255, 0.40), transparent 70%);
+}
+
+.dashboard-stat-card--royal::after {
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.42), transparent 70%);
+}
+
+.dashboard-stat-card--navy::after {
+  background: radial-gradient(circle, rgba(7, 22, 52, 0.28), transparent 70%);
+}
+
+.dashboard-stat-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-stat-icon {
+  display: flex;
+  height: 3rem;
+  width: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(26, 35, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.dashboard-shell main .dashboard-stat-icon,
+.dashboard-shell main .dashboard-stat-icon * {
+  color: #ffffff !important;
+}
+
+.dashboard-stat-card--cyan .dashboard-stat-icon {
+  background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 55%, #0284C7 100%);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-stat-card--electric .dashboard-stat-icon {
+  background: linear-gradient(135deg, #4F57FF 0%, #1A23FF 50%, #151dd9 100%);
+}
+
+.dashboard-stat-card--royal .dashboard-stat-icon {
+  background: linear-gradient(135deg, #60A5FA 0%, #2563EB 50%, #1D4ED8 100%);
+}
+
+.dashboard-stat-card--navy .dashboard-stat-icon {
+  background: linear-gradient(135deg, #1E3A8A 0%, #071634 55%, #020817 100%);
+}
+
+.dashboard-sparkline {
+  display: block;
+  width: 100%;
+  height: 2rem;
+  overflow: visible;
+}
+
+.dashboard-progress-ring {
+  transform: rotate(-90deg);
+}
+
+.dashboard-sidebar {
+  background:
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(26, 35, 255, 0.35), transparent 55%),
+    radial-gradient(ellipse 70% 35% at 100% 80%, rgba(56, 189, 248, 0.12), transparent 50%),
+    linear-gradient(180deg, #071634 0%, #0A1A5E 48%, #071a3e 100%);
+  border-right: 1px solid rgba(147, 197, 253, 0.12);
+  box-shadow: 8px 0 40px rgba(7, 22, 52, 0.18);
+}
+
+.dashboard-sidebar-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.875rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: rgba(226, 232, 240, 0.72);
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-sidebar-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dashboard-sidebar-nav-link.is-active {
+  color: #ffffff;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(26, 35, 255, 0.55) 0%, rgba(37, 99, 235, 0.35) 100%);
+  box-shadow:
+    0 0 0 1px rgba(147, 197, 253, 0.22),
+    0 0 24px rgba(26, 35, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.dashboard-sidebar-nav-link.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 55%;
+  width: 3px;
+  transform: translateY(-50%);
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, #93C5FD, #38BDF8);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+}
+
+.dashboard-club-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.10) 0%, rgba(26, 35, 255, 0.18) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 28px rgba(2, 6, 23, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.dashboard-club-card::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35), transparent 70%);
+  pointer-events: none;
+}
+
+.dashboard-topbar {
+  border-bottom: 1px solid rgba(26, 35, 255, 0.08);
+  background: rgba(238, 242, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dashboard-priority-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(26, 35, 255, 0.10);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.9) 100%);
+  padding: 1.15rem 1.25rem;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dashboard-priority-card:hover {
+  transform: translateY(-3px) translateX(2px);
+  border-color: rgba(26, 35, 255, 0.22);
+  box-shadow: 0 16px 40px rgba(26, 35, 255, 0.12);
+}
+
+.dashboard-priority-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.dashboard-priority-card--danger::before {
+  background: linear-gradient(180deg, #F43F5E, #FB7185);
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.45);
+}
+
+.dashboard-priority-card--warning::before {
+  background: linear-gradient(180deg, #F59E0B, #FBBF24);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+.dashboard-priority-card--info::before {
+  background: linear-gradient(180deg, #1A23FF, #38BDF8);
+  box-shadow: 0 0 16px rgba(26, 35, 255, 0.4);
+}
+
+.dashboard-priority-card--success::before,
+.dashboard-priority-card--default::before {
+  background: linear-gradient(180deg, #10B981, #34D399);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+}
+
+.dashboard-timeline {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.dashboard-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(26, 35, 255, 0.35), rgba(56, 189, 248, 0.15), transparent);
+}
+
+.dashboard-timeline-item {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.dashboard-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.dashboard-timeline-dot {
+  position: absolute;
+  left: -1.05rem;
+  top: 0.85rem;
+  height: 0.625rem;
+  width: 0.625rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1A23FF, #38BDF8);
+  box-shadow: 0 0 0 3px rgba(238, 242, 255, 1), 0 0 12px rgba(26, 35, 255, 0.45);
+}
+
+.dashboard-invoice-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(26, 35, 255, 0.10);
+  background: linear-gradient(145deg, #ffffff 0%, #F0F4FF 100%);
+  padding: 1.1rem 1.2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dashboard-invoice-chip:hover {
+  transform: translateY(-3px);
+  border-color: rgba(26, 35, 255, 0.25);
+  box-shadow: 0 14px 36px rgba(26, 35, 255, 0.12);
+}
+
+@keyframes dashboard-pulse-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.dashboard-live-dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 999px;
+  background: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 12px rgba(16, 185, 129, 0.6);
+  animation: dashboard-pulse-glow 2.4s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
    Dashboard clair — compat pages écrites pour l'ancien thème sombre.
    Les classes « texte blanc / surfaces translucides » utilisées par
    les écrans non encore migrés sont remappées vers la palette claire.
@@ -1590,9 +1939,9 @@ h3 {
   color: #ffffff !important;
 }
 
-/* Surfaces translucides blanches → surfaces claires plates */
+/* Surfaces translucides blanches → surfaces bleutées */
 .dashboard-shell main [class*="bg-white/"] {
-  background-color: #F6F8FC !important;
+  background-color: #F0F4FF !important;
   backdrop-filter: none !important;
 }
 
