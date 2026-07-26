@@ -1555,6 +1555,14 @@ h3 {
    ------------------------------------------------------------------ */
 
 .dashboard-shell {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Ne pas utiliser overflow:clip/hidden ici : ça crée un containing block
+     qui casse position:fixed sur la sidebar. */
+  overflow: visible;
   background:
     radial-gradient(ellipse 70% 45% at 12% -8%, rgba(26, 35, 255, 0.16), transparent 55%),
     radial-gradient(ellipse 55% 40% at 92% 8%, rgba(56, 189, 248, 0.14), transparent 50%),
@@ -1576,9 +1584,62 @@ h3 {
   mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 10%, transparent 75%);
 }
 
-.dashboard-shell > * {
+/* Largeur sidebar — source unique pour offset du main-shell */
+.dashboard-shell {
+  --dashboard-sidebar-width: 17.5rem;
+}
+
+.dashboard-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  width: var(--dashboard-sidebar-width);
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dashboard-main-shell {
   position: relative;
   z-index: 1;
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main-shell {
+    margin-left: var(--dashboard-sidebar-width);
+    width: calc(100% - var(--dashboard-sidebar-width));
+  }
+}
+
+.dashboard-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 0;
+  border-bottom: 1px solid rgba(26, 35, 255, 0.08);
+  background: rgba(238, 242, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dashboard-main-content {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .dashboard-glass-card {
@@ -1775,13 +1836,6 @@ h3 {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(56, 189, 248, 0.35), transparent 70%);
   pointer-events: none;
-}
-
-.dashboard-topbar {
-  border-bottom: 1px solid rgba(26, 35, 255, 0.08);
-  background: rgba(238, 242, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(1.2);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .dashboard-priority-card {

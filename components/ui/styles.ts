@@ -29,7 +29,7 @@ export const obillzLandingGridOverlayClass = dashboardGridOverlayClass;
 
 /** Shell tableau de bord — fond bleuté Obillz + atmosphère */
 export const dashboardShellRootClass =
-  "dashboard-shell obillz-dashboard relative isolate min-h-[100dvh] w-full overflow-x-clip bg-[#EEF2FF] text-[#0B1220]";
+  "dashboard-shell obillz-dashboard isolate min-h-[100dvh] w-full bg-[#EEF2FF] text-[#0B1220]";
 
 /**
  * Surface carte dashboard — glass bleuté, bordure bleue, ombre premium.

@@ -167,13 +167,13 @@ export default function DashboardLayout({
 
       <aside
         className={cn(
-          "dashboard-sidebar fixed left-0 top-0 z-50 flex h-screen w-[17.5rem] flex-col transition-transform duration-300 lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "dashboard-sidebar transition-transform duration-300 lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        <div className="relative z-10 flex h-full flex-col">
+        <div className="relative z-10 flex h-full min-h-0 flex-col">
           {/* Logo */}
-          <div className="flex items-center justify-between gap-3 px-5 pb-3 pt-5">
+          <div className="flex shrink-0 items-center justify-between gap-3 px-5 pb-3 pt-5">
             <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
               <Image
                 src="/logo-obillz.png"
@@ -193,7 +193,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Club premium card */}
-          <div className="px-4 pb-4">
+          <div className="shrink-0 px-4 pb-4">
             <div className="dashboard-club-card px-3.5 py-3.5">
               <div className="relative flex items-center gap-3">
                 <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF] via-[#2563EB] to-[#38BDF8] text-sm font-bold text-white shadow-[0_0_24px_rgba(26,35,255,0.55)]">
@@ -219,7 +219,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-3 pb-4">
+          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
             <p className="mb-2.5 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200/45">
               {t("dashboard.navigation.primary")}
             </p>
@@ -331,7 +331,7 @@ export default function DashboardLayout({
             </div>
           </nav>
 
-          <div className="border-t border-white/10 p-3">
+          <div className="shrink-0 border-t border-white/10 p-3">
             <Link
               href="/"
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-blue-100/55 transition-all duration-200 hover:bg-white/[0.06] hover:text-white"
@@ -343,8 +343,8 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      <div className="relative z-10 flex min-h-[100dvh] flex-col lg:ml-[17.5rem]">
-        <header className="dashboard-topbar sticky top-0 z-30">
+      <div className="dashboard-main-shell">
+        <header className="dashboard-topbar">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center">
               <button
@@ -386,11 +386,11 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="relative min-w-0 flex-1 overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-          <div className="relative w-full min-w-0">{children}</div>
+        <main className="dashboard-main-content px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className="w-full min-w-0">{children}</div>
         </main>
 
-        <footer className="border-t border-[rgba(26,35,255,0.08)] bg-transparent">
+        <footer className="shrink-0 border-t border-[rgba(26,35,255,0.08)] bg-transparent">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#7B8BA5] sm:flex-row sm:px-6 lg:px-8">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
