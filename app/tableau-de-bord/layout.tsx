@@ -151,7 +151,6 @@ export default function DashboardLayout({
 
   const displayName = clubName || t("dashboard.topbar.clubFallback");
   const initial = (clubName || t("dashboard.topbar.clubFallback") || "C").charAt(0).toUpperCase();
-  const seasonYear = new Date().getFullYear();
 
   return (
     <NewFeaturesAnnouncementProvider>
@@ -173,7 +172,7 @@ export default function DashboardLayout({
       >
         <div className="relative z-10 flex h-full min-h-0 flex-col">
           {/* Logo */}
-          <div className="flex shrink-0 items-center justify-between gap-3 px-5 pb-3 pt-5">
+          <div className="flex shrink-0 items-center justify-between gap-3 px-5 pb-5 pt-5">
             <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
               <Image
                 src="/logo-obillz.png"
@@ -190,32 +189,6 @@ export default function DashboardLayout({
             >
               <X className="h-5 w-5" />
             </button>
-          </div>
-
-          {/* Club premium card */}
-          <div className="shrink-0 px-4 pb-4">
-            <div className="dashboard-club-card px-3.5 py-3.5">
-              <div className="relative flex items-center gap-3">
-                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF] via-[#2563EB] to-[#38BDF8] text-sm font-bold text-white shadow-[0_0_24px_rgba(26,35,255,0.55)]">
-                  {loadingUser ? "…" : initial}
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0A1A5E] bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-white">
-                    {loadingUser ? "…" : displayName}
-                  </p>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-200">
-                      Saison {seasonYear}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Actif
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Navigation */}

@@ -14,17 +14,13 @@ export default function PageHeader({ title, subtitle, actions, className }: Page
   return (
     <div
       className={cn(
-        "relative flex w-full min-w-0 flex-col gap-5 sm:gap-6 md:flex-row md:items-end md:justify-between md:gap-10",
+        "relative flex w-full min-w-0 flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between md:gap-8",
         className
       )}
     >
-      <div className="pointer-events-none absolute -left-8 -top-10 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.18),transparent_70%)] blur-2xl" />
-      <div className="relative min-w-0 flex-1 space-y-3 md:pr-4">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(26,35,255,0.14)] bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#1A23FF] shadow-[0_0_20px_rgba(26,35,255,0.08)] backdrop-blur-sm">
-          <span className="dashboard-live-dot" />
-          Obillz
-        </div>
-        <h1 className="text-[1.85rem] font-semibold tracking-[-0.03em] text-[#0B1220] md:text-[2.15rem]">
+      <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.12),transparent_70%)] blur-2xl" />
+      <div className="relative min-w-0 flex-1 space-y-1.5 md:pr-4">
+        <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em] text-[#0B1220] md:text-[2rem]">
           {title}
         </h1>
         {subtitle ? (
