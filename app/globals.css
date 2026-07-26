@@ -17,29 +17,29 @@
   --bg-landing-end: #0A1A5E;
   --bg-landing-deep: #020418;
   
-  /* Colors - Dashboard (bleu Obillz premium 2026) */
-  --bg-dashboard: #EEF2FF;
-  --bg-surface: #FFFFFF;
-  --bg-surface-hover: #F0F4FF;
-  --border: rgba(26, 35, 255, 0.10);
-  --border-hover: rgba(26, 35, 255, 0.22);
-  --text-primary: #0B1220;
-  --text-secondary: #4A5B78;
-  --text-tertiary: #7B8BA5;
+  /* Colors - Dashboard (bleu nuit Obillz premium) */
+  --bg-dashboard: #071634;
+  --bg-surface: #0F2744;
+  --bg-surface-hover: #143056;
+  --border: rgba(147, 197, 253, 0.16);
+  --border-hover: rgba(147, 197, 253, 0.28);
+  --text-primary: #F1F5F9;
+  --text-secondary: #A8B8D0;
+  --text-tertiary: #7B91B0;
   
   /* Accent - Obillz Blue */
   --accent: #1A23FF;
   --accent-hover: #151dd9;
-  --accent-light: rgba(26, 35, 255, 0.08);
-  --accent-border: rgba(26, 35, 255, 0.25);
+  --accent-light: rgba(26, 35, 255, 0.18);
+  --accent-border: rgba(26, 35, 255, 0.4);
   
   /* Status colors */
-  --success: #10B981;
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --warning: #F59E0B;
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --error: #EF4444;
-  --error-bg: rgba(239, 68, 68, 0.1);
+  --success: #34D399;
+  --success-bg: rgba(16, 185, 129, 0.16);
+  --warning: #FBBF24;
+  --warning-bg: rgba(245, 158, 11, 0.16);
+  --error: #FB7185;
+  --error-bg: rgba(244, 63, 94, 0.16);
   
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -49,20 +49,20 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   
-  /* Shadows - Premium blue */
-  --shadow-sm: 0 1px 2px 0 rgba(26, 35, 255, 0.04);
-  --shadow-md: 0 4px 12px -1px rgba(26, 35, 255, 0.07), 0 2px 4px -2px rgba(11, 18, 32, 0.04);
-  --shadow-lg: 0 12px 28px -3px rgba(26, 35, 255, 0.10), 0 4px 8px -4px rgba(11, 18, 32, 0.05);
-  --shadow-xl: 0 24px 48px -5px rgba(26, 35, 255, 0.14), 0 8px 12px -6px rgba(11, 18, 32, 0.06);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(2, 6, 23, 0.25);
+  --shadow-md: 0 4px 12px -1px rgba(2, 6, 23, 0.35), 0 2px 4px -2px rgba(2, 6, 23, 0.2);
+  --shadow-lg: 0 12px 28px -3px rgba(2, 6, 23, 0.4), 0 4px 8px -4px rgba(2, 6, 23, 0.25);
+  --shadow-xl: 0 24px 48px -5px rgba(2, 6, 23, 0.45), 0 8px 12px -6px rgba(2, 6, 23, 0.3);
   
-  /* Card shadows - Premium */
-  --shadow-card: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07);
-  --shadow-card-hover: 0 16px 48px rgba(26, 35, 255, 0.16), 0 2px 8px rgba(26, 35, 255, 0.08);
+  /* Card shadows */
+  --shadow-card: 0 8px 32px rgba(2, 6, 23, 0.35);
+  --shadow-card-hover: 0 16px 48px rgba(2, 6, 23, 0.45);
 
-  /* Dashboard surfaces — glass bleuté + glow */
-  --dashboard-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 247, 255, 0.92) 100%);
-  --dashboard-glass-border: rgba(26, 35, 255, 0.10);
-  --dashboard-glass-glow: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07);
+  /* Dashboard surfaces */
+  --dashboard-glass-bg: #0F2744;
+  --dashboard-glass-border: rgba(147, 197, 253, 0.14);
+  --dashboard-glass-glow: 0 8px 32px rgba(2, 6, 23, 0.35);
 }
 
 @theme inline {
@@ -120,11 +120,11 @@ body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
 
 body.app-bg:has(.dashboard-shell),
 body.app-bg:has(.obillz-dashboard) {
-  background-color: #EEF2FF !important;
+  background-color: #071634 !important;
 }
 
 html:has(.dashboard-shell) {
-  background-color: #EEF2FF;
+  background-color: #071634;
 }
 
 /* ------------------------------------------------------------------
@@ -946,19 +946,19 @@ h3 {
   }
 }
 
-/* Titres principaux des pages dashboard — texte bleu nuit sur fond clair */
+/* Titres principaux des pages dashboard — lisibles sur fond navy */
 .dashboard-shell main h1 {
-  color: #10172A !important;
+  color: #F8FAFC !important;
 }
 
 /* Sous-titre directement sous le titre principal */
 .dashboard-shell main h1 + p {
-  color: #667085 !important;
+  color: #A8B8D0 !important;
 }
 
 /* Cartes dans le contenu : titres internes (MFA, modales…) */
 .dashboard-shell main .dashboard-card-surface h1 {
-  color: #10172A !important;
+  color: #F8FAFC !important;
   font-size: 1.25rem !important;
   line-height: 1.35 !important;
   letter-spacing: -0.02em !important;
@@ -971,7 +971,7 @@ h3 {
 }
 
 .dashboard-shell main .dashboard-card-surface h1 + p {
-  color: #667085 !important;
+  color: #A8B8D0 !important;
   font-size: 0.875rem !important;
   line-height: 1.625 !important;
 }
@@ -983,64 +983,61 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Harmonisation legacy → design system clair (dashboard-shell).
-   Les anciennes classes (`bg-surface`, `text-secondary`, slate…)
-   sont désormais nativement lisibles sur fond clair : on ne remappe
-   que ce qui doit être unifié (cartes, bouton accent, formulaires).
+   Harmonisation legacy → design system dark blue (dashboard-shell).
    ------------------------------------------------------------------ */
 
-/* Cartes / panneaux legacy → carte bleutée unifiée */
+/* Cartes / panneaux legacy → surface navy */
 .dashboard-shell main .bg-surface,
 .dashboard-shell main [class*="bg-surface/"] {
-  background: #ffffff !important;
-  border-color: rgba(26, 35, 255, 0.10) !important;
-  color: #0B1220;
-  box-shadow: 0 1px 2px rgba(26, 35, 255, 0.04), 0 12px 40px rgba(26, 35, 255, 0.07) !important;
+  background: #0F2744 !important;
+  border-color: rgba(147, 197, 253, 0.14) !important;
+  color: #F1F5F9;
+  box-shadow: 0 8px 32px rgba(2, 6, 23, 0.35) !important;
 }
 
 .dashboard-shell main .bg-surface-hover {
-  background: #F0F4FF !important;
+  background: #143056 !important;
 }
 
 .dashboard-shell main .bg-surface-hover:hover {
-  background: #E8EDFF !important;
+  background: #183A66 !important;
 }
 
-/* Bouton primaire legacy `accent-bg` : bleu Obillz aligné au CTA landing. */
+/* Bouton primaire legacy `accent-bg` */
 .dashboard-shell main .accent-bg {
-  background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%) !important;
+  background: linear-gradient(135deg, #2563EB 0%, #1A23FF 100%) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(37, 99, 235, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
+  border: 1px solid rgba(147, 197, 253, 0.35) !important;
+  box-shadow: 0 4px 18px rgba(26, 35, 255, 0.35) !important;
 }
 
 .dashboard-shell main .accent-bg:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #151dd9 100%) !important;
+  box-shadow: 0 6px 22px rgba(26, 35, 255, 0.45) !important;
 }
 
-/* Cartes anciennes : ombre douce */
 .dashboard-shell main .shadow-premium {
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06) !important;
+  box-shadow: 0 8px 32px rgba(2, 6, 23, 0.35) !important;
 }
 
-/* Champs formulaires — thème clair */
+/* Champs formulaires — fond clair + texte foncé (lisibilité max) */
 .dashboard-shell {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .dashboard-shell input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
 .dashboard-shell select,
 .dashboard-shell textarea {
-  background-color: #ffffff;
-  color: #10172A;
-  border-color: #DDE3EE;
+  background-color: #ffffff !important;
+  color: #0B1220 !important;
+  border-color: rgba(147, 197, 253, 0.35) !important;
 }
 
 .dashboard-shell select,
 .dashboard-shell .dashboard-select {
   color-scheme: light;
-  background-color: #ffffff;
+  background-color: #ffffff !important;
+  color: #0B1220 !important;
 }
 
 .dashboard-shell select option,
@@ -1048,20 +1045,21 @@ h3 {
 .dashboard-shell .dashboard-select option,
 .dashboard-shell .dashboard-select optgroup {
   background-color: #ffffff;
-  color: #10172A;
+  color: #0B1220;
 }
 
 .dashboard-shell select option:checked,
 .dashboard-shell .dashboard-select option:checked {
   background-color: #eef2ff;
-  color: #10172A;
+  color: #0B1220;
 }
 
 .dashboard-shell select:disabled,
 .dashboard-shell input:disabled:not([type="checkbox"]):not([type="radio"]),
 .dashboard-shell textarea:disabled {
-  opacity: 0.6;
-  background-color: #F0F4FF;
+  opacity: 0.8;
+  background-color: #E2E8F0 !important;
+  color: #475569 !important;
   cursor: not-allowed;
 }
 
@@ -1075,45 +1073,44 @@ h3 {
 .dashboard-shell select:-webkit-autofill:hover,
 .dashboard-shell select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
-  -webkit-text-fill-color: #10172A;
-  caret-color: #10172A;
+  -webkit-text-fill-color: #0B1220;
+  caret-color: #0B1220;
   transition: background-color 9999s ease-out 0s;
 }
 
 .dashboard-shell input::placeholder,
 .dashboard-shell textarea::placeholder {
-  color: #98A2B3;
+  color: #64748B !important;
 }
 
 .dashboard-shell input:focus,
 .dashboard-shell select:focus,
 .dashboard-shell textarea:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #1A23FF !important;
+  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.28);
   outline: none;
 }
 
 .dashboard-shell [contenteditable="true"] {
-  background-color: #ffffff;
-  color: #10172A;
-  border-color: #DDE3EE;
+  background-color: #ffffff !important;
+  color: #0B1220 !important;
+  border-color: rgba(147, 197, 253, 0.35) !important;
 }
 
-/* Classe legacy `.input-obillz` — harmonisée thème clair */
 .dashboard-shell .input-obillz {
   background-color: #ffffff !important;
-  color: #10172A !important;
-  border-color: #DDE3EE !important;
+  color: #0B1220 !important;
+  border-color: rgba(147, 197, 253, 0.35) !important;
   color-scheme: light;
 }
 
 .dashboard-shell .input-obillz::placeholder {
-  color: #98A2B3;
+  color: #64748B;
 }
 
 .dashboard-shell .input-obillz:focus {
-  border-color: #2563EB !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #1A23FF !important;
+  box-shadow: 0 0 0 3px rgba(26, 35, 255, 0.28);
   outline: none;
 }
 
@@ -1563,11 +1560,12 @@ h3 {
   /* Ne pas utiliser overflow:clip/hidden ici : ça crée un containing block
      qui casse position:fixed sur la sidebar. */
   overflow: visible;
+  color: #F1F5F9;
   background:
-    radial-gradient(ellipse 70% 45% at 12% -8%, rgba(26, 35, 255, 0.16), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 92% 8%, rgba(56, 189, 248, 0.14), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 70% 95%, rgba(37, 99, 235, 0.10), transparent 55%),
-    linear-gradient(180deg, #E8EDFF 0%, #EEF2FF 38%, #F3F6FF 100%);
+    radial-gradient(ellipse 70% 45% at 10% -5%, rgba(26, 35, 255, 0.22), transparent 55%),
+    radial-gradient(ellipse 50% 35% at 95% 10%, rgba(56, 189, 248, 0.10), transparent 50%),
+    radial-gradient(ellipse 45% 30% at 70% 100%, rgba(37, 99, 235, 0.12), transparent 55%),
+    linear-gradient(180deg, #071634 0%, #0A1A3E 45%, #071634 100%);
 }
 
 .dashboard-shell::before {
@@ -1576,10 +1574,10 @@ h3 {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.22;
   background-image:
-    linear-gradient(rgba(26, 35, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 35, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(147, 197, 253, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(147, 197, 253, 0.06) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 10%, transparent 75%);
 }
@@ -1627,10 +1625,10 @@ h3 {
   width: 100%;
   flex-shrink: 0;
   margin-top: 0;
-  border-bottom: 1px solid rgba(26, 35, 255, 0.08);
-  background: rgba(238, 242, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(1.2);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.12);
+  background: rgba(7, 22, 52, 0.82);
+  backdrop-filter: blur(20px) saturate(1.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .dashboard-main-content {
@@ -1643,12 +1641,14 @@ h3 {
 }
 
 .dashboard-glass-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(245, 247, 255, 0.94) 100%);
-  border: 1px solid rgba(26, 35, 255, 0.10);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26, 35, 255, 0.14), transparent 55%),
+    linear-gradient(180deg, #123055 0%, #0F2744 100%);
+  border: 1px solid rgba(147, 197, 253, 0.14);
   box-shadow:
-    0 1px 2px rgba(26, 35, 255, 0.04),
-    0 12px 40px rgba(26, 35, 255, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 8px 32px rgba(2, 6, 23, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #F1F5F9;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
@@ -1658,7 +1658,7 @@ h3 {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(26, 35, 255, 0.07), transparent 60%);
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 189, 248, 0.06), transparent 60%);
   opacity: 0.9;
 }
 
@@ -1667,22 +1667,24 @@ h3 {
   isolation: isolate;
   min-height: 11.5rem;
   border-radius: 1.5rem;
-  border: 1px solid rgba(26, 35, 255, 0.10);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 244, 255, 0.92) 100%);
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  background:
+    radial-gradient(ellipse 70% 60% at 100% 0%, rgba(26, 35, 255, 0.18), transparent 55%),
+    linear-gradient(165deg, #14345C 0%, #0F2744 100%);
   box-shadow:
-    0 1px 2px rgba(26, 35, 255, 0.04),
-    0 14px 40px rgba(26, 35, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 8px 32px rgba(2, 6, 23, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #F1F5F9;
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .dashboard-stat-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(26, 35, 255, 0.22);
+  border-color: rgba(96, 165, 250, 0.35);
   box-shadow:
-    0 8px 24px rgba(26, 35, 255, 0.12),
-    0 24px 56px rgba(26, 35, 255, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    0 8px 24px rgba(2, 6, 23, 0.4),
+    0 24px 56px rgba(26, 35, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .dashboard-stat-card::after {
@@ -1770,11 +1772,11 @@ h3 {
 
 .dashboard-sidebar {
   background:
-    radial-gradient(ellipse 80% 36% at 40% -8%, rgba(96, 165, 250, 0.18), transparent 58%),
+    radial-gradient(ellipse 80% 36% at 40% -8%, rgba(26, 35, 255, 0.28), transparent 58%),
     radial-gradient(ellipse 60% 30% at 100% 85%, rgba(56, 189, 248, 0.08), transparent 52%),
-    linear-gradient(180deg, #1a2f5c 0%, #1e3a6e 42%, #243f72 100%);
+    linear-gradient(180deg, #06122C 0%, #071634 42%, #0A1A3E 100%);
   border-right: 1px solid rgba(147, 197, 253, 0.14);
-  box-shadow: 4px 0 24px rgba(26, 47, 92, 0.10);
+  box-shadow: 4px 0 28px rgba(2, 6, 23, 0.35);
 }
 
 .dashboard-sidebar-nav-link {
@@ -1824,16 +1826,17 @@ h3 {
   gap: 1rem;
   overflow: hidden;
   border-radius: 1.25rem;
-  border: 1px solid rgba(26, 35, 255, 0.10);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.9) 100%);
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(15, 39, 68, 0.9) 100%);
   padding: 1.15rem 1.25rem;
+  color: #F1F5F9;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-priority-card:hover {
   transform: translateY(-3px) translateX(2px);
-  border-color: rgba(26, 35, 255, 0.22);
-  box-shadow: 0 16px 40px rgba(26, 35, 255, 0.12);
+  border-color: rgba(96, 165, 250, 0.3);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.35);
 }
 
 .dashboard-priority-card::before {
@@ -1906,16 +1909,17 @@ h3 {
   flex-direction: column;
   gap: 0.75rem;
   border-radius: 1.25rem;
-  border: 1px solid rgba(26, 35, 255, 0.10);
-  background: linear-gradient(145deg, #ffffff 0%, #F0F4FF 100%);
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(15, 39, 68, 0.95) 100%);
   padding: 1.1rem 1.2rem;
+  color: #F1F5F9;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-invoice-chip:hover {
   transform: translateY(-3px);
-  border-color: rgba(26, 35, 255, 0.25);
-  box-shadow: 0 14px 36px rgba(26, 35, 255, 0.12);
+  border-color: rgba(96, 165, 250, 0.3);
+  box-shadow: 0 14px 36px rgba(2, 6, 23, 0.35);
 }
 
 @keyframes dashboard-pulse-glow {
@@ -1933,166 +1937,253 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Dashboard clair — compat pages écrites pour l'ancien thème sombre.
-   Les classes « texte blanc / surfaces translucides » utilisées par
-   les écrans non encore migrés sont remappées vers la palette claire.
-   (Couche transitoire : à supprimer une fois toutes les pages migrées.)
+   Dashboard dark blue — lisibilité & cohérence.
+   Remappe les classes « thème clair » résiduelles vers la palette navy.
+   Les inputs restent blancs + texte foncé (règles formulaires ci-dessus).
    ------------------------------------------------------------------ */
 
-/* Textes blancs (toutes opacités) → bleu nuit / gris */
+/* Texte blanc : conserver (thème sombre) */
 .dashboard-shell main [class*="text-white"] {
-  color: #1D2939 !important;
+  color: #F8FAFC !important;
 }
 
 .dashboard-shell main [class*="text-white/6"],
 .dashboard-shell main [class*="text-white/5"],
 .dashboard-shell main [class*="text-white/7"] {
-  color: #667085 !important;
+  color: #CBD5E1 !important;
 }
 
 .dashboard-shell main [class*="text-white/4"],
 .dashboard-shell main [class*="text-white/3"],
 .dashboard-shell main [class*="text-white/2"] {
-  color: #98A2B3 !important;
+  color: #94A3B8 !important;
 }
 
-/* Exceptions : texte blanc conservé sur boutons/bandeaux à fond plein */
-.dashboard-shell main [class*="bg-gradient"][class*="text-white"],
-.dashboard-shell main [class*="bg-gradient"] [class*="text-white"],
-.dashboard-shell main .accent-bg[class*="text-white"],
-.dashboard-shell main .accent-bg [class*="text-white"],
-.dashboard-shell main [class*="bg-blue-6"][class*="text-white"],
-.dashboard-shell main [class*="bg-blue-6"] [class*="text-white"],
-.dashboard-shell main [class*="bg-indigo-6"][class*="text-white"],
-.dashboard-shell main [class*="bg-red-6"][class*="text-white"],
-.dashboard-shell main [class*="bg-rose-6"][class*="text-white"],
-.dashboard-shell main [class*="bg-emerald-6"][class*="text-white"],
-.dashboard-shell main [class*="bg-[#1A23FF]"][class*="text-white"],
-.dashboard-shell main [class*="bg-[#2563EB]"][class*="text-white"] {
-  color: #ffffff !important;
+/* Textes foncés hardcodés (pages legacy clair) → texte clair lisible */
+.dashboard-shell main [class*="text-[#10172A]"],
+.dashboard-shell main [class*="text-[#0B1220]"],
+.dashboard-shell main [class*="text-[#0F172A]"],
+.dashboard-shell main [class*="text-[#111827]"],
+.dashboard-shell main [class*="text-[#1D2939]"],
+.dashboard-shell main [class*="text-[#344054]"],
+.dashboard-shell main [class*="text-slate-900"],
+.dashboard-shell main [class*="text-slate-800"],
+.dashboard-shell main [class*="text-gray-900"],
+.dashboard-shell main [class*="text-gray-800"] {
+  color: #F1F5F9 !important;
 }
 
-/* Surfaces translucides blanches → surfaces bleutées */
-.dashboard-shell main [class*="bg-white/"] {
-  background-color: #F0F4FF !important;
-  backdrop-filter: none !important;
+.dashboard-shell main [class*="text-[#667085]"],
+.dashboard-shell main [class*="text-[#4A5B78]"],
+.dashboard-shell main [class*="text-[#475569]"],
+.dashboard-shell main [class*="text-slate-600"],
+.dashboard-shell main [class*="text-slate-500"],
+.dashboard-shell main [class*="text-gray-600"],
+.dashboard-shell main [class*="text-gray-500"] {
+  color: #A8B8D0 !important;
 }
 
-/* Panneaux sombres résiduels → carte blanche */
+.dashboard-shell main [class*="text-[#98A2B3]"],
+.dashboard-shell main [class*="text-[#7B8BA5]"],
+.dashboard-shell main [class*="text-[#94A3B8]"],
+.dashboard-shell main [class*="text-slate-400"],
+.dashboard-shell main [class*="text-gray-400"] {
+  color: #8BA0BC !important;
+}
+
+/* Exceptions inputs : texte foncé sur fond blanc */
+.dashboard-shell main input[class*="text-"],
+.dashboard-shell main textarea[class*="text-"],
+.dashboard-shell main select[class*="text-"] {
+  color: #0B1220 !important;
+}
+
+/* Surfaces blanches / pâles → navy (hors champs formulaire) */
+.dashboard-shell main [class*="bg-white/"]:not(input):not(textarea):not(select),
+.dashboard-shell main .bg-white:not(input):not(textarea):not(select),
+.dashboard-shell main [class~="bg-white"]:not(input):not(textarea):not(select) {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dashboard-shell main [class*="bg-[#F6F8FC]"],
+.dashboard-shell main [class*="bg-[#FAFBFD]"],
+.dashboard-shell main [class*="bg-[#F0F4FF]"],
+.dashboard-shell main [class*="bg-[#F5F7FF]"],
+.dashboard-shell main [class*="bg-[#EEF2FF]"],
+.dashboard-shell main [class*="bg-[#F2F5FA]"],
+.dashboard-shell main [class*="bg-[#F8FAFC]"],
+.dashboard-shell main [class*="bg-slate-50"],
+.dashboard-shell main [class*="bg-gray-50"] {
+  background-color: rgba(15, 39, 68, 0.72) !important;
+}
+
 .dashboard-shell main [class*="bg-slate-950"],
 .dashboard-shell main [class*="bg-slate-900"] {
-  background-color: #ffffff !important;
-  color: #10172A !important;
+  background-color: #0F2744 !important;
+  color: #F1F5F9 !important;
 }
 
-/* Bordures / anneaux / séparateurs blancs translucides → bordure claire */
+/* Bordures pâles → bordures bleues visibles */
 .dashboard-shell main [class*="border-white"] {
-  border-color: #E7EBF3 !important;
+  border-color: rgba(147, 197, 253, 0.16) !important;
 }
 
 .dashboard-shell main [class*="ring-white"] {
-  --tw-ring-color: #E7EBF3 !important;
+  --tw-ring-color: rgba(147, 197, 253, 0.2) !important;
 }
 
-.dashboard-shell main [class*="divide-white"] > :not([hidden]) ~ :not([hidden]) {
-  border-color: #EEF2F7 !important;
+.dashboard-shell main [class*="divide-white"] > :not([hidden]) ~ :not([hidden]),
+.dashboard-shell main [class*="divide-[#EEF2F7]"] > :not([hidden]) ~ :not([hidden]),
+.dashboard-shell main [class*="divide-[#E7EBF3]"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(147, 197, 253, 0.12) !important;
 }
 
-/* Teintes pastel « dark » (texte -200/-300) → équivalents lisibles sur clair */
+.dashboard-shell main [class*="border-[#E7EBF3]"],
+.dashboard-shell main [class*="border-[#EEF2F7]"],
+.dashboard-shell main [class*="border-[#DDE3EE]"],
+.dashboard-shell main [class*="border-[#C7D0E0]"],
+.dashboard-shell main [class*="border-slate-200"],
+.dashboard-shell main [class*="border-gray-200"] {
+  border-color: rgba(147, 197, 253, 0.18) !important;
+}
+
+/* Status texts — lisibles sur fond sombre */
+.dashboard-shell main .text-emerald-600,
+.dashboard-shell main .text-emerald-700 {
+  color: #34D399 !important;
+}
+
+.dashboard-shell main .text-amber-600,
+.dashboard-shell main .text-amber-700 {
+  color: #FBBF24 !important;
+}
+
+.dashboard-shell main .text-rose-600,
+.dashboard-shell main .text-red-600,
+.dashboard-shell main .text-rose-700,
+.dashboard-shell main .text-red-700 {
+  color: #FB7185 !important;
+}
+
+.dashboard-shell main .text-sky-600,
+.dashboard-shell main .text-blue-600,
+.dashboard-shell main .text-blue-700,
+.dashboard-shell main [class*="text-[#2563EB]"],
+.dashboard-shell main [class*="text-[#1D4ED8]"],
+.dashboard-shell main [class*="text-[#1A23FF]"] {
+  color: #93C5FD !important;
+}
+
 .dashboard-shell main .text-emerald-200,
 .dashboard-shell main .text-emerald-300 {
-  color: #047857 !important;
+  color: #6EE7B7 !important;
 }
 
 .dashboard-shell main .text-amber-200,
 .dashboard-shell main .text-amber-300 {
-  color: #B45309 !important;
+  color: #FCD34D !important;
 }
 
 .dashboard-shell main .text-red-200,
 .dashboard-shell main .text-rose-200,
 .dashboard-shell main .text-rose-300 {
-  color: #B42318 !important;
+  color: #FDA4AF !important;
 }
 
 .dashboard-shell main .text-blue-200,
 .dashboard-shell main .text-blue-300,
 .dashboard-shell main [class*="text-blue-200/"],
 .dashboard-shell main [class*="text-blue-300/"] {
-  color: #1D4ED8 !important;
+  color: #93C5FD !important;
 }
 
 .dashboard-shell main .text-indigo-200,
 .dashboard-shell main .text-violet-200,
 .dashboard-shell main .text-purple-200 {
-  color: #6D28D9 !important;
+  color: #C4B5FD !important;
 }
 
 .dashboard-shell main .text-sky-200,
 .dashboard-shell main .text-sky-300 {
-  color: #0369A1 !important;
+  color: #7DD3FC !important;
 }
 
-/* Fonds translucides colorés (badges dark) → pastilles claires */
-.dashboard-shell main [class*="bg-emerald-500/"] {
-  background-color: #ECFDF3 !important;
-  border-color: #ABEFC6 !important;
+/* Badges / pastilles colorées — versions dark lisibles */
+.dashboard-shell main [class*="bg-emerald-500/"],
+.dashboard-shell main [class*="bg-emerald-50"] {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
 }
 
-.dashboard-shell main [class*="bg-amber-500/"] {
-  background-color: #FFFAEB !important;
-  border-color: #FEDF89 !important;
+.dashboard-shell main [class*="bg-amber-500/"],
+.dashboard-shell main [class*="bg-amber-50"] {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
 }
 
 .dashboard-shell main [class*="bg-red-500/"],
-.dashboard-shell main [class*="bg-rose-500/"] {
-  background-color: #FEF3F2 !important;
-  border-color: #FECDCA !important;
+.dashboard-shell main [class*="bg-rose-500/"],
+.dashboard-shell main [class*="bg-red-50"],
+.dashboard-shell main [class*="bg-rose-50"] {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+  border-color: rgba(251, 113, 133, 0.3) !important;
 }
 
 .dashboard-shell main [class*="bg-blue-500/"],
 .dashboard-shell main [class*="bg-indigo-500/"],
-.dashboard-shell main [class*="bg-[#1A23FF]/"] {
-  background-color: #EFF4FF !important;
-  border-color: #C7D7FE !important;
+.dashboard-shell main [class*="bg-[#1A23FF]/"],
+.dashboard-shell main [class*="bg-blue-50"] {
+  background-color: rgba(26, 35, 255, 0.2) !important;
+  border-color: rgba(147, 197, 253, 0.28) !important;
 }
 
-/* Checkbox / radio — accent bleu Obillz */
+/* Checkbox / radio */
 .dashboard-shell main input[type="checkbox"],
 .dashboard-shell main input[type="radio"] {
   accent-color: #1a23ff;
 }
 
-/* Tableaux / listes dashboard — séparateurs clairs */
+/* Tableaux */
 .dashboard-shell main .dashboard-table-divide > :not([hidden]) ~ :not([hidden]) {
-  border-color: #EEF2F7 !important;
+  border-color: rgba(147, 197, 253, 0.12) !important;
 }
 
 .dashboard-shell main .dashboard-data-table thead tr {
-  border-bottom-color: #EEF2F7 !important;
+  border-bottom-color: rgba(147, 197, 253, 0.14) !important;
 }
 
 .dashboard-shell main .dashboard-table-footer {
-  border-top: 1px solid #EEF2F7 !important;
-  background: #FAFBFD !important;
-  color: #667085 !important;
+  border-top: 1px solid rgba(147, 197, 253, 0.12) !important;
+  background: rgba(7, 22, 52, 0.45) !important;
+  color: #A8B8D0 !important;
 }
 
 .dashboard-shell main .dashboard-table-footer p {
-  color: #667085 !important;
+  color: #A8B8D0 !important;
 }
 
-/* Surface blanche intentionnelle (QR codes) */
+/* Surface blanche intentionnelle (QR codes / documents) */
 .dashboard-shell main .qr-code-surface {
   background-color: #ffffff !important;
+  color: #0B1220 !important;
 }
 
-/* Aperçu cotisation / facture — feuille blanche type document */
 .dashboard-shell main .document-preview-surface {
   border-radius: 1rem;
-  border-color: #E7EBF3 !important;
+  border-color: rgba(147, 197, 253, 0.2) !important;
   background: #ffffff !important;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 28px rgba(16, 24, 40, 0.08) !important;
+  color: #0B1220 !important;
+  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.35) !important;
+}
+
+/* Labels dans formulaires — toujours lisibles hors inputs */
+.dashboard-shell main label {
+  color: #E2E8F0;
+}
+
+.dashboard-shell main label [class*="text-[#"],
+.dashboard-shell main label[class*="text-"] {
+  color: #E2E8F0 !important;
 }
 
 /* Hero — halo texte et profondeur */

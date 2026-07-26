@@ -5,15 +5,15 @@ import { cn } from "./cn";
 
 const variants = {
   default:
-    "border border-[rgba(26,35,255,0.12)] bg-gradient-to-r from-[#EEF2FF] to-[#F5F7FF] text-[#1A23FF]",
-  info: "border border-blue-200/80 bg-gradient-to-r from-blue-50 to-sky-50/80 text-blue-700 shadow-[0_0_16px_rgba(37,99,235,0.1)]",
+    "border border-[rgba(147,197,253,0.2)] bg-[rgba(255,255,255,0.06)] text-[#CBD5E1]",
+  info: "border border-blue-400/30 bg-blue-500/15 text-blue-200 shadow-[0_0_16px_rgba(37,99,235,0.15)]",
   success:
-    "border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-teal-50/70 text-emerald-700 shadow-[0_0_16px_rgba(16,185,129,0.1)]",
+    "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.15)]",
   warning:
-    "border border-amber-200/80 bg-gradient-to-r from-amber-50 to-orange-50/60 text-amber-700 shadow-[0_0_16px_rgba(245,158,11,0.1)]",
+    "border border-amber-400/30 bg-amber-500/15 text-amber-300 shadow-[0_0_16px_rgba(245,158,11,0.15)]",
   danger:
-    "border border-rose-200/80 bg-gradient-to-r from-rose-50 to-red-50/70 text-rose-700 shadow-[0_0_16px_rgba(244,63,94,0.1)]",
-  neutral: "border border-[rgba(26,35,255,0.08)] bg-white/90 text-[#344054]",
+    "border border-rose-400/30 bg-rose-500/15 text-rose-300 shadow-[0_0_16px_rgba(244,63,94,0.15)]",
+  neutral: "border border-[rgba(147,197,253,0.16)] bg-[rgba(255,255,255,0.05)] text-[#E2E8F0]",
 } as const;
 
 export type DashboardBadgeProps = {

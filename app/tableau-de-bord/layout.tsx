@@ -323,7 +323,7 @@ export default function DashboardLayout({
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-xl p-2 text-[#4A5B78] transition hover:bg-white/70 hover:text-[#1A23FF] lg:hidden"
+                className="rounded-xl p-2 text-[#A8B8D0] transition hover:bg-white/10 hover:text-white lg:hidden"
                 aria-label={t("dashboard.navigation.primary")}
               >
                 <Menu className="h-5 w-5" />
@@ -333,25 +333,25 @@ export default function DashboardLayout({
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               {!loadingUser ? (
                 <div
-                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(26,35,255,0.12)] bg-white/80 px-2.5 py-1.5 shadow-[0_0_20px_rgba(26,35,255,0.06)] backdrop-blur-sm md:flex"
+                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(147,197,253,0.2)] bg-[rgba(255,255,255,0.06)] px-2.5 py-1.5 backdrop-blur-sm md:flex"
                   aria-label={displayName}
                   title={displayName}
                 >
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#38BDF8] text-xs font-bold text-white shadow-[0_0_12px_rgba(26,35,255,0.35)]">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#38BDF8] text-xs font-bold text-white shadow-[0_0_12px_rgba(26,35,255,0.45)]">
                     {initial}
                   </div>
-                  <span className="truncate text-sm font-medium text-[#344054]">{displayName}</span>
+                  <span className="truncate text-sm font-medium text-[#E2E8F0]">{displayName}</span>
                 </div>
               ) : null}
 
-              <LanguageSwitcher compact theme="light" />
+              <LanguageSwitcher compact theme="dark" />
 
               <DashboardNotificationBellConnected />
 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl border border-[rgba(26,35,255,0.10)] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#4A5B78] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] hover:bg-white hover:text-[#1A23FF] sm:px-3.5 sm:py-2 sm:text-sm"
+                className="rounded-xl border border-[rgba(147,197,253,0.18)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-xs font-medium text-[#A8B8D0] transition hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(255,255,255,0.1)] hover:text-white sm:px-3.5 sm:py-2 sm:text-sm"
               >
                 {t("dashboard.topbar.logout")}
               </button>
@@ -363,14 +363,14 @@ export default function DashboardLayout({
           <div className="w-full min-w-0">{children}</div>
         </main>
 
-        <footer className="shrink-0 border-t border-[rgba(26,35,255,0.08)] bg-transparent">
-          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#7B8BA5] sm:flex-row sm:px-6 lg:px-8">
+        <footer className="shrink-0 border-t border-[rgba(147,197,253,0.12)] bg-transparent">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#7B91B0] sm:flex-row sm:px-6 lg:px-8">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
-              <Link href="/mentions-legales" className="transition-colors hover:text-[#1A23FF]">
+              <Link href="/mentions-legales" className="transition-colors hover:text-[#93C5FD]">
                 {t("dashboard.footer.legal")}
               </Link>
-              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#1A23FF]">
+              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#93C5FD]">
                 {t("dashboard.footer.privacy")}
               </Link>
             </div>

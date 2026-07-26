@@ -73,7 +73,7 @@ function ProgressRing({ value, color }: { value: number; color: string }) {
 
   return (
     <svg className="dashboard-progress-ring h-11 w-11 shrink-0" viewBox="0 0 44 44" aria-hidden>
-      <circle cx="22" cy="22" r={r} fill="none" stroke="rgba(26,35,255,0.08)" strokeWidth="4" />
+      <circle cx="22" cy="22" r={r} fill="none" stroke="rgba(147,197,253,0.15)" strokeWidth="4" />
       <circle
         cx="22"
         cy="22"
@@ -143,7 +143,7 @@ export default function StatCard({
       {footer ? (
         <div
           className={cn(
-            "text-sm leading-relaxed text-[#4A5B78]",
+            "text-sm leading-relaxed text-[#A8B8D0]",
             sparkline && sparkline.length > 1 ? "pt-1" : "mt-auto pt-1"
           )}
         >
