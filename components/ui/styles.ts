@@ -2,16 +2,18 @@
  * ============================================================
  * DESIGN SYSTEM — ESPACE CONNECTÉ (Obillz dark blue premium)
  * ============================================================
- * Palette :
- *  - Fond app        : #071634 (bleu nuit Obillz)
- *  - Cartes          : #0F2744 / surfaces navy élevées
- *  - Texte principal : #F1F5F9
- *  - Texte secondaire: #A8B8D0
- *  - Texte tertiaire : #7B91B0
- *  - Bordures        : rgba(147, 197, 253, 0.16)
- *  - Accent          : #1A23FF / #3B82F6
- *  - Inputs          : fond blanc + texte foncé (lisibilité max)
- * La landing publique n'utilise PAS ces tokens (voir section landing).
+ * Tokens (alignés sur CSS `--dash-*`) :
+ *  - primary        : #1A23FF
+ *  - primary-soft   : #3B82F6
+ *  - primary-glow   : #93C5FD
+ *  - bg             : #071634
+ *  - surface        : #0F2744
+ *  - text           : #F1F5F9 / #F8FAFC
+ *  - text-muted     : #A8B8D0
+ *  - text-subtle    : #8BA0BC
+ *  - success/warn/danger : #34D399 / #FBBF24 / #FB7185
+ *  - Inputs         : fond blanc + texte foncé
+ * La landing publique n'utilise PAS ces tokens.
  */
 
 /** Fond marketing Obillz — pages marketing (tarifs, auth) */

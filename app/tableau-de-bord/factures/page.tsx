@@ -101,12 +101,12 @@ export default function FacturesPage() {
 
   const getStatutColor = (statut: string) => {
     const colors: Record<string, string> = {
-      brouillon: "bg-slate-100 text-slate-600",
+      brouillon: "badge-neutral",
       envoye: "badge-info",
       paye: "badge-success",
       "en-retard": "badge-error",
     };
-    return colors[statut] || "bg-slate-100 text-slate-600";
+    return colors[statut] || "badge-neutral";
   };
 
   const getStatutLabel = (statut: string) => {
@@ -237,14 +237,14 @@ export default function FacturesPage() {
                         key={facture.id}
                         className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
                       >
-                        <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{facture.numero}</td>
-                        <td className="max-w-[200px] truncate px-4 py-3 text-slate-700 sm:max-w-[260px] sm:px-6">
+                        <td className="px-4 py-3 font-semibold text-[#F8FAFC] sm:px-6">{facture.numero}</td>
+                        <td className="max-w-[200px] truncate px-4 py-3 font-medium text-[#E2E8F0] sm:max-w-[260px] sm:px-6">
                           {facture.title || "—"}
                         </td>
-                        <td className="max-w-[220px] truncate px-4 py-3 text-slate-700 sm:max-w-[280px] sm:px-6">
+                        <td className="max-w-[220px] truncate px-4 py-3 text-[#CBD5E1] sm:max-w-[280px] sm:px-6">
                           {facture.recipient?.name || facture.client?.nom || t("dashboard.common.unknownClient")}
                         </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600 sm:px-6">
+                        <td className="whitespace-nowrap px-4 py-3 text-sm text-[#A8B8D0] sm:px-6">
                           {formatDate(facture.dateCreation)}
                         </td>
                         <td className="px-4 py-3 sm:px-6">
@@ -252,9 +252,9 @@ export default function FacturesPage() {
                             {getStatutLabel(facture.statut)}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-4 py-3 font-semibold text-emerald-700 sm:px-6">
+                        <td className="whitespace-nowrap px-4 py-3 font-semibold text-emerald-300 sm:px-6">
                           {formatMontant(montant)}
-                          <span className="ml-1 text-xs font-normal text-slate-500">TTC</span>
+                          <span className="ml-1 text-xs font-normal text-[#8BA0BC]">TTC</span>
                         </td>
                         <td className="px-4 py-3 text-right sm:px-6">
                           <ActionButton

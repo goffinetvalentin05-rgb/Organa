@@ -78,7 +78,7 @@ export default function SponsoringPage() {
     if (s === "active") return "badge-success";
     if (s === "pending") return "badge-info";
     if (s === "expired") return "badge-error";
-    return "bg-slate-100 text-slate-600";
+    return "badge-neutral";
   };
 
   const sponsorTypeLabel = (type: string | null) => {
@@ -150,19 +150,19 @@ export default function SponsoringPage() {
                   <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[rgba(147,197,253,0.12)]">
                 {contracts.map((c) => (
-                  <tr key={c.id} className="bg-white/80 transition-colors hover:bg-blue-50/30">
-                    <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{c.sponsorName}</td>
-                    <td className="px-4 py-3 text-slate-700 sm:px-6">{c.title}</td>
-                    <td className="hidden px-4 py-3 text-slate-600 md:table-cell sm:px-6">
+                  <tr key={c.id} className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]">
+                    <td className="px-4 py-3 font-semibold text-[#F8FAFC] sm:px-6">{c.sponsorName}</td>
+                    <td className="px-4 py-3 font-medium text-[#E2E8F0] sm:px-6">{c.title}</td>
+                    <td className="hidden px-4 py-3 text-[#A8B8D0] md:table-cell sm:px-6">
                       {sponsorTypeLabel(c.sponsorType)}
                     </td>
-                    <td className="px-4 py-3 text-slate-800 sm:px-6">{formatMontant(c.amount)}</td>
-                    <td className="hidden px-4 py-3 text-slate-600 lg:table-cell sm:px-6">
+                    <td className="px-4 py-3 font-semibold text-emerald-300 sm:px-6">{formatMontant(c.amount)}</td>
+                    <td className="hidden px-4 py-3 text-[#A8B8D0] lg:table-cell sm:px-6">
                       {formatDate(c.startDate)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600 sm:px-6">{formatDate(c.endDate)}</td>
+                    <td className="px-4 py-3 text-[#A8B8D0] sm:px-6">{formatDate(c.endDate)}</td>
                     <td className="px-4 py-3 sm:px-6">
                       <span className={`badge-obillz ${statusClass(c.status)}`}>{statusLabel(c.status)}</span>
                     </td>

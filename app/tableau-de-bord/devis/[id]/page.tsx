@@ -357,7 +357,7 @@ export default function DevisDetailPage() {
           <div className="min-w-[220px] rounded-lg border border-slate-200 bg-slate-50 p-4 text-right">
             <p
               className="text-2xl font-semibold"
-              style={{ color: companySettings?.primary_color || "#1D4ED8" }}
+              style={{ color: companySettings?.primary_color || "#1A23FF" }}
             >
               Cotisation
             </p>
@@ -509,7 +509,7 @@ export default function DevisDetailPage() {
 
       <GlassCard padding="md">
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.status")}</label>
+          <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.status")}</label>
           <select
             value={devis.statut}
             onChange={(e) =>
@@ -527,8 +527,8 @@ export default function DevisDetailPage() {
         </div>
         {devis.notes && (
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.notes")}</label>
-            <p className="text-slate-900 whitespace-pre-line">{devis.notes}</p>
+            <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.notes")}</label>
+            <p className="whitespace-pre-line text-[#F1F5F9]">{devis.notes}</p>
           </div>
         )}
       </GlassCard>

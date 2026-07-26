@@ -75,11 +75,11 @@ const getStatutLabel = (statut: string, t: (key: string) => string) => {
 
 const getStatutColor = (statut: string) => {
   const colors: Record<string, string> = {
-      a_payer: "bg-yellow-100 text-yellow-700",
-      paye: "bg-green-100 text-green-700",
-      en_retard: "bg-red-100 text-red-700",
+    a_payer: "badge-warning",
+    paye: "badge-success",
+    en_retard: "badge-error",
   };
-    return colors[statut] || "bg-slate-100 text-slate-700";
+  return colors[statut] || "badge-neutral";
 };
 
 export default function DepensesPage() {

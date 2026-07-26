@@ -1582,9 +1582,24 @@ h3 {
   mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 10%, transparent 75%);
 }
 
-/* Largeur sidebar — source unique pour offset du main-shell */
+/* Tokens palette espace connecté — source unique */
 .dashboard-shell {
   --dashboard-sidebar-width: 17.5rem;
+  --dash-bg: #071634;
+  --dash-surface: #0F2744;
+  --dash-surface-elevated: #143056;
+  --dash-border: rgba(147, 197, 253, 0.16);
+  --dash-border-strong: rgba(147, 197, 253, 0.28);
+  --dash-text: #F1F5F9;
+  --dash-text-strong: #F8FAFC;
+  --dash-text-muted: #A8B8D0;
+  --dash-text-subtle: #8BA0BC;
+  --dash-primary: #1A23FF;
+  --dash-primary-soft: #3B82F6;
+  --dash-primary-glow: #93C5FD;
+  --dash-success: #34D399;
+  --dash-warning: #FBBF24;
+  --dash-danger: #FB7185;
 }
 
 .dashboard-sidebar {
@@ -2143,7 +2158,15 @@ h3 {
   accent-color: #1a23ff;
 }
 
-/* Tableaux */
+/* Tableaux — lisibilité dark premium */
+.dashboard-shell main .dashboard-data-table td {
+  color: #E2E8F0;
+}
+
+.dashboard-shell main .dashboard-data-table th {
+  color: #8BA0BC !important;
+}
+
 .dashboard-shell main .dashboard-table-divide > :not([hidden]) ~ :not([hidden]) {
   border-color: rgba(147, 197, 253, 0.12) !important;
 }
@@ -2170,10 +2193,75 @@ h3 {
 
 .dashboard-shell main .document-preview-surface {
   border-radius: 1rem;
-  border-color: rgba(147, 197, 253, 0.2) !important;
+  border-color: rgba(147, 197, 253, 0.22) !important;
   background: #ffffff !important;
   color: #0B1220 !important;
-  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.35) !important;
+  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.4) !important;
+}
+
+/*
+ * Aperçu document (cotisation / facture) = feuille papier claire.
+ * Annule les remappeurs dark pour tout le contenu interne.
+ */
+.dashboard-shell main .document-preview-surface,
+.dashboard-shell main .document-preview-surface * {
+  color: inherit;
+}
+
+.dashboard-shell main .document-preview-surface [class*="text-slate-900"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-900"],
+.dashboard-shell main .document-preview-surface [class*="text-[#0B1220]"],
+.dashboard-shell main .document-preview-surface [class*="text-[#10172A]"] {
+  color: #0F172A !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="text-slate-800"],
+.dashboard-shell main .document-preview-surface [class*="text-slate-700"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-800"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-700"] {
+  color: #334155 !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="text-slate-600"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-600"] {
+  color: #475569 !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="text-slate-500"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-500"] {
+  color: #64748B !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="text-slate-400"],
+.dashboard-shell main .document-preview-surface [class*="text-gray-400"] {
+  color: #94A3B8 !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="bg-slate-50"],
+.dashboard-shell main .document-preview-surface [class*="bg-gray-50"],
+.dashboard-shell main .document-preview-surface [class*="bg-[#F8FAFC]"],
+.dashboard-shell main .document-preview-surface [class*="bg-[#F6F8FC]"] {
+  background-color: #F8FAFC !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="bg-white"]:not(input):not(textarea):not(select),
+.dashboard-shell main .document-preview-surface .bg-white {
+  background-color: #ffffff !important;
+}
+
+.dashboard-shell main .document-preview-surface [class*="border-slate-"],
+.dashboard-shell main .document-preview-surface [class*="border-gray-"],
+.dashboard-shell main .document-preview-surface [class*="divide-slate-"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #E2E8F0 !important;
+}
+
+.dashboard-shell main .document-preview-surface thead {
+  background-color: #F8FAFC !important;
+  color: #64748B !important;
+}
+
+.dashboard-shell main .document-preview-surface tbody {
+  color: #0F172A;
 }
 
 /* Labels dans formulaires — toujours lisibles hors inputs */
@@ -2184,6 +2272,62 @@ h3 {
 .dashboard-shell main label [class*="text-[#"],
 .dashboard-shell main label[class*="text-"] {
   color: #E2E8F0 !important;
+}
+
+/* text-slate-700 manquant du remapping → lisible sur navy */
+.dashboard-shell main [class*="text-slate-700"],
+.dashboard-shell main [class*="text-gray-700"] {
+  color: #CBD5E1 !important;
+}
+
+/* Fonds gris pâles legacy → pastilles dark */
+.dashboard-shell main [class*="bg-slate-100"],
+.dashboard-shell main [class*="bg-gray-100"] {
+  background-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+.dashboard-shell main [class*="bg-blue-100"] {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.dashboard-shell main [class*="bg-yellow-100"] {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+.dashboard-shell main [class*="text-yellow-700"],
+.dashboard-shell main [class*="text-yellow-800"] {
+  color: #FBBF24 !important;
+}
+
+.dashboard-shell main [class*="bg-red-100"],
+.dashboard-shell main [class*="bg-rose-100"] {
+  background-color: rgba(244, 63, 94, 0.18) !important;
+}
+
+.dashboard-shell main [class*="text-blue-100"],
+.dashboard-shell main [class*="text-blue-800"],
+.dashboard-shell main [class*="text-blue-700"] {
+  color: #93C5FD !important;
+}
+
+.dashboard-shell main [class*="text-green-800"],
+.dashboard-shell main [class*="text-green-700"],
+.dashboard-shell main [class*="text-emerald-800"] {
+  color: #34D399 !important;
+}
+
+.dashboard-shell main [class*="text-red-800"],
+.dashboard-shell main [class*="text-red-700"] {
+  color: #FB7185 !important;
+}
+
+/* Hover lignes de tableau */
+.dashboard-shell main tr:hover {
+  background-color: rgba(59, 130, 246, 0.06);
+}
+
+.dashboard-shell main .document-preview-surface tr:hover {
+  background-color: transparent;
 }
 
 /* Hero — halo texte et profondeur */
@@ -2448,8 +2592,47 @@ h3 {
 }
 
 .badge-info {
-  background: var(--obillz-blue-light);
-  color: var(--obillz-hero-blue);
+  background: rgba(59, 130, 246, 0.2);
+  color: #93C5FD;
+  border: 1px solid rgba(147, 197, 253, 0.25);
+}
+
+.badge-neutral {
+  background: rgba(148, 163, 184, 0.18);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Badges dans l’espace connecté — forcer contraste dark */
+.dashboard-shell .badge-info {
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: #93C5FD !important;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+}
+
+.dashboard-shell .badge-success {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34D399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.28);
+}
+
+.dashboard-shell .badge-error {
+  background: rgba(244, 63, 94, 0.18) !important;
+  color: #FB7185 !important;
+  border: 1px solid rgba(251, 113, 133, 0.28);
+}
+
+.dashboard-shell .badge-warning {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #FBBF24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+}
+
+.dashboard-shell .badge-neutral,
+.dashboard-shell .badge-obillz.bg-slate-100 {
+  background: rgba(148, 163, 184, 0.18) !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* Scroll reveal (landing) */

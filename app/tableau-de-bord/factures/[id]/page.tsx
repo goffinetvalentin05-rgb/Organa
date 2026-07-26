@@ -476,7 +476,7 @@ export default function FactureDetailPage() {
           <div className="min-w-[220px] rounded-lg border border-slate-200 bg-slate-50 p-4 text-right">
             <p
               className="text-2xl font-semibold"
-              style={{ color: companySettings?.primary_color || "#1D4ED8" }}
+              style={{ color: companySettings?.primary_color || "#1A23FF" }}
             >
               Facture
             </p>
@@ -707,7 +707,7 @@ export default function FactureDetailPage() {
       {/* Statut et notes */}
       <GlassCard padding="md">
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.status")}</label>
+          <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.status")}</label>
           <select
             value={facture.statut}
             onChange={(e) =>
@@ -725,8 +725,8 @@ export default function FactureDetailPage() {
         </div>
         {facture.notes && (
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">{t("dashboard.common.notes")}</label>
-            <p className="whitespace-pre-line text-slate-900">{facture.notes}</p>
+            <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.notes")}</label>
+            <p className="whitespace-pre-line text-[#F1F5F9]">{facture.notes}</p>
           </div>
         )}
       </GlassCard>
