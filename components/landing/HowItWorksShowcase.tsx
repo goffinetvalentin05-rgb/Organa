@@ -37,7 +37,7 @@ function StepNav({
             key={num}
             type="button"
             onClick={(event) => onSelect(index, event)}
-            className="group relative z-10 flex items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#1A23FF]/40 focus-visible:ring-offset-2"
+            className="group relative z-10 flex items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#175dd4]/40 focus-visible:ring-offset-2"
             aria-current={isActive ? "step" : undefined}
             aria-selected={isActive}
             aria-controls={STEP_CONTENT_ID}
@@ -46,7 +46,7 @@ function StepNav({
             <span
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 sm:h-10 sm:w-10 sm:text-xs ${
                 isActive
-                  ? "bg-[#1A23FF] text-white shadow-[0_8px_20px_-6px_rgba(26,35,255,0.55)]"
+                  ? "how-it-works-blue-fill text-white"
                   : "border border-slate-200 bg-white text-slate-400 group-hover:border-slate-300 group-hover:text-slate-600"
               }`}
             >
@@ -89,7 +89,7 @@ function StepContent({
           className="min-w-0"
         >
           <p
-            className="select-none text-[clamp(4rem,11vw,6.75rem)] font-black leading-[0.9] tracking-[-0.06em] text-[#1A23FF]"
+            className="how-it-works-blue-text select-none text-[clamp(4rem,11vw,6.75rem)] font-black leading-[0.9] tracking-[-0.06em]"
             aria-hidden
           >
             {num}

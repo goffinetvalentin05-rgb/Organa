@@ -115,11 +115,6 @@ export default function LandingFooter() {
 
   return (
     <footer className="site-footer">
-      {/* Fond graphique — derrière le contenu footer uniquement */}
-      <div className="footer-watermark" aria-hidden="true">
-        {t("marketing.footer.watermark")}
-      </div>
-
       <div className="footer-body">
         <motion.div
           className="footer-content"
@@ -129,8 +124,15 @@ export default function LandingFooter() {
           transition={{ duration: 0.6, ease: easePremium }}
         >
           <div className="footer-brand">
-            <Link href="/" className="inline-block opacity-95 transition hover:opacity-100">
-              <Image src="/logo-obillz.png" alt="Obillz" width={130} height={34} className="h-8 w-auto" />
+            <Link href="/" className="footer-brand__logo inline-block transition hover:opacity-90">
+              <Image
+                src="/logo-symbole.png"
+                alt="Obillz"
+                width={120}
+                height={120}
+                className="h-14 w-auto sm:h-16 md:h-[4.5rem]"
+                priority={false}
+              />
             </Link>
 
             <p className="mt-5 max-w-sm text-sm leading-relaxed">{t("marketing.footer.description")}</p>
@@ -162,28 +164,34 @@ export default function LandingFooter() {
           </FooterLinkColumn>
         </motion.div>
 
-        <div className="footer-bottom">
-          <div className="footer-bottom__social">
-            <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram">
-              <InstagramIcon className="h-[18px] w-[18px]" />
-            </SocialLink>
-            <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook">
-              <FacebookIcon className="h-[18px] w-[18px]" />
-            </SocialLink>
+        <div className="footer-closing">
+          <div className="footer-watermark" aria-hidden="true">
+            {t("marketing.footer.watermark")}
           </div>
 
-          <nav className="footer-bottom__legal" aria-label="Liens légaux">
-            {legalLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+          <div className="footer-bottom">
+            <div className="footer-bottom__social">
+              <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram">
+                <InstagramIcon className="h-[18px] w-[18px]" />
+              </SocialLink>
+              <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook">
+                <FacebookIcon className="h-[18px] w-[18px]" />
+              </SocialLink>
+            </div>
 
-        <div className="footer-copyright">
-          <p>{t("marketing.footer.copyright", { year })}</p>
-          <p>{t("marketing.footer.trialNote", { days: TRIAL_DURATION_DAYS })}</p>
+            <nav className="footer-bottom__legal" aria-label="Liens légaux">
+              {legalLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="footer-copyright">
+            <p>{t("marketing.footer.copyright", { year })}</p>
+            <p>{t("marketing.footer.trialNote", { days: TRIAL_DURATION_DAYS })}</p>
+          </div>
         </div>
       </div>
     </footer>

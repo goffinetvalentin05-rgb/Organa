@@ -50,7 +50,7 @@ export default function PricingSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className={`${landingPremiumCardClass} landing-section-content mx-auto mt-12 w-full max-w-[600px] rounded-[2rem] px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_30px_90px_rgba(15,23,42,0.18)] hover:translate-y-0 sm:mt-14 sm:px-10 sm:py-10`}
+          className={`${landingPremiumCardClass} landing-obillz-gradient landing-section-content mx-auto mt-12 w-full max-w-[600px] rounded-[2rem] px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_30px_90px_rgba(15,23,42,0.18)] hover:translate-y-0 sm:mt-14 sm:px-10 sm:py-10`}
         >
           <div className="text-center">
             <span className="inline-flex items-center rounded-full border border-white/14 bg-white/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[rgba(226,232,240,0.75)] sm:text-[11px]">

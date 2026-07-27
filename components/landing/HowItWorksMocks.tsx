@@ -90,7 +90,7 @@ function FieldInput({
 }) {
   return (
     <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] sm:py-3">
-      {icon ? <span className="shrink-0 text-[#1A23FF]">{icon}</span> : null}
+      {icon ? <span className="how-it-works-blue-icon shrink-0">{icon}</span> : null}
       <span className="text-sm font-medium text-slate-800">{value}</span>
     </div>
   );
@@ -121,7 +121,7 @@ export function ClubCreationMock({ labels }: { labels: MockLabels["step1"] }) {
         <div>
           <FieldLabel>{labels.logo}</FieldLabel>
           <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-3 py-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1A23FF]/[0.08] text-[#1A23FF]">
+            <span className="how-it-works-blue-soft flex h-11 w-11 items-center justify-center rounded-xl">
               <ImagePlus className="h-5 w-5" strokeWidth={2} />
             </span>
             <span className="text-sm text-slate-500">PNG, JPG · max 2 MB</span>
@@ -129,7 +129,7 @@ export function ClubCreationMock({ labels }: { labels: MockLabels["step1"] }) {
         </div>
         <button
           type="button"
-          className="mt-1 w-full rounded-xl bg-[#1A23FF] px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(26,35,255,0.55)] transition-transform hover:scale-[1.01]"
+          className="how-it-works-blue-fill mt-1 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01]"
         >
           {labels.cta}
         </button>
@@ -176,7 +176,7 @@ export function MemberImportMock({
               transition={{ duration: 0.35, ease: easePremium }}
               className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center"
             >
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1A23FF]/[0.08] text-[#1A23FF]">
+              <span className="how-it-works-blue-soft mx-auto flex h-12 w-12 items-center justify-center rounded-2xl">
                 <Upload className="h-5 w-5" strokeWidth={2} />
               </span>
               <p className="mt-3 text-sm font-semibold text-slate-800">{labels.fileName}</p>
@@ -194,7 +194,7 @@ export function MemberImportMock({
               className="rounded-2xl border border-slate-200 bg-white p-6 text-center"
             >
               <motion.span
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#1A23FF]/20 border-t-[#1A23FF]"
+                className="how-it-works-blue-ring mx-auto flex h-12 w-12 items-center justify-center rounded-full border-2"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
               />
@@ -223,7 +223,7 @@ export function MemberImportMock({
                     {initials}
                   </span>
                 ))}
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1A23FF] text-[10px] font-bold text-white">
+                <span className="how-it-works-blue-fill flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white">
                   +243
                 </span>
               </div>
@@ -243,7 +243,7 @@ function RoleBadge({
   variant: "blue" | "emerald" | "amber";
 }) {
   const styles = {
-    blue: "bg-[#1A23FF]/[0.1] text-[#1A23FF] border-[#1A23FF]/20",
+    blue: "how-it-works-blue-soft border",
     emerald: "bg-emerald-500/[0.1] text-emerald-700 border-emerald-500/20",
     amber: "bg-amber-500/[0.1] text-amber-700 border-amber-500/20",
   };
@@ -257,7 +257,7 @@ function RoleBadge({
 
 export function CommitteeMock({ labels }: { labels: MockLabels["step3"] }) {
   const members = [
-    { name: labels.president, role: labels.fullAccess, initials: "PD", gradient: "from-[#1A23FF] to-[#2563EB]", badge: "blue" as const },
+    { name: labels.president, role: labels.fullAccess, initials: "PD", gradient: "from-[#37b9ed] to-[#175dd4]", badge: "blue" as const },
     { name: labels.treasurer, role: labels.financeAccess, initials: "TR", gradient: "from-emerald-500 to-teal-500", badge: "emerald" as const },
     { name: labels.secretary, role: labels.adminAccess, initials: "SC", gradient: "from-amber-500 to-orange-500", badge: "amber" as const },
   ];
@@ -289,7 +289,7 @@ export function CommitteeMock({ labels }: { labels: MockLabels["step3"] }) {
 
 export function CentralizedMock({ labels }: { labels: MockLabels["step4"] }) {
   const tiles = [
-    { icon: Users, label: labels.members, value: labels.membersCount, color: "text-[#1A23FF]", bg: "bg-[#1A23FF]/[0.08]" },
+    { icon: Users, label: labels.members, value: labels.membersCount, color: "how-it-works-blue-icon", bg: "how-it-works-blue-soft" },
     { icon: Wallet, label: labels.cotisations, value: labels.cotisationsStatus, color: "text-emerald-600", bg: "bg-emerald-500/[0.08]" },
     { icon: FileText, label: labels.documents, value: labels.documentsCount, color: "text-violet-600", bg: "bg-violet-500/[0.08]" },
     { icon: CalendarDays, label: labels.events, value: labels.eventsCount, color: "text-sky-600", bg: "bg-sky-500/[0.08]" },
@@ -315,11 +315,11 @@ export function CentralizedMock({ labels }: { labels: MockLabels["step4"] }) {
           );
         })}
       </div>
-      <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-[#1A23FF]/15 bg-[#1A23FF]/[0.05] px-4 py-3">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1A23FF] text-white">
+      <div className="how-it-works-blue-soft mt-4 flex items-center justify-center gap-2 rounded-xl border px-4 py-3">
+        <span className="how-it-works-blue-fill flex h-6 w-6 items-center justify-center rounded-full text-white">
           <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
         </span>
-        <p className="text-sm font-semibold text-[#1A23FF]">{labels.centralized}</p>
+        <p className="how-it-works-blue-icon text-sm font-semibold">{labels.centralized}</p>
       </div>
     </MockShell>
   );

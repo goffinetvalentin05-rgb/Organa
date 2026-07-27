@@ -182,34 +182,11 @@ export default function SocialProofSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportOnce}
           transition={{ duration: 0.8, ease: easePremium }}
-          className="relative overflow-hidden rounded-[1.75rem] shadow-[0_48px_100px_-36px_rgba(2,10,32,0.55)] sm:rounded-[2.25rem] md:rounded-[2.75rem]"
+          className="social-proof-panel relative overflow-hidden rounded-[1.75rem] shadow-[0_48px_100px_-36px_rgba(2,10,32,0.55)] sm:rounded-[2.25rem] md:rounded-[2.75rem]"
         >
-          {/* Fond bleu nuit premium */}
-          <div
-            className="absolute inset-0 bg-[linear-gradient(155deg,#050d24_0%,#0a1a3e_42%,#0f2a5c_72%,#123a78_100%)]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -left-32 bottom-[-40%] h-[75%] w-[55%] rounded-full bg-[#1e40af]/30 blur-[120px]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -right-20 top-[-25%] h-[65%] w-[50%] rounded-full bg-[#0284c7]/20 blur-[110px]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute bottom-0 left-[40%] h-48 w-80 rounded-full bg-[#38bdf8]/10 blur-[90px]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.22]"
-            style={{
-              backgroundImage:
-                "radial-gradient(rgba(255,255,255,0.07) 0.6px, transparent 0.6px)",
-              backgroundSize: "18px 18px",
-            }}
-            aria-hidden
-          />
+          {/* Même dégradé que hero / footer */}
+          <div className="social-proof-panel__bg" aria-hidden />
+          <div className="social-proof-panel__grid" aria-hidden />
 
           <div className="relative z-10 grid items-center gap-12 px-8 py-12 sm:gap-14 sm:px-12 sm:py-14 md:px-14 md:py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10 lg:px-16 lg:py-[4.5rem] xl:px-20">
             {/* Colonne gauche — tout dans le bloc */}
@@ -218,7 +195,7 @@ export default function SocialProofSection() {
                 {t("marketing.socialProof.label")}
               </p>
               <TitleBlock title={t("marketing.socialProof.title")} />
-              <p className="mt-5 max-w-md text-base leading-relaxed text-slate-300/90 sm:mt-6 sm:text-[1.0625rem] sm:leading-[1.7]">
+              <p className="mt-5 max-w-md text-base leading-relaxed text-blue-100/75 sm:mt-6 sm:text-[1.0625rem] sm:leading-[1.7]">
                 {t("marketing.socialProof.subtitle")}
               </p>
             </div>

@@ -111,7 +111,7 @@ export default function FaqSection() {
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className={`${faqAccordionShellClass} overflow-hidden`}
+            className={`${faqAccordionShellClass} landing-obillz-gradient overflow-hidden`}
           >
             {faqItems.map((item, index) => (
               <motion.div key={item.question} variants={staggerItem}>
