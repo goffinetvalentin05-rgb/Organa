@@ -336,6 +336,12 @@
     "title": "Vereine nutzen Obillz bereits.",
     "subtitle": "Obillz begleitet bereits Sportvereine bei der Verwaltung von Mitgliedern, Beiträgen, Dokumenten und Organisation.",
     "badge": "Aktiv auf Obillz",
+    "panel": {
+      "eyebrow": "Bereits von Sportvereinen genutzt",
+      "title": "Obillz gewinnt das Vertrauen der Vereine.",
+      "body": "Vereine nutzen Obillz bereits, um Mitglieder, Beiträge, Dokumente und Organisation einfacher zu verwalten.",
+      "chips": ["Sportvereine", "Einfache Verwaltung", "Bereits im Einsatz"]
+    },
     "testimonial": {
       "quote": "",
       "author": "",
