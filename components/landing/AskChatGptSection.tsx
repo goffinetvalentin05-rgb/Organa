@@ -1,19 +1,15 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
-import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
-import { landingPremiumCardClass, landingPremiumCardDescClass } from "@/components/ui/styles";
-import { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
-
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
-}
+import {
+  easePremium,
+  scrollReveal,
+  staggerContainer,
+  staggerItem,
+  viewportOnce,
+} from "@/components/landing/landing-motion";
 
 function buildWhatsAppUrl(phone: string, message: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -22,54 +18,122 @@ function buildWhatsAppUrl(phone: string, message: string): string {
 
 export default function AskChatGptSection() {
   const { t } = useI18n();
+  const reduceMotion = useReducedMotion();
   const whatsappUrl = buildWhatsAppUrl(
     t("marketing.askChatGpt.whatsappPhone"),
     t("marketing.askChatGpt.message")
   );
 
   return (
-    <section id="demander-chatgpt" className={landingSectionShellClass()}>
-      <motion.div
-        variants={scrollReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
-        className="relative mx-auto w-[94%] max-w-[820px]"
-      >
-        <div className={`${landingPremiumCardClass} landing-premium-card--flat-shadow px-6 py-10 text-center sm:px-8 sm:py-12 md:px-12 md:py-14`}>
-          <div className="relative z-10 flex flex-col items-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/[0.06] px-3.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-              <Image
-                src="/obillz-logo.png"
-                alt={t("marketing.askChatGpt.logoAlt")}
-                width={72}
-                height={20}
-                className="h-4 w-auto opacity-90"
-              />
-            </span>
+    <section
+      id="demander-chatgpt"
+      className="landing-final-cta relative scroll-mt-24 pb-16 pt-10 md:pb-24 md:pt-14 lg:pb-28"
+    >
+      <div className="landing-final-cta__frame relative mx-auto w-[94%] max-w-[1180px]">
+        <motion.div
+          variants={scrollReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="landing-final-cta__panel relative overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] md:rounded-[2.25rem]"
+        >
+          {/* Ambiance — dégradé hero Obillz */}
+          <div className="landing-final-cta__bg" aria-hidden />
+          <div className="landing-final-cta__grid" aria-hidden />
 
-            <h2 className="mt-6 max-w-xl text-balance text-2xl font-black leading-[1.12] tracking-tight text-[#F8FAFC] md:text-3xl lg:text-4xl">
+          {/* Halos & lumière */}
+          <motion.div
+            className="landing-final-cta__halo landing-final-cta__halo--core"
+            aria-hidden
+            animate={
+              reduceMotion
+                ? undefined
+                : { opacity: [0.55, 0.9, 0.55], scale: [1, 1.06, 1] }
+            }
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="landing-final-cta__halo landing-final-cta__halo--bottom"
+            aria-hidden
+            animate={
+              reduceMotion
+                ? undefined
+                : { opacity: [0.45, 0.75, 0.45], y: [0, -10, 0] }
+            }
+            transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+          />
+          <div className="landing-final-cta__rays" aria-hidden />
+          <div className="landing-final-cta__sheen" aria-hidden />
+          <div className="landing-final-cta__edge" aria-hidden />
+
+          {/* Contenu */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-6 py-16 text-center sm:px-10 sm:py-20 md:px-14 md:py-24 lg:py-28"
+          >
+            <motion.h2
+              variants={staggerItem}
+              className="landing-final-cta__title text-balance font-bold tracking-tight text-white"
+            >
               {t("marketing.askChatGpt.title")}
-            </h2>
+            </motion.h2>
 
-            <p className={`mt-4 max-w-lg text-sm md:text-base ${landingPremiumCardDescClass}`}>
+            <motion.p
+              variants={staggerItem}
+              className="landing-final-cta__subtitle mt-5 max-w-[34rem] text-pretty text-blue-100/70 sm:mt-6"
+            >
               {t("marketing.askChatGpt.subtitle")}
-            </p>
+            </motion.p>
 
-            <div className="mt-8">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-white/16 bg-[linear-gradient(180deg,#030B1F_0%,#06122E_100%)] px-7 py-3.5 text-base font-bold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-white/22 md:px-8 md:py-4"
+            <motion.div variants={staggerItem} className="mt-9 sm:mt-10">
+              <motion.div
+                whileHover={reduceMotion ? undefined : { y: -3, scale: 1.02 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                transition={{ duration: 0.22, ease: easePremium }}
+                className="group relative inline-flex"
               >
-                <WhatsAppIcon className="h-5 w-5 shrink-0" />
-                <span>{t("marketing.askChatGpt.cta")}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+                <motion.span
+                  className="pointer-events-none absolute -inset-4 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.35),rgba(147,197,253,0.2)_45%,transparent_70%)] blur-2xl"
+                  aria-hidden
+                  animate={
+                    reduceMotion
+                      ? undefined
+                      : { opacity: [0.45, 0.8, 0.45], scale: [0.94, 1.06, 0.94] }
+                  }
+                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="landing-final-cta__btn relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-full px-8 py-3.5 text-[0.9375rem] font-semibold sm:px-9 sm:py-4 sm:text-base"
+                >
+                  <span
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/55 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 landing-cta-shimmer"
+                    aria-hidden
+                  />
+                  <span className="relative">{t("marketing.askChatGpt.cta")}</span>
+                  <ArrowRight
+                    className="relative h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                    strokeWidth={2.25}
+                    aria-hidden
+                  />
+                </a>
+              </motion.div>
+            </motion.div>
+
+            <motion.p
+              variants={staggerItem}
+              className="mt-5 text-xs font-medium tracking-wide text-blue-100/50 sm:mt-6 sm:text-[13px]"
+            >
+              {t("marketing.askChatGpt.note")}
+            </motion.p>
+          </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 }

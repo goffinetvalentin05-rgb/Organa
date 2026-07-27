@@ -343,8 +343,9 @@
   },
   "askChatGpt": {
     "title": "Noch unsicher, ob Obillz zu Ihrem Verein passt?",
-    "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus. Stellen Sie Ihre Fragen und erfahren Sie, wie Obillz die Verwaltung Ihres Vereins vereinfachen kann.",
+    "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus, stellen Sie Ihre Fragen und entdecken Sie, wie Obillz die Verwaltung Ihres Vereins vereinfachen kann.",
     "cta": "Mit dem Gründer sprechen",
+    "note": "Demo, Fragen, Begleitung — schnelle Antwort",
     "message": "Hallo, ich möchte mehr über Obillz erfahren.",
     "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"

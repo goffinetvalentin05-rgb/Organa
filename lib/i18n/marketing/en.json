@@ -402,8 +402,9 @@
   },
   "askChatGpt": {
     "title": "Still not sure Obillz is right for your club?",
-    "subtitle": "Talk directly with the founder. Ask your questions and find out how Obillz can simplify your club management.",
+    "subtitle": "Talk directly with the founder, ask your questions and discover how Obillz can simplify your club management.",
     "cta": "Talk to the founder",
+    "note": "Demo, questions, guidance — quick reply",
     "message": "Hello, I'd like to learn more about Obillz.",
     "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
