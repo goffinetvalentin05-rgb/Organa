@@ -2037,6 +2037,8 @@
       "loading": "Anmeldung läuft...",
       "signUpFree": "Kostenloses Konto erstellen",
       "secureNote": "Sichere Verbindung · SSL",
+      "trustSsl": "SSL-Verschlüsselung",
+      "trustAccess": "Sicherer Zugang",
       "backHome": "← Zur Startseite"
     }
   }

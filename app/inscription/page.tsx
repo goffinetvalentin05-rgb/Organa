@@ -2,19 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Clock, CreditCard, Shield } from "lucide-react";
+import { Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import AuthPageLayout from "@/components/auth/AuthPageLayout";
 import {
-  AuthCard,
+  AuthBrandPanel,
   AuthError,
   AuthField,
   AuthFooterLink,
+  AuthFormHeader,
   AuthInput,
   AuthPageMotion,
+  AuthSplitFrame,
+  AuthSteps,
   AuthSubmitButton,
-  AuthTrustPills,
 } from "@/components/auth/AuthForm";
 import { TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
@@ -72,154 +74,144 @@ export default function InscriptionPage() {
   return (
     <AuthPageLayout>
       <AuthPageMotion>
-        <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
-            Inscription
-          </p>
-          <h1 className="mt-3 text-balance text-2xl font-black text-white md:text-3xl">
-            {registrationComplete ? "Presque terminé" : "Commencez gratuitement"}
-          </h1>
-          <p className="mt-3 text-sm text-blue-100/75 md:text-base">
-            {registrationComplete
-              ? "Encore une étape pour activer votre compte"
-              : "Créez votre espace club en quelques secondes"}
-          </p>
-          {!registrationComplete ? (
-            <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_20px_rgba(52,211,153,0.2)]">
-              <Check className="h-3.5 w-3.5" aria-hidden />
-              {TRIAL_DURATION_DAYS} jours d&apos;essai gratuit
-            </span>
-          ) : null}
-        </div>
-
-        <div className="mt-8">
-          <AuthCard>
-            {registrationComplete ? (
-              <div className="text-center">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1A23FF]/30 text-white shadow-[0_0_28px_rgba(26,35,255,0.45)] ring-1 ring-blue-400/35">
-                  <Check className="h-7 w-7" strokeWidth={2.5} aria-hidden />
-                </span>
-                <h2 className="mt-6 text-xl font-bold text-white">Compte créé avec succès</h2>
-                <p className="mt-4 text-sm leading-relaxed text-blue-100/75">
-                  Un email de confirmation vient de vous être envoyé. Cliquez sur le lien reçu
-                  pour activer votre compte.
-                </p>
-                <p className="mt-3 text-xs leading-relaxed text-blue-100/50">
-                  Pensez à vérifier vos courriers indésirables — l&apos;email peut s&apos;y
-                  trouver.
-                </p>
-                <Link
-                  href="/connexion"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3.5 text-base font-bold text-[#1A23FF] shadow-[0_0_36px_rgba(26,35,255,0.55)] transition hover:shadow-[0_0_48px_rgba(26,35,255,0.7)]"
-                >
-                  Retour à la connexion
-                </Link>
-              </div>
-            ) : (
-              <>
-                <div className="text-center">
-                  <h2 className="text-lg font-bold text-white">Créer un compte</h2>
-                  <p className="mt-1 text-sm text-blue-100/65">
-                    Remplissez les informations ci-dessous
-                  </p>
+        <AuthSplitFrame
+          brand={
+            <AuthBrandPanel
+              badge="Inscription"
+              title={registrationComplete ? "Presque terminé" : "Commencez gratuitement"}
+              subtitle={
+                registrationComplete
+                  ? "Encore une étape pour activer votre compte"
+                  : "Créez votre espace club en quelques secondes"
+              }
+            >
+              {!registrationComplete ? (
+                <div className="space-y-6">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_20px_rgba(52,211,153,0.18)]">
+                    <Check className="h-3.5 w-3.5" aria-hidden />
+                    {TRIAL_DURATION_DAYS} jours d&apos;essai gratuit
+                  </span>
+                  <AuthSteps
+                    activeIndex={0}
+                    steps={[
+                      "Créez votre compte",
+                      "Configurez votre club",
+                      "Commencez à gérer",
+                    ]}
+                  />
                 </div>
-
-                <form onSubmit={handleSubmit} className="mt-7 space-y-5">
-                  {errorMessage ? <AuthError message={errorMessage} /> : null}
-
-                  <AuthField id="email" label="Adresse email *">
-                    <AuthInput
-                      id="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      autoComplete="email"
-                    />
-                  </AuthField>
-
-                  <AuthField id="password" label="Mot de passe *">
-                    <AuthInput
-                      id="password"
-                      type="password"
-                      placeholder="8 caractères minimum"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      autoComplete="new-password"
-                    />
-                  </AuthField>
-
-                  <AuthField id="confirmPassword" label="Confirmer le mot de passe *">
-                    <AuthInput
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={loading}
-                      autoComplete="new-password"
-                    />
-                  </AuthField>
-
-                  <AuthSubmitButton loading={loading} loadingLabel="Création en cours...">
-                    Créer mon compte
-                  </AuthSubmitButton>
-
-                  <p className="text-center text-xs leading-relaxed text-blue-100/45">
-                    En créant un compte, vous acceptez nos{" "}
-                    <Link
-                      href="/conditions-utilisation"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      conditions d&apos;utilisation
-                    </Link>{" "}
-                    et notre{" "}
-                    <Link
-                      href="/politique-confidentialite"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      politique de confidentialité
-                    </Link>
-                    .
-                  </p>
-                </form>
-
-                <AuthFooterLink
-                  prompt="Déjà un compte ?"
-                  linkHref="/connexion"
-                  linkLabel="Se connecter"
+              ) : (
+                <AuthSteps
+                  activeIndex={1}
+                  steps={[
+                    "Créez votre compte",
+                    "Confirmez votre email",
+                    "Commencez à gérer",
+                  ]}
                 />
-              </>
-            )}
-          </AuthCard>
+              )}
+            </AuthBrandPanel>
+          }
+        >
+          {registrationComplete ? (
+            <div className="flex h-full flex-col justify-center text-center lg:text-left">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1A23FF]/30 text-white shadow-[0_0_28px_rgba(26,35,255,0.45)] ring-1 ring-blue-400/35 lg:mx-0">
+                <Check className="h-7 w-7" strokeWidth={2.5} aria-hidden />
+              </span>
+              <h2 className="mt-6 text-xl font-bold text-white sm:text-2xl">
+                Compte créé avec succès
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-blue-100/75">
+                Un email de confirmation vient de vous être envoyé. Cliquez sur le lien reçu pour
+                activer votre compte.
+              </p>
+              <p className="mt-3 text-xs leading-relaxed text-blue-100/50">
+                Pensez à vérifier vos courriers indésirables — l&apos;email peut s&apos;y trouver.
+              </p>
+              <Link
+                href="/connexion"
+                className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#1A23FF] via-[#2563EB] to-[#1A23FF] bg-[length:160%_100%] py-3.5 text-base font-bold text-white shadow-[0_0_36px_rgba(26,35,255,0.45)] transition hover:shadow-[0_0_48px_rgba(26,35,255,0.65)]"
+              >
+                Retour à la connexion
+              </Link>
+            </div>
+          ) : (
+            <>
+              <AuthFormHeader
+                title="Créer un compte"
+                subtitle="Remplissez les informations ci-dessous"
+              />
 
-          {!registrationComplete ? (
-            <AuthTrustPills
-              items={[
-                {
-                  label: "Inscription en 2 min",
-                  icon: <Clock className="h-4 w-4" aria-hidden />,
-                },
-                {
-                  label: "Sans carte bancaire",
-                  icon: <CreditCard className="h-4 w-4" aria-hidden />,
-                },
-                {
-                  label: "Données sécurisées",
-                  icon: <Shield className="h-4 w-4" aria-hidden />,
-                },
-              ]}
-            />
-          ) : null}
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {errorMessage ? <AuthError message={errorMessage} /> : null}
 
-          <p className="mt-4 text-center sm:hidden">
-            <Link href="/" className="text-xs text-blue-100/50 hover:text-white">
-              ← Retour à l&apos;accueil
-            </Link>
-          </p>
-        </div>
+                <AuthField id="email" label="Adresse email *">
+                  <AuthInput
+                    id="email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    autoComplete="email"
+                  />
+                </AuthField>
+
+                <AuthField id="password" label="Mot de passe *">
+                  <AuthInput
+                    id="password"
+                    type="password"
+                    placeholder="8 caractères minimum"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    autoComplete="new-password"
+                  />
+                </AuthField>
+
+                <AuthField id="confirmPassword" label="Confirmer le mot de passe *">
+                  <AuthInput
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={loading}
+                    autoComplete="new-password"
+                  />
+                </AuthField>
+
+                <AuthSubmitButton loading={loading} loadingLabel="Création en cours...">
+                  Créer mon compte
+                </AuthSubmitButton>
+
+                <p className="text-center text-xs leading-relaxed text-blue-100/45">
+                  En créant un compte, vous acceptez nos{" "}
+                  <Link
+                    href="/conditions-utilisation"
+                    className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
+                  >
+                    conditions d&apos;utilisation
+                  </Link>{" "}
+                  et notre{" "}
+                  <Link
+                    href="/politique-confidentialite"
+                    className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
+                  >
+                    politique de confidentialité
+                  </Link>
+                  .
+                </p>
+              </form>
+
+              <AuthFooterLink
+                prompt="Déjà un compte ?"
+                linkHref="/connexion"
+                linkLabel="Se connecter"
+              />
+            </>
+          )}
+        </AuthSplitFrame>
       </AuthPageMotion>
     </AuthPageLayout>
   );

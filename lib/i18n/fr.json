@@ -2140,6 +2140,8 @@
       "loading": "Connexion en cours...",
       "signUpFree": "Créer un compte gratuitement",
       "secureNote": "Connexion sécurisée · SSL",
+      "trustSsl": "Chiffrement SSL",
+      "trustAccess": "Accès sécurisé",
       "backHome": "← Retour à l'accueil"
     }
   }

@@ -2289,6 +2289,8 @@
       "loading": "Signing in...",
       "signUpFree": "Create a free account",
       "secureNote": "Secure connection · SSL",
+      "trustSsl": "SSL encryption",
+      "trustAccess": "Secure access",
       "backHome": "← Back to home"
     }
   }

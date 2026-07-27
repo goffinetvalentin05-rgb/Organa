@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Shield } from "lucide-react";
+import { Lock, Shield, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import AuthPageLayout from "@/components/auth/AuthPageLayout";
 import {
-  AuthCard,
   AuthError,
   AuthField,
   AuthFooterLink,
+  AuthFormHeader,
   AuthInput,
   AuthPageMotion,
+  AuthBrandPanel,
+  AuthSplitFrame,
   AuthSubmitButton,
+  AuthTrustList,
 } from "@/components/auth/AuthForm";
 import { useI18n } from "@/components/I18nProvider";
 
@@ -77,73 +79,75 @@ export default function ConnexionPage() {
   return (
     <AuthPageLayout>
       <AuthPageMotion>
-        <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
-            {t("auth.login.badge")}
-          </p>
-          <h1 className="mt-3 text-balance text-2xl font-black text-white md:text-3xl">
-            {t("auth.login.title")}
-          </h1>
-          <p className="mt-3 text-sm text-blue-100/75 md:text-base">{t("auth.login.subtitle")}</p>
-        </div>
+        <AuthSplitFrame
+          brand={
+            <AuthBrandPanel
+              badge={t("auth.login.badge")}
+              title={t("auth.login.title")}
+              subtitle={t("auth.login.subtitle")}
+            >
+              <AuthTrustList
+                items={[
+                  {
+                    label: t("auth.login.secureNote"),
+                    icon: <Shield className="h-4 w-4" aria-hidden />,
+                  },
+                  {
+                    label: t("auth.login.trustSsl"),
+                    icon: <Lock className="h-4 w-4" aria-hidden />,
+                  },
+                  {
+                    label: t("auth.login.trustAccess"),
+                    icon: <ShieldCheck className="h-4 w-4" aria-hidden />,
+                  },
+                ]}
+              />
+            </AuthBrandPanel>
+          }
+        >
+          <AuthFormHeader
+            title={t("auth.login.cardTitle")}
+            subtitle={t("auth.login.cardSubtitle")}
+          />
 
-        <div className="mt-8">
-          <AuthCard>
-            <div className="text-center">
-              <h2 className="text-lg font-bold text-white">{t("auth.login.cardTitle")}</h2>
-              <p className="mt-1 text-sm text-blue-100/65">{t("auth.login.cardSubtitle")}</p>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {errorMessage ? <AuthError message={errorMessage} /> : null}
 
-            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
-              {errorMessage ? <AuthError message={errorMessage} /> : null}
+            <AuthField id="email" label={t("auth.login.email")}>
+              <AuthInput
+                id="email"
+                type="email"
+                placeholder={t("auth.login.emailPlaceholder")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                autoComplete="email"
+              />
+            </AuthField>
 
-              <AuthField id="email" label={t("auth.login.email")}>
-                <AuthInput
-                  id="email"
-                  type="email"
-                  placeholder={t("auth.login.emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  autoComplete="email"
-                />
-              </AuthField>
+            <AuthField id="password" label={t("auth.login.password")}>
+              <AuthInput
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                autoComplete="current-password"
+              />
+            </AuthField>
 
-              <AuthField id="password" label={t("auth.login.password")}>
-                <AuthInput
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  autoComplete="current-password"
-                />
-              </AuthField>
+            <AuthSubmitButton loading={loading} loadingLabel={t("auth.login.loading")}>
+              {t("auth.login.submit")}
+            </AuthSubmitButton>
+          </form>
 
-              <AuthSubmitButton loading={loading} loadingLabel={t("auth.login.loading")}>
-                {t("auth.login.submit")}
-              </AuthSubmitButton>
-            </form>
-
-            <AuthFooterLink
-              prompt={t("auth.login.noAccount")}
-              linkHref="/inscription"
-              linkLabel={t("auth.login.signUpFree")}
-            />
-          </AuthCard>
-
-          <div className="mt-5 flex items-center justify-center gap-2 text-blue-100/55">
-            <Shield className="h-4 w-4 shrink-0 text-blue-300/70" aria-hidden />
-            <span className="text-xs">{t("auth.login.secureNote")}</span>
-          </div>
-
-          <p className="mt-4 text-center sm:hidden">
-            <Link href="/" className="text-xs text-blue-100/50 hover:text-white">
-              {t("auth.login.backHome")}
-            </Link>
-          </p>
-        </div>
+          <AuthFooterLink
+            prompt={t("auth.login.noAccount")}
+            linkHref="/inscription"
+            linkLabel={t("auth.login.signUpFree")}
+          />
+        </AuthSplitFrame>
       </AuthPageMotion>
     </AuthPageLayout>
   );
