@@ -106,6 +106,37 @@ function ShowcaseCard({
   const [hovered, setHovered] = useState(false);
   const Mock = showcaseMockById[card.id];
 
+  if (card.id === "documents") {
+    return (
+      <motion.article
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        whileHover={reduceMotion ? undefined : { y: -4, transition: { duration: 0.4, ease: easePremium } }}
+        className={`${landingShowcaseCardClass} feature-card-documents`}
+      >
+        <span
+          className="pointer-events-none absolute right-5 top-3 z-0 select-none text-[4.25rem] font-black leading-none tracking-[-0.05em] text-white/[0.04] sm:right-6 sm:top-4 sm:text-[5rem] lg:text-[5.5rem]"
+          aria-hidden
+        >
+          {number}
+        </span>
+
+        <div className="feature-card-documents__text relative z-[2] shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
+          <h3 className={`relative pr-14 text-base sm:text-lg lg:pr-[4.5rem] ${landingPremiumCardTitleClass}`}>
+            {card.title}
+          </h3>
+          <p className={`relative mt-2 max-w-sm ${landingPremiumCardDescClass}`}>
+            {card.description}
+          </p>
+        </div>
+
+        <div className="feature-card-documents__visual relative z-[1] mt-4 flex min-h-0 flex-1 items-end justify-center overflow-hidden px-5 sm:px-6">
+          {Mock ? <Mock active={hovered} /> : null}
+        </div>
+      </motion.article>
+    );
+  }
+
   return (
     <motion.article
       onMouseEnter={() => setHovered(true)}
@@ -132,7 +163,11 @@ function ShowcaseCard({
           </p>
         </div>
 
-        <div className={`relative mt-5 flex-1 ${wide ? "lg:mt-0 lg:min-h-[220px]" : "min-h-[210px] sm:min-h-[230px]"}`}>
+        <div
+          className={`relative mt-5 flex-1 ${
+            wide ? "lg:mt-0 lg:min-h-[220px]" : "min-h-[210px] sm:min-h-[240px]"
+          }`}
+        >
           {Mock ? <Mock active={hovered} wide={wide} /> : null}
         </div>
       </div>

@@ -1,12 +1,14 @@
 "use client";
 
-import type { ComponentType, ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   CalendarDays,
   Check,
   Clock,
-  FileText,
+  MapPin,
+  Plus,
+  Search,
   Shield,
   TrendingUp,
   Users,
@@ -16,13 +18,42 @@ import { landingPremiumInnerClass } from "@/components/ui/styles";
 
 type MockProps = { active?: boolean; wide?: boolean };
 
-/* ── Shared primitives ── */
+/* ── Shared primitives (Obillz tokens) ── */
 
-function MockLabel({ children }: { children: ReactNode }) {
+function StatusBadge({
+  variant,
+  children,
+  large,
+  pulse,
+}: {
+  variant: "success" | "info" | "warning" | "error" | "neutral";
+  children: ReactNode;
+  large?: boolean;
+  pulse?: boolean;
+}) {
+  const reduceMotion = useReducedMotion();
+  const styles = {
+    success: "border-emerald-400/25 bg-emerald-500/[0.12] text-emerald-300",
+    info: "border-[#38BDF8]/25 bg-[#2563EB]/[0.12] text-[#38BDF8]",
+    warning: "border-amber-400/22 bg-amber-500/[0.1] text-amber-300",
+    error: "border-rose-400/25 bg-rose-500/[0.12] text-rose-300",
+    neutral: "border-white/14 bg-white/[0.06] text-[rgba(226,232,240,0.7)]",
+  };
+  const pulseAnim =
+    pulse && !reduceMotion
+      ? { boxShadow: ["0 0 0 transparent", "0 0 16px rgba(52,211,153,0.22)", "0 0 0 transparent"] }
+      : undefined;
+
   return (
-    <span className="text-[10px] font-medium uppercase tracking-[0.13em] text-[rgba(226,232,240,0.55)]">
+    <motion.span
+      animate={pulseAnim}
+      transition={pulseAnim ? { duration: 2.6, repeat: Infinity } : undefined}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border font-semibold leading-none ${styles[variant]} ${
+        large ? "px-3 py-1.5 text-[11px]" : "px-2 py-[3px] text-[9px]"
+      }`}
+    >
       {children}
-    </span>
+    </motion.span>
   );
 }
 
@@ -41,16 +72,16 @@ function MemberAvatar({
 }) {
   const reduceMotion = useReducedMotion();
   const sizes = {
-    sm: { outer: "h-7 w-7", inner: "h-[1.625rem] w-[1.625rem] text-[8px]", ring: "p-[1.5px]" },
-    md: { outer: "h-9 w-9", inner: "h-[2.125rem] w-[2.125rem] text-[9px]", ring: "p-[2px]" },
-    lg: { outer: "h-11 w-11", inner: "h-[2.625rem] w-[2.625rem] text-[10px]", ring: "p-[2px]" },
+    sm: { outer: "h-8 w-8", inner: "h-[1.75rem] w-[1.75rem] text-[9px]", ring: "p-[1.5px]" },
+    md: { outer: "h-10 w-10", inner: "h-[2.25rem] w-[2.25rem] text-[10px]", ring: "p-[2px]" },
+    lg: { outer: "h-12 w-12", inner: "h-[2.75rem] w-[2.75rem] text-[11px]", ring: "p-[2px]" },
   };
   const s = sizes[size];
 
   return (
     <span className={`relative inline-flex shrink-0 ${s.outer}`}>
       <span
-        className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br ${gradient} ${s.ring} shadow-[0_0_16px_rgba(37,99,235,0.22)]`}
+        className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br ${gradient} ${s.ring} shadow-[0_0_18px_rgba(37,99,235,0.25)]`}
       >
         <span
           className={`flex ${s.inner} items-center justify-center rounded-full bg-[#020617]/50 font-bold text-white backdrop-blur-[1px]`}
@@ -86,15 +117,15 @@ function AvatarStack({
         <span
           key={item.id}
           className="relative"
-          style={{ marginLeft: i === 0 ? 0 : -8, zIndex: items.length - i }}
+          style={{ marginLeft: i === 0 ? 0 : -10, zIndex: items.length - i }}
         >
           <MemberAvatar initials={item.initials} gradient={item.gradient} size="sm" />
         </span>
       ))}
       {extra ? (
         <span
-          className="relative flex h-7 w-7 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-[8px] font-semibold text-[rgba(226,232,240,0.75)] backdrop-blur-sm"
-          style={{ marginLeft: -8, zIndex: 0 }}
+          className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/14 bg-white/[0.07] text-[9px] font-semibold text-[rgba(226,232,240,0.75)] backdrop-blur-sm"
+          style={{ marginLeft: -10, zIndex: 0 }}
         >
           +{extra}
         </span>
@@ -103,61 +134,26 @@ function AvatarStack({
   );
 }
 
-function StatusBadge({
-  variant,
-  children,
-  dot,
-  pulse,
-}: {
-  variant: "success" | "warning" | "info" | "neutral";
-  children: ReactNode;
-  dot?: boolean;
-  pulse?: boolean;
-}) {
-  const reduceMotion = useReducedMotion();
-  const styles = {
-    success: { wrap: "border-emerald-400/20 bg-emerald-500/[0.08]", dot: "bg-emerald-400" },
-    warning: { wrap: "border-amber-400/18 bg-amber-500/[0.07]", dot: "bg-amber-400" },
-    info: { wrap: "border-[#38BDF8]/20 bg-[#2563EB]/[0.1]", dot: "bg-[#38BDF8]" },
-    neutral: { wrap: "border-white/12 bg-white/[0.05]", dot: "bg-[rgba(226,232,240,0.5)]" },
-  };
-  const s = styles[variant];
-
+function MockRow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <motion.span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-[3px] text-[9px] font-semibold leading-none tracking-[0.01em] text-[#F8FAFC] ${s.wrap}`}
-      animate={
-        pulse && !reduceMotion
-          ? { boxShadow: ["0 0 0 transparent", "0 0 14px rgba(52,211,153,0.2)", "0 0 0 transparent"] }
-          : undefined
-      }
-      transition={{ duration: 2.6, repeat: Infinity }}
+    <div
+      className={`${landingPremiumInnerClass} flex items-center gap-3 px-3.5 py-3 transition-[border-color,background-color] duration-300 ${className ?? ""}`}
     >
-      {dot ? <span className={`h-1.5 w-1.5 rounded-full ${s.dot} shadow-[0_0_6px_currentColor]`} /> : null}
       {children}
-    </motion.span>
+    </div>
   );
 }
 
-function ProgressBar({
-  value,
-  active,
-  height = "h-[6px]",
-}: {
-  value: number;
-  active?: boolean;
-  height?: string;
-}) {
+function ProgressBar({ value, active }: { value: number; active?: boolean }) {
   const reduceMotion = useReducedMotion();
   const pct = `${value}%`;
-
   return (
-    <div className={`relative overflow-hidden rounded-full bg-white/[0.05] ${height}`}>
+    <div className="relative overflow-hidden rounded-full bg-white/[0.06] h-[7px]">
       <motion.div
         className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#67E8F9]"
         initial={reduceMotion ? false : { width: "0%" }}
         animate={{ width: active || reduceMotion ? pct : `${Math.max(value - 18, 40)}%` }}
-        transition={{ duration: 1.1, ease: easePremium }}
+        transition={{ duration: 1.2, ease: easePremium }}
       />
       <motion.div
         className="absolute inset-y-[-2px] w-6 rounded-full bg-[#67E8F9]/40 blur-[3px]"
@@ -170,374 +166,364 @@ function ProgressBar({
   );
 }
 
-function MockRow({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`${landingPremiumInnerClass} flex items-center gap-2.5 px-3 py-2.5 transition-[border-color,background-color] duration-300 ${className ?? ""}`}>
-      {children}
-    </div>
-  );
-}
-
-/* ── Card mocks ── */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   01 · MEMBRES — search bar + 2–3 member cards + floating "Nouveau"
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export function MembersShowcaseMock({ active }: MockProps) {
   const reduceMotion = useReducedMotion();
   const members = [
-    { id: "lea", initials: "LM", name: "Léa Martin", role: "Senior", gradient: "from-sky-400 to-blue-600", status: "Actif" as const, online: true },
+    { id: "lea", initials: "LM", name: "Léa Martin", role: "Juniors A", gradient: "from-sky-400 to-blue-600", status: "Actif" as const, online: true },
     { id: "thomas", initials: "TK", name: "Thomas K.", role: "Comité", gradient: "from-indigo-400 to-violet-600", status: "Actif" as const, online: true },
-    { id: "nina", initials: "NR", name: "Nina R.", role: "Junior", gradient: "from-cyan-400 to-teal-500", status: "Nouveau" as const, online: false },
+    { id: "nina", initials: "NR", name: "Nina R.", role: "Senior", gradient: "from-cyan-400 to-teal-500", status: "Nouveau" as const, online: false },
   ];
 
   return (
     <div className="relative flex h-full flex-col justify-end">
-      <div className="relative mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <MockLabel>Base membres</MockLabel>
-          <AvatarStack
-            items={members.map((m) => ({
-              id: m.id,
-              initials: m.initials,
-              gradient: m.gradient,
-            }))}
-            extra={281}
-          />
+      {/* Search bar — large, clipped at top */}
+      <div className="relative mb-4 flex items-center gap-2.5 overflow-hidden rounded-xl border border-white/14 bg-white/[0.07] px-4 py-3 backdrop-blur-sm">
+        <Search className="h-4 w-4 shrink-0 text-[rgba(226,232,240,0.45)]" strokeWidth={2} aria-hidden />
+        <span className="text-[13px] text-[rgba(226,232,240,0.4)]">Rechercher un membre…</span>
+        <div className="ml-auto flex gap-2">
+          <span className="rounded-lg border border-white/12 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-[rgba(226,232,240,0.6)]">
+            Joueur ▾
+          </span>
+          <span className="rounded-lg border border-white/12 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-[rgba(226,232,240,0.6)]">
+            Juniors A ▾
+          </span>
         </div>
-        <StatusBadge variant="success" dot pulse={active}>
-          284
-        </StatusBadge>
       </div>
 
-      <ul className="relative space-y-2">
+      {/* Member rows */}
+      <ul className="relative space-y-2.5">
         {members.map((m, i) => (
           <motion.li
             key={m.id}
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: i * 0.09, ease: easePremium }}
+            transition={{ duration: 0.5, delay: i * 0.1, ease: easePremium }}
           >
             <MockRow>
               <MemberAvatar
                 initials={m.initials}
                 gradient={m.gradient}
+                size="md"
                 online={m.online}
                 highlight={active && i === 0}
               />
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[11px] font-medium leading-tight text-[#F8FAFC]">{m.name}</span>
-                <span className="mt-0.5 block text-[9px] text-[rgba(226,232,240,0.55)]">{m.role}</span>
+                <span className="block truncate text-[13px] font-semibold leading-tight text-[#F8FAFC]">{m.name}</span>
+                <span className="mt-0.5 block text-[11px] text-[rgba(226,232,240,0.5)]">{m.role}</span>
               </span>
-              <StatusBadge variant={m.status === "Nouveau" ? "info" : "neutral"} dot={m.status === "Actif"}>
+              <StatusBadge variant={m.status === "Nouveau" ? "info" : "neutral"}>
                 {m.status}
               </StatusBadge>
             </MockRow>
           </motion.li>
         ))}
       </ul>
-    </div>
-  );
-}
 
-export function CotisationsShowcaseMock({ active }: MockProps) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <div className="relative flex h-full flex-col justify-end">
-      <div className="relative flex items-center gap-4">
-        {/* Anneau de progression */}
-        <div className="relative shrink-0">
-          <svg className="h-[4.5rem] w-[4.5rem] -rotate-90" viewBox="0 0 72 72" aria-hidden>
-            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
-            <motion.circle
-              cx="36"
-              cy="36"
-              r="30"
-              fill="none"
-              stroke="url(#cotGrad)"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={188.5}
-              initial={reduceMotion ? false : { strokeDashoffset: 188.5 }}
-              animate={{ strokeDashoffset: active || reduceMotion ? 188.5 * 0.08 : 188.5 * 0.28 }}
-              transition={{ duration: 1.2, ease: easePremium }}
-            />
-            <defs>
-              <linearGradient id="cotGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#1D4ED8" />
-                <stop offset="50%" stopColor="#2563EB" />
-                <stop offset="100%" stopColor="#67E8F9" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-lg font-bold tabular-nums leading-none text-white">92</span>
-            <span className="text-[8px] font-medium text-[#67E8F9]/70">%</span>
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <MockLabel>Saison 25/26</MockLabel>
-          <p className="mt-1 text-[11px] text-[rgba(226,232,240,0.55)]">Taux de recouvrement</p>
-          <div className="mt-2.5 flex gap-2">
-            <div className="flex flex-1 flex-col rounded-xl border border-emerald-400/18 bg-emerald-500/[0.06] px-2.5 py-2">
-              <span className="flex items-center gap-1 text-[9px] text-emerald-200/70">
-                <Check className="h-2.5 w-2.5" strokeWidth={2.5} aria-hidden />
-                Payé
-              </span>
-              <span className="mt-0.5 text-sm font-bold tabular-nums text-white">156</span>
-            </div>
-            <div className="flex flex-1 flex-col rounded-xl border border-amber-400/16 bg-amber-500/[0.05] px-2.5 py-2">
-              <span className="flex items-center gap-1 text-[9px] text-amber-200/65">
-                <Clock className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
-                En attente
-              </span>
-              <span className="mt-0.5 text-sm font-bold tabular-nums text-white">14</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative mt-4">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <span className="flex items-center gap-1 text-[10px] text-[rgba(226,232,240,0.55)]">
-            <TrendingUp className="h-3 w-3 text-[#38BDF8]/60" strokeWidth={2} aria-hidden />
-            Encaissements
-          </span>
-          <span className="text-[10px] font-semibold tabular-nums text-[#F8FAFC]">CHF 18&apos;400</span>
-        </div>
-        <ProgressBar value={92} active={active} />
-      </div>
-
+      {/* Floating "Nouveau membre" panel — partially clipped bottom-right */}
       <motion.div
-        className="relative mt-3"
-        initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.45, ease: easePremium }}
+        className="absolute -bottom-3 -right-3 z-10 w-[200px] overflow-hidden rounded-2xl border border-white/20 bg-[#0F2744]/95 p-4 shadow-[0_24px_56px_rgba(2,6,23,0.5)] backdrop-blur-xl"
+        initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.92 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.5, duration: 0.6, ease: easePremium }}
       >
-        <MockRow className="justify-between">
-          <div className="flex items-center gap-2">
-            <MemberAvatar initials="LM" gradient="from-sky-400 to-blue-600" size="sm" />
-            <span className="text-[10px] font-medium text-[rgba(226,232,240,0.55)]">Cotisation senior</span>
-          </div>
-          <StatusBadge variant="success" dot pulse={active}>
-            Payé
-          </StatusBadge>
-        </MockRow>
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] shadow-[0_0_14px_rgba(37,99,235,0.35)]">
+            <Plus className="h-3.5 w-3.5 text-white" strokeWidth={2.5} aria-hidden />
+          </span>
+          <span className="text-[12px] font-bold text-white">Nouveau membre</span>
+        </div>
+        <div className="space-y-1.5">
+          <div className="h-2 w-3/4 rounded bg-white/10" />
+          <div className="h-2 w-1/2 rounded bg-white/[0.07]" />
+        </div>
       </motion.div>
     </div>
   );
 }
 
-export function EvenementsShowcaseMock({ active }: MockProps) {
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   02 · COTISATIONS — big amount + statuses + 1-2 rows + animation
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+export function CotisationsShowcaseMock({ active }: MockProps) {
   const reduceMotion = useReducedMotion();
-  const attendees = [
-    { id: "marc", initials: "MD", name: "Marc D.", gradient: "from-blue-400 to-indigo-500" },
-    { id: "julie", initials: "JP", name: "Julie P.", gradient: "from-violet-400 to-purple-500" },
-    { id: "alex", initials: "AT", name: "Alex T.", gradient: "from-cyan-400 to-blue-500" },
-  ];
+  const [paid, setPaid] = useState(false);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => setPaid((v) => !v), active ? 2600 : 3600);
+    return () => window.clearInterval(id);
+  }, [active, reduceMotion]);
 
   return (
     <div className="relative flex h-full flex-col justify-end">
-      <div className={`${landingPremiumInnerClass} overflow-hidden p-3`}>
-        <div className="flex gap-3">
-          <motion.div
-            className="relative flex h-[4.25rem] w-[4.25rem] shrink-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/14 bg-gradient-to-br from-[#2563EB]/30 to-[#020617]/80 shadow-[0_0_20px_rgba(37,99,235,0.2)]"
-            animate={active && !reduceMotion ? { y: [0, -2, 0] } : undefined}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(103,232,249,0.15),transparent_60%)]" aria-hidden />
-            <span className="relative text-[8px] font-semibold uppercase tracking-[0.12em] text-[rgba(226,232,240,0.5)]">Mar</span>
-            <span className="relative text-xl font-bold leading-none text-white">14</span>
-          </motion.div>
-
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-semibold text-white">Tournoi printemps</p>
-            <p className="mt-1 flex items-center gap-1 text-[10px] text-[rgba(226,232,240,0.55)]">
-              <CalendarDays className="h-3 w-3 shrink-0 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
-              Inscription ouverte
+      {/* Big headline amount */}
+      <div className="relative mb-5">
+        <div className="flex items-end gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[rgba(226,232,240,0.45)]">
+              Encaissements saison 25/26
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <StatusBadge variant="info" dot>
-                <Users className="mr-0.5 inline h-2.5 w-2.5 opacity-70" strokeWidth={2} aria-hidden />
-                24 inscrits
-              </StatusBadge>
-              <StatusBadge variant="success" dot>
-                18 confirmés
-              </StatusBadge>
-            </div>
+            <p className="mt-1 text-[2rem] font-bold leading-none tracking-tight text-white sm:text-[2.2rem]">
+              CHF 18&apos;400
+            </p>
+          </div>
+          <div className="mb-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
+            <TrendingUp className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
+            92%
+          </div>
+        </div>
+        <div className="mt-3">
+          <ProgressBar value={92} active={active} />
+        </div>
+      </div>
+
+      {/* Status badges — large */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        <StatusBadge variant="success" large>
+          <Check className="h-3 w-3" strokeWidth={2.5} aria-hidden />
+          156 payées
+        </StatusBadge>
+        <StatusBadge variant="warning" large>
+          <Clock className="h-3 w-3" strokeWidth={2} aria-hidden />
+          14 en attente
+        </StatusBadge>
+        <StatusBadge variant="error" large>
+          2 en retard
+        </StatusBadge>
+      </div>
+
+      {/* Single cotisation row with animated status */}
+      <MockRow>
+        <MemberAvatar initials="DS" gradient="from-indigo-400 to-violet-600" size="md" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[12px] font-semibold text-[#F8FAFC]">Dupuit Simon</span>
+          <span className="mt-0.5 block text-[10px] text-[rgba(226,232,240,0.5)]">COT-2026-002 · 280.00 CHF</span>
+        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={paid ? "paid" : "pending"}
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.85, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reduceMotion ? undefined : { opacity: 0, scale: 0.85, y: -4 }}
+            transition={{ duration: 0.3, ease: easePremium }}
+            className="inline-flex"
+          >
+            <StatusBadge variant={paid ? "success" : "info"} pulse={paid}>
+              {paid ? (
+                <>
+                  <Check className="h-2.5 w-2.5" strokeWidth={2.5} aria-hidden />
+                  Payée
+                </>
+              ) : (
+                "En attente"
+              )}
+            </StatusBadge>
+          </motion.span>
+        </AnimatePresence>
+      </MockRow>
+    </div>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   03 · ÉVÉNEMENTS — big date card + info + 3 participants + new inscription
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+export function EvenementsShowcaseMock({ active }: MockProps) {
+  const reduceMotion = useReducedMotion();
+  const [showNew, setShowNew] = useState(false);
+
+  const attendees = [
+    { id: "marc", initials: "MD", gradient: "from-blue-400 to-indigo-500" },
+    { id: "julie", initials: "JP", gradient: "from-violet-400 to-purple-500" },
+    { id: "alex", initials: "AT", gradient: "from-cyan-400 to-blue-500" },
+  ];
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => setShowNew((v) => !v), active ? 3000 : 4000);
+    return () => window.clearInterval(id);
+  }, [active, reduceMotion]);
+
+  return (
+    <div className="relative flex h-full flex-col justify-end">
+      {/* Big date + event name */}
+      <div className="mb-5 flex items-start gap-4">
+        <motion.div
+          className="relative flex h-20 w-20 shrink-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/16 bg-gradient-to-br from-[#2563EB]/35 to-[#020617]/80 shadow-[0_0_28px_rgba(37,99,235,0.22)]"
+          animate={active && !reduceMotion ? { y: [0, -3, 0] } : undefined}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(103,232,249,0.15),transparent_60%)]" aria-hidden />
+          <span className="relative text-[10px] font-semibold uppercase tracking-[0.14em] text-[rgba(226,232,240,0.5)]">
+            Mar
+          </span>
+          <span className="relative text-[1.75rem] font-bold leading-none text-white">14</span>
+        </motion.div>
+
+        <div className="min-w-0 flex-1 pt-1">
+          <p className="text-[16px] font-bold leading-tight text-white sm:text-[17px]">Tournoi de printemps</p>
+          <div className="mt-2 flex flex-col gap-1">
+            <p className="flex items-center gap-1.5 text-[11px] text-[rgba(226,232,240,0.55)]">
+              <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
+              14 mars 2026 · 09:00
+            </p>
+            <p className="flex items-center gap-1.5 text-[11px] text-[rgba(226,232,240,0.55)]">
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
+              Stade municipal · Terrains 1–3
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="relative mt-3">
-        <div className="mb-2 flex items-center justify-between">
-          <MockLabel>Inscrits récents</MockLabel>
+      {/* Participants */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
           <AvatarStack
-            items={attendees.map((a) => ({
-              id: a.id,
-              initials: a.initials,
-              gradient: a.gradient,
-            }))}
+            items={attendees.map((a) => ({ id: a.id, initials: a.initials, gradient: a.gradient }))}
             extra={21}
           />
         </div>
-        <ul className="space-y-1.5">
-          {attendees.map((a, i) => (
-            <motion.li
-              key={a.id}
-              initial={reduceMotion ? false : { opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 + i * 0.08, duration: 0.4, ease: easePremium }}
-            >
-              <MockRow>
-                <MemberAvatar initials={a.initials} gradient={a.gradient} size="sm" online />
-                <span className="flex-1 text-[10px] font-medium text-[rgba(226,232,240,0.55)]">{a.name}</span>
-                <StatusBadge variant="success" dot>
-                  Confirmé
-                </StatusBadge>
-              </MockRow>
-            </motion.li>
-          ))}
-        </ul>
+        <StatusBadge variant="info">
+          <Users className="mr-0.5 inline h-3 w-3 opacity-70" strokeWidth={2} aria-hidden />
+          {showNew ? "25" : "24"} inscrits
+        </StatusBadge>
       </div>
+
+      {/* New inscription appearing */}
+      <AnimatePresence>
+        {showNew ? (
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: 10, height: 0 }}
+            transition={{ duration: 0.4, ease: easePremium }}
+            className="overflow-hidden"
+          >
+            <MockRow className="border border-emerald-400/15 bg-emerald-500/[0.04]">
+              <MemberAvatar initials="SB" gradient="from-emerald-400 to-teal-500" size="sm" online />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12px] font-medium text-[#F8FAFC]">Sophie Blanc</span>
+                <span className="mt-0.5 block text-[10px] text-[rgba(226,232,240,0.5)]">Vient de s&apos;inscrire</span>
+              </span>
+              <StatusBadge variant="success" pulse>
+                <Check className="h-2.5 w-2.5" strokeWidth={2.5} aria-hidden />
+                Confirmé
+              </StatusBadge>
+            </MockRow>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   04 · SPONSORS — single large sponsor card + contract preview
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export function SponsorsShowcaseMock({ active }: MockProps) {
   const reduceMotion = useReducedMotion();
 
   return (
     <div className="relative flex h-full flex-col justify-end">
+      {/* Sponsor card */}
       <div className="relative">
-        <div className="flex items-start gap-3">
-          <MemberAvatar initials="BD" gradient="from-amber-400 to-orange-500" size="lg" />
+        <div className="flex items-start gap-4">
+          <MemberAvatar initials="BL" gradient="from-amber-400 to-orange-500" size="lg" highlight={active} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <MockLabel>Contrat sponsor</MockLabel>
-                <p className="mt-1 text-[13px] font-semibold text-white">Boulangerie du Lac</p>
-                <p className="mt-0.5 text-[10px] text-[rgba(226,232,240,0.5)]">Partenaire principal</p>
-              </div>
-              <motion.span
-                animate={
-                  active && !reduceMotion
-                    ? { boxShadow: ["0 0 0 transparent", "0 0 14px rgba(34,211,238,0.2)", "0 0 0 transparent"] }
-                    : undefined
-                }
-                transition={{ duration: 2.8, repeat: Infinity }}
-              >
-                <StatusBadge variant="info" dot pulse={active}>
-                  Renouv.
-                </StatusBadge>
-              </motion.span>
-            </div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-[rgba(226,232,240,0.45)]">
+              Contrat sponsor
+            </p>
+            <p className="mt-1 text-[16px] font-bold leading-tight text-white">Boulangerie du Lac</p>
+            <p className="mt-0.5 text-[11px] text-[rgba(226,232,240,0.5)]">Partenaire principal · Or</p>
           </div>
+          <motion.span
+            animate={
+              active && !reduceMotion
+                ? { boxShadow: ["0 0 0 transparent", "0 0 16px rgba(34,211,238,0.22)", "0 0 0 transparent"] }
+                : undefined
+            }
+            transition={{ duration: 2.8, repeat: Infinity }}
+          >
+            <StatusBadge variant="info" large>Renouvellement</StatusBadge>
+          </motion.span>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3">
-          <div>
-            <p className="text-[9px] text-[rgba(226,232,240,0.5)]">Montant annuel</p>
-            <p className="mt-0.5 text-sm font-bold tabular-nums text-white">CHF 2&apos;400</p>
+        {/* Contract details — 2×2 grid */}
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-white/12 bg-white/[0.04] p-3.5">
+            <p className="text-[10px] text-[rgba(226,232,240,0.45)]">Montant annuel</p>
+            <p className="mt-1 text-[18px] font-bold tabular-nums leading-none text-white">CHF 2&apos;400</p>
           </div>
-          <div className="text-right">
-            <p className="text-[9px] text-[rgba(226,232,240,0.5)]">Échéance</p>
+          <div className="rounded-xl border border-white/12 bg-white/[0.04] p-3.5">
+            <p className="text-[10px] text-[rgba(226,232,240,0.45)]">Échéance</p>
             <motion.p
-              className="mt-0.5 flex items-center justify-end gap-1 text-sm font-bold tabular-nums text-[#67E8F9]/90"
+              className="mt-1 flex items-center gap-1.5 text-[16px] font-bold tabular-nums leading-none text-[#67E8F9]/90"
               animate={
                 active && !reduceMotion
-                  ? { textShadow: ["0 0 0 transparent", "0 0 14px rgba(34,211,238,0.28)", "0 0 0 transparent"] }
+                  ? { textShadow: ["0 0 0 transparent", "0 0 16px rgba(34,211,238,0.3)", "0 0 0 transparent"] }
                   : undefined
               }
               transition={{ duration: 3, repeat: Infinity }}
             >
-              <Clock className="h-3 w-3 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
-              01.09.25
+              <Clock className="h-4 w-4 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
+              01.09.26
             </motion.p>
           </div>
         </div>
 
-        <div className="mt-3">
-          <div className="mb-1.5 flex justify-between text-[9px]">
-            <span className="text-[rgba(226,232,240,0.5)]">Durée contrat</span>
-            <span className="font-medium tabular-nums text-[rgba(226,232,240,0.55)]">68%</span>
+        {/* Mini contract preview — white doc peeking */}
+        <motion.div
+          className="absolute -bottom-4 -right-4 z-10 w-[140px] rotate-2 overflow-hidden rounded-xl border border-slate-200/80 bg-white p-3 text-[#0F172A] shadow-[0_16px_40px_rgba(2,6,23,0.3)]"
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.55, ease: easePremium }}
+        >
+          <p className="text-[8px] font-bold uppercase tracking-wider text-[#1A23FF]">Contrat</p>
+          <div className="mt-1.5 space-y-1">
+            <div className="h-1.5 w-full rounded bg-slate-100" />
+            <div className="h-1.5 w-3/4 rounded bg-slate-100" />
+            <div className="h-1.5 w-1/2 rounded bg-slate-50" />
           </div>
-          <ProgressBar value={68} active={active} height="h-1.5" />
-        </div>
+          <div className="mt-2 flex justify-between text-[7px] text-slate-500">
+            <span>390.00 CHF</span>
+            <span>08.06.2026</span>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-export function DocumentsShowcaseMock({ active }: MockProps) {
-  const reduceMotion = useReducedMotion();
-  const docs = [
-    { name: "PV AG 2024.pdf", tone: "red" as const, selected: true, size: "248 Ko" },
-    { name: "Contrat sponsor.pdf", tone: "blue" as const, selected: false, size: "412 Ko" },
-    { name: "Facture buvette.pdf", tone: "violet" as const, selected: false, size: "96 Ko" },
-  ];
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   05 · DOCUMENTS — contained product visual under text
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  const toneStyles = {
-    red: { icon: "bg-red-500/16 text-red-300/90 ring-red-400/16", accent: "from-red-500/10" },
-    blue: { icon: "bg-blue-500/16 text-blue-300/90 ring-blue-400/16", accent: "from-blue-500/10" },
-    violet: { icon: "bg-violet-500/16 text-violet-300/90 ring-violet-400/16", accent: "from-violet-500/10" },
-  };
-
+export function DocumentsShowcaseMock(_props: MockProps) {
   return (
-    <div className="relative flex h-full items-end justify-center sm:justify-start">
-      <div className="relative w-full max-w-[320px] pt-1">
-        {docs.map((doc, i) => {
-          const tone = toneStyles[doc.tone];
-          return (
-            <motion.div
-              key={doc.name}
-              className={`relative overflow-hidden rounded-xl border transition-[box-shadow,border-color] duration-300 ${
-                doc.selected
-                  ? "border-[#38BDF8]/22 bg-white/[0.06] shadow-[0_8px_28px_rgba(2,6,23,0.25),0_0_24px_rgba(37,99,235,0.08)]"
-                  : "border-white/10 bg-white/[0.035] shadow-[0_4px_16px_rgba(2,6,23,0.2)]"
-              }`}
-              style={{
-                marginTop: i === 0 ? 0 : -16,
-                zIndex: docs.length - i,
-                rotate: i === 0 ? -2 : i === 1 ? 0.6 : 2,
-              }}
-              animate={
-                active && !reduceMotion
-                  ? { y: i === 0 ? [0, -4, 0] : i === 1 ? [0, -2, 0] : [0, -1, 0] }
-                  : undefined
-              }
-              transition={{ duration: 4, delay: i * 0.15, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone.accent} to-transparent opacity-60`} aria-hidden />
-              <div className="relative flex gap-3 p-3">
-                <div className="flex shrink-0 flex-col items-center gap-1">
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${tone.icon}`}>
-                    <FileText className="h-4 w-4" strokeWidth={2} aria-hidden />
-                  </span>
-                  <span className="text-[7px] tabular-nums text-[rgba(226,232,240,0.4)]">{doc.size}</span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="truncate text-[10px] font-medium text-white">{doc.name}</p>
-                    {doc.selected ? <StatusBadge variant="info">Ouvert</StatusBadge> : null}
-                  </div>
-                  <div className="mt-2.5 space-y-1 rounded-md border border-white/[0.06] bg-[#020617]/50 p-2">
-                    {[92, 78, 64, 48].slice(0, doc.selected ? 4 : 2).map((w, li) => (
-                      <div
-                        key={li}
-                        className={`h-[3px] rounded-full ${doc.selected && li === 0 ? "bg-[#38BDF8]/40" : "bg-white/10"}`}
-                        style={{ width: `${w}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
+    // Native img preserves PNG alpha; contained by parent visual zone
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/documents-obillz-preview.png"
+      alt="Aperçu de documents Obillz : planning et procès-verbal de séance"
+      width={1024}
+      height={576}
+      decoding="async"
+      draggable={false}
+      className="feature-card-documents__img block h-full w-full max-h-full max-w-full select-none bg-transparent object-contain object-bottom"
+    />
   );
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   06 · ACCÈS (conservé — large role cards)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export function AccesShowcaseMock({ active, wide }: MockProps) {
   const reduceMotion = useReducedMotion();
@@ -549,28 +535,24 @@ export function AccesShowcaseMock({ active, wide }: MockProps) {
   ];
 
   return (
-    <div className={`relative flex h-full ${wide ? "flex-col justify-center gap-3" : "items-end justify-end"}`}>
+    <div className={`relative flex h-full ${wide ? "flex-col justify-center gap-4" : "items-end justify-end"}`}>
       {wide ? (
         <div className="hidden w-full items-center justify-center gap-2 lg:flex">
           <AvatarStack
-            items={roles.map((r) => ({
-              id: r.id,
-              initials: r.initials,
-              gradient: r.gradient,
-            }))}
+            items={roles.map((r) => ({ id: r.id, initials: r.initials, gradient: r.gradient }))}
           />
-          <span className="text-[9px] text-[rgba(226,232,240,0.45)]">· 4 membres du comité</span>
+          <span className="text-[10px] text-[rgba(226,232,240,0.45)]">· 4 membres du comité</span>
         </div>
       ) : null}
 
-      <div className={`relative grid w-full gap-2.5 ${wide ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-1"}`}>
+      <div className={`relative grid w-full gap-3 ${wide ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-1"}`}>
         {roles.map((role, i) => (
           <motion.div
             key={role.id}
-            className={`${landingPremiumInnerClass} flex flex-col items-center px-3 py-3.5 text-center`}
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            className={`${landingPremiumInnerClass} flex flex-col items-center px-4 py-4 text-center`}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07, duration: 0.45, ease: easePremium }}
+            transition={{ delay: i * 0.08, duration: 0.5, ease: easePremium }}
           >
             <MemberAvatar
               initials={role.initials}
@@ -579,10 +561,10 @@ export function AccesShowcaseMock({ active, wide }: MockProps) {
               online={role.online}
               highlight={active && i === 0}
             />
-            <span className="mt-2.5 text-[11px] font-medium text-white">{role.label}</span>
-            <span className="mt-0.5 text-[9px] text-[rgba(226,232,240,0.45)]">{role.access}</span>
-            <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-[#38BDF8]/16 bg-[#2563EB]/[0.08] px-2 py-[3px] text-[8px] font-medium text-[rgba(226,232,240,0.75)]">
-              <Shield className="h-2.5 w-2.5 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
+            <span className="mt-3 text-[12px] font-semibold text-white">{role.label}</span>
+            <span className="mt-0.5 text-[10px] text-[rgba(226,232,240,0.45)]">{role.access}</span>
+            <span className="mt-2.5 inline-flex items-center gap-1 rounded-full border border-[#38BDF8]/18 bg-[#2563EB]/[0.1] px-2.5 py-1 text-[9px] font-medium text-[rgba(226,232,240,0.75)]">
+              <Shield className="h-3 w-3 text-[#38BDF8]/55" strokeWidth={2} aria-hidden />
               {role.tag}
             </span>
           </motion.div>
@@ -591,6 +573,8 @@ export function AccesShowcaseMock({ active, wide }: MockProps) {
     </div>
   );
 }
+
+/* ── Export map ── */
 
 export const showcaseMockById: Record<string, ComponentType<MockProps>> = {
   membres: MembersShowcaseMock,
