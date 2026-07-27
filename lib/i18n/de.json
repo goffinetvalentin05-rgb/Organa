@@ -522,7 +522,9 @@
     "navigation": {
       "primary": "Navigation",
       "secondary": "Überblick",
-      "backHome": "Zur Startseite"
+      "backHome": "Zur Startseite",
+      "collapseSidebar": "Seitenleiste einklappen",
+      "expandSidebar": "Seitenleiste ausklappen"
     },
     "nav": {
       "dashboard": "Vereins-Dashboard",

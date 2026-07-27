@@ -22,6 +22,8 @@ import {
   Menu,
   X,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CreditCard,
   Wallet,
   Building2,
@@ -36,6 +38,7 @@ import {
 } from "@/lib/icons";
 
 const PUBLIC_PAGE_HREF = "/tableau-de-bord/parametres/page-publique";
+const SIDEBAR_COLLAPSED_KEY = "obillz-dashboard-sidebar-collapsed";
 
 export default function DashboardLayout({
   children,
@@ -48,6 +51,30 @@ export default function DashboardLayout({
   const [clubName, setClubName] = useState<string>("");
   const [loadingUser, setLoadingUser] = useState<boolean>(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (stored === "true") {
+        setSidebarCollapsed(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const toggleSidebarCollapsed = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -154,7 +181,12 @@ export default function DashboardLayout({
 
   return (
     <NewFeaturesAnnouncementProvider>
-    <div className={dashboardShellRootClass}>
+    <div
+      className={cn(
+        dashboardShellRootClass,
+        sidebarCollapsed && "dashboard-shell--sidebar-collapsed"
+      )}
+    >
       <ClubPublicPageAnnouncementModal />
 
       {sidebarOpen && (
@@ -171,29 +203,56 @@ export default function DashboardLayout({
         )}
       >
         <div className="relative z-10 flex h-full min-h-0 flex-col">
-          {/* Logo */}
-          <div className="flex shrink-0 items-center justify-between gap-3 px-5 pb-5 pt-5">
-            <Link href="/tableau-de-bord" className="group flex min-w-0 flex-1 items-center">
+          {/* Logo + collapse */}
+          <div className="dashboard-sidebar-header">
+            <Link
+              href="/tableau-de-bord"
+              className="dashboard-sidebar-logo-link group flex min-w-0 flex-1 items-center"
+              title="Obillz"
+            >
               <Image
                 src="/logo-obillz.png"
                 alt="Obillz"
-                width={180}
-                height={47}
-                className="h-10 w-auto max-w-[150px] object-contain brightness-0 invert opacity-95 transition-opacity group-hover:opacity-80"
+                width={200}
+                height={52}
+                className="dashboard-sidebar-logo h-12 w-auto max-w-[185px] object-contain object-left brightness-0 invert opacity-95 transition-all duration-300 group-hover:opacity-80"
                 priority
               />
             </Link>
             <button
+              type="button"
+              onClick={toggleSidebarCollapsed}
+              className="dashboard-sidebar-collapse-btn"
+              aria-label={
+                sidebarCollapsed
+                  ? t("dashboard.navigation.expandSidebar")
+                  : t("dashboard.navigation.collapseSidebar")
+              }
+              title={
+                sidebarCollapsed
+                  ? t("dashboard.navigation.expandSidebar")
+                  : t("dashboard.navigation.collapseSidebar")
+              }
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </button>
+            <button
+              type="button"
               onClick={() => setSidebarOpen(false)}
               className="rounded-xl p-2 text-blue-100/70 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
+              aria-label={t("dashboard.navigation.primary")}
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-            <p className="mb-2.5 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200/45">
+          <nav className="dashboard-sidebar-nav min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+            <p className="dashboard-sidebar-section-label mb-2.5 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200/45">
               {t("dashboard.navigation.primary")}
             </p>
             <div className="space-y-0.5">
@@ -205,6 +264,7 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
+                    title={item.name}
                     className={cn("dashboard-sidebar-nav-link", active && "is-active")}
                   >
                     <IconComponent
@@ -213,17 +273,18 @@ export default function DashboardLayout({
                         active ? "text-cyan-200" : "text-blue-200/55"
                       )}
                     />
-                    <span className="font-medium">{item.name}</span>
+                    <span className="dashboard-sidebar-nav-text font-medium">{item.name}</span>
                   </Link>
                 );
               })}
 
-              <div className="pt-1">
+              <div className="dashboard-sidebar-finances-expanded pt-1">
                 <button
                   type="button"
                   onClick={() => setFinancesOpen((open) => !open)}
                   aria-expanded={financesOpen}
                   aria-controls={financesSubmenuId}
+                  title={t("dashboard.nav.finances")}
                   className={cn(
                     "dashboard-sidebar-nav-link w-full",
                     isFinanceRoute && !financesOpen && "bg-white/[0.04]"
@@ -235,7 +296,9 @@ export default function DashboardLayout({
                       isFinanceRoute ? "text-cyan-200" : "text-blue-200/55"
                     )}
                   />
-                  <span className="flex-1 text-left font-medium">{t("dashboard.nav.finances")}</span>
+                  <span className="dashboard-sidebar-nav-text flex-1 text-left font-medium">
+                    {t("dashboard.nav.finances")}
+                  </span>
                   <ChevronDown
                     className={cn(
                       "h-4 w-4 shrink-0 text-blue-200/45 transition-transform duration-200",
@@ -279,7 +342,31 @@ export default function DashboardLayout({
                 </div>
               </div>
 
-              <div className="mx-3 my-3 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+              <div className="dashboard-sidebar-finances-collapsed space-y-0.5 pt-1">
+                {navigationFinances.map((item) => {
+                  const IconComponent = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      title={item.name}
+                      className={cn("dashboard-sidebar-nav-link", active && "is-active")}
+                    >
+                      <IconComponent
+                        className={cn(
+                          "h-[17px] w-[17px] shrink-0",
+                          active ? "text-cyan-200" : "text-blue-200/55"
+                        )}
+                      />
+                      <span className="dashboard-sidebar-nav-text sr-only">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="dashboard-sidebar-divider mx-3 my-3 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
               {navigationSecondary.map((item) => {
                 const IconComponent = item.icon;
@@ -289,6 +376,7 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
+                    title={item.name}
                     className={cn("dashboard-sidebar-nav-link", active && "is-active")}
                   >
                     <IconComponent
@@ -297,7 +385,7 @@ export default function DashboardLayout({
                         active ? "text-cyan-200" : "text-blue-200/55"
                       )}
                     />
-                    <span className="font-medium">{item.name}</span>
+                    <span className="dashboard-sidebar-nav-text font-medium">{item.name}</span>
                   </Link>
                 );
               })}
@@ -307,10 +395,13 @@ export default function DashboardLayout({
           <div className="shrink-0 border-t border-white/10 p-3">
             <Link
               href="/"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-blue-100/55 transition-all duration-200 hover:bg-white/[0.06] hover:text-white"
+              title={t("dashboard.navigation.backHome")}
+              className="dashboard-sidebar-back-home flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-blue-100/55 transition-all duration-200 hover:bg-white/[0.06] hover:text-white"
             >
-              <Home className="h-[17px] w-[17px]" />
-              <span className="font-medium">{t("dashboard.navigation.backHome")}</span>
+              <Home className="h-[17px] w-[17px] shrink-0" />
+              <span className="dashboard-sidebar-nav-text font-medium">
+                {t("dashboard.navigation.backHome")}
+              </span>
             </Link>
           </div>
         </div>

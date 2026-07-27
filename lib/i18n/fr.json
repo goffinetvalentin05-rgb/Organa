@@ -521,7 +521,9 @@
     "brandLabel": "Dashboard Club",
     "navigation": {
       "primary": "Navigation",
-      "backHome": "Retour à l'accueil"
+      "backHome": "Retour à l'accueil",
+      "collapseSidebar": "Replier la barre latérale",
+      "expandSidebar": "Déplier la barre latérale"
     },
     "nav": {
       "dashboard": "Dashboard du club",

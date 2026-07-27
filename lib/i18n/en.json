@@ -522,7 +522,9 @@
     "navigation": {
       "primary": "Navigation",
       "secondary": "Monitoring",
-      "backHome": "Back to home"
+      "backHome": "Back to home",
+      "collapseSidebar": "Collapse sidebar",
+      "expandSidebar": "Expand sidebar"
     },
     "nav": {
       "dashboard": "Club Dashboard",
