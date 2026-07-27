@@ -375,7 +375,7 @@ html:has(.dashboard-shell) {
   z-index: 5;
   margin-top: 0;
   padding-top: 135px;
-  padding-bottom: clamp(5.5rem, 9vw, 8rem);
+  padding-bottom: clamp(3.25rem, 6vw, 5rem);
   background: #ffffff;
   border-radius: 48px 48px 0 0;
   box-shadow:
@@ -919,33 +919,30 @@ html:has(.dashboard-shell) {
   display: none;
 }
 
-/* Footer — fond bleu Obillz (fin de page immersive) */
+/* Footer — socle bleu Obillz */
 .site-footer {
   position: relative;
-  z-index: 3;
+  z-index: 1;
   width: 100%;
   min-height: 0;
   margin: 0;
-  margin-bottom: 0;
-  padding: 3.5rem 0 0;
-  padding-bottom: 0;
+  padding: 4.5rem 0 0;
   border: 0;
   box-shadow: none;
   overflow: hidden;
   color: #f8fafc;
   background:
     radial-gradient(
-      ellipse 80% 45% at 50% 0%,
-      rgba(66, 133, 255, 0.32) 0%,
-      rgba(37, 99, 235, 0.12) 42%,
-      transparent 72%
+      ellipse 90% 50% at 50% 0%,
+      rgba(96, 165, 250, 0.28) 0%,
+      transparent 58%
     ),
     linear-gradient(
       180deg,
-      #0c2460 0%,
-      #123775 28%,
-      #0d2f6a 55%,
-      #071a3e 100%
+      #1a3aff 0%,
+      #1732e8 38%,
+      #1429c9 72%,
+      #1020a8 100%
     );
 }
 
@@ -953,6 +950,11 @@ html:has(.dashboard-shell) {
 .site-footer::after {
   content: none !important;
   display: none !important;
+}
+
+.footer-body {
+  position: relative;
+  z-index: 2;
 }
 
 .footer-content {
@@ -972,13 +974,13 @@ html:has(.dashboard-shell) {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .footer-content p,
 .footer-content a,
 .footer-content .footer-meta {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .footer-content a {
@@ -1034,7 +1036,7 @@ html:has(.dashboard-shell) {
   align-items: center;
   gap: 1.25rem;
   flex-wrap: wrap;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .footer-bottom__social {
@@ -1050,9 +1052,9 @@ html:has(.dashboard-shell) {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
@@ -1061,10 +1063,10 @@ html:has(.dashboard-shell) {
 }
 
 .footer-social-link:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.25);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.22);
 }
 
 .footer-bottom__legal {
@@ -1081,7 +1083,7 @@ html:has(.dashboard-shell) {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.62);
   transition: color 0.2s ease;
 }
 
@@ -1099,35 +1101,34 @@ html:has(.dashboard-shell) {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.75rem;
 }
 
+/* Grand mot de fond — uniquement dans le footer bleu, derrière les liens */
 .footer-watermark {
   position: absolute;
   left: 50%;
-  top: 42%;
-  z-index: 1;
+  top: 54%;
+  z-index: 0;
   width: 100%;
   margin: 0;
-  padding: 0 12px;
+  padding: 0 8px;
   transform: translate(-50%, -50%);
   text-align: center;
-  font-size: clamp(88px, 18vw, 280px);
+  font-size: clamp(110px, 24vw, 340px);
   font-weight: 800;
   line-height: 0.78;
-  letter-spacing: -0.07em;
+  letter-spacing: -0.06em;
   white-space: nowrap;
-  color: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.1);
   pointer-events: none;
   user-select: none;
 }
 
 @media (max-width: 1023px) {
   .site-footer {
-    min-height: 0;
-    padding-top: 2.75rem;
-    padding-bottom: 0;
+    padding-top: 3.5rem;
   }
 
   .footer-content {
@@ -1140,14 +1141,14 @@ html:has(.dashboard-shell) {
   }
 
   .footer-watermark {
-    font-size: clamp(72px, 20vw, 160px);
-    top: 38%;
+    font-size: clamp(84px, 22vw, 200px);
+    top: 50%;
   }
 }
 
 @media (max-width: 639px) {
   .site-footer {
-    padding-top: 2.25rem;
+    padding-top: 3rem;
   }
 
   .footer-content {
@@ -1174,19 +1175,19 @@ html:has(.dashboard-shell) {
   }
 
   .footer-watermark {
-    font-size: clamp(64px, 22vw, 120px);
-    top: 36%;
+    font-size: clamp(72px, 26vw, 140px);
+    top: 48%;
   }
 }
 
-/* Pages légales (fond sombre) — footer navy sans bande blanche */
-.obillz-landing:not(.obillz-landing-home) .site-footer {
+/* Pages légales — footer autonome */
+.obillz-landing:not(.obillz-landing-home) .site-footer,
+.legal-page .site-footer {
   min-height: 0;
   padding-top: 4.5rem;
-  padding-bottom: 0;
   background:
-    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1), transparent 40%),
-    linear-gradient(180deg, #123775 0%, #071a3e 60%, #071a3e 100%);
+    radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.2), transparent 45%),
+    linear-gradient(180deg, #1a3aff 0%, #1429c9 55%, #1020a8 100%);
 }
 
 .legal-page .site-footer {
@@ -1218,117 +1219,83 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Landing — fin de page (CTA large + fond bleu)
+   Landing — fin de page (carte CTA flottante + footer bleu)
    ------------------------------------------------------------------ */
 .landing-page-end {
   position: relative;
   z-index: 6;
   overflow: visible;
-  background:
-    radial-gradient(
-      ellipse 90% 40% at 50% 18%,
-      rgba(56, 189, 248, 0.22) 0%,
-      rgba(37, 99, 235, 0.14) 40%,
-      transparent 70%
-    ),
-    linear-gradient(
-      180deg,
-      #0a1f5c 0%,
-      #0c2460 18%,
-      #123775 42%,
-      #0d2f6a 68%,
-      #071a3e 100%
-    );
+  background: #ffffff;
 }
 
-.landing-page-end::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.18;
-  background:
-    linear-gradient(rgba(96, 165, 250, 0.16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(96, 165, 250, 0.16) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black 10%, transparent 75%);
-}
-
-.landing-page-end > * {
-  position: relative;
-  z-index: 1;
-}
-
-.landing-page-end .site-footer {
-  background: transparent;
-  padding-top: 1.5rem;
-}
-
+/* Carte claire : chevauche le footer bleu (margin négatif) */
 .landing-final-cta {
-  margin-top: -7.5rem;
-  padding: 0 0 2.5rem;
+  position: relative;
+  z-index: 30;
+  margin: 0;
+  margin-bottom: clamp(-5.75rem, -10vw, -8.5rem);
+  padding: 0;
 }
 
 .landing-final-cta__frame {
-  width: min(1280px, calc(100% - 40px));
+  width: min(1400px, calc(100% - 48px));
   margin-left: auto;
   margin-right: auto;
 }
 
 .landing-final-cta__panel {
   isolation: isolate;
-  border-radius: 2rem;
-  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 2.5rem;
+  border: 1px solid rgba(191, 219, 254, 0.7);
   background:
-    radial-gradient(ellipse 70% 80% at 92% 20%, rgba(191, 219, 254, 0.55), transparent 58%),
-    radial-gradient(ellipse 50% 60% at 8% 90%, rgba(219, 234, 254, 0.45), transparent 55%),
-    linear-gradient(135deg, #ffffff 0%, #f5f9ff 48%, #eef5ff 100%);
+    radial-gradient(ellipse 55% 70% at 100% 80%, rgba(147, 197, 253, 0.35), transparent 60%),
+    radial-gradient(ellipse 40% 50% at 0% 0%, rgba(239, 246, 255, 0.9), transparent 55%),
+    linear-gradient(105deg, #ffffff 0%, #f7faff 55%, #eaf2ff 100%);
   box-shadow:
-    0 32px 80px rgba(15, 23, 42, 0.18),
-    0 12px 36px rgba(37, 99, 235, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 28px 70px rgba(15, 23, 42, 0.14),
+    0 10px 28px rgba(37, 99, 235, 0.1),
+    inset 0 1px 0 #ffffff;
 }
 
 .landing-final-cta__glow {
   position: absolute;
-  right: -8%;
-  top: -30%;
-  width: 55%;
-  height: 120%;
+  right: -6%;
+  bottom: -35%;
+  width: 48%;
+  height: 110%;
   pointer-events: none;
   background: radial-gradient(
     ellipse at center,
-    rgba(147, 197, 253, 0.45),
-    rgba(59, 130, 246, 0.12) 45%,
+    rgba(147, 197, 253, 0.5),
+    rgba(96, 165, 250, 0.15) 45%,
     transparent 70%
   );
-  filter: blur(8px);
+  filter: blur(6px);
 }
 
 .landing-final-cta__orb {
   position: absolute;
-  right: 8%;
-  bottom: -20%;
-  width: 280px;
-  height: 280px;
+  right: 12%;
+  top: -25%;
+  width: 220px;
+  height: 220px;
   pointer-events: none;
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(56, 189, 248, 0.22),
-    rgba(37, 99, 235, 0.08) 50%,
-    transparent 70%
+    rgba(191, 219, 254, 0.55),
+    rgba(59, 130, 246, 0.08) 55%,
+    transparent 72%
   );
-  filter: blur(20px);
+  filter: blur(18px);
 }
 
 .landing-final-cta__content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2rem;
-  padding: clamp(2rem, 4.5vw, 3.75rem) clamp(1.5rem, 4vw, 3.5rem);
+  gap: 1.75rem;
+  padding: clamp(2rem, 4vw, 3.25rem) clamp(1.5rem, 3.8vw, 3.75rem);
 }
 
 @media (min-width: 900px) {
@@ -1336,19 +1303,21 @@ html:has(.dashboard-shell) {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 3.5rem;
-    padding: 3.5rem 4rem;
+    gap: 3rem;
+    min-height: 220px;
+    padding: 3.25rem 4.25rem;
   }
 }
 
 .landing-final-cta__copy {
-  max-width: 42rem;
+  flex: 1 1 auto;
+  max-width: 44rem;
   text-align: left;
 }
 
 .landing-final-cta__title {
   margin: 0;
-  font-size: clamp(1.75rem, 3.4vw, 2.65rem);
+  font-size: clamp(1.7rem, 3.2vw, 2.55rem);
   font-weight: 800;
   line-height: 1.12;
   letter-spacing: -0.035em;
@@ -1356,26 +1325,27 @@ html:has(.dashboard-shell) {
 }
 
 .landing-final-cta__subtitle {
-  margin: 1rem 0 0;
-  max-width: 34rem;
-  font-size: clamp(0.95rem, 1.4vw, 1.0625rem);
+  margin: 0.9rem 0 0;
+  max-width: 36rem;
+  font-size: clamp(0.95rem, 1.35vw, 1.0625rem);
   line-height: 1.65;
-  color: #475569;
+  color: #64748b;
 }
 
 .landing-final-cta__actions {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.85rem;
-  flex-shrink: 0;
+  gap: 0.8rem;
+  flex: 0 0 auto;
 }
 
 .landing-final-cta__note {
   margin: 0;
+  max-width: 16rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.01em;
+  line-height: 1.4;
   color: #64748b;
 }
 
@@ -1383,8 +1353,8 @@ html:has(.dashboard-shell) {
   background: linear-gradient(180deg, #3b5bff 0%, #1a23ff 55%, #1520e6 100%);
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 0 40px rgba(26, 35, 255, 0.4),
-    0 10px 28px rgba(26, 35, 255, 0.28),
+    0 0 36px rgba(26, 35, 255, 0.35),
+    0 10px 24px rgba(26, 35, 255, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transition:
     box-shadow 0.3s ease,
@@ -1394,8 +1364,8 @@ html:has(.dashboard-shell) {
 .landing-final-cta__btn:hover {
   background: linear-gradient(180deg, #4a68ff 0%, #2430ff 55%, #1a23ff 100%);
   box-shadow:
-    0 0 56px rgba(26, 35, 255, 0.55),
-    0 14px 36px rgba(26, 35, 255, 0.35),
+    0 0 52px rgba(26, 35, 255, 0.5),
+    0 14px 32px rgba(26, 35, 255, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
@@ -1403,29 +1373,57 @@ html:has(.dashboard-shell) {
   animation: landing-cta-shimmer 0.75s ease;
 }
 
+/* Accueil : le footer laisse de la place pour le chevauchement du CTA */
+.landing-page-end .site-footer {
+  z-index: 1;
+  padding-top: clamp(8.5rem, 15vw, 12.5rem);
+  background:
+    radial-gradient(
+      ellipse 90% 45% at 50% 0%,
+      rgba(96, 165, 250, 0.3) 0%,
+      transparent 55%
+    ),
+    linear-gradient(
+      180deg,
+      #1a3aff 0%,
+      #1732e8 38%,
+      #1429c9 72%,
+      #1020a8 100%
+    );
+}
+
+.landing-page-end .footer-watermark {
+  top: 58%;
+  z-index: 0;
+}
+
+.landing-page-end .footer-content,
+.landing-page-end .footer-bottom,
+.landing-page-end .footer-copyright {
+  z-index: 2;
+}
+
 @media (max-width: 899px) {
   .landing-final-cta {
-    margin-top: -5.5rem;
-    padding-bottom: 2rem;
+    margin-bottom: clamp(-4.5rem, -12vw, -6rem);
   }
 
   .landing-final-cta__panel {
-    border-radius: 1.65rem;
+    border-radius: 1.75rem;
+  }
+
+  .landing-page-end .site-footer {
+    padding-top: clamp(7rem, 18vw, 9.5rem);
   }
 }
 
 @media (max-width: 639px) {
-  .landing-final-cta {
-    margin-top: -4rem;
-    padding-bottom: 1.5rem;
-  }
-
   .landing-final-cta__frame {
-    width: min(1280px, calc(100% - 24px));
+    width: min(1400px, calc(100% - 24px));
   }
 
   .landing-final-cta__panel {
-    border-radius: 1.4rem;
+    border-radius: 1.45rem;
   }
 
   .landing-final-cta__actions {
@@ -1435,6 +1433,10 @@ html:has(.dashboard-shell) {
   .landing-final-cta__actions .group,
   .landing-final-cta__btn {
     width: 100%;
+  }
+
+  .landing-final-cta__note {
+    max-width: none;
   }
 }
 

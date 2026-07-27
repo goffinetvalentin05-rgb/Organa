@@ -115,73 +115,76 @@ export default function LandingFooter() {
 
   return (
     <footer className="site-footer">
+      {/* Fond graphique — derrière le contenu footer uniquement */}
       <div className="footer-watermark" aria-hidden="true">
         {t("marketing.footer.watermark")}
       </div>
 
-      <motion.div
-        className="footer-content"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewportOnce}
-        transition={{ duration: 0.65, ease: easePremium }}
-      >
-        <div className="footer-brand">
-          <Link href="/" className="inline-block opacity-95 transition hover:opacity-100">
-            <Image src="/logo-obillz.png" alt="Obillz" width={130} height={34} className="h-8 w-auto" />
-          </Link>
-
-          <p className="mt-5 max-w-sm text-sm leading-relaxed">{t("marketing.footer.description")}</p>
-
-          <div className="mt-4 flex items-center gap-2.5">
-            <SwissFlag className="h-5 w-5 shrink-0 rounded-[3px]" />
-            <span className="footer-meta text-xs">{t("marketing.footer.swissMade")}</span>
-          </div>
-        </div>
-
-        <FooterLinkColumn title={t("marketing.footer.product")}>
-          {productLinks.map((link) => (
-            <FooterLink key={link.href} href={link.href}>
-              {link.label}
-            </FooterLink>
-          ))}
-        </FooterLinkColumn>
-
-        <FooterLinkColumn title={t("marketing.footer.account")}>
-          <FooterLink href="/inscription">{t("marketing.footer.createAccount")}</FooterLink>
-          <FooterLink href="/connexion">{t("marketing.footer.login")}</FooterLink>
-        </FooterLinkColumn>
-
-        <FooterLinkColumn title={t("marketing.footer.contact")}>
-          <li>
-            <a href="mailto:contact@obillz.com">contact@obillz.com</a>
-          </li>
-          <FooterLink href="/inscription">{t("marketing.footer.cta")}</FooterLink>
-        </FooterLinkColumn>
-      </motion.div>
-
-      <div className="footer-bottom">
-        <div className="footer-bottom__social">
-          <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram">
-            <InstagramIcon className="h-[18px] w-[18px]" />
-          </SocialLink>
-          <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook">
-            <FacebookIcon className="h-[18px] w-[18px]" />
-          </SocialLink>
-        </div>
-
-        <nav className="footer-bottom__legal" aria-label="Liens légaux">
-          {legalLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              {link.label}
+      <div className="footer-body">
+        <motion.div
+          className="footer-content"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={{ duration: 0.6, ease: easePremium }}
+        >
+          <div className="footer-brand">
+            <Link href="/" className="inline-block opacity-95 transition hover:opacity-100">
+              <Image src="/logo-obillz.png" alt="Obillz" width={130} height={34} className="h-8 w-auto" />
             </Link>
-          ))}
-        </nav>
-      </div>
 
-      <div className="footer-copyright">
-        <p>{t("marketing.footer.copyright", { year })}</p>
-        <p>{t("marketing.footer.trialNote", { days: TRIAL_DURATION_DAYS })}</p>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed">{t("marketing.footer.description")}</p>
+
+            <div className="mt-4 flex items-center gap-2.5">
+              <SwissFlag className="h-5 w-5 shrink-0 rounded-[3px]" />
+              <span className="footer-meta text-xs">{t("marketing.footer.swissMade")}</span>
+            </div>
+          </div>
+
+          <FooterLinkColumn title={t("marketing.footer.product")}>
+            {productLinks.map((link) => (
+              <FooterLink key={link.href} href={link.href}>
+                {link.label}
+              </FooterLink>
+            ))}
+          </FooterLinkColumn>
+
+          <FooterLinkColumn title={t("marketing.footer.account")}>
+            <FooterLink href="/inscription">{t("marketing.footer.createAccount")}</FooterLink>
+            <FooterLink href="/connexion">{t("marketing.footer.login")}</FooterLink>
+          </FooterLinkColumn>
+
+          <FooterLinkColumn title={t("marketing.footer.contact")}>
+            <li>
+              <a href="mailto:contact@obillz.com">contact@obillz.com</a>
+            </li>
+            <FooterLink href="/inscription">{t("marketing.footer.cta")}</FooterLink>
+          </FooterLinkColumn>
+        </motion.div>
+
+        <div className="footer-bottom">
+          <div className="footer-bottom__social">
+            <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram">
+              <InstagramIcon className="h-[18px] w-[18px]" />
+            </SocialLink>
+            <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook">
+              <FacebookIcon className="h-[18px] w-[18px]" />
+            </SocialLink>
+          </div>
+
+          <nav className="footer-bottom__legal" aria-label="Liens légaux">
+            {legalLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="footer-copyright">
+          <p>{t("marketing.footer.copyright", { year })}</p>
+          <p>{t("marketing.footer.trialNote", { days: TRIAL_DURATION_DAYS })}</p>
+        </div>
       </div>
     </footer>
   );

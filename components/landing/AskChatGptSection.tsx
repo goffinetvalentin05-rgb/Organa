@@ -25,8 +25,8 @@ export default function AskChatGptSection() {
   );
 
   return (
-    <section id="demander-chatgpt" className="landing-final-cta relative scroll-mt-24">
-      <div className="landing-final-cta__frame relative mx-auto">
+    <section id="demander-chatgpt" className="landing-final-cta scroll-mt-24">
+      <div className="landing-final-cta__frame">
         <motion.div
           variants={scrollReveal}
           initial="hidden"
@@ -61,12 +61,12 @@ export default function AskChatGptSection() {
                 className="group relative inline-flex"
               >
                 <motion.span
-                  className="pointer-events-none absolute -inset-3 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.45),rgba(99,102,241,0.18)_55%,transparent_70%)] blur-2xl"
+                  className="pointer-events-none absolute -inset-3 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.4),rgba(99,102,241,0.15)_55%,transparent_70%)] blur-2xl"
                   aria-hidden
                   animate={
                     reduceMotion
                       ? undefined
-                      : { opacity: [0.45, 0.85, 0.45], scale: [0.94, 1.06, 0.94] }
+                      : { opacity: [0.4, 0.8, 0.4], scale: [0.94, 1.05, 0.94] }
                   }
                   transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
                 />
