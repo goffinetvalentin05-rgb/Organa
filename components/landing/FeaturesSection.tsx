@@ -10,7 +10,7 @@ export default function FeaturesSection() {
   const { t } = useI18n();
 
   return (
-    <section id="modules" className={`${landingSectionShellClass(true)} scroll-mt-28`}>
+    <section id="modules" className={`${landingSectionShellClass(true)} scroll-mt-32 md:scroll-mt-36`}>
       <div className="relative mx-auto w-[94%] max-w-[1240px]">
         <motion.div
           variants={scrollReveal}
