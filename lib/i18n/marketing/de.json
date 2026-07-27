@@ -563,5 +563,44 @@
     "watermark": "OBILLZ",
     "instagramUrl": "https://www.instagram.com/obillz/",
     "facebookUrl": "https://www.facebook.com/obillz/"
+  },
+  "storyInvite": {
+    "label": "DIE GESCHICHTE VON OBILLZ",
+    "title": "Die Geburt von Obillz entdecken",
+    "description": "Wie ist die Idee von Obillz entstanden?",
+    "cta": "Entdecken",
+    "hint": "Entdecken",
+    "close": "Schließen"
+  },
+  "ourStory": {
+    "label": "UNSERE GESCHICHTE",
+    "title": "Die Geburt von Obillz",
+    "subtitle": "Eine Plattform aus einer einfachen Erkenntnis: Vereinsfreiwillige verdienen bessere Werkzeuge.",
+    "backToLanding": "Zurück zur Startseite",
+    "timelineLabel": "ZEITACHSE",
+    "timelineTitle": "Der Weg von Obillz",
+    "timelineIntro": "Diese Zeitachse wird in Kürze ergänzt. Hier die geplanten Etappen.",
+    "milestones": {
+      "constat": {
+        "title": "Die Feststellung",
+        "placeholder": "Inhalt folgt — die Ausgangsfeststellung hinter Obillz."
+      },
+      "idee": {
+        "title": "Die Idee",
+        "placeholder": "Inhalt folgt — wie die Idee von Obillz entstand."
+      },
+      "creation": {
+        "title": "Die Entstehung",
+        "placeholder": "Inhalt folgt — der Aufbau der Plattform."
+      },
+      "premiersClubs": {
+        "title": "Die ersten Vereine",
+        "placeholder": "Inhalt folgt — die ersten Vereine mit Obillz."
+      },
+      "suite": {
+        "title": "Wie es weitergeht",
+        "placeholder": "Inhalt folgt — das nächste Kapitel von Obillz."
+      }
+    }
   }
 }

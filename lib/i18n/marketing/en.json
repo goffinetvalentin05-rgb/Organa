@@ -622,5 +622,44 @@
     "watermark": "OBILLZ",
     "instagramUrl": "https://www.instagram.com/obillz/",
     "facebookUrl": "https://www.facebook.com/obillz/"
+  },
+  "storyInvite": {
+    "label": "THE OBILLZ STORY",
+    "title": "Discover how Obillz was born",
+    "description": "How did the idea of Obillz come to life?",
+    "cta": "Discover",
+    "hint": "Discover",
+    "close": "Close"
+  },
+  "ourStory": {
+    "label": "OUR STORY",
+    "title": "The birth of Obillz",
+    "subtitle": "A platform born from a simple observation: club volunteers deserve better tools.",
+    "backToLanding": "Back to home",
+    "timelineLabel": "TIMELINE",
+    "timelineTitle": "The Obillz journey",
+    "timelineIntro": "This timeline will be completed soon. Here are the planned milestones.",
+    "milestones": {
+      "constat": {
+        "title": "The observation",
+        "placeholder": "Content coming soon — the initial observation behind Obillz."
+      },
+      "idee": {
+        "title": "The idea",
+        "placeholder": "Content coming soon — how the Obillz idea took shape."
+      },
+      "creation": {
+        "title": "The creation",
+        "placeholder": "Content coming soon — building the platform."
+      },
+      "premiersClubs": {
+        "title": "The first clubs",
+        "placeholder": "Content coming soon — the first clubs to use Obillz."
+      },
+      "suite": {
+        "title": "What’s next",
+        "placeholder": "Content coming soon — the next chapter for Obillz."
+      }
+    }
   }
 }

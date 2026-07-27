@@ -620,5 +620,44 @@
     "watermark": "OBILLZ",
     "instagramUrl": "https://www.instagram.com/obillz/",
     "facebookUrl": "https://www.facebook.com/obillz/"
+  },
+  "storyInvite": {
+    "label": "L’HISTOIRE D’OBILLZ",
+    "title": "Découvrir la naissance d’Obillz",
+    "description": "Comment est née l’idée d’Obillz ?",
+    "cta": "Découvrir",
+    "hint": "Découvrir",
+    "close": "Fermer"
+  },
+  "ourStory": {
+    "label": "NOTRE HISTOIRE",
+    "title": "La naissance d’Obillz",
+    "subtitle": "Une plateforme née d’un constat simple : les bénévoles des clubs méritent de meilleurs outils.",
+    "backToLanding": "Retour à l’accueil",
+    "timelineLabel": "CHRONOLOGIE",
+    "timelineTitle": "Le parcours Obillz",
+    "timelineIntro": "Cette chronologie sera complétée prochainement. Voici les grandes étapes prévues.",
+    "milestones": {
+      "constat": {
+        "title": "Le constat",
+        "placeholder": "Contenu à venir — le constat de départ qui a motivé Obillz."
+      },
+      "idee": {
+        "title": "L’idée",
+        "placeholder": "Contenu à venir — la naissance de l’idée Obillz."
+      },
+      "creation": {
+        "title": "La création",
+        "placeholder": "Contenu à venir — la création de la plateforme."
+      },
+      "premiersClubs": {
+        "title": "Les premiers clubs",
+        "placeholder": "Contenu à venir — les premiers clubs utilisateurs."
+      },
+      "suite": {
+        "title": "La suite",
+        "placeholder": "Contenu à venir — la suite de l’aventure Obillz."
+      }
+    }
   }
 }
