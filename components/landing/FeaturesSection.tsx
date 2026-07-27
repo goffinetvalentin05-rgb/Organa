@@ -26,7 +26,7 @@ export default function FeaturesSection() {
           />
         </motion.div>
 
-        <div className="landing-section-content">
+        <div className="landing-section-content features-arc-section-content">
           <FeaturesArcShowcase />
         </div>
       </div>

@@ -80,9 +80,9 @@
     }
   },
   "modules": {
-    "label": "01 / FONCTIONNALITÉS",
-    "title": "Une fonctionnalité en tête ? Obillz l'a déjà.",
-    "subtitle": "Cotisations, planning, documents, événements, sponsors et bien plus encore, réunis dans une seule plateforme.",
+    "label": "01 / LA PLATEFORME",
+    "title": "Toute la gestion de votre club, au même endroit.",
+    "subtitle": "Membres, cotisations, événements, documents, sponsors et bien plus encore, réunis dans une seule plateforme claire et intuitive.",
     "searchHint": "Vous cherchez une fonctionnalité ? Obillz l'a.",
     "searchPlaceholder": "Rechercher une fonctionnalité…",
     "demoQueries": ["cotisations", "planning", "procès-verbal", "sponsors"],

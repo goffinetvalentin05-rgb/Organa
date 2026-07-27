@@ -80,11 +80,11 @@
     }
   },
   "modules": {
-    "label": "01 / FEATURES",
-    "titleLine1": "Looking for a feature?",
-    "titleLine2": "Obillz already has it.",
-    "title": "Looking for a feature? Obillz already has it.",
-    "subtitle": "Membership fees, scheduling, documents, events, sponsors and much more — all in one platform.",
+    "label": "01 / THE PLATFORM",
+    "titleLine1": "All your club management,",
+    "titleLine2": "in one place.",
+    "title": "All your club management, in one place.",
+    "subtitle": "Members, membership fees, events, documents, sponsors and much more — united in one clear, intuitive platform.",
     "searchHint": "Looking for a feature? Obillz has it.",
     "searchPlaceholder": "Search for a feature…",
     "demoQueries": ["membership fees", "schedule", "minutes", "sponsors"],
