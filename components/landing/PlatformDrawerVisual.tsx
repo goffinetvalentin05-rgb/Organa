@@ -1,49 +1,59 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import {
-  CalendarDays,
   CalendarRange,
+  CreditCard,
   FileText,
   Handshake,
   Megaphone,
   Receipt,
+  TrendingUp,
   Users,
-  UsersRound,
   Wallet,
 } from "lucide-react";
+import { useRef } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { getTranslationValue } from "@/lib/i18n";
-import { easePremium, staggerContainer, staggerItem, viewportOnce } from "@/components/landing/landing-motion";
 
 type DrawerTile = { id: string; label: string };
 
 const tileIcons: Record<string, LucideIcon> = {
   membres: Users,
   cotisations: Wallet,
-  evenements: CalendarDays,
+  finances: TrendingUp,
+  factures: Receipt,
+  charges: CreditCard,
+  procesVerbaux: FileText,
+  plannings: CalendarRange,
+  manifestations: Megaphone,
   sponsors: Handshake,
-  comite: UsersRound,
-  facture: Receipt,
-  planning: CalendarRange,
-  procesVerbal: FileText,
-  manifestation: Megaphone,
 };
 
 const tileOrder = [
   "membres",
   "cotisations",
-  "evenements",
+  "finances",
+  "factures",
+  "charges",
+  "procesVerbaux",
+  "plannings",
+  "manifestations",
   "sponsors",
-  "comite",
-  "facture",
-  "planning",
-  "procesVerbal",
-  "manifestation",
 ] as const;
 
-export default function PlatformDrawerVisual() {
+type PlatformDrawerVisualProps = {
+  scrollProgress: MotionValue<number>;
+};
+
+export default function PlatformDrawerVisual({ scrollProgress }: PlatformDrawerVisualProps) {
   const { locale, t } = useI18n();
   const reduceMotion = useReducedMotion();
   const raw = getTranslationValue(locale, "marketing.modules.drawerTiles");
@@ -54,99 +64,202 @@ export default function PlatformDrawerVisual() {
     return { id, label: found?.label ?? id };
   });
 
+  const progress = reduceMotion ? null : scrollProgress;
+
+  const drawerPull = useTransform(progress ?? scrollProgress, [0.08, 0.72], [0, 1]);
+  const drawerY = useTransform(drawerPull, [0, 1], [-196, 220]);
+  const drawerZ = useTransform(drawerPull, [0, 1], [-20, 140]);
+  const drawerRotateX = useTransform(drawerPull, [0, 1], [18, -4]);
+  const interiorGlow = useTransform(drawerPull, [0, 0.35, 1], [0.15, 0.55, 1]);
+  const handleGlow = useTransform(drawerPull, [0, 0.25, 1], [0.35, 0.75, 1]);
+  const shadowStrength = useTransform(drawerPull, [0, 1], [0.12, 0.38]);
+
   return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={viewportOnce}
-      transition={{ duration: 0.75, ease: easePremium }}
-      className="platform-drawer relative mx-auto w-full max-w-[920px]"
+    <div
+      className="platform-console-scene relative mx-auto w-full max-w-[980px]"
       aria-label={t("marketing.modules.drawerAriaLabel")}
     >
       <div
-        className="pointer-events-none absolute -inset-x-6 -inset-y-8 rounded-[3rem] bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.14),rgba(56,189,248,0.06)_45%,transparent_72%)] blur-2xl"
+        className="pointer-events-none absolute -inset-x-10 -bottom-16 top-8 rounded-[3rem] bg-[radial-gradient(ellipse_at_50%_65%,rgba(37,99,235,0.12),rgba(56,189,248,0.04)_42%,transparent_72%)]"
         aria-hidden
       />
 
-      <div className="platform-drawer__shell relative overflow-hidden rounded-[1.75rem] border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/80 shadow-[0_24px_64px_rgba(15,23,42,0.08),0_0_0_1px_rgba(255,255,255,0.9)_inset,0_0_48px_rgba(37,99,235,0.08)] sm:rounded-[2rem]">
-        <motion.div
-          initial={reduceMotion ? false : { y: 0 }}
-          whileInView={{ y: reduceMotion ? 0 : 8 }}
-          viewport={viewportOnce}
-          transition={{ duration: 0.85, delay: 0.12, ease: easePremium }}
-          className="platform-drawer__lip relative z-[2] border-b border-slate-200/80 bg-gradient-to-b from-slate-50/95 to-white px-6 py-4 sm:px-8 sm:py-5"
-        >
-          <div className="mx-auto flex w-full max-w-[220px] flex-col items-center gap-2">
-            <span
-              className="h-1 w-14 rounded-full bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
-              aria-hidden
-            />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">
-              Obillz
-            </span>
+      <div className="platform-console-cabinet relative">
+        <div className="platform-console-top relative overflow-hidden rounded-t-[1.35rem] border border-white/[0.08] bg-gradient-to-b from-[#071634] via-[#0A1F4D] to-[#0c2554] px-6 py-10 shadow-[0_28px_80px_rgba(7,22,52,0.28),inset_0_1px_0_rgba(255,255,255,0.08)] sm:rounded-t-[1.75rem] sm:px-10 sm:py-12 md:py-14">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(56,189,248,0.14),transparent_58%)]"
+            aria-hidden
+          />
+          <div className="relative mx-auto max-w-[680px] text-center">
+            <h2 className="text-[clamp(1.35rem,3.2vw,2rem)] font-bold leading-[1.15] tracking-tight text-white">
+              {t("marketing.modules.panelTitle")}
+            </h2>
+            <p className="mx-auto mt-3 max-w-[540px] text-[clamp(0.875rem,1.6vw,1.05rem)] leading-relaxed text-blue-100/72 sm:mt-4">
+              {t("marketing.modules.panelSubtitle")}
+            </p>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={
-            reduceMotion
-              ? false
-              : { opacity: 0, scaleY: 0.72, transformOrigin: "top center" }
-          }
-          whileInView={{ opacity: 1, scaleY: 1 }}
-          viewport={viewportOnce}
-          transition={{ duration: 0.88, delay: 0.28, ease: easePremium }}
-          className="platform-drawer__body relative overflow-hidden"
-        >
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="grid grid-cols-2 gap-2.5 p-4 sm:grid-cols-3 sm:gap-3 sm:p-6 md:gap-3.5 md:p-7"
+        <div className="platform-console-slot relative h-[420px] overflow-x-hidden overflow-y-visible sm:h-[460px] md:h-[500px]">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-0 h-8 bg-gradient-to-b from-[#0c2554] to-[#081a3d]"
+            aria-hidden
+          />
+
+          <div
+            className="platform-console-perspective absolute inset-x-0 top-0 z-[1] flex justify-center"
+            style={{ perspective: "1400px", perspectiveOrigin: "50% 20%" }}
           >
-            {tiles.map((tile) => {
-              const Icon = tileIcons[tile.id] ?? FileText;
-              return (
-                <motion.div key={tile.id} variants={staggerItem}>
-                  <DrawerTileCard icon={Icon} label={tile.label} reduceMotion={!!reduceMotion} />
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </motion.div>
+            <motion.div
+              className="platform-console-drawer relative w-[min(94vw,900px)]"
+              style={{
+                y: reduceMotion ? 200 : drawerY,
+                z: reduceMotion ? 120 : drawerZ,
+                rotateX: reduceMotion ? -2 : drawerRotateX,
+                transformStyle: "preserve-3d",
+                transformPerspective: 1400,
+              }}
+            >
+              <motion.div
+                className="platform-console-drawer-front relative z-[3] rounded-[1.1rem] border border-white/[0.1] bg-gradient-to-b from-[#0d1f45] via-[#0a1938] to-[#081530] px-6 py-5 shadow-[0_18px_40px_rgba(2,6,23,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] sm:rounded-[1.25rem] sm:px-8 sm:py-6"
+                style={{ transform: "translateZ(24px)" }}
+              >
+                <div className="mx-auto flex max-w-[280px] flex-col items-center gap-3">
+                  <motion.div
+                    className="relative h-[7px] w-[min(52vw,220px)] overflow-hidden rounded-full bg-[#061022]"
+                    style={{ opacity: handleGlow }}
+                  >
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#1A23FF]/20 via-[#38BDF8] to-[#1A23FF]/20 shadow-[0_0_18px_rgba(56,189,248,0.85),0_0_36px_rgba(26,35,255,0.45)]" />
+                  </motion.div>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-blue-200/45">
+                    Obillz
+                  </span>
+                </div>
+                <div
+                  className="pointer-events-none absolute inset-x-4 bottom-0 h-[3px] rounded-full bg-gradient-to-r from-transparent via-[#38BDF8]/35 to-transparent blur-[1px]"
+                  aria-hidden
+                />
+              </motion.div>
+
+              <div
+                className="platform-console-drawer-body relative z-[2] -mt-[2px] overflow-hidden rounded-b-[1.35rem] border border-t-0 border-white/[0.08] bg-gradient-to-b from-[#07142e] via-[#061022] to-[#040b18] sm:rounded-b-[1.5rem]"
+                style={{ transform: "translateZ(8px)" }}
+              >
+                <div
+                  className="pointer-events-none absolute -left-[3px] top-0 z-[1] h-full w-[6px] bg-gradient-to-r from-[#030712] via-[#0a1628] to-transparent"
+                  style={{ transform: "rotateY(22deg) translateZ(-6px)" }}
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute -right-[3px] top-0 z-[1] h-full w-[6px] bg-gradient-to-l from-[#030712] via-[#0a1628] to-transparent"
+                  style={{ transform: "rotateY(-22deg) translateZ(-6px)" }}
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute inset-y-0 left-0 w-5 bg-gradient-to-r from-black/40 to-transparent"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute inset-y-0 right-0 w-5 bg-gradient-to-l from-black/40 to-transparent"
+                  aria-hidden
+                />
+
+                <motion.div
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(56,189,248,0.22),transparent_62%)]"
+                  style={{ opacity: interiorGlow }}
+                  aria-hidden
+                />
+
+                <div className="relative px-4 pb-5 pt-4 sm:px-6 sm:pb-7 sm:pt-5 md:px-7 md:pb-8">
+                  <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 md:gap-4">
+                    {tiles.map((tile, index) => (
+                      <PhysicalKey
+                        key={tile.id}
+                        icon={tileIcons[tile.id] ?? FileText}
+                        label={tile.label}
+                        index={index}
+                        scrollProgress={progress ?? scrollProgress}
+                        reduceMotion={!!reduceMotion}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-3 bg-gradient-to-t from-black/40 to-transparent"
+                  aria-hidden
+                />
+              </div>
+
+              <motion.div
+                className="pointer-events-none absolute -bottom-8 left-[8%] right-[8%] h-10 rounded-[50%] bg-[#020617]/50 blur-2xl"
+                style={{ opacity: shadowStrength }}
+                aria-hidden
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        <div
+          className="platform-console-base relative -mt-1 h-5 rounded-b-[1.35rem] border border-t-0 border-white/[0.06] bg-gradient-to-b from-[#071634] to-[#050f22] shadow-[0_20px_48px_rgba(7,22,52,0.22)] sm:rounded-b-[1.75rem]"
+          aria-hidden
+        />
+      </div>
+    </div>
+  );
+}
+
+function PhysicalKey({
+  icon: Icon,
+  label,
+  index,
+  scrollProgress,
+  reduceMotion,
+}: {
+  icon: LucideIcon;
+  label: string;
+  index: number;
+  scrollProgress: MotionValue<number>;
+  reduceMotion: boolean;
+}) {
+  const start = 0.22 + index * 0.055;
+  const end = start + 0.12;
+  const keyOpacity = useTransform(scrollProgress, [start, end], [0, 1]);
+  const keyY = useTransform(scrollProgress, [start, end], [18, 0]);
+  const keyGlow = useTransform(scrollProgress, [start, end], [0, 1]);
+
+  if (reduceMotion) {
+    return (
+      <div className="platform-console-key">
+        <div className="platform-console-key__face platform-console-key__face--lit">
+          <Icon className="platform-console-key__icon" strokeWidth={1.65} aria-hidden />
+          <span className="platform-console-key__label">{label}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div className="platform-console-key" style={{ opacity: keyOpacity, y: keyY }}>
+      <div className="platform-console-key__face">
+        <motion.div
+          className="platform-console-key__glow"
+          style={{ opacity: keyGlow }}
+          aria-hidden
+        />
+        <Icon className="platform-console-key__icon" strokeWidth={1.65} aria-hidden />
+        <span className="platform-console-key__label">{label}</span>
       </div>
     </motion.div>
   );
 }
 
-function DrawerTileCard({
-  icon: Icon,
-  label,
-  reduceMotion,
-}: {
-  icon: LucideIcon;
-  label: string;
-  reduceMotion: boolean;
-}) {
-  return (
-    <motion.div
-      whileHover={
-        reduceMotion
-          ? undefined
-          : {
-              y: -3,
-              transition: { duration: 0.28, ease: easePremium },
-            }
-      }
-      className="platform-drawer__tile group flex flex-col items-center gap-2.5 rounded-xl border border-slate-200/90 bg-white px-3 py-4 shadow-[0_2px_8px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,0.95)] transition-[border-color,box-shadow] duration-300 hover:border-blue-200/80 hover:shadow-[0_8px_24px_rgba(37,99,235,0.1),0_0_0_1px_rgba(37,99,235,0.06)] sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-5"
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100/80 bg-gradient-to-br from-blue-50 to-slate-50 text-[#2563EB] shadow-[0_0_20px_rgba(37,99,235,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 group-hover:border-blue-200/90 group-hover:from-blue-100/70 group-hover:to-blue-50/90 group-hover:shadow-[0_0_24px_rgba(37,99,235,0.16)] sm:h-11 sm:w-11">
-        <Icon className="h-[18px] w-[18px] sm:h-5 sm:w-5" strokeWidth={1.75} aria-hidden />
-      </span>
-      <span className="text-center text-[11px] font-semibold leading-tight tracking-tight text-slate-700 sm:text-xs">
-        {label}
-      </span>
-    </motion.div>
-  );
+export function usePlatformScrollProgress() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  return { containerRef, scrollYProgress };
 }

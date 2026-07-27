@@ -1,38 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
-import LandingSectionIntro, { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
-import PlatformDrawerVisual from "@/components/landing/PlatformDrawerVisual";
+import PlatformDrawerVisual, { usePlatformScrollProgress } from "@/components/landing/PlatformDrawerVisual";
+import { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
 import { useI18n } from "@/components/I18nProvider";
-import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 
 export default function FeaturesSection() {
   const { t } = useI18n();
+  const { containerRef, scrollYProgress } = usePlatformScrollProgress();
 
   return (
-    <section id="modules" className={landingSectionShellClass(true)}>
+    <section
+      id="modules"
+      ref={containerRef}
+      className={`${landingSectionShellClass(true)} platform-scroll-section scroll-mt-28`}
+    >
       <div className="relative mx-auto w-[94%] max-w-[1240px]">
-        <motion.div
-          variants={scrollReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
-          <LandingSectionIntro
-            layout="centered"
-            label={t("marketing.modules.label")}
-            title={
-              <>
-                <span className="block">{t("marketing.modules.titleLine1")}</span>
-                <span className="block">{t("marketing.modules.titleLine2")}</span>
-              </>
-            }
-            description={t("marketing.modules.subtitle")}
-          />
-        </motion.div>
+        <p className="landing-section-label mb-8 text-center md:mb-10">{t("marketing.modules.label")}</p>
 
-        <div className="landing-section-content">
-          <PlatformDrawerVisual />
+        <div className="platform-scroll-sticky">
+          <PlatformDrawerVisual scrollProgress={scrollYProgress} />
         </div>
       </div>
     </section>

@@ -85,17 +85,19 @@
     "titleLine1": "Toute la gestion de votre club,",
     "titleLine2": "au même endroit.",
     "subtitle": "Retrouvez les outils et documents essentiels de votre club dans un espace unique, clair et accessible à votre comité.",
-    "drawerAriaLabel": "Espaces et documents centralisés dans Obillz",
+    "panelTitle": "Toute la gestion de votre club, au même endroit.",
+    "panelSubtitle": "Membres, finances, documents et organisation réunis dans un seul espace.",
+    "drawerAriaLabel": "Console Obillz — tiroir des outils du club",
     "drawerTiles": [
       { "id": "membres", "label": "Membres" },
       { "id": "cotisations", "label": "Cotisations" },
-      { "id": "evenements", "label": "Événements" },
-      { "id": "sponsors", "label": "Sponsors" },
-      { "id": "comite", "label": "Comité" },
-      { "id": "facture", "label": "Facture" },
-      { "id": "planning", "label": "Planning" },
-      { "id": "procesVerbal", "label": "Procès-verbal" },
-      { "id": "manifestation", "label": "Manifestation" }
+      { "id": "finances", "label": "Finances" },
+      { "id": "factures", "label": "Factures" },
+      { "id": "charges", "label": "Charges" },
+      { "id": "procesVerbaux", "label": "Procès-verbaux" },
+      { "id": "plannings", "label": "Plannings" },
+      { "id": "manifestations", "label": "Manifestations" },
+      { "id": "sponsors", "label": "Sponsors" }
     ],
     "cta": "Tester gratuitement",
     "gridCards": [
