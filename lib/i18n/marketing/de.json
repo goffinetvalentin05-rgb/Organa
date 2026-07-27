@@ -267,28 +267,69 @@
     ]
   },
   "howItWorks": {
-    "label": "So funktioniert's",
-    "title": "Starten Sie einfach mit Obillz.",
-    "subtitle": "Obillz ist darauf ausgelegt, schnell einsatzbereit zu sein — ohne komplizierte Schulung oder tiefgreifende Umstellung in der Vereinsorganisation.",
+    "label": "02 / SO FUNKTIONIERT'S",
+    "title": "Übernehmen Sie Ihren Verein — ganz einfach.",
+    "subtitle": "In wenigen Schritten zentralisiert Ihr Vorstand die Organisation und gewinnt Zeit.",
     "cta": "Kostenlos testen",
     "steps": [
       {
-        "title": "Verein anlegen",
-        "description": "Richten Sie Ihren Bereich in wenigen Minuten ein."
+        "title": "Vereinsbereich anlegen",
+        "description": "Fügen Sie die wichtigsten Informationen Ihres Vereins hinzu."
       },
       {
-        "title": "Mitglieder hinzufügen",
-        "description": "Importieren Sie Ihre Liste oder ergänzen Sie Mitglieder schrittweise."
+        "title": "Mitglieder importieren",
+        "description": "Importieren Sie Ihre bestehende Liste in wenigen Klicks, ohne alles manuell neu einzutragen."
       },
       {
-        "title": "Steuern Sie nach den Bedürfnissen Ihres Vereins",
-        "description": "Nutzen Sie die Funktionen, die für Ihren Vorstand nützlich sind — je nach Organisation und Prioritäten Ihres Vereins."
+        "title": "Vorstand einladen",
+        "description": "Geben Sie jeder Person die passenden Zugänge für ihre Rolle."
       },
       {
-        "title": "Alles zentralisiert",
-        "description": "Ihr Vorstand behält einen klaren Überblick über die Vereinsverwaltung."
+        "title": "Alles an einem Ort verwalten",
+        "description": "Finden Sie Mitglieder, Beiträge, Dokumente und Events auf einer einzigen Plattform."
       }
-    ]
+    ],
+    "mocks": {
+      "step1": {
+        "title": "Bereich erstellen",
+        "clubName": "Vereinsname",
+        "clubNameValue": "FC Les Étoiles",
+        "sport": "Sport",
+        "sportValue": "Fussball",
+        "location": "Standort",
+        "locationValue": "Lausanne, Schweiz",
+        "logo": "Logo",
+        "cta": "Meinen Bereich erstellen"
+      },
+      "step2": {
+        "title": "Mitgliederimport",
+        "fileName": "mitglieder_2026.xlsx",
+        "uploadHint": "Excel- oder CSV-Datei hier ablegen",
+        "importing": "Import läuft…",
+        "success": "248 Mitglieder importiert"
+      },
+      "step3": {
+        "title": "Vorstandverwaltung",
+        "president": "Präsident",
+        "treasurer": "Kassier",
+        "secretary": "Sekretär",
+        "fullAccess": "Vollzugriff",
+        "financeAccess": "Finanzzugriff",
+        "adminAccess": "Admin-Zugriff"
+      },
+      "step4": {
+        "title": "Zentrale Ansicht",
+        "members": "Mitglieder",
+        "membersCount": "248 aktiv",
+        "cotisations": "Beiträge",
+        "cotisationsStatus": "87 % bezahlt",
+        "documents": "Dokumente",
+        "documentsCount": "12 Dateien",
+        "events": "Events",
+        "eventsCount": "3 geplant",
+        "centralized": "Alles zentralisiert"
+      }
+    }
   },
   "askChatGpt": {
     "title": "Noch unsicher, ob Obillz zu Ihrem Verein passt?",

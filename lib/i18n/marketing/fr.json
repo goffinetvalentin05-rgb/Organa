@@ -324,28 +324,69 @@
     ]
   },
   "howItWorks": {
-    "label": "Comment ça marche",
-    "title": "Commencez simplement avec Obillz.",
-    "subtitle": "Obillz a été pensé pour être utilisable rapidement, sans formation compliquée ni changement brutal dans l'organisation du club.",
+    "label": "02 / COMMENT ÇA MARCHE",
+    "title": "Prenez en main votre club, simplement.",
+    "subtitle": "En quelques étapes, votre comité centralise son organisation et commence à gagner du temps.",
     "cta": "Tester gratuitement",
     "steps": [
       {
-        "title": "Créez votre club",
-        "description": "Configurez votre espace en quelques minutes."
+        "title": "Créez votre espace club",
+        "description": "Ajoutez les informations principales de votre club."
       },
       {
-        "title": "Ajoutez vos membres",
-        "description": "Importez votre liste ou ajoutez vos membres progressivement."
+        "title": "Importez vos membres",
+        "description": "Importez votre liste existante en quelques clics, sans devoir tout recommencer manuellement."
       },
       {
-        "title": "Pilotez selon les besoins de votre club",
-        "description": "Utilisez les fonctionnalités utiles à votre comité, selon l'organisation et les priorités de votre club."
+        "title": "Invitez votre comité",
+        "description": "Donnez à chaque personne les accès adaptés à son rôle."
       },
       {
-        "title": "Tout est centralisé",
-        "description": "Votre comité garde une vision claire de la gestion du club."
+        "title": "Gérez tout au même endroit",
+        "description": "Retrouvez vos membres, cotisations, documents et événements dans une seule plateforme."
       }
-    ]
+    ],
+    "mocks": {
+      "step1": {
+        "title": "Création de votre espace",
+        "clubName": "Nom du club",
+        "clubNameValue": "FC Les Étoiles",
+        "sport": "Sport",
+        "sportValue": "Football",
+        "location": "Localisation",
+        "locationValue": "Lausanne, Suisse",
+        "logo": "Logo",
+        "cta": "Créer mon espace"
+      },
+      "step2": {
+        "title": "Import des membres",
+        "fileName": "membres_2026.xlsx",
+        "uploadHint": "Glissez votre fichier Excel ou CSV ici",
+        "importing": "Import en cours…",
+        "success": "248 membres importés"
+      },
+      "step3": {
+        "title": "Gestion du comité",
+        "president": "Président",
+        "treasurer": "Trésorier",
+        "secretary": "Secrétaire",
+        "fullAccess": "Accès complet",
+        "financeAccess": "Accès finances",
+        "adminAccess": "Accès administratif"
+      },
+      "step4": {
+        "title": "Vue centralisée",
+        "members": "Membres",
+        "membersCount": "248 actifs",
+        "cotisations": "Cotisations",
+        "cotisationsStatus": "87 % payées",
+        "documents": "Documents",
+        "documentsCount": "12 fichiers",
+        "events": "Événements",
+        "eventsCount": "3 à venir",
+        "centralized": "Tout est centralisé"
+      }
+    }
   },
   "askChatGpt": {
     "title": "Toujours pas sûr qu'Obillz soit fait pour votre club ?",

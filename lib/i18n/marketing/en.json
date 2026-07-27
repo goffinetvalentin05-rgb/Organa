@@ -326,28 +326,69 @@
     ]
   },
   "howItWorks": {
-    "label": "How it works",
-    "title": "Start simply with Obillz.",
-    "subtitle": "Obillz was designed to be up and running quickly, with no complicated training or disruptive changes to how your club is organized.",
+    "label": "02 / HOW IT WORKS",
+    "title": "Take control of your club, simply.",
+    "subtitle": "In a few steps, your committee centralizes its organization and starts saving time.",
     "cta": "Try for free",
     "steps": [
       {
-        "title": "Create your club",
-        "description": "Set up your workspace in just a few minutes."
+        "title": "Create your club space",
+        "description": "Add your club's key information."
       },
       {
-        "title": "Add your members",
-        "description": "Import your list or add members gradually."
+        "title": "Import your members",
+        "description": "Import your existing list in a few clicks, without redoing everything manually."
       },
       {
-        "title": "Steer based on your club's needs",
-        "description": "Use the features that matter to your committee, based on how your club is organized and its priorities."
+        "title": "Invite your committee",
+        "description": "Give each person the access suited to their role."
       },
       {
-        "title": "Everything centralized",
-        "description": "Your committee keeps a clear view of club management."
+        "title": "Manage everything in one place",
+        "description": "Find your members, dues, documents and events in a single platform."
       }
-    ]
+    ],
+    "mocks": {
+      "step1": {
+        "title": "Create your space",
+        "clubName": "Club name",
+        "clubNameValue": "FC Les Étoiles",
+        "sport": "Sport",
+        "sportValue": "Football",
+        "location": "Location",
+        "locationValue": "Lausanne, Switzerland",
+        "logo": "Logo",
+        "cta": "Create my space"
+      },
+      "step2": {
+        "title": "Member import",
+        "fileName": "members_2026.xlsx",
+        "uploadHint": "Drag your Excel or CSV file here",
+        "importing": "Importing…",
+        "success": "248 members imported"
+      },
+      "step3": {
+        "title": "Committee management",
+        "president": "President",
+        "treasurer": "Treasurer",
+        "secretary": "Secretary",
+        "fullAccess": "Full access",
+        "financeAccess": "Finance access",
+        "adminAccess": "Admin access"
+      },
+      "step4": {
+        "title": "Centralized view",
+        "members": "Members",
+        "membersCount": "248 active",
+        "cotisations": "Dues",
+        "cotisationsStatus": "87% paid",
+        "documents": "Documents",
+        "documentsCount": "12 files",
+        "events": "Events",
+        "eventsCount": "3 upcoming",
+        "centralized": "Everything centralized"
+      }
+    }
   },
   "askChatGpt": {
     "title": "Still not sure Obillz is right for your club?",
