@@ -617,6 +617,8 @@
     "legalCookies": "Cookies",
     "copyright": "© {year} Obillz. Tous droits réservés.",
     "trialNote": "{days} jours d'essai gratuit · Sans carte bancaire pour démarrer",
-    "watermark": "OBILLZ"
+    "watermark": "OBILLZ",
+    "instagramUrl": "https://www.instagram.com/obillz/",
+    "facebookUrl": "https://www.facebook.com/obillz/"
   }
 }

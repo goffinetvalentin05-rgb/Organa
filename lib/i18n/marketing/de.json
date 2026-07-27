@@ -560,6 +560,8 @@
     "legalCookies": "Cookies",
     "copyright": "© {year} Obillz. Alle Rechte vorbehalten.",
     "trialNote": "{days} Tage kostenlos · Keine Karte zum Start nötig",
-    "watermark": "OBILLZ"
+    "watermark": "OBILLZ",
+    "instagramUrl": "https://www.instagram.com/obillz/",
+    "facebookUrl": "https://www.facebook.com/obillz/"
   }
 }

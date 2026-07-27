@@ -619,6 +619,8 @@
     "legalCookies": "Cookies",
     "copyright": "© {year} Obillz. All rights reserved.",
     "trialNote": "{days}-day free trial · No credit card required to start",
-    "watermark": "OBILLZ"
+    "watermark": "OBILLZ",
+    "instagramUrl": "https://www.instagram.com/obillz/",
+    "facebookUrl": "https://www.facebook.com/obillz/"
   }
 }

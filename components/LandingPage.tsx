@@ -25,10 +25,12 @@ export default function LandingPage() {
           <SocialProofSection />
           <PricingSection />
           <FaqSection />
-          <AskChatGptSection />
         </div>
 
-        <LandingFooter />
+        <div className="landing-page-end">
+          <AskChatGptSection />
+          <LandingFooter />
+        </div>
       </div>
     </main>
   );
