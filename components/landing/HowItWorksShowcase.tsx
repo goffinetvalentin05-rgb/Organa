@@ -29,6 +29,96 @@ const STEP_DURATION_MS = 4500;
 const RESUME_DELAY_MS = 2200;
 const SWIPE_THRESHOLD_PX = 48;
 
+function useStepAutoplay() {
+  const reduceMotion = useReducedMotion();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [progressKey, setProgressKey] = useState(0);
+  const [filling, setFilling] = useState(true);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [autoplayPaused, setAutoplayPaused] = useState(false);
+  const resumeTimerRef = useRef<number | null>(null);
+  const activeIndexRef = useRef(0);
+  activeIndexRef.current = activeIndex;
+
+  const clearResumeTimer = useCallback(() => {
+    if (resumeTimerRef.current != null) {
+      window.clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
+  }, []);
+
+  const goTo = useCallback((index: number) => {
+    const current = activeIndexRef.current;
+    const next = ((index % STEP_NUMBERS.length) + STEP_NUMBERS.length) % STEP_NUMBERS.length;
+    if (next === current) {
+      setProgressKey((key) => key + 1);
+      return;
+    }
+    const last = STEP_NUMBERS.length - 1;
+    const forwardWrap = current === last && next === 0;
+    const backwardWrap = current === 0 && next === last;
+    setDirection(forwardWrap || (!backwardWrap && next > current) ? 1 : -1);
+    setActiveIndex(next);
+    setProgressKey((key) => key + 1);
+  }, []);
+
+  const pauseAutoplay = useCallback(() => {
+    clearResumeTimer();
+    setAutoplayPaused(true);
+    setFilling(false);
+    resumeTimerRef.current = window.setTimeout(() => {
+      setAutoplayPaused(false);
+      setFilling(true);
+      setProgressKey((key) => key + 1);
+    }, RESUME_DELAY_MS);
+  }, [clearResumeTimer]);
+
+  const selectStep = useCallback(
+    (index: number) => {
+      goTo(index);
+      pauseAutoplay();
+    },
+    [goTo, pauseAutoplay],
+  );
+
+  useEffect(() => {
+    const onVisibility = () => setTabVisible(document.visibilityState === "visible");
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  useEffect(() => () => clearResumeTimer(), [clearResumeTimer]);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setFilling(false);
+      setAutoplayPaused(true);
+      return;
+    }
+    if (!tabVisible || autoplayPaused) return;
+
+    setFilling(true);
+    const timer = window.setTimeout(() => {
+      goTo(activeIndex + 1);
+    }, STEP_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, autoplayPaused, goTo, reduceMotion, tabVisible]);
+
+  return {
+    activeIndex,
+    direction,
+    progressKey,
+    filling: filling && !reduceMotion && tabVisible && !autoplayPaused,
+    held: Boolean(reduceMotion) || autoplayPaused || !tabVisible,
+    reduceMotion: Boolean(reduceMotion),
+    goTo,
+    pauseAutoplay,
+    selectStep,
+  };
+}
+
 function StepNav({
   activeIndex,
   onSelect,
@@ -156,14 +246,18 @@ function VisualPanel({
 function DesktopHowItWorks({
   steps,
   mockLabels,
-  activeIndex,
-  onSelect,
 }: {
   steps: Step[];
   mockLabels: MockLabels;
-  activeIndex: number;
-  onSelect: (index: number, event: MouseEvent<HTMLButtonElement>) => void;
 }) {
+  const { activeIndex, selectStep } = useStepAutoplay();
+
+  const onSelect = (index: number, event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    selectStep(index);
+  };
+
   return (
     <div className="grid items-start gap-7 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12 xl:gap-16">
       <div className="flex flex-col gap-5 sm:gap-8">
@@ -328,82 +422,17 @@ function MobileHowItWorks({
   steps: Step[];
   mockLabels: MockLabels;
 }) {
-  const reduceMotion = useReducedMotion();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [progressKey, setProgressKey] = useState(0);
-  const [filling, setFilling] = useState(true);
-  const [tabVisible, setTabVisible] = useState(true);
-  const [autoplayPaused, setAutoplayPaused] = useState(false);
-  const resumeTimerRef = useRef<number | null>(null);
+  const {
+    activeIndex,
+    direction,
+    progressKey,
+    filling,
+    held,
+    goTo,
+    pauseAutoplay,
+    selectStep,
+  } = useStepAutoplay();
   const pointerStartX = useRef<number | null>(null);
-  const activeIndexRef = useRef(0);
-  activeIndexRef.current = activeIndex;
-
-  const clearResumeTimer = useCallback(() => {
-    if (resumeTimerRef.current != null) {
-      window.clearTimeout(resumeTimerRef.current);
-      resumeTimerRef.current = null;
-    }
-  }, []);
-
-  const goTo = useCallback((index: number) => {
-    const current = activeIndexRef.current;
-    const next = ((index % STEP_NUMBERS.length) + STEP_NUMBERS.length) % STEP_NUMBERS.length;
-    if (next === current) {
-      setProgressKey((key) => key + 1);
-      return;
-    }
-    const last = STEP_NUMBERS.length - 1;
-    const forwardWrap = current === last && next === 0;
-    const backwardWrap = current === 0 && next === last;
-    setDirection(forwardWrap || (!backwardWrap && next > current) ? 1 : -1);
-    setActiveIndex(next);
-    setProgressKey((key) => key + 1);
-  }, []);
-
-  const pauseAutoplay = useCallback(() => {
-    clearResumeTimer();
-    setAutoplayPaused(true);
-    setFilling(false);
-    resumeTimerRef.current = window.setTimeout(() => {
-      setAutoplayPaused(false);
-      setFilling(true);
-      setProgressKey((key) => key + 1);
-    }, RESUME_DELAY_MS);
-  }, [clearResumeTimer]);
-
-  const selectStep = useCallback(
-    (index: number) => {
-      goTo(index);
-      pauseAutoplay();
-    },
-    [goTo, pauseAutoplay],
-  );
-
-  useEffect(() => {
-    const onVisibility = () => setTabVisible(document.visibilityState === "visible");
-    onVisibility();
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, []);
-
-  useEffect(() => () => clearResumeTimer(), [clearResumeTimer]);
-
-  useEffect(() => {
-    if (reduceMotion) {
-      setFilling(false);
-      setAutoplayPaused(true);
-      return;
-    }
-    if (!tabVisible || autoplayPaused) return;
-
-    setFilling(true);
-    const timer = window.setTimeout(() => {
-      goTo(activeIndex + 1);
-    }, STEP_DURATION_MS);
-    return () => window.clearTimeout(timer);
-  }, [activeIndex, autoplayPaused, goTo, reduceMotion, tabVisible]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -427,8 +456,6 @@ function MobileHowItWorks({
     pointerStartX.current = null;
   };
 
-  const progressHeld = Boolean(reduceMotion) || autoplayPaused || !tabVisible;
-
   return (
     <div
       className="how-it-works-mobile"
@@ -439,8 +466,8 @@ function MobileHowItWorks({
       <MobileProgressBar
         activeIndex={activeIndex}
         progressKey={progressKey}
-        filling={filling && !reduceMotion && tabVisible && !autoplayPaused}
-        held={progressHeld}
+        filling={filling}
+        held={held}
         onSelect={selectStep}
       />
 
@@ -461,26 +488,13 @@ export default function HowItWorksShowcase({
   steps: Step[];
   mockLabels: MockLabels;
 }) {
-  const [desktopIndex, setDesktopIndex] = useState(0);
-
-  const selectDesktopStep = (index: number, event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDesktopIndex(index);
-  };
-
   return (
     <div className="relative">
       <div className="md:hidden">
         <MobileHowItWorks steps={steps} mockLabels={mockLabels} />
       </div>
       <div className="hidden md:block">
-        <DesktopHowItWorks
-          steps={steps}
-          mockLabels={mockLabels}
-          activeIndex={desktopIndex}
-          onSelect={selectDesktopStep}
-        />
+        <DesktopHowItWorks steps={steps} mockLabels={mockLabels} />
       </div>
     </div>
   );
