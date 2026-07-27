@@ -618,16 +618,8 @@
     "copyright": "© {year} Obillz. Tous droits réservés.",
     "trialNote": "{days} jours d'essai gratuit · Sans carte bancaire pour démarrer",
     "watermark": "OBILLZ",
-    "instagramUrl": "https://www.instagram.com/obillz/",
-    "facebookUrl": "https://www.facebook.com/obillz/"
-  },
-  "storyInvite": {
-    "label": "L’HISTOIRE D’OBILLZ",
-    "title": "Découvrir la naissance d’Obillz",
-    "description": "Comment est née l’idée d’Obillz ?",
-    "cta": "Découvrir",
-    "hint": "Découvrir",
-    "close": "Fermer"
+    "instagramUrl": "https://www.instagram.com/obillz.ch?igsh=MW5rcmdsbmFkYmVlNA==",
+    "facebookUrl": "https://www.facebook.com/share/1EEPuBdBRS/?mibextid=wwXIfr"
   },
   "ourStory": {
     "label": "NOTRE HISTOIRE",

@@ -47,7 +47,7 @@ export default function HeroSection() {
         >
           <motion.h1
             variants={heroTitleLine}
-            className="landing-hero-title landing-hero-title-glow font-bold text-white"
+            className="landing-hero-title landing-hero-title-glow display-title text-white"
           >
             <span className="landing-hero-title-line">
               {t("marketing.hero.titleLine1")}

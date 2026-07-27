@@ -171,6 +171,9 @@ export default function FeaturesArcShowcase() {
 
   const activeFeature = features.find((feature) => feature.id === activeId) ?? null;
   const activeIndex = activeFeature ? features.indexOf(activeFeature) : null;
+  const ActiveIcon = activeFeature
+    ? (featureIcons[activeFeature.id] ?? FileText)
+    : FileText;
 
   const resolveFeature = useCallback(
     (text: string) => {
@@ -373,15 +376,24 @@ export default function FeaturesArcShowcase() {
             {activeFeature ? (
               <motion.div
                 key={activeFeature.id}
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 12 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.99 }}
                 transition={{ duration: 0.48, ease: easePremium }}
                 className="features-arc-detail"
               >
-                <div className="features-arc-detail__accent" aria-hidden />
-                <h3 className="features-arc-detail__title">{activeFeature.label}</h3>
-                <p className="features-arc-detail__text">{activeFeature.description}</p>
+                <div className="features-arc-detail__glow" aria-hidden />
+                <div className="features-arc-detail__shine" aria-hidden />
+                <div className="features-arc-detail__grid" aria-hidden />
+                <div className="features-arc-detail__body">
+                  <span className="features-arc-detail__badge" aria-hidden>
+                    <ActiveIcon className="features-arc-detail__badge-icon" strokeWidth={1.85} />
+                  </span>
+                  <div className="features-arc-detail__copy">
+                    <h3 className="features-arc-detail__title">{activeFeature.label}</h3>
+                    <p className="features-arc-detail__text">{activeFeature.description}</p>
+                  </div>
+                </div>
               </motion.div>
             ) : (
               <motion.div

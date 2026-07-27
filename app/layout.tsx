@@ -6,7 +6,7 @@ import { I18nProvider } from "@/components/I18nProvider";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-heading",
   display: "swap",
 });

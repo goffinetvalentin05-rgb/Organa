@@ -41,12 +41,12 @@ function TitleBlock({ title }: { title: string }) {
   const accent = lastSpace > 0 ? base.slice(lastSpace + 1) : "";
 
   return (
-    <h2 className="mt-4 text-balance text-[clamp(1.65rem,7.2vw,3.35rem)] font-bold leading-[1.1] tracking-tight text-white sm:mt-5 sm:leading-[1.08]">
+    <h2 className="display-title mt-4 text-balance text-[clamp(1.65rem,7.2vw,3.35rem)] leading-[0.98] tracking-[-0.045em] text-white sm:mt-5">
       {head}
       {accent ? (
         <>
           {" "}
-          <span className="font-semibold italic text-[#7dd3fc]">{accent}</span>
+          <span className="text-[#7dd3fc]">{accent}</span>
         </>
       ) : null}
       {endsWithPeriod ? "." : null}

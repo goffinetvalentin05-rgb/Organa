@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useI18n } from "@/components/I18nProvider";
 import {
   easePremium,
+  floatY,
   scrollReveal,
   staggerContainer,
   staggerItem,
@@ -39,60 +40,96 @@ export default function AskChatGptSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="landing-final-cta__panel relative overflow-hidden"
+          className="landing-final-cta__stage"
         >
-          <div className="landing-final-cta__glow" aria-hidden />
-          <div className="landing-final-cta__orb" aria-hidden />
+          <div className="landing-final-cta__atmosphere" aria-hidden>
+            <span className="landing-final-cta__blob landing-final-cta__blob--tl" />
+            <span className="landing-final-cta__blob landing-final-cta__blob--br" />
+            <span className="landing-final-cta__blob landing-final-cta__blob--c" />
+            <span className="landing-final-cta__grain" />
+          </div>
 
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="landing-final-cta__content relative z-10"
-          >
-            <div className="landing-final-cta__copy">
-              <motion.h2 variants={staggerItem} className="landing-final-cta__title">
+          <div className="landing-final-cta__grid">
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              className="landing-final-cta__copy"
+            >
+              <motion.h2 variants={staggerItem} className="landing-final-cta__title display-title">
                 {t("marketing.askChatGpt.title")}
               </motion.h2>
+
               <motion.p variants={staggerItem} className="landing-final-cta__subtitle">
                 {t("marketing.askChatGpt.subtitle")}
               </motion.p>
-            </div>
 
-            <motion.div variants={staggerItem} className="landing-final-cta__actions">
+              <motion.div variants={staggerItem} className="landing-final-cta__actions">
+                <motion.div
+                  whileHover={reduceMotion ? undefined : { y: -2, scale: 1.025 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                  transition={{ duration: 0.22, ease: easePremium }}
+                  className="group relative inline-flex"
+                >
+                  <motion.span
+                    className="landing-final-cta__btn-aura"
+                    aria-hidden
+                    animate={
+                      reduceMotion
+                        ? undefined
+                        : { opacity: [0.4, 0.8, 0.4], scale: [0.96, 1.06, 0.96] }
+                    }
+                    transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="landing-final-cta__btn"
+                  >
+                    <span className="landing-final-cta__btn-shimmer landing-cta-shimmer" aria-hidden />
+                    <WhatsAppIcon className="landing-final-cta__btn-icon" />
+                    <span>{t("marketing.askChatGpt.cta")}</span>
+                  </a>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              className="landing-final-cta__visual"
+              initial={{ opacity: 0, scale: 0.88, y: 24 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ duration: 0.85, delay: 0.12, ease: easePremium }}
+              aria-hidden
+            >
               <motion.div
-                whileHover={reduceMotion ? undefined : { y: -3, scale: 1.025 }}
-                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                transition={{ duration: 0.22, ease: easePremium }}
-                className="group relative inline-flex w-full"
+                className="landing-final-cta__orb-wrap"
+                animate={reduceMotion ? undefined : floatY(0.2)}
               >
+                <span className="landing-final-cta__orb-floor" />
                 <motion.span
-                  className="pointer-events-none absolute -inset-4 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.45),rgba(37,211,102,0.12)_50%,transparent_70%)] blur-2xl"
-                  aria-hidden
+                  className="landing-final-cta__orb-pulse"
                   animate={
                     reduceMotion
                       ? undefined
-                      : { opacity: [0.4, 0.85, 0.4], scale: [0.94, 1.06, 0.94] }
+                      : { opacity: [0.35, 0.7, 0.35], scale: [0.92, 1.08, 0.92] }
                   }
-                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="landing-final-cta__btn relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-full px-8 py-3.5 text-[0.9375rem] font-semibold text-white sm:px-9 sm:py-4 sm:text-base"
-                >
-                  <span
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/28 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 landing-cta-shimmer"
-                    aria-hidden
-                  />
-                  <WhatsAppIcon className="relative h-[1.15rem] w-[1.15rem] shrink-0" />
-                  <span className="relative">{t("marketing.askChatGpt.cta")}</span>
-                </a>
+
+                <div className="landing-final-cta__orb">
+                  <span className="landing-final-cta__orb-glass" />
+                  <span className="landing-final-cta__orb-rim" />
+                  <span className="landing-final-cta__orb-shine" />
+                  <span className="landing-final-cta__orb-core">
+                    <WhatsAppIcon className="landing-final-cta__orb-icon" />
+                  </span>
+                </div>
               </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

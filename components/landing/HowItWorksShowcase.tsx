@@ -89,7 +89,7 @@ function StepContent({
           className="min-w-0"
         >
           <p
-            className="how-it-works-blue-text select-none text-[clamp(2.5rem,12vw,6.75rem)] font-black leading-[0.88] tracking-[-0.06em]"
+            className="how-it-works-blue-text display-title select-none text-[clamp(2.5rem,12vw,6.75rem)] leading-[0.88]"
             aria-hidden
           >
             {num}

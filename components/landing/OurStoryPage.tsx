@@ -59,7 +59,7 @@ export default function OurStoryPage() {
                 transition={{ duration: 0.6, ease: easePremium }}
               >
                 <p className="landing-section-label">{t("marketing.ourStory.timelineLabel")}</p>
-                <h2 className="landing-section-title">{t("marketing.ourStory.timelineTitle")}</h2>
+                <h2 className="landing-section-title display-title">{t("marketing.ourStory.timelineTitle")}</h2>
                 <p className="landing-section-desc">
                   {/* TODO contenu : intro chronologie à rédiger */}
                   {t("marketing.ourStory.timelineIntro")}

@@ -26,7 +26,7 @@ export function LandingSectionHeader({
   return (
     <ScrollReveal className={`landing-section-intro max-w-3xl ${alignClass}`}>
       {eyebrow ? <p className="landing-section-label">{eyebrow}</p> : null}
-      {title ? <h2 className="landing-section-title">{title}</h2> : null}
+      {title ? <h2 className="landing-section-title display-title">{title}</h2> : null}
       {subtitle ? <p className="landing-section-desc">{subtitle}</p> : null}
     </ScrollReveal>
   );

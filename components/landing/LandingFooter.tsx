@@ -171,10 +171,10 @@ export default function LandingFooter() {
 
           <div className="footer-bottom">
             <div className="footer-bottom__social">
-              <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram">
+              <SocialLink href={t("marketing.footer.instagramUrl")} label="Instagram Obillz">
                 <InstagramIcon className="h-[18px] w-[18px]" />
               </SocialLink>
-              <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook">
+              <SocialLink href={t("marketing.footer.facebookUrl")} label="Facebook Obillz">
                 <FacebookIcon className="h-[18px] w-[18px]" />
               </SocialLink>
             </div>

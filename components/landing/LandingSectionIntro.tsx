@@ -39,7 +39,7 @@ export default function LandingSectionIntro({
       >
         <div className="landing-section-intro__copy max-w-2xl lg:max-w-[44rem]">
           {label ? <p className="landing-section-label">{label}</p> : null}
-          <h2 className="landing-section-title">{title}</h2>
+          <h2 className="landing-section-title display-title">{title}</h2>
           {description ? <p className="landing-section-desc">{description}</p> : null}
         </div>
         {action ? (
@@ -55,7 +55,7 @@ export default function LandingSectionIntro({
         className={`landing-section-intro landing-section-intro--centered mx-auto max-w-3xl text-center ${className}`}
       >
         {label ? <p className="landing-section-label">{label}</p> : null}
-        <h2 className="landing-section-title">{title}</h2>
+        <h2 className="landing-section-title display-title">{title}</h2>
         {description ? (
           <p className="landing-section-desc mx-auto">{description}</p>
         ) : null}
@@ -70,7 +70,7 @@ export default function LandingSectionIntro({
   return (
     <div className={`landing-section-intro landing-section-intro--stack ${className}`}>
       {label ? <p className="landing-section-label">{label}</p> : null}
-      <h2 className="landing-section-title">{title}</h2>
+      <h2 className="landing-section-title display-title">{title}</h2>
       {description ? <p className="landing-section-desc">{description}</p> : null}
       {secondaryDescription ? (
         <p className="landing-section-desc-secondary">{secondaryDescription}</p>
