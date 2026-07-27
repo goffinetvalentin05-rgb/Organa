@@ -65,10 +65,10 @@ function getArcLayout(index: number, total: number, activeIndex: number | null) 
   if (isActive) {
     return {
       x: 0,
-      y: -36,
+      y: -10,
       rotateY: 0,
       rotateZ: 0,
-      scale: 1.22,
+      scale: 1.16,
       zIndex: 40,
       opacity: 1,
     };
@@ -81,7 +81,7 @@ function getArcLayout(index: number, total: number, activeIndex: number | null) 
   if (activeIndex !== null) {
     return {
       x: offset * 92,
-      y: Math.abs(offset) * 22 + 18,
+      y: Math.abs(offset) * 14 + 4,
       rotateY: offset * -18,
       rotateZ: offset * 3.5,
       scale: Math.max(0.62, 1 - Math.abs(offset) * 0.1),
@@ -235,119 +235,128 @@ export default function FeaturesArcShowcase() {
 
   return (
     <div className="features-arc-showcase relative mx-auto w-full">
-      <div className="features-arc-showcase__backdrop" aria-hidden />
-
-      <div className="features-arc-stage" style={{ perspective: "1400px" }}>
-        <div className="features-arc-stage__floor" aria-hidden />
-
-        {features.map((feature, index) => {
-          const Icon = featureIcons[feature.id] ?? FileText;
-          const layout = getArcLayout(index, features.length, activeIndex);
-          const isActive = activeId === feature.id;
-
-          return (
-            <motion.button
-              key={feature.id}
-              type="button"
-              onClick={() => selectFeature(feature)}
-              className="features-arc-card absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2"
-              animate={{
-                x: layout.x,
-                y: layout.y,
-                rotateY: layout.rotateY,
-                rotateZ: layout.rotateZ,
-                scale: layout.scale,
-                opacity: layout.opacity,
-                zIndex: layout.zIndex,
-              }}
-              transition={{ duration: 0.72, ease: easePremium }}
-              style={{ transformStyle: "preserve-3d" }}
-              aria-label={feature.label}
-              aria-pressed={isActive}
-            >
-              <div
-                className={`features-arc-card__inner ${isActive ? "features-arc-card__inner--active" : ""}`}
-              >
-                <div className="features-arc-card__shine" aria-hidden />
-                <div className="features-arc-card__ambient" aria-hidden />
-                <div className="features-arc-card__content">
-                  <span className="features-arc-card__icon-badge">
-                    <span className="features-arc-card__icon-ring" aria-hidden />
-                    <Icon className="features-arc-card__icon" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <span className="features-arc-card__label">{feature.label}</span>
-                </div>
-                <div className="features-arc-card__footer-glow" aria-hidden />
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      <div className="features-arc-search-block">
-        <p className="features-arc-search-block__hint">{t("marketing.modules.searchHint")}</p>
+      <div className="features-arc-panel">
+        <div className="features-arc-showcase__backdrop" aria-hidden />
+        <div className="features-arc-panel__bridge" aria-hidden />
 
         <div
-          className={`features-arc-search-wrap ${searchFocused ? "features-arc-search-wrap--focused" : ""}`}
+          className={`features-arc-stage ${activeIndex !== null ? "features-arc-stage--focused" : ""}`}
+          style={{ perspective: "1400px" }}
         >
-          <div className="features-arc-search-wrap__glow" aria-hidden />
-          <label className="features-arc-search" htmlFor="features-arc-search-input">
-            <Search className="features-arc-search__icon" strokeWidth={2.2} aria-hidden />
-            <input
-              ref={inputRef}
-              id="features-arc-search-input"
-              type="search"
-              value={query}
-              onChange={(event) => {
-                setUserInteracting(true);
-                setPhase("idle");
-                applyQuery(event.target.value);
-              }}
-              onFocus={() => {
-                setUserInteracting(true);
-                setSearchFocused(true);
-              }}
-              onBlur={() => setSearchFocused(false)}
-              placeholder={t("marketing.modules.searchPlaceholder")}
-              className="features-arc-search__input"
-              autoComplete="off"
-              spellCheck={false}
-            />
-            {phase === "typing" && !userInteracting && !reduceMotion ? (
-              <motion.span
-                className="features-arc-search__cursor"
-                animate={{ opacity: [1, 0, 1] }}
-                transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
-                aria-hidden
-              />
-            ) : null}
-          </label>
+          <div className="features-arc-stage__floor" aria-hidden />
+
+          {features.map((feature, index) => {
+            const Icon = featureIcons[feature.id] ?? FileText;
+            const layout = getArcLayout(index, features.length, activeIndex);
+            const isActive = activeId === feature.id;
+
+            return (
+              <motion.button
+                key={feature.id}
+                type="button"
+                onClick={() => selectFeature(feature)}
+                className="features-arc-card absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2"
+                animate={{
+                  x: layout.x,
+                  y: layout.y,
+                  rotateY: layout.rotateY,
+                  rotateZ: layout.rotateZ,
+                  scale: layout.scale,
+                  opacity: layout.opacity,
+                  zIndex: layout.zIndex,
+                }}
+                transition={{ duration: 0.72, ease: easePremium }}
+                style={{ transformStyle: "preserve-3d" }}
+                aria-label={feature.label}
+                aria-pressed={isActive}
+              >
+                <div
+                  className={`features-arc-card__inner ${isActive ? "features-arc-card__inner--active" : ""}`}
+                >
+                  <div className="features-arc-card__shine" aria-hidden />
+                  <div className="features-arc-card__ambient" aria-hidden />
+                  <div className="features-arc-card__content">
+                    <span className="features-arc-card__icon-badge">
+                      <span className="features-arc-card__icon-ring" aria-hidden />
+                      <Icon className="features-arc-card__icon" strokeWidth={1.75} aria-hidden />
+                    </span>
+                    <span className="features-arc-card__label">{feature.label}</span>
+                  </div>
+                  <div className="features-arc-card__footer-glow" aria-hidden />
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
 
-        <AnimatePresence mode="wait">
-          {activeFeature ? (
-            <motion.div
-              key={activeFeature.id}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 12 }}
-              transition={{ duration: 0.48, ease: easePremium }}
-              className="features-arc-detail"
-            >
-              <div className="features-arc-detail__accent" aria-hidden />
-              <h3 className="features-arc-detail__title">{activeFeature.label}</h3>
-              <p className="features-arc-detail__text">{activeFeature.description}</p>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              initial={false}
-              animate={{ opacity: 1 }}
-              className="features-arc-detail features-arc-detail--placeholder"
-              aria-hidden
-            />
-          )}
-        </AnimatePresence>
+        <div className="features-arc-search-block">
+          <p className="features-arc-search-block__hint">{t("marketing.modules.searchHint")}</p>
+
+          <div
+            className={`features-arc-search-wrap ${searchFocused ? "features-arc-search-wrap--focused" : ""} ${activeFeature ? "features-arc-search-wrap--matched" : ""}`}
+          >
+            <div className="features-arc-search-wrap__ring" aria-hidden />
+            <div className="features-arc-search-wrap__glow" aria-hidden />
+            <label className="features-arc-search" htmlFor="features-arc-search-input">
+              <span className="features-arc-search__icon-badge">
+                <Search className="features-arc-search__icon" strokeWidth={2.2} aria-hidden />
+              </span>
+              <input
+                ref={inputRef}
+                id="features-arc-search-input"
+                type="search"
+                value={query}
+                onChange={(event) => {
+                  setUserInteracting(true);
+                  setPhase("idle");
+                  applyQuery(event.target.value);
+                }}
+                onFocus={() => {
+                  setUserInteracting(true);
+                  setSearchFocused(true);
+                }}
+                onBlur={() => setSearchFocused(false)}
+                placeholder={t("marketing.modules.searchPlaceholder")}
+                className="features-arc-search__input"
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {phase === "typing" && !userInteracting && !reduceMotion ? (
+                <motion.span
+                  className="features-arc-search__cursor"
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
+                  aria-hidden
+                />
+              ) : null}
+            </label>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {activeFeature ? (
+              <motion.div
+                key={activeFeature.id}
+                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.48, ease: easePremium }}
+                className="features-arc-detail"
+              >
+                <div className="features-arc-detail__accent" aria-hidden />
+                <h3 className="features-arc-detail__title">{activeFeature.label}</h3>
+                <p className="features-arc-detail__text">{activeFeature.description}</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={false}
+                animate={{ opacity: 1 }}
+                className="features-arc-detail features-arc-detail--placeholder"
+                aria-hidden
+              />
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
