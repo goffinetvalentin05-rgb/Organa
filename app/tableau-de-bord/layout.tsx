@@ -323,7 +323,7 @@ export default function DashboardLayout({
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-xl p-2 text-[#A8B8D0] transition hover:bg-white/10 hover:text-white lg:hidden"
+                className="rounded-xl p-2 text-[#64748B] transition hover:bg-[#F1F5F9] hover:text-[#0F172A] lg:hidden"
                 aria-label={t("dashboard.navigation.primary")}
               >
                 <Menu className="h-5 w-5" />
@@ -333,25 +333,25 @@ export default function DashboardLayout({
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               {!loadingUser ? (
                 <div
-                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(147,197,253,0.2)] bg-[rgba(255,255,255,0.06)] px-2.5 py-1.5 backdrop-blur-sm md:flex"
+                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-2.5 py-1.5 md:flex"
                   aria-label={displayName}
                   title={displayName}
                 >
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#38BDF8] text-xs font-bold text-white shadow-[0_0_12px_rgba(26,35,255,0.45)]">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#3B82F6] text-xs font-bold text-white">
                     {initial}
                   </div>
-                  <span className="truncate text-sm font-medium text-[#E2E8F0]">{displayName}</span>
+                  <span className="truncate text-sm font-medium text-[#0F172A]">{displayName}</span>
                 </div>
               ) : null}
 
-              <LanguageSwitcher compact theme="dark" />
+              <LanguageSwitcher compact theme="light" />
 
               <DashboardNotificationBellConnected />
 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl border border-[rgba(147,197,253,0.18)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-xs font-medium text-[#A8B8D0] transition hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(255,255,255,0.1)] hover:text-white sm:px-3.5 sm:py-2 sm:text-sm"
+                className="rounded-xl border border-[rgba(15,23,42,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[#64748B] transition hover:border-[rgba(26,35,255,0.2)] hover:bg-[#F8FAFC] hover:text-[#0F172A] sm:px-3.5 sm:py-2 sm:text-sm"
               >
                 {t("dashboard.topbar.logout")}
               </button>
@@ -363,14 +363,14 @@ export default function DashboardLayout({
           <div className="w-full min-w-0">{children}</div>
         </main>
 
-        <footer className="shrink-0 border-t border-[rgba(147,197,253,0.12)] bg-transparent">
-          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#7B91B0] sm:flex-row sm:px-6 lg:px-8">
+        <footer className="shrink-0 border-t border-[rgba(15,23,42,0.06)] bg-transparent">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-[#94A3B8] sm:flex-row sm:px-6 lg:px-8">
             <p>{t("dashboard.footer.copyright")}</p>
             <div className="flex items-center gap-4">
-              <Link href="/mentions-legales" className="transition-colors hover:text-[#93C5FD]">
+              <Link href="/mentions-legales" className="transition-colors hover:text-[#1A23FF]">
                 {t("dashboard.footer.legal")}
               </Link>
-              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#93C5FD]">
+              <Link href="/politique-confidentialite" className="transition-colors hover:text-[#1A23FF]">
                 {t("dashboard.footer.privacy")}
               </Link>
             </div>

@@ -754,9 +754,9 @@ export default function TableauDeBordPage() {
                   ) : null}
                 </div>
                 {stats.montantCotisationsPayees > 0 ? (
-                  <p className="text-xs text-[#A8B8D0]">
+                  <p className="text-xs text-[#64748B]">
                     {t("dashboard.overview.kpis.collected")}{" "}
-                    <span className="font-medium text-[#F8FAFC]">
+                    <span className="font-medium text-[#0F172A]">
                       {formatMontant(stats.montantCotisationsPayees)}
                     </span>
                   </p>
@@ -795,9 +795,9 @@ export default function TableauDeBordPage() {
                   ) : null}
                 </div>
                 {stats.montantFacturesAttente > 0 ? (
-                  <p className="text-xs text-[#A8B8D0]">
+                  <p className="text-xs text-[#64748B]">
                     {t("dashboard.overview.kpis.pendingAmount")}{" "}
-                    <span className="font-medium text-[#F8FAFC]">
+                    <span className="font-medium text-[#0F172A]">
                       {formatMontant(stats.montantFacturesAttente)}
                     </span>
                   </p>
@@ -821,7 +821,7 @@ export default function TableauDeBordPage() {
             ) : undefined
           }
           footer={
-            <p className="text-xs text-[#A8B8D0]">{t("dashboard.overview.kpis.balanceFormula")}</p>
+            <p className="text-xs text-[#64748B]">{t("dashboard.overview.kpis.balanceFormula")}</p>
           }
         />
       </div>
@@ -843,8 +843,8 @@ export default function TableauDeBordPage() {
             }
           >
             {priorities.length === 0 ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/25 bg-emerald-500/15 px-5 py-5 text-sm text-emerald-300 shadow-[0_0_24px_rgba(16,185,129,0.1)]">
-                <CheckCircle className="h-6 w-6 shrink-0 text-emerald-400" />
+              <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-5 text-sm text-emerald-700">
+                <CheckCircle className="h-6 w-6 shrink-0 text-emerald-600" />
                 <span>{t("dashboard.overview.priorities.empty")}</span>
               </div>
             ) : (
@@ -868,24 +868,24 @@ export default function TableauDeBordPage() {
                           iconBadgeClass,
                           "mt-0.5 shrink-0",
                           item.variant === "danger" &&
-                            "from-rose-500/15 to-rose-400/10 text-rose-600 ring-rose-200",
+                            "bg-rose-50 text-rose-600 ring-rose-200",
                           item.variant === "warning" &&
-                            "from-amber-500/15 to-amber-400/10 text-amber-600 ring-amber-200",
+                            "bg-amber-50 text-amber-600 ring-amber-200",
                           item.variant === "info" &&
-                            "from-[#1A23FF]/12 to-cyan-400/10 text-[#93C5FD]"
+                            "bg-blue-50 text-[#1A23FF] ring-blue-200"
                         )}
                       >
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-[#F8FAFC]">{item.label}</p>
+                          <p className="text-sm font-semibold text-[#0F172A]">{item.label}</p>
                           <DashboardBadge variant={item.variant}>{item.badgeLabel}</DashboardBadge>
                         </div>
                         {item.detail ? (
-                          <p className="mt-1 text-xs text-[#A8B8D0]">{item.detail}</p>
+                          <p className="mt-1 text-xs text-[#64748B]">{item.detail}</p>
                         ) : null}
-                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(147,197,253,0.12)]">
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#E2E8F0]">
                           <div
                             className={cn(
                               "h-full rounded-full transition-all duration-500",
@@ -894,7 +894,7 @@ export default function TableauDeBordPage() {
                               item.variant === "warning" &&
                                 "bg-gradient-to-r from-amber-500 to-amber-400",
                               item.variant === "info" &&
-                                "bg-gradient-to-r from-[#1A23FF] to-[#38BDF8]",
+                                "bg-gradient-to-r from-[#1A23FF] to-[#3B82F6]",
                               (item.variant === "default" || item.variant === "success") &&
                                 "bg-gradient-to-r from-emerald-500 to-teal-400"
                             )}
@@ -903,14 +903,14 @@ export default function TableauDeBordPage() {
                         </div>
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-2 self-center">
-                        <span className="text-2xl font-semibold tabular-nums tracking-tight text-[#F8FAFC]">
+                        <span className="text-2xl font-semibold tabular-nums tracking-tight text-[#0F172A]">
                           {item.count ?? "-"}
                         </span>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#7B91B0]">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#94A3B8]">
                           #{index + 1}
                         </span>
                         {item.href ? (
-                          <ArrowRight className="h-4 w-4 text-[#64748B] transition group-hover:translate-x-0.5 group-hover:text-[#93C5FD]" />
+                          <ArrowRight className="h-4 w-4 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
                         ) : null}
                       </div>
                     </div>
@@ -938,51 +938,48 @@ export default function TableauDeBordPage() {
         >
           <div className="space-y-3">
             <Link href="/tableau-de-bord/devis/nouveau" className={dashboardQuickActionClass}>
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(26,35,255,0.12),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF] to-[#6366f1] text-white shadow-[0_8px_24px_rgba(26,35,255,0.35)]">
+              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1A23FF] text-white">
                 <FilePlus className="h-5 w-5" />
               </div>
               <div className="relative min-w-0">
-                <p className="font-semibold text-[#F8FAFC]">
+                <p className="font-semibold text-[#0F172A]">
                   {t("dashboard.overview.quickActions.newQuote")}
                 </p>
-                <p className="mt-0.5 text-sm text-[#A8B8D0]">
+                <p className="mt-0.5 text-sm text-[#64748B]">
                   {t("dashboard.overview.quickActions.newQuoteText")}
                 </p>
               </div>
-              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#64748B] transition group-hover:translate-x-0.5 group-hover:text-[#93C5FD]" />
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
             </Link>
 
             <Link href="/tableau-de-bord/factures/nouvelle" className={dashboardQuickActionClass}>
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(37,99,235,0.12),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] text-white shadow-[0_8px_24px_rgba(37,99,235,0.35)]">
+              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white">
                 <FilePlus className="h-5 w-5" />
               </div>
               <div className="relative min-w-0">
-                <p className="font-semibold text-[#F8FAFC]">
+                <p className="font-semibold text-[#0F172A]">
                   {t("dashboard.overview.quickActions.newInvoice")}
                 </p>
-                <p className="mt-0.5 text-sm text-[#A8B8D0]">
+                <p className="mt-0.5 text-sm text-[#64748B]">
                   {t("dashboard.overview.quickActions.newInvoiceText")}
                 </p>
               </div>
-              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#64748B] transition group-hover:translate-x-0.5 group-hover:text-[#93C5FD]" />
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
             </Link>
 
             <Link href="/tableau-de-bord/clients/nouveau" className={dashboardQuickActionClass}>
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(56,189,248,0.14),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] text-white shadow-[0_8px_24px_rgba(14,165,233,0.35)]">
+              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9] text-white">
                 <UserPlus className="h-5 w-5" />
               </div>
               <div className="relative min-w-0">
-                <p className="font-semibold text-[#F8FAFC]">
+                <p className="font-semibold text-[#0F172A]">
                   {t("dashboard.overview.quickActions.newClient")}
                 </p>
-                <p className="mt-0.5 text-sm text-[#A8B8D0]">
+                <p className="mt-0.5 text-sm text-[#64748B]">
                   {t("dashboard.overview.quickActions.newClientText")}
                 </p>
               </div>
-              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#64748B] transition group-hover:translate-x-0.5 group-hover:text-[#93C5FD]" />
+              <ArrowRight className="relative ml-auto h-4 w-4 shrink-0 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
             </Link>
           </div>
         </SectionCard>
@@ -1002,23 +999,23 @@ export default function TableauDeBordPage() {
               <Link key={item.id} href={item.href} className="dashboard-invoice-chip group">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[rgba(26,35,255,0.25)] to-[rgba(56,189,248,0.12)] ring-1 ring-[rgba(147,197,253,0.2)]">
-                      <Receipt className="h-4 w-4 text-[#93C5FD]" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgba(26,35,255,0.08)] ring-1 ring-[rgba(26,35,255,0.12)]">
+                      <Receipt className="h-4 w-4 text-[#1A23FF]" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-[#F8FAFC]">{item.numero}</p>
-                      <p className="truncate text-sm text-[#A8B8D0]">{item.client}</p>
+                      <p className="truncate font-semibold text-[#0F172A]">{item.numero}</p>
+                      <p className="truncate text-sm text-[#64748B]">{item.client}</p>
                     </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-[#64748B] transition group-hover:translate-x-0.5 group-hover:text-[#93C5FD]" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#1A23FF]" />
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs text-[#A8B8D0]">
+                  <p className="text-xs text-[#64748B]">
                     {t("dashboard.overview.now.dueLabel")} {formatDate(item.date)}
                   </p>
                   <span className={`badge-obillz ${item.statutColor}`}>{item.statutLabel}</span>
                 </div>
-                <p className="text-lg font-semibold tabular-nums tracking-tight text-[#F8FAFC]">
+                <p className="text-lg font-semibold tabular-nums tracking-tight text-[#0F172A]">
                   {formatMontant(item.montant)}
                 </p>
               </Link>
@@ -1030,11 +1027,11 @@ export default function TableauDeBordPage() {
       {/* === Activité récente — timeline === */}
       <TableCard title={t("dashboard.overview.lastDocuments.title")}>
         {loading ? (
-          <div className="py-12 text-center text-sm text-[#A8B8D0]">
+          <div className="py-12 text-center text-sm text-[#64748B]">
             {t("dashboard.overview.lastDocuments.loading")}
           </div>
         ) : recentActivity.length === 0 ? (
-          <div className="py-12 text-center text-sm text-[#A8B8D0]">
+          <div className="py-12 text-center text-sm text-[#64748B]">
             {t("dashboard.overview.lastDocuments.empty")}
           </div>
         ) : (
@@ -1044,14 +1041,14 @@ export default function TableauDeBordPage() {
               const row = (
                 <div className="dashboard-timeline-item group">
                   <span className="dashboard-timeline-dot" />
-                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-3 py-3 transition-all duration-200 hover:border-[rgba(147,197,253,0.14)] hover:bg-[rgba(255,255,255,0.04)] hover:shadow-[0_8px_24px_rgba(2,6,23,0.25)]">
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-3 py-3 transition-all duration-200 hover:border-[rgba(15,23,42,0.08)] hover:bg-[#F8FAFC]">
                     <div className="flex min-w-0 items-center gap-3.5">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgba(26,35,255,0.2)] ring-1 ring-[rgba(147,197,253,0.2)]">
-                        <Icon className="h-4 w-4 text-[#93C5FD]" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgba(26,35,255,0.08)] ring-1 ring-[rgba(26,35,255,0.1)]">
+                        <Icon className="h-4 w-4 text-[#1A23FF]" />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-semibold text-[#F8FAFC]">{item.title}</p>
-                        <p className="truncate text-sm text-[#A8B8D0]">{item.subtitle}</p>
+                        <p className="truncate font-semibold text-[#0F172A]">{item.title}</p>
+                        <p className="truncate text-sm text-[#64748B]">{item.subtitle}</p>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
@@ -1059,13 +1056,13 @@ export default function TableauDeBordPage() {
                         <p
                           className={cn(
                             "font-semibold tabular-nums",
-                            item.amount >= 0 ? "text-[#F8FAFC]" : "text-rose-300"
+                            item.amount >= 0 ? "text-[#0F172A]" : "text-rose-600"
                           )}
                         >
                           {formatMontant(item.amount)}
                         </p>
                       ) : null}
-                      <p className="text-xs text-[#7B91B0]">{formatRelativeDate(item.date)}</p>
+                      <p className="text-xs text-[#94A3B8]">{formatRelativeDate(item.date)}</p>
                     </div>
                   </div>
                 </div>

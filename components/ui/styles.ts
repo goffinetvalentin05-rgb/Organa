@@ -1,18 +1,18 @@
 /**
  * ============================================================
- * DESIGN SYSTEM — ESPACE CONNECTÉ (Obillz dark blue premium)
+ * DESIGN SYSTEM — ESPACE CONNECTÉ (Obillz clair + sidebar bleue)
  * ============================================================
  * Tokens (alignés sur CSS `--dash-*`) :
  *  - primary        : #1A23FF
  *  - primary-soft   : #3B82F6
- *  - primary-glow   : #93C5FD
- *  - bg             : #071634
- *  - surface        : #0F2744
- *  - text           : #F1F5F9 / #F8FAFC
- *  - text-muted     : #A8B8D0
- *  - text-subtle    : #8BA0BC
- *  - success/warn/danger : #34D399 / #FBBF24 / #FB7185
+ *  - bg             : #F4F7FB
+ *  - surface        : #FFFFFF
+ *  - text           : #0F172A / #0B1220
+ *  - text-muted     : #64748B
+ *  - text-subtle    : #94A3B8
+ *  - success/warn/danger : #059669 / #D97706 / #E11D48
  *  - Inputs         : fond blanc + texte foncé
+ *  - Sidebar        : bleu nuit #071634 (hors tokens surface)
  * La landing publique n'utilise PAS ces tokens.
  */
 
@@ -29,43 +29,43 @@ export const dashboardGridOverlayClass = "hidden";
 /** @deprecated Alias historique. */
 export const obillzLandingGridOverlayClass = dashboardGridOverlayClass;
 
-/** Shell tableau de bord — bleu nuit Obillz */
+/** Shell tableau de bord — fond clair, sidebar bleue */
 export const dashboardShellRootClass =
-  "dashboard-shell obillz-dashboard isolate min-h-[100dvh] w-full bg-[#071634] text-[#F1F5F9]";
+  "dashboard-shell obillz-dashboard isolate min-h-[100dvh] w-full bg-[#F4F7FB] text-[#0F172A]";
 
 /**
- * Surface carte dashboard — navy élevée, bordure bleue, ombre premium.
+ * Surface carte dashboard — blanc, bordure fine, ombre discrète.
  */
 export const dashboardGlassCardClass =
-  "dashboard-glass-card relative overflow-hidden rounded-[1.5rem] border border-[rgba(147,197,253,0.14)] bg-[#0F2744] text-[#F1F5F9] shadow-[0_8px_32px_rgba(2,6,23,0.35)]";
+  "dashboard-glass-card relative overflow-hidden rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)]";
 
 export const unifiedSectionShellClass = dashboardGlassCardClass;
 
 export const unifiedSectionHeaderClass =
-  "border-b border-[rgba(147,197,253,0.12)] bg-[rgba(255,255,255,0.03)]";
+  "border-b border-[rgba(15,23,42,0.06)] bg-[#FAFBFD]";
 
 export const unifiedSectionBodyClass = "px-5 py-5 sm:px-6 sm:py-6";
 
 export const unifiedSectionFooterClass =
-  "border-t border-[rgba(147,197,253,0.12)] bg-[rgba(7,22,52,0.35)]";
+  "border-t border-[rgba(15,23,42,0.06)] bg-[#FAFBFD]";
 
 export const dashboardCardTitleClass =
-  "dashboard-section-title text-base font-semibold tracking-tight text-[#F8FAFC] sm:text-lg";
+  "dashboard-section-title text-base font-semibold tracking-tight text-[#0F172A] sm:text-lg";
 export const dashboardCardDescriptionClass =
-  "mt-1 text-sm font-normal leading-relaxed text-[#A8B8D0]";
+  "mt-1 text-sm font-normal leading-relaxed text-[#64748B]";
 export const dashboardCardLabelClass =
-  "text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8BA0BC]";
+  "text-[11px] font-semibold uppercase tracking-[0.16em] text-[#94A3B8]";
 export const dashboardCardValueClass =
-  "text-[1.85rem] font-semibold tracking-tight text-[#F8FAFC] tabular-nums sm:text-[2rem]";
+  "text-[1.85rem] font-semibold tracking-tight text-[#0F172A] tabular-nums sm:text-[2rem]";
 
 export const dashboardStatusPillClass =
-  "inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/15 px-3.5 py-1.5 text-sm font-medium text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.12)]";
+  "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-medium text-emerald-700";
 
 export const dashboardQuickActionClass =
-  "group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[rgba(147,197,253,0.14)] bg-[rgba(255,255,255,0.04)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(26,35,255,0.12)] hover:shadow-[0_16px_40px_rgba(2,6,23,0.35)] sm:p-5";
+  "group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.18)] hover:bg-white hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)] sm:p-5";
 
 export const dashboardPriorityRowClass =
-  "group flex items-start gap-4 rounded-2xl border border-[rgba(147,197,253,0.12)] bg-[rgba(255,255,255,0.04)] px-4 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(96,165,250,0.3)] hover:bg-[rgba(255,255,255,0.06)] sm:px-5 sm:py-5";
+  "group flex items-start gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.16)] hover:bg-white sm:px-5 sm:py-5";
 
 export const glassFrameClass = unifiedSectionShellClass;
 export const glassPanelClass = dashboardGlassCardClass;
@@ -74,7 +74,7 @@ export const glassCardHeaderClass = unifiedSectionHeaderClass;
 export const innerContentClass = glassPanelClass;
 
 export const dashboardTableHeadRowClass =
-  "border-b border-[rgba(147,197,253,0.12)] bg-[rgba(7,22,52,0.45)] text-xs font-semibold uppercase tracking-wide text-[#8BA0BC]";
+  "border-b border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] text-xs font-semibold uppercase tracking-wide text-[#64748B]";
 
 export const dashboardTableDivideClass = "dashboard-table-divide divide-y";
 
@@ -83,73 +83,73 @@ export const dashboardDataTableClass = "dashboard-data-table w-full text-left te
 export const dashboardTableFooterClass = "dashboard-table-footer px-4 py-3 sm:px-6";
 
 export const dashboardListRowClass =
-  "p-5 transition-colors hover:bg-[rgba(255,255,255,0.04)] md:p-6";
+  "p-5 transition-colors hover:bg-[#F8FAFC] md:p-6";
 
 export const sectionListRowClass =
-  "flex rounded-xl border border-transparent bg-transparent px-2 py-3.5 transition-all duration-200 hover:border-[rgba(147,197,253,0.12)] hover:bg-[rgba(255,255,255,0.04)] sm:px-3";
+  "flex rounded-xl border border-transparent bg-transparent px-2 py-3.5 transition-all duration-200 hover:border-[rgba(15,23,42,0.08)] hover:bg-[#F8FAFC] sm:px-3";
 
 export const glassNestedRowClass = sectionListRowClass;
 
-export const dashboardSoftListClass = "divide-y divide-[rgba(147,197,253,0.10)]";
+export const dashboardSoftListClass = "divide-y divide-[rgba(15,23,42,0.06)]";
 
 export const dashboardSecondaryButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(147,197,253,0.22)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-sm font-medium text-[#E2E8F0] shadow-sm transition hover:border-[rgba(96,165,250,0.4)] hover:bg-[rgba(255,255,255,0.1)]";
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(15,23,42,0.1)] bg-white px-4 py-2 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] hover:bg-[#F8FAFC] hover:text-[#0F172A]";
 
 /** Champs — fond clair + texte foncé pour lisibilité maximale */
 export const dashboardInputClass =
-  "w-full rounded-xl border border-[rgba(147,197,253,0.28)] bg-white px-4 py-2.5 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(2,6,23,0.2)] placeholder:text-[#64748B] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.35)] disabled:cursor-not-allowed disabled:bg-[#E2E8F0] disabled:text-[#475569] disabled:opacity-80";
+  "w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 py-2.5 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(15,23,42,0.04)] placeholder:text-[#94A3B8] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] disabled:cursor-not-allowed disabled:bg-[#F1F5F9] disabled:text-[#64748B] disabled:opacity-80";
 
 export const dashboardInputSmClass =
-  "w-full rounded-xl border border-[rgba(147,197,253,0.28)] bg-white px-3 py-2 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(2,6,23,0.2)] placeholder:text-[#64748B] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.35)] disabled:cursor-not-allowed disabled:bg-[#E2E8F0] disabled:text-[#475569] disabled:opacity-80";
+  "w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-3 py-2 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(15,23,42,0.04)] placeholder:text-[#94A3B8] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] disabled:cursor-not-allowed disabled:bg-[#F1F5F9] disabled:text-[#64748B] disabled:opacity-80";
 
 export const dashboardSelectClass =
-  "dashboard-select w-full rounded-xl border border-[rgba(147,197,253,0.28)] bg-white px-3 py-2 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(2,6,23,0.2)] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.35)] disabled:cursor-not-allowed disabled:bg-[#E2E8F0] disabled:opacity-80 [color-scheme:light]";
+  "dashboard-select w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-3 py-2 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] disabled:cursor-not-allowed disabled:bg-[#F1F5F9] disabled:opacity-80 [color-scheme:light]";
 
 export const dashboardSelectLgClass =
-  "dashboard-select w-full rounded-xl border border-[rgba(147,197,253,0.28)] bg-white px-4 py-2.5 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(2,6,23,0.2)] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.35)] disabled:cursor-not-allowed disabled:bg-[#E2E8F0] disabled:opacity-80 [color-scheme:light]";
+  "dashboard-select w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 py-2.5 text-sm text-[#0B1220] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] disabled:cursor-not-allowed disabled:bg-[#F1F5F9] disabled:opacity-80 [color-scheme:light]";
 
-export const dashboardLabelClass = "mb-1.5 block text-sm font-medium text-[#E2E8F0]";
+export const dashboardLabelClass = "mb-1.5 block text-sm font-medium text-[#334155]";
 
-export const dashboardHintClass = "mt-1.5 text-xs leading-relaxed text-[#A8B8D0]";
+export const dashboardHintClass = "mt-1.5 text-xs leading-relaxed text-[#64748B]";
 
 export const dashboardInnerPanelClass =
-  "rounded-2xl border border-[rgba(147,197,253,0.14)] bg-[rgba(7,22,52,0.55)]";
+  "rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC]";
 
 export const dashboardToggleRowClass =
-  "flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[rgba(147,197,253,0.16)] bg-[rgba(255,255,255,0.05)] px-4 py-3 transition-colors hover:border-[rgba(96,165,250,0.35)] hover:bg-[rgba(255,255,255,0.08)]";
+  "flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3 transition-colors hover:border-[rgba(26,35,255,0.18)] hover:bg-white";
 
 export const dashboardSettingsRowClass =
-  "flex flex-col gap-2 rounded-2xl border border-[rgba(147,197,253,0.16)] bg-[rgba(255,255,255,0.05)] p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4";
+  "flex flex-col gap-2 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4";
 
 export const dashboardCheckboxClass =
   "mt-1 h-4 w-4 shrink-0 rounded border-[#94A3B8] bg-white text-[#1A23FF] accent-[#1A23FF] focus:ring-[#1A23FF]/40";
 
-/** Popover / modal — surface claire contrôlée pour lisibilité des menus */
+/** Popover / modal — surface claire */
 export const dashboardPopoverPanelClass =
-  "rounded-2xl border border-[rgba(147,197,253,0.2)] bg-[#0F2744] p-4 text-[#F1F5F9] shadow-[0_16px_48px_rgba(2,6,23,0.45)] backdrop-blur-xl";
+  "rounded-2xl border border-[rgba(15,23,42,0.1)] bg-white p-4 text-[#0F172A] shadow-[0_16px_40px_rgba(15,23,42,0.12)]";
 
 export const dashboardModalClass =
-  "overflow-hidden rounded-[1.75rem] border border-[rgba(147,197,253,0.18)] bg-[#0F2744] text-[#F1F5F9] shadow-[0_24px_64px_rgba(2,6,23,0.5)]";
+  "overflow-hidden rounded-[1.75rem] border border-[rgba(15,23,42,0.1)] bg-white text-[#0F172A] shadow-[0_24px_64px_rgba(15,23,42,0.14)]";
 
 export const buvetteDayAvailableClass =
-  "border-emerald-400/30 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25";
+  "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100";
 
 export const buvetteDayReservedClass =
-  "border-amber-400/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25";
+  "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100";
 
 export const buvetteDayOccupiedClass =
-  "border-red-400/30 bg-red-500/15 text-red-300 hover:bg-red-500/25";
+  "border-red-200 bg-red-50 text-red-700 hover:bg-red-100";
 
-export const buvetteDayEmptyClass = "border-transparent bg-[rgba(255,255,255,0.04)]";
+export const buvetteDayEmptyClass = "border-transparent bg-[#F1F5F9]";
 
 export const dashboardInfoPanelClass =
-  "rounded-2xl border border-[rgba(96,165,250,0.25)] bg-[rgba(26,35,255,0.14)]";
+  "rounded-2xl border border-[rgba(26,35,255,0.14)] bg-[rgba(26,35,255,0.05)]";
 
 export const iconBadgeClass =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A23FF]/35 to-[#38BDF8]/20 text-[#93C5FD] ring-1 ring-[rgba(147,197,253,0.25)] shadow-[0_0_20px_rgba(26,35,255,0.25)] sm:h-12 sm:w-12";
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[rgba(26,35,255,0.08)] text-[#1A23FF] ring-1 ring-[rgba(26,35,255,0.12)] sm:h-12 sm:w-12";
 
 export const dashboardIconBadgeSubtleClass =
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(26,35,255,0.22)] text-[#93C5FD] ring-1 ring-[rgba(147,197,253,0.2)]";
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(26,35,255,0.08)] text-[#1A23FF] ring-1 ring-[rgba(26,35,255,0.1)]";
 
 /* ============================================================
  * LANDING — tokens réservés à la landing publique (NE PAS MODIFIER)

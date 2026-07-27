@@ -53,7 +53,7 @@ export default function SectionCard({
             </div>
           </div>
           {headerRight ? (
-            <div className="shrink-0 text-xs font-medium uppercase tracking-[0.16em] text-[#7B8BA5] [&_a]:font-semibold [&_a]:normal-case [&_a]:tracking-normal [&_a]:text-[#1A23FF] [&_a]:hover:text-[#151dd9] [&_button]:text-[#344054]">
+            <div className="shrink-0 text-xs font-medium uppercase tracking-[0.16em] text-[#94A3B8] [&_a]:font-semibold [&_a]:normal-case [&_a]:tracking-normal [&_a]:text-[#1A23FF] [&_a]:hover:text-[#151dd9] [&_button]:text-[#334155]">
               {headerRight}
             </div>
           ) : null}
@@ -65,7 +65,7 @@ export default function SectionCard({
       </div>
 
       {footer ? (
-        <footer className="relative border-t border-[rgba(26,35,255,0.07)] px-5 py-3 sm:px-6 sm:py-3.5">
+        <footer className="relative border-t border-[rgba(15,23,42,0.06)] px-5 py-3 sm:px-6 sm:py-3.5">
           {footer}
         </footer>
       ) : null}
