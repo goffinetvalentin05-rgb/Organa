@@ -2,7 +2,12 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "./cn";
-import { unifiedSectionShellClass, dashboardIconBadgeSubtleClass } from "./styles";
+import {
+  unifiedSectionShellClass,
+  dashboardIconBadgeSubtleClass,
+  dashboardTextPrimaryClass,
+  dashboardTextSecondaryClass,
+} from "./styles";
 
 type IconProps = { className?: string };
 
@@ -20,7 +25,7 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
     return (
       <div
         className={cn(
-          "flex flex-col items-center justify-center rounded-2xl border border-dashed border-[rgba(147,197,253,0.22)] bg-[rgba(255,255,255,0.03)] px-6 py-12 text-center sm:py-14",
+          "flex flex-col items-center justify-center rounded-2xl border border-dashed border-[rgba(15,23,42,0.12)] bg-[#F8FAFC] px-6 py-12 text-center sm:py-14",
           className
         )}
       >
@@ -29,9 +34,9 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
             <Icon className="h-6 w-6" />
           </div>
         ) : null}
-        <p className="text-base font-semibold text-[#F8FAFC]">{title}</p>
+        <p className={cn("text-base font-semibold", dashboardTextPrimaryClass)}>{title}</p>
         {description ? (
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-[#A8B8D0]">{description}</p>
+          <p className={cn("mt-2 max-w-md text-sm leading-relaxed", dashboardTextSecondaryClass)}>{description}</p>
         ) : null}
         {action ? <div className="mt-6 flex flex-wrap justify-center gap-3">{action}</div> : null}
       </div>
@@ -51,9 +56,9 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
           <Icon className="h-6 w-6" />
         </div>
       ) : null}
-      <p className="text-base font-semibold text-[#F8FAFC]">{title}</p>
+      <p className={cn("text-base font-semibold", dashboardTextPrimaryClass)}>{title}</p>
       {description ? (
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-[#A8B8D0]">{description}</p>
+        <p className={cn("mt-2 max-w-md text-sm leading-relaxed", dashboardTextSecondaryClass)}>{description}</p>
       ) : null}
       {action ? <div className="mt-6 flex flex-wrap justify-center gap-3">{action}</div> : null}
     </div>

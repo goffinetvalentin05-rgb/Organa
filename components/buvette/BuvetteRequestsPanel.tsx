@@ -17,6 +17,11 @@ import {
   dashboardCardDescriptionClass,
   dashboardCardTitleClass,
   dashboardSecondaryButtonClass,
+  dashboardTabActiveClass,
+  dashboardTabInactiveClass,
+  dashboardTextMutedClass,
+  dashboardTextPrimaryClass,
+  dashboardTextSecondaryClass,
   EmptyState,
   DashboardBadge,
   GlassCard,
@@ -64,7 +69,7 @@ export default function BuvetteRequestsPanel({
         </p>
       </div>
 
-      <div className="border-b border-white/10 px-4 py-3 sm:px-6">
+      <div className="border-b border-[rgba(15,23,42,0.08)] px-4 py-3 sm:px-6">
         <div className="-mx-1 flex gap-1 overflow-x-auto pb-1">
           {TABS.map((tab) => {
             const count = counts[tab];
@@ -76,9 +81,7 @@ export default function BuvetteRequestsPanel({
                 onClick={() => setActiveTab(tab)}
                 className={cn(
                   "inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition",
-                  isActive
-                    ? "border border-white/20 bg-white/[0.12] text-white shadow-sm"
-                    : "text-white/60 hover:bg-white/[0.06] hover:text-white/85"
+                  isActive ? dashboardTabActiveClass : dashboardTabInactiveClass
                 )}
               >
                 {BUVETTE_REQUEST_TAB_LABELS[tab]}
@@ -86,7 +89,9 @@ export default function BuvetteRequestsPanel({
                   <span
                     className={cn(
                       "inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
-                      isActive ? "bg-white/20 text-white" : "bg-white/10 text-white/70"
+                      isActive
+                        ? "bg-[rgba(26,35,255,0.12)] text-[#1A23FF]"
+                        : "bg-[#F1F5F9] text-[#64748B]"
                     )}
                   >
                     {count}
@@ -100,7 +105,7 @@ export default function BuvetteRequestsPanel({
 
       <div className={cn(unifiedSectionBodyClass, "space-y-3")}>
         {loading ? (
-          <p className="text-sm text-white/55">Chargement des demandes…</p>
+          <p className={cn("text-sm", dashboardTextSecondaryClass)}>Chargement des demandes…</p>
         ) : visibleRequests.length === 0 ? (
           <EmptyState embedded title={BUVETTE_REQUEST_EMPTY_LABELS[activeTab]} />
         ) : (
@@ -149,8 +154,8 @@ function RequestCard({
       >
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white/95">{fullName}</p>
-            <p className="mt-0.5 text-xs text-white/50">
+            <p className={cn("truncate text-sm font-semibold", dashboardTextPrimaryClass)}>{fullName}</p>
+            <p className={cn("mt-0.5 text-xs", dashboardTextMutedClass)}>
               Demandée le{" "}
               {new Date(request.created_at).toLocaleDateString("fr-CH", {
                 day: "numeric",
@@ -164,31 +169,31 @@ function RequestCard({
           </DashboardBadge>
         </div>
 
-        <div className="grid gap-1.5 text-sm text-white/75 sm:grid-cols-2">
+        <div className={cn("grid gap-1.5 text-sm sm:grid-cols-2", dashboardTextSecondaryClass)}>
           <p>
-            <span className="text-white/50">Date : </span>
+            <span className={dashboardTextMutedClass}>Date : </span>
             {formatDate(request.reservation_date)}
           </p>
           <p>
-            <span className="text-white/50">Type : </span>
+            <span className={dashboardTextMutedClass}>Type : </span>
             {request.event_type}
           </p>
           {request.email ? (
             <p className="truncate sm:col-span-2">
-              <span className="text-white/50">Email : </span>
+              <span className={dashboardTextMutedClass}>Email : </span>
               {request.email}
             </p>
           ) : null}
           {request.phone ? (
             <p>
-              <span className="text-white/50">Tél. : </span>
+              <span className={dashboardTextMutedClass}>Tél. : </span>
               {request.phone}
             </p>
           ) : null}
         </div>
 
         {request.message ? (
-          <p className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm leading-relaxed text-white/70">
+          <p className="rounded-lg border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-3 py-2 text-sm leading-relaxed text-[#475569]">
             {request.message}
           </p>
         ) : null}
@@ -215,7 +220,7 @@ function RequestCard({
                 onDecide(request.id, "refused");
               }}
               disabled={submitting}
-              className="rounded-lg bg-rose-600/90 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+              className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
             >
               Refuser
             </button>

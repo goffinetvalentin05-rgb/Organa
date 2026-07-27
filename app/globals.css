@@ -1657,10 +1657,34 @@ h3 {
   width: 100%;
   flex-shrink: 0;
   margin-top: 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(16px) saturate(1.1);
-  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.1);
+  background:
+    linear-gradient(90deg, #06122C 0%, #071634 55%, #0A1838 100%);
+  backdrop-filter: blur(12px) saturate(1.1);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: #E2E8F0;
+}
+
+.dashboard-topbar-control {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(226, 232, 240, 0.88);
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dashboard-topbar-control:hover {
+  border-color: rgba(147, 197, 253, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.dashboard-topbar-profile {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-topbar-profile span {
+  color: #F1F5F9;
 }
 
 .dashboard-main-content {
@@ -1684,6 +1708,21 @@ h3 {
 
 .dashboard-glass-card::before {
   content: none;
+}
+
+.dashboard-modal-surface {
+  color: #0F172A;
+}
+
+.dashboard-modal-surface h1,
+.dashboard-modal-surface h2,
+.dashboard-modal-surface h3,
+.dashboard-modal-surface h4 {
+  color: #0F172A;
+}
+
+.dashboard-modal-surface p {
+  color: #64748B;
 }
 
 .dashboard-stat-card {
@@ -1929,7 +1968,65 @@ h3 {
    ------------------------------------------------------------------ */
 
 /* Textes clairs hardcodés (legacy dark) → texte foncé lisible.
-   Ne pas remapper `text-white` : utilisé sur boutons / icônes d'accent. */
+   Ne pas remapper `text-white` sur boutons/liens accent. */
+.dashboard-shell main [class*="text-white/9"],
+.dashboard-shell main [class*="text-white/8"],
+.dashboard-shell main [class*="text-white/75"],
+.dashboard-shell main [class*="text-white/7"],
+.dashboard-shell main [class*="text-white/65"],
+.dashboard-shell main [class*="text-white/6"] {
+  color: #334155 !important;
+}
+
+.dashboard-shell main [class*="text-white/55"],
+.dashboard-shell main [class*="text-white/5"],
+.dashboard-shell main [class*="text-white/45"],
+.dashboard-shell main [class*="text-white/4"] {
+  color: #64748B !important;
+}
+
+.dashboard-shell main [class*="text-white/35"],
+.dashboard-shell main [class*="text-white/3"] {
+  color: #94A3B8 !important;
+}
+
+.dashboard-shell main
+  :is(p, span, h1, h2, h3, h4, h5, h6, li, label, td, th, div).text-white:not(button):not(a) {
+  color: #0F172A !important;
+}
+
+.dashboard-shell main a[class*="text-white/"]:not([class*="bg-"]),
+.dashboard-shell main button[class*="text-white/"]:not([class*="bg-slate-9"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-blue-6"]):not([class*="bg-red-6"]):not([class*="bg-gradient"]) {
+  color: #64748B !important;
+}
+
+.dashboard-shell main a[class*="hover:text-white"]:hover,
+.dashboard-shell main button[class*="hover:text-white"]:hover:not([class*="bg-slate-9"]):not([class*="bg-emerald"]):not([class*="bg-rose"]):not([class*="bg-blue-6"]) {
+  color: #1A23FF !important;
+}
+
+.dashboard-shell main [class*="border-white/1"],
+.dashboard-shell main [class*="border-white/2"] {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+.dashboard-shell main [class*="bg-white/[0.0"],
+.dashboard-shell main [class*="bg-white/5"],
+.dashboard-shell main [class*="bg-white/6"],
+.dashboard-shell main [class*="bg-white/1"],
+.dashboard-shell main [class*="bg-white/2"] {
+  background-color: #F8FAFC !important;
+}
+
+.dashboard-shell main [class*="hover:bg-white/"]:hover:not(button[class*="bg-slate-9"]):not(button[class*="bg-emerald"]):not(button[class*="bg-rose"]) {
+  background-color: #F1F5F9 !important;
+}
+
+.dashboard-shell main .text-slate-300,
+.dashboard-shell main .text-gray-300 {
+  color: #64748B !important;
+}
+
 .dashboard-shell main [class*="text-[#F8FAFC]"],
 .dashboard-shell main [class*="text-[#F1F5F9]"],
 .dashboard-shell main [class*="text-[#E2E8F0]"] {
@@ -1996,15 +2093,22 @@ h3 {
   color: #0B1220 !important;
 }
 
-/* Surfaces navy résiduelles → blanc */
-.dashboard-shell main [class*="bg-[#0F2744]"],
-.dashboard-shell main [class*="bg-[#071634]"],
-.dashboard-shell main [class*="bg-[#123055]"],
-.dashboard-shell main [class*="bg-[#143056]"],
-.dashboard-shell main [class*="bg-slate-950"],
-.dashboard-shell main [class*="bg-slate-900"] {
+/* Surfaces navy résiduelles → blanc (hors boutons/liens accent) */
+.dashboard-shell main [class*="bg-[#0F2744]"]:not(button):not(a),
+.dashboard-shell main [class*="bg-[#071634]"]:not(button):not(a),
+.dashboard-shell main [class*="bg-[#123055]"]:not(button):not(a),
+.dashboard-shell main [class*="bg-[#143056]"]:not(button):not(a),
+.dashboard-shell main [class*="bg-slate-950"]:not(button):not(a),
+.dashboard-shell main [class*="bg-slate-900"]:not(button):not(a) {
   background-color: #FFFFFF !important;
   color: #0F172A !important;
+}
+
+.dashboard-shell main button[class*="bg-slate-900"],
+.dashboard-shell main button[class*="bg-slate-800"],
+.dashboard-shell main a[class*="bg-slate-900"] {
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
 }
 
 /* Surfaces blanches / pâles — conserver */

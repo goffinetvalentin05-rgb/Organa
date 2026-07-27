@@ -19,7 +19,7 @@ export default function UsersAccessCard({
   if (loading) {
     return (
       <GlassCard padding="lg" className="animate-pulse">
-        <div className="h-20 rounded-xl bg-white/10" />
+        <div className="h-20 rounded-xl bg-[#F1F5F9]" />
       </GlassCard>
     );
   }
@@ -29,7 +29,7 @@ export default function UsersAccessCard({
       <Link href="/tableau-de-bord/parametres/utilisateurs" className="group block">
         <GlassCard
           padding="lg"
-          className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
+          className="transition-all duration-200 hover:border-[rgba(26,35,255,0.18)] hover:shadow-md"
         >
           <TeamCardContent t={t} locked={false} />
         </GlassCard>
@@ -41,7 +41,7 @@ export default function UsersAccessCard({
     <Link href="/tableau-de-bord/abonnement" className="group block">
       <GlassCard
         padding="lg"
-        className="transition-all duration-200 hover:border-white/30 hover:bg-white/[0.14] hover:shadow-md hover:shadow-blue-950/15"
+        className="transition-all duration-200 hover:border-[rgba(26,35,255,0.18)] hover:shadow-md"
       >
         <TeamCardContent t={t} locked />
       </GlassCard>
@@ -60,24 +60,24 @@ function TeamCardContent({
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-start gap-4">
         <div
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-lg ${
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${
             locked
-              ? "bg-white/10 text-white/70 shadow-none ring-1 ring-white/20"
-              : "bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-blue-900/35"
+              ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+              : "bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-blue-200/50"
           }`}
         >
           {locked ? <Shield className="h-6 w-6" /> : <UserCheck className="h-6 w-6" />}
         </div>
         <div className="min-w-0">
           {locked && (
-            <span className="mb-2 inline-flex items-center rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-200">
+            <span className="mb-2 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
               {t("dashboard.settings.usersAccessLocked.badge")}
             </span>
           )}
-          <h2 className="text-lg font-bold text-white drop-shadow-sm">
+          <h2 className="text-lg font-bold text-[#0F172A]">
             {t("dashboard.settings.layout.sections.usersAccess")}
           </h2>
-          <p className="mt-1 text-sm font-medium leading-relaxed text-white/75">
+          <p className="mt-1 text-sm font-medium leading-relaxed text-[#64748B]">
             {locked
               ? t("dashboard.settings.usersAccessLocked.description")
               : t("dashboard.settings.layout.usersAccess.description")}
@@ -87,8 +87,8 @@ function TeamCardContent({
       <span
         className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition sm:py-2.5 ${
           locked
-            ? "border-white/25 bg-white/10 text-white group-hover:bg-white/15"
-            : "border-white/30 bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] text-white shadow-md shadow-blue-900/25 group-hover:opacity-95"
+            ? "border-[rgba(15,23,42,0.1)] bg-[#F8FAFC] text-[#334155] group-hover:bg-[#F1F5F9]"
+            : "border-transparent bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] text-white shadow-md shadow-blue-200/40 group-hover:opacity-95"
         }`}
       >
         {locked

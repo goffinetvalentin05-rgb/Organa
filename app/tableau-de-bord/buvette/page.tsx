@@ -5,7 +5,7 @@ import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass } from "@/components/ui";
+import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, dashboardTextPrimaryClass, dashboardTextSecondaryClass, dashboardTextMutedClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass, cn } from "@/components/ui";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 import BuvetteRequestsPanel from "@/components/buvette/BuvetteRequestsPanel";
 import type { BuvetteRequest } from "@/lib/buvette/requests";
@@ -339,7 +339,7 @@ N'hésite pas à nous contacter si tu as des questions.
       </div>
 
       {message ? (
-        <GlassCard padding="md" className="border-white/10 text-sm text-white/75">
+        <GlassCard padding="md" className="border-[rgba(15,23,42,0.08)] text-sm text-[#334155]">
           {message}
         </GlassCard>
       ) : null}
@@ -348,15 +348,15 @@ N'hésite pas à nous contacter si tu as des questions.
         <GlassCard padding="md">
           <div className="mb-4 flex items-center justify-between">
             <button onClick={() => goMonth(-1)} className={dashboardSecondaryButtonClass}>{"<"}</button>
-            <p className="font-semibold text-white/90">{month}</p>
+            <p className={cn("font-semibold", dashboardTextPrimaryClass)}>{month}</p>
             <button onClick={() => goMonth(1)} className={dashboardSecondaryButtonClass}>{">"}</button>
           </div>
 
           {loading ? (
-            <p className="text-white/55">{t("dashboard.buvette.calendarLoading")}</p>
+            <p className={dashboardTextSecondaryClass}>{t("dashboard.buvette.calendarLoading")}</p>
           ) : (
             <>
-              <div className="grid grid-cols-7 gap-2 mb-2 text-xs text-white/50">
+              <div className={cn("mb-2 grid grid-cols-7 gap-2 text-xs", dashboardTextMutedClass)}>
                 {(weekdayLabels.length ? weekdayLabels : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]).map((d) => (
                   <div key={d} className="text-center">{d}</div>
                 ))}
@@ -396,9 +396,9 @@ N'hésite pas à nous contacter si tu as des questions.
         </GlassCard>
 
         <GlassCard padding="md" className="space-y-4">
-          <h2 className="font-semibold text-white/90">Détails date</h2>
+          <h2 className={cn("font-semibold", dashboardTextPrimaryClass)}>Détails date</h2>
           {!selectedDate ? (
-            <p className="text-sm text-white/55">Sélectionne une date dans le calendrier.</p>
+            <p className={cn("text-sm", dashboardTextSecondaryClass)}>Sélectionne une date dans le calendrier.</p>
           ) : (
             <>
               <p className="text-sm"><span className="font-medium">Date :</span> {selectedDate}</p>
@@ -526,12 +526,12 @@ N'hésite pas à nous contacter si tu as des questions.
             aria-label="Fermer"
             onClick={() => !archiving && setArchiveTargetId(null)}
           />
-          <div className={`relative w-full max-w-md space-y-4 p-5 ${dashboardModalClass}`}>
+          <div className={`${dashboardModalClass} relative w-full max-w-md space-y-4 p-5`}>
             <div>
-              <h3 className="text-lg font-semibold text-white/95">Archiver cette demande ?</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/65">
+              <h3 className={cn("text-lg font-semibold", dashboardTextPrimaryClass)}>Archiver cette demande ?</h3>
+              <p className={cn("mt-2 text-sm leading-relaxed", dashboardTextSecondaryClass)}>
                 La demande de{" "}
-                <span className="font-medium text-white/85">
+                <span className={cn("font-medium", dashboardTextPrimaryClass)}>
                   {archiveTarget.first_name} {archiveTarget.last_name}
                 </span>{" "}
                 ({formatDateFr(archiveTarget.reservation_date)}) sera retirée de la liste. Les
@@ -567,7 +567,7 @@ N'hésite pas à nous contacter si tu as des questions.
               <h3 className="text-lg font-semibold">Envoyer les infos pratiques</h3>
               <button
                 onClick={() => setShowInfoModal(false)}
-                className="rounded-md px-2 py-1 text-white/55 transition hover:bg-white/10 hover:text-white/90"
+                className={cn("rounded-md px-2 py-1 transition hover:bg-[#F1F5F9]", dashboardTextMutedClass)}
               >
                 ✕
               </button>
@@ -604,7 +604,7 @@ N'hésite pas à nous contacter si tu as des questions.
               <h3 className="text-lg font-semibold">Envoyer la facture</h3>
               <button
                 onClick={() => setShowInvoiceModal(false)}
-                className="rounded-md px-2 py-1 text-white/55 transition hover:bg-white/10 hover:text-white/90"
+                className={cn("rounded-md px-2 py-1 transition hover:bg-[#F1F5F9]", dashboardTextMutedClass)}
               >
                 ✕
               </button>

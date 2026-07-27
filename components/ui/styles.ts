@@ -61,6 +61,18 @@ export const dashboardCardValueClass =
 export const dashboardStatusPillClass =
   "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-medium text-emerald-700";
 
+export const dashboardTextPrimaryClass = "text-[#0F172A]";
+export const dashboardTextSecondaryClass = "text-[#64748B]";
+export const dashboardTextMutedClass = "text-[#94A3B8]";
+
+export const dashboardTabActiveClass =
+  "border border-[rgba(26,35,255,0.2)] bg-[rgba(26,35,255,0.08)] text-[#1A23FF] shadow-sm";
+export const dashboardTabInactiveClass =
+  "border border-transparent text-[#64748B] hover:border-[rgba(15,23,42,0.08)] hover:bg-[#F8FAFC] hover:text-[#0F172A]";
+
+export const dashboardTopbarControlClass =
+  "dashboard-topbar-control rounded-xl";
+
 export const dashboardQuickActionClass =
   "group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.18)] hover:bg-white hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)] sm:p-5";
 
@@ -129,7 +141,7 @@ export const dashboardPopoverPanelClass =
   "rounded-2xl border border-[rgba(15,23,42,0.1)] bg-white p-4 text-[#0F172A] shadow-[0_16px_40px_rgba(15,23,42,0.12)]";
 
 export const dashboardModalClass =
-  "overflow-hidden rounded-[1.75rem] border border-[rgba(15,23,42,0.1)] bg-white text-[#0F172A] shadow-[0_24px_64px_rgba(15,23,42,0.14)]";
+  "dashboard-modal-surface overflow-hidden rounded-[1.75rem] border border-[rgba(15,23,42,0.1)] bg-white text-[#0F172A] shadow-[0_24px_64px_rgba(15,23,42,0.14)]";
 
 export const buvetteDayAvailableClass =
   "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100";

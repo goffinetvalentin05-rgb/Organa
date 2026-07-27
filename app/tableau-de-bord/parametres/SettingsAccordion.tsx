@@ -24,7 +24,7 @@ export default function SettingsAccordion({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border border-white/12 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm ${className}`.trim()}
+      className={`overflow-hidden rounded-xl border border-[rgba(15,23,42,0.08)] bg-white shadow-sm ${className}`.trim()}
     >
       <button
         id={btnId}
@@ -32,11 +32,11 @@ export default function SettingsAccordion({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full min-h-[52px] touch-manipulation items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/[0.06] sm:min-h-[48px] sm:py-3"
+        className="flex min-h-[52px] w-full touch-manipulation items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[#F8FAFC] sm:min-h-[48px] sm:py-3"
       >
-        <span className="text-[15px] font-semibold leading-snug text-white/90 sm:text-sm">{title}</span>
+        <span className="text-[15px] font-semibold leading-snug text-[#0F172A] sm:text-sm">{title}</span>
         <ChevronDown
-          className={`h-5 w-5 shrink-0 text-white/45 transition-transform duration-200 ${
+          className={`h-5 w-5 shrink-0 text-[#94A3B8] transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
           aria-hidden
@@ -47,7 +47,7 @@ export default function SettingsAccordion({
         role="region"
         aria-labelledby={btnId}
         hidden={!open}
-        className="border-t border-white/10 bg-white/[0.02]"
+        className="border-t border-[rgba(15,23,42,0.06)] bg-[#FAFBFD]"
       >
         <div className="px-4 pb-4 pt-3">{children}</div>
       </div>

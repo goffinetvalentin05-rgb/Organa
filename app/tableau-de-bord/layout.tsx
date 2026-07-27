@@ -323,7 +323,7 @@ export default function DashboardLayout({
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-xl p-2 text-[#64748B] transition hover:bg-[#F1F5F9] hover:text-[#0F172A] lg:hidden"
+                className={cn("dashboard-topbar-control rounded-xl p-2 lg:hidden")}
                 aria-label={t("dashboard.navigation.primary")}
               >
                 <Menu className="h-5 w-5" />
@@ -333,25 +333,27 @@ export default function DashboardLayout({
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               {!loadingUser ? (
                 <div
-                  className="hidden max-w-[200px] items-center gap-2 rounded-full border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-2.5 py-1.5 md:flex"
+                  className="dashboard-topbar-profile hidden max-w-[200px] items-center gap-2 rounded-full px-2.5 py-1.5 md:flex"
                   aria-label={displayName}
                   title={displayName}
                 >
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1A23FF] to-[#3B82F6] text-xs font-bold text-white">
                     {initial}
                   </div>
-                  <span className="truncate text-sm font-medium text-[#0F172A]">{displayName}</span>
+                  <span className="truncate text-sm font-medium">{displayName}</span>
                 </div>
               ) : null}
 
-              <LanguageSwitcher compact theme="light" />
+              <LanguageSwitcher compact theme="dark" />
 
-              <DashboardNotificationBellConnected />
+              <DashboardNotificationBellConnected variant="topbar" />
 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl border border-[rgba(15,23,42,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[#64748B] transition hover:border-[rgba(26,35,255,0.2)] hover:bg-[#F8FAFC] hover:text-[#0F172A] sm:px-3.5 sm:py-2 sm:text-sm"
+                className={cn(
+                  "dashboard-topbar-control rounded-xl px-3 py-1.5 text-xs font-medium sm:px-3.5 sm:py-2 sm:text-sm"
+                )}
               >
                 {t("dashboard.topbar.logout")}
               </button>

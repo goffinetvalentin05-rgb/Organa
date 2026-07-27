@@ -17,12 +17,14 @@ type NotificationBellProps = {
   notifications?: DashboardNotification[];
   onNotificationClick?: (id: string) => void;
   className?: string;
+  variant?: "default" | "topbar";
 };
 
 export default function NotificationBell({
   notifications = [],
   onNotificationClick,
   className,
+  variant = "default",
 }: NotificationBellProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -51,6 +53,8 @@ export default function NotificationBell({
     };
   }, [open]);
 
+  const isTopbar = variant === "topbar";
+
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       <button
@@ -59,7 +63,12 @@ export default function NotificationBell({
         aria-expanded={open}
         aria-haspopup="true"
         aria-label={t("dashboard.topbar.notifications")}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(15,23,42,0.1)] bg-white text-[#64748B] transition hover:border-[rgba(26,35,255,0.2)] hover:bg-[#F8FAFC] hover:text-[#1A23FF]"
+        className={cn(
+          "relative flex h-9 w-9 items-center justify-center rounded-full transition",
+          isTopbar
+            ? "dashboard-topbar-control"
+            : "border border-[rgba(15,23,42,0.1)] bg-white text-[#64748B] hover:border-[rgba(26,35,255,0.2)] hover:bg-[#F8FAFC] hover:text-[#1A23FF]"
+        )}
       >
         <Bell className="h-4 w-4" strokeWidth={1.5} />
         {unreadCount > 0 ? (

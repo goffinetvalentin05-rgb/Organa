@@ -142,7 +142,7 @@ export default function BuvettePublicSettingsPanel() {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-start justify-between gap-3 px-4 py-4 text-left transition hover:bg-white/[0.06] sm:px-6 sm:py-5"
+        className="flex w-full items-start justify-between gap-3 px-4 py-4 text-left transition hover:bg-[#F8FAFC] sm:px-6 sm:py-5"
       >
         <div className="min-w-0 flex-1">
           <p className={`text-base sm:text-lg ${dashboardCardTitleClass}`}>
@@ -154,7 +154,7 @@ export default function BuvettePublicSettingsPanel() {
         </div>
         <ChevronDown
           className={cn(
-            "mt-1 h-5 w-5 shrink-0 text-white/45 transition-transform duration-200",
+            "mt-1 h-5 w-5 shrink-0 text-[#94A3B8] transition-transform duration-200",
             open && "rotate-180"
           )}
           aria-hidden
@@ -162,7 +162,7 @@ export default function BuvettePublicSettingsPanel() {
       </button>
 
       {open ? (
-        <div className={cn(unifiedSectionBodyClass, "border-t border-white/30 space-y-6")}>
+        <div className={cn(unifiedSectionBodyClass, "space-y-6 border-t border-[rgba(15,23,42,0.06)]")}>
           {loading || !form ? (
             <p className="text-sm text-slate-600">{t("dashboard.common.loading")}</p>
           ) : (

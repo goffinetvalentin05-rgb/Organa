@@ -12,15 +12,15 @@ interface LimitReachedAlertProps {
  * Composant réutilisable pour afficher un message d'erreur LIMIT_REACHED
  * Redirige vers /tableau-de-bord/abonnement
  */
-export default function LimitReachedAlert({ message, resource }: LimitReachedAlertProps) {
+export default function LimitReachedAlert({ message }: LimitReachedAlertProps) {
   const { t } = useI18n();
 
   return (
-    <div className="rounded-xl border-2 border-[#7C5CFF]/50 bg-gradient-to-r from-[#7C5CFF]/10 to-[#8B5CF6]/10 p-6 backdrop-blur-sm">
+    <div className="rounded-xl border border-violet-200 bg-violet-50 p-6">
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
           <svg
-            className="w-6 h-6 text-[#7C5CFF]"
+            className="h-6 w-6 text-violet-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -34,17 +34,17 @@ export default function LimitReachedAlert({ message, resource }: LimitReachedAle
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-2">
+          <h3 className="mb-2 text-lg font-semibold text-[#0F172A]">
             {t("dashboard.limits.title")}
           </h3>
-          <p className="text-white/80 mb-4">{message}</p>
+          <p className="mb-4 text-[#475569]">{message}</p>
           <Link
             href="/tableau-de-bord/abonnement"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] text-white font-medium hover:shadow-lg hover:shadow-[#7C5CFF]/30 transition-all"
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#8B5CF6] px-6 py-3 font-medium text-white transition-all hover:shadow-lg hover:shadow-violet-200"
           >
             {t("dashboard.limits.cta")}
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -62,28 +62,3 @@ export default function LimitReachedAlert({ message, resource }: LimitReachedAle
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
