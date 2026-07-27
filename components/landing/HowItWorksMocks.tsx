@@ -66,7 +66,7 @@ function MockShell({
 }) {
   return (
     <div
-      className={`rounded-[1.75rem] border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/80 p-5 shadow-[0_32px_64px_-20px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.03)] sm:p-6 md:p-7 ${className}`}
+      className={`overflow-hidden rounded-[1.35rem] border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/80 p-4 shadow-[0_32px_64px_-20px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.03)] sm:rounded-[1.75rem] sm:p-6 md:p-7 ${className}`}
     >
       {children}
     </div>
@@ -91,7 +91,7 @@ function FieldInput({
   return (
     <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] sm:py-3">
       {icon ? <span className="how-it-works-blue-icon shrink-0">{icon}</span> : null}
-      <span className="text-sm font-medium text-slate-800">{value}</span>
+      <span className="min-w-0 truncate text-sm font-medium text-slate-800">{value}</span>
     </div>
   );
 }
@@ -277,8 +277,10 @@ export function CommitteeMock({ labels }: { labels: MockLabels["step3"] }) {
               {member.initials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-slate-900">{member.name}</p>
-              <RoleBadge variant={member.badge}>{member.role}</RoleBadge>
+              <p className="truncate text-sm font-bold text-slate-900">{member.name}</p>
+              <div className="mt-1">
+                <RoleBadge variant={member.badge}>{member.role}</RoleBadge>
+              </div>
             </div>
           </li>
         ))}
@@ -309,17 +311,17 @@ export function CentralizedMock({ labels }: { labels: MockLabels["step4"] }) {
               <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tile.bg} ${tile.color}`}>
                 <Icon className="h-4 w-4" strokeWidth={2} />
               </span>
-              <p className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">{tile.label}</p>
-              <p className="mt-0.5 text-sm font-bold text-slate-900">{tile.value}</p>
+              <p className="mt-3 truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500">{tile.label}</p>
+              <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{tile.value}</p>
             </div>
           );
         })}
       </div>
-      <div className="how-it-works-blue-soft mt-4 flex items-center justify-center gap-2 rounded-xl border px-4 py-3">
-        <span className="how-it-works-blue-fill flex h-6 w-6 items-center justify-center rounded-full text-white">
+      <div className="how-it-works-blue-soft mt-4 flex min-w-0 items-center justify-center gap-2 rounded-xl border px-3 py-3 sm:px-4">
+        <span className="how-it-works-blue-fill flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
           <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
         </span>
-        <p className="how-it-works-blue-icon text-sm font-semibold">{labels.centralized}</p>
+        <p className="how-it-works-blue-icon min-w-0 text-center text-sm font-semibold leading-snug">{labels.centralized}</p>
       </div>
     </MockShell>
   );

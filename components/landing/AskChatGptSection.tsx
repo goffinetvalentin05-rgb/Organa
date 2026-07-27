@@ -65,7 +65,7 @@ export default function AskChatGptSection() {
                 whileHover={reduceMotion ? undefined : { y: -3, scale: 1.025 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
                 transition={{ duration: 0.22, ease: easePremium }}
-                className="group relative inline-flex"
+                className="group relative inline-flex w-full"
               >
                 <motion.span
                   className="pointer-events-none absolute -inset-4 rounded-full bg-[radial-gradient(circle,rgba(26,35,255,0.45),rgba(37,211,102,0.12)_50%,transparent_70%)] blur-2xl"

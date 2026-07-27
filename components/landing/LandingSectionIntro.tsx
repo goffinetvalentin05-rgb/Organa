@@ -17,7 +17,7 @@ export function landingSectionShellClass(first = false) {
   return [
     "landing-section relative scroll-mt-24",
     first ? "landing-section--first" : "",
-    "pb-16 md:pb-24 lg:pb-28",
+    "pb-12 md:pb-24 lg:pb-28",
   ]
     .filter(Boolean)
     .join(" ");

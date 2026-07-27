@@ -62,7 +62,7 @@ export default function HowItWorksSection() {
       id="comment-ca-marche"
       className={`${landingSectionShellClass()} scroll-mt-32 overflow-x-hidden md:scroll-mt-36`}
     >
-      <div className="relative mx-auto w-[94%] max-w-[1240px]">
+      <div className="relative mx-auto w-[min(94%,1240px)] max-w-[1240px]">
         <motion.div
           variants={scrollReveal}
           initial="hidden"

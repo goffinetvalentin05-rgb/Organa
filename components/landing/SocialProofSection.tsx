@@ -41,7 +41,7 @@ function TitleBlock({ title }: { title: string }) {
   const accent = lastSpace > 0 ? base.slice(lastSpace + 1) : "";
 
   return (
-    <h2 className="mt-5 text-balance text-[clamp(2rem,4.2vw,3.35rem)] font-bold leading-[1.08] tracking-tight text-white">
+    <h2 className="mt-4 text-balance text-[clamp(1.65rem,7.2vw,3.35rem)] font-bold leading-[1.1] tracking-tight text-white sm:mt-5 sm:leading-[1.08]">
       {head}
       {accent ? (
         <>
@@ -69,7 +69,7 @@ function LogoStage({ reduceMotion }: { reduceMotion: boolean }) {
 
   return (
     <div
-      className="relative flex min-h-[260px] w-full flex-col items-center justify-center sm:min-h-[300px] md:min-h-[340px]"
+      className="relative flex min-h-[220px] w-full flex-col items-center justify-center sm:min-h-[300px] md:min-h-[340px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -91,7 +91,7 @@ function LogoStage({ reduceMotion }: { reduceMotion: boolean }) {
 
       {/* Logo actif */}
       <motion.div
-        className="relative z-10 flex h-[11rem] w-[11rem] items-center justify-center sm:h-[13rem] sm:w-[13rem] md:h-[14.5rem] md:w-[14.5rem]"
+        className="relative z-10 flex h-[9.5rem] w-[9.5rem] items-center justify-center sm:h-[13rem] sm:w-[13rem] md:h-[14.5rem] md:w-[14.5rem]"
         animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
         transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
       >
@@ -176,26 +176,26 @@ export default function SocialProofSection() {
       id="ils-utilisent-obillz"
       className={`${landingSectionShellClass()} scroll-mt-32 overflow-x-hidden md:scroll-mt-36`}
     >
-      <div className="relative mx-auto w-[94%] max-w-[1240px]">
+      <div className="relative mx-auto w-[min(94%,1240px)] max-w-[1240px]">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportOnce}
           transition={{ duration: 0.8, ease: easePremium }}
-          className="social-proof-panel relative overflow-hidden rounded-[1.75rem] shadow-[0_48px_100px_-36px_rgba(2,10,32,0.55)] sm:rounded-[2.25rem] md:rounded-[2.75rem]"
+          className="social-proof-panel relative overflow-hidden rounded-[1.5rem] shadow-[0_48px_100px_-36px_rgba(2,10,32,0.55)] sm:rounded-[2.25rem] md:rounded-[2.75rem]"
         >
           {/* Même dégradé que hero / footer */}
           <div className="social-proof-panel__bg" aria-hidden />
           <div className="social-proof-panel__grid" aria-hidden />
 
-          <div className="relative z-10 grid items-center gap-12 px-8 py-12 sm:gap-14 sm:px-12 sm:py-14 md:px-14 md:py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10 lg:px-16 lg:py-[4.5rem] xl:px-20">
+          <div className="relative z-10 grid items-center gap-8 px-5 py-10 sm:gap-14 sm:px-12 sm:py-14 md:px-14 md:py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10 lg:px-16 lg:py-[4.5rem] xl:px-20">
             {/* Colonne gauche — tout dans le bloc */}
-            <div className="max-w-xl lg:max-w-[34rem]">
+            <div className="min-w-0 max-w-xl lg:max-w-[34rem]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-200/70 sm:text-xs">
                 {t("marketing.socialProof.label")}
               </p>
               <TitleBlock title={t("marketing.socialProof.title")} />
-              <p className="mt-5 max-w-md text-base leading-relaxed text-blue-100/75 sm:mt-6 sm:text-[1.0625rem] sm:leading-[1.7]">
+              <p className="mt-4 max-w-md text-[0.9375rem] leading-relaxed text-blue-100/75 sm:mt-6 sm:text-[1.0625rem] sm:leading-[1.7]">
                 {t("marketing.socialProof.subtitle")}
               </p>
             </div>

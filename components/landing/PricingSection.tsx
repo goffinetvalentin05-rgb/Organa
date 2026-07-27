@@ -31,7 +31,7 @@ export default function PricingSection() {
 
   return (
     <section id="tarifs" className={`${landingSectionShellClass()} scroll-mt-28`}>
-      <div className="relative mx-auto w-[94%] max-w-[920px]">
+      <div className="relative mx-auto w-[min(94%,920px)] max-w-[920px]">
         <LandingSectionIntro
           layout="centered"
           label={t("marketing.pricing.label")}
@@ -50,7 +50,7 @@ export default function PricingSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className={`${landingPremiumCardClass} landing-obillz-gradient landing-section-content mx-auto mt-12 w-full max-w-[600px] rounded-[2rem] px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_30px_90px_rgba(15,23,42,0.18)] hover:translate-y-0 sm:mt-14 sm:px-10 sm:py-10`}
+          className={`${landingPremiumCardClass} landing-obillz-gradient landing-section-content mx-auto mt-10 w-full max-w-[600px] rounded-[1.5rem] px-4 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_30px_90px_rgba(15,23,42,0.18)] hover:translate-y-0 sm:mt-14 sm:rounded-[2rem] sm:px-10 sm:py-10`}
         >
           <div className="text-center">
             <span className="inline-flex items-center rounded-full border border-white/14 bg-white/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[rgba(226,232,240,0.75)] sm:text-[11px]">
@@ -66,7 +66,7 @@ export default function PricingSection() {
 
           <div className="mt-8 text-center sm:mt-10">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2">
-              <span className="text-5xl font-black leading-none tracking-tight text-[#F8FAFC] sm:text-[3.5rem]">
+              <span className="text-[2.75rem] font-black leading-none tracking-tight text-[#F8FAFC] sm:text-[3.5rem]">
                 {PRICING.yearly.amount}
               </span>
               <span className="text-lg font-semibold text-[rgba(226,232,240,0.62)] sm:text-xl">
@@ -87,7 +87,7 @@ export default function PricingSection() {
             ))}
           </ul>
 
-          <div className="mt-10 flex flex-col items-center gap-4 sm:mt-12">
+          <div className="mt-10 flex w-full flex-col items-stretch gap-4 sm:mt-12 sm:items-center">
             <LandingPrimaryButton href="/inscription" showArrow={false} variant="dark">
               {t("marketing.pricing.cta", { days: TRIAL_DURATION_DAYS })}
             </LandingPrimaryButton>

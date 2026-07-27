@@ -35,11 +35,11 @@ function FaqAccordionItem({
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className={`group flex w-full items-start gap-4 px-5 py-5 text-left transition-colors duration-300 md:px-6 md:py-5 ${
+        className={`group flex w-full items-start gap-3 px-4 py-4 text-left transition-colors duration-300 sm:gap-4 sm:px-5 sm:py-5 md:px-6 md:py-5 ${
           isOpen ? "bg-white/[0.04]" : "hover:bg-white/[0.025]"
         }`}
       >
-        <span className="min-w-0 flex-1 pt-0.5 text-[0.9375rem] font-semibold leading-snug text-[#F8FAFC] md:text-base">
+        <span className="min-w-0 flex-1 pt-0.5 text-[0.9rem] font-semibold leading-snug text-[#F8FAFC] sm:text-[0.9375rem] md:text-base">
           {question}
         </span>
         <span
@@ -63,7 +63,7 @@ function FaqAccordionItem({
             transition={{ duration: 0.32, ease: easePremium }}
             className="overflow-hidden"
           >
-            <p className="landing-premium-card-desc px-5 pb-5 text-sm md:px-6 md:pb-6 md:text-[0.9375rem] md:leading-relaxed">
+            <p className="landing-premium-card-desc px-4 pb-4 text-sm sm:px-5 sm:pb-5 md:px-6 md:pb-6 md:text-[0.9375rem] md:leading-relaxed">
               {answer}
             </p>
           </motion.div>
@@ -80,15 +80,15 @@ export default function FaqSection() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section id="faq" className={`${landingSectionShellClass()} overflow-hidden`}>
-      <div className="relative mx-auto w-[94%] max-w-[1100px]">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16 lg:items-start">
+    <section id="faq" className={`${landingSectionShellClass()} overflow-x-clip`}>
+      <div className="relative mx-auto w-[min(94%,1100px)] max-w-[1100px]">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16 lg:items-start">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className="text-center lg:sticky lg:top-28 lg:text-left"
+            className="min-w-0 text-center lg:sticky lg:top-28 lg:text-left"
           >
             <motion.div variants={staggerItem}>
               <LandingSectionIntro

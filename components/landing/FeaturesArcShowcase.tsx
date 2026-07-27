@@ -56,7 +56,31 @@ const TYPING_MS = 68;
 const HOLD_MS = 3400;
 const PAUSE_MS = 1000;
 
-function getArcLayout(index: number, total: number, activeIndex: number | null) {
+function useViewportWidth() {
+  const [width, setWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const update = () => setWidth(window.innerWidth);
+    update();
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return width;
+}
+
+function getArcLayout(
+  index: number,
+  total: number,
+  activeIndex: number | null,
+  viewportWidth: number
+) {
+  const isCompact = viewportWidth < 768;
+  const isNarrow = viewportWidth < 430;
+  const isTiny = viewportWidth < 360;
+
   const defaultCenter = (total - 1) / 2;
   const focusIndex = activeIndex ?? defaultCenter;
   const offset = index - focusIndex;
@@ -65,48 +89,61 @@ function getArcLayout(index: number, total: number, activeIndex: number | null) 
   if (isActive) {
     return {
       x: 0,
-      y: -10,
+      y: isCompact ? -6 : -10,
       rotateY: 0,
       rotateZ: 0,
-      scale: 1.16,
+      scale: isTiny ? 1.04 : isCompact ? 1.08 : 1.16,
       zIndex: 40,
       opacity: 1,
     };
   }
 
-  const angleDeg = offset * 12.5;
+  const angleStep = isTiny ? 18 : isNarrow ? 15.5 : isCompact ? 14 : 12.5;
+  const angleDeg = offset * angleStep;
   const angleRad = (angleDeg * Math.PI) / 180;
-  const radius = activeIndex !== null ? 0 : 420;
+  const radius =
+    activeIndex !== null
+      ? 0
+      : isTiny
+        ? 108
+        : isNarrow
+          ? 138
+          : isCompact
+            ? 198
+            : 420;
+  const focusSpacing = isTiny ? 40 : isNarrow ? 50 : isCompact ? 66 : 92;
 
   if (activeIndex !== null) {
     return {
-      x: offset * 92,
-      y: Math.abs(offset) * 14 + 4,
-      rotateY: offset * -18,
-      rotateZ: offset * 3.5,
-      scale: Math.max(0.62, 1 - Math.abs(offset) * 0.1),
+      x: offset * focusSpacing,
+      y: Math.abs(offset) * (isCompact ? 10 : 14) + (isCompact ? 2 : 4),
+      rotateY: offset * (isCompact ? -12 : -18),
+      rotateZ: offset * (isCompact ? 2.5 : 3.5),
+      scale: Math.max(isCompact ? 0.55 : 0.62, 1 - Math.abs(offset) * (isCompact ? 0.12 : 0.1)),
       zIndex: 24 - Math.abs(offset),
-      opacity: Math.max(0.28, 1 - Math.abs(offset) * 0.18),
+      opacity: Math.max(0.22, 1 - Math.abs(offset) * (isCompact ? 0.2 : 0.18)),
     };
   }
 
+  const arcDepth = isCompact ? 34 : 52;
   const x = Math.sin(angleRad) * radius;
-  const y = (1 - Math.cos(angleRad)) * 52 + Math.abs(offset) * 4;
+  const y = (1 - Math.cos(angleRad)) * arcDepth + Math.abs(offset) * (isCompact ? 2 : 4);
 
   return {
     x,
     y,
-    rotateY: offset * -16,
-    rotateZ: offset * 3,
-    scale: Math.max(0.68, 1 - Math.abs(offset) * 0.088),
+    rotateY: offset * (isCompact ? -10 : -16),
+    rotateZ: offset * (isCompact ? 2 : 3),
+    scale: Math.max(isCompact ? 0.58 : 0.68, 1 - Math.abs(offset) * (isCompact ? 0.1 : 0.088)),
     zIndex: 22 - Math.abs(offset),
-    opacity: Math.max(0.5, 1 - Math.abs(offset) * 0.11),
+    opacity: Math.max(isCompact ? 0.4 : 0.5, 1 - Math.abs(offset) * 0.11),
   };
 }
 
 export default function FeaturesArcShowcase() {
   const { locale, t } = useI18n();
   const reduceMotion = useReducedMotion();
+  const viewportWidth = useViewportWidth();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -247,7 +284,7 @@ export default function FeaturesArcShowcase() {
 
           {features.map((feature, index) => {
             const Icon = featureIcons[feature.id] ?? FileText;
-            const layout = getArcLayout(index, features.length, activeIndex);
+            const layout = getArcLayout(index, features.length, activeIndex, viewportWidth);
             const isActive = activeId === feature.id;
 
             return (
