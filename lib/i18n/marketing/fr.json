@@ -84,21 +84,7 @@
     "title": "Toute la gestion de votre club, au même endroit.",
     "titleLine1": "Toute la gestion de votre club,",
     "titleLine2": "au même endroit.",
-    "subtitle": "Retrouvez les outils et documents essentiels de votre club dans un espace unique, clair et accessible à votre comité.",
-    "panelTitle": "Toute la gestion de votre club, au même endroit.",
-    "panelSubtitle": "Membres, finances, documents et organisation réunis dans un seul espace.",
-    "drawerAriaLabel": "Console Obillz — tiroir des outils du club",
-    "drawerTiles": [
-      { "id": "membres", "label": "Membres" },
-      { "id": "cotisations", "label": "Cotisations" },
-      { "id": "finances", "label": "Finances" },
-      { "id": "factures", "label": "Factures" },
-      { "id": "charges", "label": "Charges" },
-      { "id": "procesVerbaux", "label": "Procès-verbaux" },
-      { "id": "plannings", "label": "Plannings" },
-      { "id": "manifestations", "label": "Manifestations" },
-      { "id": "sponsors", "label": "Sponsors" }
-    ],
+    "subtitle": "Membres, finances, documents et organisation réunis dans un seul espace.",
     "cta": "Tester gratuitement",
     "gridCards": [
       {

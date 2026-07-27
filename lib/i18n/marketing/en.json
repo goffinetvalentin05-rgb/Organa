@@ -84,21 +84,7 @@
     "titleLine1": "All your club management,",
     "titleLine2": "in one place.",
     "title": "All your club management, in one place.",
-    "subtitle": "Find your club's essential tools and documents in one clear space, accessible to your committee.",
-    "panelTitle": "All your club management, in one place.",
-    "panelSubtitle": "Members, finances, documents and organisation united in a single space.",
-    "drawerAriaLabel": "Obillz console — club tools drawer",
-    "drawerTiles": [
-      { "id": "membres", "label": "Members" },
-      { "id": "cotisations", "label": "Membership fees" },
-      { "id": "finances", "label": "Finances" },
-      { "id": "factures", "label": "Invoices" },
-      { "id": "charges", "label": "Expenses" },
-      { "id": "procesVerbaux", "label": "Minutes" },
-      { "id": "plannings", "label": "Schedules" },
-      { "id": "manifestations", "label": "Events" },
-      { "id": "sponsors", "label": "Sponsors" }
-    ],
+    "subtitle": "Members, finances, documents and organisation united in a single space.",
     "cta": "Try for free",
     "gridCards": [
       {
