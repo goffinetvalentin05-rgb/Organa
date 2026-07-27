@@ -394,13 +394,6 @@
     "label": "03 / THEY USE OBILLZ",
     "title": "Clubs are already using Obillz.",
     "subtitle": "Obillz already helps sports clubs manage their members, dues, documents and day-to-day organization.",
-    "badge": "Active on Obillz",
-    "panel": {
-      "eyebrow": "Already used by sports clubs",
-      "title": "Obillz earns the trust of clubs.",
-      "body": "Clubs already use Obillz to manage their members, dues, documents and organization more simply.",
-      "chips": ["Sports clubs", "Simplified management", "Already in use"]
-    },
     "testimonial": {
       "quote": "",
       "author": "",

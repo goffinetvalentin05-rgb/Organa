@@ -392,13 +392,6 @@
     "label": "03 / ILS UTILISENT OBILLZ",
     "title": "Des clubs utilisent déjà Obillz.",
     "subtitle": "Obillz accompagne déjà des clubs sportifs dans la gestion de leurs membres, cotisations, documents et organisation.",
-    "badge": "Actif sur Obillz",
-    "panel": {
-      "eyebrow": "Déjà utilisés par des clubs sportifs",
-      "title": "Obillz gagne la confiance des clubs.",
-      "body": "Des clubs utilisent déjà Obillz pour gérer plus simplement leurs membres, cotisations, documents et organisation.",
-      "chips": ["Clubs sportifs", "Gestion simplifiée", "Déjà en usage"]
-    },
     "testimonial": {
       "quote": "",
       "author": "",
