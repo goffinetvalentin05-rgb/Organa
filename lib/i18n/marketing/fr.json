@@ -80,11 +80,23 @@
     }
   },
   "modules": {
-    "label": "Gestion du club",
-    "title": "Passez à une gestion de club plus claire",
-    "titleLine1": "Passez à une gestion",
-    "titleLine2": "de club plus claire",
-    "subtitle": "Obillz centralise les informations importantes de votre club pour aider votre comité à gagner du temps, mieux s'organiser et éviter les oublis.",
+    "label": "01 / LA PLATEFORME",
+    "title": "Toute la gestion de votre club, au même endroit.",
+    "titleLine1": "Toute la gestion de votre club,",
+    "titleLine2": "au même endroit.",
+    "subtitle": "Retrouvez les outils et documents essentiels de votre club dans un espace unique, clair et accessible à votre comité.",
+    "drawerAriaLabel": "Espaces et documents centralisés dans Obillz",
+    "drawerTiles": [
+      { "id": "membres", "label": "Membres" },
+      { "id": "cotisations", "label": "Cotisations" },
+      { "id": "evenements", "label": "Événements" },
+      { "id": "sponsors", "label": "Sponsors" },
+      { "id": "comite", "label": "Comité" },
+      { "id": "facture", "label": "Facture" },
+      { "id": "planning", "label": "Planning" },
+      { "id": "procesVerbal", "label": "Procès-verbal" },
+      { "id": "manifestation", "label": "Manifestation" }
+    ],
     "cta": "Tester gratuitement",
     "gridCards": [
       {

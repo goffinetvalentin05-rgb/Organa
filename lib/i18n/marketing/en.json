@@ -80,11 +80,23 @@
     }
   },
   "modules": {
-    "label": "Club management",
-    "titleLine1": "Move to clearer",
-    "titleLine2": "club management",
-    "title": "Move to clearer club management",
-    "subtitle": "Obillz centralises your club's important information to help your committee save time, stay organised and avoid missed deadlines.",
+    "label": "01 / THE PLATFORM",
+    "titleLine1": "All your club management,",
+    "titleLine2": "in one place.",
+    "title": "All your club management, in one place.",
+    "subtitle": "Find your club's essential tools and documents in one clear space, accessible to your committee.",
+    "drawerAriaLabel": "Spaces and documents centralised in Obillz",
+    "drawerTiles": [
+      { "id": "membres", "label": "Members" },
+      { "id": "cotisations", "label": "Membership fees" },
+      { "id": "evenements", "label": "Events" },
+      { "id": "sponsors", "label": "Sponsors" },
+      { "id": "comite", "label": "Committee" },
+      { "id": "facture", "label": "Invoice" },
+      { "id": "planning", "label": "Schedule" },
+      { "id": "procesVerbal", "label": "Minutes" },
+      { "id": "manifestation", "label": "Event day" }
+    ],
     "cta": "Try for free",
     "gridCards": [
       {
