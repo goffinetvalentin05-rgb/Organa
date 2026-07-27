@@ -98,45 +98,45 @@ function getArcLayout(
     };
   }
 
-  const angleStep = isTiny ? 18 : isNarrow ? 15.5 : isCompact ? 14 : 12.5;
+  const angleStep = isTiny ? 17 : isNarrow ? 14.5 : isCompact ? 13.5 : 12.5;
   const angleDeg = offset * angleStep;
   const angleRad = (angleDeg * Math.PI) / 180;
   const radius =
     activeIndex !== null
       ? 0
       : isTiny
-        ? 108
+        ? 120
         : isNarrow
-          ? 138
+          ? 152
           : isCompact
-            ? 198
+            ? 210
             : 420;
-  const focusSpacing = isTiny ? 40 : isNarrow ? 50 : isCompact ? 66 : 92;
+  const focusSpacing = isTiny ? 52 : isNarrow ? 64 : isCompact ? 78 : 92;
 
   if (activeIndex !== null) {
     return {
       x: offset * focusSpacing,
-      y: Math.abs(offset) * (isCompact ? 10 : 14) + (isCompact ? 2 : 4),
-      rotateY: offset * (isCompact ? -12 : -18),
-      rotateZ: offset * (isCompact ? 2.5 : 3.5),
-      scale: Math.max(isCompact ? 0.55 : 0.62, 1 - Math.abs(offset) * (isCompact ? 0.12 : 0.1)),
+      y: Math.abs(offset) * (isCompact ? 9 : 14) + (isCompact ? 2 : 4),
+      rotateY: offset * (isCompact ? -10 : -18),
+      rotateZ: offset * (isCompact ? 2 : 3.5),
+      scale: Math.max(isCompact ? 0.58 : 0.62, 1 - Math.abs(offset) * (isCompact ? 0.11 : 0.1)),
       zIndex: 24 - Math.abs(offset),
-      opacity: Math.max(0.22, 1 - Math.abs(offset) * (isCompact ? 0.2 : 0.18)),
+      opacity: Math.max(isCompact ? 0.18 : 0.28, 1 - Math.abs(offset) * (isCompact ? 0.22 : 0.18)),
     };
   }
 
-  const arcDepth = isCompact ? 34 : 52;
+  const arcDepth = isCompact ? 36 : 52;
   const x = Math.sin(angleRad) * radius;
   const y = (1 - Math.cos(angleRad)) * arcDepth + Math.abs(offset) * (isCompact ? 2 : 4);
 
   return {
     x,
     y,
-    rotateY: offset * (isCompact ? -10 : -16),
-    rotateZ: offset * (isCompact ? 2 : 3),
-    scale: Math.max(isCompact ? 0.58 : 0.68, 1 - Math.abs(offset) * (isCompact ? 0.1 : 0.088)),
+    rotateY: offset * (isCompact ? -9 : -16),
+    rotateZ: offset * (isCompact ? 1.8 : 3),
+    scale: Math.max(isCompact ? 0.62 : 0.68, 1 - Math.abs(offset) * (isCompact ? 0.09 : 0.088)),
     zIndex: 22 - Math.abs(offset),
-    opacity: Math.max(isCompact ? 0.4 : 0.5, 1 - Math.abs(offset) * 0.11),
+    opacity: Math.max(isCompact ? 0.42 : 0.5, 1 - Math.abs(offset) * 0.11),
   };
 }
 

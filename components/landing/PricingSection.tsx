@@ -31,7 +31,7 @@ export default function PricingSection() {
 
   return (
     <section id="tarifs" className={`${landingSectionShellClass()} scroll-mt-28`}>
-      <div className="relative mx-auto w-[min(94%,920px)] max-w-[920px]">
+      <div className="landing-container landing-container--md relative">
         <LandingSectionIntro
           layout="centered"
           label={t("marketing.pricing.label")}

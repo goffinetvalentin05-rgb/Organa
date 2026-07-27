@@ -81,7 +81,7 @@ export default function FaqSection() {
 
   return (
     <section id="faq" className={`${landingSectionShellClass()} overflow-x-clip`}>
-      <div className="relative mx-auto w-[min(94%,1100px)] max-w-[1100px]">
+      <div className="landing-container landing-container--lg relative">
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16 lg:items-start">
           <motion.div
             variants={staggerContainer}

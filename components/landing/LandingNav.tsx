@@ -104,13 +104,13 @@ export default function LandingNav() {
   }, [isMenuOpen, closeMenu]);
 
   return (
-    <div className="landing-nav fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-4 sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
+    <div className="landing-nav fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-[max(0.85rem,env(safe-area-inset-top,0px))] sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
       <motion.header
         ref={headerRef}
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,22.5rem)] flex-nowrap items-center justify-between gap-2 overflow-hidden rounded-full px-3 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
+        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] flex-nowrap items-center justify-between gap-2.5 overflow-hidden rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
           isLight ? "landing-nav-header--light" : "landing-nav-header--dark"
         }`}
       >
@@ -125,7 +125,7 @@ export default function LandingNav() {
             width={200}
             height={48}
             priority
-            className={`h-7 w-auto max-w-[132px] object-contain object-left sm:h-8 sm:max-w-none lg:h-9 ${isLight ? "landing-nav-logo--on-light" : ""}`}
+            className={`h-7 w-auto max-w-[140px] object-contain object-left sm:h-8 sm:max-w-none lg:h-9 ${isLight ? "landing-nav-logo--on-light" : ""}`}
           />
         </Link>
 
@@ -199,7 +199,7 @@ export default function LandingNav() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.98 }}
               transition={{ duration: reduceMotion ? 0 : 0.38, ease: easePremium }}
-              className="fixed inset-x-3 top-[calc(1rem+2.75rem+0.65rem)] z-50 max-h-[min(70dvh,calc(100dvh-5.5rem))] overflow-y-auto overflow-x-hidden rounded-[1.35rem] border border-blue-300/28 bg-gradient-to-b from-white/[0.14] via-[#2563EB]/[0.08] to-[#0A1F4D]/[0.92] p-4 shadow-[0_0_0_1px_rgba(147,197,253,0.12),0_20px_60px_rgba(10,31,77,0.45),0_0_40px_rgba(37,99,235,0.16),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:inset-x-6 sm:top-[calc(1.25rem+3rem+0.5rem)] sm:p-5 md:inset-x-8 md:top-[calc(1.5rem+3rem+0.5rem)] lg:hidden"
+              className="fixed inset-x-5 top-[calc(max(0.85rem,env(safe-area-inset-top,0px))+2.75rem+0.55rem)] z-50 max-h-[min(70dvh,calc(100dvh-5.5rem))] overflow-y-auto overflow-x-hidden rounded-[1.35rem] border border-blue-300/28 bg-gradient-to-b from-white/[0.14] via-[#2563EB]/[0.08] to-[#0A1F4D]/[0.92] p-4 shadow-[0_0_0_1px_rgba(147,197,253,0.12),0_20px_60px_rgba(10,31,77,0.45),0_0_40px_rgba(37,99,235,0.16),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:inset-x-6 sm:top-[calc(1.25rem+3rem+0.5rem)] sm:p-5 md:inset-x-8 md:top-[calc(1.5rem+3rem+0.5rem)] lg:hidden"
               aria-label="Menu mobile"
             >
               <div className="flex flex-col gap-1">

@@ -75,7 +75,7 @@ function StepContent({
   return (
     <div
       id={STEP_CONTENT_ID}
-      className="relative min-h-[180px] sm:min-h-[220px] md:min-h-[240px]"
+      className="relative min-h-[160px] sm:min-h-[220px] md:min-h-[240px]"
       aria-live="polite"
       aria-atomic="true"
     >
@@ -89,15 +89,15 @@ function StepContent({
           className="min-w-0"
         >
           <p
-            className="how-it-works-blue-text select-none text-[clamp(2.75rem,14vw,6.75rem)] font-black leading-[0.9] tracking-[-0.06em]"
+            className="how-it-works-blue-text select-none text-[clamp(2.5rem,12vw,6.75rem)] font-black leading-[0.88] tracking-[-0.06em]"
             aria-hidden
           >
             {num}
           </p>
-          <h3 className="mt-1 text-lg font-bold tracking-tight text-slate-900 sm:text-2xl md:text-[1.65rem]">
+          <h3 className="mt-2 text-[1.15rem] font-bold tracking-tight text-slate-900 sm:mt-1 sm:text-2xl md:text-[1.65rem]">
             {step.title}
           </h3>
-          <p className="mx-auto mt-3 max-w-md text-[0.9375rem] leading-relaxed text-slate-600 sm:text-[1.05rem] lg:mx-0">
+          <p className="mx-auto mt-2.5 max-w-md text-[0.9375rem] leading-relaxed text-slate-600 sm:mt-3 sm:text-[1.05rem] lg:mx-0">
             {step.description}
           </p>
         </motion.div>
@@ -116,7 +116,7 @@ function VisualPanel({
   return (
     <div
       id={VISUAL_PANEL_ID}
-      className="relative min-h-[280px] sm:min-h-[340px] lg:min-h-[400px]"
+      className="relative min-h-[240px] sm:min-h-[320px] lg:min-h-[400px]"
       aria-live="polite"
       aria-atomic="true"
     >
@@ -158,9 +158,9 @@ export default function HowItWorksShowcase({
 
   return (
     <div className="relative">
-      <div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12 xl:gap-16">
+      <div className="grid items-start gap-7 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12 xl:gap-16">
         <div className="flex flex-col gap-5 sm:gap-8">
-          <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-start">
+          <div className="flex flex-col gap-6 sm:gap-6 lg:flex-row lg:items-start">
             <div className="flex justify-center lg:justify-start">
               <StepNav activeIndex={activeIndex} onSelect={selectStep} />
             </div>
@@ -170,7 +170,7 @@ export default function HowItWorksShowcase({
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[1.5rem] bg-slate-100/70 p-3 sm:rounded-[2rem] sm:p-5 md:rounded-[2.25rem] md:p-6 lg:p-7">
+        <div className="overflow-hidden rounded-[1.35rem] bg-slate-100/70 p-3 sm:rounded-[2rem] sm:p-5 md:rounded-[2.25rem] md:p-6 lg:p-7">
           <VisualPanel activeIndex={activeIndex} mockLabels={mockLabels} />
         </div>
       </div>

@@ -15,7 +15,7 @@ type LandingSectionIntroProps = {
 
 export function landingSectionShellClass(first = false) {
   return [
-    "landing-section relative scroll-mt-24",
+    "landing-section relative scroll-mt-28",
     first ? "landing-section--first" : "",
     "pb-12 md:pb-24 lg:pb-28",
   ]
