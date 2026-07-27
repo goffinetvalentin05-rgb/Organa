@@ -390,6 +390,17 @@
       }
     }
   },
+  "socialProof": {
+    "label": "03 / THEY USE OBILLZ",
+    "title": "Clubs are already using Obillz.",
+    "subtitle": "Obillz already helps sports clubs manage their members, dues, documents and day-to-day organization.",
+    "adoptedBy": "Already adopted by sports clubs",
+    "testimonial": {
+      "quote": "",
+      "author": "",
+      "role": ""
+    }
+  },
   "askChatGpt": {
     "title": "Still not sure Obillz is right for your club?",
     "subtitle": "Talk directly with the founder. Ask your questions and find out how Obillz can simplify your club management.",

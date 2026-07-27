@@ -9,6 +9,7 @@ import LandingNav from "@/components/landing/LandingNav";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import PricingSection from "@/components/landing/PricingSection";
 import FaqSection from "@/components/landing/FaqSection";
+import SocialProofSection from "@/components/landing/SocialProofSection";
 import { obillzLandingHomeClass } from "@/components/ui/styles";
 
 export default function LandingPage() {
@@ -21,6 +22,7 @@ export default function LandingPage() {
         <div className="landing-light-zone">
           <FeaturesSection />
           <HowItWorksSection />
+          <SocialProofSection />
           <PricingSection />
           <FaqSection />
           <AskChatGptSection />

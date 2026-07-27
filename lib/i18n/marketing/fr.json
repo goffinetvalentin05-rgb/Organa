@@ -388,6 +388,17 @@
       }
     }
   },
+  "socialProof": {
+    "label": "03 / ILS UTILISENT OBILLZ",
+    "title": "Des clubs utilisent déjà Obillz.",
+    "subtitle": "Obillz accompagne déjà des clubs sportifs dans la gestion de leurs membres, cotisations, documents et organisation.",
+    "adoptedBy": "Déjà adopté par des clubs sportifs",
+    "testimonial": {
+      "quote": "",
+      "author": "",
+      "role": ""
+    }
+  },
   "askChatGpt": {
     "title": "Toujours pas sûr qu'Obillz soit fait pour votre club ?",
     "subtitle": "Échangez directement avec le fondateur. Posez vos questions et découvrez comment Obillz peut simplifier la gestion de votre club.",
