@@ -80,11 +80,68 @@
     }
   },
   "modules": {
-    "label": "01 / LA PLATEFORME",
-    "title": "Toute la gestion de votre club, au même endroit.",
-    "titleLine1": "Toute la gestion de votre club,",
-    "titleLine2": "au même endroit.",
-    "subtitle": "Membres, finances, documents et organisation réunis dans un seul espace.",
+    "label": "01 / FONCTIONNALITÉS",
+    "title": "Une fonctionnalité en tête ? Obillz l'a déjà.",
+    "subtitle": "Cotisations, planning, documents, événements, sponsors et bien plus encore, réunis dans une seule plateforme.",
+    "searchHint": "Vous cherchez une fonctionnalité ? Obillz l'a.",
+    "searchPlaceholder": "Rechercher une fonctionnalité…",
+    "demoQueries": ["cotisations", "planning", "procès-verbal", "sponsors"],
+    "arcFeatures": [
+      {
+        "id": "membres",
+        "label": "Membres",
+        "searchTerms": ["membres", "membre"],
+        "description": "Centralisez vos fiches membres et gardez les informations importantes au même endroit."
+      },
+      {
+        "id": "cotisations",
+        "label": "Cotisations",
+        "searchTerms": ["cotisations", "cotisation"],
+        "description": "Créez vos cotisations, suivez les paiements et gardez une vision claire des encaissements."
+      },
+      {
+        "id": "evenements",
+        "label": "Événements",
+        "searchTerms": ["événements", "événement", "evenements"],
+        "description": "Partagez un lien d'inscription et suivez facilement les participations."
+      },
+      {
+        "id": "sponsors",
+        "label": "Sponsors",
+        "searchTerms": ["sponsors", "sponsor", "sponsoring"],
+        "description": "Centralisez les contrats, échéances et renouvellements importants."
+      },
+      {
+        "id": "factures",
+        "label": "Factures",
+        "searchTerms": ["factures", "facture"],
+        "description": "Créez des documents clairs et gardez un suivi propre de vos factures."
+      },
+      {
+        "id": "procesVerbaux",
+        "label": "Procès-verbaux",
+        "searchTerms": ["procès-verbal", "procès verbaux", "proces-verbal", "pv"],
+        "description": "Rédigez, retrouvez et partagez vos procès-verbaux dans un espace unique."
+      },
+      {
+        "id": "planning",
+        "label": "Planning",
+        "searchTerms": ["planning", "plannings", "planning bénévoles"],
+        "description": "Créez des créneaux, organisez les bénévoles et partagez le planning facilement."
+      },
+      {
+        "id": "manifestations",
+        "label": "Manifestations",
+        "searchTerms": ["manifestations", "manifestation"],
+        "description": "Centralisez l'organisation autour de vos manifestations et événements du club."
+      },
+      {
+        "id": "comite",
+        "label": "Comité",
+        "searchTerms": ["comité", "comite", "accès comité"],
+        "description": "Invitez les bonnes personnes et attribuez les bons accès selon les responsabilités."
+      }
+    ],
     "cta": "Tester gratuitement",
     "gridCards": [
       {

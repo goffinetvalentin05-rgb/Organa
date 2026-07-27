@@ -80,11 +80,70 @@
     }
   },
   "modules": {
-    "label": "01 / THE PLATFORM",
-    "titleLine1": "All your club management,",
-    "titleLine2": "in one place.",
-    "title": "All your club management, in one place.",
-    "subtitle": "Members, finances, documents and organisation united in a single space.",
+    "label": "01 / FEATURES",
+    "titleLine1": "Looking for a feature?",
+    "titleLine2": "Obillz already has it.",
+    "title": "Looking for a feature? Obillz already has it.",
+    "subtitle": "Membership fees, scheduling, documents, events, sponsors and much more — all in one platform.",
+    "searchHint": "Looking for a feature? Obillz has it.",
+    "searchPlaceholder": "Search for a feature…",
+    "demoQueries": ["membership fees", "schedule", "minutes", "sponsors"],
+    "arcFeatures": [
+      {
+        "id": "membres",
+        "label": "Members",
+        "searchTerms": ["members", "member"],
+        "description": "Centralise member profiles and keep important information in one place."
+      },
+      {
+        "id": "cotisations",
+        "label": "Membership fees",
+        "searchTerms": ["membership fees", "membership fee", "fees"],
+        "description": "Create fees, track payments and keep a clear view of collections."
+      },
+      {
+        "id": "evenements",
+        "label": "Events",
+        "searchTerms": ["events", "event"],
+        "description": "Share a sign-up link and easily track participation."
+      },
+      {
+        "id": "sponsors",
+        "label": "Sponsors",
+        "searchTerms": ["sponsors", "sponsor", "sponsoring"],
+        "description": "Centralise contracts, deadlines and important renewals."
+      },
+      {
+        "id": "factures",
+        "label": "Invoices",
+        "searchTerms": ["invoices", "invoice"],
+        "description": "Create clear documents and keep proper track of your invoices."
+      },
+      {
+        "id": "procesVerbaux",
+        "label": "Minutes",
+        "searchTerms": ["minutes", "minute", "meeting minutes"],
+        "description": "Write, find and share meeting minutes in one place."
+      },
+      {
+        "id": "planning",
+        "label": "Schedule",
+        "searchTerms": ["schedule", "scheduling", "planning"],
+        "description": "Create slots, organise volunteers and share the schedule easily."
+      },
+      {
+        "id": "manifestations",
+        "label": "Event days",
+        "searchTerms": ["event days", "event day", "events"],
+        "description": "Centralise organisation around your club's events and match days."
+      },
+      {
+        "id": "comite",
+        "label": "Committee",
+        "searchTerms": ["committee", "committee access"],
+        "description": "Invite the right people and assign the right access for each role."
+      }
+    ],
     "cta": "Try for free",
     "gridCards": [
       {
