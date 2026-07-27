@@ -1,18 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
+import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import LandingSectionIntro, { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
-import { easePremium, floatY, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
+import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 
 type ClubLogo = {
   id: string;
   name: string;
   src: string;
-  /** Décalage vertical dans le showcase */
-  offset: "up" | "down";
-  floatDelay: number;
 };
 
 const CLUB_LOGOS: ClubLogo[] = [
@@ -20,89 +22,264 @@ const CLUB_LOGOS: ClubLogo[] = [
     id: "fontenais",
     name: "Fontenais Football Club",
     src: "/images/clubs/fontenais-fc.png",
-    offset: "up",
-    floatDelay: 0,
   },
   {
     id: "porrentruy",
     name: "FC Porrentruy",
     src: "/images/clubs/fc-porrentruy.png",
-    offset: "down",
-    floatDelay: 0.6,
   },
 ];
 
-function ClubLogoCard({
-  club,
-  delay,
+const AUTO_MS = 4200;
+
+function ClubShowcase({
   badge,
   reduceMotion,
 }: {
-  club: ClubLogo;
-  delay: number;
   badge: string;
   reduceMotion: boolean;
 }) {
-  const isUp = club.offset === "up";
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const club = CLUB_LOGOS[active]!;
+
+  const goTo = useCallback((index: number) => {
+    setActive(index);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || paused || CLUB_LOGOS.length < 2) return;
+    const id = window.setInterval(() => {
+      setActive((prev) => (prev + 1) % CLUB_LOGOS.length);
+    }, AUTO_MS);
+    return () => window.clearInterval(id);
+  }, [reduceMotion, paused]);
 
   return (
-    <motion.li
-      initial={reduceMotion ? false : { opacity: 0, y: 36, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={viewportOnce}
-      transition={{ duration: 0.7, delay, ease: easePremium }}
-      className={`relative list-none ${isUp ? "lg:-mt-4" : "lg:mt-8"}`}
-    >
-      <motion.div
-        animate={reduceMotion ? undefined : floatY(club.floatDelay)}
-        whileHover={
-          reduceMotion
-            ? undefined
-            : {
-                y: -8,
-                scale: 1.03,
-                transition: { duration: 0.35, ease: easePremium },
-              }
+    <div
+      className="relative mx-auto w-full max-w-[720px]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          setPaused(false);
         }
-        className="group/logo relative"
-      >
-        {/* Glow ambiant sous la carte */}
+      }}
+    >
+      {/* Scène immersive */}
+      <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[2.75rem]">
+        {/* Fond atmosphérique Obillz */}
         <div
-          className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-[radial-gradient(circle_at_50%_70%,rgba(26,35,255,0.18),transparent_68%)] opacity-50 blur-xl transition-opacity duration-500 group-hover/logo:opacity-90 sm:-inset-5"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,#12205a_0%,#07122f_45%,#040816_100%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.45]"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgba(56,189,248,0.07) 0.8px, transparent 0.8px)",
+            backgroundSize: "18px 18px",
+          }}
+          aria-hidden
+        />
+        {/* Light leaks */}
+        <div
+          className="pointer-events-none absolute -left-20 top-[-20%] h-[70%] w-[55%] rounded-full bg-[#1A23FF]/35 blur-[90px]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -right-16 bottom-[-10%] h-[55%] w-[50%] rounded-full bg-[#38BDF8]/25 blur-[100px]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute left-1/2 top-[40%] h-40 w-40 -translate-x-1/2 rounded-full bg-white/10 blur-[60px]"
           aria-hidden
         />
 
-        <div className="relative flex w-[10.5rem] flex-col overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/90 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.28),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-md transition-shadow duration-300 group-hover/logo:shadow-[0_28px_60px_-18px_rgba(26,35,255,0.28),0_0_0_1px_rgba(26,35,255,0.1)] sm:w-[12rem] sm:rounded-[1.65rem] md:w-[13.5rem] md:rounded-[1.75rem]">
-          {/* Reflet haut */}
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/70 to-transparent"
-            aria-hidden
-          />
+        <div className="relative z-10 flex flex-col items-center px-6 pb-10 pt-12 sm:px-10 sm:pb-12 sm:pt-14 md:pt-16">
+          {/* Badge flottant */}
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.55, delay: 0.15, ease: easePremium }}
+            className="mb-8 sm:mb-10"
+          >
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3.5 py-1.5 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md">
+              <span className="relative flex h-1.5 w-1.5">
+                {!reduceMotion ? (
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+                ) : null}
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-[11px] font-semibold tracking-wide text-white/85 sm:text-xs">
+                {badge}
+              </span>
+            </span>
+          </motion.div>
 
-          <div className="relative flex aspect-square items-center justify-center p-4 sm:p-5 md:p-6">
-            <div className="relative h-full w-full overflow-hidden rounded-[1.1rem] bg-[#05070f] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:rounded-[1.2rem]">
-              <Image
-                src={club.src}
-                alt={club.name}
-                width={220}
-                height={220}
-                className="h-full w-full object-cover"
+          {/* Capsule glass 3D */}
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.92 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.75, delay: 0.08, ease: easePremium }}
+            className="relative"
+            style={{ perspective: 1200 }}
+          >
+            {/* Glow animé sous la capsule */}
+            <motion.div
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(56,189,248,0.35) 0%, rgba(26,35,255,0.2) 40%, transparent 70%)",
+              }}
+              animate={
+                reduceMotion
+                  ? undefined
+                  : {
+                      opacity: [0.45, 0.85, 0.45],
+                      scale: [0.92, 1.05, 0.92],
+                    }
+              }
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden
+            />
+
+            <motion.div
+              animate={
+                reduceMotion
+                  ? undefined
+                  : {
+                      y: [0, -10, 0],
+                      rotateX: [8, 6, 8],
+                      rotateY: [-10, -6, -10],
+                    }
+              }
+              transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+              whileHover={
+                reduceMotion
+                  ? undefined
+                  : {
+                      scale: 1.04,
+                      rotateY: 0,
+                      rotateX: 4,
+                      transition: { duration: 0.4, ease: easePremium },
+                    }
+              }
+              className="relative h-[11.5rem] w-[11.5rem] sm:h-[14rem] sm:w-[14rem] md:h-[15.5rem] md:w-[15.5rem]"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {/* Face glass */}
+              <div className="absolute inset-0 overflow-hidden rounded-[1.85rem] border border-white/25 bg-gradient-to-br from-white/20 via-white/[0.07] to-white/[0.02] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65),0_0_60px_-10px_rgba(56,189,248,0.35),inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:rounded-[2.1rem] md:rounded-[2.25rem]">
+                {/* Specular highlight */}
+                <div
+                  className="pointer-events-none absolute -left-1/4 -top-1/3 h-[70%] w-[80%] rotate-[-18deg] rounded-full bg-gradient-to-br from-white/40 to-transparent blur-md"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute inset-x-3 top-2 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"
+                  aria-hidden
+                />
+
+                {/* Logo */}
+                <div className="relative flex h-full w-full items-center justify-center p-6 sm:p-7 md:p-8">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={club.id}
+                      initial={
+                        reduceMotion
+                          ? { opacity: 1 }
+                          : { opacity: 0, scale: 0.86, y: 14, filter: "blur(6px)" }
+                      }
+                      animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                      exit={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 1.06, y: -10, filter: "blur(4px)" }
+                      }
+                      transition={{ duration: 0.45, ease: easePremium }}
+                      className="relative h-full w-full"
+                    >
+                      <Image
+                        src={club.src}
+                        alt={club.name}
+                        fill
+                        sizes="(max-width: 640px) 140px, 200px"
+                        className="object-contain drop-shadow-[0_12px_28px_rgba(56,189,248,0.25)]"
+                        priority
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Edge depth hint */}
+              <div
+                className="pointer-events-none absolute -inset-[1px] -z-10 rounded-[1.95rem] bg-gradient-to-br from-sky-300/30 via-transparent to-[#1A23FF]/40 opacity-70 blur-[1px] sm:rounded-[2.2rem]"
+                aria-hidden
               />
-            </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Indicateurs / pastilles */}
+          <div
+            className="mt-10 flex items-center gap-2.5 sm:mt-12"
+            role="tablist"
+            aria-label="Clubs utilisateurs"
+          >
+            {CLUB_LOGOS.map((item, index) => {
+              const isActive = index === active;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={item.name}
+                  onClick={() => goTo(index)}
+                  className={`relative h-2.5 rounded-full outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-sky-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#07122f] ${
+                    isActive
+                      ? "w-8 bg-gradient-to-r from-[#38BDF8] to-[#1A23FF] shadow-[0_0_16px_rgba(56,189,248,0.55)]"
+                      : "w-2.5 bg-white/25 hover:bg-white/45"
+                  }`}
+                />
+              );
+            })}
           </div>
 
-          <div className="relative border-t border-slate-100/90 px-3 pb-3.5 pt-2.5 sm:px-4 sm:pb-4">
-            <span className="mx-auto flex w-fit items-center gap-1.5 rounded-full border border-[#1A23FF]/12 bg-[#1A23FF]/[0.06] px-2.5 py-1 text-[10px] font-semibold tracking-wide text-[#1A23FF] sm:text-[11px]">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              {badge}
-            </span>
+          {/* Mini thumbnails — preuve qu’il y a plusieurs clubs */}
+          <div className="mt-6 flex items-center gap-3 sm:mt-7">
+            {CLUB_LOGOS.map((item, index) => {
+              const isActive = index === active;
+              return (
+                <button
+                  key={`thumb-${item.id}`}
+                  type="button"
+                  onClick={() => goTo(index)}
+                  aria-label={item.name}
+                  aria-pressed={isActive}
+                  className={`relative h-11 w-11 overflow-hidden rounded-xl border transition-all duration-300 sm:h-12 sm:w-12 sm:rounded-[0.9rem] ${
+                    isActive
+                      ? "border-sky-300/50 bg-white/10 shadow-[0_0_24px_rgba(56,189,248,0.35)] scale-105"
+                      : "border-white/10 bg-white/[0.04] opacity-55 hover:opacity-90 hover:border-white/25"
+                  }`}
+                >
+                  <Image
+                    src={item.src}
+                    alt=""
+                    fill
+                    sizes="48px"
+                    className="object-contain p-1.5"
+                  />
+                </button>
+              );
+            })}
           </div>
         </div>
-      </motion.div>
-    </motion.li>
+      </div>
+    </div>
   );
 }
 
@@ -137,59 +314,10 @@ export default function SocialProofSection() {
         </motion.div>
 
         <div className="landing-section-content">
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewportOnce}
-            transition={{ duration: 0.7, delay: 0.05, ease: easePremium }}
-            className="relative mx-auto max-w-3xl"
-          >
-            {/* Fond showcase */}
-            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-gradient-to-br from-[#f4f7ff] via-white to-[#eef4ff] px-5 py-12 shadow-[0_32px_72px_-28px_rgba(15,23,42,0.18)] sm:rounded-[2.25rem] sm:px-10 sm:py-14 md:rounded-[2.5rem] md:px-14 md:py-16">
-              {/* Orbes de lumière */}
-              <div
-                className="pointer-events-none absolute -left-16 -top-20 h-56 w-56 rounded-full bg-[#1A23FF]/[0.12] blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -bottom-24 -right-10 h-64 w-64 rounded-full bg-[#38BDF8]/[0.14] blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-2xl"
-                aria-hidden
-              />
-
-              {/* Grille subtile */}
-              <div
-                className="pointer-events-none absolute inset-0 opacity-[0.35]"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgba(26,35,255,0.07) 1px, transparent 1px)",
-                  backgroundSize: "22px 22px",
-                }}
-                aria-hidden
-              />
-
-              {/* Ligne / rail décoratif derrière les cartes */}
-              <div
-                className="pointer-events-none absolute left-[18%] right-[18%] top-[48%] hidden h-px bg-gradient-to-r from-transparent via-[#1A23FF]/25 to-transparent sm:block"
-                aria-hidden
-              />
-
-              <ul className="relative z-10 flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-10">
-                {CLUB_LOGOS.map((club, index) => (
-                  <ClubLogoCard
-                    key={club.id}
-                    club={club}
-                    delay={0.12 + index * 0.12}
-                    badge={t("marketing.socialProof.badge")}
-                    reduceMotion={!!reduceMotion}
-                  />
-                ))}
-              </ul>
-            </div>
-          </motion.div>
+          <ClubShowcase
+            badge={t("marketing.socialProof.badge")}
+            reduceMotion={!!reduceMotion}
+          />
 
           {hasTestimonial ? (
             <motion.blockquote
