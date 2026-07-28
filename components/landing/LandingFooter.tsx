@@ -135,9 +135,7 @@ export default function LandingFooter() {
               />
             </Link>
 
-            <p className="mt-5 max-w-sm text-sm leading-relaxed">{t("marketing.footer.description")}</p>
-
-            <div className="mt-4 flex items-center gap-2.5">
+            <div className="mt-5 flex items-center gap-2.5">
               <SwissFlag className="h-5 w-5 shrink-0 rounded-[3px]" />
               <span className="footer-meta text-xs">{t("marketing.footer.swissMade")}</span>
             </div>

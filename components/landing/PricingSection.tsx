@@ -59,10 +59,7 @@ export default function PricingSection() {
           >
             <div className="relative z-10 flex flex-col">
               <div className="flex flex-col px-5 py-8 sm:px-7 sm:py-9 md:px-8 md:py-10">
-                <span className="inline-flex w-fit items-center rounded-full border border-white/14 bg-white/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[rgba(226,232,240,0.75)] sm:text-[11px]">
-                  {t("marketing.pricingPage.planBadge")}
-                </span>
-                <h3 className={`mt-4 text-2xl sm:text-[1.75rem] ${landingPremiumCardTitleClass}`}>
+                <h3 className={`text-2xl sm:text-[1.75rem] ${landingPremiumCardTitleClass}`}>
                   {t("marketing.pricing.planName")}
                 </h3>
                 <p className={`mt-2 ${landingPremiumCardDescClass}`}>

@@ -167,70 +167,152 @@
   },
   "modules": {
     "label": "01 / LA PLATEFORME",
-    "title": "Toute la gestion de votre club. Réunie au même endroit.",
-    "subtitle": "Membres, cotisations, manifestations, plannings, sponsors et documents réunis dans une seule plateforme, pensée pour simplifier les tâches du quotidien et faire gagner un temps précieux à votre comité.",
+    "titleLine1": "Toute la gestion de votre\u00a0club.",
+    "titleLine2": "Réunie au même\u00a0endroit.",
+    "titleAccent": "Des heures de gestion transformées en quelques minutes.",
+    "title": "Toute la gestion de votre club. Réunie au même endroit. Des heures de gestion transformées en quelques minutes.",
+    "subtitle": "Obillz réunit toutes les fonctionnalités de votre club dans une seule plateforme et transforme des tâches qui prenaient parfois des {hours} en actions réalisables en quelques {minutes}.",
+    "subtitleHours": "heures",
+    "subtitleMinutes": "minutes",
+    "titleAccentHours": "heures",
+    "titleAccentMinutes": "minutes",
     "benefits": {
       "cotisations": "Cotisations envoyées en quelques clics.",
       "plannings": "Les bénévoles s'inscrivent eux-mêmes aux plannings.",
       "recapitulatifs": "Les récapitulatifs sont générés automatiquement."
     },
-    "searchHint": "Vous cherchez une fonctionnalité ? Obillz l'a.",
-    "searchPlaceholder": "Rechercher une fonctionnalité…",
-    "demoQueries": ["cotisations", "planning", "procès-verbal", "sponsors"],
-    "arcFeatures": [
+    "orbitHint": "Explorez chaque fonctionnalité et voyez comment elle transforme votre gestion.",
+    "compareBefore": "Avant",
+    "compareAfter": "Avec Obillz",
+    "compareResult": "Résultat",
+    "orbitFeatures": [
+      {
+        "id": "statistiques",
+        "label": "Dashboard",
+        "description": "Visualisez d’un coup d’œil l’état de votre club.",
+        "before": "Compiler des chiffres à la main avant chaque séance de comité.",
+        "after": "Ouvrez le dashboard : les indicateurs clés sont déjà là.",
+        "result": "Des décisions plus rapides, basées sur des données à jour."
+      },
       {
         "id": "membres",
         "label": "Membres",
-        "searchTerms": ["membres", "membre"],
-        "description": "Centralisez vos fiches membres et gardez les informations importantes au même endroit."
+        "description": "Centralisez toutes les fiches membres au même endroit.",
+        "before": "Chercher les infos dans Excel, mails et dossiers papier.",
+        "after": "Une fiche complète, toujours à jour et accessible au comité.",
+        "result": "Plus de listes dispersées — tout le monde voit la même réalité."
       },
       {
         "id": "cotisations",
         "label": "Cotisations",
-        "searchTerms": ["cotisations", "cotisation"],
-        "description": "Créez vos cotisations, suivez les paiements et gardez une vision claire des encaissements."
-      },
-      {
-        "id": "evenements",
-        "label": "Événements",
-        "searchTerms": ["événements", "événement", "evenements"],
-        "description": "Partagez un lien d'inscription et suivez facilement les participations."
-      },
-      {
-        "id": "sponsors",
-        "label": "Sponsors",
-        "searchTerms": ["sponsors", "sponsor", "sponsoring"],
-        "description": "Centralisez les contrats, échéances et renouvellements importants."
+        "description": "Envoyez une cotisation à tous vos membres en quelques clics.",
+        "before": "Préparer chaque cotisation et relancer les membres manuellement.",
+        "after": "Sélectionnez les membres, renseignez les informations puis envoyez tout en quelques clics.",
+        "result": "Des dizaines de minutes gagnées à chaque campagne de cotisations."
       },
       {
         "id": "factures",
         "label": "Factures",
-        "searchTerms": ["factures", "facture"],
-        "description": "Créez des documents clairs et gardez un suivi propre de vos factures."
+        "description": "Créez et suivez vos factures sans friction.",
+        "before": "Rédiger des factures à la main et perdre le fil des paiements.",
+        "after": "Générez, envoyez et suivez le statut de chaque facture.",
+        "result": "Un suivi propre, sans tableurs ni documents égarés."
       },
       {
-        "id": "procesVerbaux",
-        "label": "Procès-verbaux",
-        "searchTerms": ["procès-verbal", "procès verbaux", "proces-verbal", "pv"],
-        "description": "Rédigez, retrouvez et partagez vos procès-verbaux dans un espace unique."
+        "id": "encaissements",
+        "label": "Encaissements",
+        "description": "Suivez clairement ce qui a été encaissé.",
+        "before": "Recouper cotisations, buvette et événements dans plusieurs fichiers.",
+        "after": "Une vue unique des encaissements, filtrée et lisible.",
+        "result": "La trésorerie du club devient compréhensible en quelques secondes."
       },
       {
-        "id": "planning",
-        "label": "Planning",
-        "searchTerms": ["planning", "plannings", "planning bénévoles"],
-        "description": "Créez des créneaux, organisez les bénévoles et partagez le planning facilement."
+        "id": "revenus",
+        "label": "Revenus",
+        "description": "Suivez les produits et revenus annexes du club.",
+        "before": "Noter maillots, tombolas et repas sur des feuilles séparées.",
+        "after": "Enregistrez chaque revenu produit au même endroit.",
+        "result": "Une vision claire de ce que le club génère réellement."
       },
       {
-        "id": "manifestations",
-        "label": "Manifestations",
-        "searchTerms": ["manifestations", "manifestation"],
-        "description": "Centralisez l'organisation autour de vos manifestations et événements du club."
+        "id": "charges",
+        "label": "Charges",
+        "description": "Gardez le contrôle sur les dépenses du club.",
+        "before": "Accumuler tickets et justifs sans vue d’ensemble.",
+        "after": "Saisissez et classez les charges à côté des recettes.",
+        "result": "Une comptabilité lisible, sans fin de mois chaotique."
       },
       {
-        "id": "comite",
-        "label": "Comité",
-        "searchTerms": ["comité", "comite", "accès comité"],
-        "description": "Invitez les bonnes personnes et attribuez les bons accès selon les responsabilités."
+        "id": "sponsors",
+        "label": "Sponsoring",
+        "description": "Suivez partenaires, contrats et renouvellements.",
+        "before": "Contrats éparpillés et échéances oubliées.",
+        "after": "Chaque partenaire, montant et statut visibles d’un coup d’œil.",
+        "result": "Moins d’oublis, plus de partenariats renouvelés à temps."
+      },
+      {
+        "id": "evenements",
+        "label": "Événements",
+        "description": "Organisez vos manifestations sans tableau Excel.",
+        "before": "Gérer inscriptions et infos dans des fichiers et messages dispersés.",
+        "after": "Créez l’événement, ouvrez les inscriptions et suivez en temps réel.",
+        "result": "L’organisation d’un match ou d’un tournoi devient lisible."
+      },
+      {
+        "id": "buvette",
+        "label": "Buvette",
+        "description": "Gérez les créneaux et demandes de buvette simplement.",
+        "before": "Coordonner la buvette par messages et tableaux improvisés.",
+        "after": "Réservations et créneaux centralisés, visibles du comité.",
+        "result": "Moins de stress le jour du match, plus de clarté pour l’équipe."
+      },
+      {
+        "id": "plannings",
+        "label": "Plannings",
+        "description": "Créez les postes, partagez un lien, laissez les bénévoles s’inscrire.",
+        "before": "Relancer chacun pour savoir qui est disponible.",
+        "after": "Les bénévoles choisissent leurs créneaux eux-mêmes.",
+        "result": "Le planning se remplit sans enchaîner les messages WhatsApp."
+      },
+      {
+        "id": "pv",
+        "label": "PV de séances",
+        "description": "Rédigez et partagez vos procès-verbaux rapidement.",
+        "before": "Rédiger, formater et redistribuer le PV à la main.",
+        "after": "Structurez la séance et exportez un PDF prêt à partager.",
+        "result": "Des comptes rendus propres, prêts en une fraction du temps."
+      },
+      {
+        "id": "qrcodes",
+        "label": "QR Codes",
+        "description": "Créez des liens et QR codes pour inscriptions et actions rapides.",
+        "before": "Demander des inscriptions via formulaires et messages éparpillés.",
+        "after": "Générez un QR code et partagez-le en un clic.",
+        "result": "Les inscriptions arrivent toutes seules, sans paperasse."
+      },
+      {
+        "id": "communication",
+        "label": "Communication",
+        "description": "Envoyez des campagnes ciblées à vos membres.",
+        "before": "Copier-coller des listes d’emails et relancer manuellement.",
+        "after": "Créez une campagne et envoyez-la à la bonne audience.",
+        "result": "Moins de temps perdu, une communication plus régulière."
+      },
+      {
+        "id": "pagePublique",
+        "label": "Page publique",
+        "description": "Présentez votre club en ligne simplement.",
+        "before": "Maintenir un site ou des posts pour chaque info.",
+        "after": "Une page publique claire : programme, buvette, inscriptions.",
+        "result": "Votre club a une vitrine pro, sans gestion web complexe."
+      },
+      {
+        "id": "parametres",
+        "label": "Paramètres",
+        "description": "Configurez le club et les accès du comité.",
+        "before": "Tout le monde a les mêmes accès… ou personne n’a les bons.",
+        "after": "Attribuez les droits adaptés à chaque rôle du comité.",
+        "result": "Une collaboration fluide, sans partager tous les accès."
       }
     ],
     "cta": "Tester gratuitement",
@@ -479,8 +561,65 @@
       }
     }
   },
+  "whyChoose": {
+    "label": "03 / POURQUOI CHOISIR OBILLZ",
+    "title": "Pourquoi choisir Obillz?",
+    "description": "Obillz ne se contente pas de réunir toutes les fonctionnalités de votre club dans une seule plateforme.",
+    "secondaryDescription": "Nous avons conçu un outil pensé autour du fonctionnement réel des clubs sportifs afin de simplifier le quotidien des bénévoles et leur faire gagner un temps précieux.",
+    "cards": [
+      {
+        "id": "terrain",
+        "badge": "Du terrain",
+        "title": "Conçu par des personnes du terrain.",
+        "paragraphs": [
+          "Obillz n'a pas été imaginé dans un bureau.",
+          "Nous avons grandi dans des clubs sportifs et connu, de l'intérieur, les défis quotidiens des bénévoles.",
+          "Chaque fonctionnalité répond à un besoin réel observé sur le terrain."
+        ]
+      },
+      {
+        "id": "automate",
+        "badge": "Gain de temps",
+        "title": "Moins de tâches manuelles.",
+        "paragraphs": [
+          "Les actions qui prenaient auparavant des heures deviennent des processus simples réalisables en quelques minutes.",
+          "Votre comité passe moins de temps sur l'administratif et davantage sur le club."
+        ]
+      },
+      {
+        "id": "unify",
+        "badge": "Tout-en-un",
+        "title": "Tout au même endroit.",
+        "paragraphs": [
+          "Membres, cotisations, finances, documents, manifestations, sponsors, plannings et bien plus encore.",
+          "Une seule plateforme.",
+          "Plus besoin de jongler entre plusieurs outils."
+        ]
+      },
+      {
+        "id": "simple",
+        "badge": "Prise en main",
+        "title": "Simple dès le premier jour.",
+        "paragraphs": [
+          "Une interface claire, intuitive et rapide à prendre en main.",
+          "Aucune formation compliquée.",
+          "Votre comité peut commencer immédiatement."
+        ]
+      },
+      {
+        "id": "evolve",
+        "badge": "Co-construit",
+        "title": "Une plateforme qui évolue avec les clubs.",
+        "paragraphs": [
+          "Nous échangeons régulièrement avec les clubs qui utilisent Obillz.",
+          "Lorsqu'un besoin revient souvent, nous faisons notre maximum pour développer une nouvelle fonctionnalité.",
+          "Votre retour participe directement à l'évolution de la plateforme."
+        ]
+      }
+    ]
+  },
   "socialProof": {
-    "label": "03 / ILS UTILISENT OBILLZ",
+    "label": "04 / ILS UTILISENT OBILLZ",
     "title": "Des clubs utilisent déjà Obillz.",
     "subtitle": "Obillz accompagne déjà des clubs sportifs dans la gestion de leurs membres, cotisations, documents et organisation.",
     "testimonial": {

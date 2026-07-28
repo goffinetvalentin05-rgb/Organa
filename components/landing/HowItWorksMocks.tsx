@@ -68,10 +68,10 @@ function MockShell({
 }) {
   return (
     <div
-      className={`overflow-hidden border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/80 shadow-[0_32px_64px_-20px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.03)] ${
+      className={`how-it-works-mock overflow-hidden border shadow-[0_32px_64px_-20px_rgba(15,23,42,0.14),0_0_0_1px_rgba(15,23,42,0.03)] ${
         compact
-          ? "rounded-[1.5rem] p-3.5"
-          : "rounded-[1.35rem] p-4 sm:rounded-[1.75rem] sm:p-6 md:p-7"
+          ? "how-it-works-mock--compact rounded-[1.5rem] p-3.5"
+          : "how-it-works-mock--desktop rounded-[1.75rem] p-7 sm:rounded-[2rem] sm:p-8 md:p-9"
       } ${className}`}
     >
       {children}
@@ -81,7 +81,7 @@ function MockShell({
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[11px]">
+    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-[11px] md:text-xs">
       {children}
     </p>
   );
@@ -98,12 +98,18 @@ function FieldInput({
 }) {
   return (
     <div
-      className={`mt-1.5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] ${
-        compact ? "px-2.5 py-2" : "px-3 py-2.5 sm:py-3"
+      className={`mt-1.5 flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] sm:rounded-2xl ${
+        compact ? "px-2.5 py-2" : "px-3.5 py-3 sm:px-4 sm:py-3.5"
       }`}
     >
       {icon ? <span className="how-it-works-blue-icon shrink-0">{icon}</span> : null}
-      <span className="min-w-0 truncate text-sm font-medium text-slate-800">{value}</span>
+      <span
+        className={`min-w-0 truncate font-medium text-slate-800 ${
+          compact ? "text-sm" : "text-sm sm:text-[0.975rem]"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -119,17 +125,17 @@ export function ClubCreationMock({
     <MockShell compact={compact}>
       <p
         className={`font-bold tracking-tight text-slate-900 ${
-          compact ? "text-[0.95rem]" : "text-base sm:text-lg"
+          compact ? "text-[0.95rem]" : "text-lg sm:text-xl"
         }`}
       >
         {labels.title}
       </p>
-      <div className={compact ? "mt-3 space-y-2.5" : "mt-5 space-y-4"}>
+      <div className={compact ? "mt-3 space-y-2.5" : "mt-6 space-y-5"}>
         <div>
           <FieldLabel>{labels.clubName}</FieldLabel>
           <FieldInput value={labels.clubNameValue} compact={compact} />
         </div>
-        <div className={`grid ${compact ? "grid-cols-2 gap-2.5" : "gap-4 sm:grid-cols-2"}`}>
+        <div className={`grid ${compact ? "grid-cols-2 gap-2.5" : "gap-4 sm:grid-cols-2 sm:gap-5"}`}>
           <div>
             <FieldLabel>{labels.sport}</FieldLabel>
             <FieldInput value={labels.sportValue} compact={compact} />
@@ -139,25 +145,25 @@ export function ClubCreationMock({
             <FieldInput
               value={labels.locationValue}
               compact={compact}
-              icon={compact ? undefined : <MapPin className="h-4 w-4" strokeWidth={2} />}
+              icon={compact ? undefined : <MapPin className="h-4 w-4 sm:h-[1.15rem] sm:w-[1.15rem]" strokeWidth={2} />}
             />
           </div>
         </div>
         {compact ? null : (
           <div>
             <FieldLabel>{labels.logo}</FieldLabel>
-            <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-3 py-3">
-              <span className="how-it-works-blue-soft flex h-11 w-11 items-center justify-center rounded-xl">
+            <div className="mt-1.5 flex items-center gap-3.5 rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-4">
+              <span className="how-it-works-blue-soft flex h-12 w-12 items-center justify-center rounded-xl">
                 <ImagePlus className="h-5 w-5" strokeWidth={2} />
               </span>
-              <span className="text-sm text-slate-500">PNG, JPG · max 2 MB</span>
+              <span className="text-sm text-slate-500 sm:text-[0.9375rem]">PNG, JPG · max 2 MB</span>
             </div>
           </div>
         )}
         <button
           type="button"
-          className={`how-it-works-blue-fill w-full rounded-xl px-4 text-sm font-semibold text-white transition-transform hover:scale-[1.01] ${
-            compact ? "mt-0.5 py-2.5" : "mt-1 py-3"
+          className={`how-it-works-blue-fill w-full rounded-xl px-4 text-sm font-semibold text-white transition-transform hover:scale-[1.01] sm:rounded-2xl sm:text-[0.975rem] ${
+            compact ? "mt-0.5 py-2.5" : "mt-1.5 py-3.5 sm:py-4"
           }`}
         >
           {labels.cta}
@@ -193,18 +199,18 @@ export function MemberImportMock({
     return () => window.clearTimeout(t1);
   }, [active, reduceMotion]);
 
-  const panelPad = compact ? "p-4" : "p-6";
+  const panelPad = compact ? "p-4" : "p-8 sm:p-10";
 
   return (
     <MockShell compact={compact}>
       <p
         className={`font-bold tracking-tight text-slate-900 ${
-          compact ? "text-[0.95rem]" : "text-base sm:text-lg"
+          compact ? "text-[0.95rem]" : "text-lg sm:text-xl"
         }`}
       >
         {labels.title}
       </p>
-      <div className={compact ? "mt-3" : "mt-5"}>
+      <div className={compact ? "mt-3" : "mt-6"}>
         <AnimatePresence mode="wait">
           {phase === "upload" ? (
             <motion.div
@@ -215,11 +221,19 @@ export function MemberImportMock({
               transition={{ duration: 0.35, ease: easePremium }}
               className={`rounded-2xl border border-dashed border-slate-200 bg-white text-center ${panelPad}`}
             >
-              <span className="how-it-works-blue-soft mx-auto flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Upload className="h-5 w-5" strokeWidth={2} />
+              <span
+                className={`how-it-works-blue-soft mx-auto flex items-center justify-center rounded-2xl ${
+                  compact ? "h-12 w-12" : "h-14 w-14"
+                }`}
+              >
+                <Upload className={compact ? "h-5 w-5" : "h-6 w-6"} strokeWidth={2} />
               </span>
-              <p className="mt-3 text-sm font-semibold text-slate-800">{labels.fileName}</p>
-              <p className="mt-1 text-xs text-slate-500">{labels.uploadHint}</p>
+              <p className={`font-semibold text-slate-800 ${compact ? "mt-3 text-sm" : "mt-4 text-base"}`}>
+                {labels.fileName}
+              </p>
+              <p className={`text-slate-500 ${compact ? "mt-1 text-xs" : "mt-1.5 text-sm"}`}>
+                {labels.uploadHint}
+              </p>
             </motion.div>
           ) : null}
 
@@ -233,11 +247,15 @@ export function MemberImportMock({
               className={`rounded-2xl border border-slate-200 bg-white text-center ${panelPad}`}
             >
               <motion.span
-                className="how-it-works-blue-ring mx-auto flex h-12 w-12 items-center justify-center rounded-full border-2"
+                className={`how-it-works-blue-ring mx-auto flex items-center justify-center rounded-full border-2 ${
+                  compact ? "h-12 w-12" : "h-14 w-14"
+                }`}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
               />
-              <p className="mt-4 text-sm font-medium text-slate-600">{labels.importing}</p>
+              <p className={`font-medium text-slate-600 ${compact ? "mt-4 text-sm" : "mt-5 text-base"}`}>
+                {labels.importing}
+              </p>
             </motion.div>
           ) : null}
 
@@ -249,22 +267,32 @@ export function MemberImportMock({
               transition={{ duration: 0.45, ease: easePremium }}
               className={`rounded-2xl border border-emerald-200/80 bg-emerald-50/60 text-center ${panelPad}`}
             >
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_8px_20px_-6px_rgba(16,185,129,0.5)]">
-                <Check className="h-6 w-6" strokeWidth={2.5} />
+              <span
+                className={`mx-auto flex items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_8px_20px_-6px_rgba(16,185,129,0.5)] ${
+                  compact ? "h-12 w-12" : "h-14 w-14"
+                }`}
+              >
+                <Check className={compact ? "h-6 w-6" : "h-7 w-7"} strokeWidth={2.5} />
               </span>
-              <p className={`font-bold text-emerald-800 ${compact ? "mt-3 text-base" : "mt-4 text-lg"}`}>
+              <p className={`font-bold text-emerald-800 ${compact ? "mt-3 text-base" : "mt-5 text-xl"}`}>
                 {labels.success}
               </p>
-              <div className={`flex flex-wrap justify-center gap-2 ${compact ? "mt-3" : "mt-4"}`}>
+              <div className={`flex flex-wrap justify-center gap-2 ${compact ? "mt-3" : "mt-5 gap-2.5"}`}>
                 {["MD", "CL", "SR", "AB", "PK"].map((initials) => (
                   <span
                     key={initials}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200/80"
+                    className={`flex items-center justify-center rounded-full bg-white font-bold text-slate-700 shadow-sm ring-1 ring-slate-200/80 ${
+                      compact ? "h-8 w-8 text-[10px]" : "h-10 w-10 text-xs"
+                    }`}
                   >
                     {initials}
                   </span>
                 ))}
-                <span className="how-it-works-blue-fill flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white">
+                <span
+                  className={`how-it-works-blue-fill flex items-center justify-center rounded-full font-bold text-white ${
+                    compact ? "h-8 w-8 text-[10px]" : "h-10 w-10 text-xs"
+                  }`}
+                >
                   +243
                 </span>
               </div>
@@ -313,29 +341,31 @@ export function CommitteeMock({
     <MockShell compact={compact}>
       <p
         className={`font-bold tracking-tight text-slate-900 ${
-          compact ? "text-[0.95rem]" : "text-base sm:text-lg"
+          compact ? "text-[0.95rem]" : "text-lg sm:text-xl"
         }`}
       >
         {labels.title}
       </p>
-      <ul className={compact ? "mt-3 space-y-2" : "mt-5 space-y-3"}>
+      <ul className={compact ? "mt-3 space-y-2" : "mt-6 space-y-3.5"}>
         {members.map((member) => (
           <li
             key={member.name}
-            className={`flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] ${
-              compact ? "px-2.5 py-2.5" : "px-3 py-3 sm:px-4"
+            className={`flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] sm:rounded-2xl ${
+              compact ? "px-2.5 py-2.5" : "px-4 py-3.5 sm:px-5 sm:py-4"
             }`}
           >
             <span
-              className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white shadow-md ${member.gradient} ${
-                compact ? "h-9 w-9" : "h-10 w-10"
+              className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-bold text-white shadow-md ${member.gradient} ${
+                compact ? "h-9 w-9 text-xs" : "h-11 w-11 text-sm"
               }`}
             >
               {member.initials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-slate-900">{member.name}</p>
-              <div className="mt-1">
+              <p className={`truncate font-bold text-slate-900 ${compact ? "text-sm" : "text-sm sm:text-base"}`}>
+                {member.name}
+              </p>
+              <div className="mt-1.5">
                 <RoleBadge variant={member.badge}>{member.role}</RoleBadge>
               </div>
             </div>
@@ -364,49 +394,63 @@ export function CentralizedMock({
     <MockShell compact={compact}>
       <p
         className={`font-bold tracking-tight text-slate-900 ${
-          compact ? "text-[0.95rem]" : "text-base sm:text-lg"
+          compact ? "text-[0.95rem]" : "text-lg sm:text-xl"
         }`}
       >
         {labels.title}
       </p>
-      <div className={`grid grid-cols-2 ${compact ? "mt-3 gap-2" : "mt-5 gap-3"}`}>
+      <div className={`grid grid-cols-2 ${compact ? "mt-3 gap-2" : "mt-6 gap-3.5 sm:gap-4"}`}>
         {tiles.map((tile) => {
           const Icon = tile.icon;
           return (
             <div
               key={tile.label}
-              className={`rounded-xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] ${
-                compact ? "p-2.5" : "p-3.5 sm:p-4"
+              className={`rounded-xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] sm:rounded-2xl ${
+                compact ? "p-2.5" : "p-4 sm:p-5"
               }`}
             >
               <span
                 className={`flex items-center justify-center rounded-xl ${tile.bg} ${tile.color} ${
-                  compact ? "h-8 w-8" : "h-9 w-9"
+                  compact ? "h-8 w-8" : "h-10 w-10"
                 }`}
               >
-                <Icon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2} />
+                <Icon className={compact ? "h-3.5 w-3.5" : "h-5 w-5"} strokeWidth={2} />
               </span>
               <p
-                className={`truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500 ${
-                  compact ? "mt-2" : "mt-3"
+                className={`truncate font-semibold uppercase tracking-wide text-slate-500 ${
+                  compact ? "mt-2 text-[10px]" : "mt-3.5 text-[11px]"
                 }`}
               >
                 {tile.label}
               </p>
-              <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{tile.value}</p>
+              <p
+                className={`mt-0.5 truncate font-bold text-slate-900 ${
+                  compact ? "text-sm" : "text-sm sm:text-base"
+                }`}
+              >
+                {tile.value}
+              </p>
             </div>
           );
         })}
       </div>
       <div
-        className={`how-it-works-blue-soft flex min-w-0 items-center justify-center gap-2 rounded-xl border px-3 sm:px-4 ${
-          compact ? "mt-2.5 py-2.5" : "mt-4 py-3"
+        className={`how-it-works-blue-soft flex min-w-0 items-center justify-center gap-2.5 rounded-xl border px-3 sm:rounded-2xl sm:px-4 ${
+          compact ? "mt-2.5 py-2.5" : "mt-5 py-3.5 sm:py-4"
         }`}
       >
-        <span className="how-it-works-blue-fill flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
-          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+        <span
+          className={`how-it-works-blue-fill flex shrink-0 items-center justify-center rounded-full text-white ${
+            compact ? "h-6 w-6" : "h-7 w-7"
+          }`}
+        >
+          <Check className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
         </span>
-        <p className="how-it-works-blue-icon min-w-0 text-center text-sm font-semibold leading-snug">
+        <p
+          className={`how-it-works-blue-icon min-w-0 text-center font-semibold leading-snug ${
+            compact ? "text-sm" : "text-sm sm:text-[0.975rem]"
+          }`}
+        >
           {labels.centralized}
         </p>
       </div>

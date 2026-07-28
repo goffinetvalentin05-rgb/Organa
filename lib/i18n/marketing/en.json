@@ -131,72 +131,152 @@
   },
   "modules": {
     "label": "01 / THE PLATFORM",
-    "titleLine1": "All your club management,",
-    "titleLine2": "in one place.",
-    "title": "All your club management. Brought together in one place.",
-    "subtitle": "Members, fees, event organisation, schedules, sponsors and documents in a single platform designed to simplify daily tasks and save valuable time for your committee.",
+    "titleLine1": "All your club\u00a0management.",
+    "titleLine2": "Brought together in one\u00a0place.",
+    "titleAccent": "Hours of admin turned into a few minutes.",
+    "title": "All your club management. Brought together in one place. Hours of admin turned into a few minutes.",
+    "subtitle": "Obillz brings every club feature into one platform and turns tasks that once took {hours} into actions you can complete in a few {minutes}.",
+    "subtitleHours": "hours",
+    "subtitleMinutes": "minutes",
+    "titleAccentHours": "Hours",
+    "titleAccentMinutes": "minutes",
     "benefits": {
       "cotisations": "Membership fees sent in just a few clicks.",
       "plannings": "Volunteers sign themselves up to schedules.",
       "recapitulatifs": "Recaps are generated automatically."
     },
-    "searchHint": "Looking for a feature? Obillz has it.",
-    "searchPlaceholder": "Search for a feature…",
-    "demoQueries": ["membership fees", "schedule", "minutes", "sponsors"],
-    "arcFeatures": [
+    "orbitHint": "Explore each feature and see how it transforms the way you run your club.",
+    "compareBefore": "Before",
+    "compareAfter": "With Obillz",
+    "compareResult": "Result",
+    "orbitFeatures": [
+      {
+        "id": "statistiques",
+        "label": "Dashboard",
+        "description": "See the state of your club at a glance.",
+        "before": "Compiling numbers by hand before every committee meeting.",
+        "after": "Open the dashboard — key indicators are already there.",
+        "result": "Faster decisions based on up-to-date data."
+      },
       {
         "id": "membres",
         "label": "Members",
-        "searchTerms": ["members", "member"],
-        "description": "Centralise member profiles and keep important information in one place."
+        "description": "Centralise every member profile in one place.",
+        "before": "Hunting for info across Excel, emails and paper folders.",
+        "after": "A complete profile, always up to date and available to the committee.",
+        "result": "No more scattered lists — everyone sees the same reality."
       },
       {
         "id": "cotisations",
         "label": "Membership fees",
-        "searchTerms": ["membership fees", "membership fee", "fees"],
-        "description": "Create fees, track payments and keep a clear view of collections."
-      },
-      {
-        "id": "evenements",
-        "label": "Events",
-        "searchTerms": ["events", "event"],
-        "description": "Share a sign-up link and easily track participation."
-      },
-      {
-        "id": "sponsors",
-        "label": "Sponsors",
-        "searchTerms": ["sponsors", "sponsor", "sponsoring"],
-        "description": "Centralise contracts, deadlines and important renewals."
+        "description": "Send a membership fee to all members in a few clicks.",
+        "before": "Preparing every fee and chasing members by hand.",
+        "after": "Select members, enter the details, then send everything in a few clicks.",
+        "result": "Dozens of minutes saved on every fee campaign."
       },
       {
         "id": "factures",
         "label": "Invoices",
-        "searchTerms": ["invoices", "invoice"],
-        "description": "Create clear documents and keep proper track of your invoices."
+        "description": "Create and track invoices without friction.",
+        "before": "Writing invoices manually and losing track of payments.",
+        "after": "Generate, send and follow the status of every invoice.",
+        "result": "Clean tracking — no more spreadsheets or lost files."
       },
       {
-        "id": "procesVerbaux",
+        "id": "encaissements",
+        "label": "Collections",
+        "description": "Clearly follow what has been collected.",
+        "before": "Reconciling fees, canteen and events across multiple files.",
+        "after": "One readable view of collections, ready to filter.",
+        "result": "Club cash flow becomes clear in seconds."
+      },
+      {
+        "id": "revenus",
+        "label": "Revenue",
+        "description": "Track product and side revenue for the club.",
+        "before": "Logging kits, raffles and meals on separate sheets.",
+        "after": "Record every product revenue in one place.",
+        "result": "A clear view of what the club actually generates."
+      },
+      {
+        "id": "charges",
+        "label": "Expenses",
+        "description": "Keep club spending under control.",
+        "before": "Piling up receipts with no overview.",
+        "after": "Log and categorise expenses alongside income.",
+        "result": "Readable accounting without chaotic month-ends."
+      },
+      {
+        "id": "sponsors",
+        "label": "Sponsoring",
+        "description": "Track partners, contracts and renewals.",
+        "before": "Scattered contracts and forgotten deadlines.",
+        "after": "Every partner, amount and status visible at a glance.",
+        "result": "Fewer missed renewals, more partnerships kept on time."
+      },
+      {
+        "id": "evenements",
+        "label": "Events",
+        "description": "Organise events without an Excel sheet.",
+        "before": "Managing sign-ups across files and scattered messages.",
+        "after": "Create the event, open sign-ups and track in real time.",
+        "result": "Organising a match or tournament becomes readable."
+      },
+      {
+        "id": "buvette",
+        "label": "Canteen",
+        "description": "Manage canteen slots and requests simply.",
+        "before": "Coordinating the canteen via messages and improvised tables.",
+        "after": "Bookings and slots centralised for the committee.",
+        "result": "Less match-day stress, more clarity for the team."
+      },
+      {
+        "id": "plannings",
+        "label": "Schedules",
+        "description": "Create roles, share a link, let volunteers sign up.",
+        "before": "Chasing everyone to see who’s available.",
+        "after": "Volunteers pick their own slots.",
+        "result": "The schedule fills without endless WhatsApp threads."
+      },
+      {
+        "id": "pv",
         "label": "Minutes",
-        "searchTerms": ["minutes", "minute", "meeting minutes"],
-        "description": "Write, find and share meeting minutes in one place."
+        "description": "Write and share meeting minutes quickly.",
+        "before": "Writing, formatting and redistributing minutes by hand.",
+        "after": "Structure the meeting and export a share-ready PDF.",
+        "result": "Clean minutes, ready in a fraction of the time."
       },
       {
-        "id": "planning",
-        "label": "Schedule",
-        "searchTerms": ["schedule", "scheduling", "planning"],
-        "description": "Create slots, organise volunteers and share the schedule easily."
+        "id": "qrcodes",
+        "label": "QR Codes",
+        "description": "Create links and QR codes for quick sign-ups.",
+        "before": "Collecting sign-ups via forms and scattered messages.",
+        "after": "Generate a QR code and share it in one click.",
+        "result": "Sign-ups arrive on their own — no paperwork."
       },
       {
-        "id": "manifestations",
-        "label": "Event days",
-        "searchTerms": ["event days", "event day", "events"],
-        "description": "Centralise organisation around your club's events and match days."
+        "id": "communication",
+        "label": "Communication",
+        "description": "Send targeted campaigns to your members.",
+        "before": "Copy-pasting email lists and chasing people manually.",
+        "after": "Create a campaign and send it to the right audience.",
+        "result": "Less wasted time, more consistent communication."
       },
       {
-        "id": "comite",
-        "label": "Committee",
-        "searchTerms": ["committee", "committee access"],
-        "description": "Invite the right people and assign the right access for each role."
+        "id": "pagePublique",
+        "label": "Public page",
+        "description": "Present your club online simply.",
+        "before": "Maintaining a site or posts for every update.",
+        "after": "A clear public page: programme, canteen, sign-ups.",
+        "result": "A professional club showcase without complex web work."
+      },
+      {
+        "id": "parametres",
+        "label": "Settings",
+        "description": "Configure the club and committee access.",
+        "before": "Everyone has the same access… or no one has the right ones.",
+        "after": "Assign the right permissions for each committee role.",
+        "result": "Smooth collaboration without sharing every permission."
       }
     ],
     "cta": "Try for free",
@@ -445,8 +525,65 @@
       }
     }
   },
+  "whyChoose": {
+    "label": "03 / WHY CHOOSE OBILLZ",
+    "title": "Why choose Obillz?",
+    "description": "Obillz does more than bring every club feature together in one platform.",
+    "secondaryDescription": "We built a tool around how sports clubs actually work — to simplify volunteers' daily life and give them back precious time.",
+    "cards": [
+      {
+        "id": "terrain",
+        "badge": "From the field",
+        "title": "Built by people from the field.",
+        "paragraphs": [
+          "Obillz wasn't imagined in an office.",
+          "We grew up in sports clubs and know, from the inside, the daily challenges volunteers face.",
+          "Every feature answers a real need observed on the ground."
+        ]
+      },
+      {
+        "id": "automate",
+        "badge": "Time saved",
+        "title": "Fewer manual tasks.",
+        "paragraphs": [
+          "Actions that used to take hours become simple processes you can finish in minutes.",
+          "Your committee spends less time on admin and more time on the club."
+        ]
+      },
+      {
+        "id": "unify",
+        "badge": "All-in-one",
+        "title": "Everything in one place.",
+        "paragraphs": [
+          "Members, dues, finances, documents, events, sponsors, schedules and much more.",
+          "One single platform.",
+          "No more juggling between tools."
+        ]
+      },
+      {
+        "id": "simple",
+        "badge": "Day one",
+        "title": "Simple from day one.",
+        "paragraphs": [
+          "A clear, intuitive interface that's quick to pick up.",
+          "No complicated training.",
+          "Your committee can get started right away."
+        ]
+      },
+      {
+        "id": "evolve",
+        "badge": "Co-built",
+        "title": "A platform that grows with clubs.",
+        "paragraphs": [
+          "We regularly talk with the clubs using Obillz.",
+          "When a need comes up often, we do our best to ship a new feature.",
+          "Your feedback directly shapes the platform."
+        ]
+      }
+    ]
+  },
   "socialProof": {
-    "label": "03 / THEY USE OBILLZ",
+    "label": "04 / THEY USE OBILLZ",
     "title": "Clubs are already using Obillz.",
     "subtitle": "Obillz already helps sports clubs manage their members, dues, documents and day-to-day organization.",
     "testimonial": {

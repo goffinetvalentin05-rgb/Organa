@@ -8,8 +8,9 @@ import {
   useState,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
-import { easePremium } from "@/components/landing/landing-motion";
+import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 import {
   CentralizedMock,
   ClubCreationMock,
@@ -127,11 +128,8 @@ function StepNav({
   onSelect: (index: number, event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
-    <nav className="relative flex flex-row gap-3 lg:flex-col lg:gap-5" aria-label="Étapes">
-      <span
-        className="absolute left-[18px] top-5 bottom-5 hidden w-px bg-gradient-to-b from-slate-200 via-slate-200/80 to-transparent lg:block sm:left-[19px]"
-        aria-hidden
-      />
+    <nav className="how-it-works-step-nav relative flex flex-row gap-3 lg:flex-col lg:gap-5" aria-label="Étapes">
+      <span className="how-it-works-step-rail" aria-hidden />
       {STEP_NUMBERS.map((num, index) => {
         const isActive = activeIndex === index;
         return (
@@ -139,23 +137,21 @@ function StepNav({
             key={num}
             type="button"
             onClick={(event) => onSelect(index, event)}
-            className="group relative z-10 flex items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#175dd4]/40 focus-visible:ring-offset-2"
+            className="how-it-works-step-btn group relative z-10 flex items-center rounded-full outline-none"
             aria-current={isActive ? "step" : undefined}
             aria-selected={isActive}
             aria-controls={STEP_CONTENT_ID}
             aria-label={`Étape ${num}`}
           >
             <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 sm:h-10 sm:w-10 sm:text-xs ${
-                isActive
-                  ? "how-it-works-blue-fill text-white"
-                  : "border border-slate-200 bg-white text-slate-400 group-hover:border-slate-300 group-hover:text-slate-600"
+              className={`how-it-works-step-dot flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 sm:h-10 sm:w-10 sm:text-xs ${
+                isActive ? "how-it-works-step-dot--active how-it-works-blue-fill text-white" : "how-it-works-step-dot--idle"
               }`}
             >
               {num}
             </span>
             {index < STEP_NUMBERS.length - 1 ? (
-              <span className="mx-0.5 h-px w-4 bg-slate-200 sm:mx-1 sm:w-6 lg:hidden" aria-hidden />
+              <span className="how-it-works-step-connector mx-0.5 h-px w-4 sm:mx-1 sm:w-6 lg:hidden" aria-hidden />
             ) : null}
           </button>
         );
@@ -196,10 +192,10 @@ function StepContent({
           >
             {num}
           </p>
-          <h3 className="mt-2 text-[1.15rem] font-bold tracking-tight text-slate-900 sm:mt-1 sm:text-2xl md:text-[1.65rem]">
+          <h3 className="how-it-works-step-title mt-2 text-[1.15rem] font-bold tracking-tight sm:mt-1 sm:text-2xl md:text-[1.65rem]">
             {step.title}
           </h3>
-          <p className="mx-auto mt-2.5 max-w-md text-[0.9375rem] leading-relaxed text-slate-600 sm:mt-3 sm:text-[1.05rem] lg:mx-0">
+          <p className="how-it-works-step-desc mx-auto mt-2.5 max-w-md text-[0.9375rem] leading-relaxed sm:mt-3 sm:text-[1.05rem] lg:mx-0">
             {step.description}
           </p>
         </motion.div>
@@ -218,10 +214,11 @@ function VisualPanel({
   return (
     <div
       id={VISUAL_PANEL_ID}
-      className="relative min-h-[240px] sm:min-h-[320px] lg:min-h-[400px]"
+      className="how-it-works-visual-stage relative w-full"
       aria-live="polite"
       aria-atomic="true"
     >
+      <div className="how-it-works-visual-stage__glow" aria-hidden />
       <AnimatePresence mode="wait">
         <motion.div
           key={activeIndex}
@@ -229,7 +226,7 @@ function VisualPanel({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -12 }}
           transition={{ duration: 0.4, ease: easePremium }}
-          className="w-full"
+          className="how-it-works-visual-stage__card relative z-[1] w-full"
         >
           {activeIndex === 0 ? <ClubCreationMock labels={mockLabels.step1} /> : null}
           {activeIndex === 1 ? (
@@ -244,13 +241,16 @@ function VisualPanel({
 }
 
 function DesktopHowItWorks({
+  intro,
   steps,
   mockLabels,
 }: {
+  intro: ReactNode;
   steps: Step[];
   mockLabels: MockLabels;
 }) {
   const { activeIndex, selectStep } = useStepAutoplay();
+  const reduceMotion = useReducedMotion();
 
   const onSelect = (index: number, event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -259,8 +259,15 @@ function DesktopHowItWorks({
   };
 
   return (
-    <div className="grid items-start gap-7 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12 xl:gap-16">
-      <div className="flex flex-col gap-5 sm:gap-8">
+    <div className="how-it-works-desktop grid items-center gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-8 xl:gap-12">
+      <motion.div
+        className="how-it-works-desktop__copy flex min-w-0 flex-col gap-8 sm:gap-10 lg:max-w-[34rem] lg:justify-self-center xl:max-w-[36rem]"
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.65, ease: easePremium, delay: 0.08 }}
+      >
+        {intro}
         <div className="flex flex-col gap-6 sm:gap-6 lg:flex-row lg:items-start">
           <div className="flex justify-center lg:justify-start">
             <StepNav activeIndex={activeIndex} onSelect={onSelect} />
@@ -269,11 +276,17 @@ function DesktopHowItWorks({
             <StepContent steps={steps} activeIndex={activeIndex} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="overflow-hidden rounded-[1.35rem] bg-slate-100/70 p-3 sm:rounded-[2rem] sm:p-5 md:rounded-[2.25rem] md:p-6 lg:p-7">
+      <motion.div
+        className="how-it-works-desktop__visual flex w-full items-center justify-center px-1 sm:px-2 lg:px-3"
+        initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.7, ease: easePremium, delay: 0.18 }}
+      >
         <VisualPanel activeIndex={activeIndex} mockLabels={mockLabels} />
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -482,19 +495,31 @@ function MobileHowItWorks({
 }
 
 export default function HowItWorksShowcase({
+  intro,
   steps,
   mockLabels,
 }: {
+  intro: ReactNode;
   steps: Step[];
   mockLabels: MockLabels;
 }) {
   return (
-    <div className="relative">
-      <div className="md:hidden">
-        <MobileHowItWorks steps={steps} mockLabels={mockLabels} />
+    <div className="how-it-works-showcase relative">
+      <div className="lg:hidden">
+        <motion.div
+          variants={scrollReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
+          {intro}
+        </motion.div>
+        <div className="landing-section-content how-it-works-content">
+          <MobileHowItWorks steps={steps} mockLabels={mockLabels} />
+        </div>
       </div>
-      <div className="hidden md:block">
-        <DesktopHowItWorks steps={steps} mockLabels={mockLabels} />
+      <div className="hidden lg:block">
+        <DesktopHowItWorks intro={intro} steps={steps} mockLabels={mockLabels} />
       </div>
     </div>
   );

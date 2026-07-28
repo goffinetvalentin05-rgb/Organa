@@ -2,7 +2,7 @@
 
 import HeroSection from "@/components/landing/HeroSection";
 import AskChatGptSection from "@/components/landing/AskChatGptSection";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import DiscoveryChapter from "@/components/landing/DiscoveryChapter";
 import LandingIntroExperience from "@/components/landing/LandingIntroExperience";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
@@ -21,7 +21,7 @@ export default function LandingPage() {
         <HeroSection />
         <div className="landing-light-zone">
           <FeaturesSection />
-          <HowItWorksSection />
+          <DiscoveryChapter />
           <PricingSection />
           <AskChatGptSection />
         </div>

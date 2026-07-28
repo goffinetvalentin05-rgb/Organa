@@ -1,10 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import HowItWorksShowcase from "@/components/landing/HowItWorksShowcase";
 import type { MockLabels } from "@/components/landing/HowItWorksMocks";
-import LandingSectionIntro, { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
-import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
+import LandingSectionIntro from "@/components/landing/LandingSectionIntro";
 import { useI18n } from "@/components/I18nProvider";
 import { getTranslationValue } from "@/lib/i18n";
 
@@ -58,17 +56,9 @@ export default function HowItWorksSection() {
   };
 
   return (
-    <section
-      id="comment-ca-marche"
-      className={`${landingSectionShellClass()} scroll-mt-32 overflow-x-hidden md:scroll-mt-36`}
-    >
-      <div className="landing-container relative">
-        <motion.div
-          variants={scrollReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
+    <section id="comment-ca-marche" className="discovery-chapter__block scroll-mt-32 md:scroll-mt-36">
+      <HowItWorksShowcase
+        intro={
           <LandingSectionIntro
             layout="stack"
             label={t("marketing.howItWorks.label")}
@@ -76,12 +66,10 @@ export default function HowItWorksSection() {
             description={t("marketing.howItWorks.subtitle")}
             className="max-w-2xl lg:max-w-[44rem]"
           />
-        </motion.div>
-
-        <div className="landing-section-content how-it-works-content">
-          <HowItWorksShowcase steps={steps} mockLabels={mockLabels} />
-        </div>
-      </div>
+        }
+        steps={steps}
+        mockLabels={mockLabels}
+      />
     </section>
   );
 }

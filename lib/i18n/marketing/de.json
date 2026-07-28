@@ -131,15 +131,154 @@
   },
   "modules": {
     "label": "01 / DIE PLATTFORM",
-    "titleLine1": "Wechseln Sie zu klarerer",
-    "titleLine2": "Vereinsverwaltung",
-    "title": "Die gesamte Verwaltung Ihres Vereins. An einem Ort vereint.",
-    "subtitle": "Mitglieder, Beiträge, Veranstaltungen, Pläne, Sponsoren und Dokumente in einer einzigen Plattform, die Alltagsaufgaben vereinfacht und Ihrem Vorstand wertvolle Zeit spart.",
+    "titleLine1": "Die gesamte Verwaltung Ihres\u00a0Vereins.",
+    "titleLine2": "An einem Ort\u00a0vereint.",
+    "titleAccent": "Stunden an Verwaltung werden zu wenigen Minuten.",
+    "title": "Die gesamte Verwaltung Ihres Vereins. An einem Ort vereint. Stunden an Verwaltung werden zu wenigen Minuten.",
+    "subtitle": "Obillz vereint alle Funktionen Ihres Vereins in einer Plattform und verwandelt Aufgaben, die früher {hours} dauerten, in Aktionen von wenigen {minutes}.",
+    "subtitleHours": "Stunden",
+    "subtitleMinutes": "Minuten",
+    "titleAccentHours": "Stunden",
+    "titleAccentMinutes": "Minuten",
     "benefits": {
       "cotisations": "Beiträge in wenigen Klicks versendet.",
       "plannings": "Freiwillige tragen sich selbst in die Pläne ein.",
       "recapitulatifs": "Zusammenfassungen werden automatisch erzeugt."
     },
+    "orbitHint": "Entdecken Sie jede Funktion und sehen Sie, wie sie Ihre Vereinsverwaltung verändert.",
+    "compareBefore": "Vorher",
+    "compareAfter": "Mit Obillz",
+    "compareResult": "Ergebnis",
+    "orbitFeatures": [
+      {
+        "id": "statistiques",
+        "label": "Dashboard",
+        "description": "Sehen Sie den Zustand Ihres Vereins auf einen Blick.",
+        "before": "Zahlen vor jeder Vorstandssitzung manuell zusammenstellen.",
+        "after": "Dashboard öffnen — die Kennzahlen sind schon da.",
+        "result": "Schnellere Entscheidungen auf Basis aktueller Daten."
+      },
+      {
+        "id": "membres",
+        "label": "Mitglieder",
+        "description": "Alle Mitgliederprofile an einem Ort bündeln.",
+        "before": "Infos in Excel, Mails und Papierordnern suchen.",
+        "after": "Ein vollständiges, stets aktuelles Profil für den Vorstand.",
+        "result": "Keine verstreuten Listen mehr — alle sehen dieselbe Realität."
+      },
+      {
+        "id": "cotisations",
+        "label": "Beiträge",
+        "description": "Einen Beitrag in wenigen Klicks an alle Mitglieder senden.",
+        "before": "Jeden Beitrag vorbereiten und Mitglieder manuell mahnen.",
+        "after": "Mitglieder wählen, Angaben erfassen und alles in wenigen Klicks senden.",
+        "result": "Dutzende Minuten gespart bei jeder Beitragskampagne."
+      },
+      {
+        "id": "factures",
+        "label": "Rechnungen",
+        "description": "Rechnungen ohne Reibung erstellen und verfolgen.",
+        "before": "Rechnungen manuell schreiben und Zahlungen verlieren.",
+        "after": "Erstellen, senden und Status jeder Rechnung verfolgen.",
+        "result": "Saubere Nachverfolgung — ohne Tabellen und verlorene Dateien."
+      },
+      {
+        "id": "encaissements",
+        "label": "Eingänge",
+        "description": "Klar nachverfolgen, was eingegangen ist.",
+        "before": "Beiträge, Buffet und Events in mehreren Dateien abgleichen.",
+        "after": "Eine lesbare Übersicht aller Eingänge.",
+        "result": "Die Vereinskasse wird in Sekunden verständlich."
+      },
+      {
+        "id": "revenus",
+        "label": "Einnahmen",
+        "description": "Produkte und Nebeneinnahmen des Vereins verfolgen.",
+        "before": "Trikots, Tombolas und Essen auf getrennten Blättern notieren.",
+        "after": "Jede Produkt-Einnahme am gleichen Ort erfassen.",
+        "result": "Klarer Blick darauf, was der Verein wirklich erwirtschaftet."
+      },
+      {
+        "id": "charges",
+        "label": "Ausgaben",
+        "description": "Ausgaben des Vereins unter Kontrolle behalten.",
+        "before": "Belege sammeln ohne Überblick.",
+        "after": "Ausgaben neben den Einnahmen erfassen und kategorisieren.",
+        "result": "Lesbare Buchhaltung ohne chaotische Monatsenden."
+      },
+      {
+        "id": "sponsors",
+        "label": "Sponsoring",
+        "description": "Partner, Verträge und Verlängerungen im Blick behalten.",
+        "before": "Verstreute Verträge und vergessene Fristen.",
+        "after": "Jeder Partner, Betrag und Status auf einen Blick.",
+        "result": "Weniger vergessene Verlängerungen, mehr Partnerschaften rechtzeitig."
+      },
+      {
+        "id": "evenements",
+        "label": "Events",
+        "description": "Veranstaltungen ohne Excel organisieren.",
+        "before": "Anmeldungen in Dateien und Nachrichten verstreut verwalten.",
+        "after": "Event erstellen, Anmeldungen öffnen und live verfolgen.",
+        "result": "Die Organisation eines Spiels oder Turniers wird lesbar."
+      },
+      {
+        "id": "buvette",
+        "label": "Buffet",
+        "description": "Buffet-Slots und Anfragen einfach verwalten.",
+        "before": "Buffet per Nachrichten und improvisierten Tabellen koordinieren.",
+        "after": "Reservierungen und Slots zentral für den Vorstand.",
+        "result": "Weniger Stress am Spieltag, mehr Klarheit für das Team."
+      },
+      {
+        "id": "plannings",
+        "label": "Pläne",
+        "description": "Rollen erstellen, Link teilen, Freiwillige sich eintragen lassen.",
+        "before": "Jeden einzeln nach Verfügbarkeit fragen.",
+        "after": "Freiwillige wählen ihre Slots selbst.",
+        "result": "Der Plan füllt sich ohne endlose WhatsApp-Ketten."
+      },
+      {
+        "id": "pv",
+        "label": "Protokolle",
+        "description": "Sitzungsprotokolle schnell schreiben und teilen.",
+        "before": "Protokoll manuell schreiben, formatieren und verteilen.",
+        "after": "Sitzung strukturieren und teilfertiges PDF exportieren.",
+        "result": "Saubere Protokolle in einem Bruchteil der Zeit."
+      },
+      {
+        "id": "qrcodes",
+        "label": "QR-Codes",
+        "description": "Links und QR-Codes für schnelle Anmeldungen erstellen.",
+        "before": "Anmeldungen über Formulare und verstreute Nachrichten sammeln.",
+        "after": "QR-Code erzeugen und mit einem Klick teilen.",
+        "result": "Anmeldungen kommen von allein — ohne Papierkram."
+      },
+      {
+        "id": "communication",
+        "label": "Kommunikation",
+        "description": "Gezielte Kampagnen an Ihre Mitglieder senden.",
+        "before": "E-Mail-Listen kopieren und manuell nachfassen.",
+        "after": "Kampagne erstellen und an die richtige Zielgruppe senden.",
+        "result": "Weniger Zeitverlust, regelmässigere Kommunikation."
+      },
+      {
+        "id": "pagePublique",
+        "label": "Öffentliche Seite",
+        "description": "Ihren Verein online einfach präsentieren.",
+        "before": "Website oder Posts für jedes Update pflegen.",
+        "after": "Eine klare öffentliche Seite: Programm, Buffet, Anmeldungen.",
+        "result": "Professionelle Vereinsvitrine ohne komplexes Web-Management."
+      },
+      {
+        "id": "parametres",
+        "label": "Einstellungen",
+        "description": "Verein und Vorstandszugriffe konfigurieren.",
+        "before": "Alle haben denselben Zugriff… oder niemand die richtigen.",
+        "after": "Passende Rechte für jede Vorstandsrolle vergeben.",
+        "result": "Flüssige Zusammenarbeit ohne alle Rechte zu teilen."
+      }
+    ],
     "cta": "Kostenlos testen",
     "gridCards": [
       {
@@ -386,8 +525,65 @@
       }
     }
   },
+  "whyChoose": {
+    "label": "03 / WARUM OBILLZ",
+    "title": "Warum Obillz wählen?",
+    "description": "Obillz bringt nicht nur alle Funktionen Ihres Vereins auf einer Plattform zusammen.",
+    "secondaryDescription": "Wir haben ein Werkzeug um die reale Arbeitsweise von Sportvereinen herum gebaut — damit Freiwillige ihren Alltag vereinfachen und wertvolle Zeit zurückgewinnen.",
+    "cards": [
+      {
+        "id": "terrain",
+        "badge": "Aus der Praxis",
+        "title": "Von Menschen aus der Praxis.",
+        "paragraphs": [
+          "Obillz wurde nicht in einem Büro erdacht.",
+          "Wir sind in Sportvereinen aufgewachsen und kennen die täglichen Herausforderungen der Freiwilligen von innen.",
+          "Jede Funktion beantwortet einen echten Bedarf aus dem Vereinsalltag."
+        ]
+      },
+      {
+        "id": "automate",
+        "badge": "Zeitersparnis",
+        "title": "Weniger manuelle Aufgaben.",
+        "paragraphs": [
+          "Was früher Stunden dauerte, wird zu einfachen Prozessen in wenigen Minuten.",
+          "Ihr Vorstand verbringt weniger Zeit mit Verwaltung und mehr Zeit mit dem Verein."
+        ]
+      },
+      {
+        "id": "unify",
+        "badge": "Alles-in-einem",
+        "title": "Alles an einem Ort.",
+        "paragraphs": [
+          "Mitglieder, Beiträge, Finanzen, Dokumente, Anlässe, Sponsoren, Planungen und vieles mehr.",
+          "Eine einzige Plattform.",
+          "Kein Jonglieren mehr zwischen Tools."
+        ]
+      },
+      {
+        "id": "simple",
+        "badge": "Sofort klar",
+        "title": "Einfach ab dem ersten Tag.",
+        "paragraphs": [
+          "Eine klare, intuitive Oberfläche — schnell erlernbar.",
+          "Keine komplizierte Schulung.",
+          "Ihr Vorstand kann sofort starten."
+        ]
+      },
+      {
+        "id": "evolve",
+        "badge": "Mitgestaltet",
+        "title": "Eine Plattform, die mit den Vereinen wächst.",
+        "paragraphs": [
+          "Wir tauschen uns regelmäßig mit Vereinen aus, die Obillz nutzen.",
+          "Wenn ein Bedarf häufig zurückkommt, entwickeln wir nach Möglichkeit eine neue Funktion.",
+          "Ihr Feedback fließt direkt in die Weiterentwicklung der Plattform ein."
+        ]
+      }
+    ]
+  },
   "socialProof": {
-    "label": "03 / SIE NUTZEN OBILLZ",
+    "label": "04 / SIE NUTZEN OBILLZ",
     "title": "Vereine nutzen Obillz bereits.",
     "subtitle": "Obillz begleitet bereits Sportvereine bei der Verwaltung von Mitgliedern, Beiträgen, Dokumenten und Organisation.",
     "testimonial": {
