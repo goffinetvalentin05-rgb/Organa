@@ -21,7 +21,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
-import { PageLayout, PageHeader, SectionCard, GlassCard, cn } from "@/components/ui";
+import { PageLayout, PageHeader, SectionCard, cn, dashboardInputClass, dashboardSelectLgClass, dashboardLabelClass, dashboardHintClass, dashboardGlassCardClass } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 import UsersAccessCard from "@/components/billing/UsersAccessCard";
 import { getErrorMessage } from "@/lib/utils/error-message";
@@ -540,15 +540,15 @@ export default function ParametresPage() {
 
   if (loadingSettings || !parametres) {
     return (
-      <div className="mx-auto max-w-4xl">
-        <div className="flex items-center gap-3 text-white/80">
-          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+      <PageLayout maxWidth="5xl">
+        <div className="flex items-center gap-3 text-[#64748B]">
+          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
           <span>{t("dashboard.settings.loadingPage")}</span>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
@@ -557,11 +557,11 @@ export default function ParametresPage() {
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="5xl">
         <PageHeader title={t("dashboard.settings.title")} subtitle={t("dashboard.settings.subtitle")} />
 
         {saved && (
-          <div className="flex items-center gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/95 p-4 text-emerald-900 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-2 rounded-2xl border border-emerald-200/80 bg-emerald-50/95 p-4 text-emerald-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
             <CheckCircle className="h-5 w-5 shrink-0" />
             {t("dashboard.settings.saveSuccess")}
           </div>
@@ -575,6 +575,7 @@ export default function ParametresPage() {
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}
           description={t("dashboard.settings.layout.sectionDescriptions.members")}
+          bodyClassName="space-y-3.5 sm:space-y-4"
         >
           <SettingsAccordion
             title={t("dashboard.settings.layout.accordions.memberFields")}
@@ -583,143 +584,146 @@ export default function ParametresPage() {
             <MemberFieldsSettingsCard embedded />
           </SettingsAccordion>
           <SettingsAccordion title={t("dashboard.settings.layout.accordions.memberCategories")}>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <p className="text-sm leading-relaxed text-[#64748B] sm:text-[0.9375rem]">
               {t("dashboard.settings.layout.memberCategories.body")}
             </p>
           </SettingsAccordion>
         </SectionCard>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-9 sm:space-y-11 lg:space-y-12">
           <SectionCard
             icon={Building2}
             title={t("dashboard.settings.layout.sections.clubInfo")}
             description={t("dashboard.settings.layout.sectionDescriptions.clubInfo")}
+            bodyClassName="space-y-3.5 sm:space-y-4"
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.visualIdentity")}>
-              <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-slate-800">
-                  {t("dashboard.settings.branding.logoLabel")}
-                </label>
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                  <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                    {logoPreview ? (
-                      <Image
-                        src={logoPreview}
-                        alt={t("dashboard.settings.branding.logoAlt")}
-                        width={128}
-                        height={128}
-                        className="object-contain p-2"
-                        unoptimized={logoPreview.includes("supabase.co")}
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-slate-400">
-                        <Building2 className="mb-2 h-12 w-12" />
-                        <span className="text-center text-xs">{t("dashboard.settings.branding.noLogo")}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-3">
-                    <div>
-                      <label
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[var(--obillz-hero-blue)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
-                      >
-                        {uploading ? (
-                          <>
-                            <Loader className="h-4 w-4 animate-spin" />
-                            {t("dashboard.settings.branding.uploading")}
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="h-4 w-4" />
-                            {t("dashboard.settings.branding.upload")}
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg,image/svg+xml"
-                          onChange={handleLogoUpload}
-                          disabled={uploading}
-                          className="hidden"
+              <div className="space-y-6">
+                <div>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
+                    {t("dashboard.settings.branding.logoLabel")}
+                  </label>
+                  <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+                    <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC]">
+                      {logoPreview ? (
+                        <Image
+                          src={logoPreview}
+                          alt={t("dashboard.settings.branding.logoAlt")}
+                          width={128}
+                          height={128}
+                          className="object-contain p-2"
+                          unoptimized={logoPreview.includes("supabase.co")}
                         />
-                      </label>
-                      <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.formats")}</p>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-4 text-[#94A3B8]">
+                          <Building2 className="mb-2 h-12 w-12" />
+                          <span className="text-center text-xs">{t("dashboard.settings.branding.noLogo")}</span>
+                        </div>
+                      )}
                     </div>
-                    {logoPreview ? (
-                      <button
-                        type="button"
-                        onClick={handleLogoDelete}
-                        disabled={deleting}
-                        className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 font-medium text-red-600 transition-all hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {deleting ? (
-                          <>
-                            <Loader className="h-4 w-4 animate-spin" />
-                            {t("dashboard.settings.branding.deleting")}
-                          </>
-                        ) : (
-                          <>
-                            <Trash className="h-4 w-4" />
-                            {t("dashboard.settings.branding.delete")}
-                          </>
-                        )}
-                      </button>
-                    ) : null}
+                    <div className="min-w-0 flex-1 space-y-3">
+                      <div>
+                        <label
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#151dd9] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(26,35,255,0.22)] transition duration-250 hover:opacity-95"
+                        >
+                          {uploading ? (
+                            <>
+                              <Loader className="h-4 w-4 animate-spin" />
+                              {t("dashboard.settings.branding.uploading")}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4" />
+                              {t("dashboard.settings.branding.upload")}
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+                            onChange={handleLogoUpload}
+                            disabled={uploading}
+                            className="hidden"
+                          />
+                        </label>
+                        <p className={dashboardHintClass}>{t("dashboard.settings.branding.formats")}</p>
+                      </div>
+                      {logoPreview ? (
+                        <button
+                          type="button"
+                          onClick={handleLogoDelete}
+                          disabled={deleting}
+                          className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 font-medium text-rose-700 transition-all duration-250 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {deleting ? (
+                            <>
+                              <Loader className="h-4 w-4 animate-spin" />
+                              {t("dashboard.settings.branding.deleting")}
+                            </>
+                          ) : (
+                            <>
+                              <Trash className="h-4 w-4" />
+                              {t("dashboard.settings.branding.delete")}
+                            </>
+                          )}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium text-primary">
-                  {t("dashboard.settings.branding.primaryColorLabel")}
-                </label>
-                <div className="flex flex-wrap items-center gap-4">
-                  <input
-                    type="color"
-                    value={formData.primaryColor ?? "#6D5EF8"}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    className="h-12 w-20 cursor-pointer rounded-lg border border-subtle-hover bg-surface"
-                  />
-                  <input
-                    type="text"
-                    value={formData.primaryColor ?? "#6D5EF8"}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^#[0-9A-Fa-f]{0,6}$/.test(value) || value === "") {
-                        setFormData({ ...formData, primaryColor: value || "#6D5EF8" });
-                      }
-                    }}
-                    placeholder="#6D5EF8"
-                    className="min-w-[8rem] flex-1 rounded-lg border border-subtle-hover bg-surface px-4 py-2 font-mono text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                  />
+                <div>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
+                    {t("dashboard.settings.branding.primaryColorLabel")}
+                  </label>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <input
+                      type="color"
+                      value={formData.primaryColor ?? "#6D5EF8"}
+                      onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                      className="h-12 w-20 cursor-pointer rounded-xl border border-[rgba(15,23,42,0.12)] bg-white"
+                    />
+                    <input
+                      type="text"
+                      value={formData.primaryColor ?? "#6D5EF8"}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^#[0-9A-Fa-f]{0,6}$/.test(value) || value === "") {
+                          setFormData({ ...formData, primaryColor: value || "#6D5EF8" });
+                        }
+                      }}
+                      placeholder="#6D5EF8"
+                      className={cn(dashboardInputClass, "min-w-[8rem] flex-1 font-mono")}
+                    />
+                  </div>
+                  <p className={dashboardHintClass}>{t("dashboard.settings.branding.primaryColorHelp")}</p>
                 </div>
-                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.primaryColorHelp")}</p>
-              </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium text-primary">
-                  {t("dashboard.settings.branding.currencyLabel")}
-                </label>
-                <select
-                  value={formData.currency ?? "CHF"}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                  className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
-                >
-                  <option value="CHF">{t("dashboard.settings.branding.currencies.CHF")}</option>
-                  <option value="EUR">{t("dashboard.settings.branding.currencies.EUR")}</option>
-                  <option value="USD">{t("dashboard.settings.branding.currencies.USD")}</option>
-                  <option value="GBP">{t("dashboard.settings.branding.currencies.GBP")}</option>
-                  <option value="CAD">{t("dashboard.settings.branding.currencies.CAD")}</option>
-                  <option value="AUD">{t("dashboard.settings.branding.currencies.AUD")}</option>
-                  <option value="JPY">{t("dashboard.settings.branding.currencies.JPY")}</option>
-                </select>
-                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.currencyHelp")}</p>
+                <div>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
+                    {t("dashboard.settings.branding.currencyLabel")}
+                  </label>
+                  <select
+                    value={formData.currency ?? "CHF"}
+                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                    className={dashboardSelectLgClass}
+                  >
+                    <option value="CHF">{t("dashboard.settings.branding.currencies.CHF")}</option>
+                    <option value="EUR">{t("dashboard.settings.branding.currencies.EUR")}</option>
+                    <option value="USD">{t("dashboard.settings.branding.currencies.USD")}</option>
+                    <option value="GBP">{t("dashboard.settings.branding.currencies.GBP")}</option>
+                    <option value="CAD">{t("dashboard.settings.branding.currencies.CAD")}</option>
+                    <option value="AUD">{t("dashboard.settings.branding.currencies.AUD")}</option>
+                    <option value="JPY">{t("dashboard.settings.branding.currencies.JPY")}</option>
+                  </select>
+                  <p className={dashboardHintClass}>{t("dashboard.settings.branding.currencyHelp")}</p>
+                </div>
               </div>
             </SettingsAccordion>
 
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.contactDetails")}>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-primary">
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.settings.companyInfo.nameLabel")}
                   </label>
                   <input
@@ -727,12 +731,12 @@ export default function ParametresPage() {
                     required
                     value={formData.nomEntreprise ?? ""}
                     onChange={(e) => setFormData({ ...formData, nomEntreprise: e.target.value })}
-                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    className={dashboardInputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-primary">
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.settings.companyInfo.addressLabel")}
                   </label>
                   <textarea
@@ -740,13 +744,13 @@ export default function ParametresPage() {
                     value={formData.adresse ?? ""}
                     onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
                     rows={3}
-                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    className={dashboardInputClass}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-primary">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
                       {t("dashboard.settings.companyInfo.emailLabel")}
                     </label>
                     <input
@@ -754,12 +758,12 @@ export default function ParametresPage() {
                       required
                       value={formData.email ?? ""}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                      className={dashboardInputClass}
                     />
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-primary">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
                       {t("dashboard.settings.companyInfo.phoneLabel")}
                     </label>
                     <input
@@ -767,7 +771,7 @@ export default function ParametresPage() {
                       required
                       value={formData.telephone ?? ""}
                       onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
-                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                      className={dashboardInputClass}
                     />
                   </div>
                 </div>
@@ -779,6 +783,7 @@ export default function ParametresPage() {
             icon={Wallet}
             title={t("dashboard.settings.layout.sections.finances")}
             description={t("dashboard.settings.layout.sectionDescriptions.finances")}
+            bodyClassName="space-y-3.5 sm:space-y-4"
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.subscription")}>
               {loadingPlan ? (
@@ -895,7 +900,7 @@ export default function ParametresPage() {
               <p className="mb-4 text-sm text-slate-500">{t("dashboard.settings.billing.subtitle")}</p>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-primary">
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.settings.billing.ibanLabel")}
                   </label>
                   <input
@@ -903,12 +908,12 @@ export default function ParametresPage() {
                     value={formData.iban ?? ""}
                     onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
                     placeholder={t("dashboard.settings.billing.ibanPlaceholder")}
-                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    className={dashboardInputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-primary">
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.settings.billing.bankNameLabel")}
                   </label>
                   <input
@@ -916,12 +921,12 @@ export default function ParametresPage() {
                     value={formData.bankName ?? ""}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                     placeholder={t("dashboard.settings.billing.bankNamePlaceholder")}
-                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    className={dashboardInputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-primary">
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
                     {t("dashboard.settings.billing.paymentTermsLabel")}
                   </label>
                   <textarea
@@ -929,9 +934,9 @@ export default function ParametresPage() {
                     onChange={(e) => setFormData({ ...formData, conditionsPaiement: e.target.value })}
                     placeholder={t("dashboard.settings.billing.paymentTermsPlaceholder")}
                     rows={3}
-                    className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                    className={dashboardInputClass}
                   />
-                  <p className="mt-1 text-xs text-tertiary">{t("dashboard.settings.billing.paymentTermsHelp")}</p>
+                  <p className={dashboardHintClass}>{t("dashboard.settings.billing.paymentTermsHelp")}</p>
                 </div>
               </div>
             </SettingsAccordion>
@@ -941,6 +946,7 @@ export default function ParametresPage() {
             icon={Shield}
             title={t("dashboard.settings.layout.sections.security")}
             description={t("dashboard.settings.layout.sectionDescriptions.security")}
+            bodyClassName="space-y-3.5 sm:space-y-4"
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.email")}>
               <p className="mb-4 text-sm text-slate-600">{t("dashboard.settings.email.introDefault")}</p>
@@ -987,7 +993,7 @@ export default function ParametresPage() {
                     {t("dashboard.settings.email.resendDomainHelp")}
                   </p>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-primary">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
                       {t("dashboard.settings.email.customSenderLabel")}
                     </label>
                     <input
@@ -995,11 +1001,11 @@ export default function ParametresPage() {
                       value={formData.emailExpediteur ?? ""}
                       onChange={(e) => setFormData({ ...formData, emailExpediteur: e.target.value })}
                       placeholder={t("dashboard.settings.email.senderEmailPlaceholder")}
-                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                      className={dashboardInputClass}
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-primary">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
                       {t("dashboard.settings.email.apiKeyLabel")}
                     </label>
                     <input
@@ -1018,9 +1024,9 @@ export default function ParametresPage() {
                           : t("dashboard.settings.email.apiKeyPlaceholder")
                       }
                       autoComplete="off"
-                      className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                      className={dashboardInputClass}
                     />
-                    <p className="mt-1 text-xs text-tertiary">
+                    <p className={dashboardHintClass}>
                       {t("dashboard.settings.email.apiKeyHelpBefore")}{" "}
                       <a
                         href="https://resend.com/api-keys"
@@ -1042,10 +1048,11 @@ export default function ParametresPage() {
             icon={Settings}
             title={t("dashboard.settings.layout.sections.advanced")}
             description={t("dashboard.settings.layout.sectionDescriptions.advanced")}
+            bodyClassName="space-y-3.5 sm:space-y-4"
           >
             <SettingsAccordion title={t("dashboard.settings.layout.accordions.pdfHeader")}>
               <div>
-                <label className="mb-2 block text-sm font-medium text-primary">
+                <label className={`mb-2 block ${dashboardLabelClass}`}>
                   {t("dashboard.settings.branding.headerStyleLabel")}
                 </label>
                 <select
@@ -1056,23 +1063,24 @@ export default function ParametresPage() {
                       styleEnTete: e.target.value as "simple" | "moderne" | "classique",
                     })
                   }
-                  className="w-full rounded-lg border border-subtle-hover bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                  className={dashboardSelectLgClass}
                 >
                   <option value="simple">{t("dashboard.settings.branding.headerStyles.simple")}</option>
                   <option value="moderne">{t("dashboard.settings.branding.headerStyles.moderne")}</option>
                   <option value="classique">{t("dashboard.settings.branding.headerStyles.classique")}</option>
                 </select>
-                <p className="mt-2 text-xs text-tertiary">{t("dashboard.settings.branding.headerStyleHelp")}</p>
+                <p className={dashboardHintClass}>{t("dashboard.settings.branding.headerStyleHelp")}</p>
               </div>
             </SettingsAccordion>
           </SectionCard>
 
           <div
             className={cn(
-              "flex flex-col gap-3 rounded-[24px] border border-white/40 bg-gradient-to-br from-white/95 via-sky-50/80 to-indigo-200/45 px-4 py-4 shadow-xl shadow-blue-950/10 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"
+              dashboardGlassCardClass,
+              "flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6"
             )}
           >
-            <p className="text-sm text-slate-600">{t("dashboard.settings.layout.saveBarHint")}</p>
+            <p className="text-sm leading-relaxed text-[#64748B]">{t("dashboard.settings.layout.saveBarHint")}</p>
             <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
               {t("dashboard.settings.saveButton")}
             </DashboardPrimaryButton>

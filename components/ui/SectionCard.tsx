@@ -6,7 +6,6 @@ import {
   unifiedSectionShellClass,
   unifiedSectionHeaderClass,
   unifiedSectionBodyClass,
-  dashboardIconBadgeSubtleClass,
   dashboardCardTitleClass,
   dashboardCardDescriptionClass,
 } from "./styles";
@@ -36,19 +35,33 @@ export default function SectionCard({
   bodyClassName,
 }: SectionCardProps) {
   return (
-    <section className={cn(unifiedSectionShellClass, "flex flex-col", className)}>
-      <header className={cn(unifiedSectionHeaderClass, "relative px-5 py-4 sm:px-6 sm:py-5")}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div className="flex min-w-0 items-center gap-3.5">
+    <section
+      className={cn(
+        unifiedSectionShellClass,
+        "flex flex-col transition-[box-shadow,border-color,transform] duration-300 ease-out",
+        "hover:border-[rgba(26,35,255,0.12)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.06),0_12px_32px_rgba(15,23,42,0.04)]",
+        className,
+      )}
+    >
+      <header className={cn(unifiedSectionHeaderClass, "relative px-5 py-5 sm:px-6 sm:py-6")}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+          <div className="flex min-w-0 items-start gap-4 sm:items-center">
             {Icon ? (
-              <div className={cn(dashboardIconBadgeSubtleClass, "h-10 w-10 rounded-xl")}>
-                <Icon className="h-4.5 w-4.5 h-[18px] w-[18px]" />
-              </div>
+              <span
+                className="dashboard-stat-icon dashboard-section-icon shrink-0"
+                style={{
+                  background: "linear-gradient(135deg, #4F57FF 0%, #1A23FF 50%, #151dd9 100%)",
+                }}
+              >
+                <Icon className="h-5 w-5" aria-hidden />
+              </span>
             ) : null}
             <div className="min-w-0">
               <h2 className={dashboardCardTitleClass}>{title}</h2>
               {description ? (
-                <p className={dashboardCardDescriptionClass}>{description}</p>
+                <p className={cn(dashboardCardDescriptionClass, "mt-1.5 max-w-2xl text-[0.9375rem] leading-relaxed")}>
+                  {description}
+                </p>
               ) : null}
             </div>
           </div>
@@ -65,7 +78,7 @@ export default function SectionCard({
       </div>
 
       {footer ? (
-        <footer className="relative border-t border-[rgba(15,23,42,0.06)] px-5 py-3 sm:px-6 sm:py-3.5">
+        <footer className="relative border-t border-[rgba(15,23,42,0.06)] px-5 py-3.5 sm:px-6 sm:py-4">
           {footer}
         </footer>
       ) : null}

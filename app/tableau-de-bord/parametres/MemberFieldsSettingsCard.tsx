@@ -140,7 +140,9 @@ export default function MemberFieldsSettingsCard({
           </p>
         </div>
       ) : (
-        <p className={dashboardHintClass}>{t("dashboard.settings.memberFields.subtitle")}</p>
+        <p className="text-sm leading-relaxed text-[#64748B]">
+          {t("dashboard.settings.memberFields.subtitle")}
+        </p>
       )}
 
       {loading ? (
@@ -160,9 +162,9 @@ export default function MemberFieldsSettingsCard({
                       onChange={(e) => toggle(key, e.target.checked)}
                     />
                     <span>
-                      <span className="block font-medium text-white/90">{t(labelKey(key))}</span>
+                      <span className="block font-medium text-[#0F172A]">{t(labelKey(key))}</span>
                       {key === "avs_number" && (
-                        <span className="mt-1 block rounded-lg border border-amber-400/30 bg-amber-500/12 px-2 py-1.5 text-xs text-amber-200">
+                        <span className="mt-1.5 block rounded-xl border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs leading-relaxed text-amber-800">
                           {t("dashboard.settings.memberFields.avsWarning")}
                         </span>
                       )}
@@ -177,13 +179,13 @@ export default function MemberFieldsSettingsCard({
             <p className={dashboardHintClass}>{t("dashboard.settings.memberFields.readOnlyHint")}</p>
           )}
 
-          <div className="pt-2">
+          <div className="pt-1">
             <DashboardPrimaryButton
               type="button"
               onClick={handleSave}
               disabled={saving || !canSave}
               icon="none"
-              className="w-full sm:w-auto justify-center"
+              className="w-full justify-center sm:w-auto"
             >
               {saving
                 ? t("dashboard.common.saving")
