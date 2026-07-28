@@ -2078,6 +2078,12 @@
     "marketing": {
       "loading": "Loading...",
       "loadError": "Loading error",
+      "subtitle": "Create and send email campaigns to your contacts in a few clicks.",
+      "stats": {
+        "contacts": "Contacts",
+        "campaignsSent": "Campaigns sent",
+        "openRate": "Open rate"
+      },
       "tabs": {
         "contacts": "Contacts",
         "campaigns": "Campaigns"
@@ -2094,7 +2100,9 @@
           "source": "Source",
           "actions": "Actions"
         },
-        "empty": "No contacts yet.",
+        "empty": "You don't have any contacts yet.",
+        "emptyDescription": "Add your first contact to start sending campaigns.",
+        "unsubscribed": "Unsubscribed",
         "edit": "Edit",
         "delete": "Delete",
         "deleteConfirm": "Delete this contact?",
@@ -2114,7 +2122,15 @@
         "send": "Send campaign",
         "sending": "Sending...",
         "empty": "No campaigns yet.",
-        "historyTitle": "Campaign history"
+        "emptyDescription": "Create your first campaign above to reach your contacts.",
+        "historyTitle": "Campaign history",
+        "recipients": "recipients",
+        "status": {
+          "sent": "Sent",
+          "sending": "Sending",
+          "failed": "Failed",
+          "draft": "Draft"
+        }
       }
     },
     "events": {

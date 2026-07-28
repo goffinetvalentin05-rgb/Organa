@@ -1929,6 +1929,12 @@
     "marketing": {
       "loading": "Chargement...",
       "loadError": "Erreur de chargement",
+      "subtitle": "Créez et envoyez des campagnes e-mail à vos contacts en quelques clics.",
+      "stats": {
+        "contacts": "Contacts",
+        "campaignsSent": "Campagnes envoyées",
+        "openRate": "Taux d'ouverture"
+      },
       "tabs": {
         "contacts": "Contacts",
         "campaigns": "Campagnes"
@@ -1945,7 +1951,9 @@
           "source": "Source",
           "actions": "Actions"
         },
-        "empty": "Aucun contact pour le moment.",
+        "empty": "Vous n'avez encore aucun contact.",
+        "emptyDescription": "Ajoutez votre premier contact pour commencer à envoyer des campagnes.",
+        "unsubscribed": "Désabonné",
         "edit": "Modifier",
         "delete": "Supprimer",
         "deleteConfirm": "Supprimer ce contact ?",
@@ -1965,7 +1973,15 @@
         "send": "Envoyer la campagne",
         "sending": "Envoi...",
         "empty": "Aucune campagne pour le moment.",
-        "historyTitle": "Historique des campagnes"
+        "emptyDescription": "Créez votre première campagne ci-dessus pour toucher vos contacts.",
+        "historyTitle": "Historique des campagnes",
+        "recipients": "destinataires",
+        "status": {
+          "sent": "Envoyée",
+          "sending": "En cours",
+          "failed": "Échec",
+          "draft": "Brouillon"
+        }
       }
     },
     "events": {

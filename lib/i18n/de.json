@@ -1948,6 +1948,12 @@
     "marketing": {
       "loading": "Wird geladen...",
       "loadError": "Ladefehler",
+      "subtitle": "Erstellen und versenden Sie E-Mail-Kampagnen an Ihre Kontakte in wenigen Klicks.",
+      "stats": {
+        "contacts": "Kontakte",
+        "campaignsSent": "Gesendete Kampagnen",
+        "openRate": "Öffnungsrate"
+      },
       "tabs": {
         "contacts": "Kontakte",
         "campaigns": "Kampagnen"
@@ -1964,7 +1970,9 @@
           "source": "Quelle",
           "actions": "Aktionen"
         },
-        "empty": "Noch keine Kontakte.",
+        "empty": "Sie haben noch keine Kontakte.",
+        "emptyDescription": "Fügen Sie Ihren ersten Kontakt hinzu, um Kampagnen zu senden.",
+        "unsubscribed": "Abgemeldet",
         "edit": "Bearbeiten",
         "delete": "Löschen",
         "deleteConfirm": "Diesen Kontakt löschen?",
@@ -1984,7 +1992,15 @@
         "send": "Kampagne senden",
         "sending": "Wird gesendet...",
         "empty": "Noch keine Kampagnen.",
-        "historyTitle": "Kampagnenverlauf"
+        "emptyDescription": "Erstellen Sie oben Ihre erste Kampagne, um Ihre Kontakte zu erreichen.",
+        "historyTitle": "Kampagnenverlauf",
+        "recipients": "Empfänger",
+        "status": {
+          "sent": "Gesendet",
+          "sending": "Wird gesendet",
+          "failed": "Fehlgeschlagen",
+          "draft": "Entwurf"
+        }
       }
     },
     "abonnementPage": {

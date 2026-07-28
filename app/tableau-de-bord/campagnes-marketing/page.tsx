@@ -3,7 +3,27 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
-import { PageLayout, PageHeader, GlassCard, TableCard } from "@/components/ui";
+import { Edit, Trash, Mail, Users, CheckCircle } from "@/lib/icons";
+import {
+  PageLayout,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+  StatCard,
+  ActionButton,
+  EntityCard,
+  EntityCardList,
+  EntityAvatar,
+  EntityMetaRow,
+  DashboardBadge,
+  cn,
+  dashboardGlassCardClass,
+  dashboardInputClass,
+  dashboardSelectLgClass,
+  dashboardLabelClass,
+  dashboardModalClass,
+  dashboardCheckboxClass,
+} from "@/components/ui";
 
 type MarketingContact = {
   id: string;
@@ -33,6 +53,11 @@ const formatDate = (value: string | null) => {
   if (Number.isNaN(date.getTime())) return "-";
   return date.toLocaleString("fr-CH");
 };
+
+function contactDisplayName(contact: MarketingContact) {
+  const full = [contact.first_name, contact.last_name].filter(Boolean).join(" ").trim();
+  return full || contact.email;
+}
 
 export default function MarketingCampaignsPage() {
   const { t } = useI18n();
@@ -65,6 +90,10 @@ export default function MarketingCampaignsPage() {
   });
 
   const activeContacts = useMemo(() => contacts.filter((contact) => !contact.unsubscribed), [contacts]);
+  const campaignsSent = useMemo(
+    () => campaigns.filter((c) => c.status === "sent").length,
+    [campaigns],
+  );
 
   const refreshContacts = useCallback(async () => {
     const params = new URLSearchParams();
@@ -119,7 +148,7 @@ export default function MarketingCampaignsPage() {
   }, [loading, refreshContacts]);
 
   const handleDeleteContact = async (id: string) => {
-    if (!confirm("Supprimer ce contact ?")) return;
+    if (!confirm(t("dashboard.marketing.contacts.deleteConfirm"))) return;
 
     try {
       const res = await fetch(`/api/marketing/contacts/${id}`, { method: "DELETE" });
@@ -257,381 +286,513 @@ export default function MarketingCampaignsPage() {
     }
   };
 
+  const campaignStatusBadge = (status: MarketingCampaign["status"]) => {
+    const variant =
+      status === "sent"
+        ? "success"
+        : status === "sending"
+          ? "info"
+          : status === "failed"
+            ? "danger"
+            : "neutral";
+    return (
+      <DashboardBadge variant={variant}>
+        {t(`dashboard.marketing.campaigns.status.${status}`)}
+      </DashboardBadge>
+    );
+  };
+
   if (loading) {
     return (
-      <PageLayout maxWidth="6xl" stack="none" className="py-10 text-center text-white/70">
-        {t("dashboard.marketing.loading")}
+      <PageLayout maxWidth="7xl">
+        <div className="flex items-center justify-center py-20 text-[#64748B]">
+          {t("dashboard.marketing.loading")}
+        </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout maxWidth="6xl">
-      <PageHeader title={t("dashboard.pageTitles.marketing")} />
+    <PageLayout maxWidth="7xl">
+      <PageHeader
+        title={t("dashboard.pageTitles.marketing")}
+        subtitle={t("dashboard.marketing.subtitle")}
+      />
 
-      <GlassCard padding="sm" className="inline-flex w-fit max-w-full flex-wrap gap-2">
-        <button
-          type="button"
-          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-            activeTab === "contacts"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
-          }`}
-          onClick={() => setActiveTab("contacts")}
-        >
-          {t("dashboard.marketing.tabs.contacts")}
-        </button>
-        <button
-          type="button"
-          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-            activeTab === "campaigns"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
-          }`}
-          onClick={() => setActiveTab("campaigns")}
-        >
-          {t("dashboard.marketing.tabs.campaigns")}
-        </button>
-      </GlassCard>
+      <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
+        <StatCard
+          label={t("dashboard.marketing.stats.contacts")}
+          value={contacts.length}
+          icon={Users}
+          accent="electric"
+        />
+        <StatCard
+          label={t("dashboard.marketing.stats.campaignsSent")}
+          value={campaignsSent}
+          icon={Mail}
+          accent="royal"
+        />
+        <StatCard
+          label={t("dashboard.marketing.stats.openRate")}
+          value="—"
+          icon={CheckCircle}
+          accent="cyan"
+        />
+      </div>
+
+      <div
+        className={cn(
+          "inline-flex w-full max-w-md rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-1.5",
+          "shadow-[0_1px_2px_rgba(15,23,42,0.03)]",
+        )}
+        role="tablist"
+        aria-label={t("dashboard.pageTitles.marketing")}
+      >
+        {(
+          [
+            ["contacts", t("dashboard.marketing.tabs.contacts")],
+            ["campaigns", t("dashboard.marketing.tabs.campaigns")],
+          ] as const
+        ).map(([key, label]) => {
+          const active = activeTab === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setActiveTab(key)}
+              className={cn(
+                "flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-250",
+                active
+                  ? "bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#151dd9] text-white shadow-[0_4px_14px_rgba(26,35,255,0.28)]"
+                  : "text-[#64748B] hover:bg-white hover:text-[#0F172A]",
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
 
       {activeTab === "contacts" ? (
-        <GlassCard padding="lg" className="space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
-              <input
-                type="text"
-                value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
-                placeholder={t("dashboard.marketing.contacts.searchPlaceholder")}
-                className="rounded-lg border px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-              />
-              <select
-                value={sourceFilter}
-                onChange={(e) => setSourceFilter(e.target.value)}
-                className="rounded-lg border px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-              >
-                <option value="">{t("dashboard.marketing.contacts.allSources")}</option>
-                {sources.map((source) => (
-                  <option key={source} value={source}>
-                    {source}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <DashboardPrimaryButton type="button" onClick={openCreateContactModal} className="whitespace-nowrap">
+        <div className="space-y-5 sm:space-y-6">
+          <div
+            className={cn(
+              dashboardGlassCardClass,
+              "flex flex-col gap-3 p-4 transition-shadow duration-250 sm:flex-row sm:items-center sm:gap-4 sm:p-5",
+            )}
+          >
+            <input
+              type="text"
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              placeholder={t("dashboard.marketing.contacts.searchPlaceholder")}
+              className={cn(dashboardInputClass, "sm:flex-1")}
+            />
+            <select
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value)}
+              className={cn(dashboardSelectLgClass, "sm:w-56")}
+            >
+              <option value="">{t("dashboard.marketing.contacts.allSources")}</option>
+              {sources.map((source) => (
+                <option key={source} value={source}>
+                  {source}
+                </option>
+              ))}
+            </select>
+            <DashboardPrimaryButton
+              type="button"
+              onClick={openCreateContactModal}
+              className="w-full justify-center whitespace-nowrap sm:w-auto"
+            >
               {t("dashboard.marketing.contacts.addContact")}
             </DashboardPrimaryButton>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                  <th className="py-3 pr-4">Nom</th>
-                  <th className="py-3 pr-4">Prénom</th>
-                  <th className="py-3 pr-4">Email</th>
-                  <th className="py-3 pr-4">Téléphone</th>
-                  <th className="py-3 pr-4">Source</th>
-                  <th className="py-3 pr-0">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {contacts.length === 0 ? (
-                  <tr>
-                    <td className="py-6 text-slate-500" colSpan={6}>
-                      {t("dashboard.marketing.contacts.empty")}
-                    </td>
-                  </tr>
-                ) : (
-                  contacts.map((contact) => (
-                    <tr key={contact.id} className="border-b border-slate-100">
-                      <td className="py-3 pr-4">{contact.last_name || "-"}</td>
-                      <td className="py-3 pr-4">{contact.first_name || "-"}</td>
-                      <td className="py-3 pr-4">{contact.email}</td>
-                      <td className="py-3 pr-4">{contact.phone || "-"}</td>
-                      <td className="py-3 pr-4">{contact.source}</td>
-                      <td className="py-3 pr-0">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <button
-                            type="button"
-                            className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-[var(--obillz-hero-blue)]"
-                            onClick={() => openEditContactModal(contact)}
-                          >
-                            Modifier
-                          </button>
-                          <button
-                            type="button"
-                            className="text-sm font-medium text-red-700 hover:text-red-800"
-                            onClick={() => handleDeleteContact(contact.id)}
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </GlassCard>
+          {contacts.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title={t("dashboard.marketing.contacts.empty")}
+              description={t("dashboard.marketing.contacts.emptyDescription")}
+              action={
+                <DashboardPrimaryButton type="button" onClick={openCreateContactModal}>
+                  {t("dashboard.marketing.contacts.addContact")}
+                </DashboardPrimaryButton>
+              }
+            />
+          ) : (
+            <EntityCardList>
+              {contacts.map((contact) => {
+                const displayName = contactDisplayName(contact);
+                return (
+                  <EntityCard
+                    key={contact.id}
+                    layout="row"
+                    leading={<EntityAvatar label={displayName} size="sm" />}
+                    title={displayName}
+                    subtitle={contact.email}
+                    badges={
+                      <>
+                        {contact.source ? (
+                          <DashboardBadge variant="info">{contact.source}</DashboardBadge>
+                        ) : null}
+                        {contact.unsubscribed ? (
+                          <DashboardBadge variant="warning">
+                            {t("dashboard.marketing.contacts.unsubscribed")}
+                          </DashboardBadge>
+                        ) : null}
+                      </>
+                    }
+                    meta={
+                      <>
+                        <EntityMetaRow
+                          inline
+                          label={t("dashboard.marketing.contacts.columns.phone")}
+                          value={contact.phone || "—"}
+                        />
+                        {contact.first_name || contact.last_name ? (
+                          <EntityMetaRow
+                            inline
+                            label={t("dashboard.marketing.contacts.columns.email")}
+                            value={contact.email}
+                          />
+                        ) : null}
+                      </>
+                    }
+                    actions={
+                      <>
+                        <ActionButton
+                          type="button"
+                          onClick={() => openEditContactModal(contact)}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          {t("dashboard.marketing.contacts.edit")}
+                        </ActionButton>
+                        <ActionButton
+                          type="button"
+                          variant="dangerSoft"
+                          onClick={() => void handleDeleteContact(contact.id)}
+                          className="inline-flex items-center gap-2"
+                        >
+                          <Trash className="h-4 w-4" />
+                          {t("dashboard.marketing.contacts.delete")}
+                        </ActionButton>
+                      </>
+                    }
+                  />
+                );
+              })}
+            </EntityCardList>
+          )}
+        </div>
       ) : null}
 
       {contactModalOpen ? (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={closeContactModal} />
-          <GlassCard className="relative z-[1] w-full max-w-lg shadow-2xl shadow-blue-900/10" padding="lg">
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">
-              {editingContactId ? t("dashboard.marketing.contacts.modalEditTitle") : t("dashboard.marketing.contacts.modalAddTitle")}
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-250"
+            onClick={closeContactModal}
+          />
+          <div className={cn(dashboardModalClass, "relative z-[1] w-full max-w-lg p-6 sm:p-7")}>
+            <h3 className="mb-5 text-lg font-semibold tracking-tight text-[#0F172A]">
+              {editingContactId
+                ? t("dashboard.marketing.contacts.modalEditTitle")
+                : t("dashboard.marketing.contacts.modalAddTitle")}
             </h3>
 
-            <form onSubmit={handleSaveContact} className="space-y-3">
-              <input
-                type="text"
-                value={contactForm.lastName}
-                onChange={(e) => setContactForm((prev) => ({ ...prev, lastName: e.target.value }))}
-                placeholder="Nom *"
-                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                required
-              />
-              <input
-                type="text"
-                value={contactForm.firstName}
-                onChange={(e) => setContactForm((prev) => ({ ...prev, firstName: e.target.value }))}
-                placeholder="Prénom *"
-                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                required
-              />
-              <input
-                type="email"
-                value={contactForm.email}
-                onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
-                placeholder="Email *"
-                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                required
-              />
-              <input
-                type="text"
-                value={contactForm.phone}
-                onChange={(e) => setContactForm((prev) => ({ ...prev, phone: e.target.value }))}
-                placeholder="Téléphone"
-                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-              />
-              <input
-                type="text"
-                value={contactForm.source}
-                onChange={(e) => setContactForm((prev) => ({ ...prev, source: e.target.value }))}
-                placeholder="Source"
-                className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-              />
+            <form onSubmit={handleSaveContact} className="space-y-4">
+              <div>
+                <label className={dashboardLabelClass}>
+                  {t("dashboard.marketing.contacts.columns.lastName")} *
+                </label>
+                <input
+                  type="text"
+                  value={contactForm.lastName}
+                  onChange={(e) => setContactForm((prev) => ({ ...prev, lastName: e.target.value }))}
+                  className={dashboardInputClass}
+                  required
+                />
+              </div>
+              <div>
+                <label className={dashboardLabelClass}>
+                  {t("dashboard.marketing.contacts.columns.firstName")} *
+                </label>
+                <input
+                  type="text"
+                  value={contactForm.firstName}
+                  onChange={(e) => setContactForm((prev) => ({ ...prev, firstName: e.target.value }))}
+                  className={dashboardInputClass}
+                  required
+                />
+              </div>
+              <div>
+                <label className={dashboardLabelClass}>
+                  {t("dashboard.marketing.contacts.columns.email")} *
+                </label>
+                <input
+                  type="email"
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
+                  className={dashboardInputClass}
+                  required
+                />
+              </div>
+              <div>
+                <label className={dashboardLabelClass}>
+                  {t("dashboard.marketing.contacts.columns.phone")}
+                </label>
+                <input
+                  type="text"
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm((prev) => ({ ...prev, phone: e.target.value }))}
+                  className={dashboardInputClass}
+                />
+              </div>
+              <div>
+                <label className={dashboardLabelClass}>
+                  {t("dashboard.marketing.contacts.columns.source")}
+                </label>
+                <input
+                  type="text"
+                  value={contactForm.source}
+                  onChange={(e) => setContactForm((prev) => ({ ...prev, source: e.target.value }))}
+                  className={dashboardInputClass}
+                />
+              </div>
 
               <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={closeContactModal}
-                  className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
+                <ActionButton type="button" onClick={closeContactModal}>
+                  {t("dashboard.marketing.contacts.cancel")}
+                </ActionButton>
+                <DashboardPrimaryButton
+                  type="submit"
+                  icon="none"
+                  disabled={savingContact}
+                  className="justify-center"
                 >
-                  Annuler
-                </button>
-                <DashboardPrimaryButton type="submit" icon="none" disabled={savingContact} className="justify-center">
-                  {savingContact ? "Enregistrement..." : "Enregistrer"}
+                  {savingContact
+                    ? t("dashboard.common.saving")
+                    : t("dashboard.marketing.contacts.save")}
                 </DashboardPrimaryButton>
               </div>
             </form>
-          </GlassCard>
+          </div>
         </div>
       ) : null}
 
       {activeTab === "campaigns" ? (
-        <section className="space-y-6">
-          <GlassCard padding="lg">
-            <form onSubmit={handleSendCampaign} className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">{t("dashboard.marketing.campaigns.createTitle")}</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nom interne de la campagne"
-                className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                required
-              />
-              <input
-                type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Objet de l'email"
-                className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-700">Contenu (éditeur simple riche)</p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm"
-                  onClick={() => applyEditorCommand("bold")}
-                >
-                  Gras
-                </button>
-                <button
-                  type="button"
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm"
-                  onClick={() => applyEditorCommand("italic")}
-                >
-                  Italique
-                </button>
-                <button
-                  type="button"
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 text-sm"
-                  onClick={() => applyEditorCommand("insertUnorderedList")}
-                >
-                  Liste
-                </button>
-              </div>
-              <div
-                ref={editorRef}
-                contentEditable
-                suppressContentEditableWarning
-                className="min-h-40 rounded-lg border border-slate-300 p-3 focus:outline-none"
-                onInput={(e) => setContentHtml(e.currentTarget.innerHTML)}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-slate-700">Envoyer à</p>
-              <div className="flex flex-wrap gap-4 text-sm text-slate-800">
-                <label className="inline-flex items-center gap-2">
+        <div className="space-y-6 sm:space-y-8">
+          <SectionCard
+            icon={Mail}
+            title={t("dashboard.marketing.campaigns.createTitle")}
+            description={t("dashboard.marketing.subtitle")}
+          >
+            <form onSubmit={handleSendCampaign} className="space-y-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className={dashboardLabelClass}>
+                    {t("dashboard.marketing.campaigns.nameLabel")}
+                  </label>
                   <input
-                    type="radio"
-                    checked={audienceMode === "all"}
-                    onChange={() => setAudienceMode("all")}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={dashboardInputClass}
+                    required
                   />
-                  Tous les contacts
-                </label>
-                <label className="inline-flex items-center gap-2">
-                  <input
-                    type="radio"
-                    checked={audienceMode === "source"}
-                    onChange={() => setAudienceMode("source")}
-                  />
-                  Filtrer par source
-                </label>
-                <label className="inline-flex items-center gap-2">
-                  <input
-                    type="radio"
-                    checked={audienceMode === "manual"}
-                    onChange={() => setAudienceMode("manual")}
-                  />
-                  Sélection manuelle
-                </label>
-              </div>
-
-              {audienceMode === "source" && (
-                <select
-                  value={audienceSource}
-                  onChange={(e) => setAudienceSource(e.target.value)}
-                  className="rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--obillz-hero-blue)]/30"
-                  required
-                >
-                  <option value="">Choisir une source</option>
-                  {sources.map((source) => (
-                    <option key={source} value={source}>
-                      {source}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {audienceMode === "manual" && (
-                <div className="max-h-48 overflow-auto rounded-lg border border-slate-200 p-3 space-y-2">
-                  {activeContacts.length === 0 ? (
-                    <p className="text-sm text-slate-500">Aucun contact actif.</p>
-                  ) : (
-                    activeContacts.map((contact) => (
-                      <label key={contact.id} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={selectedContactIds.includes(contact.id)}
-                          onChange={() => toggleManualContact(contact.id)}
-                        />
-                        <span>
-                          {contact.email} ({contact.first_name || "-"} {contact.last_name || "-"})
-                        </span>
-                      </label>
-                    ))
-                  )}
                 </div>
-              )}
-            </div>
+                <div>
+                  <label className={dashboardLabelClass}>
+                    {t("dashboard.marketing.campaigns.subjectLabel")}
+                  </label>
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    className={dashboardInputClass}
+                    required
+                  />
+                </div>
+              </div>
 
-            <DashboardPrimaryButton type="submit" icon="none" disabled={sending} className="justify-center">
-              {sending ? t("dashboard.marketing.campaigns.sending") : t("dashboard.marketing.campaigns.send")}
-            </DashboardPrimaryButton>
-          </form>
-          </GlassCard>
-
-          <TableCard title={t("dashboard.marketing.campaigns.historyTitle")} bodyClassName="p-0">
-            <div className="overflow-x-auto p-6 pt-0">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                    <th className="py-3 pr-4">Campagne</th>
-                    <th className="py-3 pr-4">Objet</th>
-                    <th className="py-3 pr-4">Date d&apos;envoi</th>
-                    <th className="py-3 pr-4">Destinataires</th>
-                    <th className="py-3 pr-0">Statut</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {campaigns.length === 0 ? (
-                    <tr>
-                      <td className="py-6 text-slate-500" colSpan={5}>
-                        {t("dashboard.marketing.campaigns.empty")}
-                      </td>
-                    </tr>
-                  ) : (
-                    campaigns.map((campaign) => (
-                      <tr key={campaign.id} className="border-b border-slate-100">
-                        <td className="py-3 pr-4">{campaign.name}</td>
-                        <td className="py-3 pr-4">{campaign.subject}</td>
-                        <td className="py-3 pr-4">{formatDate(campaign.sent_at || campaign.created_at)}</td>
-                        <td className="py-3 pr-4">{campaign.recipient_count}</td>
-                        <td className="py-3 pr-0">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              campaign.status === "sent"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : campaign.status === "sending"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : campaign.status === "failed"
-                                    ? "bg-red-100 text-red-700"
-                                    : "bg-slate-100 text-slate-700"
-                            }`}
-                          >
-                            {campaign.status === "sent"
-                              ? "Envoyée"
-                              : campaign.status === "sending"
-                                ? "En cours"
-                                : campaign.status === "failed"
-                                  ? "Échec"
-                                  : "Brouillon"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
+              <div className="space-y-2.5">
+                <p className={dashboardLabelClass}>Contenu</p>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      ["bold", "Gras"],
+                      ["italic", "Italique"],
+                      ["insertUnorderedList", "Liste"],
+                    ] as const
+                  ).map(([cmd, label]) => (
+                    <ActionButton
+                      key={cmd}
+                      type="button"
+                      onClick={() => applyEditorCommand(cmd)}
+                      className="!px-3 !py-1.5 text-xs"
+                    >
+                      {label}
+                    </ActionButton>
+                  ))}
+                </div>
+                <div
+                  ref={editorRef}
+                  contentEditable
+                  suppressContentEditableWarning
+                  className={cn(
+                    dashboardInputClass,
+                    "min-h-40 py-3 focus:outline-none [&>p]:mb-2",
                   )}
-                </tbody>
-              </table>
-            </div>
-          </TableCard>
-        </section>
+                  onInput={(e) => setContentHtml(e.currentTarget.innerHTML)}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <p className={dashboardLabelClass}>
+                  {t("dashboard.marketing.campaigns.audienceLabel")}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      ["all", t("dashboard.marketing.campaigns.audienceAll")],
+                      ["source", t("dashboard.marketing.campaigns.audienceSource")],
+                      ["manual", t("dashboard.marketing.campaigns.audienceManual")],
+                    ] as const
+                  ).map(([mode, label]) => {
+                    const active = audienceMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setAudienceMode(mode)}
+                        className={cn(
+                          "rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-250",
+                          active
+                            ? "border-[rgba(26,35,255,0.28)] bg-[rgba(26,35,255,0.08)] text-[#1A23FF]"
+                            : "border-[rgba(15,23,42,0.1)] bg-white text-[#64748B] hover:border-[rgba(26,35,255,0.16)] hover:text-[#0F172A]",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {audienceMode === "source" ? (
+                  <select
+                    value={audienceSource}
+                    onChange={(e) => setAudienceSource(e.target.value)}
+                    className={dashboardSelectLgClass}
+                    required
+                  >
+                    <option value="">Choisir une source</option>
+                    {sources.map((source) => (
+                      <option key={source} value={source}>
+                        {source}
+                      </option>
+                    ))}
+                  </select>
+                ) : null}
+
+                {audienceMode === "manual" ? (
+                  <div className="max-h-48 space-y-2 overflow-auto rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-4">
+                    {activeContacts.length === 0 ? (
+                      <p className="text-sm text-[#64748B]">Aucun contact actif.</p>
+                    ) : (
+                      activeContacts.map((contact) => (
+                        <label
+                          key={contact.id}
+                          className="flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 text-sm text-[#0F172A] transition-colors duration-200 hover:bg-white"
+                        >
+                          <input
+                            type="checkbox"
+                            className={dashboardCheckboxClass}
+                            checked={selectedContactIds.includes(contact.id)}
+                            onChange={() => toggleManualContact(contact.id)}
+                          />
+                          <span>
+                            {contact.email} ({contact.first_name || "-"} {contact.last_name || "-"})
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </div>
+
+              <DashboardPrimaryButton
+                type="submit"
+                icon="none"
+                disabled={sending}
+                className="w-full justify-center sm:w-auto"
+              >
+                {sending
+                  ? t("dashboard.marketing.campaigns.sending")
+                  : t("dashboard.marketing.campaigns.send")}
+              </DashboardPrimaryButton>
+            </form>
+          </SectionCard>
+
+          <div className="space-y-4">
+            <h2 className="text-base font-semibold tracking-tight text-[#0F172A] sm:text-lg">
+              {t("dashboard.marketing.campaigns.historyTitle")}
+            </h2>
+
+            {campaigns.length === 0 ? (
+              <EmptyState
+                icon={Mail}
+                title={t("dashboard.marketing.campaigns.empty")}
+                description={t("dashboard.marketing.campaigns.emptyDescription")}
+              />
+            ) : (
+              <EntityCardList>
+                {campaigns.map((campaign) => (
+                  <EntityCard
+                    key={campaign.id}
+                    layout="row"
+                    leading={
+                      <span
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4F57FF] via-[#1A23FF] to-[#151dd9] text-white shadow-[0_4px_12px_rgba(26,35,255,0.22)]"
+                        aria-hidden
+                      >
+                        <Mail className="h-5 w-5" />
+                      </span>
+                    }
+                    title={campaign.name}
+                    subtitle={campaign.subject}
+                    status={campaignStatusBadge(campaign.status)}
+                    meta={
+                      <>
+                        <EntityMetaRow
+                          inline
+                          label={t("dashboard.marketing.campaigns.recipients")}
+                          value={String(campaign.recipient_count)}
+                        />
+                        <EntityMetaRow
+                          inline
+                          label="Date"
+                          value={formatDate(campaign.sent_at || campaign.created_at)}
+                        />
+                      </>
+                    }
+                    amount={
+                      <span className="text-base font-semibold tabular-nums text-[#0F172A] sm:text-lg">
+                        {campaign.recipient_count}
+                        <span className="ml-1.5 text-xs font-medium text-[#94A3B8]">
+                          {t("dashboard.marketing.campaigns.recipients")}
+                        </span>
+                      </span>
+                    }
+                  />
+                ))}
+              </EntityCardList>
+            )}
+          </div>
+        </div>
       ) : null}
     </PageLayout>
   );
 }
-
