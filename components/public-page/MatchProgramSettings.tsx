@@ -6,8 +6,8 @@ import { FileText, Loader, Trash } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import type { MatchProgramType, PublicPageSettings } from "@/lib/public-page/types";
 import { cn } from "@/components/ui";
+import PremiumSwitch from "./PremiumSwitch";
 import {
-  ppCheckboxClass,
   ppDangerButtonClass,
   ppDashedButtonClass,
   ppDisabledBlockClass,
@@ -100,8 +100,8 @@ export default function MatchProgramSettings({
 
   return (
     <div className="space-y-4">
-      <label className={ppToggleRowClass}>
-        <div>
+      <div className={ppToggleRowClass}>
+        <div className="min-w-0">
           <span className={ppToggleTitleClass}>
             {t("dashboard.settings.publicPage.matchProgram.enabled")}
           </span>
@@ -109,18 +109,17 @@ export default function MatchProgramSettings({
             {t("dashboard.settings.publicPage.matchProgram.enabledHint")}
           </p>
         </div>
-        <input
-          type="checkbox"
+        <PremiumSwitch
           checked={form.showMatchProgram}
-          onChange={(e) =>
+          onChange={(showMatchProgram) =>
             setForm({
               ...form,
-              showMatchProgram: e.target.checked,
+              showMatchProgram,
             })
           }
-          className={ppCheckboxClass}
+          aria-label={t("dashboard.settings.publicPage.matchProgram.enabled")}
         />
-      </label>
+      </div>
 
       <div className={cn(!form.showMatchProgram && ppDisabledBlockClass)}>
         {form.showMatchProgram ? (

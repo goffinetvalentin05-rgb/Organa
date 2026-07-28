@@ -898,6 +898,8 @@
         "linkCopied": "Link in die Zwischenablage kopiert",
         "linkCopyError": "Link konnte nicht kopiert werden",
         "copyLink": "Link kopieren",
+        "copiedShort": "Kopiert!",
+        "publicLinkLabel": "Öffentlicher Link",
         "preview": "Vorschau",
         "enabledLabel": "Öffentliche Seite aktivieren",
         "activationTitle": "Veröffentlichung",

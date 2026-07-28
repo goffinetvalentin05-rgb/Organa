@@ -958,6 +958,8 @@
         "linkCopied": "Link copied to clipboard",
         "linkCopyError": "Could not copy link",
         "copyLink": "Copy link",
+        "copiedShort": "Copied!",
+        "publicLinkLabel": "Public link",
         "preview": "Preview",
         "enabledLabel": "Enable public page",
         "activationTitle": "Publishing",

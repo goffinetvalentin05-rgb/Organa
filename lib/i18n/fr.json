@@ -836,6 +836,8 @@
         "linkCopied": "Lien copié dans le presse-papiers",
         "linkCopyError": "Impossible de copier le lien",
         "copyLink": "Copier le lien",
+        "copiedShort": "Copié !",
+        "publicLinkLabel": "Lien public",
         "preview": "Aperçu",
         "enabledLabel": "Activer la page publique",
         "activationTitle": "Publication",

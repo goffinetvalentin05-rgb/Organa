@@ -4,6 +4,7 @@ import { useI18n } from "@/components/I18nProvider";
 import type { PublicPageLink, PublicPageLinkInput } from "@/lib/public-page/types";
 import { cn } from "@/components/ui";
 import { Trash, Plus } from "@/lib/icons";
+import PremiumSwitch from "./PremiumSwitch";
 import {
   ppCheckboxClass,
   ppDashedButtonClass,
@@ -98,8 +99,8 @@ export default function PublicLinksSettings({
 
   return (
     <div className="space-y-4">
-      <label className={ppToggleRowClass}>
-        <div>
+      <div className={ppToggleRowClass}>
+        <div className="min-w-0">
           <span className={ppToggleTitleClass}>
             {t("dashboard.settings.publicPage.publicLinks.enabled")}
           </span>
@@ -107,13 +108,12 @@ export default function PublicLinksSettings({
             {t("dashboard.settings.publicPage.publicLinks.enabledHint")}
           </p>
         </div>
-        <input
-          type="checkbox"
+        <PremiumSwitch
           checked={enabled}
-          onChange={(e) => onEnabledChange(e.target.checked)}
-          className={ppCheckboxClass}
+          onChange={onEnabledChange}
+          aria-label={t("dashboard.settings.publicPage.publicLinks.enabled")}
         />
-      </label>
+      </div>
 
       <div className={cn(!enabled && ppDisabledBlockClass)}>
         {enabled ? (
