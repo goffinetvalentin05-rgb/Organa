@@ -14,11 +14,7 @@ import {
 } from "@/components/landing/landing-motion";
 import TrustStatsSection from "@/components/landing/TrustStatsSection";
 
-type HeroSectionProps = {
-  introReady?: boolean;
-};
-
-export default function HeroSection({ introReady = true }: HeroSectionProps) {
+export default function HeroSection() {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
 
@@ -98,9 +94,11 @@ export default function HeroSection({ introReady = true }: HeroSectionProps) {
                 />
               </Link>
             </motion.div>
-
-            <HeroStoryCta ready={introReady} />
           </motion.div>
+
+          <div className="landing-hero-story-cta-slot">
+            <HeroStoryCta />
+          </div>
         </motion.div>
       </div>
 

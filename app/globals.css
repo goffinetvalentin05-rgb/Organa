@@ -6247,6 +6247,18 @@ h3 {
   display: flex;
   justify-content: center;
   width: 100%;
+  position: relative;
+  z-index: 21;
+  margin-top: 0;
+}
+
+.landing-hero-story-cta-slot {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.95rem;
+  position: relative;
+  z-index: 21;
 }
 
 .landing-hero-story-cta-float {
