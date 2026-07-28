@@ -1249,7 +1249,9 @@
         "downloadPdf": "Download PDF",
         "convertAction": "Convert to invoice",
         "createdAt": "Created on",
-        "dueDate": "Due date"
+        "dueDate": "Due date",
+        "createdOn": "Created on",
+        "dueOn": "Due on"
       },
       "loadError": "Error loading quotes",
       "clientsLoadError": "Error loading clients",
@@ -1419,6 +1421,8 @@
         "createFollowup": "Create follow-up task",
         "createdAt": "Created on",
         "dueDate": "Due date",
+        "createdOn": "Created on",
+        "dueOn": "Due on",
         "paidAt": "Payment date",
         "eventSectionTitle": "Event",
         "eventLinkedLabel": "Linked event",

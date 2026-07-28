@@ -1127,7 +1127,9 @@
         "downloadPdf": "Télécharger PDF",
         "convertAction": "Transformer en facture",
         "createdAt": "Date de création",
-        "dueDate": "Date d'échéance"
+        "dueDate": "Date d'échéance",
+        "createdOn": "Créée le",
+        "dueOn": "Échéance le"
       },
       "loadError": "Erreur lors du chargement des cotisations",
       "clientsLoadError": "Erreur lors du chargement des membres",
@@ -1304,6 +1306,8 @@
         "createFollowup": "Créer tâche de relance",
         "createdAt": "Date de création",
         "dueDate": "Date d'échéance",
+        "createdOn": "Créée le",
+        "dueOn": "Échéance le",
         "paidAt": "Date de paiement",
         "eventSectionTitle": "Événement",
         "eventLinkedLabel": "Événement lié",

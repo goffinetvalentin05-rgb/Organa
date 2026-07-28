@@ -1119,7 +1119,9 @@
         "downloadPdf": "PDF herunterladen",
         "convertAction": "In Rechnung umwandeln",
         "createdAt": "Erstellungsdatum",
-        "dueDate": "Fälligkeitsdatum"
+        "dueDate": "Fälligkeitsdatum",
+        "createdOn": "Erstellt am",
+        "dueOn": "Fällig am"
       },
       "loadError": "Fehler beim Laden der Angebote",
       "clientsLoadError": "Fehler beim Laden der Kunden",
@@ -1289,6 +1291,8 @@
         "createFollowup": "Nachfassaufgabe erstellen",
         "createdAt": "Erstellungsdatum",
         "dueDate": "Fälligkeitsdatum",
+        "createdOn": "Erstellt am",
+        "dueOn": "Fällig am",
         "paidAt": "Zahlungsdatum",
         "eventSectionTitle": "Veranstaltung",
         "eventLinkedLabel": "Verknüpfte Veranstaltung",

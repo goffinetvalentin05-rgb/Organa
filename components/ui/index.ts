@@ -64,6 +64,8 @@ export type { PageLayoutProps } from "./PageLayout";
 export { default as DashboardPageShell } from "./DashboardPageShell";
 export type { DashboardPageShellProps } from "./DashboardPageShell";
 export { default as PageHeader } from "./PageHeader";
+export { default as DetailPageHeader } from "./DetailPageHeader";
+export type { DetailPageHeaderProps } from "./DetailPageHeader";
 export { default as GlassCard } from "./GlassCard";
 export { default as DataCard } from "./DataCard";
 export { default as SectionCard } from "./SectionCard";

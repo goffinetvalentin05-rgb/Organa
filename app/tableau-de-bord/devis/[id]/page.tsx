@@ -17,7 +17,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
-  PageHeader,
+  DetailPageHeader,
   GlassCard,
   ActionButton,
   dashboardSelectLgClass,
@@ -197,7 +197,7 @@ export default function DevisDetailPage() {
 
   if (!devis) {
     return (
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center">
           <p className="text-slate-600">{t("dashboard.common.loading")}</p>
         </GlassCard>
@@ -207,7 +207,7 @@ export default function DevisDetailPage() {
 
   if (!devis.lignes || !Array.isArray(devis.lignes)) {
     return (
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
           <p className="text-red-700 font-medium">{t("dashboard.quotes.detail.invalidData")}</p>
           <Link
@@ -247,23 +247,36 @@ export default function DevisDetailPage() {
   };
 
   return (
-    <PageLayout maxWidth="4xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/devis"
-          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
-        >
-          ← {t("dashboard.quotes.detail.backToList")}
-        </Link>
-      </div>
-
-      <PageHeader
-        title={devis.numero}
-        subtitle={`${t("dashboard.common.client")}: ${devis.client?.nom || t("dashboard.common.unknownClient")}${
-          devis.title ? ` · ${devis.title}` : ""
-        }`}
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/devis"
+        backLabel={t("dashboard.quotes.detail.backToList")}
+        reference={devis.numero}
+        title={devis.title || undefined}
+        subject={devis.client?.nom || t("dashboard.common.unknownClient")}
+        meta={
+          <span>
+            {t("dashboard.quotes.detail.createdOn")} {formatDate(devis.dateCreation)}
+            {devis.dateEcheance
+              ? ` • ${t("dashboard.quotes.detail.dueOn")} ${formatDate(devis.dateEcheance)}`
+              : ""}
+          </span>
+        }
+        status={
+          <span className={`badge-obillz ${getStatutColor(devis.statut)}`}>
+            {t(`dashboard.status.quote.${
+              devis.statut === "brouillon"
+                ? "draft"
+                : devis.statut === "envoye"
+                  ? "sent"
+                  : devis.statut === "accepte"
+                    ? "accepted"
+                    : "refused"
+            }`)}
+          </span>
+        }
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <>
             <ActionButton
               type="button"
               onClick={() => setIdentityModalOpen(true)}
@@ -271,15 +284,15 @@ export default function DevisDetailPage() {
               title={t("dashboard.common.edit")}
             >
               <Edit className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+              {t("dashboard.common.edit")}
             </ActionButton>
             <ActionButton
               type="button"
               onClick={handleEnvoyerEmail}
               disabled={envoiEmail || !devis.client?.email}
-              className="inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="h-4 w-4" />
               {envoiEmail ? t("dashboard.quotes.detail.sending") : t("dashboard.quotes.detail.sendEmail")}
             </ActionButton>
             <ActionButton
@@ -289,13 +302,12 @@ export default function DevisDetailPage() {
                   toast.error(t("dashboard.common.missingDocumentId"));
                   return;
                 }
-                const url = `/api/documents/${id}/pdf?type=quote`;
-                window.open(url, "_blank");
+                window.open(`/api/documents/${id}/pdf?type=quote`, "_blank");
               }}
               disabled={!id}
               className="inline-flex items-center gap-2 disabled:opacity-50"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="h-4 w-4" />
               {t("dashboard.quotes.detail.previewPdf")}
             </ActionButton>
             <ActionButton
@@ -305,9 +317,8 @@ export default function DevisDetailPage() {
                   toast.error(t("dashboard.common.missingDocumentId"));
                   return;
                 }
-                const url = `/api/documents/${id}/pdf?type=quote&download=true`;
                 const link = document.createElement("a");
-                link.href = url;
+                link.href = `/api/documents/${id}/pdf?type=quote&download=true`;
                 link.download = `obillz-cotisation-${devis?.numero || id}.pdf`;
                 document.body.appendChild(link);
                 link.click();
@@ -316,7 +327,7 @@ export default function DevisDetailPage() {
               disabled={!id}
               className="inline-flex items-center gap-2 disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
               {t("dashboard.quotes.detail.downloadPdf")}
             </ActionButton>
             <ActionButton
@@ -325,10 +336,10 @@ export default function DevisDetailPage() {
               onClick={handleDelete}
               className="inline-flex items-center gap-2"
             >
-              <Trash className="w-4 h-4" />
+              <Trash className="h-4 w-4" />
               {t("dashboard.common.delete")}
             </ActionButton>
-          </div>
+          </>
         }
       />
 

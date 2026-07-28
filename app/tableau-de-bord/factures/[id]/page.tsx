@@ -22,7 +22,7 @@ import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdenti
 import ClubDocumentLogo from "@/components/documents/ClubDocumentLogo";
 import {
   PageLayout,
-  PageHeader,
+  DetailPageHeader,
   GlassCard,
   ActionButton,
   dashboardSelectLgClass,
@@ -325,7 +325,7 @@ export default function FactureDetailPage() {
 
   if (!facture) {
     return (
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center">
           <p className="text-slate-600">{t("dashboard.common.loading")}</p>
         </GlassCard>
@@ -335,7 +335,7 @@ export default function FactureDetailPage() {
 
   if (!facture.lignes || !Array.isArray(facture.lignes)) {
     return (
-      <PageLayout maxWidth="4xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
           <p className="text-red-700 font-medium">{t("dashboard.invoices.detail.invalidData")}</p>
           <Link
@@ -364,24 +364,48 @@ export default function FactureDetailPage() {
     return date.toLocaleDateString(localeToIntl[locale]);
   };
 
-  return (
-    <PageLayout maxWidth="4xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/factures"
-          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
-        >
-          ← {t("dashboard.invoices.detail.backToList")}
-        </Link>
-      </div>
+  const getStatutColor = (statut: string) => {
+    const colors: Record<string, string> = {
+      brouillon: "bg-slate-100 text-slate-700",
+      envoye: "bg-blue-100 text-blue-700",
+      paye: "bg-green-100 text-green-700",
+      "en-retard": "bg-red-100 text-red-700",
+    };
+    return colors[statut] || "bg-slate-100 text-slate-700";
+  };
 
-      <PageHeader
-        title={facture.numero}
-        subtitle={`${t("dashboard.invoices.form.fields.recipientType")}: ${recipientName}${
-          facture.title ? ` · ${facture.title}` : ""
-        }`}
+  const statutLabelKey =
+    facture.statut === "brouillon"
+      ? "draft"
+      : facture.statut === "envoye"
+        ? "sent"
+        : facture.statut === "paye"
+          ? "paid"
+          : "overdue";
+
+  return (
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/factures"
+        backLabel={t("dashboard.invoices.detail.backToList")}
+        reference={facture.numero}
+        title={facture.title || undefined}
+        subject={recipientName}
+        meta={
+          <span>
+            {t("dashboard.invoices.detail.createdOn")} {formatDate(facture.dateCreation)}
+            {facture.dateEcheance
+              ? ` • ${t("dashboard.invoices.detail.dueOn")} ${formatDate(facture.dateEcheance)}`
+              : ""}
+          </span>
+        }
+        status={
+          <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
+            {t(`dashboard.status.invoice.${statutLabelKey}`)}
+          </span>
+        }
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <>
             <ActionButton
               type="button"
               onClick={() => setIdentityModalOpen(true)}
@@ -389,15 +413,15 @@ export default function FactureDetailPage() {
               title={t("dashboard.common.edit")}
             >
               <Edit className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
+              {t("dashboard.common.edit")}
             </ActionButton>
             <ActionButton
               type="button"
               onClick={handleEnvoyerEmail}
               disabled={envoiEmail || !recipientEmail}
-              className="inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="h-4 w-4" />
               {envoiEmail ? t("dashboard.invoices.detail.sending") : t("dashboard.invoices.detail.sendEmail")}
             </ActionButton>
             <ActionButton
@@ -407,13 +431,12 @@ export default function FactureDetailPage() {
                   toast.error(t("dashboard.common.missingDocumentId"));
                   return;
                 }
-                const url = `/api/documents/${id}/pdf?type=invoice`;
-                window.open(url, "_blank");
+                window.open(`/api/documents/${id}/pdf?type=invoice`, "_blank");
               }}
               disabled={!id}
               className="inline-flex items-center gap-2 disabled:opacity-50"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="h-4 w-4" />
               {t("dashboard.invoices.detail.previewPdf")}
             </ActionButton>
             <ActionButton
@@ -423,9 +446,8 @@ export default function FactureDetailPage() {
                   toast.error(t("dashboard.common.missingDocumentId"));
                   return;
                 }
-                const url = `/api/documents/${id}/pdf?type=invoice&download=true`;
                 const link = document.createElement("a");
-                link.href = url;
+                link.href = `/api/documents/${id}/pdf?type=invoice&download=true`;
                 link.download = `obillz-invoice-${facture?.numero || id}.pdf`;
                 document.body.appendChild(link);
                 link.click();
@@ -434,7 +456,7 @@ export default function FactureDetailPage() {
               disabled={!id}
               className="inline-flex items-center gap-2 disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
               {t("dashboard.invoices.detail.downloadPdf")}
             </ActionButton>
             <ActionButton
@@ -443,10 +465,10 @@ export default function FactureDetailPage() {
               onClick={handleDelete}
               className="inline-flex items-center gap-2"
             >
-              <Trash className="w-4 h-4" />
+              <Trash className="h-4 w-4" />
               {t("dashboard.common.delete")}
             </ActionButton>
-          </div>
+          </>
         }
       />
 

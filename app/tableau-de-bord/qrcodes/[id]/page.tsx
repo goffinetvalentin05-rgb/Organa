@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/components/I18nProvider";
 import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
 import {
-  ArrowRight,
   Download,
   Trash,
   Users,
@@ -19,7 +17,9 @@ import {
 } from "@/lib/icons";
 import {
   PageLayout,
+  DetailPageHeader,
   GlassCard,
+  ActionButton,
   dashboardInnerPanelClass,
   dashboardSecondaryButtonClass,
   dashboardCardTitleClass,
@@ -281,14 +281,39 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <PageLayout maxWidth="7xl">
-      {/* Back link */}
-      <Link
-        href="/tableau-de-bord/qrcodes"
-        className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
-      >
-        <ArrowRight className="w-4 h-4 rotate-180" />
-        {t("dashboard.qrcodes.detail.backToList")}
-      </Link>
+      <DetailPageHeader
+        backHref="/tableau-de-bord/qrcodes"
+        backLabel={t("dashboard.qrcodes.detail.backToList")}
+        title={qrcode.name}
+        meta={
+          <span>
+            {getEventTypeLabel(qrcode.event_type)}
+            {(qrcode.event_date || qrcode.event_time)
+              ? ` • ${
+                  formatEventSchedule(qrcode.event_date, qrcode.event_time) ||
+                  formatEventDate(qrcode.event_date, locale as "fr" | "de" | "en") ||
+                  formatEventTime(qrcode.event_time, locale as "fr" | "de" | "en")
+                }`
+              : ""}
+          </span>
+        }
+        actions={
+          <>
+            <ActionButton type="button" onClick={openEditModal} className="inline-flex items-center gap-2">
+              <Edit className="h-4 w-4" />
+              {t("dashboard.common.edit")}
+            </ActionButton>
+            <ActionButton type="button" onClick={() => downloadQR("png")} className="inline-flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              {t("dashboard.qrcodes.detail.downloadPng")}
+            </ActionButton>
+            <ActionButton type="button" onClick={() => downloadQR("svg")} className="inline-flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              {t("dashboard.qrcodes.detail.downloadSvg")}
+            </ActionButton>
+          </>
+        }
+      />
 
       {/* Main content */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -309,24 +334,6 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
                 />
               </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => downloadQR("png")}
-                className={`flex-1 ${dashboardSecondaryButtonClass} px-3 py-2 text-sm`}
-              >
-                <Download className="w-4 h-4" />
-                {t("dashboard.qrcodes.detail.downloadPng")}
-              </button>
-              <button
-                type="button"
-                onClick={() => downloadQR("svg")}
-                className={`flex-1 ${dashboardSecondaryButtonClass} px-3 py-2 text-sm`}
-              >
-                <Download className="w-4 h-4" />
-                {t("dashboard.qrcodes.detail.downloadSvg")}
-              </button>
-            </div>
           </div>
 
           {/* Event Info */}
@@ -335,14 +342,6 @@ export default function QRCodeDetailPage({ params }: { params: Promise<{ id: str
               <h2 className={dashboardCardTitleClass}>
                 {t("dashboard.qrcodes.detail.eventInfo")}
               </h2>
-              <button
-                type="button"
-                onClick={openEditModal}
-                className={`${dashboardSecondaryButtonClass} px-3 py-2 text-xs`}
-              >
-                <Edit className="w-4 h-4" />
-                {t("dashboard.common.edit")}
-              </button>
             </div>
             <div className="space-y-3">
               <div>

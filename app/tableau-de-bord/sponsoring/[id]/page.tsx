@@ -1,13 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ArrowLeft, Edit, Download, Eye, Handshake, FileText } from "@/lib/icons";
+import { Edit, Download, Eye, Handshake, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard, SectionCard } from "@/components/ui";
+import { PageLayout, DetailPageHeader, GlassCard, SectionCard, ActionButton } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
 type Contract = {
@@ -104,7 +103,7 @@ export default function ContratSponsorDetailPage() {
 
   if (loading || !contract) {
     return (
-      <PageLayout maxWidth="3xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard className="p-10 text-center text-slate-500">{t("dashboard.common.loading")}</GlassCard>
       </PageLayout>
     );
@@ -114,64 +113,76 @@ export default function ContratSponsorDetailPage() {
   const downloadPdfUrl = `/api/pdf/contrat-sponsor/download?id=${contract.id}&locale=${locale}`;
 
   return (
-    <PageLayout maxWidth="3xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/sponsoring"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("dashboard.sponsoring.backToList")}
-        </Link>
-        <PageHeader
-          title={contract.title}
-          subtitle={contract.sponsorName}
-          actions={
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setPdfPreviewOpen(true);
-                  requestAnimationFrame(() => {
-                    previewAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-all hover:bg-white/18"
-              >
-                <Eye className="h-4 w-4" />
-                {t("dashboard.sponsoring.detail.previewPdf")}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!pdfPreviewOpen) {
-                    toast.error(t("dashboard.sponsoring.detail.downloadRequiresPreview"));
-                    return;
-                  }
-                  const link = document.createElement("a");
-                  link.href = downloadPdfUrl;
-                  link.download = `contrat-sponsor-${contract.title.replace(/\s+/g, "-").slice(0, 40)}.pdf`;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-all hover:bg-white/18"
-              >
-                <Download className="h-4 w-4" />
-                {t("dashboard.sponsoring.detail.downloadPdf")}
-              </button>
-              <DashboardPrimaryButton
-                href={`/tableau-de-bord/sponsoring/${contract.id}/modifier`}
-                icon="none"
-                className="inline-flex items-center gap-2"
-              >
-                <Edit className="h-4 w-4" />
-                {t("dashboard.sponsoring.detail.edit")}
-              </DashboardPrimaryButton>
-            </div>
-          }
-        />
-      </div>
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/sponsoring"
+        backLabel={t("dashboard.sponsoring.backToList")}
+        title={contract.title}
+        subject={contract.sponsorName}
+        meta={
+          <span>
+            {t("dashboard.sponsoring.detail.period")} : {formatDate(contract.startDate)} →{" "}
+            {formatDate(contract.endDate)}
+          </span>
+        }
+        status={
+          <span className={`badge-obillz ${statusClass(contract.status)}`}>
+            {statusLabel(contract.status)}
+          </span>
+        }
+        actions={
+          <>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                setPdfPreviewOpen(true);
+                requestAnimationFrame(() => {
+                  previewAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
+              className="inline-flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              {t("dashboard.sponsoring.detail.previewPdf")}
+            </ActionButton>
+            <ActionButton
+              type="button"
+              onClick={() => {
+                if (!pdfPreviewOpen) {
+                  toast.error(t("dashboard.sponsoring.detail.downloadRequiresPreview"));
+                  return;
+                }
+                const link = document.createElement("a");
+                link.href = downloadPdfUrl;
+                link.download = `contrat-sponsor-${contract.title.replace(/\s+/g, "-").slice(0, 40)}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="inline-flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              {t("dashboard.sponsoring.detail.downloadPdf")}
+            </ActionButton>
+            <DashboardPrimaryButton
+              href={`/tableau-de-bord/sponsoring/${contract.id}/modifier`}
+              icon="none"
+              className="inline-flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              {t("dashboard.sponsoring.detail.edit")}
+            </DashboardPrimaryButton>
+            <ActionButton
+              type="button"
+              variant="dangerSoft"
+              onClick={() => void handleDelete()}
+              className="inline-flex items-center gap-2"
+            >
+              {t("dashboard.common.delete")}
+            </ActionButton>
+          </>
+        }
+      />
 
       {pdfPreviewOpen ? (
         <div ref={previewAnchorRef}>
@@ -227,16 +238,6 @@ export default function ContratSponsorDetailPage() {
           {contract.content || "—"}
         </p>
       </SectionCard>
-
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => void handleDelete()}
-          className="rounded-xl border border-red-200/90 bg-red-50/90 px-4 py-2.5 text-sm font-medium text-red-800 transition hover:bg-red-100"
-        >
-          {t("dashboard.common.delete")}
-        </button>
-      </div>
     </PageLayout>
   );
 }

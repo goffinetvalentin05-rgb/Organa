@@ -1,13 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ArrowLeft, Edit, Download, ClipboardList } from "@/lib/icons";
+import { Edit, Download, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard, SectionCard } from "@/components/ui";
+import { PageLayout, DetailPageHeader, GlassCard, SectionCard, ActionButton } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import type {
   MeetingMinutesPayload,
@@ -93,7 +92,7 @@ export default function PvSeanceDetailPage() {
 
   if (loading || !minute) {
     return (
-      <PageLayout maxWidth="3xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard className="p-10 text-center text-slate-500">{t("dashboard.common.loading")}</GlassCard>
       </PageLayout>
     );
@@ -108,40 +107,43 @@ export default function PvSeanceDetailPage() {
     list.length ? list.map((p) => p.name).join(", ") : "—";
 
   return (
-    <PageLayout maxWidth="3xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/pv-seances"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("dashboard.meetingMinutes.backToList")}
-        </Link>
-        <PageHeader
-          title={minute.title}
-          subtitle={t("dashboard.meetingMinutes.detail.subtitle")}
-          actions={
-            <div className="flex flex-wrap gap-2">
-              <DashboardPrimaryButton
-                href={`/tableau-de-bord/pv-seances/${minute.id}/modifier`}
-                icon="none"
-                className="inline-flex items-center gap-2"
-              >
-                <Edit className="h-4 w-4" />
-                {t("dashboard.common.edit")}
-              </DashboardPrimaryButton>
-              <DashboardPrimaryButton
-                href={downloadPdfUrl}
-                icon="none"
-                className="inline-flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {t("dashboard.meetingMinutes.downloadPdf")}
-              </DashboardPrimaryButton>
-            </div>
-          }
-        />
-      </div>
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/pv-seances"
+        backLabel={t("dashboard.meetingMinutes.backToList")}
+        title={minute.title}
+        meta={
+          <span>
+            {formatDate(minute.meetingDate)}
+            {timeRange !== "—" ? ` • ${timeRange}` : ""}
+            {` • ${typeLabel(minute.meetingType)}`}
+          </span>
+        }
+        status={
+          <span className="badge-obillz bg-slate-100 text-slate-700">
+            {statusLabel(minute.status)}
+          </span>
+        }
+        actions={
+          <>
+            <DashboardPrimaryButton
+              href={`/tableau-de-bord/pv-seances/${minute.id}/modifier`}
+              icon="none"
+              className="inline-flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              {t("dashboard.common.edit")}
+            </DashboardPrimaryButton>
+            <ActionButton
+              href={downloadPdfUrl}
+              className="inline-flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              {t("dashboard.meetingMinutes.downloadPdf")}
+            </ActionButton>
+          </>
+        }
+      />
 
       <SectionCard title={t("dashboard.meetingMinutes.form.general")} icon={ClipboardList}>
         <dl className="grid gap-4 sm:grid-cols-2">

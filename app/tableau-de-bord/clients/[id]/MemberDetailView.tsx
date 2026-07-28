@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Edit, ClipboardList } from "@/lib/icons";
+import { Edit, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
-import { PageLayout, GlassCard, SectionCard, ActionButton } from "@/components/ui";
+import { PageLayout, GlassCard, SectionCard, ActionButton, DetailPageHeader } from "@/components/ui";
 import CreatedByBadge from "@/components/CreatedByBadge";
 import type { MemberFieldsMerged } from "@/lib/member-fields/types";
 import {
@@ -103,41 +103,45 @@ export default function MemberDetailView({
     .join(", ");
 
   return (
-    <PageLayout maxWidth="3xl">
-      <GlassCard
-        padding="sm"
-        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <Link
-          href="/tableau-de-bord/clients"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition-colors hover:text-[#2563EB]"
-        >
-          <ArrowLeft className="h-4 w-4 shrink-0" />
-          {t("dashboard.clients.memberDetail.back")}
-        </Link>
-        {canManageMembers ? (
-          <ActionButton
-            href={`/tableau-de-bord/clients/${member.id}/edit`}
-            className="inline-flex items-center justify-center gap-2"
-          >
-            <Edit className="h-4 w-4" />
-            {t("dashboard.clients.memberDetail.editAction")}
-          </ActionButton>
-        ) : null}
-      </GlassCard>
-
-      <GlassCard padding="none" className="shadow-md shadow-slate-200/40">
-        <div
-          className="px-6 py-8 sm:px-8 sm:py-10 text-white"
-          style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-        >
-          <p className="text-sm font-medium text-white/80 uppercase tracking-wide">
-            {t("dashboard.clients.memberDetail.title")}
-          </p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-bold break-words">
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/clients"
+        backLabel={t("dashboard.clients.memberDetail.back")}
+        title={
+          <>
             {member.prenom ? `${member.prenom} ` : ""}
             {member.nom?.trim() || t("dashboard.clients.noName")}
-          </h1>
+          </>
+        }
+        meta={
+          <span>
+            {[
+              formatRoleLabel(member.role, t),
+              member.category ? formatCategoryLabel(member.category, t) : null,
+              member.email,
+            ]
+              .filter(Boolean)
+              .join(" • ")}
+          </span>
+        }
+        actions={
+          canManageMembers ? (
+            <ActionButton
+              href={`/tableau-de-bord/clients/${member.id}/edit`}
+              className="inline-flex items-center justify-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              {t("dashboard.clients.memberDetail.editAction")}
+            </ActionButton>
+          ) : undefined
+        }
+      />
+
+      <GlassCard padding="none" className="shadow-md shadow-slate-200/40">
+        <div className="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <p className="text-sm font-medium uppercase tracking-wide text-[#64748B]">
+            {t("dashboard.clients.memberDetail.title")}
+          </p>
         </div>
 
         <dl className="divide-y divide-slate-100">

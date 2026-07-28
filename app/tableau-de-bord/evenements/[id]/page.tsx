@@ -8,7 +8,7 @@ import { localeToIntl } from "@/lib/i18n";
 import { Edit, Trash, Eye, Calendar, ArrowRight, X } from "@/lib/icons";
 import {
   PageLayout,
-  PageHeader,
+  DetailPageHeader,
   GlassCard,
   SectionCard,
   ActionButton,
@@ -276,7 +276,7 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <PageLayout maxWidth="5xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center">
           <p className="text-slate-600">{t("dashboard.common.loading")}</p>
         </GlassCard>
@@ -286,7 +286,7 @@ export default function EventDetailPage() {
 
   if (errorMessage || !event) {
     return (
-      <PageLayout maxWidth="5xl">
+      <PageLayout maxWidth="7xl">
         <GlassCard padding="lg" className="text-center border-red-200/80 bg-red-50/70">
           <p className="text-red-700 font-medium">{errorMessage || "Événement non trouvé"}</p>
           <Link
@@ -309,30 +309,27 @@ export default function EventDetailPage() {
   );
 
   return (
-    <PageLayout maxWidth="6xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/evenements"
-          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
-        >
-          ← {t("dashboard.events.detail.backToList")}
-        </Link>
-      </div>
-
-      <PageHeader
+    <PageLayout maxWidth="7xl">
+      <DetailPageHeader
+        backHref="/tableau-de-bord/evenements"
+        backLabel={t("dashboard.events.detail.backToList")}
         title={isEditing ? t("dashboard.events.form.editTitle") : event.name}
-        subtitle={isEditing ? undefined : subtitleParts.join(" • ")}
+        meta={isEditing ? undefined : <span>{subtitleParts.join(" • ")}</span>}
+        status={
+          isEditing ? undefined : (
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
+                statusBadgeClass(event.status)
+              )}
+            >
+              {t(`dashboard.events.status.${event.status}`)}
+            </span>
+          )
+        }
         actions={
-          isEditing ? null : (
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
-                  statusBadgeClass(event.status)
-                )}
-              >
-                {t(`dashboard.events.status.${event.status}`)}
-              </span>
+          isEditing ? undefined : (
+            <>
               <ActionButton type="button" onClick={() => setIsEditing(true)} className="inline-flex items-center gap-2">
                 <Edit className="h-4 w-4" />
                 {t("dashboard.events.detail.editAction")}
@@ -341,7 +338,7 @@ export default function EventDetailPage() {
                 <Trash className="h-4 w-4" />
                 {t("dashboard.events.detail.deleteAction")}
               </ActionButton>
-            </div>
+            </>
           )
         }
       />

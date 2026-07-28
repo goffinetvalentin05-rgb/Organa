@@ -23,7 +23,7 @@ import { localeToIntl } from "@/lib/i18n";
 import { useI18n } from "@/components/I18nProvider";
 import {
   PageLayout,
-  PageHeader,
+  DetailPageHeader,
   GlassCard,
   SectionCard,
   ActionButton,
@@ -688,30 +688,35 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <PageLayout maxWidth="7xl">
-      <div>
-        <Link
-          href="/tableau-de-bord/plannings"
-          className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
-        >
-          ← Retour aux plannings
-        </Link>
-      </div>
-
-      <PageHeader
+      <DetailPageHeader
+        backHref="/tableau-de-bord/plannings"
+        backLabel="Retour aux plannings"
         title={planning.name}
-        subtitle={
-          <>
-            <p className="font-semibold text-white/95">{formatDate(planning.date)}</p>
-            {planning.description?.trim() ? (
-              <p className="text-sm font-normal text-white/75">{planning.description.trim()}</p>
-            ) : null}
-          </>
+        subject={formatDate(planning.date)}
+        meta={
+          planning.description?.trim() ? (
+            <span>{planning.description.trim()}</span>
+          ) : planning.event ? (
+            <span>
+              Lié à :{" "}
+              <Link
+                href={`/tableau-de-bord/evenements/${planning.event.id}`}
+                className="font-medium text-[#1A23FF] hover:underline"
+              >
+                {planning.event.name}
+              </Link>
+            </span>
+          ) : undefined
+        }
+        status={
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold ${getStatusColor(planning.status)} border-current/20`}
+          >
+            {getStatusLabel(planning.status)}
+          </span>
         }
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold ${getStatusColor(planning.status)} border-current/20`}>
-              {getStatusLabel(planning.status)}
-            </span>
+          <>
             {!permissionsLoading && hasPermission(PERMISSIONS.MANAGE_PLANNINGS) && (
               <ActionButton
                 type="button"
@@ -744,17 +749,17 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
               <option value="published">Publié</option>
               <option value="archived">Archivé</option>
             </select>
-          </div>
+          </>
         }
       />
 
-      {planning.event ? (
-        <div className="flex items-center gap-2 text-sm text-white/85">
+      {planning.event && planning.description?.trim() ? (
+        <div className="flex items-center gap-2 text-sm text-[#64748B]">
           <Calendar className="w-4 h-4" />
           <span>Lié à :</span>
           <Link
             href={`/tableau-de-bord/evenements/${planning.event.id}`}
-            className="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold text-white hover:bg-white/25 transition-colors"
+            className="rounded-full bg-[#1A23FF]/10 px-3 py-1 text-sm font-semibold text-[#1A23FF] hover:bg-[#1A23FF]/15 transition-colors"
           >
             {planning.event.name}
           </Link>
