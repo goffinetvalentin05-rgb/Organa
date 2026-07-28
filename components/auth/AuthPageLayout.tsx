@@ -12,24 +12,27 @@ type AuthPageLayoutProps = {
 export default function AuthPageLayout({ children }: AuthPageLayoutProps) {
   return (
     <main className={obillzLandingRootClass}>
-      {/* Ambiance immersive — grille + lueurs (esprit hero Obillz) */}
+      {/* Fond auth aligné sur le footer de la landing */}
       <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden" aria-hidden>
         <div
-          className="absolute inset-0 opacity-[0.35]"
+          className="absolute inset-0"
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(96,165,250,0.11) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,0.11) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-            maskImage:
-              "radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 72%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 72%)",
+            background:
+              "radial-gradient(ellipse 80% 42% at 50% 45%, rgba(50,91,255,0.32), transparent 70%), radial-gradient(circle at 50% 85%, rgba(56,189,248,0.16) 0%, transparent 42%), linear-gradient(180deg, #071634 0%, #102d78 38%, #175dd4 68%, #37b9ed 100%)",
           }}
         />
-        <div className="absolute -left-[20%] top-[-10%] h-[55vh] w-[70vw] rounded-full bg-[radial-gradient(ellipse,rgba(26,35,255,0.35),transparent_68%)] blur-3xl" />
-        <div className="absolute -right-[15%] bottom-[-5%] h-[50vh] w-[60vw] rounded-full bg-[radial-gradient(ellipse,rgba(56,189,248,0.18),transparent_70%)] blur-3xl" />
-        <div className="absolute left-1/2 top-[12%] h-40 w-[min(70vw,520px)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(37,99,235,0.28),transparent_70%)] blur-3xl" />
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
+        <div
+          className="absolute inset-0 opacity-[0.22]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(96,165,250,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,0.14) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+            maskImage:
+              "radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%)",
+          }}
+        />
       </div>
 
       <div className="relative z-10 flex min-h-[100dvh] flex-col">

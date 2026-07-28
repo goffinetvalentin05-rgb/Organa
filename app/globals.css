@@ -2735,6 +2735,212 @@ body.app-bg > * {
   z-index: 1;
 }
 
+.three-steps-panel__halo {
+  position: absolute;
+  inset: auto 10% -14% 10%;
+  height: 16rem;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.32), transparent 54%),
+    radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.18), transparent 68%);
+  filter: blur(48px);
+  pointer-events: none;
+}
+
+.three-steps-panel__grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.78), transparent 100%);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.three-steps-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% -18px 12%;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.42), transparent 68%);
+  filter: blur(20px);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.three-steps-card--featured::after {
+  inset: auto 10% -20px 10%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.52), transparent 70%);
+}
+
+.three-steps-card__border {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(147, 197, 253, 0.45), rgba(255, 255, 255, 0.06) 36%, rgba(37, 99, 235, 0.34) 80%, rgba(103, 232, 249, 0.32));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.three-steps-card__shine {
+  position: absolute;
+  inset: -32% auto auto -28%;
+  width: 60%;
+  height: 180%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  transform: rotate(22deg);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.three-steps-card__glow {
+  position: absolute;
+  inset: auto -10% -20% -10%;
+  height: 42%;
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.28), transparent 68%);
+  filter: blur(26px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.three-steps-conclusion {
+  position: relative;
+}
+
+.three-steps-conclusion::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -0.35rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0), rgba(37, 99, 235, 0.28), rgba(14, 165, 233, 0.4), rgba(37, 99, 235, 0.28), rgba(37, 99, 235, 0));
+}
+
+.three-steps-float-halo {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(36px);
+  opacity: 0.55;
+}
+
+.three-steps-float-halo--left {
+  left: 5%;
+  top: 4rem;
+  width: 13rem;
+  height: 13rem;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.18), transparent 70%);
+}
+
+.three-steps-float-halo--center {
+  left: 50%;
+  top: 0.5rem;
+  width: 18rem;
+  height: 18rem;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.16), transparent 72%);
+}
+
+.three-steps-float-halo--right {
+  right: 6%;
+  top: 5rem;
+  width: 12rem;
+  height: 12rem;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.14), transparent 72%);
+}
+
+.three-steps-card-v2::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% -14px 12%;
+  height: 1.15rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.3), transparent 70%);
+  filter: blur(14px);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.three-steps-card-v2__border {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(147, 197, 253, 0.42), rgba(255, 255, 255, 0.06) 32%, rgba(37, 99, 235, 0.22) 80%, rgba(103, 232, 249, 0.26));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.three-steps-card-v2__shine {
+  position: absolute;
+  inset: -38% auto auto -26%;
+  width: 56%;
+  height: 160%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  transform: rotate(22deg);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.three-steps-card-v2__glow {
+  position: absolute;
+  inset: auto -6% -16% -6%;
+  height: 36%;
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 72%);
+  filter: blur(18px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .three-steps-card {
+    max-width: 100%;
+  }
+
+  .three-steps-float-halo--left,
+  .three-steps-float-halo--right {
+    width: 9rem;
+    height: 9rem;
+  }
+
+  .three-steps-float-halo--center {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .three-steps-card,
+  .three-steps-card-v2,
+  .three-steps-card::after,
+  .three-steps-card-v2::after,
+  .three-steps-card__shine,
+  .three-steps-card-v2__shine,
+  .three-steps-card__glow,
+  .three-steps-card-v2__glow,
+  .three-steps-panel__halo {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* Typography classes */
 .font-heading {
   font-family: var(--font-heading), sans-serif;

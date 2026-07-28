@@ -17,7 +17,7 @@
     "title": "Verein verwalten, ohne den Abend zu verlieren.",
     "titleLine1": "Verein verwalten,",
     "titleLine2": "ohne den Abend zu verlieren.",
-    "subtitle": "Rechnungen, Mitglieder, Beiträge, Events und Zahlungen in einer Plattform für Sportvereine.",
+    "subtitle": "Obillz vereinfacht Beiträge, Einsatzpläne, Veranstaltungen und administrative Aufgaben Ihres Vereins und bündelt die gesamte Verwaltung in einer einzigen Plattform.",
     "keywords": "Mitglieder • Beiträge • Rechnungen • Events",
     "ctaPrimary": "Obillz kostenlos testen",
     "ctaSecondary": "So funktioniert's",
@@ -79,12 +79,67 @@
       "page-publique": { "subtitle": "Online-Auftritt" }
     }
   },
+  "threeSteps": {
+    "label": "01 / WENIGER ADMIN",
+    "title": "Weniger Administration. Mehr Zeit für Ihren Verein.",
+    "subtitle": "Obillz vereinfacht Aufgaben, die Vorstände heute noch Stunden kosten.",
+    "discreetLead": "Drei Schritte genügen.",
+    "conclusion": "Was früher einen ganzen Abend brauchte, dauert jetzt nur noch wenige Minuten.",
+    "benefits": [
+      "Beiträge in wenigen Klicks versendet",
+      "Selbstständige Anmeldungen",
+      "Automatisch erzeugte Zusammenfassungen"
+    ],
+    "cards": {
+      "cotisations": {
+        "label": "BEITRÄGE",
+        "title": "Ein Beitrag in 3 Klicks versendet.",
+        "subtitle": "Sofort verständlich: Mitglieder, Beitrag, Versand.",
+        "summary": ["Mitglieder", "Beitrag", "Versand"],
+        "result": "Beitrag versendet ✓",
+        "steps": [
+          { "verb": "Wählen", "title": "Wählen", "text": "Mitglieder" },
+          { "verb": "Erstellen", "title": "Erstellen", "text": "Den Beitrag" },
+          { "verb": "Senden", "title": "Senden", "text": "Per E-Mail" }
+        ]
+      },
+      "plannings": {
+        "label": "PLÄNE",
+        "title": "Ein Plan, der sich fast von selbst füllt.",
+        "subtitle": "Der Vorstand erstellt den Bedarf, teilt einen Link und Freiwillige tragen sich selbst ein.",
+        "summary": ["Einteilungen", "Link", "Anmeldungen"],
+        "result": "8 von 10 Posten besetzt",
+        "steps": [
+          { "verb": "Erstellen", "title": "Erstellen", "text": "Einteilungen" },
+          { "verb": "Teilen", "title": "Teilen", "text": "Den Link" },
+          { "verb": "Füllen", "title": "Füllen", "text": "Automatisch" }
+        ]
+      },
+      "recapitulatif": {
+        "label": "ZUSAMMENFASSUNG",
+        "title": "Ein PDF automatisch erstellt.",
+        "subtitle": "Anmeldungen werden automatisch organisiert und das PDF ist sofort teilbar.",
+        "summary": ["Anmeldungen", "Plan", "PDF"],
+        "result": "PDF bereit ✓",
+        "steps": [
+          { "verb": "Sammeln", "title": "Sammeln", "text": "Anmeldungen" },
+          { "verb": "Ordnen", "title": "Ordnen", "text": "Den Plan" },
+          { "verb": "Erzeugen", "title": "Erzeugen", "text": "Das PDF" }
+        ]
+      }
+    }
+  },
   "modules": {
-    "label": "Vereinsverwaltung",
+    "label": "01 / DIE PLATTFORM",
     "titleLine1": "Wechseln Sie zu klarerer",
     "titleLine2": "Vereinsverwaltung",
-    "title": "Wechseln Sie zu klarerer Vereinsverwaltung",
-    "subtitle": "Obillz bündelt die wichtigen Informationen Ihres Vereins, damit Ihr Vorstand Zeit spart, besser organisiert bleibt und nichts vergisst.",
+    "title": "Die gesamte Verwaltung Ihres Vereins. An einem Ort vereint.",
+    "subtitle": "Mitglieder, Beiträge, Veranstaltungen, Pläne, Sponsoren und Dokumente in einer einzigen Plattform, die Alltagsaufgaben vereinfacht und Ihrem Vorstand wertvolle Zeit spart.",
+    "benefits": {
+      "cotisations": "Beiträge in wenigen Klicks versendet.",
+      "plannings": "Freiwillige tragen sich selbst in die Pläne ein.",
+      "recapitulatifs": "Zusammenfassungen werden automatisch erzeugt."
+    },
     "cta": "Kostenlos testen",
     "gridCards": [
       {

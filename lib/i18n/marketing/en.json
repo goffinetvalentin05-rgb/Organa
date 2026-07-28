@@ -17,7 +17,7 @@
     "title": "Run your club without losing your evenings.",
     "titleLine1": "Run your club",
     "titleLine2": "without losing your evenings.",
-    "subtitle": "Invoices, members, membership fees, events and payments in one platform built for sports clubs.",
+    "subtitle": "Obillz simplifies membership fees, schedules, event organisation and admin tasks for your club, while bringing all your management together in a single platform.",
     "keywords": "Members • Fees • Invoices • Events",
     "ctaPrimary": "Try Obillz for free",
     "ctaSecondary": "See how it works",
@@ -79,12 +79,67 @@
       "page-publique": { "subtitle": "Online showcase" }
     }
   },
+  "threeSteps": {
+    "label": "01 / LESS ADMIN",
+    "title": "Less admin. More time for your club.",
+    "subtitle": "Obillz simplifies the tasks that currently take committees hours.",
+    "discreetLead": "Three steps are enough.",
+    "conclusion": "What used to take an evening now takes just a few minutes.",
+    "benefits": [
+      "Membership fees sent in just a few clicks",
+      "Self-serve sign-ups",
+      "Automatic recap PDFs"
+    ],
+    "cards": {
+      "cotisations": {
+        "label": "MEMBERSHIP FEES",
+        "title": "A fee sent in 3 clicks.",
+        "subtitle": "Understood instantly: members, fee, send.",
+        "summary": ["Members", "Fee", "Send"],
+        "result": "Fee sent ✓",
+        "steps": [
+          { "verb": "Select", "title": "Select", "text": "Members" },
+          { "verb": "Write", "title": "Write", "text": "The fee" },
+          { "verb": "Send", "title": "Send", "text": "By email" }
+        ]
+      },
+      "plannings": {
+        "label": "SCHEDULES",
+        "title": "A schedule that almost fills itself.",
+        "subtitle": "The committee creates the needs, shares a link, then volunteers sign themselves up.",
+        "summary": ["Assignments", "Link", "Sign-ups"],
+        "result": "8 out of 10 slots filled",
+        "steps": [
+          { "verb": "Create", "title": "Create", "text": "Assignments" },
+          { "verb": "Share", "title": "Share", "text": "The link" },
+          { "verb": "Fill", "title": "Fill", "text": "Automatically" }
+        ]
+      },
+      "recapitulatif": {
+        "label": "RECAP",
+        "title": "A PDF generated automatically.",
+        "subtitle": "Sign-ups are organised automatically and the PDF is ready to share.",
+        "summary": ["Sign-ups", "Schedule", "PDF"],
+        "result": "PDF ready ✓",
+        "steps": [
+          { "verb": "Collect", "title": "Collect", "text": "Sign-ups" },
+          { "verb": "Organise", "title": "Organise", "text": "The schedule" },
+          { "verb": "Generate", "title": "Generate", "text": "The PDF" }
+        ]
+      }
+    }
+  },
   "modules": {
     "label": "01 / THE PLATFORM",
     "titleLine1": "All your club management,",
     "titleLine2": "in one place.",
-    "title": "All your club management, in one place.",
-    "subtitle": "Members, membership fees, events, documents, sponsors and much more — united in one clear, intuitive platform.",
+    "title": "All your club management. Brought together in one place.",
+    "subtitle": "Members, fees, event organisation, schedules, sponsors and documents in a single platform designed to simplify daily tasks and save valuable time for your committee.",
+    "benefits": {
+      "cotisations": "Membership fees sent in just a few clicks.",
+      "plannings": "Volunteers sign themselves up to schedules.",
+      "recapitulatifs": "Recaps are generated automatically."
+    },
     "searchHint": "Looking for a feature? Obillz has it.",
     "searchPlaceholder": "Search for a feature…",
     "demoQueries": ["membership fees", "schedule", "minutes", "sponsors"],

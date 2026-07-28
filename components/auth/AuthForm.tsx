@@ -68,11 +68,13 @@ export function AuthSplitFrame({
 }
 
 export function AuthBrandPanel({
+  visual,
   badge,
   title,
   subtitle,
   children,
 }: {
+  visual?: ReactNode;
   badge: string;
   title: string;
   subtitle: string;
@@ -80,6 +82,7 @@ export function AuthBrandPanel({
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {visual ? <div className="mb-6">{visual}</div> : null}
       <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-200/90">{badge}</p>
       <h1 className="mt-3 text-balance text-[1.65rem] font-black leading-[1.15] tracking-tight text-white sm:mt-4 sm:text-3xl lg:text-[2.05rem]">
         {title}

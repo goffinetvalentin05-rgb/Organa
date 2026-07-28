@@ -17,7 +17,7 @@
     "title": "Gérez votre club sans perdre vos soirées.",
     "titleLine1": "Gérez votre club",
     "titleLine2": "sans perdre vos soirées.",
-    "subtitle": "Obillz centralise vos membres, cotisations, événements, sponsors et documents dans une plateforme simple, pensée pour les clubs sportifs.",
+    "subtitle": "Obillz simplifie les cotisations, plannings, manifestations et tâches administratives de votre club, tout en regroupant toute votre gestion dans une seule plateforme.",
     "keywords": "Membres • Cotisations • Factures • Événements",
     "ctaPrimary": "Tester Obillz gratuitement",
     "ctaSecondary": "Voir comment ça marche",
@@ -79,10 +79,101 @@
       "page-publique": { "subtitle": "Vitrine en ligne" }
     }
   },
+  "threeSteps": {
+    "label": "01 / MOINS D’ADMINISTRATIF",
+    "title": "Moins d’administratif. Plus de temps pour votre club.",
+    "subtitle": "Obillz simplifie les tâches qui prennent aujourd’hui des heures aux comités.",
+    "discreetLead": "Trois étapes suffisent.",
+    "conclusion": "Ce qui prenait une soirée ne prend désormais que quelques minutes.",
+    "benefits": [
+      "Cotisations envoyées en quelques clics",
+      "Inscriptions autonomes",
+      "Récapitulatifs générés automatiquement"
+    ],
+    "cards": {
+      "cotisations": {
+        "label": "COTISATIONS",
+        "title": "Une cotisation envoyée en 3 clics.",
+        "subtitle": "Compris immédiatement : membres, cotisation, envoi.",
+        "summary": ["Membres", "Cotisation", "Envoi"],
+        "result": "Cotisation envoyée ✓",
+        "steps": [
+          {
+            "verb": "Sélectionner",
+            "title": "Sélectionner",
+            "text": "Les membres"
+          },
+          {
+            "verb": "Rédiger",
+            "title": "Rédiger",
+            "text": "La cotisation"
+          },
+          {
+            "verb": "Envoyer",
+            "title": "Envoyer",
+            "text": "Par e-mail"
+          }
+        ]
+      },
+      "plannings": {
+        "label": "PLANNINGS",
+        "title": "Un planning qui se remplit tout seul.",
+        "subtitle": "Le comité crée les besoins, partage un lien, puis les bénévoles s’inscrivent.",
+        "summary": ["Affectations", "Lien", "Inscriptions"],
+        "result": "8 postes sur 10 remplis",
+        "steps": [
+          {
+            "verb": "Créer",
+            "title": "Créer",
+            "text": "Les affectations"
+          },
+          {
+            "verb": "Partager",
+            "title": "Partager",
+            "text": "Le lien"
+          },
+          {
+            "verb": "Remplir",
+            "title": "Remplir",
+            "text": "Automatiquement"
+          }
+        ]
+      },
+      "recapitulatif": {
+        "label": "RÉCAPITULATIF",
+        "title": "Un PDF généré automatiquement.",
+        "subtitle": "Les inscriptions sont organisées automatiquement et le PDF est prêt à partager.",
+        "summary": ["Inscriptions", "Planning", "PDF"],
+        "result": "PDF prêt ✓",
+        "steps": [
+          {
+            "verb": "Récupérer",
+            "title": "Récupérer",
+            "text": "Les inscriptions"
+          },
+          {
+            "verb": "Organiser",
+            "title": "Organiser",
+            "text": "Le planning"
+          },
+          {
+            "verb": "Générer",
+            "title": "Générer",
+            "text": "Le PDF"
+          }
+        ]
+      }
+    }
+  },
   "modules": {
     "label": "01 / LA PLATEFORME",
-    "title": "Toute la gestion de votre club, au même endroit.",
-    "subtitle": "Membres, cotisations, événements, documents, sponsors et bien plus encore, réunis dans une seule plateforme claire et intuitive.",
+    "title": "Toute la gestion de votre club. Réunie au même endroit.",
+    "subtitle": "Membres, cotisations, manifestations, plannings, sponsors et documents réunis dans une seule plateforme, pensée pour simplifier les tâches du quotidien et faire gagner un temps précieux à votre comité.",
+    "benefits": {
+      "cotisations": "Cotisations envoyées en quelques clics.",
+      "plannings": "Les bénévoles s'inscrivent eux-mêmes aux plannings.",
+      "recapitulatifs": "Les récapitulatifs sont générés automatiquement."
+    },
     "searchHint": "Vous cherchez une fonctionnalité ? Obillz l'a.",
     "searchPlaceholder": "Rechercher une fonctionnalité…",
     "demoQueries": ["cotisations", "planning", "procès-verbal", "sponsors"],
