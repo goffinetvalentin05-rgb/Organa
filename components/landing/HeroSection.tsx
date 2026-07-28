@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
+import HeroStoryCta from "@/components/landing/HeroStoryCta";
 import {
   easePremium,
   heroCtaEnter,
@@ -13,7 +14,11 @@ import {
 } from "@/components/landing/landing-motion";
 import TrustStatsSection from "@/components/landing/TrustStatsSection";
 
-export default function HeroSection() {
+type HeroSectionProps = {
+  introReady?: boolean;
+};
+
+export default function HeroSection({ introReady = true }: HeroSectionProps) {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
 
@@ -93,6 +98,8 @@ export default function HeroSection() {
                 />
               </Link>
             </motion.div>
+
+            <HeroStoryCta ready={introReady} />
           </motion.div>
         </motion.div>
       </div>

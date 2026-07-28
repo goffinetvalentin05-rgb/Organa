@@ -3,10 +3,11 @@
 import { motion, useReducedMotion } from "framer-motion";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import WhyChooseSection from "@/components/landing/WhyChooseSection";
+import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
 import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
 
-/** Chapitre unique 02 + 03 — un seul panneau bleu Obillz. */
+/** Chapitre unique 02 + 03 + CTA — un seul panneau bleu Obillz. */
 export default function DiscoveryChapter() {
   const reduceMotion = useReducedMotion();
 
@@ -73,6 +74,7 @@ export default function DiscoveryChapter() {
         <div className="how-it-works-panel__content how-it-works-panel__content--chapter">
           <HowItWorksSection />
           <WhyChooseSection />
+          <AskChatGptSection embedded />
         </div>
       </motion.div>
     </div>

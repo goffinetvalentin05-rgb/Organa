@@ -629,7 +629,7 @@
     }
   },
   "askChatGpt": {
-    "title": "Toujours pas sûr qu'Obillz soit fait pour votre club ?",
+    "title": "Toujours pas sûr qu'Obillz\nsoit fait pour votre club ?",
     "subtitle": "Échangez directement avec le fondateur, posez vos questions et découvrez comment Obillz peut simplifier la gestion de votre club.",
     "cta": "Parler au fondateur",
     "note": "Démo, questions, accompagnement — réponse rapide",
@@ -851,35 +851,43 @@
     "instagramUrl": "https://www.instagram.com/obillz.ch?igsh=MW5rcmdsbmFkYmVlNA==",
     "facebookUrl": "https://www.facebook.com/share/1EEPuBdBRS/?mibextid=wwXIfr"
   },
+  "storyWidget": {
+    "title": "Découvrir la naissance d’Obillz",
+    "subtitle": "Découvrez pourquoi Obillz a été créé.",
+    "close": "Fermer"
+  },
   "ourStory": {
     "label": "NOTRE HISTOIRE",
-    "title": "La naissance d’Obillz",
-    "subtitle": "Une plateforme née d’un constat simple : les bénévoles des clubs méritent de meilleurs outils.",
+    "title": "L’histoire derrière Obillz.",
+    "subtitle": "Un parcours né sur le terrain — des clubs, des comités et des bénévoles.",
     "backToLanding": "Retour à l’accueil",
-    "timelineLabel": "CHRONOLOGIE",
-    "timelineTitle": "Le parcours Obillz",
-    "timelineIntro": "Cette chronologie sera complétée prochainement. Voici les grandes étapes prévues.",
-    "milestones": {
-      "constat": {
-        "title": "Le constat",
-        "placeholder": "Contenu à venir — le constat de départ qui a motivé Obillz."
+    "manifesto": "Obillz n’a pas été imaginé dans un bureau. Il est né sur le terrain.",
+    "timelineLabel": "Le parcours Obillz",
+    "steps": {
+      "grandir": {
+        "title": "Grandir dans les clubs",
+        "body": "Nous avons grandi dans des clubs sportifs, vécu les entraînements, les tournois, les buvettes, les manifestations et les soirées de comité."
+      },
+      "observer": {
+        "title": "Observer les problèmes",
+        "body": "Au fil des années, nous avons vu les mêmes difficultés revenir partout : Excel, WhatsApp, documents dispersés, cotisations, organisation compliquée."
       },
       "idee": {
-        "title": "L’idée",
-        "placeholder": "Contenu à venir — la naissance de l’idée Obillz."
+        "title": "Une idée",
+        "body": "Nous nous sommes demandé pourquoi aucun outil n’était réellement pensé pour les bénévoles."
       },
-      "creation": {
-        "title": "La création",
-        "placeholder": "Contenu à venir — la création de la plateforme."
+      "creer": {
+        "title": "Créer Obillz",
+        "body": "Nous avons commencé à construire un outil simple. Pas un logiciel imaginé dans un bureau, mais un outil créé à partir des besoins réels du terrain."
       },
-      "premiersClubs": {
-        "title": "Les premiers clubs",
-        "placeholder": "Contenu à venir — les premiers clubs utilisateurs."
-      },
-      "suite": {
-        "title": "La suite",
-        "placeholder": "Contenu à venir — la suite de l’aventure Obillz."
+      "construire": {
+        "title": "Construire avec les clubs",
+        "body": "Aujourd’hui encore, Obillz évolue grâce aux retours des clubs. Lorsqu’un besoin revient régulièrement, nous faisons notre maximum pour développer une nouvelle fonctionnalité."
       }
-    }
+    },
+    "ctaTitle": "Prêt à simplifier la vie de votre club ?",
+    "ctaSubtitle": "Découvrez Obillz, ou échangez directement avec le fondateur.",
+    "ctaDiscover": "Découvrir Obillz",
+    "ctaFounder": "Parler au fondateur"
   }
 }

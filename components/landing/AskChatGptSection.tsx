@@ -24,16 +24,29 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export default function AskChatGptSection() {
+export default function AskChatGptSection({
+  embedded = false,
+}: {
+  /** Intégré dans le panneau bleu Discovery (sans carte séparée). */
+  embedded?: boolean;
+}) {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
   const whatsappUrl = buildWhatsAppUrl(
     t("marketing.askChatGpt.whatsappPhone"),
     t("marketing.askChatGpt.message")
   );
+  const titleLines = t("marketing.askChatGpt.title").split("\n");
 
   return (
-    <section id="demander-chatgpt" className="landing-final-cta scroll-mt-24">
+    <section
+      id="demander-chatgpt"
+      className={
+        embedded
+          ? "landing-final-cta landing-final-cta--embedded discovery-chapter__block discovery-chapter__block--ask scroll-mt-32 md:scroll-mt-36"
+          : "landing-final-cta scroll-mt-24"
+      }
+    >
       <div className="landing-final-cta__frame">
         <motion.div
           variants={scrollReveal}
@@ -42,12 +55,14 @@ export default function AskChatGptSection() {
           viewport={viewportOnce}
           className="landing-final-cta__stage"
         >
-          <div className="landing-final-cta__atmosphere" aria-hidden>
-            <span className="landing-final-cta__blob landing-final-cta__blob--tl" />
-            <span className="landing-final-cta__blob landing-final-cta__blob--br" />
-            <span className="landing-final-cta__blob landing-final-cta__blob--c" />
-            <span className="landing-final-cta__grain" />
-          </div>
+          {!embedded ? (
+            <div className="landing-final-cta__atmosphere" aria-hidden>
+              <span className="landing-final-cta__blob landing-final-cta__blob--tl" />
+              <span className="landing-final-cta__blob landing-final-cta__blob--br" />
+              <span className="landing-final-cta__blob landing-final-cta__blob--c" />
+              <span className="landing-final-cta__grain" />
+            </div>
+          ) : null}
 
           <div className="landing-final-cta__grid">
             <motion.div
@@ -58,7 +73,11 @@ export default function AskChatGptSection() {
               className="landing-final-cta__copy"
             >
               <motion.h2 variants={staggerItem} className="landing-final-cta__title display-title">
-                {t("marketing.askChatGpt.title")}
+                {titleLines.map((line, index) => (
+                  <span key={index} className="landing-final-cta__title-line">
+                    {line}
+                  </span>
+                ))}
               </motion.h2>
 
               <motion.p variants={staggerItem} className="landing-final-cta__subtitle">

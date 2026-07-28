@@ -1,7 +1,7 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
-  /* Typography — Inter pour body/UI et titres marketing display */
+  /* Typography â€” Inter pour body/UI et titres marketing display */
   --font-heading: var(--font-heading);
   --font-body: var(--font-heading);
   --font-display: var(--font-heading);
@@ -12,7 +12,7 @@
   --obillz-blue-light: rgba(26, 35, 255, 0.08);
   --obillz-blue-border: rgba(26, 35, 255, 0.25);
 
-  /* Colors - Landing (bleu nuit foncé premium) */
+  /* Colors - Landing (bleu nuit foncÃ© premium) */
   --bg-landing-start: #03062A;
   --bg-landing-mid: #050A3A;
   --bg-landing-end: #0A1A5E;
@@ -100,7 +100,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Fond par défaut : marketing / auth / pages légales (évite les bandes blanches iOS Safari) */
+/* Fond par dÃ©faut : marketing / auth / pages lÃ©gales (Ã©vite les bandes blanches iOS Safari) */
 body.app-bg {
   background-color: #020617 !important;
   min-height: 100dvh !important;
@@ -119,6 +119,14 @@ body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
   background-color: #020817 !important;
 }
 
+body.app-bg:has(.our-story-page) {
+  background-color: #071634 !important;
+}
+
+html:has(.our-story-page) {
+  background-color: #071634;
+}
+
 body.app-bg:has(.dashboard-shell),
 body.app-bg:has(.obillz-dashboard) {
   background-color: #F4F7FB !important;
@@ -129,7 +137,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Landing marketing (tarifs, légal, auth) — fond navy uniforme
+   Landing marketing (tarifs, lÃ©gal, auth) â€” fond navy uniforme
    ------------------------------------------------------------------ */
 .obillz-landing:not(.obillz-landing-home)::before {
   content: "";
@@ -158,7 +166,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Landing accueil — hero bleu + feuille blanche + footer sombre
+   Landing accueil â€” hero bleu + feuille blanche + footer sombre
    ------------------------------------------------------------------ */
 .obillz-landing-home {
   --sheet-overlap-pull: 48px;
@@ -174,7 +182,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Conteneur landing — gutter cohérent (20px mobile) */
+/* Conteneur landing â€” gutter cohÃ©rent (20px mobile) */
 .landing-container {
   width: min(1240px, calc(100% - (var(--landing-gutter) * 2)));
   max-width: 1240px;
@@ -196,7 +204,7 @@ html:has(.dashboard-shell) {
   display: none;
 }
 
-/* Navbar landing — thème sombre / clair selon le scroll */
+/* Navbar landing â€” thÃ¨me sombre / clair selon le scroll */
 .landing-nav-header {
   transition:
     background 0.32s ease,
@@ -240,7 +248,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Hero — styles DESKTOP (défaut, hors media query)
+   Hero â€” styles DESKTOP (dÃ©faut, hors media query)
    ------------------------------------------------------------------ */
 .landing-hero-shell {
   position: relative;
@@ -295,7 +303,7 @@ html:has(.dashboard-shell) {
   display: none;
 }
 
-/* Bloc principal — desktop */
+/* Bloc principal â€” desktop */
 .landing-hero-content {
   position: relative;
   z-index: 2;
@@ -344,9 +352,13 @@ html:has(.dashboard-shell) {
   position: relative;
   z-index: 20;
   margin-top: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.95rem;
 }
 
-/* Stats — desktop : 4 colonnes */
+/* Stats â€” desktop : 4 colonnes */
 .landing-trust-strip {
   position: relative;
   z-index: 2;
@@ -399,7 +411,7 @@ html:has(.dashboard-shell) {
   line-height: 1.45;
 }
 
-/* Feuille claire — fond premium (dot grid + halos bleus subtils) */
+/* Feuille claire â€” fond premium (dot grid + halos bleus subtils) */
 .landing-light-zone {
   position: relative;
   z-index: 5;
@@ -421,7 +433,7 @@ html:has(.dashboard-shell) {
     0 -1px 0 rgba(2, 6, 23, 0.04);
 }
 
-/* Halos / lueurs bleues très discrètes */
+/* Halos / lueurs bleues trÃ¨s discrÃ¨tes */
 .landing-light-zone::before {
   content: "";
   position: absolute;
@@ -462,7 +474,7 @@ html:has(.dashboard-shell) {
     );
 }
 
-/* Dot grid + grille géométrique très légère */
+/* Dot grid + grille gÃ©omÃ©trique trÃ¨s lÃ©gÃ¨re */
 .landing-light-zone::after {
   content: "";
   position: absolute;
@@ -507,7 +519,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Features orbit — bulles interactives autour du titre
+   Features orbit â€” bulles interactives autour du titre
    ------------------------------------------------------------------ */
 .features-orbit-section-content {
   margin-top: 0;
@@ -852,7 +864,7 @@ html:has(.dashboard-shell) {
   outline-offset: 3px;
 }
 
-/* —— Mobile native layout —— */
+/* â€”â€” Mobile native layout â€”â€” */
 .features-orbit-mobile {
   display: none;
 }
@@ -1253,7 +1265,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Desktop : hero légèrement plus haut que le viewport pour masquer la feuille */
+/* Desktop : hero lÃ©gÃ¨rement plus haut que le viewport pour masquer la feuille */
 @media (min-width: 769px) {
   .landing-hero-shell {
     min-height: calc(100svh + 48px);
@@ -1268,7 +1280,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Hero mobile — UNIQUEMENT max-width: 768px
+   Hero mobile â€” UNIQUEMENT max-width: 768px
    ------------------------------------------------------------------ */
 @media (max-width: 768px) {
   .landing-hero-shell {
@@ -1277,7 +1289,7 @@ html:has(.dashboard-shell) {
     overflow-x: clip;
   }
 
-  /* Premier écran = hero seulement (réassurances sous la ligne de flottaison) */
+  /* Premier Ã©cran = hero seulement (rÃ©assurances sous la ligne de flottaison) */
   .landing-hero-content {
     z-index: 2;
     flex: 0 0 auto;
@@ -1329,7 +1341,7 @@ html:has(.dashboard-shell) {
     font-size: 0.9375rem;
   }
 
-  /* Réassurances : sous le fold */
+  /* RÃ©assurances : sous le fold */
   .landing-trust-strip {
     margin-top: 0;
   }
@@ -1437,12 +1449,12 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Retire les atmosphères sombres des sections claires */
+/* Retire les atmosphÃ¨res sombres des sections claires */
 .landing-light-zone > section > [aria-hidden="true"].pointer-events-none {
   display: none;
 }
 
-/* Footer — socle bleu Obillz */
+/* Footer â€” socle bleu Obillz */
 .site-footer {
   position: relative;
   z-index: 1;
@@ -1458,7 +1470,7 @@ html:has(.dashboard-shell) {
   background-color: #071634;
 }
 
-/* Même dégradé que le hero landing */
+/* MÃªme dÃ©gradÃ© que le hero landing */
 .site-footer::before {
   content: "";
   position: absolute;
@@ -1654,7 +1666,7 @@ html:has(.dashboard-shell) {
   font-size: 0.75rem;
 }
 
-/* Zone basse : trait + réseaux + watermark coupé sous le trait */
+/* Zone basse : trait + rÃ©seaux + watermark coupÃ© sous le trait */
 .footer-closing {
   position: relative;
   z-index: 1;
@@ -1664,7 +1676,7 @@ html:has(.dashboard-shell) {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-/* Haut des lettres juste sous le trait, bas coupé par overflow */
+/* Haut des lettres juste sous le trait, bas coupÃ© par overflow */
 .footer-watermark {
   position: absolute;
   left: 50%;
@@ -1761,13 +1773,13 @@ html:has(.dashboard-shell) {
     padding-top: 1.35rem;
   }
 
-  /* Watermark trop gênant sur mobile — on le masque */
+  /* Watermark trop gÃªnant sur mobile â€” on le masque */
   .footer-watermark {
     display: none;
   }
 }
 
-/* Pages légales — footer autonome (même dégradé hero) */
+/* Pages lÃ©gales â€” footer autonome (mÃªme dÃ©gradÃ© hero) */
 .obillz-landing:not(.obillz-landing-home) .site-footer,
 .legal-page .site-footer {
   min-height: 0;
@@ -1779,14 +1791,14 @@ html:has(.dashboard-shell) {
   margin-top: 0;
 }
 
-/* Dernier élément visuel — aucun espace après le footer sur l’accueil */
+/* Dernier Ã©lÃ©ment visuel â€” aucun espace aprÃ¨s le footer sur lâ€™accueil */
 .obillz-landing-home,
 .obillz-landing-home > .relative.z-10 {
   padding-bottom: 0;
   margin-bottom: 0;
 }
 
-/* Carte CTA fondateur — ombre légère, sans glow bas (legacy) */
+/* Carte CTA fondateur â€” ombre lÃ©gÃ¨re, sans glow bas (legacy) */
 .landing-premium-card--flat-shadow {
   background:
     radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 40%),
@@ -1803,7 +1815,7 @@ html:has(.dashboard-shell) {
   transform: none;
 }
 
-/* Social proof / tarifs / FAQ — même dégradé hero / footer */
+/* Social proof / tarifs / FAQ â€” mÃªme dÃ©gradÃ© hero / footer */
 .social-proof-panel,
 .landing-obillz-gradient.landing-premium-card,
 .landing-obillz-gradient.landing-glass-card {
@@ -1903,12 +1915,19 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Pourquoi choisir Obillz — éventail de cartes interactives
+   Pourquoi choisir Obillz â€” Ã©ventail de cartes interactives
    ------------------------------------------------------------------ */
 .discovery-chapter__block--why {
   margin-top: clamp(8rem, 18vw, 14rem);
   padding-top: clamp(2rem, 4vw, 3.5rem);
-  padding-bottom: clamp(1rem, 3vw, 2.25rem);
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+/* CTA Â« Toujours pas sÃ»râ€¦ Â» â€” respiration gÃ©nÃ©reuse aprÃ¨s Why Choose */
+.discovery-chapter__block--ask {
+  margin-top: clamp(18rem, 26vw, 24rem);
+  padding-top: clamp(3.5rem, 6vw, 5rem);
+  padding-bottom: clamp(0.5rem, 2vw, 1.25rem);
 }
 
 .why-choose__intro {
@@ -1928,6 +1947,7 @@ html:has(.dashboard-shell) {
 .why-fan {
   position: relative;
   margin-top: clamp(3.5rem, 8vw, 6.5rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .why-fan__halo {
@@ -2186,7 +2206,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Mobile — slider horizontal snap */
+/* Mobile â€” slider horizontal snap */
 
 .why-fan__scroller {
   display: flex;
@@ -2267,21 +2287,35 @@ html:has(.dashboard-shell) {
   .discovery-chapter__block--why {
     margin-top: clamp(11rem, 15vw, 17rem);
     padding-top: clamp(2.5rem, 3.5vw, 4rem);
+    padding-bottom: clamp(4rem, 7vw, 6.5rem);
+  }
+
+  .discovery-chapter__block--ask {
+    margin-top: clamp(20rem, 22vw, 26rem);
+    padding-top: clamp(4rem, 6vw, 5.5rem);
     padding-bottom: clamp(1.5rem, 3vw, 2.75rem);
   }
 
   .why-fan {
     margin-top: clamp(4.5rem, 7vw, 7rem);
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
   }
 }
 
 @media (max-width: 767px) {
   .discovery-chapter__block--why {
     margin-top: clamp(6.5rem, 22vw, 9.5rem);
+    padding-bottom: clamp(2.5rem, 8vw, 4rem);
+  }
+
+  .discovery-chapter__block--ask {
+    margin-top: clamp(14rem, 32vw, 18rem);
+    padding-top: clamp(2.5rem, 7vw, 4rem);
   }
 
   .why-fan {
     margin-top: clamp(3rem, 10vw, 4.25rem);
+    margin-bottom: clamp(1.25rem, 4vw, 2rem);
   }
 }
 
@@ -2293,7 +2327,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Tarifs — carte verticale + intro, duo centré */
+/* Tarifs â€” carte verticale + intro, duo centrÃ© */
 .pricing-split {
   display: grid;
   align-items: center;
@@ -2370,7 +2404,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* How it works — accents alignés sur le dégradé hero / footer */
+/* How it works â€” accents alignÃ©s sur le dÃ©gradÃ© hero / footer */
 .how-it-works-blue-fill {
   background: linear-gradient(180deg, #3b8aef 0%, #175dd4 45%, #1a23ff 100%);
   box-shadow:
@@ -2498,7 +2532,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   How it works — grand panneau bleu premium Obillz
+   How it works â€” grand panneau bleu premium Obillz
    ------------------------------------------------------------------ */
 .how-it-works-panel {
   position: relative;
@@ -2621,7 +2655,7 @@ html:has(.dashboard-shell) {
   padding-bottom: clamp(5rem, 9vw, 7.5rem);
 }
 
-/* Texte intro adapté au fond bleu */
+/* Texte intro adaptÃ© au fond bleu */
 .how-it-works-panel .landing-section-label {
   color: rgba(186, 230, 253, 0.78);
 }
@@ -2784,7 +2818,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* How it works — composition mobile dédiée (style éditorial) */
+/* How it works â€” composition mobile dÃ©diÃ©e (style Ã©ditorial) */
 .how-it-works-mobile {
   display: flex;
   flex-direction: column;
@@ -2942,7 +2976,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Landing — CTA finale immersive (scène 2 colonnes + orb glass)
+   Landing â€” CTA finale immersive (scÃ¨ne 2 colonnes + orb glass)
    ------------------------------------------------------------------ */
 .landing-page-end {
   position: relative;
@@ -2960,6 +2994,83 @@ html:has(.dashboard-shell) {
     0
     clamp(1.5rem, 3.5vw, 2.75rem);
   overflow: visible;
+}
+
+/* IntÃ©grÃ© au panneau Discovery â€” pas de carte / fond sÃ©parÃ©s */
+.landing-final-cta--embedded {
+  z-index: 1;
+  padding: 0;
+  overflow: visible;
+}
+
+.landing-final-cta--embedded .landing-final-cta__frame {
+  /* Un peu moins large / moins dÃ©calÃ© vers le centre quâ€™avant */
+  width: min(1020px, calc(100% - clamp(1rem, 3.5vw, 2.5rem)));
+  max-width: 1020px;
+  margin-inline: auto;
+}
+
+.landing-final-cta--embedded .landing-final-cta__stage {
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.landing-final-cta--embedded .landing-final-cta__grid {
+  min-height: 0;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  padding:
+    clamp(0.5rem, 1.5vw, 1rem)
+    clamp(0.5rem, 2vw, 1.25rem)
+    clamp(0.25rem, 1vw, 0.75rem);
+}
+
+.landing-final-cta--embedded .landing-final-cta__copy {
+  /* LÃ©ger dÃ©calage Ã  droite, mais un cran plus Ã  gauche quâ€™avant */
+  margin-left: clamp(0.25rem, 1.5vw, 1.25rem);
+  max-width: min(100%, 40rem);
+}
+
+.landing-final-cta--embedded .landing-final-cta__title {
+  color: #ffffff;
+  max-width: none;
+  text-wrap: unset;
+}
+
+/* Exactement 2 lignes : chaque segment i18n (\n) = 1 ligne, sans rewrap */
+.landing-final-cta--embedded .landing-final-cta__title-line {
+  display: block;
+}
+
+@media (min-width: 901px) {
+  .landing-final-cta--embedded .landing-final-cta__title-line {
+    white-space: nowrap;
+  }
+
+  .landing-final-cta--embedded .landing-final-cta__grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  }
+}
+
+.landing-final-cta--embedded .landing-final-cta__subtitle {
+  color: rgba(226, 242, 255, 0.78);
+}
+
+@media (max-width: 900px) {
+  .landing-final-cta--embedded .landing-final-cta__frame {
+    width: min(100%, calc(100% - 0.5rem));
+  }
+
+  .landing-final-cta--embedded .landing-final-cta__copy {
+    margin-left: 0;
+    max-width: none;
+  }
+
+  .landing-final-cta--embedded .landing-final-cta__grid {
+    padding-inline: 0;
+  }
 }
 
 .landing-page-end .landing-final-cta {
@@ -3152,7 +3263,7 @@ html:has(.dashboard-shell) {
   animation: landing-cta-shimmer 0.75s ease;
 }
 
-/* Visuel droit — orb glassmorphism */
+/* Visuel droit â€” orb glassmorphism */
 .landing-final-cta__visual {
   position: relative;
   display: grid;
@@ -3381,7 +3492,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Breakpoints fins — téléphone étroit */
+/* Breakpoints fins â€” tÃ©lÃ©phone Ã©troit */
 @media (max-width: 430px) {
   .landing-hero-title {
     font-size: clamp(1.9rem, 8.8vw, 2.45rem);
@@ -3461,7 +3572,7 @@ html:has(.dashboard-shell) {
 }
 
 /* ------------------------------------------------------------------
-   Landing — design system en-têtes de section (fond clair)
+   Landing â€” design system en-tÃªtes de section (fond clair)
    ------------------------------------------------------------------ */
 .landing-section {
   padding-top: clamp(4rem, 8vw, 5.5rem);
@@ -3566,7 +3677,7 @@ body.app-bg::after {
   display: none;
 }
 
-/* Pas de pseudo-éléments sur le body : le fond landing est porté par `.dashboard-shell`. */
+/* Pas de pseudo-Ã©lÃ©ments sur le body : le fond landing est portÃ© par `.dashboard-shell`. */
 body.app-bg:has(.dashboard-shell)::before {
   display: none;
 }
@@ -3796,7 +3907,7 @@ body.app-bg > * {
   font-family: var(--font-body), sans-serif;
 }
 
-/* Titres marketing display (Inter) — ne pas appliquer globalement aux h1/h2 SaaS */
+/* Titres marketing display (Inter) â€” ne pas appliquer globalement aux h1/h2 SaaS */
 .display-title {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
@@ -3862,7 +3973,7 @@ h3 {
   background: var(--bg-surface-hover);
 }
 
-/* Typographie SaaS — titres de page maîtrisés (pas de titres écrasants) */
+/* Typographie SaaS â€” titres de page maÃ®trisÃ©s (pas de titres Ã©crasants) */
 .dashboard-shell h1 {
   font-size: 1.75rem !important;
   line-height: 1.2 !important;
@@ -3887,7 +3998,7 @@ h3 {
   }
 }
 
-/* Titres de section / cartes — restent lisibles sans concurrencer le H1 */
+/* Titres de section / cartes â€” restent lisibles sans concurrencer le H1 */
 .dashboard-shell .dashboard-section-title {
   font-size: 1rem !important;
   line-height: 1.35 !important;
@@ -3901,7 +4012,7 @@ h3 {
   }
 }
 
-/* Titres principaux des pages dashboard — lisibles sur fond clair */
+/* Titres principaux des pages dashboard â€” lisibles sur fond clair */
 .dashboard-shell main h1 {
   color: #0F172A !important;
 }
@@ -3911,7 +4022,7 @@ h3 {
   color: #64748B !important;
 }
 
-/* Cartes dans le contenu : titres internes (MFA, modales…) */
+/* Cartes dans le contenu : titres internes (MFA, modalesâ€¦) */
 .dashboard-shell main .dashboard-card-surface h1 {
   color: #0F172A !important;
   font-size: 1.25rem !important;
@@ -3938,10 +4049,10 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Harmonisation legacy → design system clair (dashboard-shell).
+   Harmonisation legacy â†’ design system clair (dashboard-shell).
    ------------------------------------------------------------------ */
 
-/* Cartes / panneaux legacy → surface blanche */
+/* Cartes / panneaux legacy â†’ surface blanche */
 .dashboard-shell main .bg-surface,
 .dashboard-shell main [class*="bg-surface/"] {
   background: #FFFFFF !important;
@@ -3975,7 +4086,7 @@ h3 {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06) !important;
 }
 
-/* Champs formulaires — fond clair + texte foncé (lisibilité max) */
+/* Champs formulaires â€” fond clair + texte foncÃ© (lisibilitÃ© max) */
 .dashboard-shell {
   color-scheme: light;
 }
@@ -4229,7 +4340,7 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Landing premium — carte référence (navy sombre + glow bas cyan/bleu)
+   Landing premium â€” carte rÃ©fÃ©rence (navy sombre + glow bas cyan/bleu)
    ------------------------------------------------------------------ */
 .landing-premium-card {
   position: relative;
@@ -4300,7 +4411,7 @@ h3 {
   z-index: 1;
 }
 
-/* Carte 05 — documents : texte au-dessus, visuel contenu en bas */
+/* Carte 05 â€” documents : texte au-dessus, visuel contenu en bas */
 .feature-card-documents {
   display: flex;
   flex-direction: column;
@@ -4335,7 +4446,7 @@ h3 {
   border-radius: 1.35rem;
 }
 
-/* Panneau interne — pills, rows, widgets */
+/* Panneau interne â€” pills, rows, widgets */
 .landing-premium-inner {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
@@ -4358,7 +4469,7 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Landing premium — cartes glass (alias → premium card)
+   Landing premium â€” cartes glass (alias â†’ premium card)
    ------------------------------------------------------------------ */
 .landing-glass-card {
   position: relative;
@@ -4462,7 +4573,7 @@ h3 {
   );
 }
 
-/* Hero compact — pages marketing (tarifs, etc.) */
+/* Hero compact â€” pages marketing (tarifs, etc.) */
 .landing-pricing-hero {
   position: relative;
   z-index: 1;
@@ -4533,7 +4644,7 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Dashboard Obillz Premium — sidebar bleue + contenu clair
+   Dashboard Obillz Premium â€” sidebar bleue + contenu clair
    ------------------------------------------------------------------ */
 
 .dashboard-shell {
@@ -4542,7 +4653,7 @@ h3 {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  /* Ne pas utiliser overflow:clip/hidden ici : ça crée un containing block
+  /* Ne pas utiliser overflow:clip/hidden ici : Ã§a crÃ©e un containing block
      qui casse position:fixed sur la sidebar. */
   overflow: visible;
   color: #0F172A;
@@ -4553,7 +4664,7 @@ h3 {
   content: none;
 }
 
-/* Tokens palette espace connecté — source unique */
+/* Tokens palette espace connectÃ© â€” source unique */
 .dashboard-shell {
   --dashboard-sidebar-width: 17.5rem;
   --dashboard-sidebar-width-collapsed: 4.75rem;
@@ -4594,7 +4705,7 @@ h3 {
   transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Même dégradé + halo que le footer landing */
+/* MÃªme dÃ©gradÃ© + halo que le footer landing */
 .dashboard-sidebar::before {
   content: "";
   position: absolute;
@@ -5082,12 +5193,12 @@ h3 {
 }
 
 /* ------------------------------------------------------------------
-   Dashboard clair — lisibilité & cohérence.
-   Remappe les classes « thème sombre » résiduelles vers la palette claire.
+   Dashboard clair â€” lisibilitÃ© & cohÃ©rence.
+   Remappe les classes Â« thÃ¨me sombre Â» rÃ©siduelles vers la palette claire.
    La sidebar reste hors de `main` et conserve son rendu bleu.
    ------------------------------------------------------------------ */
 
-/* Textes clairs hardcodés (legacy dark) → texte foncé lisible.
+/* Textes clairs hardcodÃ©s (legacy dark) â†’ texte foncÃ© lisible.
    Ne pas remapper `text-white` sur boutons/liens accent. */
 .dashboard-shell main [class*="text-white/9"],
 .dashboard-shell main [class*="text-white/8"],
@@ -5170,7 +5281,7 @@ h3 {
   color: #64748B !important;
 }
 
-/* Textes foncés — conserver (thème clair) */
+/* Textes foncÃ©s â€” conserver (thÃ¨me clair) */
 .dashboard-shell main [class*="text-[#10172A]"],
 .dashboard-shell main [class*="text-[#0B1220]"],
 .dashboard-shell main [class*="text-[#0F172A]"],
@@ -5213,7 +5324,7 @@ h3 {
   color: #0B1220 !important;
 }
 
-/* Surfaces navy résiduelles → blanc (hors boutons/liens accent) */
+/* Surfaces navy rÃ©siduelles â†’ blanc (hors boutons/liens accent) */
 .dashboard-shell main [class*="bg-[#0F2744]"]:not(button):not(a),
 .dashboard-shell main [class*="bg-[#071634]"]:not(button):not(a),
 .dashboard-shell main [class*="bg-[#123055]"]:not(button):not(a),
@@ -5231,7 +5342,7 @@ h3 {
   color: #FFFFFF !important;
 }
 
-/* Surfaces blanches / pâles — conserver */
+/* Surfaces blanches / pÃ¢les â€” conserver */
 .dashboard-shell main .bg-white:not(input):not(textarea):not(select),
 .dashboard-shell main [class~="bg-white"]:not(input):not(textarea):not(select) {
   background-color: #FFFFFF !important;
@@ -5282,7 +5393,7 @@ h3 {
   border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
-/* Status texts — lisibles sur fond clair */
+/* Status texts â€” lisibles sur fond clair */
 .dashboard-shell main .text-emerald-600,
 .dashboard-shell main .text-emerald-700 {
   color: #059669 !important;
@@ -5359,7 +5470,7 @@ h3 {
   color: #B45309 !important;
 }
 
-/* Badges / pastilles — versions claires */
+/* Badges / pastilles â€” versions claires */
 .dashboard-shell main [class*="bg-emerald-500/"],
 .dashboard-shell main [class*="bg-emerald-50"] {
   background-color: rgba(16, 185, 129, 0.1) !important;
@@ -5407,7 +5518,7 @@ h3 {
   accent-color: #1a23ff;
 }
 
-/* Tableaux — lisibilité claire */
+/* Tableaux â€” lisibilitÃ© claire */
 .dashboard-shell main .dashboard-data-table td {
   color: #0F172A;
 }
@@ -5528,7 +5639,7 @@ h3 {
   background-color: transparent;
 }
 
-/* Icônes KPI / CTA bleus — texte blanc conservé */
+/* IcÃ´nes KPI / CTA bleus â€” texte blanc conservÃ© */
 .dashboard-shell main .dashboard-stat-icon,
 .dashboard-shell main .dashboard-stat-icon *,
 .dashboard-shell main .accent-bg,
@@ -5536,7 +5647,7 @@ h3 {
   color: #ffffff !important;
 }
 
-/* Hero — halo texte et profondeur */
+/* Hero â€” halo texte et profondeur */
 .landing-hero-title-glow {
   text-shadow:
     0 0 40px rgba(26, 35, 255, 0.6),
@@ -5555,7 +5666,7 @@ h3 {
   background-position: 100% 100%;
 }
 
-/* Texture grain légère — fond landing premium */
+/* Texture grain lÃ©gÃ¨re â€” fond landing premium */
 .landing-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
@@ -5581,7 +5692,7 @@ h3 {
   display: none;
 }
 
-/* Bouton CTA hero : léger pulse + apparition */
+/* Bouton CTA hero : lÃ©ger pulse + apparition */
 @keyframes hero-cta-pulse {
   0%, 100% {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 0 rgba(255, 255, 255, 0.4);
@@ -5644,7 +5755,7 @@ h3 {
   }
 }
 
-/* Amélioration des effets hover */
+/* AmÃ©lioration des effets hover */
 .hover-glow:hover {
   box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
   transform: translateY(-2px);
@@ -5654,7 +5765,7 @@ h3 {
   transform: scale(1.02);
 }
 
-/* Effets de lumière sur les cartes */
+/* Effets de lumiÃ¨re sur les cartes */
 .card-glow {
   position: relative;
   overflow: hidden;
@@ -5676,7 +5787,7 @@ h3 {
   opacity: 1;
 }
 
-/* Glow subtil pour les éléments premium */
+/* Glow subtil pour les Ã©lÃ©ments premium */
 .glow-subtle {
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
 }
@@ -5690,7 +5801,7 @@ h3 {
   background: linear-gradient(135deg, rgba(3, 6, 42, 0.95) 0%, rgba(5, 10, 58, 0.95) 50%, rgba(10, 26, 94, 0.95) 100%);
 }
 
-/* Ombre très subtile pour la profondeur */
+/* Ombre trÃ¨s subtile pour la profondeur */
 .shadow-premium {
   box-shadow: var(--shadow-card);
 }
@@ -5809,7 +5920,7 @@ h3 {
   border: 1px solid rgba(148, 163, 184, 0.22);
 }
 
-/* Badges dans l’espace connecté — contraste clair */
+/* Badges dans lâ€™espace connectÃ© â€” contraste clair */
 .dashboard-shell .badge-info {
   background: rgba(59, 130, 246, 0.1) !important;
   color: #1D4ED8 !important;
@@ -5862,7 +5973,7 @@ h3 {
   }
 }
 
-/* ─── Pages légales (fond clair premium) ─── */
+/* â”€â”€â”€ Pages lÃ©gales (fond clair premium) â”€â”€â”€ */
 .legal-page {
   min-height: 100vh;
   min-height: 100dvh;
@@ -6048,7 +6159,7 @@ h3 {
   }
 }
 /* ------------------------------------------------------------------
-   Landing — preloader + page /notre-histoire
+   Landing â€” preloader + story widget + page /notre-histoire
    ------------------------------------------------------------------ */
 .landing-preloader {
   position: fixed;
@@ -6131,39 +6242,214 @@ h3 {
   }
 }
 
-/* Page /notre-histoire */
-.our-story-page .landing-light-zone.our-story-light {
-  margin-top: -36px;
-  border-radius: 36px 36px 0 0;
+/* CTA hero — naissance d’Obillz */
+.landing-hero-story-cta-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.landing-hero-story-cta-float {
+  display: inline-flex;
+}
+
+.landing-hero-story-cta {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+  padding: 0.55rem 1rem 0.55rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(15, 40, 100, 0.35) 55%,
+      rgba(8, 28, 78, 0.45) 100%
+    );
+  box-shadow:
+    0 8px 24px rgba(2, 6, 23, 0.22),
+    0 0 24px rgba(26, 35, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #f8fafc;
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.landing-hero-story-cta:hover {
+  border-color: rgba(147, 197, 253, 0.45);
+  box-shadow:
+    0 12px 32px rgba(2, 6, 23, 0.28),
+    0 0 36px rgba(26, 35, 255, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.landing-hero-story-cta__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -35% -20%;
+  z-index: 0;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 40% 50%,
+    rgba(26, 35, 255, 0.45) 0%,
+    rgba(56, 189, 248, 0.16) 45%,
+    transparent 70%
+  );
+  filter: blur(14px);
+  opacity: 0.65;
+}
+
+.landing-hero-story-cta:hover .landing-hero-story-cta__glow {
+  opacity: 1;
+}
+
+.landing-hero-story-cta__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: transparent;
+  box-shadow:
+    0 6px 14px rgba(26, 35, 255, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.landing-hero-story-cta__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.landing-hero-story-cta__label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .landing-hero-story-cta__label {
+    white-space: normal;
+    text-align: left;
+    font-size: 0.78rem;
+  }
+
+  .landing-hero-story-cta {
+    padding-right: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-story-cta {
+    transition: none;
+  }
+
+  .landing-hero-story-cta:hover {
+    transform: none;
+  }
+}
+
+/* Page /notre-histoire — expérience timeline immersive */
+.our-story-page {
+  --our-story-ink: #f8fafc;
+  --our-story-muted: rgba(186, 230, 253, 0.72);
+  --landing-gutter: 24px;
+  color: #f8fafc;
+  /* Socle identique au footer landing */
+  background-color: #071634 !important;
+  background-image: none !important;
+}
+
+/*
+ * Fond = EXACTEMENT `.site-footer::before` + `::after`,
+ * en `fixed` pour que le dégradé bleu foncé → cyan lumineux
+ * reste visible dans le viewport (comme sur le footer),
+ * au lieu d’être dilué sur toute la hauteur de page.
+ */
+html body .our-story-page.obillz-landing::before {
+  content: "";
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 80% 42% at 50% 45%,
+      rgba(50, 91, 255, 0.32),
+      transparent 70%
+    ),
+    radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.16) 0%, transparent 42%),
+    linear-gradient(
+      180deg,
+      #071634 0%,
+      #102d78 38%,
+      #175dd4 68%,
+      #37b9ed 100%
+    );
+}
+
+html body .our-story-page.obillz-landing::after {
+  content: "";
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.14) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%);
+  mask-image: radial-gradient(ellipse 100% 82% at 50% 58%, black 5%, transparent 70%);
+}
+
+/* Atmosphère custom désactivée — le fond footer porte l’ambiance */
+.our-story-atmosphere,
+.our-story-atmosphere__orb,
+.our-story-atmosphere__grain {
+  display: none;
 }
 
 .our-story-hero {
   position: relative;
   isolation: isolate;
   padding:
-    max(7.5rem, calc(env(safe-area-inset-top, 0px) + 6rem))
+    max(7.75rem, calc(env(safe-area-inset-top, 0px) + 6.25rem))
     0
-    4.5rem;
-  background-color: #071634;
-  overflow: hidden;
-}
-
-.our-story-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 42% at 50% 45%, rgba(50, 91, 255, 0.32), transparent 70%),
-    radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.16) 0%, transparent 42%),
-    linear-gradient(180deg, #071634 0%, #102d78 38%, #175dd4 68%, #37b9ed 100%);
+    clamp(3rem, 8vw, 5.5rem);
+  background: transparent;
+  overflow: visible;
 }
 
 .our-story-hero__inner {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 40rem;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .our-story-hero .landing-section-label {
@@ -6172,19 +6458,20 @@ h3 {
 
 .our-story-hero__title {
   margin: 0.85rem 0 0;
-  font-size: clamp(2.1rem, 5.5vw, 3.4rem);
+  font-size: clamp(2.25rem, 5.8vw, 3.6rem);
   font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
   color: #ffffff;
+  text-wrap: balance;
 }
 
 .our-story-hero__subtitle {
-  margin: 1.15rem 0 0;
-  max-width: 36rem;
+  margin: 1.15rem auto 0;
+  max-width: 32rem;
   font-size: clamp(1rem, 1.6vw, 1.125rem);
   line-height: 1.65;
-  color: rgba(219, 234, 254, 0.78);
+  color: var(--our-story-muted);
 }
 
 .our-story-back {
@@ -6210,91 +6497,442 @@ h3 {
   background: rgba(255, 255, 255, 0.14);
 }
 
-.our-story-back--primary {
-  border-color: rgba(37, 99, 235, 0.18);
-  background: #ffffff;
-  color: #1d4ed8;
-  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.12);
-}
-
-.our-story-back--primary:hover {
-  border-color: rgba(37, 99, 235, 0.28);
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
-.our-story-timeline-section {
-  padding-bottom: 4rem;
-}
-
 .our-story-timeline {
-  margin: 2.5rem 0 0;
+  position: relative;
+  width: min(1120px, calc(100% - (var(--landing-gutter, 24px) * 2)));
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) 0 clamp(4rem, 10vw, 7rem);
+}
+
+.our-story-timeline__track {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: 2px;
+  transform: translateX(-50%);
+}
+
+.our-story-timeline__track-base {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg,
+    rgba(147, 197, 253, 0.08),
+    rgba(147, 197, 253, 0.22),
+    rgba(147, 197, 253, 0.08)
+  );
+}
+
+.our-story-timeline__track-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg,
+    rgba(56, 189, 248, 0.2) 0%,
+    #38bdf8 18%,
+    #1a23ff 55%,
+    #60a5fa 100%
+  );
+  box-shadow:
+    0 0 18px rgba(26, 35, 255, 0.65),
+    0 0 40px rgba(56, 189, 248, 0.35);
+}
+
+.our-story-timeline__track-head {
+  position: absolute;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(26, 35, 255, 0.35),
+    0 0 24px rgba(56, 189, 248, 0.9),
+    0 0 48px rgba(26, 35, 255, 0.55);
+}
+
+.our-story-timeline__list {
+  position: relative;
+  z-index: 1;
+  margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4.5rem, 10vw, 7.5rem);
 }
 
-.our-story-timeline__item {
+.our-story-step {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 1rem;
-  align-items: start;
-  padding: 1.25rem 1.2rem;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: #ffffff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+  width: 100%;
 }
 
-.our-story-timeline__index {
+.our-story-step__rail {
+  pointer-events: none;
+  position: absolute;
+  top: 2.4rem;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+}
+
+.our-story-step__node {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #7dd3fc 0%, #1a23ff 100%);
+  box-shadow:
+    0 0 0 5px rgba(7, 22, 52, 0.85),
+    0 0 0 7px rgba(125, 211, 252, 0.35),
+    0 0 28px rgba(26, 35, 255, 0.7);
+}
+
+.our-story-step__stage {
+  position: relative;
+  width: min(100%, 31rem);
+}
+
+.our-story-step__stage--left {
+  margin-right: auto;
+  margin-left: clamp(0rem, 2vw, 1.5rem);
+}
+
+.our-story-step__stage--right {
+  margin-left: auto;
+  margin-right: clamp(0rem, 2vw, 1.5rem);
+}
+
+.our-story-step__stage--center {
+  margin-inline: auto;
+  width: min(100%, 30rem);
+}
+
+.our-story-card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: 1.35rem 1.4rem 1.45rem;
+  border-radius: 1.45rem;
+  border: 1px solid rgba(147, 197, 253, 0.22);
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 45%, rgba(15, 40, 100, 0.35) 100%);
+  box-shadow:
+    0 22px 56px rgba(2, 6, 23, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform-origin: center center;
+  transition: box-shadow 0.3s ease;
+}
+
+.our-story-card:hover {
+  box-shadow:
+    0 28px 64px rgba(2, 6, 23, 0.36),
+    0 0 48px rgba(26, 35, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.our-story-card__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  border-radius: 2rem;
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.22), transparent 55%);
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+}
+
+.our-story-card:hover .our-story-card__glow {
+  opacity: 1;
+}
+
+.our-story-card__shine {
+  pointer-events: none;
+  position: absolute;
+  inset: 1px;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%);
+}
+
+.our-story-card__top,
+.our-story-card__title,
+.our-story-card__text {
+  position: relative;
+  z-index: 1;
+}
+
+.our-story-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.our-story-card__icon {
   display: inline-flex;
-  height: 2.5rem;
-  width: 2.5rem;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
-  background: linear-gradient(180deg, #455cff 0%, #1a23ff 100%);
+  width: 2.55rem;
+  height: 2.55rem;
+  border-radius: 0.9rem;
   color: #ffffff;
-  font-size: 0.75rem;
+  background: linear-gradient(160deg, #455cff 0%, #1a23ff 55%, #0ea5e9 100%);
+  box-shadow:
+    0 10px 22px rgba(26, 35, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.our-story-card__index {
+  font-size: 0.8rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  color: rgba(186, 230, 253, 0.55);
 }
 
-.our-story-timeline__title {
+.our-story-card__title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #ffffff;
 }
 
-.our-story-timeline__text {
-  margin: 0.35rem 0 0;
-  font-size: 0.9rem;
+.our-story-card__text {
+  margin: 0.65rem 0 0;
+  font-size: 0.95rem;
   line-height: 1.55;
-  color: #64748b;
+  color: rgba(219, 234, 254, 0.72);
 }
 
-.our-story-cta-wrap {
-  margin-top: 2.5rem;
+.our-story-step--sm .our-story-step__stage {
+  width: min(100%, 22rem);
+}
+
+.our-story-step--sm .our-story-card {
+  padding: 1.15rem 1.2rem 1.25rem;
+}
+
+.our-story-step--md .our-story-step__stage {
+  width: min(100%, 26rem);
+}
+
+.our-story-step--lg .our-story-step__stage {
+  width: min(100%, 31rem);
+}
+
+.our-story-step--lg .our-story-card {
+  padding: 1.55rem 1.6rem 1.65rem;
+}
+
+.our-story-step--lg .our-story-card__title {
+  font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+}
+
+.our-story-step--center .our-story-step__stage {
+  width: min(100%, 30rem);
+}
+
+.our-story-step__floats {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.our-story-float {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0.45rem;
+  border-radius: 0.85rem;
+  color: rgba(186, 230, 253, 0.9);
+  background: rgba(15, 40, 100, 0.35);
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  box-shadow: 0 0 24px rgba(26, 35, 255, 0.22);
+  opacity: 0.38;
+}
+
+.our-story-float--a { top: -8%; left: 8%; width: 2.8rem; height: 2.8rem; }
+.our-story-float--b { top: 55%; left: -2%; width: 2.2rem; height: 2.2rem; }
+.our-story-float--c { bottom: -6%; left: 34%; width: 2.5rem; height: 2.5rem; }
+.our-story-float--d { top: -10%; right: 10%; width: 2.7rem; height: 2.7rem; }
+.our-story-float--e { top: 48%; right: -3%; width: 2.3rem; height: 2.3rem; }
+.our-story-float--f { bottom: -8%; right: 28%; width: 2.5rem; height: 2.5rem; }
+.our-story-float--g { top: -12%; left: 18%; width: 2.9rem; height: 2.9rem; }
+.our-story-float--h { top: 20%; right: 8%; width: 2.4rem; height: 2.4rem; }
+.our-story-float--i { top: -6%; left: 4%; width: 2.5rem; height: 2.5rem; }
+.our-story-float--j { bottom: 8%; left: -4%; width: 2.2rem; height: 2.2rem; }
+.our-story-float--k { bottom: -10%; left: 42%; width: 2.6rem; height: 2.6rem; }
+.our-story-float--l { top: -8%; right: 6%; width: 2.7rem; height: 2.7rem; }
+.our-story-float--m { top: 52%; right: -2%; width: 2.3rem; height: 2.3rem; }
+.our-story-float--n { bottom: -8%; right: 36%; width: 2.5rem; height: 2.5rem; }
+
+.our-story-cta-section {
+  position: relative;
+  z-index: 1;
+  padding: 0 0 clamp(3rem, 8vw, 5rem);
+}
+
+.our-story-cta-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border-radius: 1.75rem;
+  border: 1px solid rgba(147, 197, 253, 0.24);
+  background:
+    radial-gradient(ellipse 70% 80% at 10% 0%, rgba(37, 99, 235, 0.28), transparent 55%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(56, 189, 248, 0.18), transparent 50%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.12) 0%, rgba(8, 28, 78, 0.55) 100%);
+  box-shadow:
+    0 24px 64px rgba(2, 6, 23, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  text-align: center;
+}
+
+.our-story-cta-panel__quote {
+  margin: 0 auto;
+  max-width: 30rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.92);
+  text-wrap: balance;
+}
+
+.our-story-cta-panel__title {
+  margin: 1.35rem 0 0;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  color: #ffffff;
+}
+
+.our-story-cta-panel__text {
+  margin: 0.65rem auto 0;
+  max-width: 26rem;
+  font-size: 0.975rem;
+  line-height: 1.55;
+  color: var(--our-story-muted);
+}
+
+.our-story-cta-panel__actions {
+  margin-top: 1.5rem;
   display: flex;
-  justify-content: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
-@media (max-width: 768px) {
+.our-story-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.our-story-cta-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .our-story-timeline__track {
+    left: 1.15rem;
+    transform: none;
+  }
+
+  .our-story-step__rail {
+    left: 1.15rem;
+    transform: none;
+  }
+
+  .our-story-step__stage--left,
+  .our-story-step__stage--right,
+  .our-story-step__stage--center,
+  .our-story-step--sm .our-story-step__stage,
+  .our-story-step--md .our-story-step__stage,
+  .our-story-step--lg .our-story-step__stage {
+    width: calc(100% - 2.75rem);
+    margin-left: 2.75rem;
+    margin-right: 0;
+  }
+
+  .our-story-float {
+    opacity: 0.22;
+  }
+
+  .our-story-float--b,
+  .our-story-float--e,
+  .our-story-float--j,
+  .our-story-float--m {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
   .our-story-hero {
     padding:
       max(6.5rem, calc(env(safe-area-inset-top, 0px) + 5.25rem))
       0
-      3.25rem;
+      2.75rem;
   }
 
-  .our-story-page .landing-light-zone.our-story-light {
-    border-radius: 28px 28px 0 0;
+  .our-story-timeline__list {
+    gap: 3.5rem;
   }
 
-  .our-story-timeline__item {
-    padding: 1.1rem 1rem;
-    gap: 0.85rem;
+  .our-story-card {
+    padding: 1.2rem 1.15rem 1.3rem;
+    border-radius: 1.25rem;
+  }
+
+  .our-story-cta-panel__actions {
+    flex-direction: column;
+  }
+
+  .our-story-cta-panel__actions > * {
+    width: 100%;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .our-story-float {
+    animation: none !important;
+  }
+}
+

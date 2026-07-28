@@ -1,7 +1,7 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import HeroSection from "@/components/landing/HeroSection";
-import AskChatGptSection from "@/components/landing/AskChatGptSection";
 import DiscoveryChapter from "@/components/landing/DiscoveryChapter";
 import LandingIntroExperience from "@/components/landing/LandingIntroExperience";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
@@ -12,18 +12,20 @@ import PricingSection from "@/components/landing/PricingSection";
 import { obillzLandingHomeClass } from "@/components/ui/styles";
 
 export default function LandingPage() {
+  const [introReady, setIntroReady] = useState(false);
+  const handleIntroReady = useCallback(() => setIntroReady(true), []);
+
   return (
     <main className={obillzLandingHomeClass}>
-      <LandingIntroExperience />
+      <LandingIntroExperience onReady={handleIntroReady} />
       <div className="relative z-10">
         <LandingLocaleEffects />
         <LandingNav />
-        <HeroSection />
+        <HeroSection introReady={introReady} />
         <div className="landing-light-zone">
           <FeaturesSection />
           <DiscoveryChapter />
           <PricingSection />
-          <AskChatGptSection />
         </div>
 
         <div className="landing-page-end">

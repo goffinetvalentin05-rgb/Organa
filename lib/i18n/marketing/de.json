@@ -593,7 +593,7 @@
     }
   },
   "askChatGpt": {
-    "title": "Noch unsicher, ob Obillz zu Ihrem Verein passt?",
+    "title": "Noch unsicher, ob Obillz\nzu Ihrem Verein passt?",
     "subtitle": "Tauschen Sie sich direkt mit dem Gründer aus, stellen Sie Ihre Fragen und entdecken Sie, wie Obillz die Verwaltung Ihres Vereins vereinfachen kann.",
     "cta": "Mit dem Gründer sprechen",
     "note": "Demo, Fragen, Begleitung — schnelle Antwort",
@@ -815,35 +815,43 @@
     "instagramUrl": "https://www.instagram.com/obillz.ch?igsh=MW5rcmdsbmFkYmVlNA==",
     "facebookUrl": "https://www.facebook.com/share/1EEPuBdBRS/?mibextid=wwXIfr"
   },
+  "storyWidget": {
+    "title": "Die Entstehung von Obillz entdecken",
+    "subtitle": "Erfahren Sie, warum Obillz geschaffen wurde.",
+    "close": "Schließen"
+  },
   "ourStory": {
     "label": "UNSERE GESCHICHTE",
-    "title": "Die Geburt von Obillz",
-    "subtitle": "Eine Plattform aus einer einfachen Erkenntnis: Vereinsfreiwillige verdienen bessere Werkzeuge.",
+    "title": "Die Geschichte hinter Obillz.",
+    "subtitle": "Ein Weg vom Platz — Vereine, Vorstände und Freiwillige.",
     "backToLanding": "Zurück zur Startseite",
-    "timelineLabel": "ZEITACHSE",
-    "timelineTitle": "Der Weg von Obillz",
-    "timelineIntro": "Diese Zeitachse wird in Kürze ergänzt. Hier die geplanten Etappen.",
-    "milestones": {
-      "constat": {
-        "title": "Die Feststellung",
-        "placeholder": "Inhalt folgt — die Ausgangsfeststellung hinter Obillz."
+    "manifesto": "Obillz wurde nicht in einem Büro erdacht. Es entstand auf dem Platz.",
+    "timelineLabel": "Der Weg von Obillz",
+    "steps": {
+      "grandir": {
+        "title": "In Vereinen aufwachsen",
+        "body": "Wir sind in Sportvereinen aufgewachsen — Training, Turniere, Festwirtschaft, Anlässe und späte Vorstandsabende."
+      },
+      "observer": {
+        "title": "Probleme beobachten",
+        "body": "Über die Jahre kamen dieselben Schwierigkeiten überall zurück: Excel, WhatsApp, verstreute Dokumente, Beiträge, komplizierte Organisation."
       },
       "idee": {
-        "title": "Die Idee",
-        "placeholder": "Inhalt folgt — wie die Idee von Obillz entstand."
+        "title": "Eine Idee",
+        "body": "Wir fragten uns, warum kein Werkzeug wirklich für Freiwillige gedacht war."
       },
-      "creation": {
-        "title": "Die Entstehung",
-        "placeholder": "Inhalt folgt — der Aufbau der Plattform."
+      "creer": {
+        "title": "Obillz schaffen",
+        "body": "Wir begannen, etwas Einfaches zu bauen. Keine Software aus dem Büro, sondern ein Werkzeug aus den echten Bedürfnissen vom Platz."
       },
-      "premiersClubs": {
-        "title": "Die ersten Vereine",
-        "placeholder": "Inhalt folgt — die ersten Vereine mit Obillz."
-      },
-      "suite": {
-        "title": "Wie es weitergeht",
-        "placeholder": "Inhalt folgt — das nächste Kapitel von Obillz."
+      "construire": {
+        "title": "Mit Vereinen bauen",
+        "body": "Obillz entwickelt sich weiterhin dank dem Feedback der Vereine. Wenn ein Bedarf regelmässig zurückkommt, tun wir unser Bestes, eine neue Funktion zu liefern."
       }
-    }
+    },
+    "ctaTitle": "Bereit, den Vereinsalltag zu vereinfachen?",
+    "ctaSubtitle": "Entdecken Sie Obillz oder sprechen Sie direkt mit dem Gründer.",
+    "ctaDiscover": "Obillz entdecken",
+    "ctaFounder": "Mit dem Gründer sprechen"
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import LandingPreloader from "@/components/landing/LandingPreloader";
 
 /**
@@ -9,13 +9,26 @@ import LandingPreloader from "@/components/landing/LandingPreloader";
  */
 let loaderShownThisDocument = false;
 
-export default function LandingIntroExperience() {
+type LandingIntroExperienceProps = {
+  /** Appelé une fois quand le préloader a terminé (immédiat si déjà joué). */
+  onReady?: () => void;
+};
+
+export default function LandingIntroExperience({ onReady }: LandingIntroExperienceProps) {
   const [isLoading, setIsLoading] = useState(() => !loaderShownThisDocument);
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   const finishLoader = useCallback(() => {
     loaderShownThisDocument = true;
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      onReadyRef.current?.();
+    }
+  }, [isLoading]);
 
   /* Filet de sécurité si le preloader ne callback pas */
   useEffect(() => {

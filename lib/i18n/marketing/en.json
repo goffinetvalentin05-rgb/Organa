@@ -593,7 +593,7 @@
     }
   },
   "askChatGpt": {
-    "title": "Still not sure Obillz is right for your club?",
+    "title": "Still not sure Obillz\nis right for your club?",
     "subtitle": "Talk directly with the founder, ask your questions and discover how Obillz can simplify your club management.",
     "cta": "Talk to the founder",
     "note": "Demo, questions, guidance — quick reply",
@@ -815,35 +815,43 @@
     "instagramUrl": "https://www.instagram.com/obillz.ch?igsh=MW5rcmdsbmFkYmVlNA==",
     "facebookUrl": "https://www.facebook.com/share/1EEPuBdBRS/?mibextid=wwXIfr"
   },
+  "storyWidget": {
+    "title": "Discover how Obillz was born",
+    "subtitle": "Find out why Obillz was created.",
+    "close": "Close"
+  },
   "ourStory": {
     "label": "OUR STORY",
-    "title": "The birth of Obillz",
-    "subtitle": "A platform born from a simple observation: club volunteers deserve better tools.",
+    "title": "The story behind Obillz.",
+    "subtitle": "A journey born on the ground — clubs, committees and volunteers.",
     "backToLanding": "Back to home",
-    "timelineLabel": "TIMELINE",
-    "timelineTitle": "The Obillz journey",
-    "timelineIntro": "This timeline will be completed soon. Here are the planned milestones.",
-    "milestones": {
-      "constat": {
-        "title": "The observation",
-        "placeholder": "Content coming soon — the initial observation behind Obillz."
+    "manifesto": "Obillz wasn’t imagined in an office. It was born on the ground.",
+    "timelineLabel": "The Obillz journey",
+    "steps": {
+      "grandir": {
+        "title": "Growing up in clubs",
+        "body": "We grew up in sports clubs — training sessions, tournaments, snack bars, events and late committee nights."
+      },
+      "observer": {
+        "title": "Seeing the problems",
+        "body": "Over the years, the same issues kept coming back everywhere: Excel, WhatsApp, scattered documents, fees, messy organisation."
       },
       "idee": {
-        "title": "The idea",
-        "placeholder": "Content coming soon — how the Obillz idea took shape."
+        "title": "An idea",
+        "body": "We wondered why no tool was truly designed for volunteers."
       },
-      "creation": {
-        "title": "The creation",
-        "placeholder": "Content coming soon — building the platform."
+      "creer": {
+        "title": "Creating Obillz",
+        "body": "We started building something simple. Not software imagined in an office, but a tool shaped by real needs on the ground."
       },
-      "premiersClubs": {
-        "title": "The first clubs",
-        "placeholder": "Content coming soon — the first clubs to use Obillz."
-      },
-      "suite": {
-        "title": "What’s next",
-        "placeholder": "Content coming soon — the next chapter for Obillz."
+      "construire": {
+        "title": "Building with clubs",
+        "body": "Obillz still evolves thanks to club feedback. When a need comes up again and again, we do our best to ship a new feature."
       }
-    }
+    },
+    "ctaTitle": "Ready to simplify your club’s life?",
+    "ctaSubtitle": "Explore Obillz, or talk directly with the founder.",
+    "ctaDiscover": "Discover Obillz",
+    "ctaFounder": "Talk to the founder"
   }
 }

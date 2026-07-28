@@ -32,14 +32,6 @@ function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
       const probe = headerRef.current?.getBoundingClientRect().bottom ?? 72;
       const footerContent = document.querySelector(".footer-content");
       const lightZone = document.querySelector(".landing-light-zone");
-      const finalCta = document.querySelector("#demander-chatgpt");
-
-      /* Après le bloc CTA clair → fond bleu de fin de page → thème sombre. */
-      const finalCtaBottom = finalCta?.getBoundingClientRect().bottom;
-      if (finalCtaBottom !== undefined && finalCtaBottom <= probe + 8) {
-        setTheme("dark");
-        return;
-      }
 
       /* Thème sombre dès que les colonnes du footer (zone bleue) arrivent sous la nav. */
       const footerContentTop = footerContent?.getBoundingClientRect().top;
@@ -49,7 +41,7 @@ function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
       }
 
       const lightRect = lightZone?.getBoundingClientRect();
-      /* Zone claire + carte CTA claire → thème clair. */
+      /* Zone claire (features → découverte → tarifs) → thème clair. */
       if (lightRect && lightRect.top <= probe + 10) {
         setTheme("light");
         return;

@@ -4,7 +4,7 @@ import OurStoryPage from "@/components/landing/OurStoryPage";
 export const metadata: Metadata = {
   title: "Notre histoire | Obillz",
   description:
-    "Découvrez la naissance d’Obillz — une plateforme née pour simplifier la vie des bénévoles de clubs sportifs.",
+    "L’histoire derrière Obillz — né sur le terrain, au contact des clubs, des comités et des bénévoles.",
 };
 
 export default function NotreHistoireRoute() {
