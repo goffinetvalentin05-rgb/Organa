@@ -10,14 +10,12 @@ import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
   PageHeader,
-  TableCard,
   EmptyState,
   ActionButton,
   GlassCard,
-  dashboardTableHeadRowClass,
-  dashboardTableDivideClass,
-  dashboardDataTableClass,
-  dashboardTableFooterClass,
+  EntityCard,
+  EntityCardGrid,
+  EntityMetaRow,
   dashboardSelectClass,
   dashboardPopoverPanelClass,
   dashboardLabelClass,
@@ -187,109 +185,99 @@ export default function FacturesPage() {
         ))}
       </div>
 
-      <TableCard bodyClassName="p-0">
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="inline-flex items-center gap-3 text-slate-500">
-              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              {t("dashboard.common.loading")}
-            </div>
+      {loading ? (
+        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center shadow-sm">
+          <div className="inline-flex items-center gap-3 text-slate-500">
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            {t("dashboard.common.loading")}
           </div>
-        ) : errorMessage ? (
-          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
-            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
-            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
-          </GlassCard>
-        ) : factures.length === 0 ? (
-          <EmptyState
-            embedded
-            icon={Receipt}
-            title={t("dashboard.invoices.emptyState")}
-            action={
-              <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle" className="inline-flex">
-                {t("dashboard.invoices.emptyCta")}
-              </DashboardPrimaryButton>
-            }
-          />
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className={`${dashboardDataTableClass} min-w-[800px]`}>
-                <thead>
-                  <tr className={dashboardTableHeadRowClass}>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.number")}</th>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.documentTitle")}</th>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.client")}</th>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.date")}</th>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
-                    <th className="px-4 py-3 sm:px-6">{t("dashboard.common.amount")}</th>
-                    <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
-                  </tr>
-                </thead>
-                <tbody className={dashboardTableDivideClass}>
-                  {factures.map((facture) => {
-                    const montant = calculerTotalTTC(facture.lignes);
-                    return (
-                      <tr
-                        key={facture.id}
-                        className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
+        </div>
+      ) : errorMessage ? (
+        <GlassCard className="border-red-200/80 bg-red-50/50 text-center">
+          <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+          <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+        </GlassCard>
+      ) : factures.length === 0 ? (
+        <EmptyState
+          icon={Receipt}
+          title={t("dashboard.invoices.emptyState")}
+          action={
+            <DashboardPrimaryButton href="/tableau-de-bord/factures/nouvelle" className="inline-flex">
+              {t("dashboard.invoices.emptyCta")}
+            </DashboardPrimaryButton>
+          }
+        />
+      ) : (
+        <>
+          <EntityCardGrid>
+            {factures.map((facture) => {
+              const montant = calculerTotalTTC(facture.lignes);
+              return (
+                <EntityCard
+                  key={facture.id}
+                  href={`/tableau-de-bord/factures/${facture.id}`}
+                  title={facture.title || facture.numero}
+                  subtitle={facture.numero}
+                  amount={
+                    <>
+                      {formatMontant(montant)}
+                      <span className="ml-1.5 text-sm font-medium text-[#94A3B8]">TTC</span>
+                    </>
+                  }
+                  status={
+                    <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
+                      {getStatutLabel(facture.statut)}
+                    </span>
+                  }
+                  meta={
+                    <>
+                      <EntityMetaRow
+                        label={t("dashboard.common.client")}
+                        value={
+                          facture.recipient?.name ||
+                          facture.client?.nom ||
+                          t("dashboard.common.unknownClient")
+                        }
+                      />
+                      <EntityMetaRow
+                        label={t("dashboard.common.date")}
+                        value={formatDate(facture.dateCreation)}
+                      />
+                    </>
+                  }
+                  actions={
+                    <>
+                      <ActionButton
+                        href={`/tableau-de-bord/factures/${facture.id}`}
+                        className="inline-flex items-center gap-1.5"
+                        title={t("dashboard.common.view")}
                       >
-                        <td className="px-4 py-3 font-semibold text-[#F8FAFC] sm:px-6">{facture.numero}</td>
-                        <td className="max-w-[200px] truncate px-4 py-3 font-medium text-[#E2E8F0] sm:max-w-[260px] sm:px-6">
-                          {facture.title || "—"}
-                        </td>
-                        <td className="max-w-[220px] truncate px-4 py-3 text-[#CBD5E1] sm:max-w-[280px] sm:px-6">
-                          {facture.recipient?.name || facture.client?.nom || t("dashboard.common.unknownClient")}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-[#A8B8D0] sm:px-6">
-                          {formatDate(facture.dateCreation)}
-                        </td>
-                        <td className="px-4 py-3 sm:px-6">
-                          <span className={`badge-obillz ${getStatutColor(facture.statut)}`}>
-                            {getStatutLabel(facture.statut)}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 font-semibold text-emerald-300 sm:px-6">
-                          {formatMontant(montant)}
-                          <span className="ml-1 text-xs font-normal text-[#8BA0BC]">TTC</span>
-                        </td>
-                        <td className="px-4 py-3 text-right sm:px-6">
-                          <ActionButton
-                            href={`/tableau-de-bord/factures/${facture.id}`}
-                            className="mr-1 inline-flex items-center gap-1.5 p-2"
-                            title={t("dashboard.common.view")}
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                          </ActionButton>
-                          <ActionButton
-                            type="button"
-                            variant="dangerSoft"
-                            onClick={() => handleDelete(facture.id)}
-                            title={t("dashboard.common.delete")}
-                            className="inline-flex p-2"
-                          >
-                            <Trash className="h-4 w-4" />
-                          </ActionButton>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className={dashboardTableFooterClass}>
-              <p className="text-center text-sm">
-                {t("dashboard.invoices.listTotal", { count: factures.length })}
-              </p>
-            </div>
-          </>
-        )}
-      </TableCard>
+                        <Eye className="h-4 w-4" />
+                        {t("dashboard.common.view")}
+                      </ActionButton>
+                      <ActionButton
+                        type="button"
+                        variant="dangerSoft"
+                        onClick={() => handleDelete(facture.id)}
+                        title={t("dashboard.common.delete")}
+                        className="inline-flex p-2"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </ActionButton>
+                    </>
+                  }
+                />
+              );
+            })}
+          </EntityCardGrid>
+          <p className="text-center text-sm text-[#94A3B8]">
+            {t("dashboard.invoices.listTotal", { count: factures.length })}
+          </p>
+        </>
+      )}
     </PageLayout>
   );
 }

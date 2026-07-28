@@ -10,11 +10,12 @@ import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
   PageHeader,
-  TableCard,
   EmptyState,
   GlassCard,
   ActionButton,
-  dashboardTableHeadRowClass,
+  EntityCard,
+  EntityCardGrid,
+  EntityMetaRow,
 } from "@/components/ui";
 
 interface EventOption {
@@ -226,59 +227,60 @@ function ProduitsPageInner() {
           }
         />
       ) : (
-        <TableCard bodyClassName="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead>
-                <tr className={dashboardTableHeadRowClass}>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.name")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.date")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.productRevenues.columns.amount")}</th>
-                  <th className="hidden px-4 py-3 md:table-cell sm:px-6">{t("dashboard.productRevenues.columns.event")}</th>
-                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {revenues.map((r) => (
-                  <tr key={r.id} className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]">
-                    <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{r.name}</td>
-                    <td className="px-4 py-3 text-sm text-slate-600 sm:px-6">{formatDate(r.revenue_date)}</td>
-                    <td className="px-4 py-3 font-semibold text-emerald-700 sm:px-6">{formatMontant(r.amount)}</td>
-                    <td className="hidden px-4 py-3 text-sm text-slate-600 md:table-cell sm:px-6">
-                      {r.event ? (
-                        <Link href={`/tableau-de-bord/evenements/${r.event.id}`} className="text-secondary hover:text-primary">
+        <EntityCardGrid>
+          {revenues.map((r) => (
+            <EntityCard
+              key={r.id}
+              title={r.name}
+              amount={formatMontant(r.amount)}
+              meta={
+                <>
+                  <EntityMetaRow
+                    label={t("dashboard.productRevenues.columns.date")}
+                    value={formatDate(r.revenue_date)}
+                  />
+                  <EntityMetaRow
+                    label={t("dashboard.productRevenues.columns.event")}
+                    value={
+                      r.event ? (
+                        <Link
+                          href={`/tableau-de-bord/evenements/${r.event.id}`}
+                          className="text-secondary hover:text-primary"
+                        >
                           {r.event.name}
                         </Link>
                       ) : (
                         t("dashboard.productRevenues.columns.noEvent")
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right sm:px-6">
-                      <ActionButton
-                        type="button"
-                        onClick={() => openEdit(r)}
-                        title={t("dashboard.productRevenues.editButton")}
-                        className="mr-1 inline-flex items-center gap-1.5 p-2"
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
-                      </ActionButton>
-                      <ActionButton
-                        type="button"
-                        variant="dangerSoft"
-                        onClick={() => void handleDelete(r.id)}
-                        title={t("dashboard.common.delete")}
-                        className="inline-flex p-2"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </ActionButton>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </TableCard>
+                      )
+                    }
+                  />
+                </>
+              }
+              actions={
+                <>
+                  <ActionButton
+                    type="button"
+                    onClick={() => openEdit(r)}
+                    title={t("dashboard.productRevenues.editButton")}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <Edit className="h-4 w-4" />
+                    {t("dashboard.common.edit")}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    variant="dangerSoft"
+                    onClick={() => void handleDelete(r.id)}
+                    title={t("dashboard.common.delete")}
+                    className="inline-flex p-2"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </ActionButton>
+                </>
+              }
+            />
+          ))}
+        </EntityCardGrid>
       )}
 
       {showForm && (

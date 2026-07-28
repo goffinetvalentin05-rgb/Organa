@@ -5,11 +5,12 @@ import { Eye, Edit, Trash, Download, Receipt } from "@/lib/icons";
 import {
   PageLayout,
   PageHeader,
-  TableCard,
   EmptyState,
   GlassCard,
   ActionButton,
-  dashboardTableHeadRowClass,
+  EntityCard,
+  EntityCardGrid,
+  EntityMetaRow,
   dashboardSelectClass,
   dashboardPopoverPanelClass,
   dashboardLabelClass,
@@ -759,73 +760,65 @@ export default function DepensesPage() {
         </GlassCard>
       ) : null}
 
-      <TableCard bodyClassName="p-0">
-        {loading ? (
-          <div className="p-12 text-center">
-            <p className="text-secondary">{t("dashboard.common.loading")}</p>
-          </div>
-        ) : errorMessage ? (
-          <GlassCard padding="lg" className="m-5 border-red-200/80 bg-red-50/50 text-center">
-            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
-            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
-          </GlassCard>
-        ) : depensesTriees.length === 0 ? (
-          <div className="p-6">
-            <EmptyState
-              embedded
-              icon={Receipt}
-              title={t("dashboard.expenses.emptyState")}
-              action={
-                <button
-                  type="button"
-                  onClick={openCreateForm}
-                  className="inline-block rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:opacity-95"
-                  style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
-                >
-                  {t("dashboard.expenses.emptyCta")}
-                </button>
-              }
-            />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[880px] text-left text-sm">
-              <thead>
-                <tr className={dashboardTableHeadRowClass}>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.supplier")}</th>
-                  <th className="whitespace-nowrap px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.dueDate")}</th>
-                  <th className="whitespace-nowrap px-4 py-3 sm:px-6">{t("dashboard.expenses.listColumns.attachment")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.amount")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
-                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {depensesTriees.map((depense) => {
-                  const statutAffiche = getStatutAffiche(depense);
-                  const besoinAction =
-                    depense.status === "a_payer" &&
-                    (isDatePassee(depense.date) || isDateProche(depense.date, 7));
-                  const hrefPJ = depense.attachmentUrl ? buildAttachmentHref(depense.attachmentUrl) : null;
-                  return (
-                    <tr
-                      key={depense.id}
-                      className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]"
-                    >
-                      <td className="max-w-[220px] px-4 py-3 sm:max-w-xs sm:px-6">
-                        <p className="truncate font-medium text-slate-900">{depense.label}</p>
-                        {depense.notes ? (
-                          <p className="mt-0.5 truncate text-xs text-slate-500">{depense.notes}</p>
-                        ) : null}
-                        {besoinAction ? (
-                          <p className="mt-0.5 text-xs text-amber-700">{t("dashboard.expenses.actionRecommendedHint")}</p>
-                        ) : null}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600 sm:px-6">
-                        {formatDate(depense.date)}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        {hrefPJ ? (
+      {loading ? (
+        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center shadow-sm">
+          <p className="text-secondary">{t("dashboard.common.loading")}</p>
+        </div>
+      ) : errorMessage ? (
+        <GlassCard padding="lg" className="border-red-200/80 bg-red-50/50 text-center">
+          <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+          <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+        </GlassCard>
+      ) : depensesTriees.length === 0 ? (
+        <EmptyState
+          icon={Receipt}
+          title={t("dashboard.expenses.emptyState")}
+          action={
+            <button
+              type="button"
+              onClick={openCreateForm}
+              className="inline-block rounded-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:opacity-95"
+              style={{ pointerEvents: "auto", zIndex: 50, position: "relative" }}
+            >
+              {t("dashboard.expenses.emptyCta")}
+            </button>
+          }
+        />
+      ) : (
+        <EntityCardGrid columns={2}>
+          {depensesTriees.map((depense) => {
+            const statutAffiche = getStatutAffiche(depense);
+            const besoinAction =
+              depense.status === "a_payer" &&
+              (isDatePassee(depense.date) || isDateProche(depense.date, 7));
+            const hrefPJ = depense.attachmentUrl
+              ? buildAttachmentHref(depense.attachmentUrl)
+              : null;
+            return (
+              <EntityCard
+                key={depense.id}
+                title={depense.label}
+                subtitle={depense.notes || undefined}
+                amount={formatMontant(depense.amount)}
+                status={
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${getStatutColor(
+                      statutAffiche
+                    )}`}
+                  >
+                    {getStatutLabel(statutAffiche, t)}
+                  </span>
+                }
+                meta={
+                  <>
+                    <EntityMetaRow
+                      label={t("dashboard.expenses.listColumns.dueDate")}
+                      value={formatDate(depense.date)}
+                    />
+                    <EntityMetaRow
+                      label={t("dashboard.expenses.listColumns.attachment")}
+                      value={
+                        hrefPJ ? (
                           <a
                             href={hrefPJ}
                             target="_blank"
@@ -836,58 +829,53 @@ export default function DepensesPage() {
                             {t("dashboard.expenses.attachmentBadge")}
                           </a>
                         ) : (
-                          <span className="text-xs text-slate-400">—</span>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-900 sm:px-6">
-                        {formatMontant(depense.amount)}
-                      </td>
-                      <td className="px-4 py-3 sm:px-6">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${getStatutColor(
-                            statutAffiche
-                          )}`}
-                        >
-                          {getStatutLabel(statutAffiche, t)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right sm:px-6">
-                        <ActionButton
-                          type="button"
-                          className="mr-1 inline-flex items-center gap-1.5 p-2"
-                          title={t("dashboard.common.view")}
-                          onClick={() => handleVoir(depense)}
-                        >
-                          <Eye className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          type="button"
-                          className="mr-1 inline-flex items-center gap-1.5 p-2"
-                          title={t("dashboard.common.edit")}
-                          onClick={() => handleModifier(depense)}
-                        >
-                          <Edit className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          type="button"
-                          variant="dangerSoft"
-                          className="inline-flex p-2"
-                          title={t("dashboard.common.delete")}
-                          onClick={() => handleDelete(depense.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </ActionButton>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </TableCard>
+                          "—"
+                        )
+                      }
+                    />
+                    {besoinAction ? (
+                      <p className="text-xs text-amber-700">
+                        {t("dashboard.expenses.actionRecommendedHint")}
+                      </p>
+                    ) : null}
+                  </>
+                }
+                actions={
+                  <>
+                    <ActionButton
+                      type="button"
+                      className="inline-flex items-center gap-1.5"
+                      title={t("dashboard.common.view")}
+                      onClick={() => handleVoir(depense)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      {t("dashboard.common.view")}
+                    </ActionButton>
+                    <ActionButton
+                      type="button"
+                      className="inline-flex items-center gap-1.5"
+                      title={t("dashboard.common.edit")}
+                      onClick={() => handleModifier(depense)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      {t("dashboard.common.edit")}
+                    </ActionButton>
+                    <ActionButton
+                      type="button"
+                      variant="dangerSoft"
+                      className="inline-flex p-2"
+                      title={t("dashboard.common.delete")}
+                      onClick={() => handleDelete(depense.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </ActionButton>
+                  </>
+                }
+              />
+            );
+          })}
+        </EntityCardGrid>
+      )}
 
       {showViewModal && selectedDepense && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">

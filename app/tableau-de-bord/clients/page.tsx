@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import Link from "next/link";
 import toast from "react-hot-toast";
 import DeleteClientButton from "./components/DeleteClientButton";
 import { Edit, Users, Filter } from "@/lib/icons";
@@ -17,12 +16,13 @@ import {
   PageHeader,
   GlassCard,
   ListCard,
-  TableCard,
   EmptyState,
   ActionButton,
+  EntityCard,
+  EntityCardGrid,
+  EntityAvatar,
+  EntityMetaRow,
   glassCardClass,
-  dashboardListRowClass,
-  dashboardTableDivideClass,
   dashboardSecondaryButtonClass,
   cn,
 } from "@/components/ui";
@@ -234,74 +234,68 @@ export default function ClientsPage() {
           }
         />
       ) : (
-        <TableCard bodyClassName="overflow-hidden p-0">
-          <div className={dashboardTableDivideClass}>
-            {filteredClients.map((client) => (
-              <div key={client.id} className={dashboardListRowClass}>
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <Link
-                    href={`/tableau-de-bord/clients/${client.id}`}
-                    className="flex items-start gap-4 min-w-0 flex-1 text-left group rounded-xl outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
-                  >
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0 group-hover:opacity-95 transition-opacity"
-                      style={{ backgroundColor: "var(--obillz-hero-blue)" }}
-                    >
-                      {(client.nom || "?").charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
-                          {client.prenom ? `${client.prenom} ` : ""}
-                          {client.nom || t("dashboard.clients.noName")}
-                        </h3>
-                        {vis.role.enabled && (
-                          <span
-                            className={`px-2 py-0.5 text-xs font-medium rounded-full ${roleColors[client.role] || "bg-slate-100 text-slate-700"}`}
-                          >
-                            {formatRoleLabel(client.role, t)}
-                          </span>
-                        )}
-                        {vis.category.enabled && client.category && (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
-                            {formatCategoryLabel(client.category, t)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 grid gap-1 text-sm">
-                        {vis.email.enabled && (
-                          <p className="text-slate-500 flex items-center gap-2">
-                            <span className="text-slate-400 w-16 shrink-0">Email</span>
-                            <span className="truncate">
-                              {client.email || t("dashboard.clients.notProvided")}
-                            </span>
-                          </p>
-                        )}
-                        {vis.phone.enabled && (
-                          <p className="text-slate-500 flex items-center gap-2">
-                            <span className="text-slate-400 w-16 shrink-0">Tél.</span>
-                            <span>{client.telephone || t("dashboard.clients.notProvided")}</span>
-                          </p>
-                        )}
-                        {vis.address.enabled && (
-                          <p className="text-slate-500 flex items-center gap-2">
-                            <span className="text-slate-400 w-16 shrink-0">Adresse</span>
-                            <span className="truncate">
-                              {client.adresse || client.postal_code || client.city
-                                ? [
-                                    client.adresse,
-                                    [client.postal_code, client.city].filter(Boolean).join(" "),
-                                  ]
-                                    .filter(Boolean)
-                                    .join(", ")
-                                : t("dashboard.clients.addressNotProvided")}
-                            </span>
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                  <div className="flex shrink-0 flex-wrap items-center gap-2 md:ml-4">
+        <EntityCardGrid>
+          {filteredClients.map((client) => {
+            const displayName = `${client.prenom ? `${client.prenom} ` : ""}${
+              client.nom || t("dashboard.clients.noName")
+            }`;
+            return (
+              <EntityCard
+                key={client.id}
+                href={`/tableau-de-bord/clients/${client.id}`}
+                leading={<EntityAvatar label={client.nom || "?"} />}
+                title={displayName}
+                badges={
+                  <>
+                    {vis.role.enabled ? (
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          roleColors[client.role] || "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {formatRoleLabel(client.role, t)}
+                      </span>
+                    ) : null}
+                    {vis.category.enabled && client.category ? (
+                      <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+                        {formatCategoryLabel(client.category, t)}
+                      </span>
+                    ) : null}
+                  </>
+                }
+                meta={
+                  <>
+                    {vis.email.enabled ? (
+                      <EntityMetaRow
+                        label="Email"
+                        value={client.email || t("dashboard.clients.notProvided")}
+                      />
+                    ) : null}
+                    {vis.phone.enabled ? (
+                      <EntityMetaRow
+                        label="Tél."
+                        value={client.telephone || t("dashboard.clients.notProvided")}
+                      />
+                    ) : null}
+                    {vis.address.enabled ? (
+                      <EntityMetaRow
+                        label="Adresse"
+                        value={
+                          client.adresse || client.postal_code || client.city
+                            ? [
+                                client.adresse,
+                                [client.postal_code, client.city].filter(Boolean).join(" "),
+                              ]
+                                .filter(Boolean)
+                                .join(", ")
+                            : t("dashboard.clients.addressNotProvided")
+                        }
+                      />
+                    ) : null}
+                  </>
+                }
+                actions={
+                  <>
                     <ActionButton
                       href={`/tableau-de-bord/clients/${client.id}/edit`}
                       onClick={(e) => e.stopPropagation()}
@@ -316,12 +310,12 @@ export default function ClientsPage() {
                         setClients((prev) => prev.filter((c) => c.id !== removedId))
                       }
                     />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TableCard>
+                  </>
+                }
+              />
+            );
+          })}
+        </EntityCardGrid>
       )}
 
       {/* Footer avec compteur */}

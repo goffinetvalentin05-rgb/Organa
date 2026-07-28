@@ -7,11 +7,12 @@ import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
   PageHeader,
-  TableCard,
   EmptyState,
   GlassCard,
   ActionButton,
-  dashboardTableHeadRowClass,
+  EntityCard,
+  EntityCardGrid,
+  EntityMetaRow,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import type { MeetingStatus, MeetingType } from "@/lib/meeting-minutes";
@@ -108,106 +109,99 @@ export default function PvSeancesPage() {
         }
       />
 
-      <TableCard bodyClassName="p-0">
-        {loading ? (
-          <div className="p-12 text-center text-slate-500">{t("dashboard.common.loading")}</div>
-        ) : errorMessage ? (
-          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
-            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
-            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
-          </GlassCard>
-        ) : minutes.length === 0 ? (
-          <EmptyState
-            embedded
-            icon={ClipboardList}
-            title={t("dashboard.meetingMinutes.emptyState")}
-            description={t("dashboard.meetingMinutes.emptyDescription")}
-            action={
-              <DashboardPrimaryButton
-                href="/tableau-de-bord/pv-seances/nouveau"
-                className="inline-flex"
-                icon="none"
-              >
-                {t("dashboard.meetingMinutes.emptyCta")}
-              </DashboardPrimaryButton>
-            }
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead>
-                <tr className={dashboardTableHeadRowClass}>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.meetingMinutes.columns.title")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.meetingMinutes.columns.date")}</th>
-                  <th className="hidden px-4 py-3 md:table-cell sm:px-6">
-                    {t("dashboard.meetingMinutes.columns.type")}
-                  </th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
-                  <th className="hidden px-4 py-3 lg:table-cell sm:px-6">
-                    {t("dashboard.meetingMinutes.columns.updated")}
-                  </th>
-                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {minutes.map((m) => (
-                  <tr key={m.id} className="bg-white/80 transition-colors hover:bg-blue-50/30">
-                    <td className="px-4 py-3 font-medium text-slate-900 sm:px-6">{m.title}</td>
-                    <td className="px-4 py-3 text-slate-700 sm:px-6">{formatDate(m.meetingDate)}</td>
-                    <td className="hidden px-4 py-3 text-slate-600 md:table-cell sm:px-6">
-                      {typeLabel(m.meetingType)}
-                    </td>
-                    <td className="px-4 py-3 sm:px-6">
-                      <span className={`badge-obillz ${statusClass(m.status)}`}>
-                        {statusLabel(m.status)}
-                      </span>
-                    </td>
-                    <td className="hidden px-4 py-3 text-slate-600 lg:table-cell sm:px-6">
-                      {formatDateTime(m.updatedAt)}
-                    </td>
-                    <td className="px-4 py-3 sm:px-6">
-                      <div className="flex flex-wrap justify-end gap-1.5">
-                        <ActionButton
-                          href={`/tableau-de-bord/pv-seances/${m.id}`}
-                          className="inline-flex items-center gap-1.5 p-2"
-                        >
-                          <Eye className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          href={`/tableau-de-bord/pv-seances/${m.id}/modifier`}
-                          className="inline-flex items-center gap-1.5 p-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          type="button"
-                          className="inline-flex items-center gap-1.5 p-2"
-                          title={t("dashboard.meetingMinutes.downloadPdf")}
-                          onClick={() => downloadPdf(m.id)}
-                        >
-                          <Download className="h-4 w-4" />
-                          <span className="hidden sm:inline">PDF</span>
-                        </ActionButton>
-                        <ActionButton
-                          type="button"
-                          variant="dangerSoft"
-                          className="inline-flex p-2"
-                          title={t("dashboard.common.delete")}
-                          onClick={() => void handleDelete(m.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </ActionButton>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </TableCard>
+      {loading ? (
+        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center text-slate-500 shadow-sm">
+          {t("dashboard.common.loading")}
+        </div>
+      ) : errorMessage ? (
+        <GlassCard className="border-red-200/80 bg-red-50/50 text-center">
+          <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+          <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+        </GlassCard>
+      ) : minutes.length === 0 ? (
+        <EmptyState
+          icon={ClipboardList}
+          title={t("dashboard.meetingMinutes.emptyState")}
+          description={t("dashboard.meetingMinutes.emptyDescription")}
+          action={
+            <DashboardPrimaryButton
+              href="/tableau-de-bord/pv-seances/nouveau"
+              className="inline-flex"
+              icon="none"
+            >
+              {t("dashboard.meetingMinutes.emptyCta")}
+            </DashboardPrimaryButton>
+          }
+        />
+      ) : (
+        <EntityCardGrid>
+          {minutes.map((m) => (
+            <EntityCard
+              key={m.id}
+              href={`/tableau-de-bord/pv-seances/${m.id}`}
+              title={m.title}
+              status={
+                <span className={`badge-obillz ${statusClass(m.status)}`}>
+                  {statusLabel(m.status)}
+                </span>
+              }
+              badges={
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+                  {typeLabel(m.meetingType)}
+                </span>
+              }
+              meta={
+                <>
+                  <EntityMetaRow
+                    label={t("dashboard.meetingMinutes.columns.date")}
+                    value={formatDate(m.meetingDate)}
+                  />
+                  <EntityMetaRow
+                    label={t("dashboard.meetingMinutes.columns.updated")}
+                    value={formatDateTime(m.updatedAt)}
+                  />
+                </>
+              }
+              actions={
+                <>
+                  <ActionButton
+                    href={`/tableau-de-bord/pv-seances/${m.id}`}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <Eye className="h-4 w-4" />
+                    {t("dashboard.common.view")}
+                  </ActionButton>
+                  <ActionButton
+                    href={`/tableau-de-bord/pv-seances/${m.id}/modifier`}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <Edit className="h-4 w-4" />
+                    {t("dashboard.common.edit")}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    className="inline-flex items-center gap-1.5"
+                    title={t("dashboard.meetingMinutes.downloadPdf")}
+                    onClick={() => downloadPdf(m.id)}
+                  >
+                    <Download className="h-4 w-4" />
+                    PDF
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    variant="dangerSoft"
+                    className="inline-flex p-2"
+                    title={t("dashboard.common.delete")}
+                    onClick={() => void handleDelete(m.id)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </ActionButton>
+                </>
+              }
+            />
+          ))}
+        </EntityCardGrid>
+      )}
     </PageLayout>
   );
 }

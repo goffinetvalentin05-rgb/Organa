@@ -7,11 +7,12 @@ import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
   PageHeader,
-  TableCard,
   EmptyState,
   GlassCard,
   ActionButton,
-  dashboardTableHeadRowClass,
+  EntityCard,
+  EntityCardGrid,
+  EntityMetaRow,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 
@@ -112,91 +113,84 @@ export default function SponsoringPage() {
         }
       />
 
-      <TableCard bodyClassName="p-0">
-        {loading ? (
-          <div className="p-12 text-center text-slate-500">{t("dashboard.common.loading")}</div>
-        ) : errorMessage ? (
-          <GlassCard className="m-5 border-red-200/80 bg-red-50/50 text-center">
-            <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
-            <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
-          </GlassCard>
-        ) : contracts.length === 0 ? (
-          <EmptyState
-            embedded
-            icon={Handshake}
-            title={t("dashboard.sponsoring.emptyState")}
-            action={
-              <DashboardPrimaryButton href="/tableau-de-bord/sponsoring/nouveau" className="inline-flex" icon="none">
-                {t("dashboard.sponsoring.emptyCta")}
-              </DashboardPrimaryButton>
-            }
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead>
-                <tr className={dashboardTableHeadRowClass}>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.sponsor")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.contractName")}</th>
-                  <th className="hidden px-4 py-3 md:table-cell sm:px-6">
-                    {t("dashboard.sponsoring.columns.type")}
-                  </th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.amount")}</th>
-                  <th className="hidden px-4 py-3 lg:table-cell sm:px-6">
-                    {t("dashboard.sponsoring.columns.start")}
-                  </th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.sponsoring.columns.end")}</th>
-                  <th className="px-4 py-3 sm:px-6">{t("dashboard.common.status")}</th>
-                  <th className="px-4 py-3 text-right sm:px-6">{t("dashboard.common.actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(147,197,253,0.12)]">
-                {contracts.map((c) => (
-                  <tr key={c.id} className="bg-transparent transition-colors hover:bg-indigo-500/[0.06]">
-                    <td className="px-4 py-3 font-semibold text-[#F8FAFC] sm:px-6">{c.sponsorName}</td>
-                    <td className="px-4 py-3 font-medium text-[#E2E8F0] sm:px-6">{c.title}</td>
-                    <td className="hidden px-4 py-3 text-[#A8B8D0] md:table-cell sm:px-6">
-                      {sponsorTypeLabel(c.sponsorType)}
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-emerald-300 sm:px-6">{formatMontant(c.amount)}</td>
-                    <td className="hidden px-4 py-3 text-[#A8B8D0] lg:table-cell sm:px-6">
-                      {formatDate(c.startDate)}
-                    </td>
-                    <td className="px-4 py-3 text-[#A8B8D0] sm:px-6">{formatDate(c.endDate)}</td>
-                    <td className="px-4 py-3 sm:px-6">
-                      <span className={`badge-obillz ${statusClass(c.status)}`}>{statusLabel(c.status)}</span>
-                    </td>
-                    <td className="px-4 py-3 sm:px-6">
-                      <div className="flex flex-wrap justify-end gap-1.5">
-                        <ActionButton href={`/tableau-de-bord/sponsoring/${c.id}`} className="inline-flex items-center gap-1.5 p-2">
-                          <Eye className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.view")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          href={`/tableau-de-bord/sponsoring/${c.id}/modifier`}
-                          className="inline-flex items-center gap-1.5 p-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          <span className="hidden sm:inline">{t("dashboard.common.edit")}</span>
-                        </ActionButton>
-                        <ActionButton
-                          type="button"
-                          variant="dangerSoft"
-                          className="inline-flex p-2"
-                          title={t("dashboard.common.delete")}
-                          onClick={() => void handleDelete(c.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </ActionButton>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </TableCard>
+      {loading ? (
+        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center shadow-sm text-slate-500">
+          {t("dashboard.common.loading")}
+        </div>
+      ) : errorMessage ? (
+        <GlassCard className="border-red-200/80 bg-red-50/50 text-center">
+          <p className="font-medium text-red-700">{t("dashboard.common.loadFailed")}</p>
+          <p className="mt-2 text-sm text-red-600/90">{errorMessage}</p>
+        </GlassCard>
+      ) : contracts.length === 0 ? (
+        <EmptyState
+          icon={Handshake}
+          title={t("dashboard.sponsoring.emptyState")}
+          action={
+            <DashboardPrimaryButton href="/tableau-de-bord/sponsoring/nouveau" className="inline-flex" icon="none">
+              {t("dashboard.sponsoring.emptyCta")}
+            </DashboardPrimaryButton>
+          }
+        />
+      ) : (
+        <EntityCardGrid>
+          {contracts.map((c) => (
+            <EntityCard
+              key={c.id}
+              href={`/tableau-de-bord/sponsoring/${c.id}`}
+              title={c.sponsorName}
+              subtitle={c.title}
+              amount={formatMontant(c.amount)}
+              status={
+                <span className={`badge-obillz ${statusClass(c.status)}`}>{statusLabel(c.status)}</span>
+              }
+              meta={
+                <>
+                  <EntityMetaRow
+                    label={t("dashboard.sponsoring.columns.type")}
+                    value={sponsorTypeLabel(c.sponsorType)}
+                  />
+                  <EntityMetaRow
+                    label={t("dashboard.sponsoring.columns.start")}
+                    value={formatDate(c.startDate)}
+                  />
+                  <EntityMetaRow
+                    label={t("dashboard.sponsoring.columns.end")}
+                    value={formatDate(c.endDate)}
+                  />
+                </>
+              }
+              actions={
+                <>
+                  <ActionButton
+                    href={`/tableau-de-bord/sponsoring/${c.id}`}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <Eye className="h-4 w-4" />
+                    {t("dashboard.common.view")}
+                  </ActionButton>
+                  <ActionButton
+                    href={`/tableau-de-bord/sponsoring/${c.id}/modifier`}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <Edit className="h-4 w-4" />
+                    {t("dashboard.common.edit")}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    variant="dangerSoft"
+                    className="inline-flex p-2"
+                    title={t("dashboard.common.delete")}
+                    onClick={() => void handleDelete(c.id)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </ActionButton>
+                </>
+              }
+            />
+          ))}
+        </EntityCardGrid>
+      )}
     </PageLayout>
   );
 }

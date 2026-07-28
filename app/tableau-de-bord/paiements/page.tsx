@@ -6,7 +6,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
 import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
-import { PageLayout, PageHeader, TableCard, EmptyState, DataCard, dashboardListRowClass, cn } from "@/components/ui";
+import { PageLayout, PageHeader, EmptyState, DataCard, EntityCard, EntityCardGrid, EntityMetaRow } from "@/components/ui";
 
 interface DocumentClient {
   nom?: string;
@@ -145,68 +145,52 @@ export default function PaiementsPage() {
         </DataCard>
       </div>
 
-      <TableCard bodyClassName="p-0">
-        {loading ? (
-          <div className="p-8 text-center text-slate-500">
-            {t("dashboard.common.loading")}
-          </div>
-        ) : payments.length === 0 ? (
-          <div className="p-6">
-            <EmptyState embedded icon={CreditCard} title={t("dashboard.payments.emptyState")} />
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-100">
-            {payments.map((payment) => (
-              <a
-                key={payment.id}
-                href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
-                className={cn(dashboardListRowClass, "flex items-center justify-between gap-4")}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    payment.type === "membership" 
-                      ? "bg-blue-100" 
-                      : "bg-purple-100"
-                  }`}>
-                    {payment.type === "membership" ? (
-                      <FileText className={`w-5 h-5 ${
-                        payment.type === "membership" 
-                          ? "text-blue-600" 
-                          : "text-purple-600"
-                      }`} />
-                    ) : (
-                      <Receipt className="w-5 h-5 text-purple-600" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-900">{payment.member}</p>
-                    <p className="text-sm text-slate-500">
-                      {payment.type === "membership" 
-                        ? t("dashboard.payments.types.membership") 
-                        : t("dashboard.payments.types.invoice")
-                      } • {payment.documentNumber}
-                    </p>
-                  </div>
+      {loading ? (
+        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-8 text-center text-slate-500 shadow-sm">
+          {t("dashboard.common.loading")}
+        </div>
+      ) : payments.length === 0 ? (
+        <EmptyState icon={CreditCard} title={t("dashboard.payments.emptyState")} />
+      ) : (
+        <EntityCardGrid>
+          {payments.map((payment) => (
+            <EntityCard
+              key={payment.id}
+              href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
+              leading={
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    payment.type === "membership" ? "bg-blue-100" : "bg-purple-100"
+                  }`}
+                >
+                  {payment.type === "membership" ? (
+                    <FileText className="h-5 w-5 text-blue-600" />
+                  ) : (
+                    <Receipt className="h-5 w-5 text-purple-600" />
+                  )}
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="font-semibold text-slate-900">
-                      {formatMontant(payment.amount)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {formatDate(payment.date)}
-                    </p>
-                  </div>
-                  <span className="badge-obillz badge-success flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    {t("dashboard.payments.status.paid")}
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        )}
-      </TableCard>
+              }
+              title={payment.member}
+              subtitle={
+                <>
+                  {payment.type === "membership"
+                    ? t("dashboard.payments.types.membership")
+                    : t("dashboard.payments.types.invoice")}{" "}
+                  • {payment.documentNumber}
+                </>
+              }
+              amount={formatMontant(payment.amount)}
+              status={
+                <span className="badge-obillz badge-success inline-flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  {t("dashboard.payments.status.paid")}
+                </span>
+              }
+              meta={<EntityMetaRow label={t("dashboard.common.date")} value={formatDate(payment.date)} />}
+            />
+          ))}
+        </EntityCardGrid>
+      )}
     </PageLayout>
   );
 }
