@@ -14,7 +14,7 @@ import {
   ActionButton,
   GlassCard,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
   dashboardSelectClass,
   dashboardPopoverPanelClass,
@@ -212,12 +212,13 @@ export default function FacturesPage() {
         />
       ) : (
         <>
-          <EntityCardGrid>
+          <EntityCardList>
             {factures.map((facture) => {
               const montant = calculerTotalTTC(facture.lignes);
               return (
                 <EntityCard
                   key={facture.id}
+                  layout="row"
                   href={`/tableau-de-bord/factures/${facture.id}`}
                   title={facture.title || facture.numero}
                   subtitle={facture.numero}
@@ -235,6 +236,7 @@ export default function FacturesPage() {
                   meta={
                     <>
                       <EntityMetaRow
+                        inline
                         label={t("dashboard.common.client")}
                         value={
                           facture.recipient?.name ||
@@ -243,6 +245,7 @@ export default function FacturesPage() {
                         }
                       />
                       <EntityMetaRow
+                        inline
                         label={t("dashboard.common.date")}
                         value={formatDate(facture.dateCreation)}
                       />
@@ -272,7 +275,7 @@ export default function FacturesPage() {
                 />
               );
             })}
-          </EntityCardGrid>
+          </EntityCardList>
           <p className="text-center text-sm text-[#94A3B8]">
             {t("dashboard.invoices.listTotal", { count: factures.length })}
           </p>

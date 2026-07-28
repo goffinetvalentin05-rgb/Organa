@@ -14,7 +14,7 @@ import {
   ActionButton,
   GlassCard,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
 } from "@/components/ui";
 
@@ -146,12 +146,13 @@ export default function DevisPage() {
         />
       ) : (
         <>
-          <EntityCardGrid>
+          <EntityCardList>
             {devis.map((devisItem) => {
               const montant = calculerTotalTTC(devisItem.lignes);
               return (
                 <EntityCard
                   key={devisItem.id}
+                  layout="row"
                   href={`/tableau-de-bord/devis/${devisItem.id}`}
                   title={devisItem.title || devisItem.numero}
                   subtitle={devisItem.numero}
@@ -169,10 +170,12 @@ export default function DevisPage() {
                   meta={
                     <>
                       <EntityMetaRow
+                        inline
                         label={t("dashboard.common.client")}
                         value={devisItem.client?.nom || t("dashboard.common.unknownClient")}
                       />
                       <EntityMetaRow
+                        inline
                         label={t("dashboard.common.date")}
                         value={formatDate(devisItem.dateCreation)}
                       />
@@ -202,7 +205,7 @@ export default function DevisPage() {
                 />
               );
             })}
-          </EntityCardGrid>
+          </EntityCardList>
           <p className="text-center text-sm text-[#94A3B8]">
             {t("dashboard.quotes.totalCount", { count: devis.length })}
           </p>

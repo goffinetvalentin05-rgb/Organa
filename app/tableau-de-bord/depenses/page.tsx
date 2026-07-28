@@ -9,7 +9,7 @@ import {
   GlassCard,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
   dashboardSelectClass,
   dashboardPopoverPanelClass,
@@ -785,7 +785,7 @@ export default function DepensesPage() {
           }
         />
       ) : (
-        <EntityCardGrid columns={2}>
+        <EntityCardList>
           {depensesTriees.map((depense) => {
             const statutAffiche = getStatutAffiche(depense);
             const besoinAction =
@@ -797,6 +797,7 @@ export default function DepensesPage() {
             return (
               <EntityCard
                 key={depense.id}
+                layout="row"
                 title={depense.label}
                 subtitle={depense.notes || undefined}
                 amount={formatMontant(depense.amount)}
@@ -812,10 +813,12 @@ export default function DepensesPage() {
                 meta={
                   <>
                     <EntityMetaRow
+                      inline
                       label={t("dashboard.expenses.listColumns.dueDate")}
                       value={formatDate(depense.date)}
                     />
                     <EntityMetaRow
+                      inline
                       label={t("dashboard.expenses.listColumns.attachment")}
                       value={
                         hrefPJ ? (
@@ -874,7 +877,7 @@ export default function DepensesPage() {
               />
             );
           })}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
 
       {showViewModal && selectedDepense && (

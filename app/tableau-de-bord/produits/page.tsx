@@ -14,7 +14,7 @@ import {
   GlassCard,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
 } from "@/components/ui";
 
@@ -227,19 +227,22 @@ function ProduitsPageInner() {
           }
         />
       ) : (
-        <EntityCardGrid>
+        <EntityCardList>
           {revenues.map((r) => (
             <EntityCard
               key={r.id}
+              layout="row"
               title={r.name}
               amount={formatMontant(r.amount)}
               meta={
                 <>
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.productRevenues.columns.date")}
                     value={formatDate(r.revenue_date)}
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.productRevenues.columns.event")}
                     value={
                       r.event ? (
@@ -280,7 +283,7 @@ function ProduitsPageInner() {
               }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
 
       {showForm && (

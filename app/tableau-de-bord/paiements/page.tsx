@@ -6,7 +6,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
 import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
-import { PageLayout, PageHeader, EmptyState, DataCard, EntityCard, EntityCardGrid, EntityMetaRow } from "@/components/ui";
+import { PageLayout, PageHeader, EmptyState, DataCard, EntityCard, EntityCardList, EntityMetaRow } from "@/components/ui";
 
 interface DocumentClient {
   nom?: string;
@@ -152,14 +152,15 @@ export default function PaiementsPage() {
       ) : payments.length === 0 ? (
         <EmptyState icon={CreditCard} title={t("dashboard.payments.emptyState")} />
       ) : (
-        <EntityCardGrid>
+        <EntityCardList>
           {payments.map((payment) => (
             <EntityCard
               key={payment.id}
+              layout="row"
               href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
               leading={
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${
                     payment.type === "membership" ? "bg-blue-100" : "bg-purple-100"
                   }`}
                 >
@@ -186,10 +187,12 @@ export default function PaiementsPage() {
                   {t("dashboard.payments.status.paid")}
                 </span>
               }
-              meta={<EntityMetaRow label={t("dashboard.common.date")} value={formatDate(payment.date)} />}
+              meta={
+                <EntityMetaRow inline label={t("dashboard.common.date")} value={formatDate(payment.date)} />
+              }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
     </PageLayout>
   );

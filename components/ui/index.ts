@@ -75,7 +75,7 @@ export { default as TableCard } from "./TableCard";
 export { default as FormSection } from "./FormSection";
 export { default as ListCard } from "./ListCard";
 export { default as DashboardBadge } from "./DashboardBadge";
-export { default as EntityCard, EntityCardGrid, EntityAvatar, EntityMetaRow } from "./EntityCard";
+export { default as EntityCard, EntityCardGrid, EntityCardList, EntityAvatar, EntityMetaRow } from "./EntityCard";
 export type { EntityCardProps, EntityCardGridProps } from "./EntityCard";
 /** @deprecated Utilisez `TableCard` — alias conservé pour compatibilité. */
 export { default as DataTableCard } from "./TableCard";
