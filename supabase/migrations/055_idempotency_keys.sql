@@ -1,12 +1,15 @@
 -- Migration 055 : Idempotency keys
 -- Permet de protéger côté backend les endpoints à effet de bord
 -- contre les doubles soumissions (double-click, retry navigateur, etc.).
+--
+-- Convention club_id = UUID du compte owner (= auth.users), comme partout ailleurs.
+-- Pas de table public.clubs dans ce projet.
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE IF NOT EXISTS public.idempotency_keys (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  club_id uuid NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+  club_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   key text NOT NULL,
   method text NOT NULL,
   path text NOT NULL,
@@ -22,3 +25,5 @@ CREATE TABLE IF NOT EXISTS public.idempotency_keys (
 CREATE INDEX IF NOT EXISTS idx_idempotency_keys_club_created_at
   ON public.idempotency_keys (club_id, created_at DESC);
 
+-- Accès uniquement via service_role (helper serveur withIdempotency).
+ALTER TABLE public.idempotency_keys ENABLE ROW LEVEL SECURITY;

@@ -369,7 +369,7 @@ export async function POST(request: NextRequest) {
       .lte("created_at", `${year}-12-31`);
 
     if (countError) {
-      const safeCountError = countError as SupabaseOpError & { stack?: string };
+      const safeCountError = countError as { message?: string; stack?: string };
       console.error("ERREUR DOCUMENT COTISATION", {
         step: "documents.post.count",
         error: countError,

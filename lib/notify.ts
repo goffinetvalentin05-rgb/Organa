@@ -1,16 +1,14 @@
 import toast from "react-hot-toast";
 
-type ToastId = string | number;
-
-export function notifySuccess(message: string, id?: ToastId) {
+export function notifySuccess(message: string, id?: string) {
   return toast.success(message, id ? { id } : undefined);
 }
 
-export function notifyError(message: string, id?: ToastId) {
+export function notifyError(message: string, id?: string) {
   return toast.error(message, id ? { id } : undefined);
 }
 
-export function notifyInfo(message: string, id?: ToastId) {
+export function notifyInfo(message: string, id?: string) {
   return toast(message, id ? { id } : undefined);
 }
 
