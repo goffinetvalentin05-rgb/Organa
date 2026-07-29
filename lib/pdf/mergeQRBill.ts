@@ -13,8 +13,36 @@
  */
 
 import { PDFDocument } from "pdf-lib";
-import { renderQRBillSlipPdf, QR_BILL_HEIGHT_PT } from "@/lib/swiss-qr-bill";
+import {
+  renderQRBillSlipPdf,
+  QR_BILL_HEIGHT_PT,
+  QR_BILL_WIDTH_PT,
+} from "@/lib/swiss-qr-bill";
 import type { QRBillData } from "@/lib/swiss-qr-bill/types";
+
+export type QRBillPlacement = {
+  x: number;
+  y: 0;
+  width: number;
+  height: number;
+};
+
+/**
+ * Calcule un placement centré sans jamais redimensionner la zone officielle.
+ *
+ * Une page A4 créée par un moteur PDF peut différer de quelques millièmes de
+ * point de la conversion exacte de 210 mm. Utiliser directement la largeur de
+ * la page étirait imperceptiblement le slip. Le centrer à sa largeur SIX
+ * exacte garantit des cotes inchangées et des marges latérales identiques.
+ */
+export function getQRBillPlacement(pageWidth: number): QRBillPlacement {
+  return {
+    x: (pageWidth - QR_BILL_WIDTH_PT) / 2,
+    y: 0,
+    width: QR_BILL_WIDTH_PT,
+    height: QR_BILL_HEIGHT_PT,
+  };
+}
 
 /**
  * Ajoute la zone de paiement en bas de la dernière page du PDF fourni.
@@ -38,14 +66,9 @@ export async function attachQRBillToPdf(
   const lastPage = pages[pages.length - 1];
   const { width } = lastPage.getSize();
 
-  // Ancrage en bas à gauche, sur toute la largeur : la norme SIX impose que la
-  // zone de paiement occupe le bas de la page sur 210 × 105 mm.
-  lastPage.drawPage(slipPage, {
-    x: 0,
-    y: 0,
-    width,
-    height: QR_BILL_HEIGHT_PT,
-  });
+  // Centré sur la page à ses dimensions SIX exactes : aucun étirement, même
+  // minime, n'est appliqué au QR, aux séparateurs ou aux espacements internes.
+  lastPage.drawPage(slipPage, getQRBillPlacement(width));
 
   return Buffer.from(await target.save());
 }

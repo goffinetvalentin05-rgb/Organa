@@ -21,6 +21,12 @@ import { QR_BILL_HEIGHT_PT } from "@/lib/swiss-qr-bill";
 type Matrix = [number, number, number, number, number, number];
 const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
 
+function renderPdf(element: React.ReactElement): Promise<Buffer> {
+  // Les composants retournent bien un <Document>, mais le typage public de
+  // renderToBuffer exige directement ReactElement<DocumentProps>.
+  return renderToBuffer(element as Parameters<typeof renderToBuffer>[0]);
+}
+
 const mul = (m: Matrix, n: Matrix): Matrix => [
   m[0] * n[0] + m[1] * n[2],
   m[0] * n[1] + m[1] * n[3],
@@ -166,7 +172,7 @@ describe("réservation de la zone de paiement", () => {
 
   for (const { label, lines } of cases) {
     it(`laisse la zone de paiement libre — ${label}`, async () => {
-      const pdf = await renderToBuffer(
+      const pdf = await renderPdf(
         React.createElement(FacturePdf, {
           company,
           client,
@@ -185,7 +191,7 @@ describe("réservation de la zone de paiement", () => {
   }
 
   it("laisse également la zone libre sur une cotisation", async () => {
-    const pdf = await renderToBuffer(
+    const pdf = await renderPdf(
       React.createElement(DevisPdf, {
         company,
         client,
@@ -204,7 +210,7 @@ describe("réservation de la zone de paiement", () => {
   });
 
   it("n'impose aucune réservation quand la QR-facture est indisponible", async () => {
-    const withoutQR = await renderToBuffer(
+    const withoutQR = await renderPdf(
       React.createElement(FacturePdf, {
         company,
         client,

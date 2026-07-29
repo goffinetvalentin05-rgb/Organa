@@ -10,9 +10,10 @@ import {
   validateQRBillData,
   renderQRBillSlipPdf,
   QR_BILL_HEIGHT_PT,
+  QR_BILL_WIDTH_PT,
 } from "@/lib/swiss-qr-bill";
 import type { QRBillData } from "@/lib/swiss-qr-bill/types";
-import { attachQRBillToPdf } from "@/lib/pdf/mergeQRBill";
+import { attachQRBillToPdf, getQRBillPlacement } from "@/lib/pdf/mergeQRBill";
 
 /** IBAN standard suisse (référence de type NON). */
 const IBAN_STANDARD = "CH5800791123000889012";
@@ -204,6 +205,31 @@ describe("incrustation dans le PDF du document", () => {
 
     expect(width).toBeCloseTo(595.28, 1);
     expect(height).toBeCloseTo(841.89, 1);
+  });
+
+  it("centre le slip sans modifier ses dimensions officielles", () => {
+    const pageWidth = 595.28;
+    const placement = getQRBillPlacement(pageWidth);
+    const leftMargin = placement.x;
+    const rightMargin = pageWidth - placement.x - placement.width;
+
+    expect(placement.width).toBe(QR_BILL_WIDTH_PT);
+    expect(placement.height).toBe(QR_BILL_HEIGHT_PT);
+    expect(placement.y).toBe(0);
+    expect(leftMargin).toBeCloseTo(rightMargin, 10);
+  });
+
+  it("ne redimensionne pas le slip si la largeur A4 diffère de quelques millièmes", () => {
+    const exactA4Width = QR_BILL_WIDTH_PT;
+    const commonRoundedA4Width = 595.28;
+
+    expect(getQRBillPlacement(exactA4Width).width).toBe(QR_BILL_WIDTH_PT);
+    expect(getQRBillPlacement(commonRoundedA4Width).width).toBe(QR_BILL_WIDTH_PT);
+    expect(getQRBillPlacement(exactA4Width).x).toBe(0);
+    expect(getQRBillPlacement(commonRoundedA4Width).x).toBeCloseTo(
+      (commonRoundedA4Width - QR_BILL_WIDTH_PT) / 2,
+      10
+    );
   });
 
   it("produit un PDF plus lourd que l'original, signe que le slip est bien incrusté", async () => {

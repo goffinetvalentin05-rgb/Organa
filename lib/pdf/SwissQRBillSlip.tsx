@@ -6,9 +6,9 @@
  * dégraderait la lisibilité du QR. Elle est donc produite en vectoriel par
  * PDFKit puis incrustée après coup (voir `lib/pdf/mergeQRBill.ts`).
  *
- * Le rôle de ce composant est de réserver dans le flux du document une bande
- * de la hauteur exacte du slip (105 mm). Comme `@react-pdf/renderer` bascule
- * un bloc de hauteur fixe sur la page suivante lorsqu'il ne tient plus, cette
+ * Le rôle de ce composant est de réserver dans le flux la partie du slip qui
+ * dépasse la marge basse déjà vide. Comme `@react-pdf/renderer` bascule un
+ * bloc de hauteur fixe sur la page suivante lorsqu'il ne tient plus, cette
  * réservation garantit que le bas de la dernière page est libre et que la
  * zone de paiement ne recouvrira jamais le contenu de la facture.
  *
