@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Viewport } from "next";
 import { Toaster } from "react-hot-toast";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { I18nProvider } from "@/components/I18nProvider";
 
 const inter = Inter({
@@ -62,6 +63,7 @@ export default function RootLayout({
           }}
         />
         <div id="obillz-portal-root" className="fixed inset-0 z-[9999] pointer-events-none" />
+        <Analytics />
       </body>
     </html>
   );
