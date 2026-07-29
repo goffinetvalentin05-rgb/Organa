@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -42,6 +43,11 @@ export async function POST(request: NextRequest) {
     const accessCheck = await requireWriteAccess();
     if (accessCheck.response) {
       return accessCheck.response;
+    }
+
+    const idempotencyKey = request.headers.get("Idempotency-Key");
+    if (!idempotencyKey) {
+      return NextResponse.json({ error: "Idempotency-Key requis" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -93,128 +99,148 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let contactsQuery = supabase
-      .from("marketing_contacts")
-      .select("id, email")
-      .eq("club_id", guard.clubId)
-      .eq("unsubscribed", false);
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey,
+      resourceType: "marketing_campaign",
+      operation: async () => {
+        let contactsQuery = supabase
+          .from("marketing_contacts")
+          .select("id, email")
+          .eq("club_id", guard.clubId)
+          .eq("unsubscribed", false);
 
-    if (sendTo === "source" && source) {
-      contactsQuery = contactsQuery.eq("source", source);
-    }
-    if (sendTo === "manual") {
-      contactsQuery = contactsQuery.in("id", contactIds);
-    }
+        if (sendTo === "source" && source) {
+          contactsQuery = contactsQuery.eq("source", source);
+        }
+        if (sendTo === "manual") {
+          contactsQuery = contactsQuery.in("id", contactIds);
+        }
 
-    const { data: contacts, error: contactsError } = await contactsQuery;
-    if (contactsError) {
-      return NextResponse.json({ error: contactsError.message }, { status: 500 });
-    }
+        const { data: contacts, error: contactsError } = await contactsQuery;
+        if (contactsError) {
+          return { status: 500, body: { error: contactsError.message }, resourceId: null };
+        }
 
-    if (!contacts || contacts.length === 0) {
-      return NextResponse.json({ error: "Aucun destinataire actif pour cette campagne" }, { status: 400 });
-    }
+        if (!contacts || contacts.length === 0) {
+          return {
+            status: 400,
+            body: { error: "Aucun destinataire actif pour cette campagne" },
+            resourceId: null,
+          };
+        }
 
-    const { data: campaign, error: campaignError } = await supabase
-      .from("marketing_campaigns")
-      .insert({
-        club_id: guard.clubId,
-        name,
-        subject,
-        content_html: contentHtml,
-        status: "sending",
-      })
-      .select("id")
-      .single();
+        const { data: campaign, error: campaignError } = await supabase
+          .from("marketing_campaigns")
+          .insert({
+            club_id: guard.clubId,
+            name,
+            subject,
+            content_html: contentHtml,
+            status: "sending",
+          })
+          .select("id")
+          .single();
 
-    if (campaignError || !campaign) {
-      return NextResponse.json({ error: campaignError?.message || "Erreur création campagne" }, { status: 500 });
-    }
+        if (campaignError || !campaign) {
+          return {
+            status: 500,
+            body: { error: campaignError?.message || "Erreur création campagne" },
+            resourceId: null,
+          };
+        }
 
-    const recipientPayload = contacts.map((contact) => ({
-      campaign_id: campaign.id,
-      club_id: guard.clubId,
-      contact_id: contact.id,
-      email: contact.email,
-      status: "pending",
-    }));
+        const recipientPayload = contacts.map((contact: { id: string; email: string }) => ({
+          campaign_id: campaign.id,
+          club_id: guard.clubId,
+          contact_id: contact.id,
+          email: contact.email,
+          status: "pending",
+        }));
 
-    const { data: recipients, error: recipientsError } = await supabase
-      .from("marketing_campaign_recipients")
-      .insert(recipientPayload)
-      .select("id, email, unsubscribe_token");
+        const { data: recipients, error: recipientsError } = await supabase
+          .from("marketing_campaign_recipients")
+          .insert(recipientPayload)
+          .select("id, email, unsubscribe_token");
 
-    if (recipientsError || !recipients) {
-      await supabase
-        .from("marketing_campaigns")
-        .update({ status: "failed", recipient_count: 0 })
-        .eq("id", campaign.id)
-        .eq("club_id", guard.clubId);
+        if (recipientsError || !recipients) {
+          await supabase
+            .from("marketing_campaigns")
+            .update({ status: "failed", recipient_count: 0 })
+            .eq("id", campaign.id)
+            .eq("club_id", guard.clubId);
 
-      return NextResponse.json(
-        { error: recipientsError?.message || "Erreur préparation destinataires" },
-        { status: 500 }
-      );
-    }
+          return {
+            status: 500,
+            body: { error: recipientsError?.message || "Erreur préparation destinataires" },
+            resourceId: null,
+          };
+        }
 
-    const { resend, from } = delivery;
+        const { resend, from } = delivery;
 
-    const baseUrl = new URL(request.url).origin;
-    let successCount = 0;
+        const baseUrl = new URL(request.url).origin;
+        let successCount = 0;
 
-    for (const recipient of recipients) {
-      const unsubscribeUrl = `${baseUrl}/desinscription/${recipient.unsubscribe_token}`;
-      const footer = `
+        for (const recipient of recipients) {
+          const unsubscribeUrl = `${baseUrl}/desinscription/${recipient.unsubscribe_token}`;
+          const footer = `
         <hr style="margin-top:24px;margin-bottom:12px;border:none;border-top:1px solid #e5e7eb;" />
         <p style="font-size:12px;color:#6b7280;">
           Vous recevez cet email car vous êtes inscrit(e) aux communications du club.<br/>
           <a href="${unsubscribeUrl}" style="color:#7C5CFF;text-decoration:underline;">Lien de désinscription</a>
         </p>
       `;
-      const html = `${contentHtml}${footer}`;
+          const html = `${contentHtml}${footer}`;
 
-      const { error: sendError } = await resend.emails.send({
-        from,
-        to: [recipient.email],
-        subject,
-        html,
-      });
+          const { error: sendError } = await resend.emails.send({
+            from,
+            to: [recipient.email],
+            subject,
+            html,
+          });
 
-      if (sendError) {
+          if (sendError) {
+            await supabase
+              .from("marketing_campaign_recipients")
+              .update({ status: "failed" })
+              .eq("id", recipient.id);
+            continue;
+          }
+
+          successCount += 1;
+          await supabase
+            .from("marketing_campaign_recipients")
+            .update({ status: "sent", sent_at: new Date().toISOString() })
+            .eq("id", recipient.id);
+        }
+
+        const status = successCount > 0 ? "sent" : "failed";
         await supabase
-          .from("marketing_campaign_recipients")
-          .update({ status: "failed" })
-          .eq("id", recipient.id);
-        continue;
-      }
+          .from("marketing_campaigns")
+          .update({
+            status,
+            sent_at: new Date().toISOString(),
+            recipient_count: recipients.length,
+          })
+          .eq("id", campaign.id)
+          .eq("club_id", guard.clubId);
 
-      successCount += 1;
-      await supabase
-        .from("marketing_campaign_recipients")
-        .update({ status: "sent", sent_at: new Date().toISOString() })
-        .eq("id", recipient.id);
-    }
-
-    const status = successCount > 0 ? "sent" : "failed";
-    await supabase
-      .from("marketing_campaigns")
-      .update({
-        status,
-        sent_at: new Date().toISOString(),
-        recipient_count: recipients.length,
-      })
-      .eq("id", campaign.id)
-      .eq("club_id", guard.clubId);
-
-    return NextResponse.json(
-      {
-        success: status === "sent",
-        campaignId: campaign.id,
-        recipientCount: recipients.length,
-        sentCount: successCount,
+        return {
+          status: 201,
+          body: {
+            success: status === "sent",
+            campaignId: campaign.id,
+            recipientCount: recipients.length,
+            sentCount: successCount,
+          },
+          resourceId: campaign.id,
+        };
       },
-      { status: 201 }
-    );
+    });
+
+    return NextResponse.json(idempotencyResult.body, { status: idempotencyResult.status });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erreur serveur";
     return NextResponse.json({ error: message }, { status: 500 });

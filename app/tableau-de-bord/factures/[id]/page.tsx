@@ -29,6 +29,10 @@ import {
   documentPreviewSurfaceClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 interface Facture {
   id: string;
@@ -79,7 +83,11 @@ export default function FactureDetailPage() {
   const id = (params?.id as string) || "";
   const { t, locale } = useI18n();
   const [facture, setFacture] = useState<Facture | null>(null);
-  const [envoiEmail, setEnvoiEmail] = useState(false);
+  const {
+    isSubmitting: envoiEmail,
+    showOverlay: showEmailOverlay,
+    run: runEmailSend,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
 
@@ -258,41 +266,39 @@ export default function FactureDetailPage() {
       }
       return;
     }
+    if (envoiEmail) return;
 
-    setEnvoiEmail(true);
-    try {
-      const response = await fetch("/api/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "facture",
-          documentId: id,
-        }),
-      });
+    await runEmailSend(async (idempotencyKey) => {
+      try {
+        const response = await idempotentFetch("/api/email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          idempotencyKey,
+          body: JSON.stringify({
+            type: "facture",
+            documentId: id,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data?.error || t("dashboard.invoices.detail.sendError"));
+        }
 
-      if (!response.ok) {
-        throw new Error(data?.error || t("dashboard.invoices.detail.sendError"));
-      }
+        notifySuccess(t("dashboard.invoices.detail.sendSuccess"), "email-send");
 
-      if (typeof toast !== "undefined" && toast.success) {
-        toast.success(t("dashboard.invoices.detail.sendSuccess"));
+        // Mettre à jour le statut si c'est un brouillon
+        if (facture.statut === "brouillon") {
+          handleChangerStatut("envoye");
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          getErrorMessage(error) || t("dashboard.invoices.detail.sendErrorFallback");
+        notifyError(String(errorMessage), "email-send");
       }
-      // Mettre à jour le statut si c'est un brouillon
-      if (facture.statut === "brouillon") {
-        handleChangerStatut("envoye");
-      }
-    } catch (error: unknown) {
-      if (typeof toast !== "undefined" && toast.error) {
-        const errorMessage = getErrorMessage(error) || t("dashboard.invoices.detail.sendErrorFallback");
-        toast.error(String(errorMessage));
-      }
-    } finally {
-      setEnvoiEmail(false);
-    }
+    });
   };
 
   const handleImprimer = () => {
@@ -384,7 +390,9 @@ export default function FactureDetailPage() {
           : "overdue";
 
   return (
-    <PageLayout maxWidth="7xl">
+    <>
+      <SubmittingOverlay visible={showEmailOverlay} message="Envoi en cours…" />
+      <PageLayout maxWidth="7xl">
       <DetailPageHeader
         backHref="/tableau-de-bord/factures"
         backLabel={t("dashboard.invoices.detail.backToList")}
@@ -471,7 +479,7 @@ export default function FactureDetailPage() {
           </>
         }
       />
-
+ 
       {/* Aperçu */}
       <div className={documentPreviewSurfaceClass}>
         <div className="flex items-start justify-between gap-6">
@@ -752,7 +760,8 @@ export default function FactureDetailPage() {
           </div>
         )}
       </GlassCard>
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
 

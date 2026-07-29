@@ -19,6 +19,7 @@ import {
   type ExternalRecipientData,
   type RecipientType,
 } from "@/lib/documents/recipient";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -341,10 +342,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculer les totaux
-    const totalHT = calculerTotalHT(lignes);
-    const totalTVA = calculerTVA(lignes);
-    const totalTTC = calculerTotalTTC(lignes);
+    const idempotencyKey = request.headers.get("Idempotency-Key");
+    const idempotencyResourceType = type === "invoice" ? "invoice" : "quote";
+
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey,
+      resourceType: idempotencyResourceType,
+      operation: async () => {
+        // Calculer les totaux
+        const totalHT = calculerTotalHT(lignes);
+        const totalTVA = calculerTVA(lignes);
+        const totalTTC = calculerTotalTTC(lignes);
 
     // Générer le numéro du document (unicité: user_id + type + btrim(numero) avec deleted_at IS NULL)
     const year = new Date().getFullYear();
@@ -359,11 +369,12 @@ export async function POST(request: NextRequest) {
       .lte("created_at", `${year}-12-31`);
 
     if (countError) {
+      const safeCountError = countError as SupabaseOpError & { stack?: string };
       console.error("ERREUR DOCUMENT COTISATION", {
         step: "documents.post.count",
         error: countError,
-        message: (countError as any)?.message,
-        stack: (countError as any)?.stack,
+        message: safeCountError?.message,
+        stack: safeCountError?.stack,
         data: { docCount },
         clubId: guard.clubId,
         memberId: clientId,
@@ -543,20 +554,24 @@ export async function POST(request: NextRequest) {
 
       if (!insertError) break;
 
-      const code = String((insertError as any)?.code || "");
+      const code = String(insertError?.code || "");
       if (code === "23505") {
         console.error("ERREUR DOCUMENT COTISATION", {
           step: "documents.post.insert.duplicate-23505",
           error: insertError,
-          message: (insertError as any)?.message,
+          message: insertError?.message,
           stack: undefined,
           data: null,
           clubId: guard.clubId,
           memberId: clientId,
           documentPayload: {
             ...documentData,
-            number: (documentData as any)?.numero,
-            document_number: (documentData as any)?.document_number,
+            number: documentData.numero,
+            document_number:
+              typeof (documentData as Record<string, unknown>).document_number ===
+              "string"
+                ? (documentData as Record<string, unknown>).document_number
+                : null,
             type: documentData.type,
           },
           pdfPayload: null,
@@ -581,8 +596,11 @@ export async function POST(request: NextRequest) {
         memberId: clientId,
         documentPayload: {
           ...documentData,
-          number: (documentData as any)?.numero,
-          document_number: (documentData as any)?.document_number,
+          number: documentData.numero,
+          document_number:
+            typeof (documentData as Record<string, unknown>).document_number === "string"
+              ? (documentData as Record<string, unknown>).document_number
+              : null,
           type: documentData.type,
         },
         pdfPayload: null,
@@ -590,10 +608,10 @@ export async function POST(request: NextRequest) {
       });
       console.error("[API][documents][POST] Erreur Supabase insert:", {
         status: "ERROR",
-        code: (insertError as any).code || "UNKNOWN",
+        code: insertError?.code || "UNKNOWN",
         message: insertError.message || "Erreur inconnue",
-        details: (insertError as any).details || null,
-        hint: (insertError as any).hint || null,
+        details: insertError?.details || null,
+        hint: insertError?.hint || null,
         data_attempted: {
           club_id: guard.clubId,
           auth_user_id: user.id,
@@ -602,24 +620,26 @@ export async function POST(request: NextRequest) {
           numero: documentData.numero,
         },
       });
-      return NextResponse.json(
-        { 
+      return {
+        status: 500,
+        body: {
           error: "Erreur lors de la création du document",
-          details: `Erreur document: ${(insertError as any).message || "duplicate"}`,
-          code: (insertError as any).code,
-          hint: (insertError as any).hint,
+          details: `Erreur document: ${insertError?.message || "duplicate"}`,
+          code: insertError?.code,
+          hint: insertError?.hint,
           numero: documentData.numero,
         },
-        { status: 500 }
-      );
+        resourceId: null,
+      };
     }
 
     if (!newDocument || !newDocument.id) {
       console.error("[API][documents][POST] Document créé mais ID manquant");
-      return NextResponse.json(
-        { error: "Erreur lors de la création du document" },
-        { status: 500 }
-      );
+      return {
+        status: 500,
+        body: { error: "Erreur lors de la création du document" },
+        resourceId: null,
+      };
     }
 
     console.log("[API][documents][POST] Document créé avec succès:", {
@@ -638,17 +658,28 @@ export async function POST(request: NextRequest) {
       ...meta,
     });
 
-    return NextResponse.json({
-      id: newDocument.id.toString(),
-      numero: newDocument.numero,
-      type: newDocument.type,
-    }, { status: 201 });
+    return {
+      status: 201,
+      body: {
+        id: newDocument.id.toString(),
+        numero: newDocument.numero,
+        type: newDocument.type,
+      },
+      resourceId: newDocument.id.toString(),
+    };
+      },
+    });
+
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
   } catch (error: unknown) {
+    const safeError = error instanceof Error ? error : null;
     console.error("ERREUR DOCUMENT COTISATION", {
       step: "documents.post.catch",
       error,
-      message: (error as any)?.message,
-      stack: (error as any)?.stack,
+      message: safeError?.message,
+      stack: safeError?.stack,
       data: null,
       clubId: undefined,
       memberId: undefined,

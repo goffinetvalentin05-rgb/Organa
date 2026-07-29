@@ -25,6 +25,10 @@ import {
 } from "@/components/ui";
 import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdentityModal";
 import ClubDocumentLogo from "@/components/documents/ClubDocumentLogo";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 interface Devis {
   id: string;
@@ -59,7 +63,11 @@ export default function DevisDetailPage() {
   const id = (params?.id as string) || "";
   const { t, locale } = useI18n();
   const [devis, setDevis] = useState<Devis | null>(null);
-  const [envoiEmail, setEnvoiEmail] = useState(false);
+  const {
+    isSubmitting: envoiEmail,
+    showOverlay: showEmailOverlay,
+    run: runEmailSend,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
@@ -155,44 +163,43 @@ export default function DevisDetailPage() {
       }
       return;
     }
+    if (envoiEmail) return;
 
-    setEnvoiEmail(true);
-    try {
-      const response = await fetch("/api/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "cotisation",
-          documentId: id,
-        }),
-      });
+    await runEmailSend(async (idempotencyKey) => {
+      try {
+        const response = await idempotentFetch("/api/email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          idempotencyKey,
+          body: JSON.stringify({
+            type: "cotisation",
+            documentId: id,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
-      if (!response.ok) {
-        const apiMessage = data?.details
-          ? `${data?.error || t("dashboard.quotes.detail.sendError")} (${data.details})`
-          : data?.error || t("dashboard.quotes.detail.sendError");
-        throw new Error(apiMessage);
-      }
+        if (!response.ok) {
+          const apiMessage = data?.details
+            ? `${data?.error || t("dashboard.quotes.detail.sendError")} (${data.details})`
+            : data?.error || t("dashboard.quotes.detail.sendError");
+          throw new Error(apiMessage);
+        }
 
-      if (typeof toast !== "undefined" && toast.success) {
-        toast.success(t("dashboard.quotes.detail.sendSuccess"));
+        notifySuccess(t("dashboard.quotes.detail.sendSuccess"), "email-send");
+
+        if (devis.statut === "brouillon") {
+          handleChangerStatut("envoye");
+        }
+      } catch (error: unknown) {
+        console.error("[Devis][Email] Erreur envoi:", error);
+        const errorMessage =
+          getErrorMessage(error) || t("dashboard.quotes.detail.sendErrorFallback");
+        notifyError(String(errorMessage), "email-send");
       }
-      if (devis.statut === "brouillon") {
-        handleChangerStatut("envoye");
-      }
-    } catch (error: unknown) {
-      console.error("[Devis][Email] Erreur envoi:", error);
-      if (typeof toast !== "undefined" && toast.error) {
-        const errorMessage = getErrorMessage(error) || t("dashboard.quotes.detail.sendErrorFallback");
-        toast.error(String(errorMessage));
-      }
-    } finally {
-      setEnvoiEmail(false);
-    }
+    });
   };
 
   if (!devis) {
@@ -247,7 +254,9 @@ export default function DevisDetailPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl">
+    <>
+      <SubmittingOverlay visible={showEmailOverlay} message="Envoi en cours…" />
+      <PageLayout maxWidth="7xl">
       <DetailPageHeader
         backHref="/tableau-de-bord/devis"
         backLabel={t("dashboard.quotes.detail.backToList")}
@@ -543,7 +552,8 @@ export default function DevisDetailPage() {
           </div>
         )}
       </GlassCard>
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
 

@@ -19,6 +19,9 @@ import {
   ActionButton,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import {
   type CotisationClient,
   type RecipientType,
@@ -57,7 +60,11 @@ export default function NouveauDevisPage() {
   const [notes, setNotes] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    isSubmitting,
+    showOverlay,
+    run: runQuoteSubmit,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{
     current: number;
@@ -186,7 +193,8 @@ export default function NouveauDevisPage() {
 
   const createQuoteForClient = async (
     targetClientId: string,
-    lignesValides: LigneDocument[]
+    lignesValides: LigneDocument[],
+    idempotencyKey?: string
   ): Promise<{ id: string; numero?: string }> => {
     const payload = {
       type: "quote",
@@ -198,13 +206,22 @@ export default function NouveauDevisPage() {
       ...(notes && notes.trim() !== "" ? { notes } : {}),
     };
 
-    const response = await fetch("/api/documents", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = idempotencyKey
+      ? await idempotentFetch("/api/documents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          idempotencyKey,
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/documents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
     if (!response.ok) {
       let errorData: any = null;
@@ -298,15 +315,19 @@ export default function NouveauDevisPage() {
     }
   };
 
-  const sendQuoteEmail = async (id: string): Promise<void> => {
-    const response = await fetch("/api/email", {
+  const sendQuoteEmail = async (
+    documentId: string,
+    recipientId: string,
+    recipientEmail: string
+  ): Promise<void> => {
+    const idempotencyKey = `email_quote:${documentId}:${recipientId}:${recipientEmail}`;
+    const response = await idempotentFetch("/api/email", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
+      idempotencyKey,
       body: JSON.stringify({
         type: "cotisation",
-        documentId: id,
+        documentId,
       }),
     });
 
@@ -385,7 +406,7 @@ export default function NouveauDevisPage() {
             }),
           });
 
-          await sendQuoteEmail(createdQuote.id);
+          await sendQuoteEmail(createdQuote.id, client.id, client.email);
           emailed += 1;
         } else {
           skippedNoEmail += 1;
@@ -539,19 +560,24 @@ export default function NouveauDevisPage() {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const data = await createQuoteForClient(memberId, lignesValides);
-      setDocumentId(data.id);
-      router.push(`/tableau-de-bord/devis/${data.id}`);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : t("dashboard.common.unknownError");
-      console.error("[Devis] Erreur lors de la création:", error);
-      toast.error(`${t("dashboard.quotes.createError")}: ${message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await runQuoteSubmit(async (idempotencyKey) => {
+      try {
+        const data = await createQuoteForClient(
+          memberId,
+          lignesValides,
+          idempotencyKey
+        );
+        setDocumentId(data.id);
+        router.replace(`/tableau-de-bord/devis/${data.id}`);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : t("dashboard.common.unknownError");
+        console.error("[Devis] Erreur lors de la création:", error);
+        toast.error(`${t("dashboard.quotes.createError")}: ${message}`);
+      }
+    });
   };
 
   const saveAndOpenPdf = async (download: boolean = false) => {

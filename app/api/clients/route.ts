@@ -10,6 +10,7 @@ import {
 } from "@/lib/clients/normalizeDbRow";
 import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
 import { buildClientInsertPayload } from "@/lib/clients/memberWritePayload";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -219,52 +220,69 @@ export async function POST(request: NextRequest) {
 
   const isDev = process.env.NODE_ENV === "development";
 
-  console.error("[API][clients][POST] attempt", {
-    clubId: guard.clubId,
-    actorUserId: user.id,
-    insertKeys: Object.keys(insertPayload),
-    payloadSummary: summarizeInsertPayloadForLog(insertPayload),
-  });
-
-  const { data: newClient, error: insertError } = await supabase
-    .from("clients")
-    .insert(insertPayload)
-    .select("*")
-    .single();
-
-  if (insertError) {
-    logClientsSupabase("POST", insertError, {
+  const idempotencyResult = await withIdempotency<Record<string, unknown>>(
+    {
+      request,
       clubId: guard.clubId,
-      actorUserId: user.id,
-    });
-    const { status, body } = jsonForClientCreateFailure(insertError, isDev);
-    return NextResponse.json(body, { status });
-  }
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+      resourceType: "member",
+      operation: async () => {
+        console.error("[API][clients][POST] attempt", {
+          clubId: guard.clubId,
+          actorUserId: user.id,
+          insertKeys: Object.keys(insertPayload),
+          payloadSummary: summarizeInsertPayloadForLog(insertPayload),
+        });
 
-  const normalized = newClient
-    ? normalizeClientsDbRow(newClient as Record<string, unknown>)
-    : null;
-  if (!normalized || !normalized.id) {
-    return NextResponse.json(
-      { error: "Erreur lors de la création du client" },
-      { status: 500 }
-    );
-  }
+        const { data: newClient, error: insertError } = await supabase
+          .from("clients")
+          .insert(insertPayload)
+          .select("*")
+          .single();
 
-  const clientResponse = normalizedClientToApiListItem(normalized);
+        if (insertError) {
+          logClientsSupabase("POST", insertError, {
+            clubId: guard.clubId,
+            actorUserId: user.id,
+          });
+          const { status, body } = jsonForClientCreateFailure(insertError, isDev);
+          return { status, body, resourceId: null };
+        }
 
-  const meta = extractRequestMetadata(request);
-  await logAudit({
-    clubId: guard.clubId,
-    action: AuditAction.CREATE,
-    resourceType: "member",
-    resourceId: String(normalized.id),
-    metadata: { role: normalized.role },
-    ...meta,
-  });
+        const normalized = newClient
+          ? normalizeClientsDbRow(newClient as Record<string, unknown>)
+          : null;
+        if (!normalized || !normalized.id) {
+          return {
+            status: 500,
+            body: { error: "Erreur lors de la création du client" },
+            resourceId: null,
+          };
+        }
 
-  // Invalider le cache
-  revalidatePath("/tableau-de-bord/clients");
+        const clientResponse = normalizedClientToApiListItem(normalized);
 
-  return NextResponse.json({ client: clientResponse }, { status: 201 });
+        const meta = extractRequestMetadata(request);
+        await logAudit({
+          clubId: guard.clubId,
+          action: AuditAction.CREATE,
+          resourceType: "member",
+          resourceId: String(normalized.id),
+          metadata: { role: normalized.role },
+          ...meta,
+        });
+
+        // Invalider le cache
+        revalidatePath("/tableau-de-bord/clients");
+
+        return {
+          status: 201,
+          body: { client: clientResponse },
+          resourceId: String(normalized.id),
+        };
+      },
+    }
+  );
+
+  return NextResponse.json(idempotencyResult.body, { status: idempotencyResult.status });
 }

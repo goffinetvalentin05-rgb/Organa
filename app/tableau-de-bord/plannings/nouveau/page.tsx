@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Plus, Trash, Clock, MapPin, Calendar } from "@/lib/icons";
-import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import {
   PageLayout,
   PageHeader,
@@ -46,7 +49,8 @@ const compactLabelClass = "mb-1.5 flex items-center gap-1 text-xs font-medium te
 export default function NouveauPlanningPage() {
   const { t } = useI18n();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const [createSuccess, setCreateSuccess] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
@@ -96,7 +100,7 @@ export default function NouveauPlanningPage() {
 
   const removeSlot = (id: string) => {
     if (slots.length <= 1) {
-      toast.error("Vous devez avoir au moins un créneau");
+      notifyError("Vous devez avoir au moins un créneau", "planning-create");
       return;
     }
     setSlots(slots.filter((s) => s.id !== id));
@@ -110,36 +114,37 @@ export default function NouveauPlanningPage() {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error("Le nom du planning est requis");
+      notifyError("Le nom du planning est requis", "planning-create");
       return;
     }
 
     if (!date) {
-      toast.error("La date est requise");
+      notifyError("La date est requise", "planning-create");
       return;
     }
 
     for (const slot of slots) {
       if (!slot.location.trim()) {
-        toast.error("Chaque créneau doit avoir un lieu/poste");
+        notifyError("Chaque créneau doit avoir un lieu/poste", "planning-create");
         return;
       }
       if (!slot.slotDate) {
-        toast.error("Chaque créneau doit avoir une date");
+        notifyError("Chaque créneau doit avoir une date", "planning-create");
         return;
       }
       const timeError = getSlotTimeRangeError(slot.startTime, slot.endTime);
       if (timeError) {
-        toast.error(timeError);
+        notifyError(timeError, "planning-create");
         return;
       }
     }
 
-    setLoading(true);
-    try {
-      const response = await fetch("/api/plannings", {
+    if (isSubmitting) return;
+    await run(async (idempotencyKey) => {
+      const response = await idempotentFetch("/api/plannings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        idempotencyKey,
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim() || null,
@@ -159,22 +164,20 @@ export default function NouveauPlanningPage() {
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         if (data.error === "LIMIT_REACHED") {
-          toast.error(data.message || "Limite de plannings atteinte");
-        } else {
-          throw new Error(data.error || "Erreur lors de la création");
+          notifyError(data.message || "Limite de plannings atteinte", "planning-create");
+          return;
         }
+        notifyError(data.error || "Erreur lors de la création", "planning-create");
         return;
       }
 
       const data = await response.json();
-      toast.success("Planning créé avec succès !");
-      router.push(`/tableau-de-bord/plannings/${data.planning.id}`);
-    } catch (error: any) {
-      console.error("[NouveauPlanning] Erreur:", error);
-      toast.error(error.message || "Erreur lors de la création");
-    } finally {
-      setLoading(false);
-    }
+      setCreateSuccess(true);
+      notifySuccess("Planning créé avec succès ✓", "planning-create");
+      setTimeout(() => setCreateSuccess(false), 2000);
+
+      router.replace(`/tableau-de-bord/plannings/${data.planning.id}`);
+    });
   };
 
   const handleEventChange = (value: string) => {
@@ -201,15 +204,17 @@ export default function NouveauPlanningPage() {
   }, [date]);
 
   return (
-    <PageLayout maxWidth="5xl">
-      <div>
+    <>
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <PageLayout maxWidth="5xl">
+        <div>
         <Link
           href="/tableau-de-bord/plannings"
           className="inline-flex items-center gap-1 text-sm font-medium text-white/85 hover:text-white transition-colors"
         >
           ← Retour aux plannings
         </Link>
-      </div>
+        </div>
 
       <PageHeader
         title="Nouveau planning"
@@ -416,21 +421,21 @@ export default function NouveauPlanningPage() {
           </ActionButton>
           <DashboardPrimaryButton
             type="submit"
-            disabled={loading}
             icon="none"
+            loading={isSubmitting}
+            loadingLabel={t("dashboard.plannings.form.creating")}
+            success={createSuccess}
+            successLabel="Planning créé ✓"
             className="w-full justify-center rounded-xl px-8 sm:w-auto"
           >
-            {loading ? (
-              t("dashboard.plannings.form.creating")
-            ) : (
-              <span className="flex items-center gap-2">
-                {t("dashboard.plannings.form.createAction")}
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            )}
+            <span className="flex items-center gap-2">
+              {t("dashboard.plannings.form.createAction")}
+              <ArrowRight className="w-5 h-5" />
+            </span>
           </DashboardPrimaryButton>
         </div>
       </form>
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }

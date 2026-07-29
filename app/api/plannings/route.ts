@@ -5,6 +5,7 @@ import { isMissingSlotDateColumnError } from "@/lib/planning/slotDateFallback";
 import { getSlotTimeRangeError } from "@/lib/planning/slotTimeRange";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -49,10 +50,10 @@ export async function GET() {
     }
 
     // Pour chaque planning, récupérer les stats des slots et affectations
-    const planningIds = (plannings || []).map((p: any) => p.id);
+    const planningIds = (plannings || []).map((p: { id: string }) => p.id);
     
-    let slotsStats: any[] = [];
-    let assignmentsStats: any[] = [];
+    let slotsStats: Array<{ id: string; planning_id: string; required_people: number }> = [];
+    let assignmentsStats: Array<{ slot_id: string }> = [];
 
     if (planningIds.length > 0) {
       // Récupérer les slots
@@ -64,7 +65,7 @@ export async function GET() {
       slotsStats = slots || [];
 
       // Récupérer les affectations
-      const slotIds = slotsStats.map((s: any) => s.id);
+      const slotIds = slotsStats.map((s) => s.id);
       if (slotIds.length > 0) {
         const { data: assignments } = await supabase
           .from("planning_assignments")
@@ -76,11 +77,14 @@ export async function GET() {
     }
 
     // Calculer les stats par planning
-    const planningsWithStats = (plannings || []).map((planning: any) => {
-      const planningSlots = slotsStats.filter((s: any) => s.planning_id === planning.id);
-      const totalRequired = planningSlots.reduce((sum: number, s: any) => sum + (s.required_people || 0), 0);
-      const slotIds = planningSlots.map((s: any) => s.id);
-      const totalAssigned = assignmentsStats.filter((a: any) => slotIds.includes(a.slot_id)).length;
+    const planningsWithStats = (plannings || []).map((planning: { id: string; events: unknown }) => {
+      const planningSlots = slotsStats.filter((s) => s.planning_id === planning.id);
+      const totalRequired = planningSlots.reduce(
+        (sum: number, s) => sum + (s.required_people || 0),
+        0
+      );
+      const slotIds = planningSlots.map((s) => s.id);
+      const totalAssigned = assignmentsStats.filter((a) => slotIds.includes(a.slot_id)).length;
 
       return {
         ...planning,
@@ -93,10 +97,11 @@ export async function GET() {
     });
 
     return NextResponse.json({ plannings: planningsWithStats }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("[API][plannings][GET] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors du chargement", details: error.message },
+      { error: "Erreur lors du chargement", details: message },
       { status: 500 }
     );
   }
@@ -148,98 +153,139 @@ export async function POST(request: NextRequest) {
       updated_by: user.id,
     };
 
-    const { data: newPlanning, error } = await supabase
-      .from("plannings")
-      .insert(payload)
-      .select(`
-        id,
-        name,
-        description,
-        date,
-        status,
-        created_at,
-        updated_at,
-        created_by,
-        updated_by,
-        event_id,
-        events (
-          id,
-          name
-        )
-      `)
-      .single();
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+      resourceType: "planning",
+      operation: async () => {
+        const { data: newPlanning, error } = await supabase
+          .from("plannings")
+          .insert(payload)
+          .select(`
+            id,
+            name,
+            description,
+            date,
+            status,
+            created_at,
+            updated_at,
+            created_by,
+            updated_by,
+            event_id,
+            events (
+              id,
+              name
+            )
+          `)
+          .single();
 
-    if (error) {
-      console.error("[API][plannings][POST] Erreur Supabase:", error);
-      return NextResponse.json(
-        { error: "Erreur lors de la création du planning", details: error.message },
-        { status: 500 }
-      );
-    }
-
-    // Créer les slots si fournis
-    if (slots && Array.isArray(slots) && slots.length > 0) {
-      for (const slot of slots) {
-        const timeError = getSlotTimeRangeError(slot.startTime, slot.endTime);
-        if (timeError) {
-          return NextResponse.json({ error: timeError }, { status: 400 });
+        if (error) {
+          console.error("[API][plannings][POST] Erreur Supabase:", error);
+          return {
+            status: 500,
+            body: {
+              error: "Erreur lors de la création du planning",
+              details: error.message,
+            },
+            resourceId: null,
+          };
         }
-      }
 
-      const slotsPayload = slots.map((slot: any, index: number) => ({
-        planning_id: newPlanning.id,
-        location: slot.location || "Poste",
-        slot_date: slot.slotDate || date,
-        start_time: slot.startTime,
-        end_time: slot.endTime,
-        required_people: slot.requiredPeople || 1,
-        notes: slot.notes || null,
-        ordre: index,
-      }));
+        // Créer les slots si fournis
+        if (slots && Array.isArray(slots) && slots.length > 0) {
+          for (const slot of slots) {
+            const timeError = getSlotTimeRangeError(slot.startTime, slot.endTime);
+            if (timeError) {
+              return { status: 400, body: { error: timeError }, resourceId: null };
+            }
+          }
 
-      let { error: slotsError } = await supabase
-        .from("planning_slots")
-        .insert(slotsPayload);
+          const slotsPayload = slots.map(
+            (slot: {
+              location?: string;
+              slotDate?: string;
+              startTime: string;
+              endTime: string;
+              requiredPeople?: number;
+              notes?: string | null;
+            }, index: number) => ({
+            planning_id: newPlanning.id,
+            location: slot.location || "Poste",
+            slot_date: slot.slotDate || date,
+            start_time: slot.startTime,
+            end_time: slot.endTime,
+            required_people: slot.requiredPeople || 1,
+            notes: slot.notes || null,
+            ordre: index,
+          })
+          );
 
-      if (slotsError && isMissingSlotDateColumnError(slotsError)) {
-        const legacyPayload = slots.map((slot: any, index: number) => ({
-          planning_id: newPlanning.id,
-          location: slot.location || "Poste",
-          start_time: slot.startTime,
-          end_time: slot.endTime,
-          required_people: slot.requiredPeople || 1,
-          notes: slot.notes || null,
-          ordre: index,
-        }));
-        const retry = await supabase.from("planning_slots").insert(legacyPayload);
-        slotsError = retry.error;
-      }
+          let { error: slotsError } = await supabase
+            .from("planning_slots")
+            .insert(slotsPayload);
 
-      if (slotsError) {
-        console.error("[API][plannings][POST] Erreur création slots:", slotsError);
-      }
-    }
+          if (slotsError && isMissingSlotDateColumnError(slotsError)) {
+            const legacyPayload = slots.map(
+              (slot: {
+                location?: string;
+                startTime: string;
+                endTime: string;
+                requiredPeople?: number;
+                notes?: string | null;
+              }, index: number) => ({
+              planning_id: newPlanning.id,
+              location: slot.location || "Poste",
+              start_time: slot.startTime,
+              end_time: slot.endTime,
+              required_people: slot.requiredPeople || 1,
+              notes: slot.notes || null,
+              ordre: index,
+            }))
+            ;
+            const retry = await supabase.from("planning_slots").insert(legacyPayload);
+            slotsError = retry.error;
+          }
 
-    revalidatePath("/tableau-de-bord");
-    revalidatePath("/tableau-de-bord/plannings");
+          if (slotsError) {
+            console.error("[API][plannings][POST] Erreur création slots:", slotsError);
+          }
+        }
 
-    return NextResponse.json(
-      {
-        planning: {
-          ...newPlanning,
-          event: newPlanning.events,
-          slotsCount: slots?.length || 0,
-          totalRequired: slots?.reduce((sum: number, s: any) => sum + (s.requiredPeople || 1), 0) || 0,
-          totalAssigned: 0,
-          fillRate: 0,
-        },
+        revalidatePath("/tableau-de-bord");
+        revalidatePath("/tableau-de-bord/plannings");
+
+        return {
+          status: 201,
+          body: {
+            planning: {
+              ...newPlanning,
+              event: newPlanning.events,
+              slotsCount: slots?.length || 0,
+              totalRequired:
+                slots?.reduce(
+                  (sum: number, s: { requiredPeople?: number }) =>
+                    sum + (s.requiredPeople || 1),
+                  0
+                ) ||
+                0,
+              totalAssigned: 0,
+              fillRate: 0,
+            },
+          },
+          resourceId: String(newPlanning.id),
+        };
       },
-      { status: 201 }
-    );
-  } catch (error: any) {
+    });
+
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("[API][plannings][POST] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création", details: error.message },
+      { error: "Erreur lors de la création", details: message },
       { status: 500 }
     );
   }

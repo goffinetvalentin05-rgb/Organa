@@ -23,6 +23,8 @@ type Base = {
   children: ReactNode;
   variant?: keyof typeof variants;
   className?: string;
+  loading?: boolean;
+  loadingLabel?: string;
 };
 
 type ActionButtonProps = Base &
@@ -32,26 +34,40 @@ type ActionButtonProps = Base &
   );
 
 export default function ActionButton(props: ActionButtonProps) {
-  const { children, variant = "surface", className } = props;
-  const cls = cn(variants[variant], className);
+  const { children, variant = "surface", className, loading = false, loadingLabel } = props;
+  const cls = cn(variants[variant], className, loading && "pointer-events-none opacity-50");
 
   if ("href" in props && typeof props.href === "string") {
-    const { href, children: _c, variant: _v, className: _cl, ...linkRest } = props;
+    const {
+      href,
+      children: _c,
+      variant: _v,
+      className: _cl,
+      loading: _l,
+      loadingLabel: _ll,
+      ...linkRest
+    } = props;
     return (
-      <Link href={href} className={cls} {...linkRest}>
-        {children}
+      <Link href={href} className={cls} aria-disabled={loading} tabIndex={loading ? -1 : undefined} {...linkRest}>
+        {loading ? loadingLabel ?? "Chargement..." : children}
       </Link>
     );
   }
 
-  const { children: _c2, variant: _v2, className: _cl2, type = "button", ...btnRest } = props as Extract<
-    ActionButtonProps,
-    { href?: undefined }
-  >;
+  const {
+    children: _c2,
+    variant: _v2,
+    className: _cl2,
+    loading: _l2,
+    loadingLabel: _ll2,
+    type = "button",
+    disabled,
+    ...btnRest
+  } = props as Extract<ActionButtonProps, { href?: undefined }>;
 
   return (
-    <button type={type} className={cls} {...btnRest}>
-      {children}
+    <button type={type} className={cls} disabled={disabled || loading} {...btnRest}>
+      {loading ? loadingLabel ?? "Chargement..." : children}
     </button>
   );
 }

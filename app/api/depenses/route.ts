@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -68,10 +69,11 @@ export async function GET() {
       { depenses: (data || []).map(formatDepense) },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("[API][depenses][GET] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors du chargement", details: error.message },
+      { error: "Erreur lors du chargement", details: message },
       { status: 500 }
     );
   }
@@ -135,63 +137,74 @@ export async function POST(request: NextRequest) {
       updated_by: user.id,
     };
 
-    const { data, error } = await supabase
-      .from("expenses")
-      .insert(payload)
-      .select(
-        "id, description, amount, date, status, notes, attachment_url, event_id, created_by, updated_by, created_at"
-      )
-      .single();
-
-    if (error) {
-      console.error(
-        "[API][depenses][POST] insert failed:",
-        error.code,
-        error.message
-      );
-    }
-
-    if (error) {
-      console.error("[API][depenses][POST] Erreur Supabase:", {
-        message: error.message,
-        details: error.details,
-        code: error.code,
-      });
-      return NextResponse.json(
-        {
-          error: "Erreur lors de la création de la dépense",
-          details: error.message,
-          hint: error.hint,
-          code: error.code,
-        },
-        { status: 500 }
-      );
-    }
-
-    const meta = extractRequestMetadata(request);
-    await logAudit({
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
       clubId: guard.clubId,
-      action: AuditAction.CREATE,
+      idempotencyKey: request.headers.get("Idempotency-Key"),
       resourceType: "expense",
-      resourceId: String(data?.id ?? ""),
-      metadata: { description: payload.description, amount: payload.amount, date: payload.date },
-      ...meta,
+      operation: async () => {
+        const { data, error } = await supabase
+          .from("expenses")
+          .insert(payload)
+          .select(
+            "id, description, amount, date, status, notes, attachment_url, event_id, created_by, updated_by, created_at"
+          )
+          .single();
+
+        if (error) {
+          console.error("[API][depenses][POST] Erreur Supabase:", {
+            message: error.message,
+            details: error.details,
+            code: error.code,
+          });
+          return {
+            status: 500,
+            body: {
+              error: "Erreur lors de la création de la dépense",
+              details: error.message,
+              hint: error.hint,
+              code: error.code,
+            },
+            resourceId: null,
+          };
+        }
+
+        const meta = extractRequestMetadata(request);
+        await logAudit({
+          clubId: guard.clubId,
+          action: AuditAction.CREATE,
+          resourceType: "expense",
+          resourceId: String(data?.id ?? ""),
+          metadata: {
+            description: payload.description,
+            amount: payload.amount,
+            date: payload.date,
+          },
+          ...meta,
+        });
+
+        revalidatePath("/tableau-de-bord");
+        revalidatePath("/tableau-de-bord/depenses");
+        if (payload.event_id) {
+          revalidatePath(`/tableau-de-bord/evenements/${payload.event_id}`);
+        }
+
+        return {
+          status: 201,
+          body: { depense: formatDepense(data) },
+          resourceId: String(data?.id ?? ""),
+        };
+      },
     });
 
-    revalidatePath("/tableau-de-bord");
-    revalidatePath("/tableau-de-bord/depenses");
-    if (payload.event_id) {
-      revalidatePath(`/tableau-de-bord/evenements/${payload.event_id}`);
-    }
-
-    return NextResponse.json(
-      { depense: formatDepense(data) },
-      { status: 201 }
-    );
-  } catch (error: any) {
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("[API][depenses][POST] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création", details: error.message },
+      { error: "Erreur lors de la création", details: message },
       { status: 500 }
     );
   }
@@ -257,23 +270,37 @@ export async function DELETE(request: NextRequest) {
     revalidatePath("/tableau-de-bord/depenses");
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("[API][depenses][DELETE] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la suppression", details: error.message },
+      { error: "Erreur lors de la suppression", details: message },
       { status: 500 }
     );
   }
 }
 
-function formatDepense(depense: any) {
+function formatDepense(depense: {
+  id?: string | null;
+  description?: string | null;
+  amount?: number | string | null;
+  date?: string | null;
+  status?: string | null;
+  notes?: string | null;
+  attachment_url?: string | null;
+  event_id?: string | null;
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}) {
   const amount =
     typeof depense.amount === "number"
       ? depense.amount
       : Number(depense.amount) || 0;
 
   return {
-    id: depense.id,
+    id: depense.id ?? "",
     label: depense.description || "",
     amount,
     date: depense.date || "",

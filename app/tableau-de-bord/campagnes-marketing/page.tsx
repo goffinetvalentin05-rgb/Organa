@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { Edit, Trash, Mail, Users, CheckCircle } from "@/lib/icons";
 import {
   PageLayout,
@@ -24,6 +25,9 @@ import {
   dashboardModalClass,
   dashboardCheckboxClass,
 } from "@/components/ui";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 type MarketingContact = {
   id: string;
@@ -70,7 +74,16 @@ export default function MarketingCampaignsPage() {
   const [sourceFilter, setSourceFilter] = useState("");
 
   const [campaigns, setCampaigns] = useState<MarketingCampaign[]>([]);
-  const [sending, setSending] = useState(false);
+  const {
+    isSubmitting: sending,
+    showOverlay: showCampaignOverlay,
+    run: runCampaignSend,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
+  const {
+    isSubmitting: savingContact,
+    showOverlay: showContactOverlay,
+    run: runContactSave,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
   const [contentHtml, setContentHtml] = useState("<p>Bonjour,</p><p>Votre message ici.</p>");
@@ -80,7 +93,6 @@ export default function MarketingCampaignsPage() {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
-  const [savingContact, setSavingContact] = useState(false);
   const [contactForm, setContactForm] = useState({
     lastName: "",
     firstName: "",
@@ -194,42 +206,56 @@ export default function MarketingCampaignsPage() {
 
   const handleSaveContact = async (event: FormEvent) => {
     event.preventDefault();
-    setSavingContact(true);
+    if (savingContact) return;
 
-    try {
-      const payload = {
-        lastName: contactForm.lastName,
-        firstName: contactForm.firstName,
-        email: contactForm.email,
-        phone: contactForm.phone,
-        source: contactForm.source,
-      };
+    await runContactSave(async (idempotencyKey) => {
+      try {
+        const payload = {
+          lastName: contactForm.lastName,
+          firstName: contactForm.firstName,
+          email: contactForm.email,
+          phone: contactForm.phone,
+          source: contactForm.source,
+        };
 
-      const isEdit = Boolean(editingContactId);
-      const endpoint = isEdit
-        ? `/api/marketing/contacts/${editingContactId}`
-        : "/api/marketing/contacts";
-      const method = isEdit ? "PUT" : "POST";
+        const isEdit = Boolean(editingContactId);
+        const endpoint = isEdit
+          ? `/api/marketing/contacts/${editingContactId}`
+          : "/api/marketing/contacts";
+        const method = isEdit ? "PUT" : "POST";
 
-      const res = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
+        const res = isEdit
+          ? await fetch(endpoint, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+          : await idempotentFetch(endpoint, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              idempotencyKey,
+              body: JSON.stringify(payload),
+            });
+        const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || "Erreur enregistrement contact");
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur enregistrement contact");
+        }
+
+        closeContactModal();
+        await refreshContacts();
+        notifySuccess(
+          isEdit ? "Contact mis à jour ✓" : "Contact créé ✓",
+          "marketing-contact-save"
+        );
+      } catch (error) {
+        console.error("[MARKETING][contacts] save error:", error);
+        notifyError(
+          error instanceof Error ? error.message : "Erreur enregistrement",
+          "marketing-contact-save"
+        );
       }
-
-      closeContactModal();
-      await refreshContacts();
-    } catch (error) {
-      console.error("[MARKETING][contacts] save error:", error);
-      alert(error instanceof Error ? error.message : "Erreur enregistrement");
-    } finally {
-      setSavingContact(false);
-    }
+    });
   };
 
   const toggleManualContact = (id: string) => {
@@ -246,44 +272,51 @@ export default function MarketingCampaignsPage() {
 
   const handleSendCampaign = async (event: FormEvent) => {
     event.preventDefault();
-    setSending(true);
+    if (sending) return;
 
-    try {
-      const payload = {
-        name,
-        subject,
-        contentHtml,
-        sendTo: audienceMode,
-        source: audienceMode === "source" ? audienceSource : null,
-        contactIds: audienceMode === "manual" ? selectedContactIds : [],
-      };
+    await runCampaignSend(async (idempotencyKey) => {
+      try {
+        const payload = {
+          name,
+          subject,
+          contentHtml,
+          sendTo: audienceMode,
+          source: audienceMode === "source" ? audienceSource : null,
+          contactIds: audienceMode === "manual" ? selectedContactIds : [],
+        };
 
-      const res = await fetch("/api/marketing/campaigns", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
+        const res = await idempotentFetch("/api/marketing/campaigns", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          idempotencyKey,
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || "Erreur envoi campagne");
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur envoi campagne");
+        }
+
+        notifySuccess(
+          `Campagne envoyée : ${data.sentCount || 0}/${data.recipientCount || 0} emails`,
+          "marketing-campaign-send"
+        );
+        setName("");
+        setSubject("");
+        setContentHtml("<p>Bonjour,</p><p>Votre message ici.</p>");
+        if (editorRef.current) {
+          editorRef.current.innerHTML = "<p>Bonjour,</p><p>Votre message ici.</p>";
+        }
+        setSelectedContactIds([]);
+        await Promise.all([refreshContacts(), refreshCampaigns()]);
+      } catch (error) {
+        console.error("[MARKETING][campaigns] send error:", error);
+        notifyError(
+          error instanceof Error ? error.message : "Erreur envoi campagne",
+          "marketing-campaign-send"
+        );
       }
-
-      alert(
-        `Campagne envoyée : ${data.sentCount || 0}/${data.recipientCount || 0} emails`
-      );
-      setName("");
-      setSubject("");
-      setContentHtml("<p>Bonjour,</p><p>Votre message ici.</p>");
-      if (editorRef.current) editorRef.current.innerHTML = "<p>Bonjour,</p><p>Votre message ici.</p>";
-      setSelectedContactIds([]);
-      await Promise.all([refreshContacts(), refreshCampaigns()]);
-    } catch (error) {
-      console.error("[MARKETING][campaigns] send error:", error);
-      alert(error instanceof Error ? error.message : "Erreur envoi campagne");
-    } finally {
-      setSending(false);
-    }
+    });
   };
 
   const campaignStatusBadge = (status: MarketingCampaign["status"]) => {
@@ -313,7 +346,12 @@ export default function MarketingCampaignsPage() {
   }
 
   return (
-    <PageLayout maxWidth="7xl">
+    <>
+      <SubmittingOverlay
+        visible={showCampaignOverlay || showContactOverlay}
+        message={showCampaignOverlay ? "Envoi de la campagne…" : "Enregistrement…"}
+      />
+      <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.pageTitles.marketing")}
         subtitle={t("dashboard.marketing.subtitle")}
@@ -793,6 +831,7 @@ export default function MarketingCampaignsPage() {
           </div>
         </div>
       ) : null}
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }

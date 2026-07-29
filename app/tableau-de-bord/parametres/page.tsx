@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,12 +20,16 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 import { PageLayout, PageHeader, SectionCard, cn, dashboardInputClass, dashboardSelectLgClass, dashboardLabelClass, dashboardHintClass, dashboardGlassCardClass } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 import UsersAccessCard from "@/components/billing/UsersAccessCard";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { TEAM_PRICING } from "@/lib/billing/pricing";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 type ApiErrorBody = {
   error?: string;
@@ -122,6 +126,13 @@ export default function ParametresPage() {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
+  const {
+    isSubmitting: isSubmittingSettings,
+    showOverlay: showSettingsOverlay,
+    run: runSettingsSave,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
+  const [saveSuccessPulse, setSaveSuccessPulse] = useState(false);
+  const initialFormSignatureRef = useRef<string | null>(null);
 
   /**
    * Helper pour lire le body d'une Response une seule fois
@@ -148,6 +159,35 @@ export default function ParametresPage() {
       return { error: t("dashboard.settings.notifications.readResponseError") };
     }
   };
+
+  const buildSettingsSignature = (data: typeof formData) =>
+    JSON.stringify({
+      nomEntreprise: data.nomEntreprise,
+      adresse: data.adresse,
+      email: data.email,
+      telephone: data.telephone,
+      primaryColor: data.primaryColor,
+      currency: data.currency,
+      iban: data.iban,
+      bankName: data.bankName,
+      conditionsPaiement: data.conditionsPaiement,
+      emailCustomEnabled: data.emailCustomEnabled,
+      emailExpediteur: data.emailExpediteur,
+      nomExpediteur: data.nomExpediteur,
+      resendApiKeyTouched: data.resendApiKeyTouched,
+      resendApiKey: data.resendApiKey,
+      qrCreditorName: data.qrCreditorName,
+      qrCreditorStreet: data.qrCreditorStreet,
+      qrCreditorBuildingNum: data.qrCreditorBuildingNum,
+      qrCreditorZip: data.qrCreditorZip,
+      qrCreditorCity: data.qrCreditorCity,
+      qrCreditorCountry: data.qrCreditorCountry,
+    });
+
+  const hasChanges =
+    initialFormSignatureRef.current === null
+      ? true
+      : buildSettingsSignature(formData) !== initialFormSignatureRef.current;
 
   /** Chargement via l’API (pas de clé Resend côté client). */
   const loadSettingsFromDB = async () => {
@@ -245,6 +285,30 @@ export default function ParametresPage() {
         currency: normalizedSettings.currency,
         invoiceColor: primaryColor,
         branding: "",
+        qrCreditorName: normalizedSettings.qr_creditor_name,
+        qrCreditorStreet: normalizedSettings.qr_creditor_street,
+        qrCreditorBuildingNum: normalizedSettings.qr_creditor_building_num,
+        qrCreditorZip: normalizedSettings.qr_creditor_zip,
+        qrCreditorCity: normalizedSettings.qr_creditor_city,
+        qrCreditorCountry: normalizedSettings.qr_creditor_country,
+      });
+
+      // Signature de référence pour le “dirty check” du bouton Enregistrer.
+      initialFormSignatureRef.current = JSON.stringify({
+        nomEntreprise: normalizedSettings.company_name,
+        adresse: normalizedSettings.company_address,
+        email: normalizedSettings.company_email,
+        telephone: normalizedSettings.company_phone,
+        primaryColor,
+        currency: normalizedSettings.currency,
+        iban: normalizedSettings.iban,
+        bankName: normalizedSettings.bank_name,
+        conditionsPaiement: normalizedSettings.payment_terms,
+        emailCustomEnabled: emailCustom,
+        emailExpediteur: normalizedSettings.email_sender_email,
+        nomExpediteur: normalizedSettings.email_sender_name,
+        resendApiKeyTouched: false,
+        resendApiKey: "",
         qrCreditorName: normalizedSettings.qr_creditor_name,
         qrCreditorStreet: normalizedSettings.qr_creditor_street,
         qrCreditorBuildingNum: normalizedSettings.qr_creditor_building_num,
@@ -353,7 +417,12 @@ export default function ParametresPage() {
       return;
     }
 
-    try {
+    if (!hasChanges) return;
+    if (isSubmittingSettings) return;
+    setSaveSuccessPulse(false);
+
+    await runSettingsSave(async (idempotencyKey) => {
+      try {
       // PAYLOAD MANUEL - TOUS LES CHAMPS QUI EXISTENT DANS LA TABLE PROFILES
       // Colonnes existantes : company_name, company_email, company_phone, company_address,
       //                      logo_path, logo_url, primary_color, currency,
@@ -448,11 +517,12 @@ export default function ParametresPage() {
       }
       console.log("[PARAMETRES] Payload (paramètres email, clé masquée):", logSafe);
 
-      const response = await fetch("/api/settings", {
+      const response = await idempotentFetch("/api/settings", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
+        idempotencyKey,
         body: JSON.stringify(cleanPayload),
       });
 
@@ -483,7 +553,7 @@ export default function ParametresPage() {
           errorData.message ||
           errorData.details ||
           t("dashboard.settings.notifications.saveError");
-        toast.error(errorMessage);
+        notifyError(errorMessage, "settings-save");
         return; // Ne pas throw pour éviter l'overlay Next.js
       }
       
@@ -492,12 +562,15 @@ export default function ParametresPage() {
       await loadSettingsFromDB();
 
       setSaved(true);
-      toast.success(t("dashboard.settings.saveSuccess"));
+      setSaveSuccessPulse(true);
+      notifySuccess(t("dashboard.settings.saveSuccess"), "settings-save");
       setTimeout(() => setSaved(false), 3000);
-    } catch (error: unknown) {
+      setTimeout(() => setSaveSuccessPulse(false), 2000);
+      } catch (error: unknown) {
       console.error("Erreur lors de la sauvegarde:", error);
       // Ne pas afficher de toast ici car on l'a déjà fait dans le if (!response.ok)
-    }
+      }
+    });
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -581,6 +654,10 @@ export default function ParametresPage() {
 
   return (
     <>
+      <SubmittingOverlay
+        visible={showSettingsOverlay}
+        message="Enregistrement en cours…"
+      />
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />
       </Suspense>
@@ -1240,8 +1317,17 @@ export default function ParametresPage() {
             )}
           >
             <p className="text-sm leading-relaxed text-[#64748B]">{t("dashboard.settings.layout.saveBarHint")}</p>
-            <DashboardPrimaryButton type="submit" icon="none" className="w-full justify-center sm:w-auto">
-              {t("dashboard.settings.saveButton")}
+            <DashboardPrimaryButton
+              type="submit"
+              icon="none"
+              disabled={!hasChanges}
+              loading={isSubmittingSettings}
+              loadingLabel={t("dashboard.common.saving")}
+              success={saveSuccessPulse}
+              successLabel="Modifications enregistrées ✓"
+              className="w-full justify-center sm:w-auto"
+            >
+              {!hasChanges ? "Aucune modification à enregistrer" : t("dashboard.settings.saveButton")}
             </DashboardPrimaryButton>
           </div>
       </form>

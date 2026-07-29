@@ -15,6 +15,9 @@ import {
   dashboardLabelClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
 
 interface EventType {
   id: string;
@@ -29,7 +32,7 @@ export default function NouvelEvenementPage() {
   const { t } = useI18n();
   const router = useRouter();
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { isSubmitting, showOverlay, run: runCreateEvent } = useSafeSubmit({ overlayDelayMs: 450 });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
   const [showNewTypeForm, setShowNewTypeForm] = useState(false);
@@ -81,46 +84,47 @@ export default function NouvelEvenementPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMessage(null);
+    setLimitReached(false);
 
-    try {
-      const response = await fetch("/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          description: formData.description.trim() || null,
-          startDate: formData.startDate,
-          endDate: formData.endDate || null,
-          status: formData.status,
-          eventTypeId: formData.eventTypeId || null,
-        }),
-      });
+    await runCreateEvent(async (idempotencyKey) => {
+      try {
+        const response = await idempotentFetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          idempotencyKey,
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            description: formData.description.trim() || null,
+            startDate: formData.startDate,
+            endDate: formData.endDate || null,
+            status: formData.status,
+            eventTypeId: formData.eventTypeId || null,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
-      if (!response.ok) {
-        if (data.error === "LIMIT_REACHED") {
-          setLimitReached(true);
-          setErrorMessage(data.message);
-        } else {
+        if (!response.ok) {
+          if (data.error === "LIMIT_REACHED") {
+            setLimitReached(true);
+            setErrorMessage(data.message);
+            return;
+          }
           throw new Error(data.error || t("dashboard.events.createError"));
         }
-        return;
-      }
 
-      router.push("/tableau-de-bord/evenements");
-    } catch (error: any) {
-      console.error("Error creating event:", error);
-      setErrorMessage(error.message || t("dashboard.events.createError"));
-    } finally {
-      setLoading(false);
-    }
+        router.replace("/tableau-de-bord/evenements");
+      } catch (error: any) {
+        console.error("Error creating event:", error);
+        setErrorMessage(error.message || t("dashboard.events.createError"));
+      }
+    });
   };
 
   return (
     <PageLayout maxWidth="4xl">
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
       <div>
         <Link
           href="/tableau-de-bord/evenements"
@@ -258,11 +262,11 @@ export default function NouvelEvenementPage() {
           </ActionButton>
           <DashboardPrimaryButton
             type="submit"
-            disabled={loading || limitReached}
+            disabled={isSubmitting || limitReached}
             icon="none"
             className="flex-1 justify-center rounded-xl"
           >
-            {loading ? t("dashboard.common.loading") : t("dashboard.events.form.createAction")}
+            {isSubmitting ? t("dashboard.common.loading") : t("dashboard.events.form.createAction")}
           </DashboardPrimaryButton>
         </div>
       </form>

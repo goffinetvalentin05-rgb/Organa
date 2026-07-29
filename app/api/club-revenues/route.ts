@@ -9,6 +9,7 @@ import {
   type ClubRevenueDbRow,
 } from "@/lib/club-revenues/types";
 import { getErrorMessage } from "@/lib/utils/error-message";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -131,60 +132,75 @@ export async function POST(request: NextRequest) {
     const eventCheck = await assertEventOwnedByUser(supabase, guard.clubId, eventId ?? null);
     if (!eventCheck.ok) return eventCheck.response;
 
-    const { data: inserted, error } = await supabase
-      .from("club_revenues")
-      .insert({
-        user_id: guard.clubId,
-        name: name.trim(),
-        amount: amountNum,
-        revenue_date: revenueDate,
-        description: typeof description === "string" && description.trim() ? description.trim() : null,
-        event_id: eventId || null,
-      })
-      .select(
-        `
-        id,
-        name,
-        amount,
-        revenue_date,
-        description,
-        event_id,
-        created_at,
-        updated_at
-      `
-      )
-      .single();
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+      resourceType: "club_revenue",
+      operation: async () => {
+        const { data: inserted, error } = await supabase
+          .from("club_revenues")
+          .insert({
+            user_id: guard.clubId,
+            name: name.trim(),
+            amount: amountNum,
+            revenue_date: revenueDate,
+            description:
+              typeof description === "string" && description.trim() ? description.trim() : null,
+            event_id: eventId || null,
+          })
+          .select(
+            `
+            id,
+            name,
+            amount,
+            revenue_date,
+            description,
+            event_id,
+            created_at,
+            updated_at
+          `
+          )
+          .single();
 
-    if (error || !inserted) {
-      console.error("[API][club-revenues][POST] insert failed", {
-        message: error?.message,
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-      });
-      return NextResponse.json(
-        {
-          error: "Impossible d'enregistrer le revenu.",
-          details: error?.message ?? "Erreur inconnue",
-          code: error?.code,
-        },
-        { status: 500 }
-      );
-    }
+        if (error || !inserted) {
+          console.error("[API][club-revenues][POST] insert failed", {
+            message: error?.message,
+            code: error?.code,
+            details: error?.details,
+            hint: error?.hint,
+          });
+          return {
+            status: 500,
+            body: {
+              error: "Impossible d'enregistrer le revenu.",
+              details: error?.message ?? "Erreur inconnue",
+              code: error?.code,
+            },
+            resourceId: null,
+          };
+        }
 
-    revalidatePath("/tableau-de-bord/produits");
-    revalidatePath("/tableau-de-bord/evenements");
-    if (inserted.event_id) {
-      revalidatePath(`/tableau-de-bord/evenements/${inserted.event_id}`);
-    }
+        revalidatePath("/tableau-de-bord/produits");
+        revalidatePath("/tableau-de-bord/evenements");
+        if (inserted.event_id) {
+          revalidatePath(`/tableau-de-bord/evenements/${inserted.event_id}`);
+        }
 
-    const event = await fetchEventLabelForRevenue(supabase, inserted.event_id);
-    return NextResponse.json(
-      {
-        revenue: mapClubRevenueToApi(inserted as ClubRevenueDbRow, event),
+        const event = await fetchEventLabelForRevenue(supabase, inserted.event_id);
+        return {
+          status: 201,
+          body: {
+            revenue: mapClubRevenueToApi(inserted as ClubRevenueDbRow, event),
+          },
+          resourceId: String(inserted.id ?? ""),
+        };
       },
-      { status: 201 }
-    );
+    });
+
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
   } catch (e: unknown) {
     console.error("[API][club-revenues][POST]", e);
     return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });

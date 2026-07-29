@@ -6,11 +6,14 @@ import Link from "next/link";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { ArrowRight, Users } from "@/lib/icons";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import MemberRoleSelect from "@/components/members/MemberRoleSelect";
 import MemberCategorySelect from "@/components/members/MemberCategorySelect";
 import { dashboardInnerPanelClass, dashboardLabelClass, dashboardSecondaryButtonClass } from "@/components/ui";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
 
 export default function NouveauClientPage() {
   const router = useRouter();
@@ -28,7 +31,11 @@ export default function NouveauClientPage() {
     date_of_birth: "",
     avs_number: "",
   });
-  const [loading, setLoading] = useState(false);
+  const {
+    isSubmitting,
+    showOverlay,
+    run: runCreateClient,
+  } = useSafeSubmit({ overlayDelayMs: 450 });
   const [error, setError] = useState<{
     type: "LIMIT_REACHED" | "OTHER";
     message: string;
@@ -55,8 +62,6 @@ export default function NouveauClientPage() {
       return;
     }
 
-    setLoading(true);
-
     const dataToSend = {
       nom: trimmedNom,
       email: formData.email.trim(),
@@ -70,66 +75,67 @@ export default function NouveauClientPage() {
       avs_number: formData.avs_number.trim() || null,
     };
 
-    try {
-      const res = await fetch("/api/clients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend),
-      });
+    await runCreateClient(async (idempotencyKey) => {
+      try {
+        const res = await idempotentFetch("/api/clients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          idempotencyKey,
+          body: JSON.stringify(dataToSend),
+        });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
 
-        if (process.env.NODE_ENV === "development") {
-          console.error("[Nouveau membre] POST /api/clients échoué", {
-            status: res.status,
-            code: data.code,
-            error: data.error,
-            debug: data.debug,
-            payloadKeys: Object.keys(dataToSend),
-            payloadSummary: {
-              nomLen: dataToSend.nom.length,
-              emailLen: dataToSend.email.length,
-              telephoneLen: dataToSend.telephone.length,
-            },
-          });
-        }
+          if (process.env.NODE_ENV === "development") {
+            console.error("[Nouveau membre] POST /api/clients échoué", {
+              status: res.status,
+              code: data.code,
+              error: data.error,
+              debug: data.debug,
+              payloadKeys: Object.keys(dataToSend),
+              payloadSummary: {
+                nomLen: dataToSend.nom.length,
+                emailLen: dataToSend.email.length,
+                telephoneLen: dataToSend.telephone.length,
+              },
+            });
+          }
 
-        if (data.error === "LIMIT_REACHED") {
+          if (data.error === "LIMIT_REACHED") {
+            setError({
+              type: "LIMIT_REACHED",
+              message: data.message || t("dashboard.clients.limitReached"),
+            });
+            return;
+          }
+
           setError({
-            type: "LIMIT_REACHED",
-            message: data.message || t("dashboard.clients.limitReached"),
+            type: "OTHER",
+            message:
+              (typeof data.error === "string" && data.error) ||
+              (typeof data.message === "string" && data.message) ||
+              t("dashboard.clients.createError"),
           });
-          setLoading(false);
           return;
         }
 
+        router.push("/tableau-de-bord/clients");
+      } catch (err) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("[Nouveau membre] exception réseau / parse", err);
+        }
         setError({
           type: "OTHER",
-          message:
-            (typeof data.error === "string" && data.error) ||
-            (typeof data.message === "string" && data.message) ||
-            t("dashboard.clients.createError"),
+          message: t("dashboard.common.unexpectedError"),
         });
-        setLoading(false);
-        return;
       }
-
-      router.push("/tableau-de-bord/clients");
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("[Nouveau membre] exception réseau / parse", err);
-      }
-      setError({
-        type: "OTHER",
-        message: t("dashboard.common.unexpectedError"),
-      });
-      setLoading(false);
-    }
+    });
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
       <div className="flex items-center gap-2 text-sm">
         <Link href="/tableau-de-bord/clients" className="text-white/70 hover:text-white transition-colors">
           Clients
@@ -322,11 +328,11 @@ export default function NouveauClientPage() {
           </button>
           <DashboardPrimaryButton
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
             icon="none"
             className="flex-1 justify-center"
           >
-            {loading ? (
+            {isSubmitting ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />

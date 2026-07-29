@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -74,28 +75,37 @@ export async function GET() {
     const revenueByEvent: Record<string, number> = {};
     const expensesByEvent: Record<string, number> = {};
 
-    (documentsData || []).forEach((doc: any) => {
-      if (doc.event_id && doc.type === "invoice") {
-        revenueByEvent[doc.event_id] = (revenueByEvent[doc.event_id] || 0) + (Number(doc.total_ttc) || 0);
+    (documentsData || []).forEach(
+      (doc: { event_id?: string | null; type?: string | null; total_ttc?: number | string | null }) => {
+        if (doc.event_id && doc.type === "invoice") {
+          revenueByEvent[doc.event_id] =
+            (revenueByEvent[doc.event_id] || 0) + Number(doc.total_ttc || 0);
+        }
       }
-    });
+    );
 
     if (!clubRevenuesError) {
-      (clubRevenuesData || []).forEach((row: any) => {
-        if (row.event_id) {
-          revenueByEvent[row.event_id] = (revenueByEvent[row.event_id] || 0) + (Number(row.amount) || 0);
+      (clubRevenuesData || []).forEach(
+        (row: { event_id?: string | null; amount?: number | string | null }) => {
+          if (row.event_id) {
+            revenueByEvent[row.event_id] =
+              (revenueByEvent[row.event_id] || 0) + Number(row.amount || 0);
+          }
         }
-      });
+      );
     }
 
-    (expensesData || []).forEach((exp: any) => {
-      if (exp.event_id) {
-        expensesByEvent[exp.event_id] = (expensesByEvent[exp.event_id] || 0) + (Number(exp.amount) || 0);
+    (expensesData || []).forEach(
+      (exp: { event_id?: string | null; amount?: number | string | null }) => {
+        if (exp.event_id) {
+          expensesByEvent[exp.event_id] =
+            (expensesByEvent[exp.event_id] || 0) + Number(exp.amount || 0);
+        }
       }
-    });
+    );
 
     // Enrichir les événements avec les totaux
-    const eventsWithFinancials = (events || []).map((event: any) => ({
+    const eventsWithFinancials = (events || []).map((event: Record<string, unknown> & { id: string; event_types: unknown }) => ({
       ...event,
       eventType: event.event_types,
       totalRevenue: revenueByEvent[event.id] || 0,
@@ -104,10 +114,11 @@ export async function GET() {
     }));
 
     return NextResponse.json({ events: eventsWithFinancials }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("[API][events][GET] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors du chargement", details: error.message },
+      { error: "Erreur lors du chargement", details: message },
       { status: 500 }
     );
   }
@@ -156,53 +167,71 @@ export async function POST(request: NextRequest) {
       event_type_id: eventTypeId || null,
     };
 
-    const { data, error } = await supabase
-      .from("events")
-      .insert(payload)
-      .select(`
-        id,
-        name,
-        description,
-        start_date,
-        end_date,
-        status,
-        created_at,
-        updated_at,
-        event_type_id,
-        event_types (
-          id,
-          name
-        )
-      `)
-      .single();
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+      resourceType: "event",
+      operation: async () => {
+        const { data, error } = await supabase
+          .from("events")
+          .insert(payload)
+          .select(`
+            id,
+            name,
+            description,
+            start_date,
+            end_date,
+            status,
+            created_at,
+            updated_at,
+            event_type_id,
+            event_types (
+              id,
+              name
+            )
+          `)
+          .single();
 
-    if (error) {
-      console.error("[API][events][POST] Erreur Supabase:", error);
-      return NextResponse.json(
-        { error: "Erreur lors de la création de l'événement", details: error.message },
-        { status: 500 }
-      );
-    }
+        if (error) {
+          console.error("[API][events][POST] Erreur Supabase:", error);
+          return {
+            status: 500,
+            body: {
+              error: "Erreur lors de la création de l'événement",
+              details: error.message,
+            },
+            resourceId: null,
+          };
+        }
 
-    revalidatePath("/tableau-de-bord");
-    revalidatePath("/tableau-de-bord/evenements");
+        revalidatePath("/tableau-de-bord");
+        revalidatePath("/tableau-de-bord/evenements");
 
-    return NextResponse.json(
-      {
-        event: {
-          ...data,
-          eventType: data.event_types,
-          totalRevenue: 0,
-          totalExpenses: 0,
-          netResult: 0,
-        },
+        return {
+          status: 201,
+          body: {
+            event: {
+              ...data,
+              eventType: data.event_types,
+              totalRevenue: 0,
+              totalExpenses: 0,
+              netResult: 0,
+            },
+          },
+          resourceId: String(data.id),
+        };
       },
-      { status: 201 }
-    );
-  } catch (error: any) {
+    });
+
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("[API][events][POST] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création", details: error.message },
+      { error: "Erreur lors de la création", details: message },
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,11 @@ export async function POST(request: NextRequest) {
       return accessCheck.response;
     }
 
+    const idempotencyKey = request.headers.get("Idempotency-Key");
+    if (!idempotencyKey) {
+      return NextResponse.json({ error: "Idempotency-Key requis" }, { status: 400 });
+    }
+
     const body = await request.json();
     const firstName = body?.firstName?.trim();
     const lastName = body?.lastName?.trim();
@@ -80,38 +86,59 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
     }
 
-    const { data: existingContact } = await supabase
-      .from("marketing_contacts")
-      .select("id")
-      .eq("club_id", guard.clubId)
-      .eq("email_normalized", email)
-      .maybeSingle();
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey,
+      resourceType: "marketing_contact",
+      operation: async () => {
+        const { data: existingContact } = await supabase
+          .from("marketing_contacts")
+          .select("id")
+          .eq("club_id", guard.clubId)
+          .eq("email_normalized", email)
+          .maybeSingle();
 
-    if (existingContact) {
-      return NextResponse.json(
-        { error: "Un contact avec cet email existe déjà pour ce club" },
-        { status: 409 }
-      );
-    }
+        if (existingContact) {
+          return {
+            status: 409,
+            body: { error: "Un contact avec cet email existe déjà pour ce club" },
+            resourceId: null,
+          };
+        }
 
-    const { data: contact, error } = await supabase
-      .from("marketing_contacts")
-      .insert({
-        club_id: guard.clubId,
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        phone,
-        source,
-      })
-      .select("id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed")
-      .single();
+        const { data: contact, error } = await supabase
+          .from("marketing_contacts")
+          .insert({
+            club_id: guard.clubId,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            phone,
+            source,
+          })
+          .select(
+            "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed"
+          )
+          .single();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+        if (error || !contact) {
+          return {
+            status: 500,
+            body: { error: error?.message || "Erreur création contact" },
+            resourceId: null,
+          };
+        }
 
-    return NextResponse.json({ contact }, { status: 201 });
+        return {
+          status: 201,
+          body: { contact },
+          resourceId: contact.id ? String(contact.id) : null,
+        };
+      },
+    });
+
+    return NextResponse.json(idempotencyResult.body, { status: idempotencyResult.status });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erreur serveur";
     return NextResponse.json({ error: message }, { status: 500 });

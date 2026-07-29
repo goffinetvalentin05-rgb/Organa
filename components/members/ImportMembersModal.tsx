@@ -6,6 +6,10 @@ import { X, Upload, CheckCircle, AlertCircle } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import {
   dashboardModalClass,
   dashboardSelectClass,
@@ -73,6 +77,8 @@ export default function ImportMembersModal({
 }: ImportMembersModalProps) {
   const { t } = useI18n();
   const vis = useMemberFieldSettings();
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const importToastId = "clients-import";
   const [step, setStep] = useState<Step>("upload");
   const [fileError, setFileError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<ParsedSpreadsheet | null>(null);
@@ -179,53 +185,62 @@ export default function ImportMembersModal({
       toast.error(t("dashboard.clients.import.errors.noValidRows"));
       return;
     }
+    if (isSubmitting) return;
+
     setStep("importing");
-    try {
-      const res = await fetch("/api/clients/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rows: validRows.map((r) => ({
-            prenom: r.prenom,
-            nom: r.nom,
-            email: r.email,
-            telephone: r.telephone,
-            adresse: r.adresse,
-            postal_code: r.postal_code,
-            city: r.city,
-            role: r.role,
-            category: r.category,
-            date_of_birth: r.date_of_birth,
-            avs_number: r.avs_number,
-          })),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        if (data.error === "LIMIT_REACHED") {
-          toast.error(data.message || t("dashboard.clients.limitReached"));
-        } else {
-          toast.error(
-            typeof data.error === "string"
-              ? data.error
-              : t("dashboard.clients.import.errors.importFailed")
-          );
+    await run(async (idempotencyKey) => {
+      try {
+        const res = await idempotentFetch("/api/clients/import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          idempotencyKey,
+          body: JSON.stringify({
+            rows: validRows.map((r) => ({
+              prenom: r.prenom,
+              nom: r.nom,
+              email: r.email,
+              telephone: r.telephone,
+              adresse: r.adresse,
+              postal_code: r.postal_code,
+              city: r.city,
+              role: r.role,
+              category: r.category,
+              date_of_birth: r.date_of_birth,
+              avs_number: r.avs_number,
+            })),
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if (data.error === "LIMIT_REACHED") {
+            notifyError(data.message || t("dashboard.clients.limitReached"), importToastId);
+          } else {
+            notifyError(
+              typeof data.error === "string"
+                ? data.error
+                : t("dashboard.clients.import.errors.importFailed"),
+              importToastId
+            );
+          }
+          setStep("preview");
+          return;
         }
+
+        setImportResult({
+          imported: data.imported ?? 0,
+          duplicates: data.duplicates ?? 0,
+          errors: data.errors ?? 0,
+        });
+        setStep("success");
+        notifySuccess("Import terminé ✓", importToastId);
+        onImported();
+      } catch {
+        notifyError(t("dashboard.clients.import.errors.importFailed"), importToastId);
         setStep("preview");
-        return;
       }
-      setImportResult({
-        imported: data.imported ?? 0,
-        duplicates: data.duplicates ?? 0,
-        errors: data.errors ?? 0,
-      });
-      setStep("success");
-      onImported();
-    } catch {
-      toast.error(t("dashboard.clients.import.errors.importFailed"));
-      setStep("preview");
-    }
-  }, [importRows, onImported, t]);
+    });
+  }, [importRows, onImported, t, isSubmitting, run]);
 
   const handleDownloadTemplate = useCallback(() => {
     const headers = buildCsvTemplateHeaders(vis, fieldLabels);
@@ -270,6 +285,11 @@ export default function ImportMembersModal({
           title={t("dashboard.clients.import.title")}
           subtitle={t(`dashboard.clients.import.steps.${step === "importing" ? "preview" : step}`)}
           t={t}
+        />
+
+        <SubmittingOverlay
+          visible={showOverlay}
+          message={t("dashboard.clients.import.importingOverlay") ?? "Import en cours…"}
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
@@ -327,7 +347,7 @@ export default function ImportMembersModal({
             else if (step === "success") handleSuccessClose();
           }}
           onClose={step === "success" ? handleSuccessClose : handleClose}
-          importing={step === "importing"}
+          importing={step === "importing" || isSubmitting}
           t={t}
         />
         </div>
@@ -865,6 +885,8 @@ function ModalFooter({
         disabled={importing || (step === "preview" && summary.valid === 0)}
         icon="none"
         className="justify-center sm:min-w-[160px]"
+        loading={importing}
+        loadingLabel={t("dashboard.clients.import.importing")}
       >
         {importing ? (
           t("dashboard.clients.import.importing")

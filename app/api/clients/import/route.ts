@@ -6,6 +6,7 @@ import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import { fetchMergedMemberFieldSettings } from "@/lib/member-fields/loadSettings";
 import { buildClientInsertPayload } from "@/lib/clients/memberWritePayload";
+import { withIdempotency } from "@/lib/api/idempotency";
 import {
   finalizeImportRows,
   MAX_IMPORT_ROWS,
@@ -81,117 +82,136 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
-  const user = guard.ctx.user;
   const clubId = guard.clubId;
 
-  const { data: existingData, error: listError } = await supabase
-    .from("clients")
-    .select("nom, email")
-    .eq("user_id", clubId);
+  const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+    request,
+    clubId,
+    idempotencyKey: request.headers.get("Idempotency-Key"),
+    resourceType: "client_import",
+    operation: async () => {
+      const supabase = await createClient();
+      const user = guard.ctx.user;
 
-  if (listError) {
-    console.error("[API][clients/import] list_error", listError);
-    return NextResponse.json(
-      { error: "Impossible de vérifier les membres existants" },
-      { status: 500 }
-    );
-  }
+      const { data: existingData, error: listError } = await supabase
+        .from("clients")
+        .select("nom, email")
+        .eq("user_id", clubId);
 
-  const existing = (existingData || []).map((r) => ({
-    nom: (r as { nom?: string }).nom ?? null,
-    email: (r as { email?: string }).email ?? null,
-  }));
-
-  const candidateRows = rawRows.map((r, i) => toImportMemberRow(r, i + 1));
-  const validated = finalizeImportRows(candidateRows, existing);
-  const fieldSettings = await fetchMergedMemberFieldSettings(supabase, clubId);
-
-  let imported = 0;
-  let duplicates = validated.filter((r) => r.status === "duplicate").length;
-  const validationErrors = validated.filter((r) => r.status === "error").length;
-  const insertErrors: { rowIndex: number; message: string }[] = [];
-
-  const seenKeys = new Set(
-    existing
-      .map((m) => {
-        const email = (m.email || "").trim().toLowerCase();
-        if (email) return `email:${email}`;
-        return m.nom?.trim() ? `name:${m.nom.trim().toLowerCase()}` : "";
-      })
-      .filter(Boolean)
-  );
-
-  for (const row of validated) {
-    if (row.status !== "valid") continue;
-
-    const key = memberIdentityKey(row.prenom, row.nom, row.email);
-    if (seenKeys.has(key)) {
-      duplicates++;
-      continue;
-    }
-
-    const bodyObj = rowToMemberBody(row);
-    const insertPayload = buildClientInsertPayload(
-      bodyObj,
-      fieldSettings,
-      clubId,
-      user.id
-    );
-
-    if (!insertPayload.nom || typeof insertPayload.nom !== "string" || !insertPayload.nom.trim()) {
-      continue;
-    }
-
-    const { data: newClient, error: insertError } = await supabase
-      .from("clients")
-      .insert(insertPayload)
-      .select("id")
-      .single();
-
-    if (insertError) {
-      if (insertError.code === "23505") {
-        duplicates++;
-        seenKeys.add(key);
-        continue;
+      if (listError) {
+        console.error("[API][clients/import] list_error", listError);
+        return {
+          status: 500,
+          body: { error: "Impossible de vérifier les membres existants" },
+          resourceId: null,
+        };
       }
-      console.error("[API][clients/import] insert_error", {
-        clubId,
-        rowIndex: row.rowIndex,
-        code: insertError.code,
-      });
-      insertErrors.push({
-        rowIndex: row.rowIndex,
-        message: "Erreur lors de l'insertion",
-      });
-      continue;
-    }
 
-    seenKeys.add(key);
-    imported++;
+      const existing = (existingData || []).map((r) => ({
+        nom: (r as { nom?: string }).nom ?? null,
+        email: (r as { email?: string }).email ?? null,
+      }));
 
-    if (newClient?.id) {
-      const meta = extractRequestMetadata(request);
-      await logAudit({
-        clubId,
-        action: AuditAction.CREATE,
-        resourceType: "member",
-        resourceId: String(newClient.id),
-        metadata: { source: "import", role: bodyObj.role },
-        ...meta,
-      });
-    }
-  }
+      const candidateRows = rawRows.map((r, i) => toImportMemberRow(r, i + 1));
+      const validated = finalizeImportRows(candidateRows, existing);
+      const fieldSettings = await fetchMergedMemberFieldSettings(supabase, clubId);
 
-  revalidatePath("/tableau-de-bord/clients");
+      let imported = 0;
+      let duplicates = validated.filter((r) => r.status === "duplicate").length;
+      const validationErrors = validated.filter((r) => r.status === "error").length;
+      const insertErrors: { rowIndex: number; message: string }[] = [];
 
-  return NextResponse.json(
-    {
-      imported,
-      duplicates,
-      errors: validationErrors + insertErrors.length,
-      insertErrors,
+      const seenKeys = new Set(
+        existing
+          .map((m) => {
+            const email = (m.email || "").trim().toLowerCase();
+            if (email) return `email:${email}`;
+            return m.nom?.trim() ? `name:${m.nom.trim().toLowerCase()}` : "";
+          })
+          .filter(Boolean)
+      );
+
+      for (const row of validated) {
+        if (row.status !== "valid") continue;
+
+        const key = memberIdentityKey(row.prenom, row.nom, row.email);
+        if (seenKeys.has(key)) {
+          duplicates++;
+          continue;
+        }
+
+        const bodyObj = rowToMemberBody(row);
+        const insertPayload = buildClientInsertPayload(
+          bodyObj,
+          fieldSettings,
+          clubId,
+          user.id
+        );
+
+        if (
+          !insertPayload.nom ||
+          typeof insertPayload.nom !== "string" ||
+          !insertPayload.nom.trim()
+        ) {
+          continue;
+        }
+
+        const { data: newClient, error: insertError } = await supabase
+          .from("clients")
+          .insert(insertPayload)
+          .select("id")
+          .single();
+
+        if (insertError) {
+          if (insertError.code === "23505") {
+            duplicates++;
+            seenKeys.add(key);
+            continue;
+          }
+          console.error("[API][clients/import] insert_error", {
+            clubId,
+            rowIndex: row.rowIndex,
+            code: insertError.code,
+          });
+          insertErrors.push({
+            rowIndex: row.rowIndex,
+            message: "Erreur lors de l'insertion",
+          });
+          continue;
+        }
+
+        seenKeys.add(key);
+        imported++;
+
+        if (newClient?.id) {
+          const meta = extractRequestMetadata(request);
+          await logAudit({
+            clubId,
+            action: AuditAction.CREATE,
+            resourceType: "member",
+            resourceId: String(newClient.id),
+            metadata: { source: "import", role: bodyObj.role },
+            ...meta,
+          });
+        }
+      }
+
+      revalidatePath("/tableau-de-bord/clients");
+
+      return {
+        status: 200,
+        body: {
+          imported,
+          duplicates,
+          errors: validationErrors + insertErrors.length,
+          insertErrors,
+        },
+        resourceId: null,
+      };
     },
-    { status: 200 }
-  );
+  });
+
+  return NextResponse.json(idempotencyResult.body, {
+    status: idempotencyResult.status,
+  });
 }

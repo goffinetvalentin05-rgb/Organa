@@ -17,9 +17,13 @@ import {
   dashboardSecondaryButtonClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 type DepenseStatut = "a_payer" | "paye";
 
@@ -102,6 +106,8 @@ export default function DepensesPage() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const [createSuccess, setCreateSuccess] = useState(false);
   const [formData, setFormData] = useState({
     label: "",
     amount: "",
@@ -192,53 +198,76 @@ export default function DepensesPage() {
 
       const response = await fetch("/api/depenses", { cache: "no-store" });
       if (!response.ok) {
-        let data: any = null;
+        let data: unknown = null;
         try {
           data = await response.json();
         } catch (parseError) {
           console.error("[Depenses] Impossible de parser la réponse:", parseError);
         }
+
+        const errorData =
+          data && typeof data === "object"
+            ? (data as { error?: unknown; details?: unknown; code?: unknown; hint?: unknown })
+            : null;
+
         console.error(
           "[Depenses] Erreur Supabase (GET):",
           {
-            error: data?.error,
-            details: data?.details,
-            code: data?.code,
-            hint: data?.hint,
+            error: errorData?.error,
+            details: errorData?.details,
+            code: errorData?.code,
+            hint: errorData?.hint,
           }
         );
+
         const messageParts = [
-          data?.error || t("dashboard.expenses.loadError"),
-          data?.details ? `details: ${data.details}` : null,
-          data?.code ? `code: ${data.code}` : null,
+          typeof errorData?.error === "string" ? errorData.error : t("dashboard.expenses.loadError"),
+          typeof errorData?.details === "string" ? `details: ${errorData.details}` : null,
+          errorData?.code ? `code: ${String(errorData.code)}` : null,
         ].filter(Boolean);
         throw new Error(messageParts.join(" | "));
       }
-      const data = await response.json();
-      if (!data?.depenses) {
-        console.warn("[Depenses] Réponse dépourvue de données:", data);
+
+      const json: unknown = await response.json();
+      const depensesRaw =
+        json && typeof json === "object" && "depenses" in json
+          ? (json as { depenses?: unknown }).depenses
+          : undefined;
+
+      if (!depensesRaw) {
+        console.warn("[Depenses] Réponse dépourvue de données:", json);
       }
-      const depensesChargees = (data?.depenses ?? []).map((depense: any) => ({
-        id: depense.id,
-        label: depense.label || "",
-        amount:
-          typeof depense.amount === "number"
-            ? depense.amount
-            : Number(depense.amount) || 0,
-        date: depense.date || "",
-        status: (depense.status || "a_payer") as DepenseStatut,
-        notes: depense.notes || undefined,
-        attachmentUrl: depense.attachmentUrl || undefined,
-        eventId: depense.eventId || undefined,
-      }));
+      const depensesChargees = (Array.isArray(depensesRaw) ? depensesRaw : []).map(
+        (depense: unknown) => {
+          const d = depense as {
+            id?: string;
+            label?: string;
+            amount?: number | string | null;
+            date?: string;
+            status?: string;
+            notes?: string | null;
+            attachmentUrl?: string | null;
+            eventId?: string | null;
+          };
+
+          return {
+            id: String(d.id ?? ""),
+            label: d.label || "",
+            amount: typeof d.amount === "number" ? d.amount : Number(d.amount) || 0,
+            date: d.date || "",
+            status: (d.status || "a_payer") as DepenseStatut,
+            notes: d.notes || undefined,
+            attachmentUrl: d.attachmentUrl || undefined,
+            eventId: d.eventId || undefined,
+          };
+        }
+      );
 
       setDepenses(depensesChargees);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[Depenses] Erreur attrapée:", error);
       const explicitMessage =
-        typeof error?.message === "string"
-          ? error.message
-          : JSON.stringify(error);
+        error instanceof Error ? error.message : JSON.stringify(error);
       setErrorMessage(explicitMessage || t("dashboard.expenses.loadError"));
       setDepenses([]);
     } finally {
@@ -349,6 +378,7 @@ export default function DepensesPage() {
       setErrorMessage(`${t("dashboard.expenses.createError")} | Données invalides`);
       return;
     }
+    if (isSubmitting) return;
 
     const normalizeDateToIso = (value: string) => {
       if (!value) return value;
@@ -363,64 +393,70 @@ export default function DepensesPage() {
 
     const formattedDate = normalizeDateToIso(formData.date);
 
-    try {
-      const supabase = createClient();
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+    await run(async (idempotencyKey) => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
-      if (authError || !user) {
-        throw new Error(t("dashboard.expenses.createError"));
+        if (authError || !user) {
+          throw new Error(t("dashboard.expenses.createError"));
+        }
+
+        let attachmentUrl: string | null = null;
+        if (formData.pieceJointe) {
+          attachmentUrl = await uploadAttachment(
+            supabase,
+            user.id,
+            formData.pieceJointe
+          );
+        }
+
+        const payload = {
+          label: formData.label.trim(),
+          amount,
+          date: formattedDate,
+          status: formData.status,
+          notes: formData.notes.trim() || null,
+          attachmentUrl: attachmentUrl || null,
+          eventId: formData.eventId || null,
+        };
+
+        const response = await idempotentFetch("/api/depenses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          idempotencyKey,
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          const messageParts = [
+            data?.error || t("dashboard.expenses.createError"),
+            data?.details ? `details: ${data.details}` : null,
+            data?.code ? `code: ${data.code}` : null,
+          ].filter(Boolean);
+          throw new Error(messageParts.join(" | "));
+        }
+
+        await loadDepenses();
+        resetForm();
+        setShowForm(false);
+        setSuccessMessage(t("dashboard.expenses.createSuccess"));
+        setCreateSuccess(true);
+        notifySuccess(t("dashboard.expenses.createSuccess"), "expense-create");
+        setTimeout(() => setCreateSuccess(false), 2000);
+      } catch (error) {
+        console.error("[Depenses][create] Erreur attrapée:", error);
+        const message =
+          error instanceof Error ? error.message : t("dashboard.expenses.createError");
+        setErrorMessage(message);
+        notifyError(message, "expense-create");
       }
-
-      let attachmentUrl: string | null = null;
-      if (formData.pieceJointe) {
-        attachmentUrl = await uploadAttachment(
-          supabase,
-          user.id,
-          formData.pieceJointe
-        );
-      }
-
-      const payload = {
-        label: formData.label.trim(),
-        amount,
-        date: formattedDate,
-        status: formData.status,
-        notes: formData.notes.trim() || null,
-        attachmentUrl: attachmentUrl || null,
-        eventId: formData.eventId || null,
-      };
-
-      const response = await fetch("/api/depenses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      console.log("response", response);
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const messageParts = [
-          data?.error || t("dashboard.expenses.createError"),
-          data?.details ? `details: ${data.details}` : null,
-          data?.code ? `code: ${data.code}` : null,
-        ].filter(Boolean);
-        throw new Error(messageParts.join(" | "));
-      }
-
-      await loadDepenses();
-      resetForm();
-      setShowForm(false);
-      setSuccessMessage(t("dashboard.expenses.createSuccess"));
-    } catch (error) {
-      console.error("[Depenses][create] Erreur attrapée:", error);
-      setErrorMessage(
-        error instanceof Error ? error.message : t("dashboard.expenses.createError")
-      );
-    }
+    });
   };
 
   const handleCreateSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -548,7 +584,9 @@ export default function DepensesPage() {
   };
 
   return (
-    <PageLayout maxWidth="7xl">
+    <>
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.expenses.title")}
         subtitle={t("dashboard.expenses.subtitle")}
@@ -750,6 +788,10 @@ export default function DepensesPage() {
             <DashboardPrimaryButton
               type="submit"
               icon="none"
+              loading={isSubmitting}
+              loadingLabel={t("dashboard.common.saving") ?? "Enregistrement..."}
+              success={createSuccess}
+              successLabel="Charge créée ✓"
               className="relative z-50 flex-1 justify-center rounded-full"
               style={{ pointerEvents: "auto" }}
             >
@@ -1097,7 +1139,8 @@ export default function DepensesPage() {
           </div>
         </div>
       )}
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
 

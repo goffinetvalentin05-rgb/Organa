@@ -20,7 +20,11 @@ import {
   ActionButton,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import type { RecipientType } from "@/lib/documents/recipient";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 interface Client {
   id: string;
@@ -73,6 +77,8 @@ function NouvelleFacturePageContent() {
   const [notes, setNotes] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const [createSuccess, setCreateSuccess] = useState(false);
 
   // Charger les clients et les événements depuis l'API Supabase
   useEffect(() => {
@@ -218,41 +224,71 @@ function NouvelleFacturePageContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateRecipient()) return;
+    if (isSubmitting) return;
 
-    const lignesValides = lignes.filter(
-      (l) => l.designation.trim() !== ""
-    );
+    const lignesValides = lignes.filter((l) => l.designation.trim() !== "");
 
     if (lignesValides.length === 0) {
       toast.error(t("dashboard.invoices.form.lineRequiredError"));
       return;
     }
 
-    try {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(buildDocumentBody(lignesValides)),
-      });
+    setCreateSuccess(false);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
-        throw new Error(detail || t("dashboard.invoices.form.createError"));
+    await run(async (idempotencyKey) => {
+      try {
+        const documentBody = buildDocumentBody(lignesValides);
+
+        const response = documentId
+          ? await idempotentFetch("/api/documents", {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              idempotencyKey,
+              body: JSON.stringify({
+                id: documentId,
+                ...documentBody,
+                ...(dateEcheance && dateEcheance.trim() !== ""
+                  ? { dateEcheance }
+                  : { dateEcheance: null }),
+                ...(datePaiement && datePaiement.trim() !== ""
+                  ? { datePaiement }
+                  : { datePaiement: null }),
+                ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
+              }),
+            })
+          : await idempotentFetch("/api/documents", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              idempotencyKey,
+              body: JSON.stringify(documentBody),
+            });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+          throw new Error(detail || t("dashboard.invoices.form.createError"));
+        }
+
+        const data = await response.json();
+        setDocumentId(data.id);
+
+        setCreateSuccess(true);
+        notifySuccess("Facture créée ✓", "invoice-create");
+        setTimeout(() => setCreateSuccess(false), 2000);
+
+        router.replace(`/tableau-de-bord/factures/${data.id}`);
+      } catch (error: unknown) {
+        console.error("[Facture] Erreur lors de la création:", error);
+        notifyError(
+          `${t("dashboard.invoices.form.createError")}: ${getErrorMessage(error)}`,
+          "invoice-create"
+        );
       }
-
-      const data = await response.json();
-      setDocumentId(data.id);
-      console.log("[Facture] Facture créée via API avec ID:", data.id, "Numéro:", data.numero);
-      router.push(`/tableau-de-bord/factures/${data.id}`);
-    } catch (error: unknown) {
-      console.error("[Facture] Erreur lors de la création:", error);
-      toast.error(
-        `${t("dashboard.invoices.form.createError")}: ${getErrorMessage(error)}`
-      );
-    }
+    });
   };
 
   // Fonction pour sauvegarder le document avant de générer le PDF
@@ -276,33 +312,35 @@ function NouvelleFacturePageContent() {
 
       // Si le document n'existe pas encore, le créer via l'API
       if (!id) {
-        const response = await fetch("/api/documents", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "invoice",
-            clientId,
-            lignes: lignesValides,
-            statut,
-            dateCreation: new Date().toISOString().split("T")[0],
-            ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-            ...(datePaiement && datePaiement.trim() !== "" ? { datePaiement } : {}),
-            ...(notes && notes.trim() !== "" ? { notes } : {}),
-            ...(eventId ? { eventId } : {}),
-          }),
+        const created = await run(async (idempotencyKey) => {
+          const response = await idempotentFetch("/api/documents", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            idempotencyKey,
+            body: JSON.stringify(buildDocumentBody(lignesValides)),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+            throw new Error(
+              detail || t("dashboard.invoices.form.createDocumentError")
+            );
+          }
+
+          const data = await response.json();
+          return { id: data.id?.toString(), numero: data.numero as string | undefined };
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
-          throw new Error(detail || t("dashboard.invoices.form.createDocumentError"));
+        if (!created?.id) {
+          // Si une autre soumission est déjà en cours, on n'essaye pas d'ouvrir le PDF avec un ID manquant.
+          return;
         }
 
-        const data = await response.json();
-        id = data.id.toString();
-        numero = data.numero;
+        id = created.id;
+        numero = created.numero;
         setDocumentId(id);
         console.log("[Facture][PDF] Document créé via API avec ID:", id, "Numéro:", numero);
       } else {
@@ -361,7 +399,9 @@ function NouvelleFacturePageContent() {
   const totalTTC = calculerTotalTTC(lignes);
 
   return (
-    <PageLayout maxWidth="4xl">
+    <>
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <PageLayout maxWidth="4xl">
       <PageHeader
         title={t("dashboard.invoices.form.title")}
         subtitle={t("dashboard.invoices.form.subtitle")}
@@ -819,7 +859,7 @@ function NouvelleFacturePageContent() {
           <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(false)}
-            disabled={savingForPdf}
+            disabled={savingForPdf || isSubmitting}
             className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
@@ -837,7 +877,7 @@ function NouvelleFacturePageContent() {
           <ActionButton
             type="button"
             onClick={() => saveAndOpenPdf(true)}
-            disabled={savingForPdf}
+            disabled={savingForPdf || isSubmitting}
             className="inline-flex items-center gap-2 disabled:opacity-50"
           >
             {savingForPdf ? (
@@ -852,12 +892,21 @@ function NouvelleFacturePageContent() {
               </>
             )}
           </ActionButton>
-          <DashboardPrimaryButton type="submit" icon="none" className="flex-1 justify-center min-w-[180px] rounded-xl">
+          <DashboardPrimaryButton
+            type="submit"
+            icon="none"
+            loading={isSubmitting}
+            loadingLabel="Création de la facture…"
+            success={createSuccess}
+            successLabel="Facture créée ✓"
+            className="flex-1 justify-center min-w-[180px] rounded-xl"
+          >
             {t("dashboard.invoices.form.createAction")}
           </DashboardPrimaryButton>
         </div>
       </form>
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
 

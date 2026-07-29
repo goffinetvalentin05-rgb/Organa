@@ -4,6 +4,7 @@ import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { resolveDocumentRecipient } from "@/lib/documents/recipient";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 export const runtime = "nodejs";
 
@@ -34,6 +35,14 @@ export async function POST(request: NextRequest) {
   try {
     const guard = await requirePermission(PERMISSIONS.MANAGE_INVOICES);
     if ("error" in guard) return guard.error;
+
+    const idempotencyKey = request.headers.get("Idempotency-Key");
+    if (!idempotencyKey) {
+      return NextResponse.json(
+        { error: "Idempotency-Key requis" },
+        { status: 400 }
+      );
+    }
 
     const supabase = await createClient();
 
@@ -241,47 +250,65 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    // Envoyer l'email via Resend
-    const { data, error } = await resendInstance.emails.send({
-      from,
-      to: [clientEmail],
-      subject: sujet,
-      html: emailHtml,
-      attachments: [
-        {
-          filename: pdfFilename,
-          content: pdfContentBase64,
-        },
-      ],
+    // Envoyer l'email via Resend (idempotent pour éviter les doubles envois)
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId: guard.clubId,
+      idempotencyKey,
+      resourceType: "email",
+      operation: async () => {
+        const { data, error } = await resendInstance.emails.send({
+          from,
+          to: [clientEmail],
+          subject: sujet,
+          html: emailHtml,
+          attachments: [
+            {
+              filename: pdfFilename,
+              content: pdfContentBase64,
+            },
+          ],
+        });
+
+        if (error) {
+          const resendMessage = getErrorMessage(error);
+          const resendName =
+            error && typeof error === "object" && "name" in error
+              ? String((error as { name?: unknown }).name || "")
+              : "";
+          console.error("[API][email] Erreur Resend:", {
+            message: resendMessage,
+            name: resendName,
+            from,
+            to: clientEmail,
+            documentId,
+            type,
+          });
+
+          return {
+            status: 500,
+            body: {
+              error: "Erreur lors de l'envoi de l'email",
+              details: resendMessage || "Erreur Resend inconnue",
+            },
+            resourceId: null,
+          };
+        }
+
+        return {
+          status: 200,
+          body: {
+            success: true,
+            message: "Email envoyé avec succès",
+            emailId: data?.id,
+          },
+          resourceId: data?.id ?? null,
+        };
+      },
     });
 
-    if (error) {
-      const resendMessage = getErrorMessage(error);
-      const resendName =
-        error && typeof error === "object" && "name" in error
-          ? String((error as { name?: unknown }).name || "")
-          : "";
-      console.error("[API][email] Erreur Resend:", {
-        message: resendMessage,
-        name: resendName,
-        from,
-        to: clientEmail,
-        documentId,
-        type,
-      });
-      return NextResponse.json(
-        {
-          error: "Erreur lors de l'envoi de l'email",
-          details: resendMessage || "Erreur Resend inconnue",
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      message: "Email envoyé avec succès",
-      emailId: data?.id 
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
     });
   } catch (error: unknown) {
     console.error("Erreur API email:", error);

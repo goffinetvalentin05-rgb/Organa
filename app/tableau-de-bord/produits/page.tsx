@@ -5,8 +5,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Edit, Trash } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import {
   PageLayout,
   PageHeader,
@@ -42,7 +46,8 @@ function ProduitsPageInner() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ClubRevenue | null>(null);
-  const [saving, setSaving] = useState(false);
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -146,41 +151,60 @@ function ProduitsPageInner() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setErrorMessage(null);
-    try {
-      const payload = {
-        name: formData.name.trim(),
-        amount: Number(formData.amount.replace(",", ".")),
-        revenueDate: formData.revenueDate,
-        description: formData.description.trim() || null,
-        eventId: formData.eventId || null,
-      };
-      if (Number.isNaN(payload.amount) || payload.amount < 0) {
-        throw new Error(t("dashboard.common.amount"));
+    const isCreate = !editing;
+    const toastId = isCreate ? "revenue-create" : "revenue-update";
+
+    if (isSubmitting) return;
+    await run(async (idempotencyKey) => {
+      try {
+        const payload = {
+          name: formData.name.trim(),
+          amount: Number(formData.amount.replace(",", ".")),
+          revenueDate: formData.revenueDate,
+          description: formData.description.trim() || null,
+          eventId: formData.eventId || null,
+        };
+        if (Number.isNaN(payload.amount) || payload.amount < 0) {
+          throw new Error(t("dashboard.common.amount"));
+        }
+
+        const url = isCreate
+          ? "/api/club-revenues"
+          : `/api/club-revenues/${editing!.id}`;
+        const method = isCreate ? "POST" : "PUT";
+
+        const res = isCreate
+          ? await idempotentFetch(url, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              idempotencyKey,
+              body: JSON.stringify(payload),
+            })
+          : await fetch(url, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
+          throw new Error(msg || t("dashboard.productRevenues.saveError"));
+        }
+
+        await loadRevenues();
+        closeForm();
+        setSaveSuccess(true);
+        notifySuccess("Enregistrement réussi ✓", toastId);
+        setTimeout(() => setSaveSuccess(false), 2000);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : t("dashboard.productRevenues.saveError");
+        setErrorMessage(message);
+        notifyError(message, toastId);
       }
-      const url = editing ? `/api/club-revenues/${editing.id}` : "/api/club-revenues";
-      const method = editing ? "PUT" : "POST";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const msg = [data?.error, data?.details].filter(Boolean).join(" — ");
-        throw new Error(msg || t("dashboard.productRevenues.saveError"));
-      }
-      await loadRevenues();
-      closeForm();
-    } catch (err: unknown) {
-      setErrorMessage(
-        (err instanceof Error ? err.message : null) ||
-          t("dashboard.productRevenues.saveError")
-      );
-    } finally {
-      setSaving(false);
-    }
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -197,7 +221,9 @@ function ProduitsPageInner() {
   };
 
   return (
-    <PageLayout maxWidth="7xl">
+    <>
+      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.productRevenues.title")}
         subtitle={t("dashboard.productRevenues.subtitle")}
@@ -355,20 +381,24 @@ function ProduitsPageInner() {
                 <ActionButton type="button" onClick={closeForm} className="flex-1 justify-center">
                   {t("dashboard.productRevenues.form.cancel")}
                 </ActionButton>
-                <ActionButton
+                <DashboardPrimaryButton
                   type="submit"
-                  variant="premiumInline"
-                  disabled={saving}
-                  className="flex-1 justify-center disabled:opacity-50"
+                  icon="none"
+                  loading={isSubmitting}
+                  loadingLabel={t("dashboard.productRevenues.form.saving")}
+                  success={saveSuccess}
+                  successLabel="Enregistrement réussi ✓"
+                  className="flex-1 justify-center"
                 >
-                  {saving ? t("dashboard.productRevenues.form.saving") : t("dashboard.productRevenues.form.save")}
-                </ActionButton>
+                  {t("dashboard.productRevenues.form.save")}
+                </DashboardPrimaryButton>
               </div>
             </form>
           </GlassCard>
         </div>
       )}
-    </PageLayout>
+      </PageLayout>
+    </>
   );
 }
 

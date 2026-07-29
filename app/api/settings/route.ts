@@ -5,6 +5,7 @@ import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/compan
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { resolveClubLogoUrlForClient } from "@/lib/club/resolveClubLogoUrl";
+import { withIdempotency } from "@/lib/api/idempotency";
 
 type SettingsPutBody = Partial<{
   company_name: string;
@@ -82,13 +83,14 @@ export async function GET(request: NextRequest) {
     console.log("[API][settings] GET - club:", clubId, "actor:", actorId);
 
     // Profil Â« entreprise Â» du club = ligne profiles.user_id = propriÃ©taire du club
-    let { data: profile, error: fetchError } = await supabase
+    const { data: profileData, error: fetchError } = await supabase
       .from("profiles")
       .select(
         "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
       )
       .eq("user_id", clubId)
       .maybeSingle();
+    let profile = profileData;
 
     // CrÃ©ation auto du profil : uniquement pour son propre compte-club (pas pour un invitÃ©)
     if (!profile) {
@@ -430,141 +432,173 @@ export async function PUT(request: NextRequest) {
       email_sender_name: profilePayload.email_sender_name,
     });
 
-    if (existingProfile) {
-      // Le profil existe, faire UN SEUL UPDATE avec TOUS les champs
-      console.log("[API][settings] PUT - Mise Ã  jour du profil existant avec TOUS les champs");
+    const idempotencyResult = await withIdempotency<Record<string, unknown>>({
+      request,
+      clubId,
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+      resourceType: "settings",
+      operation: async () => {
+        if (existingProfile) {
+          // Le profil existe, faire UN SEUL UPDATE avec TOUS les champs
+          console.log("[API][settings] PUT - Mise Ã  jour du profil existant avec TOUS les champs");
       
-      // Exclure user_id et plan de l'update (ils ne doivent pas changer)
-      const updateData: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(profilePayload)) {
-        if (
-          key !== "user_id" &&
-          key !== "plan" &&
-          (allowedFields as readonly string[]).includes(key)
-        ) {
-          updateData[key] = value;
+          // Exclure user_id et plan de l'update (ils ne doivent pas changer)
+          const updateData: Record<string, unknown> = {};
+          for (const [key, value] of Object.entries(profilePayload)) {
+            if (
+              key !== "user_id" &&
+              key !== "plan" &&
+              (allowedFields as readonly string[]).includes(key)
+            ) {
+              updateData[key] = value;
+            }
+          }
+          
+          const { data: profile, error: updateError } = await supabase
+            .from("profiles")
+            .update(updateData)
+            .eq("user_id", clubId)
+            .select(
+              "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
+            )
+            .single();
+  
+          dbError = updateError;
+          updatedProfile = profile;
+        } else {
+          // Le profil n'existe pas, le crÃ©er avec TOUS les champs
+          console.log("[API][settings] PUT - Profil inexistant, crÃ©ation avec TOUS les champs");
+          const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .insert(profilePayload)
+            .select(
+              "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
+            )
+            .single();
+  
+          dbError = createError;
+          updatedProfile = newProfile;
         }
-      }
-      
-      const { data: profile, error: updateError } = await supabase
-        .from("profiles")
-        .update(updateData)
-        .eq("user_id", clubId)
-        .select(
-          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
-        )
-        .single();
 
-      dbError = updateError;
-      updatedProfile = profile;
-    } else {
-      // Le profil n'existe pas, le crÃ©er avec TOUS les champs
-      console.log("[API][settings] PUT - Profil inexistant, crÃ©ation avec TOUS les champs");
-      const { data: newProfile, error: createError } = await supabase
-        .from("profiles")
-        .insert(profilePayload)
-        .select(
-          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
-        )
-        .single();
+        if (dbError) {
+          // LOGS DÃ‰VELOPPEUR COMPLETS
+          // Logger TOUTES les infos Supabase
+          const { resend_api_key: _e, ...safePayload } = profilePayload;
+          console.error("[API][settings] PUT - Erreur DB complÃ¨te:", {
+            code: dbError.code,
+            message: dbError.message,
+            details: dbError.details,
+            hint: dbError.hint,
+            profilePayload: { ...safePayload, resend_api_key: profilePayload.resend_api_key ? "[prÃ©sent]" : null },
+            allowedFields: allowedFields,
+            operation: existingProfile ? "UPDATE" : "INSERT",
+          });
+          
+          // Afficher le message d'erreur exact de Supabase
+          return {
+            status: 500,
+            body: {
+              error:
+                dbError.message || "Erreur lors de la sauvegarde des paramÃ¨tres",
+              details: dbError.details || "",
+              hint: dbError.hint || "",
+              code: dbError.code,
+            },
+            resourceId: null,
+          };
+        }
 
-      dbError = createError;
-      updatedProfile = newProfile;
-    }
+        if (!updatedProfile) {
+          console.error(
+            "[API][settings] PUT - Aucun profil retournÃ© aprÃ¨s opÃ©ration DB"
+          );
+          return {
+            status: 500,
+            body: {
+              error: "Erreur lors de la sauvegarde des paramÃ¨tres",
+              details: "Le profil n'a pas pu Ãªtre sauvegardÃ©",
+            },
+            resourceId: null,
+          };
+        }
 
-    if (dbError) {
-      // LOGS DÃ‰VELOPPEUR COMPLETS
-      // Logger TOUTES les infos Supabase
-      const { resend_api_key: _e, ...safePayload } = profilePayload;
-      console.error("[API][settings] PUT - Erreur DB complÃ¨te:", {
-        code: dbError.code,
-        message: dbError.message,
-        details: dbError.details,
-        hint: dbError.hint,
-        profilePayload: { ...safePayload, resend_api_key: profilePayload.resend_api_key ? "[prÃ©sent]" : null },
-        allowedFields: allowedFields,
-        operation: existingProfile ? "UPDATE" : "INSERT",
-      });
-      
-      // Afficher le message d'erreur exact de Supabase
-      return NextResponse.json(
-        { 
-          error: dbError.message || "Erreur lors de la sauvegarde des paramÃ¨tres",
-          details: dbError.details || "",
-          hint: dbError.hint || "",
-          code: dbError.code,
-        },
-        { status: 500 }
-      );
-    }
+        console.log(
+          "[API][settings] PUT - Profil sauvegardÃ© avec succÃ¨s via UPDATE/INSERT"
+        );
 
-    if (!updatedProfile) {
-      console.error("[API][settings] PUT - Aucun profil retournÃ© aprÃ¨s opÃ©ration DB");
-      return NextResponse.json(
-        { 
-          error: "Erreur lors de la sauvegarde des paramÃ¨tres", 
-          details: "Le profil n'a pas pu Ãªtre sauvegardÃ©",
-        },
-        { status: 500 }
-      );
-    }
-
-    console.log("[API][settings] PUT - Profil sauvegardÃ© avec succÃ¨s via UPDATE/INSERT");
-
-    const logoUrl = await resolveClubLogoUrlForClient(
-      supabase,
-      updatedProfile,
-      clubId
-    );
+        const logoUrl = await resolveClubLogoUrlForClient(
+          supabase,
+          updatedProfile,
+          clubId
+        );
 
     // Calculer currency_symbol si non dÃ©fini
-    const currency = updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
-    const currency_symbol =
-      updatedProfile?.currency_symbol || getCurrencySymbol(currency);
+        const currency =
+          updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
+        const currency_symbol =
+          updatedProfile?.currency_symbol || getCurrencySymbol(currency);
 
     // Formater la rÃ©ponse avec valeurs par dÃ©faut robustes
-    const rawSettings = {
-      primary_color: updatedProfile?.primary_color,
-      currency: updatedProfile?.currency,
-      currency_symbol: updatedProfile?.currency_symbol,
-    };
-    
-    const companySettings = getCompanySettings(rawSettings);
+        const rawSettings = {
+          primary_color: updatedProfile?.primary_color,
+          currency: updatedProfile?.currency,
+          currency_symbol: updatedProfile?.currency_symbol,
+        };
+        
+        const companySettings = getCompanySettings(rawSettings);
 
-    const putHasResendKey = Boolean(
-      (updatedProfile as { resend_api_key?: string | null })?.resend_api_key &&
-        String((updatedProfile as { resend_api_key?: string | null }).resend_api_key).trim()
-    );
-    const settings = {
-      company_name: updatedProfile?.company_name || "",
-      company_email: updatedProfile?.company_email || "",
-      company_phone: updatedProfile?.company_phone || "",
-      company_address: updatedProfile?.company_address || "",
-      logo_path: updatedProfile?.logo_path || null,
-      logo_url: logoUrl,
-      primary_color: companySettings.primary_color,
-      currency: companySettings.currency,
-      currency_symbol: currency_symbol,
-      iban: updatedProfile?.iban || "",
-      bank_name: updatedProfile?.bank_name || "",
-      payment_terms: updatedProfile?.payment_terms || "",
-      email_sender_email: updatedProfile?.email_sender_email || "",
-      email_sender_name: updatedProfile?.email_sender_name || "",
-      email_custom_enabled: (updatedProfile as { email_custom_enabled?: boolean | null })
-        ?.email_custom_enabled === true,
-      resend_key_configured: putHasResendKey,
-      // Swiss QR Bill
-      qr_creditor_name: (updatedProfile as ProfileSettingsRow)?.qr_creditor_name || "",
-      qr_creditor_street: (updatedProfile as ProfileSettingsRow)?.qr_creditor_street || "",
-      qr_creditor_building_num: (updatedProfile as ProfileSettingsRow)?.qr_creditor_building_num || "",
-      qr_creditor_zip: (updatedProfile as ProfileSettingsRow)?.qr_creditor_zip || "",
-      qr_creditor_city: (updatedProfile as ProfileSettingsRow)?.qr_creditor_city || "",
-      qr_creditor_country: (updatedProfile as ProfileSettingsRow)?.qr_creditor_country || "CH",
-    };
+        const putHasResendKey = Boolean(
+          (updatedProfile as { resend_api_key?: string | null })?.resend_api_key &&
+            String((updatedProfile as { resend_api_key?: string | null }).resend_api_key).trim()
+        );
+        const settings = {
+          company_name: updatedProfile?.company_name || "",
+          company_email: updatedProfile?.company_email || "",
+          company_phone: updatedProfile?.company_phone || "",
+          company_address: updatedProfile?.company_address || "",
+          logo_path: updatedProfile?.logo_path || null,
+          logo_url: logoUrl,
+          primary_color: companySettings.primary_color,
+          currency: companySettings.currency,
+          currency_symbol: currency_symbol,
+          iban: updatedProfile?.iban || "",
+          bank_name: updatedProfile?.bank_name || "",
+          payment_terms: updatedProfile?.payment_terms || "",
+          email_sender_email: updatedProfile?.email_sender_email || "",
+          email_sender_name: updatedProfile?.email_sender_name || "",
+          email_custom_enabled: (updatedProfile as {
+            email_custom_enabled?: boolean | null;
+          })
+            ?.email_custom_enabled === true,
+          resend_key_configured: putHasResendKey,
+          // Swiss QR Bill
+          qr_creditor_name:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_name || "",
+          qr_creditor_street:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_street || "",
+          qr_creditor_building_num:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_building_num || "",
+          qr_creditor_zip:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_zip || "",
+          qr_creditor_city:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_city || "",
+          qr_creditor_country:
+            (updatedProfile as ProfileSettingsRow)?.qr_creditor_country || "CH",
+        };
 
-    console.log("[API][settings] PUT - Settings sauvegardÃ©s avec succÃ¨s");
+        console.log("[API][settings] PUT - Settings sauvegardÃ©s avec succÃ¨s");
 
-    return NextResponse.json({ settings });
+        return {
+          status: 200,
+          body: { settings },
+          resourceId: null,
+        };
+      },
+    });
+
+    return NextResponse.json(idempotencyResult.body, {
+      status: idempotencyResult.status,
+    });
   } catch (error: unknown) {
     // Logger TOUTES les infos de l'erreur
     console.error("[API][settings] PUT - Erreur inattendue:", {
