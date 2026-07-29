@@ -13,11 +13,7 @@
  */
 
 import { PDFDocument } from "pdf-lib";
-import {
-  renderQRBillSlipPdf,
-  QR_BILL_HEIGHT_PT,
-  QR_BILL_WIDTH_PT,
-} from "@/lib/swiss-qr-bill";
+import { renderQRBillSlipPdf } from "@/lib/swiss-qr-bill";
 import type { QRBillData } from "@/lib/swiss-qr-bill/types";
 
 export type QRBillPlacement = {
@@ -28,19 +24,24 @@ export type QRBillPlacement = {
 };
 
 /**
- * Calcule un placement centré sans jamais redimensionner la zone officielle.
+ * Calcule le placement du bloc QR à partir des largeurs RÉELLES mesurées.
  *
- * Une page A4 créée par un moteur PDF peut différer de quelques millièmes de
- * point de la conversion exacte de 210 mm. Utiliser directement la largeur de
- * la page étirait imperceptiblement le slip. Le centrer à sa largeur SIX
- * exacte garantit des cotes inchangées et des marges latérales identiques.
+ * Formule imposée :
+ *   x = (largeurPageA4 - largeurBlocQR) / 2
+ *
+ * Échelle 1:1 : on réutilise width/height du slip source, sans les forcer à
+ * une constante qui pourrait étirer le rendu.
  */
-export function getQRBillPlacement(pageWidth: number): QRBillPlacement {
+export function getQRBillPlacement(
+  pageWidth: number,
+  slipWidth: number,
+  slipHeight: number
+): QRBillPlacement {
   return {
-    x: (pageWidth - QR_BILL_WIDTH_PT) / 2,
+    x: (pageWidth - slipWidth) / 2,
     y: 0,
-    width: QR_BILL_WIDTH_PT,
-    height: QR_BILL_HEIGHT_PT,
+    width: slipWidth,
+    height: slipHeight,
   };
 }
 
@@ -60,15 +61,33 @@ export async function attachQRBillToPdf(
   const target = await PDFDocument.load(documentPdf);
   const slip = await PDFDocument.load(slipPdf);
 
-  const [slipPage] = await target.embedPdf(slip, [0]);
+  const slipPageObj = slip.getPage(0);
+  const slipSize = slipPageObj.getSize();
+
+  const [embedded] = await target.embedPdf(slip, [0]);
 
   const pages = target.getPages();
   const lastPage = pages[pages.length - 1];
-  const { width } = lastPage.getSize();
+  const pageSize = lastPage.getSize();
 
-  // Centré sur la page à ses dimensions SIX exactes : aucun étirement, même
-  // minime, n'est appliqué au QR, aux séparateurs ou aux espacements internes.
-  lastPage.drawPage(slipPage, getQRBillPlacement(width));
+  const placement = getQRBillPlacement(
+    pageSize.width,
+    slipSize.width,
+    slipSize.height
+  );
+
+  // Logs temporaires de diagnostic (à retirer une fois le centrage validé).
+  console.log("[QR-Bill placement]", {
+    largeurPageA4: pageSize.width,
+    largeurBlocQR: slipSize.width,
+    hauteurBlocQR: slipSize.height,
+    xActuel_siZero: 0,
+    xCentre: placement.x,
+    margeGauche: placement.x,
+    margeDroite: pageSize.width - placement.x - placement.width,
+  });
+
+  lastPage.drawPage(embedded, placement);
 
   return Buffer.from(await target.save());
 }

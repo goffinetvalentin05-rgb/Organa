@@ -146,16 +146,28 @@ describe("rendu de la zone de paiement", () => {
 
     expect(slip.subarray(0, 5).toString()).toBe("%PDF-");
 
-    const raw = slip.toString("latin1");
-    expect(raw).toContain("/Font");
-    // Aucune image bitmap : le QR doit rester vectoriel pour rester scannable.
-    expect(raw).not.toContain("/Subtype /Image");
-
     const doc = await PDFDocument.load(slip);
     expect(doc.getPageCount()).toBe(1);
 
-    const { height } = doc.getPage(0).getSize();
-    expect(height).toBeCloseTo(QR_BILL_HEIGHT_PT, 1);
+    const { width, height } = doc.getPage(0).getSize();
+    expect(width).toBeCloseTo(QR_BILL_WIDTH_PT, 2);
+    expect(height).toBeCloseTo(QR_BILL_HEIGHT_PT, 2);
+
+    // Le QR swissqrbill est dessiné en vecteurs (rectangles), jamais en image.
+    const contents = doc.getPage(0).node.Contents();
+    const { PDFArray, PDFRawStream, decodePDFRawStream } = await import("pdf-lib");
+    const streams =
+      contents instanceof PDFArray
+        ? contents.asArray().map((ref) => doc.context.lookup(ref))
+        : [contents];
+    let stream = "";
+    for (const item of streams) {
+      if (item instanceof PDFRawStream) {
+        stream += Buffer.from(decodePDFRawStream(item).decode()).toString("latin1");
+      }
+    }
+    expect(stream).toMatch(/\bre\b/); // rectangles du QR
+    expect(stream).not.toMatch(/\/Image\b/);
   });
 
   it("fonctionne avec un QR-IBAN et sa référence QRR", async () => {
@@ -207,15 +219,17 @@ describe("incrustation dans le PDF du document", () => {
     expect(height).toBeCloseTo(841.89, 1);
   });
 
-  it("centre le slip sans modifier ses dimensions officielles", () => {
-    const pageWidth = 595.28;
-    const placement = getQRBillPlacement(pageWidth);
+  it("centre le slip à partir des largeurs réelles, sans redimensionner", () => {
+    const pageWidth = 595.280029;
+    const slipWidth = QR_BILL_WIDTH_PT;
+    const placement = getQRBillPlacement(pageWidth, slipWidth, QR_BILL_HEIGHT_PT);
     const leftMargin = placement.x;
     const rightMargin = pageWidth - placement.x - placement.width;
 
-    expect(placement.width).toBe(QR_BILL_WIDTH_PT);
+    expect(placement.width).toBe(slipWidth);
     expect(placement.height).toBe(QR_BILL_HEIGHT_PT);
     expect(placement.y).toBe(0);
+    expect(placement.x).toBeCloseTo((pageWidth - slipWidth) / 2, 10);
     expect(leftMargin).toBeCloseTo(rightMargin, 10);
   });
 
@@ -223,13 +237,43 @@ describe("incrustation dans le PDF du document", () => {
     const exactA4Width = QR_BILL_WIDTH_PT;
     const commonRoundedA4Width = 595.28;
 
-    expect(getQRBillPlacement(exactA4Width).width).toBe(QR_BILL_WIDTH_PT);
-    expect(getQRBillPlacement(commonRoundedA4Width).width).toBe(QR_BILL_WIDTH_PT);
-    expect(getQRBillPlacement(exactA4Width).x).toBe(0);
-    expect(getQRBillPlacement(commonRoundedA4Width).x).toBeCloseTo(
-      (commonRoundedA4Width - QR_BILL_WIDTH_PT) / 2,
-      10
+    expect(getQRBillPlacement(exactA4Width, QR_BILL_WIDTH_PT, QR_BILL_HEIGHT_PT).width).toBe(
+      QR_BILL_WIDTH_PT
     );
+    expect(
+      getQRBillPlacement(commonRoundedA4Width, QR_BILL_WIDTH_PT, QR_BILL_HEIGHT_PT).width
+    ).toBe(QR_BILL_WIDTH_PT);
+    expect(getQRBillPlacement(exactA4Width, QR_BILL_WIDTH_PT, QR_BILL_HEIGHT_PT).x).toBe(0);
+    expect(
+      getQRBillPlacement(commonRoundedA4Width, QR_BILL_WIDTH_PT, QR_BILL_HEIGHT_PT).x
+    ).toBeCloseTo((commonRoundedA4Width - QR_BILL_WIDTH_PT) / 2, 10);
+  });
+
+  it("inclut la ligne de découpe haute absente sur une page de 105 mm exact", async () => {
+    const slip = await renderQRBillSlipPdf(buildData());
+    const doc = await PDFDocument.load(slip);
+    const { width, height } = doc.getPage(0).getSize();
+
+    expect(width).toBeCloseTo(QR_BILL_WIDTH_PT, 2);
+    expect(height).toBeCloseTo(QR_BILL_HEIGHT_PT, 2);
+
+    const contents = doc.getPage(0).node.Contents();
+    const { PDFArray, PDFRawStream, decodePDFRawStream } = await import("pdf-lib");
+    const streams =
+      contents instanceof PDFArray
+        ? contents.asArray().map((ref) => doc.context.lookup(ref))
+        : [contents];
+
+    let stream = "";
+    for (const item of streams) {
+      if (item instanceof PDFRawStream) {
+        stream += Buffer.from(decodePDFRawStream(item).decode()).toString("latin1");
+      }
+    }
+
+    // Ligne pleine largeur 0 → 210 mm (uniquement si outlines activés).
+    expect(stream).toMatch(/0(\.0+)?\s+[\d.]+\s+m/);
+    expect(stream).toContain("595.2765");
   });
 
   it("produit un PDF plus lourd que l'original, signe que le slip est bien incrusté", async () => {
