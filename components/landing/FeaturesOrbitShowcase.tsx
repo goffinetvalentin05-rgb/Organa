@@ -92,24 +92,20 @@ const FEATURE_ICONS: Record<OrbitFeatureId, LucideIcon> = {
 };
 
 type OrbitSlot = {
-  x: number;
-  y: number;
+  angle: number;
+  counterAngle: number;
   size: "sm" | "md";
   floatDelay: number;
 };
 
-/** Ellipse un peu plus ouverte — laisse de la place au titre agrandi */
+/** Répartition parfaitement régulière sur une orbite circulaire unique. */
 function buildOrbitLayout(count: number): OrbitSlot[] {
   return Array.from({ length: count }, (_, i) => {
-    const t = i / count;
-    const angle = -Math.PI / 2 + t * Math.PI * 2;
-    const wobble = Math.sin(i * 1.7) * 2;
-    const rx = 48 + (i % 3) * 1.2 + wobble * 0.3;
-    const ry = 43 + ((i + 1) % 3) * 1.4 - wobble * 0.2;
+    const angle = -90 + (i * 360) / count;
     return {
-      x: Math.round(Math.cos(angle) * rx * 10) / 10,
-      y: Math.round(Math.sin(angle) * ry * 10) / 10,
-      size: i % 4 === 0 ? "md" : "sm",
+      angle,
+      counterAngle: -angle,
+      size: "sm",
       floatDelay: i * 0.18,
     };
   });
@@ -367,6 +363,7 @@ export default function FeaturesOrbitShowcase() {
         />
         <div className="features-orbit-stage__ring" aria-hidden />
         <div className="features-orbit-stage__ring features-orbit-stage__ring--inner" aria-hidden />
+        <div className="features-orbit-stage__connection" aria-hidden />
 
         <motion.div
           className="features-orbit-center"
@@ -391,8 +388,8 @@ export default function FeaturesOrbitShowcase() {
                 }`}
                 style={
                   {
-                    "--ox": `${layout.x}%`,
-                    "--oy": `${layout.y}%`,
+                    "--orbit-angle": `${layout.angle}deg`,
+                    "--orbit-counter-angle": `${layout.counterAngle}deg`,
                   } as CSSProperties
                 }
                 role="listitem"
