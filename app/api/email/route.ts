@@ -5,6 +5,11 @@ import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { resolveDocumentRecipient } from "@/lib/documents/recipient";
 import { withIdempotency } from "@/lib/api/idempotency";
+import { getDocumentPdfData } from "@/lib/utils/pdf-data";
+import {
+  renderInvoicePdfBuffer,
+  renderQuotePdfBuffer,
+} from "@/lib/pdf/renderDocumentPdf";
 
 export const runtime = "nodejs";
 
@@ -83,6 +88,7 @@ export async function POST(request: NextRequest) {
         {
           error:
             "L'envoi d'emails n'est pas disponible. La configuration du serveur est incomplète (RESEND_API_KEY).",
+          step: "config",
         },
         { status: 503 }
       );
@@ -119,8 +125,20 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (documentError || !documentData || documentData.type !== expectedType) {
-      console.error("[API][email] Document introuvable:", documentError);
-      return NextResponse.json({ error: "Document ou client introuvable" }, { status: 404 });
+      console.error("[API][email] Document introuvable:", {
+        step: "email.document.load",
+        documentId,
+        clubId: guard.clubId,
+        error: documentError,
+      });
+      return NextResponse.json(
+        {
+          error: "Document ou client introuvable",
+          step: "document",
+          details: documentError?.message ?? null,
+        },
+        { status: 404 }
+      );
     }
 
     const document = documentData;
@@ -148,7 +166,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!recipient.email) {
-      return NextResponse.json({ error: "Email du destinataire introuvable" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Email du destinataire introuvable", step: "recipient" },
+        { status: 404 }
+      );
     }
 
     const clientEmail = recipient.email;
@@ -170,37 +191,40 @@ export async function POST(request: NextRequest) {
         ? `<p><strong>Date d'échéance :</strong> ${dateEcheance}</p>`
         : "";
 
-    const baseUrl = new URL(request.url).origin;
-    const pdfPath =
-      expectedType === "quote"
-        ? `/api/pdf/devis/download?id=${documentId}`
-        : `/api/pdf/facture/download?id=${documentId}`;
-    const pdfUrl = `${baseUrl}${pdfPath}`;
-
-    const pdfResponse = await fetch(pdfUrl, {
-      method: "GET",
-      headers: {
-        cookie: request.headers.get("cookie") || "",
-      },
-      cache: "no-store",
-    });
-
-    if (!pdfResponse.ok) {
-      const pdfError = await pdfResponse.text();
+    // Le PDF est produit dans ce même processus. Un aller-retour HTTP vers
+    // /api/pdf/... rejouerait le middleware d'authentification avec un cookie
+    // recopié à la main : lors d'un envoi groupé, la session Supabase peut déjà
+    // avoir été rafraîchie entre-temps et l'appel interne repartait en 401,
+    // faisant échouer l'envoi alors que la cotisation venait d'être créée.
+    let pdfContentBase64: string;
+    try {
+      const pdfData = await getDocumentPdfData(documentId, expectedType, {
+        dataUserId: guard.clubId,
+      });
+      const pdfBuffer =
+        expectedType === "quote"
+          ? await renderQuotePdfBuffer(pdfData)
+          : await renderInvoicePdfBuffer(pdfData);
+      pdfContentBase64 = pdfBuffer.toString("base64");
+    } catch (pdfError: unknown) {
       console.error("[API][email] Erreur génération PDF joint:", {
-        status: pdfResponse.status,
-        statusText: pdfResponse.statusText,
-        pdfUrl,
-        error: pdfError,
+        step: "email.pdf.render",
+        documentId,
+        type: expectedType,
+        clubId: guard.clubId,
+        message: getErrorMessage(pdfError),
+        stack: pdfError instanceof Error ? pdfError.stack : undefined,
       });
       return NextResponse.json(
-        { error: "Impossible de générer le PDF de la cotisation" },
+        {
+          error: "Impossible de générer le PDF de la cotisation",
+          step: "pdf",
+          details: getErrorMessage(pdfError),
+        },
         { status: 500 }
       );
     }
 
-    const pdfArrayBuffer = await pdfResponse.arrayBuffer();
-    const pdfContentBase64 = Buffer.from(pdfArrayBuffer).toString("base64");
     const pdfFilename = `${typeDoc}-${numero || documentId}.pdf`;
 
     const emailHtml = `
@@ -289,7 +313,9 @@ export async function POST(request: NextRequest) {
             status: 500,
             body: {
               error: "Erreur lors de l'envoi de l'email",
+              step: "send",
               details: resendMessage || "Erreur Resend inconnue",
+              provider: resendName || "resend",
             },
             resourceId: null,
           };

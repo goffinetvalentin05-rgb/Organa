@@ -133,9 +133,29 @@ export async function withIdempotency<TBody>(
     };
   }
 
+  const releaseKey = async () => {
+    try {
+      await supabase
+        .from("idempotency_keys")
+        .delete()
+        .eq("club_id", params.clubId)
+        .eq("key", idempotencyKey);
+    } catch {
+      // ignore
+    }
+  };
+
   // 3) We are the first request: run operation and persist result.
   try {
     const result = await params.operation();
+
+    // Un échec serveur n'est pas un résultat idempotent : le mémoriser
+    // condamnerait toute nouvelle tentative à recevoir la même erreur en cache.
+    // On libère la clé pour qu'un retry rejoue réellement l'opération.
+    if (result.status >= 500) {
+      await releaseKey();
+      return result;
+    }
 
     try {
       await supabase
@@ -165,19 +185,7 @@ export async function withIdempotency<TBody>(
       resourceId: null,
     };
 
-    try {
-      await supabase
-        .from("idempotency_keys")
-        .update({
-          response_status: errorResult.status,
-          response_body: errorResult.body as Record<string, unknown>,
-          resource_id: null,
-        })
-        .eq("club_id", params.clubId)
-        .eq("key", idempotencyKey);
-    } catch {
-      // ignore
-    }
+    await releaseKey();
 
     return errorResult;
   }

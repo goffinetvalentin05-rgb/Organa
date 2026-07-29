@@ -15,7 +15,7 @@ type IdempotencyRow = {
 };
 
 class IdempotencyKeysQuery {
-  private mode: "select" | "insert" | "update" | null = null;
+  private mode: "select" | "insert" | "update" | "delete" | null = null;
   private filters: Record<string, unknown> = {};
   private insertPayload: FromPayload | null = null;
   private updatePayload: FromPayload | null = null;
@@ -39,8 +39,22 @@ class IdempotencyKeysQuery {
     return this;
   }
 
+  delete() {
+    this.mode = "delete";
+    return this;
+  }
+
   eq(col: string, value: unknown) {
     this.filters[col] = value;
+
+    if (this.mode === "delete") {
+      const clubId = String(this.filters["club_id"] ?? "");
+      const key = String(this.filters["key"] ?? "");
+      if (clubId && key) {
+        store.delete(`${clubId}::${key}`);
+        return Promise.resolve({ data: null, error: null });
+      }
+    }
 
     // Cas spécifique: on applique l'update dès que les 2 filtres sont connus.
     if (this.mode === "update" && this.updatePayload) {
@@ -195,6 +209,100 @@ describe("avecIdempotency", () => {
 
     expect(opK1).toHaveBeenCalledTimes(1);
     expect(opK2).toHaveBeenCalledTimes(1);
+  });
+
+  it("un échec serveur n'est pas mémorisé : la même clé rejoue l'opération", async () => {
+    const op = vi
+      .fn()
+      .mockResolvedValueOnce({
+        status: 500,
+        body: { error: "Erreur lors de l'envoi de l'email" },
+        resourceId: null,
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        body: { success: true },
+        resourceId: "email-1",
+      });
+
+    const req = makeRequest("k-retry", "/api/email");
+
+    const first = await withIdempotency({
+      request: req,
+      clubId: "club-1",
+      resourceType: "email",
+      idempotencyKey: "k-retry",
+      operation: op,
+    });
+
+    const retry = await withIdempotency({
+      request: req,
+      clubId: "club-1",
+      resourceType: "email",
+      idempotencyKey: "k-retry",
+      operation: op,
+    });
+
+    expect(first.status).toBe(500);
+    expect(op).toHaveBeenCalledTimes(2);
+    expect(retry.status).toBe(200);
+    expect(retry.body).toEqual({ success: true });
+  });
+
+  it("une exception dans l'opération libère aussi la clé", async () => {
+    const op = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Resend indisponible"))
+      .mockResolvedValueOnce({
+        status: 200,
+        body: { success: true },
+        resourceId: "email-2",
+      });
+
+    const req = makeRequest("k-throw", "/api/email");
+
+    const first = await withIdempotency({
+      request: req,
+      clubId: "club-1",
+      resourceType: "email",
+      idempotencyKey: "k-throw",
+      operation: op,
+    });
+
+    expect(first.status).toBe(500);
+
+    const retry = await withIdempotency({
+      request: req,
+      clubId: "club-1",
+      resourceType: "email",
+      idempotencyKey: "k-throw",
+      operation: op,
+    });
+
+    expect(op).toHaveBeenCalledTimes(2);
+    expect(retry.status).toBe(200);
+  });
+
+  it("un succès reste mémorisé et n'est jamais rejoué", async () => {
+    const op = vi.fn(async () => ({
+      status: 200,
+      body: { success: true },
+      resourceId: "email-3",
+    }));
+
+    const req = makeRequest("k-ok", "/api/email");
+
+    for (let i = 0; i < 3; i += 1) {
+      await withIdempotency({
+        request: req,
+        clubId: "club-1",
+        resourceType: "email",
+        idempotencyKey: "k-ok",
+        operation: op,
+      });
+    }
+
+    expect(op).toHaveBeenCalledTimes(1);
   });
 });
 

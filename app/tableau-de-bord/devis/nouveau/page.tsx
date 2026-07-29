@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
@@ -32,16 +32,18 @@ import {
   getTeamsWithCounts,
   resolveCotisationTargets,
 } from "@/lib/quotes/recipients";
+import {
+  computeBulkRunId,
+  runBulkCotisations,
+  type BulkLogEntry,
+  type BulkMemberInput,
+  type BulkMemberState,
+  type BulkProgress,
+  type BulkStep,
+  type BulkSummary,
+} from "@/lib/quotes/bulkCotisations";
 
 const COTISATIONS_LIST_PATH = "/tableau-de-bord/devis";
-
-type BulkResultSummary = {
-  created: number;
-  emailed: number;
-  skippedNoEmail: number;
-  failed: number;
-  total: number;
-};
 
 export default function NouveauDevisPage() {
   const router = useRouter();
@@ -66,14 +68,13 @@ export default function NouveauDevisPage() {
     run: runQuoteSubmit,
   } = useSafeSubmit({ overlayDelayMs: 450 });
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
-  const [bulkProgress, setBulkProgress] = useState<{
-    current: number;
-    total: number;
-    created: number;
-    message: string;
-  } | null>(null);
-  const [bulkSummary, setBulkSummary] = useState<BulkResultSummary | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<BulkResultSummary | null>(null);
+  // Verrou synchrone : `setState` est asynchrone, un double clic rapide
+  // passerait avant le re-render qui désactive le bouton.
+  const bulkLockRef = useRef(false);
+  const [bulkProgress, setBulkProgress] = useState<BulkProgress | null>(null);
+  const [bulkStates, setBulkStates] = useState<BulkMemberState[] | null>(null);
+  const [bulkSummary, setBulkSummary] = useState<BulkSummary | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<BulkSummary | null>(null);
 
   const currencyFormatter = useMemo(
     () =>
@@ -191,20 +192,41 @@ export default function NouveauDevisPage() {
   const getLignesValides = () =>
     lignes.filter((l) => l.designation.trim() !== "");
 
+  /** Extrait le message le plus parlant d'une réponse d'erreur d'API. */
+  const readApiError = async (response: Response): Promise<string> => {
+    const raw = await response.text();
+    try {
+      const parsed = JSON.parse(raw) as {
+        error?: string;
+        details?: string;
+        step?: string;
+      };
+      const parts = [parsed.error, parsed.details].filter(
+        (part): part is string => typeof part === "string" && part.trim() !== ""
+      );
+      if (parts.length > 0) return parts.join(" — ");
+    } catch {
+      // Réponse non JSON : le texte brut reste la meilleure information.
+    }
+    return raw.trim() !== "" ? raw : `HTTP ${response.status}`;
+  };
+
+  const buildQuotePayload = (targetClientId: string, lignesValides: LigneDocument[]) => ({
+    type: "quote",
+    clientId: targetClientId,
+    lignes: lignesValides,
+    statut,
+    dateCreation: new Date().toISOString().split("T")[0],
+    ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
+    ...(notes && notes.trim() !== "" ? { notes } : {}),
+  });
+
   const createQuoteForClient = async (
     targetClientId: string,
     lignesValides: LigneDocument[],
     idempotencyKey?: string
-  ): Promise<{ id: string; numero?: string }> => {
-    const payload = {
-      type: "quote",
-      clientId: targetClientId,
-      lignes: lignesValides,
-      statut,
-      dateCreation: new Date().toISOString().split("T")[0],
-      ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
-      ...(notes && notes.trim() !== "" ? { notes } : {}),
-    };
+  ): Promise<{ id: string; numero?: string; alreadyExisted: boolean }> => {
+    const payload = buildQuotePayload(targetClientId, lignesValides);
 
     const response = idempotencyKey
       ? await idempotentFetch("/api/documents", {
@@ -224,54 +246,40 @@ export default function NouveauDevisPage() {
         });
 
     if (!response.ok) {
-      let errorData: any = null;
-      try {
-        errorData = await response.json();
-      } catch {
-        // ignore
-      }
+      const message = await readApiError(response);
       console.error("ERREUR DOCUMENT COTISATION", {
         step: "frontend.createQuoteForClient.response-not-ok",
-        error: errorData,
-        message: errorData?.details || errorData?.error,
-        stack: undefined,
-        data: null,
-        clubId: undefined,
+        error: message,
+        message,
+        status: response.status,
         memberId: targetClientId,
         documentPayload: payload,
-        pdfPayload: null,
-        storagePath: null,
       });
-      throw new Error(
-        `Erreur document: ${
-          errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
-        }`
-      );
+      throw new Error(`Erreur document: ${message}`);
     }
 
     const data = await response.json();
-    return { id: data.id, numero: data.numero };
+    return {
+      id: data.id,
+      numero: data.numero,
+      alreadyExisted: data.alreadyExisted === true,
+    };
   };
 
   const fetchQuotePdfBlob = async (id: string, download: boolean): Promise<Blob> => {
     const url = `/api/documents/${id}/pdf?type=quote${download ? "&download=true" : ""}`;
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
-      const raw = await response.text();
+      const message = await readApiError(response);
       console.error("ERREUR DOCUMENT COTISATION", {
         step: "frontend.pdf.fetchQuotePdfBlob.response-not-ok",
-        error: raw,
-        message: raw,
-        stack: undefined,
-        data: null,
-        clubId: undefined,
-        memberId: undefined,
+        error: message,
+        message,
+        status: response.status,
         documentPayload: { id },
         pdfPayload: { url, download },
-        storagePath: null,
       });
-      // Le backend renvoie souvent du JSON; on garde le texte brut pour la console.
-      throw new Error(raw || "Erreur génération PDF");
+      throw new Error(message);
     }
     return await response.blob();
   };
@@ -317,10 +325,8 @@ export default function NouveauDevisPage() {
 
   const sendQuoteEmail = async (
     documentId: string,
-    recipientId: string,
-    recipientEmail: string
+    idempotencyKey: string
   ): Promise<void> => {
-    const idempotencyKey = `email_quote:${documentId}:${recipientId}:${recipientEmail}`;
     const response = await idempotentFetch("/api/email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -332,144 +338,146 @@ export default function NouveauDevisPage() {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData?.error || t("dashboard.quotes.detail.sendError"));
+      throw new Error(await readApiError(response));
     }
   };
 
-  const handleBulkSubmit = async (
-    targets: CotisationClient[],
-    lignesValides: LigneDocument[]
+  /**
+   * Trace structurée de chaque étape, pour pouvoir rattacher une erreur à un
+   * membre, une cotisation et une étape précise dans la console navigateur.
+   */
+  const logBulkEntry = (entry: BulkLogEntry) => {
+    const payload = {
+      memberId: entry.memberId,
+      memberName: entry.memberName,
+      documentId: entry.documentId,
+      step: entry.step,
+      outcome: entry.outcome,
+      message: entry.message ?? null,
+      stack: entry.stack ?? null,
+      response: entry.response ?? null,
+    };
+
+    if (entry.outcome === "error") {
+      console.error("[Cotisation][Bulk]", payload);
+      return;
+    }
+    console.info("[Cotisation][Bulk]", payload);
+  };
+
+  const stepLabel = useCallback(
+    (step: BulkStep | null): string => {
+      if (step === "create") return t("dashboard.quotes.recipients.bulkStepCreate");
+      if (step === "pdf") return t("dashboard.quotes.recipients.bulkStepPdf");
+      if (step === "email") return t("dashboard.quotes.recipients.bulkStepEmail");
+      return "";
+    },
+    [t]
+  );
+
+  const runBulk = async (
+    targets: BulkMemberInput[],
+    lignesValides: LigneDocument[],
+    previous?: BulkMemberState[]
   ) => {
     if (targets.length === 0) {
       toast.error(t("dashboard.quotes.recipients.noTargets"));
       return;
     }
 
+    if (bulkLockRef.current) return;
+    bulkLockRef.current = true;
+
     setIsBulkProcessing(true);
     setBulkSummary(null);
     setBulkProgress({
-      current: 0,
+      processed: 0,
       total: targets.length,
-      created: 0,
-      message: t("dashboard.quotes.recipients.bulkInitializing"),
+      currentMemberName: null,
+      currentStep: null,
     });
 
-    let created = 0;
-    let emailed = 0;
-    let skippedNoEmail = 0;
-    let failed = 0;
+    // L'empreinte du formulaire rend les clés d'idempotence reproductibles :
+    // relancer la même saisie ne peut pas créer une seconde cotisation.
+    const runId = computeBulkRunId({
+      memberIds: targets.map((target) => target.id),
+      payload: buildQuotePayload("", lignesValides),
+    });
 
-    for (let index = 0; index < targets.length; index += 1) {
-      const client = targets[index];
-      const step = index + 1;
-      let createdDocumentId: string | null = null;
+    try {
+      const { states, summary } = await runBulkCotisations({
+        members: targets.map((target) => ({
+          id: target.id,
+          nom: target.nom,
+          email: target.email,
+        })),
+        runId,
+        previous,
+        deps: {
+          createCotisation: ({ memberId, idempotencyKey }) =>
+            createQuoteForClient(memberId, lignesValides, idempotencyKey),
+          generatePdf: async ({ documentId }) => {
+            await fetchQuotePdfBlob(documentId, true);
+          },
+          sendEmail: ({ documentId, idempotencyKey }) =>
+            sendQuoteEmail(documentId, idempotencyKey),
+        },
+        onProgress: (progress, states) => {
+          setBulkProgress(progress);
+          setBulkStates(states);
+        },
+        onLog: logBulkEntry,
+      });
 
-      try {
-        setBulkProgress({
-          current: index,
-          total: targets.length,
-          created,
-          message: t("dashboard.quotes.recipients.bulkCreating", {
-            step: String(step),
-            total: String(targets.length),
-            name: client.nom,
-          }),
-        });
-
-        const createdQuote = await createQuoteForClient(client.id, lignesValides);
-        createdDocumentId = createdQuote.id;
-        created += 1;
-
-        setBulkProgress({
-          current: index,
-          total: targets.length,
-          created,
-          message: t("dashboard.quotes.recipients.bulkPdf", {
-            step: String(step),
-            total: String(targets.length),
-            name: client.nom,
-          }),
-        });
-
-        await fetchQuotePdfBlob(createdQuote.id, true);
-
-        if (client.email && client.email.trim() !== "") {
-          setBulkProgress({
-            current: index,
-            total: targets.length,
-            created,
-            message: t("dashboard.quotes.recipients.bulkEmail", {
-              step: String(step),
-              total: String(targets.length),
-              name: client.nom,
-            }),
-          });
-
-          await sendQuoteEmail(createdQuote.id, client.id, client.email);
-          emailed += 1;
-        } else {
-          skippedNoEmail += 1;
-        }
-      } catch (error) {
-        failed += 1;
-        console.error("[Cotisation][Bulk] Erreur traitement membre:", {
-          memberId: client.id,
-          memberName: client.nom,
-          error,
-        });
-        // Rollback best-effort: si le PDF échoue, ne pas laisser un doc incomplet.
-        if (createdDocumentId) {
-          await deleteDocumentSafe(createdDocumentId);
-        }
-      } finally {
-        setBulkProgress({
-          current: step,
-          total: targets.length,
-          created,
-          message: t("dashboard.quotes.recipients.bulkProgress", {
-            created: String(created),
-            total: String(targets.length),
-          }),
-        });
-      }
-    }
-
-    const summary: BulkResultSummary = {
-      created,
-      emailed,
-      skippedNoEmail,
-      failed,
-      total: targets.length,
-    };
-
-    setIsBulkProcessing(false);
-    setBulkProgress(null);
-
-    if (failed > 0) {
+      setBulkStates(states);
       setBulkSummary(summary);
-      toast.error(
-        t("dashboard.quotes.recipients.bulkSummaryFailed", {
-          count: String(failed),
+
+      if (summary.failed > 0) {
+        toast.error(
+          t("dashboard.quotes.recipients.bulkSummaryFailed", {
+            count: String(summary.failed),
+          })
+        );
+        return;
+      }
+
+      toast.success(
+        t("dashboard.quotes.recipients.bulkDoneToast", {
+          created: String(summary.created),
+          emailed: String(summary.emailed),
+          skipped: String(summary.skippedNoEmail),
         })
       );
+      setSubmitSuccess(summary);
+    } finally {
+      setIsBulkProcessing(false);
+      setBulkProgress(null);
+      bulkLockRef.current = false;
+    }
+  };
+
+  const retryFailedOnly = async () => {
+    if (!bulkStates || isBulkProcessing) return;
+
+    const lignesValides = getLignesValides();
+    if (lignesValides.length === 0) {
+      toast.error(t("dashboard.quotes.lineRequiredError"));
       return;
     }
 
-    if (created === 0) {
-      setBulkSummary(summary);
-      toast.error(t("dashboard.quotes.createError"));
-      return;
-    }
+    if (!bulkStates.some((state) => state.status === "error")) return;
 
-    toast.success(
-      t("dashboard.quotes.recipients.bulkDoneToast", {
-        created: String(created),
-        emailed: String(emailed),
-        skipped: String(skippedNoEmail),
-      })
-    );
-    setSubmitSuccess(summary);
+    // On rejoue la liste complète en fournissant l'état précédent : l'orchestrateur
+    // ignore les membres déjà traités et reprend les autres à l'étape exacte où ils
+    // se sont arrêtés, sans jamais recréer de cotisation. Les destinataires sont
+    // reconstruits depuis l'état, pour rester valides même si la sélection a bougé.
+    const targets: BulkMemberInput[] = bulkStates.map((state) => ({
+      id: state.memberId,
+      nom: state.memberName,
+      email: state.email,
+    }));
+
+    await runBulk(targets, lignesValides, bulkStates);
   };
 
   const validateRecipients = (): boolean => {
@@ -535,7 +543,7 @@ export default function NouveauDevisPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isBulkProcessing || isSubmitting) {
+    if (bulkLockRef.current || isBulkProcessing || isSubmitting) {
       return;
     }
 
@@ -556,7 +564,7 @@ export default function NouveauDevisPage() {
       if (!confirmDuplicatesIfNeeded(targetMembers, totalTtc)) {
         return;
       }
-      await handleBulkSubmit(targetMembers, lignesValides);
+      await runBulk(targetMembers, lignesValides);
       return;
     }
 
@@ -625,29 +633,16 @@ export default function NouveauDevisPage() {
         });
 
         if (!response.ok) {
-          let errorData: any = null;
-          try {
-            errorData = await response.json();
-          } catch {
-            // ignore
-          }
+          const message = await readApiError(response);
           console.error("ERREUR DOCUMENT COTISATION", {
             step: "frontend.saveAndOpenPdf.post.response-not-ok",
-            error: errorData,
-            message: errorData?.details || errorData?.error,
-            stack: undefined,
-            data: null,
-            clubId: undefined,
+            error: message,
+            message,
+            status: response.status,
             memberId,
             documentPayload: payload,
-            pdfPayload: null,
-            storagePath: null,
           });
-          throw new Error(
-            `Erreur document: ${
-              errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
-            }`
-          );
+          throw new Error(`Erreur document: ${message}`);
         }
 
         const data = await response.json();
@@ -676,29 +671,16 @@ export default function NouveauDevisPage() {
         });
 
         if (!response.ok) {
-          let errorData: any = null;
-          try {
-            errorData = await response.json();
-          } catch {
-            // ignore
-          }
+          const message = await readApiError(response);
           console.error("ERREUR DOCUMENT COTISATION", {
             step: "frontend.saveAndOpenPdf.patch.response-not-ok",
-            error: errorData,
-            message: errorData?.details || errorData?.error,
-            stack: undefined,
-            data: null,
-            clubId: undefined,
+            error: message,
+            message,
+            status: response.status,
             memberId,
             documentPayload: payload,
-            pdfPayload: null,
-            storagePath: null,
           });
-          throw new Error(
-            `Erreur document: ${
-              errorData?.details || errorData?.error || response.statusText || "HTTP_ERROR"
-            }`
-          );
+          throw new Error(`Erreur document: ${message}`);
         }
 
         const data = await response.json();
@@ -748,6 +730,7 @@ export default function NouveauDevisPage() {
     setSubmitSuccess(null);
     setBulkSummary(null);
     setBulkProgress(null);
+    setBulkStates(null);
     setRecipientType("individual");
     setMemberId("");
     setTeamCategory("");
@@ -764,7 +747,10 @@ export default function NouveauDevisPage() {
     setTeamCategory("");
     setDocumentId(null);
     setBulkSummary(null);
+    setBulkStates(null);
   };
+
+  const failedStates = bulkStates?.filter((state) => state.status === "error") ?? [];
 
   const totalHT = calculerTotalHT(lignes);
   const totalTVA = calculerTVA(lignes);
@@ -815,6 +801,11 @@ export default function NouveauDevisPage() {
             <p>
               {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
                 count: String(submitSuccess.emailed),
+              })}
+            </p>
+            <p>
+              {t("dashboard.quotes.recipients.bulkSummaryExisting", {
+                count: String(submitSuccess.alreadyExisting),
               })}
             </p>
             <p>
@@ -1160,48 +1151,97 @@ export default function NouveauDevisPage() {
 
         {bulkProgress && (
           <GlassCard padding="md" className="space-y-3">
-            <p className="text-sm font-medium text-slate-900">{bulkProgress.message}</p>
+            <p className="text-sm font-medium text-slate-900">
+              {bulkProgress.currentMemberName
+                ? t("dashboard.quotes.recipients.bulkCurrentStep", {
+                    name: bulkProgress.currentMemberName,
+                    step: stepLabel(bulkProgress.currentStep),
+                  })
+                : t("dashboard.quotes.recipients.bulkInitializing")}
+            </p>
             <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] transition-all"
                 style={{
-                  width: `${bulkProgress.total > 0 ? (bulkProgress.current / bulkProgress.total) * 100 : 0}%`,
+                  width: `${
+                    bulkProgress.total > 0
+                      ? (bulkProgress.processed / bulkProgress.total) * 100
+                      : 0
+                  }%`,
                 }}
               />
             </div>
             <p className="text-xs text-slate-600">
-              {bulkProgress.created}/{bulkProgress.total}{" "}
-              {t("dashboard.quotes.recipients.bulkCreatedLabel")}
+              {bulkProgress.processed} / {bulkProgress.total}
             </p>
           </GlassCard>
         )}
 
         {bulkSummary && (
-          <GlassCard padding="md" className="space-y-2">
+          <GlassCard padding="md" className="space-y-3">
             <h3 className="text-lg font-semibold text-slate-900">
               {t("dashboard.quotes.recipients.bulkSummaryTitle")}
             </h3>
-            <p className="text-slate-600">
-              {t("dashboard.quotes.recipients.bulkSummaryCreated", {
-                count: String(bulkSummary.created),
-              })}
-            </p>
-            <p className="text-slate-600">
-              {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
-                count: String(bulkSummary.emailed),
-              })}
-            </p>
-            <p className="text-slate-600">
-              {t("dashboard.quotes.recipients.bulkSummaryNoEmail", {
-                count: String(bulkSummary.skippedNoEmail),
-              })}
-            </p>
-            {bulkSummary.failed > 0 && (
-              <p className="text-red-600 font-medium">
-                {t("dashboard.quotes.recipients.bulkSummaryFailed", {
-                  count: String(bulkSummary.failed),
+            <div className="space-y-1">
+              <p className="text-slate-600">
+                {t("dashboard.quotes.recipients.bulkSummaryCreated", {
+                  count: String(bulkSummary.created),
                 })}
               </p>
+              <p className="text-slate-600">
+                {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
+                  count: String(bulkSummary.emailed),
+                })}
+              </p>
+              <p className="text-slate-600">
+                {t("dashboard.quotes.recipients.bulkSummaryExisting", {
+                  count: String(bulkSummary.alreadyExisting),
+                })}
+              </p>
+              <p className="text-slate-600">
+                {t("dashboard.quotes.recipients.bulkSummaryNoEmail", {
+                  count: String(bulkSummary.skippedNoEmail),
+                })}
+              </p>
+              {bulkSummary.failed > 0 && (
+                <p className="text-red-600 font-medium">
+                  {t("dashboard.quotes.recipients.bulkSummaryFailed", {
+                    count: String(bulkSummary.failed),
+                  })}
+                </p>
+              )}
+            </div>
+
+            {failedStates.length > 0 && (
+              <div className="space-y-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm font-semibold text-red-700">
+                  {t("dashboard.quotes.recipients.bulkErrorsTitle")}
+                </p>
+                <ul className="space-y-1.5">
+                  {failedStates.map((state) => (
+                    <li key={state.memberId} className="text-sm text-red-700">
+                      <span className="font-medium">{state.memberName}</span>
+                      {" — "}
+                      {t("dashboard.quotes.recipients.bulkErrorStep", {
+                        step: stepLabel(state.failedStep),
+                      })}
+                      {state.errorMessage && (
+                        <span className="block text-xs text-red-600 break-words">
+                          {state.errorMessage}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <ActionButton
+                  type="button"
+                  onClick={retryFailedOnly}
+                  disabled={isBulkProcessing}
+                  className="inline-flex items-center gap-2 disabled:opacity-50"
+                >
+                  {t("dashboard.quotes.recipients.bulkRetryFailed")}
+                </ActionButton>
+              </div>
             )}
           </GlassCard>
         )}
@@ -1253,6 +1293,7 @@ export default function NouveauDevisPage() {
           <DashboardPrimaryButton
             type="submit"
             disabled={isBulkProcessing || isSubmitting}
+            aria-busy={isBulkProcessing || isSubmitting}
             icon="none"
             className="flex-1 justify-center min-w-[180px] rounded-xl"
           >

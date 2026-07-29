@@ -356,6 +356,62 @@ export async function POST(request: NextRequest) {
         const totalTVA = calculerTVA(lignes);
         const totalTTC = calculerTotalTTC(lignes);
 
+    const normalizedDateCreation =
+      dateCreation || new Date().toISOString().split("T")[0];
+    const normalizedDateEcheance =
+      dateEcheance && String(dateEcheance).trim() !== ""
+        ? String(dateEcheance).trim()
+        : null;
+
+    // Garde-fou anti-doublon pour les cotisations : une seconde tentative
+    // (nouveau clic, « réessayer », clé d'idempotence perdue) doit retrouver la
+    // cotisation existante au lieu d'en insérer une identique.
+    if (type === "quote" && resolvedClientId) {
+      let duplicateQuery = supabase
+        .from("documents")
+        .select("id, numero, type")
+        .eq("user_id", guard.clubId)
+        .eq("type", "quote")
+        .eq("client_id", resolvedClientId)
+        .eq("date_creation", normalizedDateCreation)
+        .eq("total_ttc", totalTTC)
+        .is("deleted_at", null);
+
+      duplicateQuery =
+        normalizedDateEcheance === null
+          ? duplicateQuery.is("date_echeance", null)
+          : duplicateQuery.eq("date_echeance", normalizedDateEcheance);
+
+      const { data: duplicate, error: duplicateError } = await duplicateQuery
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (duplicateError) {
+        // Non bloquant : au pire on retombe sur la création normale.
+        console.warn("[API][documents][POST] Recherche de doublon impossible:", {
+          message: duplicateError.message,
+          clientId: resolvedClientId,
+        });
+      } else if (duplicate?.id) {
+        console.log("[API][documents][POST] Cotisation identique déjà existante:", {
+          id: duplicate.id,
+          numero: duplicate.numero,
+          clientId: resolvedClientId,
+        });
+        return {
+          status: 200,
+          body: {
+            id: String(duplicate.id),
+            numero: duplicate.numero,
+            type: duplicate.type,
+            alreadyExisted: true,
+          },
+          resourceId: String(duplicate.id),
+        };
+      }
+    }
+
     // Générer le numéro du document (unicité: user_id + type + btrim(numero) avec deleted_at IS NULL)
     const year = new Date().getFullYear();
     // On compte les documents "actifs" (deleted_at IS NULL) pour coller à l’index unique partiel.
@@ -428,7 +484,7 @@ export async function POST(request: NextRequest) {
       type: type,
       items: lignes,
       status: statut || "brouillon",
-      date_creation: dateCreation || new Date().toISOString().split("T")[0],
+      date_creation: normalizedDateCreation,
       total_ht: totalHT,
       total_tva: totalTVA,
       total_ttc: totalTTC,
@@ -444,8 +500,8 @@ export async function POST(request: NextRequest) {
     documentData.updated_by = user.id;
 
     // Ajouter date_echeance uniquement si fourni et non vide
-    if (dateEcheance && dateEcheance.trim() !== "") {
-      documentData.date_echeance = dateEcheance;
+    if (normalizedDateEcheance !== null) {
+      documentData.date_echeance = normalizedDateEcheance;
     }
 
     // Ajouter date_paiement uniquement si fourni et non vide (pour les factures)
@@ -664,6 +720,7 @@ export async function POST(request: NextRequest) {
         id: newDocument.id.toString(),
         numero: newDocument.numero,
         type: newDocument.type,
+        alreadyExisted: false,
       },
       resourceId: newDocument.id.toString(),
     };
