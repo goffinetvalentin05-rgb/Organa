@@ -9,7 +9,7 @@ import {
   calculerTVA,
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
-import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
+import { Plus, Eye, Download, Trash, Loader, Mail } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import {
@@ -23,6 +23,14 @@ import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
+import {
+  createAndSend,
+  createOnly,
+  markDocumentAsSent,
+  retryDocumentEmail,
+  type DocumentFlowPhase,
+  type SubmissionMode,
+} from "@/lib/documents/createDocumentFlow";
 import {
   type CotisationClient,
   type RecipientType,
@@ -41,6 +49,7 @@ import {
   type BulkMemberState,
   type BulkProgress,
   type BulkStep,
+  type BulkSubmissionMode,
   type BulkSummary,
 } from "@/lib/quotes/bulkCotisations";
 
@@ -76,6 +85,15 @@ export default function NouveauDevisPage() {
   const [bulkStates, setBulkStates] = useState<BulkMemberState[] | null>(null);
   const [bulkSummary, setBulkSummary] = useState<BulkSummary | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<BulkSummary | null>(null);
+  const [lastBulkMode, setLastBulkMode] =
+    useState<BulkSubmissionMode>("create-and-send");
+  const [activeMode, setActiveMode] = useState<SubmissionMode | null>(null);
+  const [loadingPhase, setLoadingPhase] = useState<DocumentFlowPhase | null>(
+    null
+  );
+  /** Document créé mais e-mail en échec — retry sans recreate. */
+  const [emailFailedDocId, setEmailFailedDocId] = useState<string | null>(null);
+  const [retryingEmail, setRetryingEmail] = useState(false);
 
   const currencyFormatter = useMemo(
     () =>
@@ -360,6 +378,7 @@ export default function NouveauDevisPage() {
   const runBulk = async (
     targets: BulkMemberInput[],
     lignesValides: LigneDocument[],
+    submissionMode: BulkSubmissionMode,
     previous?: BulkMemberState[]
   ) => {
     if (targets.length === 0) {
@@ -371,6 +390,7 @@ export default function NouveauDevisPage() {
     bulkLockRef.current = true;
 
     setIsBulkProcessing(true);
+    setLastBulkMode(submissionMode);
     setBulkSummary(null);
     setBulkProgress({
       processed: 0,
@@ -394,6 +414,7 @@ export default function NouveauDevisPage() {
           email: target.email,
         })),
         runId,
+        submissionMode,
         previous,
         deps: {
           createCotisation: ({ memberId, idempotencyKey }) =>
@@ -407,6 +428,10 @@ export default function NouveauDevisPage() {
               cotisationId: documentId,
               recipientEmail: email,
               memberId,
+            });
+            await markDocumentAsSent({
+              type: "cotisation",
+              documentId,
             });
           },
         },
@@ -429,13 +454,21 @@ export default function NouveauDevisPage() {
         return;
       }
 
-      toast.success(
-        t("dashboard.quotes.recipients.bulkDoneToast", {
-          created: String(summary.created),
-          emailed: String(summary.emailed),
-          skipped: String(summary.skippedNoEmail),
-        })
-      );
+      if (submissionMode === "create-only") {
+        toast.success(
+          t("dashboard.quotes.recipients.bulkDoneToastCreateOnly", {
+            created: String(summary.created + summary.alreadyExisting),
+          })
+        );
+      } else {
+        toast.success(
+          t("dashboard.quotes.recipients.bulkDoneToastCreateAndSend", {
+            created: String(summary.created + summary.alreadyExisting),
+            emailed: String(summary.emailed),
+            failed: String(summary.failed),
+          })
+        );
+      }
       setSubmitSuccess(summary);
     } finally {
       setIsBulkProcessing(false);
@@ -465,7 +498,7 @@ export default function NouveauDevisPage() {
       email: state.email,
     }));
 
-    await runBulk(targets, lignesValides, bulkStates);
+    await runBulk(targets, lignesValides, lastBulkMode, bulkStates);
   };
 
   const validateRecipients = (): boolean => {
@@ -528,10 +561,8 @@ export default function NouveauDevisPage() {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (bulkLockRef.current || isBulkProcessing || isSubmitting) {
+  const handleCreate = async (submissionMode: SubmissionMode) => {
+    if (bulkLockRef.current || isBulkProcessing || isSubmitting || activeMode) {
       return;
     }
 
@@ -552,19 +583,83 @@ export default function NouveauDevisPage() {
       if (!confirmDuplicatesIfNeeded(targetMembers, totalTtc)) {
         return;
       }
-      await runBulk(targetMembers, lignesValides);
+      await runBulk(targetMembers, lignesValides, submissionMode);
       return;
     }
 
+    const selectedClient = clients.find((c) => c.id === memberId);
+    const recipientEmail = (selectedClient?.email || "").trim();
+
+    if (submissionMode === "create-and-send" && recipientEmail === "") {
+      toast.error(t("dashboard.quotes.detail.missingClientEmail"));
+      return;
+    }
+
+    const existingIdForSend =
+      submissionMode === "create-and-send" ? emailFailedDocId : null;
+    if (submissionMode === "create-only") {
+      setEmailFailedDocId(null);
+    }
+
     await runQuoteSubmit(async (idempotencyKey) => {
+      setActiveMode(submissionMode);
+      setLoadingPhase("creating");
       try {
-        const data = await createQuoteForClient(
+        if (submissionMode === "create-only") {
+          const outcome = await createOnly({
+            type: "cotisation",
+            createFn: async () => {
+              const data = await createQuoteForClient(
+                memberId,
+                lignesValides,
+                idempotencyKey
+              );
+              return { documentId: data.id, meta: { numero: data.numero } };
+            },
+          });
+          setDocumentId(outcome.document.documentId);
+          toast.success(t("dashboard.quotes.createdOnlySuccess"));
+          router.replace(
+            `/tableau-de-bord/devis/${outcome.document.documentId}`
+          );
+          return;
+        }
+
+        const outcome = await createAndSend({
+          type: "cotisation",
+          recipientEmail,
           memberId,
-          lignesValides,
-          idempotencyKey
+          existingDocumentId: existingIdForSend,
+          onPhase: setLoadingPhase,
+          createFn: async () => {
+            const data = await createQuoteForClient(
+              memberId,
+              lignesValides,
+              idempotencyKey
+            );
+            return { documentId: data.id, meta: { numero: data.numero } };
+          },
+        });
+
+        setDocumentId(outcome.document.documentId);
+
+        if (outcome.emailSent) {
+          setEmailFailedDocId(null);
+          toast.success(t("dashboard.quotes.createdAndSentSuccess"));
+          router.replace(
+            `/tableau-de-bord/devis/${outcome.document.documentId}`
+          );
+          return;
+        }
+
+        setEmailFailedDocId(outcome.document.documentId);
+        const errMsg =
+          outcome.emailError instanceof Error
+            ? outcome.emailError.message
+            : t("dashboard.common.unknownError");
+        toast.error(
+          `${t("dashboard.quotes.createdButEmailFailed")} ${errMsg}`
         );
-        setDocumentId(data.id);
-        router.replace(`/tableau-de-bord/devis/${data.id}`);
       } catch (error: unknown) {
         const message =
           error instanceof Error
@@ -572,8 +667,48 @@ export default function NouveauDevisPage() {
             : t("dashboard.common.unknownError");
         console.error("[Devis] Erreur lors de la création:", error);
         toast.error(`${t("dashboard.quotes.createError")}: ${message}`);
+      } finally {
+        setActiveMode(null);
+        setLoadingPhase(null);
       }
     });
+  };
+
+  const handleRetryEmail = async () => {
+    if (!emailFailedDocId || retryingEmail || isSubmitting) return;
+
+    const selectedClient = clients.find((c) => c.id === memberId);
+    const recipientEmail = (selectedClient?.email || "").trim();
+
+    setRetryingEmail(true);
+    setLoadingPhase("sending");
+    try {
+      await retryDocumentEmail({
+        type: "cotisation",
+        documentId: emailFailedDocId,
+        recipientEmail,
+        memberId,
+      });
+      toast.success(t("dashboard.quotes.createdAndSentSuccess"));
+      router.replace(`/tableau-de-bord/devis/${emailFailedDocId}`);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("dashboard.common.unknownError");
+      toast.error(
+        `${t("dashboard.quotes.createdButEmailFailed")} ${message}`
+      );
+    } finally {
+      setRetryingEmail(false);
+      setLoadingPhase(null);
+    }
+  };
+
+  // Empêche le submit natif du formulaire (Entrée) : les actions passent
+  // explicitement par les boutons avec submissionMode.
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
   };
 
   const saveAndOpenPdf = async (download: boolean = false) => {
@@ -719,6 +854,10 @@ export default function NouveauDevisPage() {
     setBulkSummary(null);
     setBulkProgress(null);
     setBulkStates(null);
+    setLastBulkMode("create-and-send");
+    setEmailFailedDocId(null);
+    setActiveMode(null);
+    setLoadingPhase(null);
     setRecipientType("individual");
     setMemberId("");
     setTeamCategory("");
@@ -777,7 +916,19 @@ export default function NouveauDevisPage() {
               {t("dashboard.quotes.recipients.successTitle")}
             </h2>
             <p className="text-secondary">
-              {t("dashboard.quotes.recipients.successMessage")}
+              {lastBulkMode === "create-only"
+                ? t("dashboard.quotes.recipients.successMessageCreateOnly", {
+                    count: String(
+                      submitSuccess.created + submitSuccess.alreadyExisting
+                    ),
+                  })
+                : t("dashboard.quotes.recipients.successMessageCreateAndSend", {
+                    created: String(
+                      submitSuccess.created + submitSuccess.alreadyExisting
+                    ),
+                    emailed: String(submitSuccess.emailed),
+                    failed: String(submitSuccess.failed),
+                  })}
             </p>
           </div>
           <div className="rounded-lg border border-subtle bg-surface-hover px-4 py-3 text-left text-sm text-secondary space-y-1">
@@ -787,9 +938,11 @@ export default function NouveauDevisPage() {
               })}
             </p>
             <p>
-              {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
-                count: String(submitSuccess.emailed),
-              })}
+              {lastBulkMode === "create-only"
+                ? t("dashboard.quotes.recipients.bulkSummaryNoEmailSent")
+                : t("dashboard.quotes.recipients.bulkSummaryEmailed", {
+                    count: String(submitSuccess.emailed),
+                  })}
             </p>
             <p>
               {t("dashboard.quotes.recipients.bulkSummaryExisting", {
@@ -1177,9 +1330,11 @@ export default function NouveauDevisPage() {
                 })}
               </p>
               <p className="text-slate-600">
-                {t("dashboard.quotes.recipients.bulkSummaryEmailed", {
-                  count: String(bulkSummary.emailed),
-                })}
+                {lastBulkMode === "create-only"
+                  ? t("dashboard.quotes.recipients.bulkSummaryNoEmailSent")
+                  : t("dashboard.quotes.recipients.bulkSummaryEmailed", {
+                      count: String(bulkSummary.emailed),
+                    })}
               </p>
               <p className="text-slate-600">
                 {t("dashboard.quotes.recipients.bulkSummaryExisting", {
@@ -1278,27 +1433,97 @@ export default function NouveauDevisPage() {
               </>
             )}
           </ActionButton>
-          <DashboardPrimaryButton
-            type="submit"
-            disabled={isBulkProcessing || isSubmitting}
-            aria-busy={isBulkProcessing || isSubmitting}
-            icon="none"
-            className="flex-1 justify-center min-w-[180px] rounded-xl"
-          >
-            {isBulkProcessing ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader className="w-4 h-4 animate-spin" />
-                {t("dashboard.quotes.recipients.bulkInProgress")}
-              </span>
-            ) : isSubmitting ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader className="w-4 h-4 animate-spin" />
-                {t("dashboard.quotes.saving")}
-              </span>
-            ) : (
-              t("dashboard.quotes.createAction")
-            )}
-          </DashboardPrimaryButton>
+
+          {emailFailedDocId ? (
+            <ActionButton
+              type="button"
+              onClick={() => void handleRetryEmail()}
+              disabled={retryingEmail || isSubmitting || isBulkProcessing}
+              className="flex-1 justify-center min-w-[180px] inline-flex items-center gap-2"
+            >
+              {retryingEmail ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.quotes.sendingEmail")}
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4" />
+                  {t("dashboard.quotes.retrySend")}
+                </>
+              )}
+            </ActionButton>
+          ) : null}
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-1">
+            <ActionButton
+              type="button"
+              onClick={() => void handleCreate("create-only")}
+              disabled={
+                isBulkProcessing ||
+                isSubmitting ||
+                activeMode !== null ||
+                retryingEmail ||
+                Boolean(emailFailedDocId)
+              }
+              className="flex-1 justify-center min-w-[160px] inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {(activeMode === "create-only" ||
+                (isBulkProcessing && lastBulkMode === "create-only")) ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.quotes.creating")}
+                </>
+              ) : recipientType === "individual" ? (
+                t("dashboard.quotes.createOnly")
+              ) : (
+                t("dashboard.quotes.recipients.bulkCreateOnly")
+              )}
+            </ActionButton>
+            <DashboardPrimaryButton
+              type="button"
+              onClick={() => void handleCreate("create-and-send")}
+              disabled={
+                isBulkProcessing ||
+                isSubmitting ||
+                activeMode !== null ||
+                retryingEmail
+              }
+              aria-busy={
+                isBulkProcessing ||
+                isSubmitting ||
+                activeMode === "create-and-send"
+              }
+              icon="none"
+              className="flex-1 justify-center min-w-[180px] rounded-xl"
+            >
+              {isBulkProcessing && lastBulkMode === "create-and-send" ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.quotes.recipients.bulkInProgressCreateAndSend")}
+                </span>
+              ) : isBulkProcessing && lastBulkMode === "create-only" ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.quotes.recipients.bulkInProgressCreateOnly")}
+                </span>
+              ) : activeMode === "create-and-send" ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {loadingPhase === "sending"
+                    ? t("dashboard.quotes.sendingEmail")
+                    : t("dashboard.quotes.creating")}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  {recipientType === "individual"
+                    ? t("dashboard.quotes.createAndSend")
+                    : t("dashboard.quotes.recipients.bulkCreateAndSend")}
+                </span>
+              )}
+            </DashboardPrimaryButton>
+          </div>
         </div>
       </form>
     </PageLayout>

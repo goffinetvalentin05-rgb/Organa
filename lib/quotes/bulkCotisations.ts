@@ -111,11 +111,18 @@ export type BulkCotisationsDeps = {
   }): Promise<void>;
 };
 
+export type BulkSubmissionMode = "create-only" | "create-and-send";
+
 export type RunBulkCotisationsParams = {
   members: BulkMemberInput[];
   /** Empreinte du formulaire : rend les clés d'idempotence reproductibles. */
   runId: string;
   deps: BulkCotisationsDeps;
+  /**
+   * `create-only` : create + pdf uniquement, aucun e-mail.
+   * `create-and-send` : create → pdf → email (comportement historique).
+   */
+  submissionMode?: BulkSubmissionMode;
   /** État d'une tentative précédente, pour ne rejouer que les erreurs. */
   previous?: BulkMemberState[];
   onProgress?: (progress: BulkProgress, states: BulkMemberState[]) => void;
@@ -205,7 +212,16 @@ export function summarize(states: BulkMemberState[]): BulkSummary {
 export async function runBulkCotisations(
   params: RunBulkCotisationsParams
 ): Promise<RunBulkCotisationsResult> {
-  const { members, runId, deps, previous, onProgress, onLog } = params;
+  const {
+    members,
+    runId,
+    deps,
+    submissionMode = "create-and-send",
+    previous,
+    onProgress,
+    onLog,
+  } = params;
+  const shouldSendEmail = submissionMode === "create-and-send";
 
   const previousById = new Map(
     (previous ?? []).map((state) => [state.memberId, state])
@@ -315,7 +331,11 @@ export async function runBulkCotisations(
         });
       }
 
-      if (state.email === "") {
+      if (!shouldSendEmail) {
+        // Mode création uniquement : le document et le PDF sont prêts, aucun e-mail.
+        state.status = "done";
+        state.step = "pdf";
+      } else if (state.email === "") {
         state.status = "skippedNoEmail";
         state.step = "pdf";
       } else if (!state.emailSent) {

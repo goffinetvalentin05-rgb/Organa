@@ -429,3 +429,52 @@ describe("résumé", () => {
     });
   });
 });
+
+describe("submissionMode create-only", () => {
+  it("crée les cotisations et les PDF sans appeler sendEmail", async () => {
+    const server = createServer();
+    const sendSpy = vi.fn(server.deps.sendEmail);
+
+    const { states, summary } = await runBulkCotisations({
+      members: MEMBERS,
+      runId: RUN_ID,
+      submissionMode: "create-only",
+      deps: { ...server.deps, sendEmail: sendSpy },
+    });
+
+    expect(summary.created).toBe(2);
+    expect(summary.emailed).toBe(0);
+    expect(summary.failed).toBe(0);
+    expect(server.pdfCalls).toEqual(["doc-1", "doc-2"]);
+    expect(sendSpy).not.toHaveBeenCalled();
+    expect(server.sentEmails).toEqual([]);
+    expect(states.every((s) => s.status === "done")).toBe(true);
+    expect(states.every((s) => s.emailSent === false)).toBe(true);
+  });
+
+  it("en create-and-send, n'envoie que les documents créés avec succès et une adresse", async () => {
+    const NO_EMAIL = {
+      id: "member-no-email",
+      nom: "Sans Email",
+      email: "",
+    };
+    const server = createServer({ failPdfFor: [JULIE.id] });
+
+    const { summary, states } = await runBulkCotisations({
+      members: [SOPHIE, JULIE, NO_EMAIL],
+      runId: RUN_ID,
+      submissionMode: "create-and-send",
+      deps: server.deps,
+    });
+
+    expect(summary.created).toBe(3);
+    expect(summary.emailed).toBe(1);
+    expect(summary.skippedNoEmail).toBe(1);
+    expect(summary.failed).toBe(1);
+    expect(server.sentEmails).toEqual(["doc-1"]);
+
+    const julie = states.find((s) => s.memberId === JULIE.id);
+    expect(julie?.status).toBe("error");
+    expect(julie?.emailSent).toBe(false);
+  });
+});

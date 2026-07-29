@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
@@ -9,6 +10,13 @@ import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashb
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 import BuvetteRequestsPanel from "@/components/buvette/BuvetteRequestsPanel";
 import type { BuvetteRequest } from "@/lib/buvette/requests";
+import {
+  createAndSend,
+  createOnly,
+  retryDocumentEmail,
+  type DocumentFlowPhase,
+  type SubmissionMode,
+} from "@/lib/documents/createDocumentFlow";
 
 type DayData = {
   status: "available" | "occupied" | "reserved";
@@ -28,6 +36,7 @@ function currentMonthKey() {
 }
 
 export default function BuvettePage() {
+  const router = useRouter();
   const { t, tList, locale } = useI18n();
   const weekdayLabels = tList("dashboard.buvette.weekdays");
   const [month, setMonth] = useState(currentMonthKey());
@@ -45,7 +54,10 @@ export default function BuvettePage() {
   const [invoiceMessageDraft, setInvoiceMessageDraft] = useState("");
   const [invoiceStep, setInvoiceStep] = useState<"message" | "amount">("message");
   const [invoiceAmount, setInvoiceAmount] = useState("");
-  const [sendingInvoice, setSendingInvoice] = useState(false);
+  const [invoiceActiveMode, setInvoiceActiveMode] = useState<SubmissionMode | null>(null);
+  const [invoiceLoadingPhase, setInvoiceLoadingPhase] = useState<DocumentFlowPhase | null>(null);
+  const [emailFailedInvoiceId, setEmailFailedInvoiceId] = useState<string | null>(null);
+  const [retryingInvoiceEmail, setRetryingInvoiceEmail] = useState(false);
   const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null);
   const [archiving, setArchiving] = useState(false);
 
@@ -287,8 +299,54 @@ N'hésite pas à nous contacter si tu as des questions.
     }
   };
 
-  const sendInvoice = async () => {
+  const createBuvetteInvoice = async (invoiceId?: string | null) => {
+    if (!selectedRequest) {
+      throw new Error("Aucune réservation sélectionnée");
+    }
+    const amount = Number(invoiceAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error("Merci de saisir un montant valide.");
+    }
+    if (!invoiceMessageDraft.trim()) {
+      throw new Error("Le message ne peut pas être vide.");
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    try {
+      const res = await fetch(
+        `/api/buvette/requests/${selectedRequest.id}/send-invoice`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount,
+            message: invoiceMessageDraft,
+            ...(invoiceId ? { invoiceId } : {}),
+          }),
+          signal: controller.signal,
+        }
+      );
+      if (!res.ok) {
+        throw new Error(await getApiError(res, "Impossible de créer la facture"));
+      }
+      const data = (await res.json()) as {
+        invoiceId?: string;
+        invoiceNumber?: string;
+      };
+      if (!data.invoiceId) {
+        throw new Error("Identifiant de facture manquant");
+      }
+      return { documentId: data.invoiceId, meta: { numero: data.invoiceNumber } };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
+  const handleCreateInvoice = async (submissionMode: SubmissionMode) => {
     if (!selectedRequest) return;
+    if (invoiceActiveMode || retryingInvoiceEmail) return;
+
     if (!invoiceMessageDraft.trim()) {
       setMessage("Le message ne peut pas être vide.");
       return;
@@ -299,26 +357,80 @@ N'hésite pas à nous contacter si tu as des questions.
       return;
     }
 
-    setSendingInvoice(true);
     setMessage(null);
+    setInvoiceActiveMode(submissionMode);
+    setInvoiceLoadingPhase("creating");
+    const existingId = emailFailedInvoiceId;
+
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      const res = await fetch(`/api/buvette/requests/${selectedRequest.id}/send-invoice`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, message: invoiceMessageDraft }),
-        signal: controller.signal,
-      }).finally(() => clearTimeout(timeoutId));
-      if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer la facture"));
-      setShowInvoiceModal(false);
-      setInvoiceAmount("");
-      toast.success("✅ Email envoyé avec succès !");
+      if (submissionMode === "create-only") {
+        const outcome = await createOnly({
+          type: "facture",
+          createFn: () => createBuvetteInvoice(),
+        });
+        setShowInvoiceModal(false);
+        setInvoiceAmount("");
+        setEmailFailedInvoiceId(null);
+        toast.success(t("dashboard.invoices.form.createdOnlySuccess"));
+        router.push(`/tableau-de-bord/factures/${outcome.document.documentId}`);
+        return;
+      }
+
+      const outcome = await createAndSend({
+        type: "facture",
+        recipientEmail: selectedRequest.email,
+        existingDocumentId: existingId,
+        onPhase: setInvoiceLoadingPhase,
+        createFn: () => createBuvetteInvoice(existingId),
+      });
+
+      if (outcome.emailSent) {
+        setShowInvoiceModal(false);
+        setInvoiceAmount("");
+        setEmailFailedInvoiceId(null);
+        toast.success(t("dashboard.invoices.form.createdAndSentSuccess"));
+        router.push(`/tableau-de-bord/factures/${outcome.document.documentId}`);
+        return;
+      }
+
+      setEmailFailedInvoiceId(outcome.document.documentId);
+      setMessage(
+        `${t("dashboard.invoices.form.createdButEmailFailed")} ${getErrorMessage(outcome.emailError)}`
+      );
     } catch (error: unknown) {
-      console.error("[Buvette][UI] Erreur envoi facture:", error);
+      console.error("[Buvette][UI] Erreur création facture:", error);
       setMessage(getErrorMessage(error));
     } finally {
-      setSendingInvoice(false);
+      setInvoiceActiveMode(null);
+      setInvoiceLoadingPhase(null);
+    }
+  };
+
+  const handleRetryInvoiceEmail = async () => {
+    if (!emailFailedInvoiceId || !selectedRequest || retryingInvoiceEmail) return;
+
+    setRetryingInvoiceEmail(true);
+    setInvoiceLoadingPhase("sending");
+    setMessage(null);
+    try {
+      await retryDocumentEmail({
+        type: "facture",
+        documentId: emailFailedInvoiceId,
+        recipientEmail: selectedRequest.email,
+      });
+      setShowInvoiceModal(false);
+      setInvoiceAmount("");
+      setEmailFailedInvoiceId(null);
+      toast.success(t("dashboard.invoices.form.createdAndSentSuccess"));
+      router.push(`/tableau-de-bord/factures/${emailFailedInvoiceId}`);
+    } catch (error: unknown) {
+      console.error("[Buvette][UI] Erreur retry envoi facture:", error);
+      setMessage(
+        `${t("dashboard.invoices.form.createdButEmailFailed")} ${getErrorMessage(error)}`
+      );
+    } finally {
+      setRetryingInvoiceEmail(false);
+      setInvoiceLoadingPhase(null);
     }
   };
 
@@ -650,19 +762,52 @@ N'hésite pas à nous contacter si tu as des questions.
                   placeholder="Montant en CHF"
                   className={`${dashboardInputClass} min-h-[14rem] resize-y`}
                 />
-                <div className="flex justify-end gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                   <button
+                    type="button"
                     onClick={() => setInvoiceStep("message")}
+                    disabled={invoiceActiveMode !== null || retryingInvoiceEmail}
                     className={dashboardSecondaryButtonClass}
                   >
                     Retour
                   </button>
+                  {emailFailedInvoiceId ? (
+                    <button
+                      type="button"
+                      onClick={() => void handleRetryInvoiceEmail()}
+                      disabled={retryingInvoiceEmail || invoiceActiveMode !== null}
+                      className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                    >
+                      {retryingInvoiceEmail
+                        ? t("dashboard.invoices.form.sendingEmail")
+                        : t("dashboard.invoices.form.retrySend")}
+                    </button>
+                  ) : null}
                   <button
-                    onClick={sendInvoice}
-                    disabled={sendingInvoice}
+                    type="button"
+                    onClick={() => void handleCreateInvoice("create-only")}
+                    disabled={
+                      invoiceActiveMode !== null ||
+                      retryingInvoiceEmail ||
+                      Boolean(emailFailedInvoiceId)
+                    }
+                    className={`${dashboardSecondaryButtonClass} disabled:opacity-50`}
+                  >
+                    {invoiceActiveMode === "create-only"
+                      ? t("dashboard.invoices.form.creating")
+                      : t("dashboard.invoices.form.createOnly")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleCreateInvoice("create-and-send")}
+                    disabled={invoiceActiveMode !== null || retryingInvoiceEmail}
                     className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
                   >
-                    {sendingInvoice ? "Envoi..." : "Générer et envoyer la facture"}
+                    {invoiceActiveMode === "create-and-send"
+                      ? invoiceLoadingPhase === "sending"
+                        ? t("dashboard.invoices.form.sendingEmail")
+                        : t("dashboard.invoices.form.creating")
+                      : t("dashboard.invoices.form.createAndSend")}
                   </button>
                 </div>
               </>

@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
 import { createClient } from "@/lib/supabase/server";
-import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getCurrencySymbol } from "@/lib/utils/currency";
-import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
-import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
 
 export const runtime = "nodejs";
 
@@ -20,6 +16,13 @@ function getErrorMessage(error: unknown): string {
   return "Erreur inconnue";
 }
 
+/**
+ * Crée une facture à partir d'une réservation buvette acceptée.
+ *
+ * L'envoi e-mail n'est plus effectué ici : le client appelle ensuite
+ * `sendInvoiceEmail` (fonction centrale) si l'utilisateur a choisi
+ * « Créer et envoyer ».
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -34,6 +37,34 @@ export async function POST(
     const body = await request.json();
     const amount = Number(body?.amount);
     const customMessage = typeof body?.message === "string" ? body.message.trim() : "";
+    const existingInvoiceId =
+      typeof body?.invoiceId === "string" && body.invoiceId.trim() !== ""
+        ? body.invoiceId.trim()
+        : null;
+
+    // Reprise après échec d'envoi : ne jamais recréer la facture.
+    if (existingInvoiceId) {
+      const { data: existing } = await supabase
+        .from("documents")
+        .select("id, numero")
+        .eq("id", existingInvoiceId)
+        .eq("user_id", guard.clubId)
+        .eq("type", "invoice")
+        .maybeSingle();
+
+      if (existing?.id) {
+        return NextResponse.json(
+          {
+            success: true,
+            invoiceId: existing.id,
+            invoiceNumber: existing.numero,
+            alreadyExisted: true,
+          },
+          { status: 200 }
+        );
+      }
+    }
+
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
@@ -63,9 +94,7 @@ export async function POST(
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select(
-        "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, resend_api_key, email_custom_enabled, email_sender_name, email_sender_email"
-      )
+      .select("currency, currency_symbol")
       .eq("user_id", guard.clubId)
       .maybeSingle();
 
@@ -77,36 +106,11 @@ export async function POST(
       );
     }
 
-    const delivery = resolveResendFromProfile({
-      company_name: profile?.company_name,
-      company_email: profile?.company_email,
-      email_sender_name: profile?.email_sender_name,
-      email_sender_email: profile?.email_sender_email,
-      resend_api_key: profile?.resend_api_key,
-      email_custom_enabled: profile?.email_custom_enabled,
-    });
-    if (!delivery) {
-      console.error("[API][buvette][send-invoice] Aucune configuration Resend utilisable");
-      return NextResponse.json(
-        {
-          error:
-            "L'envoi d'emails n'est pas disponible. Vérifiez la clé Resend côté serveur ou le mode expéditeur avancé.",
-        },
-        { status: 503 }
-      );
-    }
-    const resendInstance = delivery.resend;
-    const fromEmail = delivery.from;
-
-    const logoUrl = await getClubLogoDataUrlForPdf(supabase, profile, guard.clubId);
-
     const currency = profile?.currency || "CHF";
     const currencySymbol = profile?.currency_symbol || getCurrencySymbol(currency);
     const formattedDate = new Date(reqData.reservation_date).toLocaleDateString("fr-CH");
     const todayIso = new Date().toISOString().split("T")[0];
-    const formattedAmount = amount.toFixed(2);
 
-    // Générer un numéro de facture au même format que le module Factures: FAC-YYYY-XXX
     const year = new Date().getFullYear();
     const { count: invoiceCount } = await supabase
       .from("documents")
@@ -117,7 +121,6 @@ export async function POST(
       .lte("created_at", `${year}-12-31`);
     const invoiceNumber = `FAC-${year}-${String((invoiceCount ?? 0) + 1).padStart(3, "0")}`;
 
-    // Créer/récupérer un client pour rattacher la facture dans le module Factures
     const fullName = `${reqData.first_name} ${reqData.last_name}`.trim();
     let clientId: string | null = null;
 
@@ -157,101 +160,15 @@ export async function POST(
     const lineDescription = `Location buvette - ${reqData.event_type} - ${formattedDate}`;
     const buvetteDocumentTitle = lineDescription.slice(0, DOCUMENT_TITLE_MAX_LENGTH);
 
-    const pdfBuffer = await renderToBuffer(
-      <FacturePdf
-        company={{
-          name: profile?.company_name || "Club",
-          address: profile?.company_address || "",
-          email: profile?.company_email || "",
-          phone: profile?.company_phone || "",
-          logoUrl,
-          iban: profile?.iban || "",
-          bankName: profile?.bank_name || "",
-          conditionsPaiement: profile?.payment_terms || "",
-        }}
-        client={{
-          name: `${reqData.first_name} ${reqData.last_name}`.trim(),
-          email: reqData.email,
-          address: "",
-        }}
-        document={{
-          number: invoiceNumber,
-          date: todayIso,
-          dueDate: reqData.reservation_date,
-          currency,
-          currencySymbol,
-          vatRate: 0,
-          notes: `Date de réservation: ${formattedDate}`,
-          subject: buvetteDocumentTitle,
-        }}
-        lines={[
-          {
-            label: `Location buvette - ${reqData.event_type}`,
-            qty: 1,
-            unitPrice: amount,
-            total: amount,
-            vat: 0,
-          },
-        ]}
-        totals={{
-          subtotal: amount,
-          vat: 0,
-          total: amount,
-        }}
-        primaryColor={profile?.primary_color || "#1D4ED8"}
-      />
-    );
-
-    const defaultMessage = `Bonjour ${reqData.first_name},
-
-Suite à la validation de ta réservation de la buvette
-pour le ${formattedDate}, tu trouveras en pièce jointe ta facture.
-
-N'hésite pas à nous contacter si tu as des questions.
-À bientôt !`;
-    const finalTextMessage = customMessage || defaultMessage;
-    const finalHtmlMessage = finalTextMessage.replace(/\n/g, "<br/>");
-    const filename = `facture-buvette-${invoiceNumber}.pdf`;
-
-    const { data, error } = await resendInstance.emails.send({
-      from: fromEmail,
-      to: [reqData.email],
-      subject: `Facture - Réservation buvette du ${reqData.reservation_date}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <div>${finalHtmlMessage}</div>
-          <p style="margin-top: 12px;"><strong>Montant :</strong> ${formattedAmount} ${currencySymbol}</p>
-        </div>
-      `,
-      text: `${finalTextMessage}\n\nMontant : ${formattedAmount} ${currencySymbol}`,
-      attachments: [
-        {
-          filename,
-          content: Buffer.from(pdfBuffer).toString("base64"),
-        },
-      ],
-    });
-
-    if (error) {
-      const resendMessage = getErrorMessage(error);
-      const resendName =
-        error && typeof error === "object" && "name" in error
-          ? String((error as { name?: unknown }).name || "")
-          : "";
-      console.error("[API][buvette][send-invoice] Erreur Resend:", {
-        message: resendMessage,
-        name: resendName,
-        mode: delivery.mode,
-        to: reqData.email,
-        requestId: id,
-      });
-      return NextResponse.json(
-        { error: "Erreur lors de l'envoi de la facture", details: resendMessage },
-        { status: 500 }
-      );
+    const notesParts = [
+      `Facture générée depuis Buvette (request_id=${id})`,
+      `Date de réservation: ${formattedDate}`,
+      `Montant: ${amount.toFixed(2)} ${currencySymbol}`,
+    ];
+    if (customMessage) {
+      notesParts.push(`Message: ${customMessage}`);
     }
 
-    // Enregistrer la facture dans la table documents (module Factures)
     const buvetteLine = {
       id: `buvette-${id}`,
       designation: lineDescription,
@@ -267,7 +184,7 @@ N'hésite pas à nous contacter si tu as des questions.
         user_id: guard.clubId,
         client_id: clientId,
         type: "invoice",
-        status: "envoye",
+        status: "brouillon",
         date_creation: todayIso,
         date_echeance: reqData.reservation_date,
         items: [buvetteLine],
@@ -276,7 +193,7 @@ N'hésite pas à nous contacter si tu as des questions.
         total_ttc: amount,
         numero: invoiceNumber,
         title: buvetteDocumentTitle,
-        notes: `Facture générée depuis Buvette (request_id=${id})`,
+        notes: notesParts.join("\n"),
       })
       .select("id")
       .single();
@@ -285,7 +202,7 @@ N'hésite pas à nous contacter si tu as des questions.
       console.error("[API][buvette][send-invoice] Erreur insertion facture:", insertInvoiceError);
       return NextResponse.json(
         {
-          error: "Email envoyé mais impossible d'enregistrer la facture en base",
+          error: "Impossible d'enregistrer la facture en base",
           details: insertInvoiceError?.message || "Insertion échouée",
         },
         { status: 500 }
@@ -295,10 +212,9 @@ N'hésite pas à nous contacter si tu as des questions.
     return NextResponse.json(
       {
         success: true,
-        message: "Email envoyé avec succès",
-        emailId: data?.id,
         invoiceId: insertedInvoice.id,
         invoiceNumber,
+        alreadyExisted: false,
       },
       { status: 200 }
     );
@@ -310,4 +226,3 @@ N'hésite pas à nous contacter si tu as des questions.
     );
   }
 }
-

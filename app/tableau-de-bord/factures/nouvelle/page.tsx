@@ -10,7 +10,7 @@ import {
   calculerTotalTTC,
 } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
-import { Plus, Eye, Download, Trash, Loader } from "@/lib/icons";
+import { Plus, Eye, Download, Trash, Loader, Mail } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import {
@@ -25,6 +25,13 @@ import type { RecipientType } from "@/lib/documents/recipient";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import {
+  createAndSend,
+  createOnly,
+  retryDocumentEmail,
+  type DocumentFlowPhase,
+  type SubmissionMode,
+} from "@/lib/documents/createDocumentFlow";
 
 interface Client {
   id: string;
@@ -79,6 +86,10 @@ function NouvelleFacturePageContent() {
   const [savingForPdf, setSavingForPdf] = useState(false);
   const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
   const [createSuccess, setCreateSuccess] = useState(false);
+  const [activeMode, setActiveMode] = useState<SubmissionMode | null>(null);
+  const [loadingPhase, setLoadingPhase] = useState<DocumentFlowPhase | null>(null);
+  const [emailFailedDocId, setEmailFailedDocId] = useState<string | null>(null);
+  const [retryingEmail, setRetryingEmail] = useState(false);
 
   // Charger les clients et les événements depuis l'API Supabase
   useEffect(() => {
@@ -221,10 +232,63 @@ function NouvelleFacturePageContent() {
     ...(eventId ? { eventId } : {}),
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const resolveRecipientEmail = (): string => {
+    if (recipientType === "member") {
+      return (selectedClient?.email || "").trim();
+    }
+    if (recipientType === "external") {
+      return extEmail.trim();
+    }
+    return "";
+  };
+
+  const persistInvoice = async (
+    lignesValides: LigneDocument[],
+    idempotencyKey: string
+  ): Promise<{ documentId: string }> => {
+    const documentBody = buildDocumentBody(lignesValides);
+
+    const response = documentId
+      ? await idempotentFetch("/api/documents", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          idempotencyKey,
+          body: JSON.stringify({
+            id: documentId,
+            ...documentBody,
+            ...(dateEcheance && dateEcheance.trim() !== ""
+              ? { dateEcheance }
+              : { dateEcheance: null }),
+            ...(datePaiement && datePaiement.trim() !== ""
+              ? { datePaiement }
+              : { datePaiement: null }),
+            ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
+          }),
+        })
+      : await idempotentFetch("/api/documents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          idempotencyKey,
+          body: JSON.stringify(documentBody),
+        });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
+      throw new Error(detail || t("dashboard.invoices.form.createError"));
+    }
+
+    const data = await response.json();
+    return { documentId: data.id };
+  };
+
+  const handleCreate = async (submissionMode: SubmissionMode) => {
     if (!validateRecipient()) return;
-    if (isSubmitting) return;
+    if (isSubmitting || activeMode || retryingEmail) return;
 
     const lignesValides = lignes.filter((l) => l.designation.trim() !== "");
 
@@ -233,62 +297,105 @@ function NouvelleFacturePageContent() {
       return;
     }
 
+    const recipientEmail = resolveRecipientEmail();
+    if (submissionMode === "create-and-send" && recipientEmail === "") {
+      toast.error(t("dashboard.invoices.detail.missingClientEmail"));
+      return;
+    }
+
     setCreateSuccess(false);
+    const existingIdForSend =
+      submissionMode === "create-and-send" ? emailFailedDocId : null;
+    if (submissionMode === "create-only") {
+      setEmailFailedDocId(null);
+    }
 
     await run(async (idempotencyKey) => {
+      setActiveMode(submissionMode);
+      setLoadingPhase("creating");
       try {
-        const documentBody = buildDocumentBody(lignesValides);
-
-        const response = documentId
-          ? await idempotentFetch("/api/documents", {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              idempotencyKey,
-              body: JSON.stringify({
-                id: documentId,
-                ...documentBody,
-                ...(dateEcheance && dateEcheance.trim() !== ""
-                  ? { dateEcheance }
-                  : { dateEcheance: null }),
-                ...(datePaiement && datePaiement.trim() !== ""
-                  ? { datePaiement }
-                  : { datePaiement: null }),
-                ...(notes && notes.trim() !== "" ? { notes } : { notes: null }),
-              }),
-            })
-          : await idempotentFetch("/api/documents", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              idempotencyKey,
-              body: JSON.stringify(documentBody),
-            });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          const detail = [errorData.error, errorData.details].filter(Boolean).join(" — ");
-          throw new Error(detail || t("dashboard.invoices.form.createError"));
+        if (submissionMode === "create-only") {
+          const outcome = await createOnly({
+            type: "facture",
+            createFn: () => persistInvoice(lignesValides, idempotencyKey),
+          });
+          setDocumentId(outcome.document.documentId);
+          setCreateSuccess(true);
+          notifySuccess("Facture créée ✓", "invoice-create");
+          toast.success(t("dashboard.invoices.form.createdOnlySuccess"));
+          router.replace(
+            `/tableau-de-bord/factures/${outcome.document.documentId}`
+          );
+          return;
         }
 
-        const data = await response.json();
-        setDocumentId(data.id);
+        const outcome = await createAndSend({
+          type: "facture",
+          recipientEmail,
+          existingDocumentId: existingIdForSend,
+          onPhase: setLoadingPhase,
+          createFn: () => persistInvoice(lignesValides, idempotencyKey),
+        });
 
-        setCreateSuccess(true);
-        notifySuccess("Facture créée ✓", "invoice-create");
-        setTimeout(() => setCreateSuccess(false), 2000);
+        setDocumentId(outcome.document.documentId);
 
-        router.replace(`/tableau-de-bord/factures/${data.id}`);
+        if (outcome.emailSent) {
+          setEmailFailedDocId(null);
+          setCreateSuccess(true);
+          notifySuccess("Facture créée ✓", "invoice-create");
+          toast.success(t("dashboard.invoices.form.createdAndSentSuccess"));
+          router.replace(
+            `/tableau-de-bord/factures/${outcome.document.documentId}`
+          );
+          return;
+        }
+
+        setEmailFailedDocId(outcome.document.documentId);
+        const errMsg =
+          outcome.emailError instanceof Error
+            ? outcome.emailError.message
+            : getErrorMessage(outcome.emailError);
+        toast.error(
+          `${t("dashboard.invoices.form.createdButEmailFailed")} ${errMsg}`
+        );
       } catch (error: unknown) {
         console.error("[Facture] Erreur lors de la création:", error);
         notifyError(
           `${t("dashboard.invoices.form.createError")}: ${getErrorMessage(error)}`,
           "invoice-create"
         );
+      } finally {
+        setActiveMode(null);
+        setLoadingPhase(null);
       }
     });
+  };
+
+  const handleRetryEmail = async () => {
+    if (!emailFailedDocId || retryingEmail || isSubmitting) return;
+
+    setRetryingEmail(true);
+    setLoadingPhase("sending");
+    try {
+      await retryDocumentEmail({
+        type: "facture",
+        documentId: emailFailedDocId,
+        recipientEmail: resolveRecipientEmail(),
+      });
+      toast.success(t("dashboard.invoices.form.createdAndSentSuccess"));
+      router.replace(`/tableau-de-bord/factures/${emailFailedDocId}`);
+    } catch (error: unknown) {
+      toast.error(
+        `${t("dashboard.invoices.form.createdButEmailFailed")} ${getErrorMessage(error)}`
+      );
+    } finally {
+      setRetryingEmail(false);
+      setLoadingPhase(null);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
   };
 
   // Fonction pour sauvegarder le document avant de générer le PDF
@@ -892,17 +999,70 @@ function NouvelleFacturePageContent() {
               </>
             )}
           </ActionButton>
-          <DashboardPrimaryButton
-            type="submit"
-            icon="none"
-            loading={isSubmitting}
-            loadingLabel="Création de la facture…"
-            success={createSuccess}
-            successLabel="Facture créée ✓"
-            className="flex-1 justify-center min-w-[180px] rounded-xl"
-          >
-            {t("dashboard.invoices.form.createAction")}
-          </DashboardPrimaryButton>
+
+          {emailFailedDocId ? (
+            <ActionButton
+              type="button"
+              onClick={() => void handleRetryEmail()}
+              disabled={retryingEmail || isSubmitting}
+              className="flex-1 justify-center min-w-[180px] inline-flex items-center gap-2"
+            >
+              {retryingEmail ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.invoices.form.sendingEmail")}
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4" />
+                  {t("dashboard.invoices.form.retrySend")}
+                </>
+              )}
+            </ActionButton>
+          ) : null}
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-1">
+            <ActionButton
+              type="button"
+              onClick={() => void handleCreate("create-only")}
+              disabled={
+                isSubmitting ||
+                activeMode !== null ||
+                retryingEmail ||
+                Boolean(emailFailedDocId)
+              }
+              className="flex-1 justify-center min-w-[160px] inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {activeMode === "create-only" ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  {t("dashboard.invoices.form.creating")}
+                </>
+              ) : (
+                t("dashboard.invoices.form.createOnly")
+              )}
+            </ActionButton>
+            <DashboardPrimaryButton
+              type="button"
+              onClick={() => void handleCreate("create-and-send")}
+              disabled={isSubmitting || activeMode !== null || retryingEmail}
+              icon="none"
+              loading={activeMode === "create-and-send"}
+              loadingLabel={
+                loadingPhase === "sending"
+                  ? t("dashboard.invoices.form.sendingEmail")
+                  : t("dashboard.invoices.form.creating")
+              }
+              success={createSuccess}
+              successLabel="Facture créée ✓"
+              className="flex-1 justify-center min-w-[180px] rounded-xl"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                {t("dashboard.invoices.form.createAndSend")}
+              </span>
+            </DashboardPrimaryButton>
+          </div>
         </div>
       </form>
       </PageLayout>
