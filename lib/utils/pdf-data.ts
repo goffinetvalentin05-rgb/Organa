@@ -18,7 +18,7 @@ import {
 import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
 import {
   validateQRBillData,
-  generateSwissQRBillDataUri,
+  formatValidationErrors,
   buildFreeReference,
   isQRIBAN,
   generateQRRReference,
@@ -224,7 +224,7 @@ export async function getDocumentPdfData(
     : { title: "DEVIS", clientLabel: "Client", numberLabel: "Numéro" };
 
   // ================================================================
-  // Swiss QR Bill — génération SVG
+  // Swiss QR Bill
   // ================================================================
   const docNum = document.numero || "";
   const existingQRRef = (document as Record<string, unknown>).qr_reference as string | null | undefined;
@@ -293,19 +293,14 @@ export async function getDocumentPdfData(
     language: "FR",
   };
 
+  // La zone de paiement n'est pas dessinée ici : elle est produite en vectoriel
+  // par PDFKit puis incrustée dans le PDF final (voir lib/pdf/mergeQRBill.ts).
+  // À ce stade on se contente de valider les données et de les transmettre.
   const qrValidation = validateQRBillData(qrBillData);
-  let qrBillSvgDataUri: string | null = null;
-  let qrBillError: string | null = null;
+  const qrBillError = qrValidation.valid ? null : formatValidationErrors(qrValidation);
 
-  if (qrValidation.valid) {
-    try {
-      qrBillSvgDataUri = await generateSwissQRBillDataUri(qrBillData);
-    } catch (err) {
-      console.error("[pdf-data] Erreur génération QR Bill SVG:", err);
-      qrBillError = "Erreur lors de la génération du QR Bill. Vérifiez les paramètres de paiement.";
-    }
-  } else {
-    qrBillError = qrValidation.errors.map((e) => e.message).join(" • ");
+  if (!qrValidation.valid) {
+    console.warn("[pdf-data] QR-facture non générée:", qrBillError);
   }
 
   return {
@@ -333,10 +328,10 @@ export async function getDocumentPdfData(
     totals,
     primaryColor,
     documentLabel,
-    /** Swiss QR Bill */
+    /** Swiss QR Bill : données validées, incrustées après le rendu react-pdf. */
     qrBill: {
-      svgDataUri: qrBillSvgDataUri,
-      hasQRBill: qrBillSvgDataUri !== null,
+      data: qrValidation.valid ? qrBillData : null,
+      hasQRBill: qrValidation.valid,
       errorMessage: qrBillError,
     },
   };

@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // PDFKit charge ses métriques de polices (.afm) depuis le disque à l'exécution.
+  // Le laisser hors du bundle serveur évite que ces fichiers soient perdus au
+  // build, ce qui casserait la génération de la QR-facture en production.
+  serverExternalPackages: ["pdfkit", "swissqrbill"],
   // Configuration des images pour permettre l'affichage des logos depuis Supabase Storage
   images: {
     remotePatterns: [

@@ -4,9 +4,16 @@
  */
 import { StyleSheet } from "@react-pdf/renderer";
 
+/**
+ * Marge de page commune à tous les PDF club.
+ * Exportée car la réservation de la zone de paiement Swiss QR Bill doit en
+ * tenir compte : la marge basse est déjà vide et se situe sous le slip.
+ */
+export const CLUB_PDF_PAGE_PADDING = 48;
+
 export const clubDocumentPdfStyles = StyleSheet.create({
   page: {
-    padding: 48,
+    padding: CLUB_PDF_PAGE_PADDING,
     fontSize: 10,
     fontFamily: "Helvetica",
     color: "#0F172A",

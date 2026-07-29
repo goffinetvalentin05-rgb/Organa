@@ -22,9 +22,8 @@ interface FacturePdfProps {
     bankName?: string;
     conditionsPaiement?: string;
   };
-  /** Swiss QR Bill */
+  /** Swiss QR Bill : la zone de paiement est incrustée après le rendu. */
   qrBill?: {
-    svgDataUri: string | null;
     hasQRBill: boolean;
     errorMessage: string | null;
   };
@@ -89,7 +88,9 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.content}>
+        {/* Le retrait bas réserve la place du pied de page en position absolue ;
+            avec une QR-facture ce pied est masqué, l'espace est donc rendu. */}
+        <View style={[styles.content, qrBill?.hasQRBill ? { paddingBottom: 0 } : {}]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.companyBlock}>
@@ -258,13 +259,11 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
           )}
         </View>
 
-        {/* Swiss QR Bill slip — bas de page */}
+        {/* Réserve le bas de la dernière page pour la zone de paiement */}
         {qrBill && (
           <SwissQRBillSlip
-            svgDataUri={qrBill.svgDataUri || ""}
             hasQRBill={qrBill.hasQRBill}
             errorMessage={qrBill.errorMessage || undefined}
-            primaryColor={primaryColor}
           />
         )}
 

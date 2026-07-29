@@ -1,8 +1,9 @@
 /**
  * Module Swiss QR Bill — Obillz
  *
- * Point d'entrée unique pour toute la logique QR Bill.
- * Conformité : SIX Group Swiss QR Bill v2.2
+ * Point d'entrée unique de la logique QR-facture. Le format, la validation et
+ * le rendu proviennent de la librairie `swissqrbill` (conforme SIX Group) ;
+ * ce module n'ajoute que l'intégration métier Obillz.
  */
 
 export type {
@@ -27,6 +28,7 @@ export {
 } from "./validate";
 
 export {
-  generateSwissQRBillSVG,
-  generateSwissQRBillDataUri,
-} from "./generate-svg";
+  renderQRBillSlipPdf,
+  QR_BILL_WIDTH_PT,
+  QR_BILL_HEIGHT_PT,
+} from "./generate-pdf";

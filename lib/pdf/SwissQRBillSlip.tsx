@@ -1,119 +1,85 @@
 /**
- * SwissQRBillSlip — Composant @react-pdf/renderer
+ * SwissQRBillSlip — réservation de la zone de paiement Swiss QR Bill.
  *
- * Intègre la zone de paiement Swiss QR Bill officielle au bas d'une page A4.
- * Le SVG est généré par `swissqrbill/svg` et rendu via <Image> en data URI.
+ * Ce composant ne dessine pas la QR-facture : `@react-pdf/renderer` ne sait
+ * afficher que du JPEG et du PNG, et rastériser la zone de paiement
+ * dégraderait la lisibilité du QR. Elle est donc produite en vectoriel par
+ * PDFKit puis incrustée après coup (voir `lib/pdf/mergeQRBill.ts`).
  *
- * Dimensions officielles SIX Group :
- * - Largeur totale : 210 mm (A4)
- * - Hauteur totale : 105 mm
- * - Reçu (gauche) : 62 mm × 105 mm
- * - Section paiement (droite) : 148 mm × 105 mm
+ * Le rôle de ce composant est de réserver dans le flux du document une bande
+ * de la hauteur exacte du slip (105 mm). Comme `@react-pdf/renderer` bascule
+ * un bloc de hauteur fixe sur la page suivante lorsqu'il ne tient plus, cette
+ * réservation garantit que le bas de la dernière page est libre et que la
+ * zone de paiement ne recouvrira jamais le contenu de la facture.
+ *
+ * Si la QR-facture ne peut pas être générée, un encart explicatif compact
+ * prend sa place et le pied de page bancaire classique est conservé.
  */
 
 import React from "react";
-import { View, Image, StyleSheet, Text } from "@react-pdf/renderer";
-import type { QRBillData } from "@/lib/swiss-qr-bill/types";
+import { View, Text, StyleSheet } from "@react-pdf/renderer";
+import { QR_BILL_HEIGHT_PT } from "@/lib/swiss-qr-bill";
+import { CLUB_PDF_PAGE_PADDING } from "@/lib/pdf/clubPdfLayout";
+
+/**
+ * Hauteur à neutraliser dans le flux du document.
+ *
+ * La zone de paiement est posée tout en bas de la page, de 0 à 105 mm. La
+ * marge basse de la page est déjà vide et tombe dans cette bande : il suffit
+ * donc de bloquer la différence pour que le contenu reste au-dessus du slip.
+ * Réserver les 105 mm entiers gaspillerait la hauteur d'une marge et
+ * provoquerait des pages supplémentaires inutiles.
+ */
+const RESERVATION_HEIGHT_PT = Math.max(0, QR_BILL_HEIGHT_PT - CLUB_PDF_PAGE_PADDING);
 
 interface SwissQRBillSlipProps {
-  /** Data URI SVG base64 généré par generateSwissQRBillDataUri() */
-  svgDataUri: string;
-  /** Couleur primaire pour la ligne de séparation */
-  primaryColor?: string;
-  /** Indique si le QR Bill a été généré avec succès */
+  /** Vrai si la zone de paiement sera incrustée dans le PDF final. */
   hasQRBill: boolean;
-  /** Message d'erreur si pas de QR Bill */
+  /** Message affiché lorsque la QR-facture ne peut pas être produite. */
   errorMessage?: string;
-  /** Données pour l'affichage fallback si SVG non dispo */
-  fallbackData?: Pick<QRBillData, "creditor" | "amount" | "currency" | "message">;
 }
 
 const styles = StyleSheet.create({
-  // Ligne de séparation perforée
-  separator: {
-    borderTopWidth: 1,
-    borderTopStyle: "dashed",
-    borderTopColor: "#CBD5E1",
-    marginTop: 8,
-    marginBottom: 0,
-    position: "relative",
-  },
-  separatorLabel: {
-    position: "absolute",
-    top: -7,
-    left: "50%",
-    transform: "translateX(-50%)",
-    backgroundColor: "white",
-    paddingHorizontal: 8,
-    fontSize: 7,
-    color: "#94A3B8",
-    letterSpacing: 1,
-  },
-  // Conteneur principal du slip (occupe 105mm de haut)
-  slipContainer: {
+  reservation: {
     width: "100%",
-    // hauteur en points PDF : 105mm ≈ 297.6pt
-    height: 297.6,
-    position: "relative",
-    overflow: "hidden",
+    height: RESERVATION_HEIGHT_PT,
   },
-  // Image SVG pleine largeur
-  svgImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    objectPosition: "top left",
-  },
-  // Section erreur/fallback
-  errorContainer: {
-    width: "100%",
-    height: 297.6,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FEF2F2",
+  errorBox: {
+    marginTop: 10,
     borderWidth: 1,
     borderColor: "#FECACA",
-    borderRadius: 4,
-    padding: 16,
+    borderRadius: 6,
+    backgroundColor: "#FEF2F2",
+    padding: 12,
+  },
+  errorTitle: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#B91C1C",
+    marginBottom: 4,
   },
   errorText: {
-    fontSize: 9,
+    fontSize: 8,
     color: "#DC2626",
-    textAlign: "center",
-    lineHeight: 1.6,
+    lineHeight: 1.5,
   },
 });
 
-/**
- * Composant PDF : zone de paiement Swiss QR Bill conforme SIX Group.
- * À placer en bas de page (utilise `fixed` ou en dernier élément de page).
- */
 export const SwissQRBillSlip: React.FC<SwissQRBillSlipProps> = ({
-  svgDataUri,
-  primaryColor = "#3B82F6",
   hasQRBill,
   errorMessage,
 }) => {
-  return (
-    <View>
-      {/* Ligne de séparation avec ciseaux — indique la zone de découpe */}
-      <View style={[styles.separator, { borderTopColor: primaryColor + "40" }]}>
-        <Text style={styles.separatorLabel}>✂  SECTION PAIEMENT</Text>
+  if (!hasQRBill) {
+    return (
+      <View style={styles.errorBox} wrap={false}>
+        <Text style={styles.errorTitle}>QR-facture indisponible</Text>
+        <Text style={styles.errorText}>
+          {errorMessage ||
+            "Complétez l'IBAN et l'adresse du bénéficiaire dans Paramètres > QR-facture suisse pour que la zone de paiement soit générée automatiquement."}
+        </Text>
       </View>
+    );
+  }
 
-      {hasQRBill && svgDataUri ? (
-        <View style={styles.slipContainer}>
-          <Image src={svgDataUri} style={styles.svgImage} />
-        </View>
-      ) : (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>
-            {errorMessage ||
-              "QR-facture non disponible.\nConfigurez l'IBAN et l'adresse du bénéficiaire dans Paramètres > Paiements."}
-          </Text>
-        </View>
-      )}
-    </View>
-  );
+  return <View style={styles.reservation} wrap={false} />;
 };
