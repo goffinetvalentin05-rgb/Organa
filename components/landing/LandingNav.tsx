@@ -20,6 +20,87 @@ const menuItemVariants = {
 
 type NavTheme = "dark" | "light";
 
+function useLandingNavMorph(
+  navRef: RefObject<HTMLDivElement | null>,
+  headerRef: RefObject<HTMLElement | null>
+) {
+  useEffect(() => {
+    let animationFrame: number | null = null;
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const update = () => {
+      animationFrame = null;
+      const nav = navRef.current;
+      const header = headerRef.current;
+      if (!nav || !header) return;
+
+      const rawProgress = Math.min(1, Math.max(0, (window.scrollY - 40) / 140));
+      const progress = reducedMotionQuery.matches
+        ? window.scrollY > 40
+          ? 1
+          : 0
+        : rawProgress;
+
+      nav.style.setProperty("--landing-nav-scroll-progress", progress.toFixed(4));
+
+      if (progress === 0) {
+        nav.style.removeProperty("padding-top");
+        nav.style.removeProperty("padding-left");
+        nav.style.removeProperty("padding-right");
+        header.style.removeProperty("max-width");
+        header.style.removeProperty("border-radius");
+        header.style.removeProperty("padding-left");
+        header.style.removeProperty("padding-right");
+        return;
+      }
+
+      const viewportWidth = window.innerWidth;
+      const isSm = viewportWidth >= 640;
+      const isMd = viewportWidth >= 768;
+      const isLg = viewportWidth >= 1024;
+      const isXl = viewportWidth >= 1280;
+
+      const startSide = isMd ? 32 : isSm ? 24 : 20;
+      const endSide = isLg ? 12 : isMd ? 10 : isSm ? 8 : 6;
+      const startTop = isLg ? 28 : isMd ? 24 : isSm ? 20 : 13.6;
+      const startMaxWidth = isXl ? 1100 : isLg ? 1060 : isMd ? 768 : isSm ? 512 : 384;
+      const startPadding = isLg ? 32 : isMd ? 20 : isSm ? 16 : 14;
+      const endPadding = isLg ? 28 : isMd ? 20 : isSm ? 16 : 12;
+      const startRadius = isLg ? 28 : isSm ? 24 : 22;
+      const endRadius = isLg ? 16 : 14;
+      const lerp = (start: number, end: number) => start + (end - start) * progress;
+      const initialWidth = Math.min(startMaxWidth, viewportWidth - startSide * 2);
+      const expandedWidth = viewportWidth - endSide * 2;
+
+      nav.style.paddingTop = `${lerp(startTop, 0)}px`;
+      nav.style.paddingLeft = `${lerp(startSide, endSide)}px`;
+      nav.style.paddingRight = `${lerp(startSide, endSide)}px`;
+      header.style.maxWidth = `${lerp(initialWidth, expandedWidth)}px`;
+      header.style.borderRadius = `${lerp(startRadius, endRadius)}px`;
+      header.style.paddingLeft = `${lerp(startPadding, endPadding)}px`;
+      header.style.paddingRight = `${lerp(startPadding, endPadding)}px`;
+    };
+
+    const onScroll = () => {
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    reducedMotionQuery.addEventListener("change", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      reducedMotionQuery.removeEventListener("change", onScroll);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+    };
+  }, [navRef, headerRef]);
+}
+
 function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
   const [theme, setTheme] = useState<NavTheme>(() =>
     typeof document !== "undefined" && document.querySelector(".legal-page")
@@ -70,9 +151,11 @@ function useLandingNavTheme(headerRef: RefObject<HTMLElement | null>) {
 
 export default function LandingNav() {
   const { t } = useI18n();
+  const navRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const navTheme = useLandingNavTheme(headerRef);
   const isLight = navTheme === "light";
+  useLandingNavMorph(navRef, headerRef);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -96,7 +179,10 @@ export default function LandingNav() {
   }, [isMenuOpen, closeMenu]);
 
   return (
-    <div className="landing-nav fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-[max(0.85rem,env(safe-area-inset-top,0px))] sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7">
+    <div
+      ref={navRef}
+      className="landing-nav fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-[max(0.85rem,env(safe-area-inset-top,0px))] sm:px-6 sm:pt-5 md:px-8 md:pt-6 lg:pt-7"
+    >
       <motion.header
         ref={headerRef}
         initial={{ opacity: 0, y: -14 }}

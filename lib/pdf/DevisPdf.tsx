@@ -8,6 +8,7 @@ import {
   pdfHyphenationCallback,
   sanitizePdfNotes,
 } from "@/lib/pdf/clubPdfLayout";
+import { SwissQRBillSlip } from "@/lib/pdf/SwissQRBillSlip";
 
 // Types pour les données
 interface DevisPdfProps {
@@ -60,6 +61,12 @@ interface DevisPdfProps {
     clientLabel: string; // "CONCERNE" ou "CLIENT"
     numberLabel: string; // "Référence" ou "Numéro"
   };
+  /** Swiss QR Bill */
+  qrBill?: {
+    svgDataUri: string | null;
+    hasQRBill: boolean;
+    errorMessage: string | null;
+  };
 }
 
 export const DevisPdf: React.FC<DevisPdfProps> = ({
@@ -68,6 +75,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   document,
   lines,
   totals,
+  qrBill,
   primaryColor = "#3B82F6",
   documentLabel,
 }) => {
@@ -267,8 +275,18 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
           )}
         </View>
 
-        {/* Footer */}
-        {(company.iban || company.bankName || company.conditionsPaiement) && (
+        {/* Swiss QR Bill slip — bas de page */}
+        {qrBill && (
+          <SwissQRBillSlip
+            svgDataUri={qrBill.svgDataUri || ""}
+            hasQRBill={qrBill.hasQRBill}
+            errorMessage={qrBill.errorMessage || undefined}
+            primaryColor={primaryColor}
+          />
+        )}
+
+        {/* Footer IBAN texte — affiché seulement si pas de QR Bill */}
+        {!qrBill?.hasQRBill && (company.iban || company.bankName || company.conditionsPaiement) && (
           <View style={styles.footer} fixed>
             {(company.iban || company.bankName) && (
               <Text style={styles.footerText}>

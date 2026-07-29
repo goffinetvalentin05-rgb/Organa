@@ -15,6 +15,7 @@ export async function renderQuotePdfBuffer(data: DocumentPdfData): Promise<Buffe
       totals={data.totals}
       primaryColor={data.primaryColor}
       documentLabel={data.documentLabel}
+      qrBill={data.qrBill}
     />
   );
 }
@@ -28,6 +29,7 @@ export async function renderInvoicePdfBuffer(data: DocumentPdfData): Promise<Buf
       lines={data.lines}
       totals={data.totals}
       primaryColor={data.primaryColor}
+      qrBill={data.qrBill}
     />
   );
 }

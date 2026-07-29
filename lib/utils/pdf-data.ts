@@ -16,6 +16,14 @@ import {
   resolveDocumentRecipient,
 } from "@/lib/documents/recipient";
 import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
+import {
+  validateQRBillData,
+  generateSwissQRBillDataUri,
+  buildFreeReference,
+  isQRIBAN,
+  generateQRRReference,
+} from "@/lib/swiss-qr-bill";
+import type { QRBillData } from "@/lib/swiss-qr-bill/types";
 
 type DocumentType = "quote" | "invoice";
 
@@ -38,6 +46,13 @@ export type ClubCompanyPdfPayload = {
     iban: string;
     bankName: string;
     conditionsPaiement: string;
+    /** Champs structurés Swiss QR Bill créancier */
+    qrCreditorName?: string;
+    qrCreditorStreet?: string;
+    qrCreditorBuildingNum?: string;
+    qrCreditorZip?: string;
+    qrCreditorCity?: string;
+    qrCreditorCountry?: string;
   };
   primaryColor: string;
   currency: string;
@@ -54,7 +69,7 @@ export async function getClubCompanyPdfData(
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms"
+      "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
     )
     .eq("user_id", scopeUserId)
     .maybeSingle();
@@ -81,6 +96,12 @@ export async function getClubCompanyPdfData(
       iban: profile?.iban || "",
       bankName: profile?.bank_name || "",
       conditionsPaiement: profile?.payment_terms || "",
+      qrCreditorName: (profile as Record<string, unknown>)?.qr_creditor_name as string | undefined || undefined,
+      qrCreditorStreet: (profile as Record<string, unknown>)?.qr_creditor_street as string | undefined || undefined,
+      qrCreditorBuildingNum: (profile as Record<string, unknown>)?.qr_creditor_building_num as string | undefined || undefined,
+      qrCreditorZip: (profile as Record<string, unknown>)?.qr_creditor_zip as string | undefined || undefined,
+      qrCreditorCity: (profile as Record<string, unknown>)?.qr_creditor_city as string | undefined || undefined,
+      qrCreditorCountry: ((profile as Record<string, unknown>)?.qr_creditor_country as string | undefined) || "CH",
     },
     primaryColor: companySettings.primary_color,
     currency,
@@ -113,7 +134,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -202,6 +223,91 @@ export async function getDocumentPdfData(
     ? { title: "COTISATION", clientLabel: "Concerne", numberLabel: "Référence" }
     : { title: "DEVIS", clientLabel: "Client", numberLabel: "Numéro" };
 
+  // ================================================================
+  // Swiss QR Bill — génération SVG
+  // ================================================================
+  const docNum = document.numero || "";
+  const existingQRRef = (document as Record<string, unknown>).qr_reference as string | null | undefined;
+
+  // Référence : stable, persistée en DB. Si déjà générée, on la réutilise.
+  // Pour QR-IBAN → référence QRR (27 chiffres)
+  // Pour IBAN standard → communication libre
+  const iban = company.iban;
+  const useQRIBAN = iban ? isQRIBAN(iban) : false;
+
+  let qrReference: string | undefined;
+  if (useQRIBAN) {
+    qrReference = existingQRRef || generateQRRReference(scopeUserId, docNum);
+  }
+
+  // Si pas de référence en DB, on la sauvegarde de manière transparente
+  if (useQRIBAN && qrReference && !existingQRRef) {
+    try {
+      await supabase
+        .from("documents")
+        .update({ qr_reference: qrReference })
+        .eq("id", id)
+        .eq("user_id", scopeUserId);
+    } catch {
+      // Non bloquant — la référence sera régénérée (déterministe)
+    }
+  }
+
+  // Communication libre pour IBAN standard
+  const qrMessage = buildFreeReference(docNum);
+
+  // Créancier QR Bill : préférence aux champs structurés, fallback sur company_name
+  const creditorName = company.qrCreditorName || company.name;
+  const creditorZip = company.qrCreditorZip || "";
+  const creditorCity = company.qrCreditorCity || "";
+  const creditorCountry = company.qrCreditorCountry || "CH";
+
+  // Débiteur (membre ou externe)
+  const debtorName = resolvedRecipient.name;
+  const debtorStreet = resolvedRecipient.address || undefined;
+  const debtorZip = resolvedRecipient.postalCode || "";
+  const debtorCity = resolvedRecipient.city || "";
+  const debtorCountry = resolvedRecipient.country || "CH";
+
+  const qrBillData: QRBillData = {
+    currency: (currency === "EUR" ? "EUR" : "CHF") as "CHF" | "EUR",
+    amount: totals.total > 0 ? totals.total : undefined,
+    creditor: {
+      account: iban,
+      name: creditorName,
+      street: company.qrCreditorStreet || undefined,
+      buildingNumber: company.qrCreditorBuildingNum || undefined,
+      zip: creditorZip,
+      city: creditorCity,
+      country: creditorCountry,
+    },
+    debtor: debtorZip && debtorCity ? {
+      name: debtorName,
+      street: debtorStreet,
+      zip: debtorZip,
+      city: debtorCity,
+      country: debtorCountry,
+    } : undefined,
+    reference: qrReference,
+    message: qrMessage,
+    language: "FR",
+  };
+
+  const qrValidation = validateQRBillData(qrBillData);
+  let qrBillSvgDataUri: string | null = null;
+  let qrBillError: string | null = null;
+
+  if (qrValidation.valid) {
+    try {
+      qrBillSvgDataUri = await generateSwissQRBillDataUri(qrBillData);
+    } catch (err) {
+      console.error("[pdf-data] Erreur génération QR Bill SVG:", err);
+      qrBillError = "Erreur lors de la génération du QR Bill. Vérifiez les paramètres de paiement.";
+    }
+  } else {
+    qrBillError = qrValidation.errors.map((e) => e.message).join(" • ");
+  }
+
   return {
     company,
     client: {
@@ -213,7 +319,7 @@ export async function getDocumentPdfData(
       city: resolvedRecipient.city || "",
     },
     document: {
-      number: document.numero || "",
+      number: docNum,
       subject: String((document as { title?: string }).title || "").trim(),
       date: document.date_creation,
       dueDate: document.date_echeance,
@@ -227,6 +333,12 @@ export async function getDocumentPdfData(
     totals,
     primaryColor,
     documentLabel,
+    /** Swiss QR Bill */
+    qrBill: {
+      svgDataUri: qrBillSvgDataUri,
+      hasQRBill: qrBillSvgDataUri !== null,
+      errorMessage: qrBillError,
+    },
   };
 }
 

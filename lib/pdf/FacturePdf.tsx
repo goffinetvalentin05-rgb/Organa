@@ -8,6 +8,7 @@ import {
   pdfHyphenationCallback,
   sanitizePdfNotes,
 } from "@/lib/pdf/clubPdfLayout";
+import { SwissQRBillSlip } from "@/lib/pdf/SwissQRBillSlip";
 
 // Types pour les données
 interface FacturePdfProps {
@@ -20,6 +21,12 @@ interface FacturePdfProps {
     iban?: string;
     bankName?: string;
     conditionsPaiement?: string;
+  };
+  /** Swiss QR Bill */
+  qrBill?: {
+    svgDataUri: string | null;
+    hasQRBill: boolean;
+    errorMessage: string | null;
   };
   client: {
     name: string;
@@ -61,6 +68,7 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
   lines,
   totals,
   primaryColor = "#3B82F6",
+  qrBill,
 }) => {
   // Styles dynamiques avec la couleur primaire
   const dynamicStyles = StyleSheet.create({
@@ -250,8 +258,18 @@ export const FacturePdf: React.FC<FacturePdfProps> = ({
           )}
         </View>
 
-        {/* Footer */}
-        {(company.iban || company.bankName || company.conditionsPaiement) && (
+        {/* Swiss QR Bill slip — bas de page */}
+        {qrBill && (
+          <SwissQRBillSlip
+            svgDataUri={qrBill.svgDataUri || ""}
+            hasQRBill={qrBill.hasQRBill}
+            errorMessage={qrBill.errorMessage || undefined}
+            primaryColor={primaryColor}
+          />
+        )}
+
+        {/* Footer IBAN texte — affiché seulement si pas de QR Bill */}
+        {!qrBill?.hasQRBill && (company.iban || company.bankName || company.conditionsPaiement) && (
           <View style={styles.footer} fixed>
             {(company.iban || company.bankName) && (
               <Text style={styles.footerText}>

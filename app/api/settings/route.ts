@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/company-settings";
@@ -21,9 +21,16 @@ type SettingsPutBody = Partial<{
   email_sender_email: string;
   resend_api_key: string;
   email_custom_enabled: boolean;
+  // Swiss QR Bill
+  qr_creditor_name: string;
+  qr_creditor_street: string;
+  qr_creditor_building_num: string;
+  qr_creditor_zip: string;
+  qr_creditor_city: string;
+  qr_creditor_country: string;
 }>;
 
-type ProfileSettingsRow = {
+  type ProfileSettingsRow = {
   user_id?: string;
   plan?: string;
   company_name?: string | null;
@@ -42,6 +49,13 @@ type ProfileSettingsRow = {
   email_sender_email?: string | null;
   resend_api_key?: string | null;
   email_custom_enabled?: boolean | null;
+  // Swiss QR Bill
+  qr_creditor_name?: string | null;
+  qr_creditor_street?: string | null;
+  qr_creditor_building_num?: string | null;
+  qr_creditor_zip?: string | null;
+  qr_creditor_city?: string | null;
+  qr_creditor_country?: string | null;
 };
 
 type SupabaseOpError = {
@@ -52,12 +66,12 @@ type SupabaseOpError = {
 };
 
 /**
- * API Route pour récupérer les paramètres de l'entreprise
+ * API Route pour rÃ©cupÃ©rer les paramÃ¨tres de l'entreprise
  * GET /api/settings
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log("[API][settings] GET - Début récupération");
+    console.log("[API][settings] GET - DÃ©but rÃ©cupÃ©ration");
     const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
     if ("error" in guard) return guard.error;
 
@@ -67,19 +81,19 @@ export async function GET(request: NextRequest) {
 
     console.log("[API][settings] GET - club:", clubId, "actor:", actorId);
 
-    // Profil « entreprise » du club = ligne profiles.user_id = propriétaire du club
+    // Profil Â« entreprise Â» du club = ligne profiles.user_id = propriÃ©taire du club
     let { data: profile, error: fetchError } = await supabase
       .from("profiles")
       .select(
-        "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+        "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
       )
       .eq("user_id", clubId)
       .maybeSingle();
 
-    // Création auto du profil : uniquement pour son propre compte-club (pas pour un invité)
+    // CrÃ©ation auto du profil : uniquement pour son propre compte-club (pas pour un invitÃ©)
     if (!profile) {
       if (clubId === actorId) {
-        console.log("[API][settings] GET - Profil inexistant, création avec valeurs par défaut...");
+        console.log("[API][settings] GET - Profil inexistant, crÃ©ation avec valeurs par dÃ©faut...");
         const defaultCurrencySymbol = getCurrencySymbol(DEFAULT_COMPANY_SETTINGS.currency);
 
         const { data: newProfile, error: createError } = await supabase
@@ -92,47 +106,47 @@ export async function GET(request: NextRequest) {
             currency_symbol: defaultCurrencySymbol,
           })
           .select(
-            "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+            "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
           )
           .single();
 
         if (createError) {
-          console.error("[API][settings] GET - Erreur création profil:", createError);
+          console.error("[API][settings] GET - Erreur crÃ©ation profil:", createError);
           profile = null;
         } else {
           profile = newProfile;
         }
       } else {
         console.log(
-          "[API][settings] GET - Pas de profil pour ce club (hors création auto invité)"
+          "[API][settings] GET - Pas de profil pour ce club (hors crÃ©ation auto invitÃ©)"
         );
       }
     } else if (fetchError) {
-      console.error("[API][settings] GET - Erreur récupération profil:", {
+      console.error("[API][settings] GET - Erreur rÃ©cupÃ©ration profil:", {
         code: fetchError.code,
         message: fetchError.message,
         details: fetchError.details,
         hint: fetchError.hint,
       });
-      // En cas d'erreur de récupération, utiliser null pour déclencher les fallbacks
+      // En cas d'erreur de rÃ©cupÃ©ration, utiliser null pour dÃ©clencher les fallbacks
       profile = null;
     }
 
-    // Si profile est toujours null après toutes les tentatives, utiliser des valeurs par défaut
+    // Si profile est toujours null aprÃ¨s toutes les tentatives, utiliser des valeurs par dÃ©faut
     if (!profile) {
-      console.log("[API][settings] GET - Utilisation des valeurs par défaut");
+      console.log("[API][settings] GET - Utilisation des valeurs par dÃ©faut");
     }
 
     const logoUrl = await resolveClubLogoUrlForClient(supabase, profile, clubId);
     if (logoUrl) {
-      console.log("[API][settings] GET - Logo URL résolue:", logoUrl);
+      console.log("[API][settings] GET - Logo URL rÃ©solue:", logoUrl);
     }
 
-    // Calculer currency_symbol si non défini
+    // Calculer currency_symbol si non dÃ©fini
     const currency = profile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
     const currency_symbol = profile?.currency_symbol || getCurrencySymbol(currency);
 
-    // Formater les données selon les spécifications avec valeurs par défaut robustes
+    // Formater les donnÃ©es selon les spÃ©cifications avec valeurs par dÃ©faut robustes
     const rawSettings = {
       primary_color: profile?.primary_color,
       currency: profile?.currency,
@@ -161,27 +175,34 @@ export async function GET(request: NextRequest) {
       email_sender_name: profile?.email_sender_name || "",
       email_custom_enabled: profile?.email_custom_enabled === true,
       resend_key_configured: hasResendKey,
+      // Swiss QR Bill
+      qr_creditor_name: profile?.qr_creditor_name || "",
+      qr_creditor_street: profile?.qr_creditor_street || "",
+      qr_creditor_building_num: profile?.qr_creditor_building_num || "",
+      qr_creditor_zip: profile?.qr_creditor_zip || "",
+      qr_creditor_city: profile?.qr_creditor_city || "",
+      qr_creditor_country: profile?.qr_creditor_country || "CH",
     };
 
-    console.log("[API][settings] GET - Settings récupérés avec succès");
+    console.log("[API][settings] GET - Settings rÃ©cupÃ©rÃ©s avec succÃ¨s");
 
     return NextResponse.json({ settings });
   } catch (error: unknown) {
     console.error("[API][settings] GET - Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des paramètres", details: getErrorMessage(error) },
+      { error: "Erreur lors de la rÃ©cupÃ©ration des paramÃ¨tres", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
 /**
- * API Route pour sauvegarder les paramètres de l'entreprise
+ * API Route pour sauvegarder les paramÃ¨tres de l'entreprise
  * PUT /api/settings
  */
 export async function PUT(request: NextRequest) {
   try {
-    console.log("[API][settings] PUT - Début sauvegarde");
+    console.log("[API][settings] PUT - DÃ©but sauvegarde");
     const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
     if ("error" in guard) return guard.error;
 
@@ -195,12 +216,12 @@ export async function PUT(request: NextRequest) {
     let body: SettingsPutBody;
     try {
       body = (await request.json()) as SettingsPutBody;
-      console.log("[API][settings] PUT - Body reçu:", body);
+      console.log("[API][settings] PUT - Body reÃ§u:", body);
       
-      // Validation basique : body doit être un objet
+      // Validation basique : body doit Ãªtre un objet
       if (!body || typeof body !== 'object' || Array.isArray(body)) {
         return NextResponse.json(
-          { error: "Format de données invalide", details: "Le body doit être un objet JSON" },
+          { error: "Format de donnÃ©es invalide", details: "Le body doit Ãªtre un objet JSON" },
           { status: 400 }
         );
       }
@@ -208,14 +229,14 @@ export async function PUT(request: NextRequest) {
       console.error("[API][settings] PUT - Erreur parsing JSON:", parseError);
       return NextResponse.json(
         {
-          error: "Format de données invalide",
+          error: "Format de donnÃ©es invalide",
           details: getErrorMessage(parseError) || "JSON invalide",
         },
         { status: 400 }
       );
     }
 
-    // Définir les champs autorisés - UNIQUEMENT ceux qui existent dans la table profiles
+    // DÃ©finir les champs autorisÃ©s - UNIQUEMENT ceux qui existent dans la table profiles
     // Colonnes existantes : user_id, plan, stripe_customer_id, stripe_subscription_id,
     //                      created_at, updated_at, company_name, company_email, company_phone,
     //                      company_address, logo_path, logo_url, primary_color, currency,
@@ -238,20 +259,27 @@ export async function PUT(request: NextRequest) {
       'email_sender_email',
       'resend_api_key',
       'email_custom_enabled',
-      'updated_at'
+      'updated_at',
+      // Swiss QR Bill
+      'qr_creditor_name',
+      'qr_creditor_street',
+      'qr_creditor_building_num',
+      'qr_creditor_zip',
+      'qr_creditor_city',
+      'qr_creditor_country',
     ] as const;
 
-    // Récupérer le profil existant avec TOUS les champs nécessaires AVANT de construire le payload
+    // RÃ©cupÃ©rer le profil existant avec TOUS les champs nÃ©cessaires AVANT de construire le payload
     const { data: existingProfile, error: checkError } = await supabase
       .from("profiles")
       .select(
-        "user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+        "user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
       )
       .eq("user_id", clubId)
       .maybeSingle();
 
     if (checkError) {
-      console.error("[API][settings] PUT - Erreur vérification profil:", {
+      console.error("[API][settings] PUT - Erreur vÃ©rification profil:", {
         code: checkError.code,
         message: checkError.message,
         details: checkError.details,
@@ -259,7 +287,7 @@ export async function PUT(request: NextRequest) {
       });
       return NextResponse.json(
         { 
-          error: "Erreur lors de la vérification du profil", 
+          error: "Erreur lors de la vÃ©rification du profil", 
           details: checkError.message,
           code: checkError.code,
           hint: checkError.hint,
@@ -299,26 +327,26 @@ export async function PUT(request: NextRequest) {
     profilePayload.logo_path = existingProfile?.logo_path || null;
     profilePayload.logo_url = existingProfile?.logo_url || null;
     
-    // Gérer primary_color avec validation
+    // GÃ©rer primary_color avec validation
     if (body.primary_color !== undefined && body.primary_color !== null) {
       const hexColor = String(body.primary_color).trim();
       if (hexColor && /^#[0-9A-Fa-f]{6}$/.test(hexColor)) {
         profilePayload.primary_color = hexColor;
       } else {
-        console.warn("[API][settings] PUT - Couleur mal formatée, utilisation de la valeur par défaut:", hexColor);
+        console.warn("[API][settings] PUT - Couleur mal formatÃ©e, utilisation de la valeur par dÃ©faut:", hexColor);
         profilePayload.primary_color = existingProfile?.primary_color || DEFAULT_COMPANY_SETTINGS.primary_color;
       }
     } else {
       profilePayload.primary_color = existingProfile?.primary_color || DEFAULT_COMPANY_SETTINGS.primary_color;
     }
 
-    // Gérer currency avec validation
+    // GÃ©rer currency avec validation
     if (body.currency !== undefined && body.currency !== null) {
       const currency = String(body.currency).trim().toUpperCase();
       if (currency && currency.length === 3) {
         profilePayload.currency = currency;
       } else {
-        console.warn("[API][settings] PUT - Devise mal formatée, utilisation de la valeur par défaut:", currency);
+        console.warn("[API][settings] PUT - Devise mal formatÃ©e, utilisation de la valeur par dÃ©faut:", currency);
         profilePayload.currency = existingProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
       }
     } else {
@@ -330,7 +358,7 @@ export async function PUT(request: NextRequest) {
       typeof profilePayload.currency === "string" ? profilePayload.currency : undefined
     );
 
-    // Gérer les champs bancaires
+    // GÃ©rer les champs bancaires
     profilePayload.iban = body.iban !== undefined
       ? (body.iban?.trim() || null)
       : (existingProfile?.iban || null);
@@ -339,12 +367,12 @@ export async function PUT(request: NextRequest) {
       ? (body.bank_name?.trim() || null)
       : (existingProfile?.bank_name || null);
     
-    // Gérer payment_terms - IMPORTANT: Garder les chaînes vides comme strings
+    // GÃ©rer payment_terms - IMPORTANT: Garder les chaÃ®nes vides comme strings
     profilePayload.payment_terms = body.payment_terms !== undefined
       ? (body.payment_terms !== null ? String(body.payment_terms).trim() : "")
       : (existingProfile?.payment_terms || "");
 
-    // Gérer les champs email - IMPORTANT: Garder les chaînes vides comme strings
+    // GÃ©rer les champs email - IMPORTANT: Garder les chaÃ®nes vides comme strings
     profilePayload.email_sender_email = body.email_sender_email !== undefined
       ? (body.email_sender_email !== null ? String(body.email_sender_email).trim() : "")
       : (existingProfile?.email_sender_email || "");
@@ -371,12 +399,32 @@ export async function PUT(request: NextRequest) {
         ? Boolean(body.email_custom_enabled)
         : Boolean(existingProfile?.email_custom_enabled);
 
+    // Swiss QR Bill — créancier structuré
+    profilePayload.qr_creditor_name = body.qr_creditor_name !== undefined
+      ? (body.qr_creditor_name !== null ? String(body.qr_creditor_name).trim() : "")
+      : (existingProfile?.qr_creditor_name || "");
+    profilePayload.qr_creditor_street = body.qr_creditor_street !== undefined
+      ? (body.qr_creditor_street !== null ? String(body.qr_creditor_street).trim() : "")
+      : (existingProfile?.qr_creditor_street || "");
+    profilePayload.qr_creditor_building_num = body.qr_creditor_building_num !== undefined
+      ? (body.qr_creditor_building_num !== null ? String(body.qr_creditor_building_num).trim() : "")
+      : (existingProfile?.qr_creditor_building_num || "");
+    profilePayload.qr_creditor_zip = body.qr_creditor_zip !== undefined
+      ? (body.qr_creditor_zip !== null ? String(body.qr_creditor_zip).trim() : "")
+      : (existingProfile?.qr_creditor_zip || "");
+    profilePayload.qr_creditor_city = body.qr_creditor_city !== undefined
+      ? (body.qr_creditor_city !== null ? String(body.qr_creditor_city).trim() : "")
+      : (existingProfile?.qr_creditor_city || "");
+    profilePayload.qr_creditor_country = body.qr_creditor_country !== undefined
+      ? (body.qr_creditor_country !== null ? String(body.qr_creditor_country).trim() : "CH")
+      : (existingProfile?.qr_creditor_country || "CH");
+
     const { resend_api_key: _omit, ...logSafePayload } = profilePayload;
-    console.log("[API][settings] PUT - Payload (hors clé Resend):", {
+    console.log("[API][settings] PUT - Payload (hors clÃ© Resend):", {
       ...logSafePayload,
-      resend_api_key: profilePayload.resend_api_key ? "[présent]" : null,
+      resend_api_key: profilePayload.resend_api_key ? "[prÃ©sent]" : null,
     });
-    console.log("[API][settings] PUT - Vérification champs spécifiques:", {
+    console.log("[API][settings] PUT - VÃ©rification champs spÃ©cifiques:", {
       payment_terms: profilePayload.payment_terms,
       email_sender_email: profilePayload.email_sender_email,
       email_sender_name: profilePayload.email_sender_name,
@@ -384,7 +432,7 @@ export async function PUT(request: NextRequest) {
 
     if (existingProfile) {
       // Le profil existe, faire UN SEUL UPDATE avec TOUS les champs
-      console.log("[API][settings] PUT - Mise à jour du profil existant avec TOUS les champs");
+      console.log("[API][settings] PUT - Mise Ã  jour du profil existant avec TOUS les champs");
       
       // Exclure user_id et plan de l'update (ils ne doivent pas changer)
       const updateData: Record<string, unknown> = {};
@@ -403,20 +451,20 @@ export async function PUT(request: NextRequest) {
         .update(updateData)
         .eq("user_id", clubId)
         .select(
-          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
         )
         .single();
 
       dbError = updateError;
       updatedProfile = profile;
     } else {
-      // Le profil n'existe pas, le créer avec TOUS les champs
-      console.log("[API][settings] PUT - Profil inexistant, création avec TOUS les champs");
+      // Le profil n'existe pas, le crÃ©er avec TOUS les champs
+      console.log("[API][settings] PUT - Profil inexistant, crÃ©ation avec TOUS les champs");
       const { data: newProfile, error: createError } = await supabase
         .from("profiles")
         .insert(profilePayload)
         .select(
-          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
+          "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
         )
         .single();
 
@@ -425,15 +473,15 @@ export async function PUT(request: NextRequest) {
     }
 
     if (dbError) {
-      // LOGS DÉVELOPPEUR COMPLETS
+      // LOGS DÃ‰VELOPPEUR COMPLETS
       // Logger TOUTES les infos Supabase
       const { resend_api_key: _e, ...safePayload } = profilePayload;
-      console.error("[API][settings] PUT - Erreur DB complète:", {
+      console.error("[API][settings] PUT - Erreur DB complÃ¨te:", {
         code: dbError.code,
         message: dbError.message,
         details: dbError.details,
         hint: dbError.hint,
-        profilePayload: { ...safePayload, resend_api_key: profilePayload.resend_api_key ? "[présent]" : null },
+        profilePayload: { ...safePayload, resend_api_key: profilePayload.resend_api_key ? "[prÃ©sent]" : null },
         allowedFields: allowedFields,
         operation: existingProfile ? "UPDATE" : "INSERT",
       });
@@ -441,7 +489,7 @@ export async function PUT(request: NextRequest) {
       // Afficher le message d'erreur exact de Supabase
       return NextResponse.json(
         { 
-          error: dbError.message || "Erreur lors de la sauvegarde des paramètres",
+          error: dbError.message || "Erreur lors de la sauvegarde des paramÃ¨tres",
           details: dbError.details || "",
           hint: dbError.hint || "",
           code: dbError.code,
@@ -451,17 +499,17 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!updatedProfile) {
-      console.error("[API][settings] PUT - Aucun profil retourné après opération DB");
+      console.error("[API][settings] PUT - Aucun profil retournÃ© aprÃ¨s opÃ©ration DB");
       return NextResponse.json(
         { 
-          error: "Erreur lors de la sauvegarde des paramètres", 
-          details: "Le profil n'a pas pu être sauvegardé",
+          error: "Erreur lors de la sauvegarde des paramÃ¨tres", 
+          details: "Le profil n'a pas pu Ãªtre sauvegardÃ©",
         },
         { status: 500 }
       );
     }
 
-    console.log("[API][settings] PUT - Profil sauvegardé avec succès via UPDATE/INSERT");
+    console.log("[API][settings] PUT - Profil sauvegardÃ© avec succÃ¨s via UPDATE/INSERT");
 
     const logoUrl = await resolveClubLogoUrlForClient(
       supabase,
@@ -469,12 +517,12 @@ export async function PUT(request: NextRequest) {
       clubId
     );
 
-    // Calculer currency_symbol si non défini
+    // Calculer currency_symbol si non dÃ©fini
     const currency = updatedProfile?.currency || DEFAULT_COMPANY_SETTINGS.currency;
     const currency_symbol =
       updatedProfile?.currency_symbol || getCurrencySymbol(currency);
 
-    // Formater la réponse avec valeurs par défaut robustes
+    // Formater la rÃ©ponse avec valeurs par dÃ©faut robustes
     const rawSettings = {
       primary_color: updatedProfile?.primary_color,
       currency: updatedProfile?.currency,
@@ -505,9 +553,16 @@ export async function PUT(request: NextRequest) {
       email_custom_enabled: (updatedProfile as { email_custom_enabled?: boolean | null })
         ?.email_custom_enabled === true,
       resend_key_configured: putHasResendKey,
+      // Swiss QR Bill
+      qr_creditor_name: (updatedProfile as ProfileSettingsRow)?.qr_creditor_name || "",
+      qr_creditor_street: (updatedProfile as ProfileSettingsRow)?.qr_creditor_street || "",
+      qr_creditor_building_num: (updatedProfile as ProfileSettingsRow)?.qr_creditor_building_num || "",
+      qr_creditor_zip: (updatedProfile as ProfileSettingsRow)?.qr_creditor_zip || "",
+      qr_creditor_city: (updatedProfile as ProfileSettingsRow)?.qr_creditor_city || "",
+      qr_creditor_country: (updatedProfile as ProfileSettingsRow)?.qr_creditor_country || "CH",
     };
 
-    console.log("[API][settings] PUT - Settings sauvegardés avec succès");
+    console.log("[API][settings] PUT - Settings sauvegardÃ©s avec succÃ¨s");
 
     return NextResponse.json({ settings });
   } catch (error: unknown) {
@@ -524,10 +579,11 @@ export async function PUT(request: NextRequest) {
     
     return NextResponse.json(
       { 
-        error: "Erreur lors de la sauvegarde des paramètres",
+        error: "Erreur lors de la sauvegarde des paramÃ¨tres",
         details: errorMessage,
       },
       { status: 500 }
     );
   }
 }
+

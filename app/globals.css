@@ -204,12 +204,29 @@ html:has(.dashboard-shell) {
   display: none;
 }
 
-/* Navbar landing â€” thÃ¨me sombre / clair selon le scroll */
+/* Navbar landing — morphing continu au scroll et thème selon la section */
 .landing-nav-header {
+  isolation: isolate;
+  will-change: max-width, border-radius;
   transition:
     background 0.32s ease,
     border-color 0.32s ease,
     box-shadow 0.32s ease;
+}
+
+.landing-nav-header::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--landing-nav-scroll-progress, 0);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.landing-nav-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .landing-nav-header--dark {
@@ -235,6 +252,19 @@ html:has(.dashboard-shell) {
   backdrop-filter: blur(18px);
 }
 
+.landing-nav-header--dark::after {
+  background: linear-gradient(
+    90deg,
+    rgba(7, 22, 52, 0.78) 0%,
+    rgba(10, 31, 77, 0.74) 50%,
+    rgba(7, 22, 52, 0.78) 100%
+  );
+}
+
+.landing-nav-header--light::after {
+  background: rgba(255, 255, 255, 0.94);
+}
+
 .landing-nav-logo--on-light {
   filter: brightness(0) saturate(100%);
   opacity: 0.9;
@@ -244,6 +274,12 @@ html:has(.dashboard-shell) {
   .landing-nav-header .landing-nav-cta,
   .landing-nav-header .navbar-cta {
     display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-nav-header {
+    transition-duration: 0.01ms !important;
   }
 }
 

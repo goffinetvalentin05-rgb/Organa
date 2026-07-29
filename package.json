@@ -17,12 +17,14 @@
     "@react-pdf/renderer": "^4.3.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.88.0",
+    "@types/pdfkit": "^0.17.6",
     "framer-motion": "^12.26.2",
     "jszip": "^3.10.1",
     "lucide-react": "^1.7.0",
     "nanoid": "^5.1.6",
     "next": "^16.0.10",
     "papaparse": "^5.5.3",
+    "pdfkit": "^0.19.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
@@ -30,6 +32,7 @@
     "recharts": "^3.7.0",
     "resend": "^4.0.0",
     "stripe": "^20.1.0",
+    "swissqrbill": "^4.4.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

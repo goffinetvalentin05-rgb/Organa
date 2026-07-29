@@ -109,6 +109,13 @@ export default function ParametresPage() {
     currency: "",
     invoiceColor: "",
     branding: "",
+    // Swiss QR Bill — créancier structuré
+    qrCreditorName: "",
+    qrCreditorStreet: "",
+    qrCreditorBuildingNum: "",
+    qrCreditorZip: "",
+    qrCreditorCity: "",
+    qrCreditorCountry: "CH",
   });
   const [saved, setSaved] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -193,6 +200,12 @@ export default function ParametresPage() {
         payment_terms: (s.payment_terms as string) ?? "",
         email_sender_email: (s.email_sender_email as string) ?? "",
         email_sender_name: (s.email_sender_name as string) ?? "",
+        qr_creditor_name: (s.qr_creditor_name as string) ?? "",
+        qr_creditor_street: (s.qr_creditor_street as string) ?? "",
+        qr_creditor_building_num: (s.qr_creditor_building_num as string) ?? "",
+        qr_creditor_zip: (s.qr_creditor_zip as string) ?? "",
+        qr_creditor_city: (s.qr_creditor_city as string) ?? "",
+        qr_creditor_country: (s.qr_creditor_country as string) ?? "CH",
       };
 
       const params: Parametres = {
@@ -232,6 +245,12 @@ export default function ParametresPage() {
         currency: normalizedSettings.currency,
         invoiceColor: primaryColor,
         branding: "",
+        qrCreditorName: normalizedSettings.qr_creditor_name,
+        qrCreditorStreet: normalizedSettings.qr_creditor_street,
+        qrCreditorBuildingNum: normalizedSettings.qr_creditor_building_num,
+        qrCreditorZip: normalizedSettings.qr_creditor_zip,
+        qrCreditorCity: normalizedSettings.qr_creditor_city,
+        qrCreditorCountry: normalizedSettings.qr_creditor_country,
       });
 
       if (logoUrl) {
@@ -392,6 +411,14 @@ export default function ParametresPage() {
       if (formData.conditionsPaiement !== undefined) {
         payload.payment_terms = formData.conditionsPaiement.trim();
       }
+
+      // Swiss QR Bill — créancier structuré
+      payload.qr_creditor_name = formData.qrCreditorName?.trim() || "";
+      payload.qr_creditor_street = formData.qrCreditorStreet?.trim() || "";
+      payload.qr_creditor_building_num = formData.qrCreditorBuildingNum?.trim() || "";
+      payload.qr_creditor_zip = formData.qrCreditorZip?.trim() || "";
+      payload.qr_creditor_city = formData.qrCreditorCity?.trim() || "";
+      payload.qr_creditor_country = formData.qrCreditorCountry?.trim() || "CH";
 
       // Champs email (clé Resend uniquement si l’utilisateur la saisit ou l’efface explicitement)
       payload.email_custom_enabled = formData.emailCustomEnabled;
@@ -938,6 +965,138 @@ export default function ParametresPage() {
                   />
                   <p className={dashboardHintClass}>{t("dashboard.settings.billing.paymentTermsHelp")}</p>
                 </div>
+              </div>
+            </SettingsAccordion>
+
+            {/* ── Swiss QR Bill ── */}
+            <SettingsAccordion title="QR-facture suisse (Swiss QR Bill)">
+              <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+                <p className="text-sm font-medium text-blue-900">QR-facture conforme SIX Group</p>
+                <p className="mt-1 text-xs text-blue-700">
+                  Ces informations sont utilisées pour générer automatiquement la zone de paiement Swiss QR Bill
+                  sur toutes vos factures et cotisations PDF. Elles doivent correspondre exactement à votre compte bancaire suisse.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Nom du bénéficiaire */}
+                <div>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
+                    Nom du bénéficiaire
+                    <span className="ml-1 text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.qrCreditorName ?? ""}
+                    onChange={(e) => setFormData({ ...formData, qrCreditorName: e.target.value })}
+                    placeholder={formData.nomEntreprise || "Nom de votre association / club"}
+                    className={dashboardInputClass}
+                    maxLength={70}
+                  />
+                  <p className={dashboardHintClass}>Laissez vide pour utiliser le nom du club. Max 70 caractères.</p>
+                </div>
+
+                {/* Adresse */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
+                      Rue
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.qrCreditorStreet ?? ""}
+                      onChange={(e) => setFormData({ ...formData, qrCreditorStreet: e.target.value })}
+                      placeholder="Rue de la Paix"
+                      className={dashboardInputClass}
+                      maxLength={70}
+                    />
+                  </div>
+                  <div>
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
+                      N°
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.qrCreditorBuildingNum ?? ""}
+                      onChange={(e) => setFormData({ ...formData, qrCreditorBuildingNum: e.target.value })}
+                      placeholder="12"
+                      className={dashboardInputClass}
+                      maxLength={16}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
+                      NPA
+                      <span className="ml-1 text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.qrCreditorZip ?? ""}
+                      onChange={(e) => setFormData({ ...formData, qrCreditorZip: e.target.value })}
+                      placeholder="1000"
+                      className={dashboardInputClass}
+                      maxLength={16}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className={`mb-2 block ${dashboardLabelClass}`}>
+                      Ville
+                      <span className="ml-1 text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.qrCreditorCity ?? ""}
+                      onChange={(e) => setFormData({ ...formData, qrCreditorCity: e.target.value })}
+                      placeholder="Lausanne"
+                      className={dashboardInputClass}
+                      maxLength={35}
+                    />
+                  </div>
+                </div>
+
+                {/* Pays */}
+                <div>
+                  <label className={`mb-2 block ${dashboardLabelClass}`}>
+                    Pays
+                  </label>
+                  <select
+                    value={formData.qrCreditorCountry ?? "CH"}
+                    onChange={(e) => setFormData({ ...formData, qrCreditorCountry: e.target.value })}
+                    className={dashboardSelectLgClass}
+                  >
+                    <option value="CH">🇨🇭 Suisse (CH)</option>
+                    <option value="LI">🇱🇮 Liechtenstein (LI)</option>
+                    <option value="FR">🇫🇷 France (FR)</option>
+                    <option value="DE">🇩🇪 Allemagne (DE)</option>
+                    <option value="AT">🇦🇹 Autriche (AT)</option>
+                    <option value="IT">🇮🇹 Italie (IT)</option>
+                  </select>
+                </div>
+
+                {/* Indicateur de configuration */}
+                {formData.iban && formData.qrCreditorZip && formData.qrCreditorCity ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                    <svg className="h-4 w-4 shrink-0 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Configuration QR-facture complète — vos PDF incluront automatiquement la zone de paiement.</span>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.293 5.293a1 1 0 011.414 0l7 7a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 010-1.414l7-7z" />
+                    </svg>
+                    <span>
+                      Pour activer la QR-facture :{" "}
+                      {!formData.iban && <strong>IBAN manquant</strong>}
+                      {formData.iban && !formData.qrCreditorZip && <strong>NPA manquant</strong>}
+                      {formData.iban && formData.qrCreditorZip && !formData.qrCreditorCity && <strong>Ville manquante</strong>}
+                    </span>
+                  </div>
+                )}
               </div>
             </SettingsAccordion>
           </SectionCard>
