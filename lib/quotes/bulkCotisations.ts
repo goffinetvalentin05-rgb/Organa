@@ -8,10 +8,14 @@
  * en repartant de l'étape exacte où le traitement s'est arrêté : une cotisation
  * déjà créée n'est jamais recréée, un PDF déjà produit n'est pas régénéré.
  *
- * Les clés d'idempotence sont dérivées du contenu du formulaire (`runId`) et de
- * l'identifiant du membre. Elles sont donc stables d'une tentative à l'autre :
- * un second clic ou un « réessayer » ne peut pas produire de doublon côté
- * serveur, même si l'état local a été perdu.
+ * La clé d'idempotence de la *création* est dérivée du contenu du formulaire
+ * (`runId`) et de l'identifiant du membre. Elle est donc stable d'une tentative
+ * à l'autre : un second clic ou un « réessayer » ne peut pas produire de
+ * cotisation en double, même si l'état local a été perdu.
+ *
+ * L'*envoi*, lui, ne fabrique aucune clé ici : il délègue à
+ * `sendCotisationEmail`, la fonction utilisée par le bouton « Envoyer par
+ * mail ». Les deux flux exécutent ainsi rigoureusement le même code d'envoi.
  */
 
 export type BulkStep = "create" | "pdf" | "email";
@@ -95,11 +99,15 @@ export type BulkCotisationsDeps = {
     documentId: string;
     memberId: string;
   }): Promise<void>;
+  /**
+   * Doit appeler la fonction centrale d'envoi (`sendCotisationEmail`). Aucune
+   * clé d'idempotence n'est fournie : elle est produite par cette fonction,
+   * exactement comme lors d'un envoi manuel.
+   */
   sendEmail(input: {
     documentId: string;
     memberId: string;
     email: string;
-    idempotencyKey: string;
   }): Promise<void>;
 };
 
@@ -124,13 +132,6 @@ export function createCotisationIdempotencyKey(
   memberId: string
 ): string {
   return `cotisation:${runId}:${memberId}`;
-}
-
-export function createCotisationEmailIdempotencyKey(
-  runId: string,
-  memberId: string
-): string {
-  return `cotisation-email:${runId}:${memberId}`;
 }
 
 /**
@@ -331,7 +332,6 @@ export async function runBulkCotisations(
           documentId: state.documentId,
           memberId: member.id,
           email: state.email,
-          idempotencyKey: createCotisationEmailIdempotencyKey(runId, member.id),
         });
         state.emailSent = true;
         state.status = "done";

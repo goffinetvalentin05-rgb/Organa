@@ -22,6 +22,7 @@ import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import {
   type CotisationClient,
   type RecipientType,
@@ -323,25 +324,6 @@ export default function NouveauDevisPage() {
     }
   };
 
-  const sendQuoteEmail = async (
-    documentId: string,
-    idempotencyKey: string
-  ): Promise<void> => {
-    const response = await idempotentFetch("/api/email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      idempotencyKey,
-      body: JSON.stringify({
-        type: "cotisation",
-        documentId,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(await readApiError(response));
-    }
-  };
-
   /**
    * Trace structurée de chaque étape, pour pouvoir rattacher une erreur à un
    * membre, une cotisation et une étape précise dans la console navigateur.
@@ -419,8 +401,14 @@ export default function NouveauDevisPage() {
           generatePdf: async ({ documentId }) => {
             await fetchQuotePdfBlob(documentId, true);
           },
-          sendEmail: ({ documentId, idempotencyKey }) =>
-            sendQuoteEmail(documentId, idempotencyKey),
+          // Exactement la fonction du bouton « Envoyer par mail ».
+          sendEmail: async ({ documentId, memberId, email }) => {
+            await sendCotisationEmail({
+              cotisationId: documentId,
+              recipientEmail: email,
+              memberId,
+            });
+          },
         },
         onProgress: (progress, states) => {
           setBulkProgress(progress);

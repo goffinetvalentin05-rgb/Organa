@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   computeBulkRunId,
-  createCotisationEmailIdempotencyKey,
   createCotisationIdempotencyKey,
   runBulkCotisations,
   summarize,
@@ -143,7 +142,7 @@ describe("création groupée nominale (deux membres avec email valide)", () => {
     expect(progress.every((p) => p.processed <= p.total)).toBe(true);
   });
 
-  it("dérive des clés d'idempotence distinctes par membre et par opération", async () => {
+  it("dérive une clé d'idempotence de création stable et distincte par membre", async () => {
     const server = createServer();
     const keys: string[] = [];
 
@@ -156,20 +155,36 @@ describe("création groupée nominale (deux membres avec email valide)", () => {
           keys.push(input.idempotencyKey);
           return server.deps.createCotisation(input);
         },
-        sendEmail: (input) => {
-          keys.push(input.idempotencyKey);
-          return server.deps.sendEmail(input);
-        },
       },
     });
 
     expect(keys).toEqual([
       createCotisationIdempotencyKey(RUN_ID, SOPHIE.id),
-      createCotisationEmailIdempotencyKey(RUN_ID, SOPHIE.id),
       createCotisationIdempotencyKey(RUN_ID, JULIE.id),
-      createCotisationEmailIdempotencyKey(RUN_ID, JULIE.id),
     ]);
-    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("laisse la fonction centrale produire la clé de l'envoi", async () => {
+    const server = createServer();
+    const sendInputs: Record<string, unknown>[] = [];
+
+    await runBulkCotisations({
+      members: MEMBERS,
+      runId: RUN_ID,
+      deps: {
+        ...server.deps,
+        sendEmail: (input) => {
+          sendInputs.push(input as unknown as Record<string, unknown>);
+          return server.deps.sendEmail(input);
+        },
+      },
+    });
+
+    // Une clé fabriquée ici réintroduirait la divergence avec le bouton manuel.
+    expect(sendInputs).toEqual([
+      { documentId: "doc-1", memberId: SOPHIE.id, email: SOPHIE.email },
+      { documentId: "doc-2", memberId: JULIE.id, email: JULIE.email },
+    ]);
   });
 });
 

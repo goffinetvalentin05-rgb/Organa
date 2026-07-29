@@ -31,7 +31,7 @@ import {
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
-import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { sendInvoiceEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 
 interface Facture {
@@ -268,24 +268,12 @@ export default function FactureDetailPage() {
     }
     if (envoiEmail) return;
 
-    await runEmailSend(async (idempotencyKey) => {
+    await runEmailSend(async () => {
       try {
-        const response = await idempotentFetch("/api/email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          idempotencyKey,
-          body: JSON.stringify({
-            type: "facture",
-            documentId: id,
-          }),
+        await sendInvoiceEmail({
+          invoiceId: id,
+          recipientEmail,
         });
-
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(data?.error || t("dashboard.invoices.detail.sendError"));
-        }
 
         notifySuccess(t("dashboard.invoices.detail.sendSuccess"), "email-send");
 

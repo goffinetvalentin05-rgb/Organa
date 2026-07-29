@@ -27,7 +27,7 @@ import EditDocumentIdentityModal from "@/components/documents/EditDocumentIdenti
 import ClubDocumentLogo from "@/components/documents/ClubDocumentLogo";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
-import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 
 interface Devis {
@@ -165,28 +165,13 @@ export default function DevisDetailPage() {
     }
     if (envoiEmail) return;
 
-    await runEmailSend(async (idempotencyKey) => {
+    await runEmailSend(async () => {
       try {
-        const response = await idempotentFetch("/api/email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          idempotencyKey,
-          body: JSON.stringify({
-            type: "cotisation",
-            documentId: id,
-          }),
+        await sendCotisationEmail({
+          cotisationId: id,
+          recipientEmail: devis.client?.email,
+          memberId: devis.clientId ?? null,
         });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          const apiMessage = data?.details
-            ? `${data?.error || t("dashboard.quotes.detail.sendError")} (${data.details})`
-            : data?.error || t("dashboard.quotes.detail.sendError");
-          throw new Error(apiMessage);
-        }
 
         notifySuccess(t("dashboard.quotes.detail.sendSuccess"), "email-send");
 
