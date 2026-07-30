@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ProductSwitcher from "@/components/ProductSwitcher";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
 
@@ -188,24 +189,28 @@ export default function LandingNav() {
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: easePremium }}
-        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] flex-nowrap items-center justify-between gap-2.5 overflow-hidden rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
+        className={`landing-nav-header relative flex h-11 w-full max-w-[min(100%,24rem)] flex-nowrap items-center justify-between gap-2.5 overflow-visible rounded-full px-3.5 sm:h-12 sm:max-w-[min(100%,32rem)] sm:gap-3 sm:px-4 md:max-w-[min(100%,48rem)] md:px-5 lg:h-14 lg:max-w-[min(100%,1060px)] lg:gap-4 lg:px-8 xl:max-w-[min(100%,1100px)] ${
           isLight ? "landing-nav-header--light" : "landing-nav-header--dark"
         }`}
       >
-        <Link
-          href="/"
-          className="flex min-w-0 shrink items-center transition hover:opacity-90"
-          onClick={closeMenu}
-        >
-          <Image
-            src="/obillz-logo.png"
-            alt="Obillz"
-            width={200}
-            height={48}
-            priority
-            className={`h-7 w-auto max-w-[140px] object-contain object-left sm:h-8 sm:max-w-none lg:h-9 ${isLight ? "landing-nav-logo--on-light" : ""}`}
-          />
-        </Link>
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Link
+            href="/"
+            className="flex min-w-0 shrink items-center transition hover:opacity-90"
+            onClick={closeMenu}
+          >
+            <Image
+              src="/obillz-logo.png"
+              alt="Obillz"
+              width={200}
+              height={48}
+              priority
+              className={`h-7 w-auto max-w-[112px] object-contain object-left sm:h-8 sm:max-w-[140px] lg:h-9 lg:max-w-none ${isLight ? "landing-nav-logo--on-light" : ""}`}
+            />
+          </Link>
+          <span className={`hidden h-5 w-px sm:block ${isLight ? "bg-slate-900/10" : "bg-white/15"}`} />
+          <ProductSwitcher current="sport" theme={navTheme} />
+        </div>
 
         <div className="landing-nav-actions hidden shrink-0 items-center gap-1.5 sm:gap-2 lg:flex lg:gap-3">
           <LanguageSwitcher compact theme={navTheme} />
