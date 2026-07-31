@@ -147,25 +147,16 @@ function MfaVerifyForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          <button
-            type="button"
-            onClick={() => {
-              void (async () => {
-                const loginHref = next.startsWith("/associations/")
-                  ? "/associations/connexion"
-                  : "/connexion";
-                try {
-                  await supabase.auth.signOut();
-                } catch {
-                  // on redirige quand même
-                }
-                window.location.href = loginHref;
-              })();
-            }}
+          <a
+            href={
+              next.startsWith("/associations/")
+                ? "/deconnexion?next=/associations/connexion"
+                : "/deconnexion?next=/connexion"
+            }
             className="underline hover:text-slate-700"
           >
             Retour à la connexion
-          </button>
+          </a>
         </p>
       </div>
     </div>

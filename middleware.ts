@@ -272,6 +272,7 @@ export const config = {
     "/associations/inscription",
     "/associations/espace",
     "/associations/espace/:path*",
+    "/deconnexion",
     "/api/:path*",
   ],
 };

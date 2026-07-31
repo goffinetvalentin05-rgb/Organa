@@ -272,25 +272,16 @@ function ConfigurerMfaForm() {
           )}
 
           <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
-            <button
-              type="button"
-              onClick={() => {
-                void (async () => {
-                  const loginHref = nextPath.startsWith("/associations/")
-                    ? "/associations/connexion"
-                    : "/connexion";
-                  try {
-                    await supabase.auth.signOut();
-                  } catch {
-                    // on redirige quand même
-                  }
-                  window.location.href = loginHref;
-                })();
-              }}
+            <a
+              href={
+                nextPath.startsWith("/associations/")
+                  ? "/deconnexion?next=/associations/connexion"
+                  : "/deconnexion?next=/connexion"
+              }
               className="font-medium underline decoration-slate-300 underline-offset-2 hover:text-slate-800"
             >
               Retour à la connexion
-            </button>
+            </a>
           </p>
         </div>
       </div>
