@@ -2,6 +2,12 @@ import { requireProductAccess } from "@/lib/auth/require-product-access";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AssociationsDashboardShell from "@/components/associations/dashboard/AssociationsDashboardShell";
+import {
+  associationsOrgDisplayName,
+  associationsRoleLabel,
+  associationsUserChipLabel,
+} from "@/lib/associations/settings";
+import { resolveClubLogoUrlForClient } from "@/lib/club/resolveClubLogoUrl";
 
 async function loadAssociationsContext() {
   const access = await requireProductAccess("association");
@@ -11,7 +17,7 @@ async function loadAssociationsContext() {
     await Promise.all([
       supabase
         .from("profiles")
-        .select("company_name, product_type, logo_url")
+        .select("company_name, product_type, logo_url, logo_path")
         .eq("user_id", access.clubId)
         .maybeSingle(),
       supabase
@@ -29,32 +35,29 @@ async function loadAssociationsContext() {
     redirect("/tableau-de-bord");
   }
 
-  const orgName =
-    typeof profile?.company_name === "string" && profile.company_name.trim()
-      ? profile.company_name.trim()
-      : "Votre association";
+  const orgName = associationsOrgDisplayName(profile?.company_name);
 
-  const logoUrl =
-    typeof profile?.logo_url === "string" && profile.logo_url.trim()
-      ? profile.logo_url.trim()
-      : null;
+  const logoUrl = await resolveClubLogoUrlForClient(
+    supabase,
+    profile
+      ? { logo_url: profile.logo_url, logo_path: profile.logo_path }
+      : null,
+    access.clubId
+  );
 
   const userEmail =
     (typeof membership?.email === "string" && membership.email.trim()) ||
     authUser.user?.email ||
     null;
 
-  const userLabel =
-    (typeof membership?.name === "string" && membership.name.trim()) ||
-    userEmail ||
-    "Utilisateur";
+  const userLabel = associationsUserChipLabel(membership?.name, userEmail);
 
   return {
     orgName,
     logoUrl,
     userEmail,
     userLabel,
-    role: access.role,
+    role: associationsRoleLabel(access.role),
     hasLogo: Boolean(logoUrl),
   };
 }

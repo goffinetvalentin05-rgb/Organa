@@ -12,8 +12,9 @@ import styles from "./associations-dashboard.module.css";
 
 type AssociationsDashboardHomeProps = {
   orgName: string;
-  userLabel: string;
+  firstName: string | null;
   hasLogo: boolean;
+  hasCompanyName: boolean;
 };
 
 const overviewCards = [
@@ -22,24 +23,32 @@ const overviewCards = [
     href: "/associations/espace/membres",
     icon: Users,
     tone: "bg-[#ed7059]/12 text-[#ed7059]",
+    empty: "Aucun membre",
+    cta: "Ajouter le premier membre",
   },
   {
     title: "Cotisations",
     href: "/associations/espace/cotisations",
     icon: Wallet,
     tone: "bg-[#7f9c88]/18 text-[#4f6b58]",
+    empty: "Aucune campagne",
+    cta: "Préparer les cotisations",
   },
   {
     title: "Documents",
     href: "/associations/espace/documents",
     icon: FileText,
     tone: "bg-[#17211d]/8 text-[#17211d]",
+    empty: "Aucun document",
+    cta: "Ajouter un document",
   },
   {
     title: "Événements",
     href: "/associations/espace/evenements",
     icon: Calendar,
     tone: "bg-[#ed7059]/10 text-[#c84f3b]",
+    empty: "Aucun événement",
+    cta: "Créer un événement",
   },
 ] as const;
 
@@ -75,15 +84,18 @@ const setupSteps = [
 
 export default function AssociationsDashboardHome({
   orgName,
-  userLabel,
+  firstName,
   hasLogo,
+  hasCompanyName,
 }: AssociationsDashboardHomeProps) {
   const setupDone = {
-    info: Boolean(orgName && orgName !== "Votre association"),
+    info: hasCompanyName,
     members: false,
     docs: false,
     dues: false,
   };
+
+  const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
 
   return (
     <div className="space-y-8">
@@ -102,10 +114,13 @@ export default function AssociationsDashboardHome({
             Obillz Associations
           </p>
           <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.045em] text-[#17211d] sm:text-4xl">
-            Bonjour{userLabel ? `, ${userLabel.split(" ")[0]}` : ""}, bienvenue sur Obillz
+            {greeting}
           </h2>
+          <p className="mt-2 text-xl font-extrabold tracking-[-0.03em] text-[#17211d] sm:text-2xl">
+            Bienvenue sur Obillz Associations
+          </p>
           <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-[#66736d] sm:text-base">
-            Voici un aperçu de votre association{" "}
+            Voici un aperçu de votre association :{" "}
             <span className="font-extrabold text-[#17211d]">{orgName}</span>.
           </p>
         </div>
@@ -118,7 +133,7 @@ export default function AssociationsDashboardHome({
               Vue d’ensemble
             </h3>
             <p className="mt-1 text-sm font-medium text-[#66736d]">
-              Les indicateurs métier arriveront avec les modules.
+              Commencez par renseigner vos premiers contenus.
             </p>
           </div>
         </div>
@@ -126,23 +141,26 @@ export default function AssociationsDashboardHome({
           {overviewCards.map((card) => {
             const Icon = card.icon;
             return (
-              <Link
-                key={card.href}
-                href={card.href}
-                className={`${styles.card} group p-5 transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(23,33,29,0.07)]`}
-              >
+              <div key={card.href} className={`${styles.card} p-5`}>
                 <div className="flex items-center justify-between">
                   <span
                     className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl ${card.tone}`}
                   >
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
-                  <ArrowRight className="h-4 w-4 text-[#9aa49e] transition group-hover:translate-x-0.5 group-hover:text-[#ed7059]" />
                 </div>
                 <p className="mt-5 text-sm font-extrabold text-[#17211d]">{card.title}</p>
-                <p className={styles.statValue}>—</p>
-                <p className="mt-1 text-xs font-semibold text-[#9aa49e]">Bientôt disponible</p>
-              </Link>
+                <p className="mt-3 text-base font-extrabold tracking-[-0.03em] text-[#17211d]">
+                  {card.empty}
+                </p>
+                <Link
+                  href={card.href}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-extrabold text-[#ed7059] transition hover:text-[#c84f3b]"
+                >
+                  {card.cta}
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </Link>
+              </div>
             );
           })}
         </div>
@@ -194,7 +212,12 @@ export default function AssociationsDashboardHome({
             </p>
           </div>
           {!hasLogo ? (
-            <p className="text-xs font-bold text-[#b84e3a]">Astuce : ajoutez bientôt votre logo</p>
+            <Link
+              href="/associations/espace/parametres#identite"
+              className="text-xs font-bold text-[#b84e3a] hover:underline"
+            >
+              Ajouter votre logo
+            </Link>
           ) : null}
         </div>
         <ol className="mt-5 grid gap-3 sm:grid-cols-2">
