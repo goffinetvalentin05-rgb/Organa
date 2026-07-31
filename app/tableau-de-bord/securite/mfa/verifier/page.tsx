@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
@@ -148,16 +147,25 @@ function MfaVerifyForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          <Link
-            href={
-              next.startsWith("/associations/")
-                ? "/associations/connexion"
-                : "/connexion"
-            }
+          <button
+            type="button"
+            onClick={() => {
+              void (async () => {
+                const loginHref = next.startsWith("/associations/")
+                  ? "/associations/connexion"
+                  : "/connexion";
+                try {
+                  await supabase.auth.signOut();
+                } catch {
+                  // on redirige quand même
+                }
+                window.location.href = loginHref;
+              })();
+            }}
             className="underline hover:text-slate-700"
           >
             Retour à la connexion
-          </Link>
+          </button>
         </p>
       </div>
     </div>
