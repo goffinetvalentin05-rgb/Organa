@@ -12,7 +12,6 @@ import {
   Landmark,
   MapPin,
   Megaphone,
-  Menu,
   Package,
   ShieldCheck,
   Sparkles,
@@ -28,6 +27,7 @@ import {
   useReducedMotion,
   useScroll,
   useSpring,
+  useTransform,
 } from "framer-motion";
 import {
   useEffect,
@@ -37,7 +37,8 @@ import {
   type CSSProperties,
   type SVGProps,
 } from "react";
-import ProductSwitcher from "@/components/ProductSwitcher";
+import ObillzFloatingNav from "@/components/ObillzFloatingNav";
+import AssociationsFooter from "@/components/associations/AssociationsFooter";
 import { associationFeatures } from "@/lib/associations";
 import styles from "./associations.module.css";
 
@@ -91,21 +92,6 @@ function WhatsAppIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
     </svg>
-  );
-}
-
-function Wordmark() {
-  return (
-    <Link href="/associations" className="flex items-center transition hover:opacity-90" aria-label="Obillz">
-      <Image
-        src="/obillz-logo.png"
-        alt="Obillz"
-        width={200}
-        height={48}
-        priority
-        className="landing-nav-logo--on-light h-8 w-auto max-w-[140px] object-contain object-left sm:h-9 sm:max-w-none"
-      />
-    </Link>
   );
 }
 
@@ -405,6 +391,144 @@ export function LegacyWhyAssociationsSection() {
   );
 }
 
+const collaborationFeedbacks = [
+  { text: "Pouvoir réserver nos salles", x: 8, y: 14, delay: 0, color: "#ed7059" },
+  { text: "Il nous manque un suivi du matériel", x: 68, y: 10, delay: 0.35, color: "#6d5efc" },
+  { text: "Un rappel automatique des cotisations", x: 4, y: 58, delay: 0.7, color: "#7f9c88" },
+  { text: "Partager les documents du comité", x: 70, y: 62, delay: 1.05, color: "#ed7059" },
+  { text: "Gérer les répétitions", x: 18, y: 84, delay: 1.4, color: "#6d5efc" },
+  { text: "Inviter les bénévoles", x: 58, y: 82, delay: 1.75, color: "#7f9c88" },
+];
+
+function CollaborationConstellation({ reduceMotion }: { reduceMotion: boolean | null }) {
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => setCycle((value) => value + 1), 7200);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion]);
+
+  return (
+    <div className={styles.collaborationVisual} aria-label="Animation des retours associations">
+      <div className={styles.collaborationOrbit} aria-hidden />
+      <div className={styles.collaborationOrbitOuter} aria-hidden />
+      <div className={styles.collaborationRays} aria-hidden />
+
+      {collaborationFeedbacks.map((feedback) => (
+        <motion.div
+          key={`${feedback.text}-${cycle}`}
+          className={styles.feedbackChip}
+          style={
+            {
+              "--chip-x": `${feedback.x}%`,
+              "--chip-y": `${feedback.y}%`,
+              "--chip-accent": feedback.color,
+            } as CSSProperties
+          }
+          initial={
+            reduceMotion
+              ? { opacity: 0.85, x: "-50%", y: "-50%", scale: 1 }
+              : { opacity: 0, x: "-50%", y: "-50%", scale: 0.9 }
+          }
+          animate={
+            reduceMotion
+              ? { opacity: 0.85, x: "-50%", y: "-50%", scale: 1 }
+              : {
+                  opacity: [0, 1, 1, 0],
+                  x: ["-50%", "-50%", "-50%", "-50%"],
+                  y: ["-50%", "-50%", "-50%", "-50%"],
+                  left: [`${feedback.x}%`, `${feedback.x}%`, "50%", "50%"],
+                  top: [`${feedback.y}%`, `${feedback.y}%`, "48%", "48%"],
+                  scale: [0.92, 1, 0.88, 0.7],
+                }
+          }
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : {
+                  duration: 5.4,
+                  delay: feedback.delay,
+                  times: [0, 0.18, 0.72, 1],
+                  ease: [0.22, 1, 0.36, 1],
+                }
+          }
+        >
+          <span className={styles.feedbackChipDot} />
+          {feedback.text}
+        </motion.div>
+      ))}
+
+      <div className={styles.collaborationCoreAnchor}>
+        <motion.div
+          className={styles.collaborationCore}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.04, 1],
+                  boxShadow: [
+                    "0 28px 70px rgba(23, 33, 29, 0.28), 0 0 0 1.1rem rgba(127, 156, 136, 0.05), 0 0 28px rgba(127, 156, 136, 0.18)",
+                    "0 32px 80px rgba(23, 33, 29, 0.3), 0 0 0 1.35rem rgba(127, 156, 136, 0.09), 0 0 48px rgba(237, 112, 89, 0.22)",
+                    "0 28px 70px rgba(23, 33, 29, 0.28), 0 0 0 1.1rem rgba(127, 156, 136, 0.05), 0 0 28px rgba(127, 156, 136, 0.18)",
+                  ],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : { duration: 4.2, repeat: Infinity, ease: "easeInOut" }
+          }
+        >
+          {!reduceMotion && (
+            <>
+              <motion.span
+                key={`wave-a-${cycle}`}
+                className={styles.collaborationWave}
+                initial={{ opacity: 0, scale: 0.55 }}
+                animate={{ opacity: [0, 0.45, 0], scale: [0.55, 1.35, 1.7] }}
+                transition={{ duration: 2.2, delay: 4.1, ease: "easeOut" }}
+              />
+              <motion.span
+                key={`wave-b-${cycle}`}
+                className={styles.collaborationWave}
+                initial={{ opacity: 0, scale: 0.55 }}
+                animate={{ opacity: [0, 0.28, 0], scale: [0.55, 1.55, 1.95] }}
+                transition={{ duration: 2.4, delay: 4.35, ease: "easeOut" }}
+              />
+            </>
+          )}
+          <Image
+            src="/logo-symbole.png"
+            alt="Obillz"
+            width={64}
+            height={64}
+            className={styles.collaborationSymbol}
+          />
+        </motion.div>
+      </div>
+
+      <motion.p
+        key={`caption-${cycle}`}
+        className={styles.collaborationCaption}
+        initial={{ opacity: 0, y: 8 }}
+        animate={
+          reduceMotion
+            ? { opacity: 0.7, y: 0 }
+            : { opacity: [0, 0, 0.85, 0.85, 0], y: [8, 8, 0, 0, -4] }
+        }
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { duration: 6.4, times: [0, 0.55, 0.68, 0.88, 1], ease: "easeInOut" }
+        }
+      >
+        Les retours convergent. Le produit évolue.
+      </motion.p>
+    </div>
+  );
+}
+
 function WhyAssociationsSection() {
   const reduceMotion = useReducedMotion();
   const transition = {
@@ -413,7 +537,7 @@ function WhyAssociationsSection() {
   };
 
   return (
-    <section className={styles.collaborationSection}>
+    <section id="pourquoi" className={styles.collaborationSection}>
       <div className={styles.noise} />
       <div className="relative mx-auto max-w-[1180px]">
         <motion.div
@@ -437,214 +561,373 @@ function WhyAssociationsSection() {
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: reduceMotion ? 0 : 50,
-            scale: reduceMotion ? 1 : 0.975,
-          }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ ...transition, delay: 0.12 }}
-          className={styles.collaborationPanel}
-        >
-          <div className={styles.collaborationGlow} aria-hidden />
-          <div className="relative z-10 grid gap-12 lg:grid-cols-[.92fr_1.08fr] lg:items-center">
-            <div>
-              <span className={styles.collaborationBadge}>
-                <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
-                Une vision collaborative
-              </span>
-              <h3 className="mt-7 text-3xl font-extrabold tracking-[-.05em] text-[#17211d] sm:text-4xl">
-                Un logiciel qui grandira avec vous.
-              </h3>
-              <p className="mt-5 text-sm font-medium leading-relaxed text-[#68756e] sm:text-base">
-                Nous écouterons les besoins, les difficultés et les idées des
-                associations afin de développer les fonctionnalités qui leur feront
-                réellement gagner du temps.
-              </p>
-
-              <div className={styles.collaborationPrinciples}>
-                {[
-                  ["Écouter", "Chaque retour compte."],
-                  ["Comprendre", "Chaque association a sa réalité."],
-                  ["Construire", "Les fonctionnalités vraiment utiles."],
-                ].map(([title, text], index) => (
-                  <motion.div
-                    key={title}
-                    initial={{ opacity: 0, x: reduceMotion ? 0 : -18 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ ...transition, delay: 0.24 + index * 0.08 }}
-                  >
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <p>
-                      <strong>{title}</strong>
-                      {text}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.collaborationVisual} aria-label="Boucle de co-construction">
-              <div className={styles.collaborationGrid} aria-hidden />
-              <motion.div
-                className={`${styles.feedbackNode} ${styles.feedbackIdea}`}
-                animate={
-                  reduceMotion ? undefined : { y: [0, -7, 0], rotate: [-2, 0, -2] }
-                }
-                transition={{ duration: 5.4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="h-4 w-4" />
-                <span>
-                  <strong>Une idée</strong>
-                  pour aller plus loin
-                </span>
-              </motion.div>
-              <motion.div
-                className={`${styles.feedbackNode} ${styles.feedbackNeed}`}
-                animate={
-                  reduceMotion ? undefined : { y: [0, 6, 0], rotate: [2, 0, 2] }
-                }
-                transition={{
-                  duration: 6.1,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: -2,
-                }}
-              >
-                <Megaphone className="h-4 w-4" />
-                <span>
-                  <strong>Un besoin</strong>
-                  issu du quotidien
-                </span>
-              </motion.div>
-              <motion.div
-                className={`${styles.feedbackNode} ${styles.feedbackDifficulty}`}
-                animate={
-                  reduceMotion ? undefined : { x: [0, 5, 0], y: [0, -3, 0] }
-                }
-                transition={{
-                  duration: 5.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: -3,
-                }}
-              >
-                <Users className="h-4 w-4" />
-                <span>
-                  <strong>Une difficulté</strong>
-                  à simplifier
-                </span>
-              </motion.div>
-
-              <div className={styles.collaborationCore}>
-                <span className={styles.collaborationCorePulse} />
-                <Image
-                  src="/logo-symbole.png"
-                  alt=""
-                  width={42}
-                  height={42}
-                  className="relative z-10 h-10 w-10 object-contain"
-                />
-                <span>Obillz Associations</span>
-              </div>
-
-              <motion.div
-                className={styles.collaborationOutput}
-                animate={reduceMotion ? undefined : { scale: [1, 1.025, 1] }}
-                transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <span className="h-2 w-2 rounded-full bg-[#7f9c88] shadow-[0_0_0_5px_rgba(127,156,136,.12)]" />
-                Le produit évolue
-              </motion.div>
-            </div>
-          </div>
-
-          <motion.blockquote
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ ...transition, delay: 0.38 }}
-            className={styles.collaborationManifesto}
+        <div className={styles.collaborationLayout}>
+          <motion.div
+            initial={{ opacity: 0, x: reduceMotion ? 0 : -28 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ ...transition, delay: 0.08 }}
+            className={styles.collaborationCopy}
           >
-            Notre objectif n’est pas de créer un outil générique, mais une plateforme
-            construite avec celles et ceux qui la feront vivre au quotidien.
-          </motion.blockquote>
-        </motion.div>
+            <span className={styles.collaborationBadge}>
+              <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
+              Une vision collaborative
+            </span>
+            <h3 className="mt-7 text-3xl font-extrabold tracking-[-.05em] text-[#17211d] sm:text-4xl">
+              Un logiciel qui grandira avec vous.
+            </h3>
+            <p className="mt-5 text-sm font-medium leading-relaxed text-[#68756e] sm:text-base">
+              Nous écouterons les besoins, les difficultés et les idées des associations
+              afin de développer les fonctionnalités qui leur feront réellement gagner du
+              temps.
+            </p>
+
+            <div className={styles.collaborationPrinciples}>
+              {[
+                ["Écouter", "Chaque retour compte."],
+                ["Comprendre", "Chaque association a sa réalité."],
+                ["Construire", "Les fonctionnalités vraiment utiles."],
+              ].map(([title, text], index) => (
+                <motion.div
+                  key={title}
+                  initial={{ opacity: 0, x: reduceMotion ? 0 : -18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ ...transition, delay: 0.2 + index * 0.08 }}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <p>
+                    <strong>{title}</strong>
+                    {text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ ...transition, delay: 0.16 }}
+          >
+            <CollaborationConstellation reduceMotion={reduceMotion} />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
 }
 
-function AssociationsNav() {
-  const [open, setOpen] = useState(false);
+function OurStoryExperience() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (!open) return;
-    const close = () => setOpen(false);
-    window.addEventListener("resize", close);
-    return () => window.removeEventListener("resize", close);
-  }, [open]);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 70%", "end 85%"],
+  });
+
+  const pathLength = useTransform(
+    scrollYProgress,
+    [0, 1],
+    reduceMotion ? [1, 1] : [0, 1]
+  );
+
+  const titleLines = [
+    "Parce que la passion",
+    "ne devrait jamais rimer",
+    "avec administration.",
+  ];
+
+  const storySteps = [
+    {
+      key: "p1",
+      side: "left" as const,
+      content: (
+        <>
+          Nous avons commencé par développer Obillz pour les{" "}
+          <span className={styles.storyEmphasis}>clubs sportifs</span>, parce que c’est dans cet
+          univers que nous avons grandi.
+        </>
+      ),
+    },
+    {
+      key: "p2",
+      side: "right" as const,
+      content: (
+        <>
+          Puis nous avons vu plus large. Chaque semaine, des milliers de personnes donnent leur
+          temps pour faire vivre une{" "}
+          <span className={styles.storyEmphasis}>société de musique</span>, une{" "}
+          <span className={styles.storyEmphasis}>chorale</span>, une{" "}
+          <span className={styles.storyEmphasis}>troupe de théâtre</span> ou une association
+          locale.
+        </>
+      ),
+    },
+    {
+      key: "p3",
+      side: "left" as const,
+      content: (
+        <>
+          Elles aussi gèrent des membres, des cotisations, des événements, des documents et toute
+          une vie administrative — souvent le soir, une fois leur journée terminée.
+        </>
+      ),
+    },
+    {
+      key: "p4",
+      side: "right" as const,
+      featured: true,
+      content: (
+        <>
+          Ces <span className={styles.storyEmphasis}>bénévoles</span> méritent eux aussi des{" "}
+          <span className={styles.storyEmphasis}>outils modernes</span>.
+        </>
+      ),
+    },
+    {
+      key: "p5",
+      side: "center" as const,
+      climax: true,
+      content: (
+        <>
+          C’est pour eux que nous développons aujourd’hui{" "}
+          <strong className={styles.storyClimaxBrand}>Obillz Associations.</strong>
+        </>
+      ),
+    },
+  ];
+
+  const ease = [0.22, 1, 0.36, 1] as const;
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
-      <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between rounded-[1.35rem] border border-white/70 bg-[#fbfaf6]/85 px-4 shadow-[0_12px_45px_rgba(35,48,41,.09)] backdrop-blur-2xl sm:px-5">
-        <div className="flex min-w-0 items-center gap-3">
-          <Wordmark />
-          <div className="hidden h-6 w-px bg-[#17211d]/10 md:block" />
-          <div className="hidden md:block">
-            <ProductSwitcher current="associations" theme="light" />
-          </div>
-        </div>
-
-        <div className="hidden items-center gap-7 lg:flex">
-          <a href="#histoire" className="text-sm font-semibold text-[#65716b] transition hover:text-[#17211d]">Notre histoire</a>
-          <a href="#fonctionnalites" className="text-sm font-semibold text-[#65716b] transition hover:text-[#17211d]">Fonctionnalités</a>
-          <a href="#fonctionnement" className="text-sm font-semibold text-[#65716b] transition hover:text-[#17211d]">Comment ça marche</a>
-          <a
-            href="mailto:contact@obillz.com?subject=Démonstration Obillz Associations"
-            className="rounded-full bg-[#17211d] px-5 py-2.5 text-sm font-bold text-white shadow-[0_8px_22px_rgba(23,33,29,.18)] transition hover:-translate-y-0.5 hover:bg-[#293b33]"
-          >
-            Réserver une démo
-          </a>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#17211d]/10 bg-white text-[#17211d] lg:hidden"
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-        >
-          {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </button>
+    <section ref={sectionRef} id="histoire" className={styles.storySection}>
+      <div className={styles.noise} style={{ opacity: 0.1, mixBlendMode: "screen" }} />
+      <div className={styles.storyHalo} aria-hidden />
+      <div className={styles.storyOrbOne} aria-hidden />
+      <div className={styles.storyOrbTwo} aria-hidden />
+      <div className={styles.storyParticles} aria-hidden>
+        {Array.from({ length: 14 }).map((_, index) => (
+          <span key={index} style={{ "--particle-index": index } as CSSProperties} />
+        ))}
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto mt-2 max-w-[1180px] rounded-[1.35rem] border border-white/80 bg-[#fbfaf6]/95 p-3 shadow-2xl backdrop-blur-2xl lg:hidden"
-          >
-            <div className="mb-2 md:hidden"><ProductSwitcher current="associations" theme="light" /></div>
-            {[
-              ["#histoire", "Notre histoire"],
-              ["#fonctionnalites", "Fonctionnalités"],
-              ["#fonctionnement", "Comment ça marche"],
-            ].map(([href, label]) => (
-              <a key={href} href={href} onClick={() => setOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-bold text-[#3d4943] hover:bg-[#f0ede5]">
-                {label}
-              </a>
+      <div className={styles.storyInner}>
+        <motion.div
+          className={styles.storyIntro}
+          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12%" }}
+          transition={{ duration: reduceMotion ? 0 : 0.75, ease }}
+        >
+          <p className={styles.storyEyebrow}>Notre histoire</p>
+          <h2 className={styles.storyTitle}>
+            {titleLines.map((line, index) => (
+              <motion.span
+                key={line}
+                className="block"
+                initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-12%" }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.7,
+                  delay: reduceMotion ? 0 : 0.08 + index * 0.1,
+                  ease,
+                }}
+              >
+                {line}
+              </motion.span>
             ))}
+          </h2>
+        </motion.div>
+
+        <div className={styles.storyZigzag}>
+          <svg className={styles.storyZigzagPath} viewBox="0 0 1000 920" fill="none" aria-hidden>
+            <path
+              d="M220 60 C 280 120, 720 90, 780 170 C 840 250, 260 280, 220 370 C 180 460, 760 470, 800 560 C 840 650, 280 680, 250 760 C 230 810, 420 850, 500 880"
+              stroke="rgba(244,154,136,0.14)"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+            <motion.path
+              d="M220 60 C 280 120, 720 90, 780 170 C 840 250, 260 280, 220 370 C 180 460, 760 470, 800 560 C 840 650, 280 680, 250 760 C 230 810, 420 850, 500 880"
+              stroke="rgba(244,154,136,0.72)"
+              strokeWidth="1.55"
+              strokeLinecap="round"
+              style={{ pathLength }}
+            />
+          </svg>
+
+          {storySteps.map((step, index) => (
+            <motion.article
+              key={step.key}
+              className={`${styles.storyBeat} ${
+                step.side === "left"
+                  ? styles.storyBeatLeft
+                  : step.side === "right"
+                    ? styles.storyBeatRight
+                    : styles.storyBeatCenter
+              } ${step.featured ? styles.storyBeatFeatured : ""} ${
+                step.climax ? styles.storyBeatClimax : ""
+              }`}
+              initial={
+                reduceMotion
+                  ? false
+                  : {
+                      opacity: 0,
+                      y: 36,
+                      x: step.side === "left" ? -28 : step.side === "right" ? 28 : 0,
+                    }
+              }
+              whileInView={{ opacity: 1, y: 0, x: 0 }}
+              viewport={{ once: true, amount: 0.45, margin: "-8% 0px" }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.75,
+                delay: reduceMotion ? 0 : 0.04,
+                ease,
+              }}
+            >
+              <span className={styles.storyBeatMarker} aria-hidden>
+                <span className={styles.storyBeatDot} />
+                <span className={styles.storyBeatIndex}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </span>
+              <p className={styles.storyBeatText}>{step.content}</p>
+              {step.climax && <span className={styles.storyClimaxHalo} aria-hidden />}
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.storyCurve} aria-hidden />
+    </section>
+  );
+}
+
+function AssociationsClosingChapter() {
+  const reduceMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const transition = {
+    duration: reduceMotion ? 0 : 0.8,
+    ease: [0.22, 1, 0.36, 1] as const,
+  };
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const glowY = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [40, -40]);
+
+  return (
+    <section id="cta-final" ref={sectionRef} className={styles.closingChapter}>
+      <div className={styles.closingChapterCurve} aria-hidden>
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path d="M0,80 C360,20 720,20 1440,80 L1440,0 L0,0 Z" />
+        </svg>
+      </div>
+
+      <motion.div className={styles.closingChapterGlow} style={{ y: glowY }} aria-hidden />
+      <div className={styles.closingChapterGrain} aria-hidden />
+
+      <div className={styles.closingChapterInner}>
+        <motion.blockquote
+          className={styles.closingManifesto}
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={transition}
+        >
+          Notre objectif n’est pas de créer un outil générique, mais une plateforme
+          construite avec celles et ceux qui la feront vivre au quotidien.
+        </motion.blockquote>
+
+        <motion.div
+          className={styles.closingConnector}
+          aria-hidden
+          initial={{ scaleY: 0, opacity: 0 }}
+          whileInView={{ scaleY: 1, opacity: 1 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={{ ...transition, duration: reduceMotion ? 0 : 0.9, delay: 0.1 }}
+        />
+
+        <motion.div
+          className={styles.closingCta}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-12%" }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: reduceMotion ? 0 : 0.11,
+                delayChildren: reduceMotion ? 0 : 0.08,
+              },
+            },
+          }}
+        >
+          <motion.p className={styles.finalCtaEyebrow} variants={fadeUp} transition={transition}>
+            <HeartHandshake className="h-3.5 w-3.5" strokeWidth={1.9} />
+            Une dernière chose
+          </motion.p>
+
+          <motion.h2 className={styles.finalCtaTitle} variants={fadeUp} transition={transition}>
+            <span>Le temps des bénévoles est précieux.</span>
+            <span className={styles.finalCtaTitleAccent}>Ne le gaspillez plus.</span>
+          </motion.h2>
+
+          <motion.p className={styles.finalCtaSubtitle} variants={fadeUp} transition={transition}>
+            Toute votre association. Enfin réunie au même endroit —
+            pour que votre comité retrouve le plaisir d’organiser, pas de jongler.
+          </motion.p>
+
+          <motion.div className={styles.finalCtaActions} variants={fadeUp} transition={transition}>
+            <a
+              href={founderWhatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.finalCtaPrimary}
+            >
+              <WhatsAppIcon className="h-[18px] w-[18px]" />
+              Réserver une démo avec le fondateur
+            </a>
+            <a
+              href="mailto:contact@obillz.com?subject=Essai Obillz Associations"
+              className={styles.finalCtaSecondary}
+            >
+              Essayer gratuitement
+            </a>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+
+          <motion.p className={styles.finalCtaNote} variants={fadeUp} transition={transition}>
+            Sans engagement · Échange direct avec le fondateur
+          </motion.p>
+        </motion.div>
+      </div>
+
+      <div className={styles.closingChapterBridge} aria-hidden />
+    </section>
+  );
+}
+
+function AssociationsNav() {
+  return (
+    <ObillzFloatingNav
+      product="associations"
+      homeHref="/associations"
+      links={[
+        { href: "#histoire", label: "Notre histoire" },
+        { href: "#fonctionnalites", label: "Fonctionnalités" },
+        { href: "#fonctionnement", label: "Comment ça marche" },
+      ]}
+      cta={{
+        href: "mailto:contact@obillz.com?subject=Démonstration Obillz Associations",
+        label: "Réserver une démo",
+        external: true,
+      }}
+    />
   );
 }
 
@@ -711,24 +994,33 @@ export default function AssociationsLanding() {
         </div>
       </div>
 
-      <section id="histoire" className="relative bg-[#17211d] px-5 py-24 text-white sm:py-32">
-        <div className={styles.noise} style={{ opacity: 0.09, mixBlendMode: "screen" }} />
-        <div className="relative mx-auto grid max-w-[1180px] gap-14 lg:grid-cols-[.8fr_1.2fr]">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} transition={transition}>
-            <p className="mb-6 text-xs font-black uppercase tracking-[.2em] text-[#ed8b77]">Notre histoire</p>
-            <h2 className={styles.storyTitle}>Parce que la passion ne devrait jamais rimer avec administration.</h2>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} transition={{ staggerChildren: 0.12 }} className="space-y-6 text-lg leading-relaxed text-white/65 sm:text-xl">
-            <motion.p variants={fadeUp} transition={transition}>Nous avons commencé par développer Obillz pour les clubs sportifs, parce que c’est dans cet univers que nous avons grandi.</motion.p>
-            <motion.p variants={fadeUp} transition={transition}>Puis nous avons vu plus large. Chaque semaine, des milliers de personnes donnent leur temps pour faire vivre une société de musique, une chorale, une troupe de théâtre ou une association locale.</motion.p>
-            <motion.p variants={fadeUp} transition={transition}>Elles aussi gèrent des membres, des cotisations, des événements, des documents et toute une vie administrative — souvent le soir, une fois leur journée terminée.</motion.p>
-            <motion.p variants={fadeUp} transition={transition} className="font-serif text-2xl italic text-white sm:text-3xl">Ces bénévoles méritent eux aussi des outils modernes.</motion.p>
-            <motion.p variants={fadeUp} transition={transition}>C’est pour eux que nous développons aujourd’hui <strong className="font-bold text-[#f49a88]">Obillz Associations.</strong></motion.p>
-          </motion.div>
-        </div>
-      </section>
+      <OurStoryExperience />
 
-      <section id="fonctionnalites" className={styles.featuresOrbitSection}>
+      <motion.section
+        id="fonctionnalites"
+        className={styles.featuresOrbitSection}
+        initial={
+          reduceMotion
+            ? { opacity: 1 }
+            : {
+                opacity: 0,
+                y: 88,
+                scale: 0.965,
+                boxShadow: "0 0 0 rgba(23,33,29,0)",
+              }
+        }
+        whileInView={{
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          boxShadow: "0 -28px 80px rgba(23,33,29,0.12), 0 18px 50px rgba(23,33,29,0.04)",
+        }}
+        viewport={{ once: true, amount: 0.12 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.05,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      >
         <div className={styles.noise} />
         <div className={styles.orbitShell}>
           <div className={styles.orbitStage}>
@@ -881,27 +1173,15 @@ export default function AssociationsLanding() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       <HowItWorksJourney />
 
       <WhyAssociationsSection />
 
-      <section className="bg-white px-4 pb-4 sm:px-6 sm:pb-6">
-        <div className={`${styles.cta} relative mx-auto max-w-[1320px] overflow-hidden rounded-[2rem] px-6 py-20 text-center text-white sm:rounded-[3rem] sm:px-10 sm:py-28`}>
-          <div className={styles.noise} style={{ opacity: 0.08, mixBlendMode: "screen" }} />
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={transition} className="relative mx-auto max-w-4xl">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-[#f19380] ring-1 ring-white/15"><HeartHandshake className="h-6 w-6" /></span>
-            <h2 className="mt-8 text-4xl font-extrabold leading-[1.02] tracking-[-.055em] sm:text-5xl">Prêt à simplifier la gestion de votre association&nbsp;?</h2>
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">Découvrez comment Obillz peut redonner du temps à votre comité et à vos bénévoles.</p>
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><a href="mailto:contact@obillz.com?subject=Démonstration Obillz Associations" className="inline-flex items-center justify-center rounded-full bg-[#ed7059] px-7 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f17e69]">Réserver une démonstration</a><a href="mailto:contact@obillz.com?subject=Essai Obillz Associations" className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-7 py-3.5 text-sm font-extrabold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/15">Essayer gratuitement</a></div>
-          </motion.div>
-        </div>
-      </section>
+      <AssociationsClosingChapter />
 
-      <footer className="bg-white px-5 py-10">
-        <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-6 border-t border-[#17211d]/[0.08] pt-8 sm:flex-row"><Wordmark /><p className="text-xs font-semibold text-[#7b8780]">© {new Date().getFullYear()} Obillz. Imaginé en Suisse pour les bénévoles.</p><div className="flex gap-5 text-xs font-bold text-[#66736d]"><Link href="/mentions-legales">Mentions légales</Link><Link href="/politique-confidentialite">Confidentialité</Link></div></div>
-      </footer>
+      <AssociationsFooter />
     </main>
   );
 }
