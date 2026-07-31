@@ -6,7 +6,6 @@ import {
   homeForProduct,
   loginForProduct,
   resolveOrgForProduct,
-  resolvePostLoginDestination,
   type ObillzProduct,
 } from "@/lib/auth/product-access";
 
@@ -162,7 +161,7 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  /* --------- Pages auth : déjà connecté → home produit --------- */
+  /* --------- Pages auth : déjà connecté → home du MÊME produit seulement --------- */
   if (
     user &&
     (pathname === "/connexion" ||
@@ -173,17 +172,24 @@ export async function middleware(request: NextRequest) {
     const intended: ObillzProduct =
       pathname.startsWith("/associations/") ? "association" : "sport";
     const preferred = request.cookies.get(OBILLZ_ACTIVE_CLUB_COOKIE)?.value;
-    const dest = await resolvePostLoginDestination(
+    const org = await resolveOrgForProduct(
       supabase,
       user.id,
       intended,
       preferred
     );
-    const redirectRes = NextResponse.redirect(new URL(dest.home, request.url));
-    if (dest.clubId) {
-      setActiveClubCookie(redirectRes, dest.clubId);
+
+    if (org) {
+      const redirectRes = NextResponse.redirect(
+        new URL(homeForProduct(intended), request.url)
+      );
+      setActiveClubCookie(redirectRes, org.clubId);
+      return redirectRes;
     }
-    return redirectRes;
+
+    // Connecté mais sans org du tunnel courant : laisser la page Auth
+    // (aucun envoi silencieux vers l'autre produit).
+    return response;
   }
 
   /* --------- MFA partagé (tous produits) --------- */

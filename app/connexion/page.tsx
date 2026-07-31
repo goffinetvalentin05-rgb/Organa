@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import AuthPageLayout from "@/components/auth/AuthPageLayout";
@@ -17,21 +18,36 @@ import {
 } from "@/components/auth/AuthForm";
 import { useI18n } from "@/components/I18nProvider";
 
-async function resolvePostLoginHome(intendedProduct: "sport" | "association") {
+async function resolveSportHome(): Promise<
+  | { ok: true; home: string }
+  | { ok: false; message: string }
+> {
   const res = await fetch("/api/auth/post-login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ intendedProduct }),
+    body: JSON.stringify({ intendedProduct: "sport" }),
   });
+  const data = (await res.json().catch(() => null)) as {
+    home?: string;
+    error?: string;
+  } | null;
+
   if (!res.ok) {
-    return intendedProduct === "sport" ? "/tableau-de-bord" : "/associations/espace";
+    return {
+      ok: false,
+      message:
+        data?.error || "Aucun espace Obillz Sport n’est associé à ce compte.",
+    };
   }
-  const data = (await res.json()) as { home?: string };
-  return typeof data.home === "string" && data.home.startsWith("/")
-    ? data.home
-    : intendedProduct === "sport"
-      ? "/tableau-de-bord"
-      : "/associations/espace";
+
+  if (typeof data?.home === "string" && data.home.startsWith("/tableau-de-bord")) {
+    return { ok: true, home: data.home };
+  }
+
+  return {
+    ok: false,
+    message: "Aucun espace Obillz Sport n’est associé à ce compte.",
+  };
 }
 
 export default function ConnexionPage() {
@@ -40,12 +56,14 @@ export default function ConnexionPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [wrongProduct, setWrongProduct] = useState(false);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (loading) return;
 
     setErrorMessage(null);
+    setWrongProduct(false);
 
     if (!email || !email.includes("@")) {
       toast.error(t("auth.login.invalidEmail"));
@@ -78,10 +96,19 @@ export default function ConnexionPage() {
 
       if (data.user) {
         await supabase.auth.getSession();
+        const dest = await resolveSportHome();
+
+        if (!dest.ok) {
+          setWrongProduct(true);
+          setErrorMessage(dest.message);
+          toast.error(dest.message);
+          await supabase.auth.signOut();
+          return;
+        }
+
         toast.success(t("auth.login.success"));
-        const home = await resolvePostLoginHome("sport");
         await new Promise((resolve) => setTimeout(resolve, 100));
-        window.location.href = home;
+        window.location.href = dest.home;
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t("auth.login.error");
@@ -120,6 +147,20 @@ export default function ConnexionPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {errorMessage ? <AuthError message={errorMessage} /> : null}
+
+              {wrongProduct ? (
+                <div className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-blue-100/80">
+                  <p>
+                    Ce compte semble lié à Obillz Associations.{" "}
+                    <Link
+                      href="/associations/connexion"
+                      className="font-semibold text-white underline-offset-2 hover:underline"
+                    >
+                      Connexion Associations
+                    </Link>
+                  </p>
+                </div>
+              ) : null}
 
               <AuthField id="email" label={t("auth.login.email")}>
                 <AuthInput

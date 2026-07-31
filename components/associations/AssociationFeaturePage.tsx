@@ -39,11 +39,11 @@ export default function AssociationFeaturePage({ feature }: { feature: Associati
             <h1 className={styles.display}>{feature.title}</h1>
             <p className="mt-8 max-w-2xl text-lg font-medium leading-relaxed text-[#65716b] sm:text-xl">{feature.description}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href="mailto:contact@obillz.com?subject=Démonstration Obillz Associations" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#17211d] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5">
-                Réserver une démonstration <ArrowRight className="h-4 w-4" />
-              </a>
-              <Link href="/associations" className="inline-flex items-center justify-center rounded-full border border-[#17211d]/15 bg-white px-6 py-3.5 text-sm font-extrabold">
-                Découvrir l’univers
+              <Link href="/associations/inscription" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#17211d] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5">
+                Créer un compte <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/associations/connexion" className="inline-flex items-center justify-center rounded-full border border-[#17211d]/15 bg-white px-6 py-3.5 text-sm font-extrabold">
+                Connexion
               </Link>
             </div>
           </motion.div>
@@ -74,9 +74,9 @@ export default function AssociationFeaturePage({ feature }: { feature: Associati
         <div className="relative mx-auto max-w-3xl">
           <h2 className="text-3xl font-extrabold tracking-[-.045em] sm:text-5xl">Une gestion plus simple commence ici.</h2>
           <p className="mx-auto mt-5 max-w-xl text-base text-white/55">Parlez-nous de votre association et découvrez une solution adaptée à votre quotidien.</p>
-          <a href="mailto:contact@obillz.com?subject=Obillz Associations" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#ed7059] px-7 py-3.5 text-sm font-extrabold shadow-lg transition hover:-translate-y-0.5">
-            Nous contacter <ArrowRight className="h-4 w-4" />
-          </a>
+          <Link href="/associations/inscription" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#ed7059] px-7 py-3.5 text-sm font-extrabold shadow-lg transition hover:-translate-y-0.5">
+            Créer un compte <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
     </main>

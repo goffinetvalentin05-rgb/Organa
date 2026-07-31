@@ -13,8 +13,8 @@ export const runtime = "nodejs";
  * POST /api/auth/post-login
  * Body: { intendedProduct: "sport" | "association" }
  *
- * Résout la destination post-connexion selon profiles.product_type
- * des organisations accessibles. Pose le cookie club actif.
+ * Résout la destination post-connexion pour LE produit demandé uniquement.
+ * Pas de bascule silencieuse vers l'autre produit.
  */
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -58,21 +58,36 @@ export async function POST(request: NextRequest) {
     preferred
   );
 
+  if (!dest.hasAccess || !dest.clubId) {
+    const message =
+      intendedProduct === "association"
+        ? "Aucun espace Obillz Associations n’est associé à ce compte."
+        : "Aucun espace Obillz Sport n’est associé à ce compte.";
+
+    return NextResponse.json(
+      {
+        ok: false,
+        code: "NO_PRODUCT_ORG",
+        error: message,
+        product: intendedProduct,
+      },
+      { status: 403 }
+    );
+  }
+
   const res = NextResponse.json({
     ok: true,
     product: dest.product,
     home: dest.home,
     clubId: dest.clubId,
-    switchedProduct: dest.switchedProduct,
+    switchedProduct: false,
   });
 
-  if (dest.clubId) {
-    res.cookies.set(OBILLZ_ACTIVE_CLUB_COOKIE, dest.clubId, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 400,
-      sameSite: "lax",
-    });
-  }
+  res.cookies.set(OBILLZ_ACTIVE_CLUB_COOKIE, dest.clubId, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 400,
+    sameSite: "lax",
+  });
 
   return res;
 }

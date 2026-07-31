@@ -1,28 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import toast from "react-hot-toast";
-import AuthPageLayout from "@/components/auth/AuthPageLayout";
-import {
-  AuthCard,
-  AuthError,
-  AuthField,
-  AuthFooterLink,
-  AuthFormHeader,
-  AuthInput,
-  AuthPageMotion,
-  AuthSubmitButton,
-} from "@/components/auth/AuthForm";
+import AssociationsAuthShell from "@/components/associations/AssociationsAuthShell";
 
-/**
- * Inscription Obillz Associations.
- * N'appelle pas signUp côté navigateur avec un product_type libre :
- * POST /api/associations/inscription fixe product=association côté serveur.
- */
 export default function AssociationsInscriptionPage() {
+  const [associationName, setAssociationName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,28 +21,39 @@ export default function AssociationsInscriptionPage() {
     e.preventDefault();
     setErrorMessage(null);
 
+    if (!associationName.trim()) {
+      toast.error("Indiquez le nom de votre association");
+      return;
+    }
+    if (!firstName.trim() || !lastName.trim()) {
+      toast.error("Indiquez votre prénom et votre nom");
+      return;
+    }
     if (!email.includes("@")) {
       toast.error("Veuillez entrer une adresse email valide");
       return;
     }
-
     if (password.length < 8) {
       toast.error("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
-
     if (password !== confirmPassword) {
       toast.error("Les mots de passe ne correspondent pas");
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await fetch("/api/associations/inscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          associationName: associationName.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        }),
       });
 
       const data = (await res.json().catch(() => null)) as {
@@ -71,7 +69,6 @@ export default function AssociationsInscriptionPage() {
 
       setRegistrationComplete(true);
     } catch (err: unknown) {
-      console.error("Erreur inscription Associations:", err);
       const msg =
         err instanceof Error ? err.message : "Erreur lors de la création du compte";
       setErrorMessage(msg);
@@ -81,143 +78,183 @@ export default function AssociationsInscriptionPage() {
     }
   };
 
+  const inputClass =
+    "mt-1.5 w-full rounded-2xl border border-[#17211d]/12 bg-white px-4 py-3 text-sm font-medium text-[#17211d] shadow-sm outline-none transition placeholder:text-[#9aa49e] focus:border-[#ed7059]/50 focus:ring-2 focus:ring-[#ed7059]/20";
+
   return (
-    <AuthPageLayout>
-      <AuthPageMotion>
-        <div className="mx-auto w-full max-w-[560px]">
-          <AuthCard>
-            {registrationComplete ? (
-              <div className="flex h-full flex-col justify-center text-center lg:text-left">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1A23FF]/30 text-white shadow-[0_0_28px_rgba(26,35,255,0.45)] ring-1 ring-blue-400/35 lg:mx-0">
-                  <Check className="h-7 w-7" strokeWidth={2.5} aria-hidden />
-                </span>
-                <h2 className="mt-6 text-xl font-bold text-white sm:text-2xl">
-                  Compte Associations créé
-                </h2>
-                <p className="mt-4 text-sm leading-relaxed text-blue-100/75">
-                  Un email de confirmation vient de vous être envoyé. Cliquez sur le lien reçu pour
-                  activer votre compte Obillz Associations.
+    <AssociationsAuthShell>
+      <div className="w-full max-w-[520px]">
+        <div className="rounded-[1.75rem] border border-[#17211d]/10 bg-white/85 p-7 shadow-[0_24px_60px_rgba(23,33,29,0.08)] backdrop-blur-md sm:p-9">
+          {registrationComplete ? (
+            <div className="text-center sm:text-left">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ed7059]/15 text-[#ed7059] sm:mx-0">
+                <Check className="h-7 w-7" strokeWidth={2.5} aria-hidden />
+              </span>
+              <h1 className="mt-5 text-[1.75rem] font-extrabold tracking-[-0.04em] text-[#17211d]">
+                Compte créé avec succès
+              </h1>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-[#65716b]">
+                Un email de confirmation vient de vous être envoyé. Cliquez sur le lien
+                reçu pour activer votre espace Obillz Associations.
+              </p>
+              <p className="mt-2 text-xs text-[#9aa49e]">
+                Pensez à vérifier vos courriers indésirables.
+              </p>
+              <Link
+                href="/associations/connexion"
+                className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-[#ed7059] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_rgba(237,112,89,.27)] transition hover:-translate-y-0.5 hover:bg-[#d85e48]"
+              >
+                Aller à la connexion
+              </Link>
+            </div>
+          ) : (
+            <>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#b84e3a]">
+                Obillz Associations
+              </p>
+              <h1 className="mt-3 text-[1.75rem] font-extrabold tracking-[-0.04em] text-[#17211d] sm:text-[2rem]">
+                Créer votre espace Obillz Associations
+              </h1>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-[#65716b]">
+                Centralisez la gestion de votre association en quelques minutes
+              </p>
+
+              <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                {errorMessage ? (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    {errorMessage}
+                  </div>
+                ) : null}
+
+                <div>
+                  <label htmlFor="associationName" className="text-sm font-bold text-[#17211d]">
+                    Nom de l’association *
+                  </label>
+                  <input
+                    id="associationName"
+                    value={associationName}
+                    onChange={(e) => setAssociationName(e.target.value)}
+                    disabled={loading}
+                    placeholder="Ex. Chorale du village"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="firstName" className="text-sm font-bold text-[#17211d]">
+                      Prénom *
+                    </label>
+                    <input
+                      id="firstName"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      disabled={loading}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="text-sm font-bold text-[#17211d]">
+                      Nom *
+                    </label>
+                    <input
+                      id="lastName"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={loading}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="text-sm font-bold text-[#17211d]">
+                    Adresse email *
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    placeholder="votre@email.com"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="text-sm font-bold text-[#17211d]">
+                    Mot de passe *
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    placeholder="8 caractères minimum"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="confirmPassword" className="text-sm font-bold text-[#17211d]">
+                    Confirmer le mot de passe *
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={loading}
+                    placeholder="••••••••"
+                    className={inputClass}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-[#ed7059] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_rgba(237,112,89,.27)] transition hover:-translate-y-0.5 hover:bg-[#d85e48] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                >
+                  {loading ? "Création en cours…" : "Créer mon espace"}
+                </button>
+
+                <p className="text-center text-xs leading-relaxed text-[#9aa49e]">
+                  En créant un compte, vous acceptez nos{" "}
+                  <Link
+                    href="/conditions-utilisation"
+                    className="underline-offset-2 hover:text-[#17211d] hover:underline"
+                  >
+                    conditions d’utilisation
+                  </Link>{" "}
+                  et notre{" "}
+                  <Link
+                    href="/politique-confidentialite"
+                    className="underline-offset-2 hover:text-[#17211d] hover:underline"
+                  >
+                    politique de confidentialité
+                  </Link>
+                  .
                 </p>
-                <p className="mt-3 text-xs leading-relaxed text-blue-100/50">
-                  Pensez à vérifier vos courriers indésirables — l&apos;email peut s&apos;y trouver.
-                </p>
+              </form>
+
+              <p className="mt-7 text-center text-sm text-[#65716b]">
+                Vous avez déjà un compte ?{" "}
                 <Link
                   href="/associations/connexion"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#1A23FF] via-[#2563EB] to-[#1A23FF] bg-[length:160%_100%] py-3.5 text-base font-bold text-white shadow-[0_0_36px_rgba(26,35,255,0.45)] transition hover:shadow-[0_0_48px_rgba(26,35,255,0.65)]"
+                  className="font-extrabold text-[#ed7059] underline-offset-2 hover:underline"
                 >
-                  Retour à la connexion
+                  Se connecter
                 </Link>
-                <p className="mt-4 text-center text-xs text-blue-100/45">
-                  <Link href="/associations" className="underline-offset-2 hover:text-white hover:underline">
-                    Retour à Obillz Associations
-                  </Link>
-                </p>
-              </div>
-            ) : (
-              <>
-                <AuthFormHeader
-                  badge={
-                    <div className="relative inline-flex">
-                      <span
-                        className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.28),transparent_68%)] blur-xl"
-                        aria-hidden
-                      />
-                      <Image
-                        src="/logo-symbole.png"
-                        alt="Symbole Obillz"
-                        width={64}
-                        height={64}
-                        className="relative h-14 w-14 object-contain"
-                        priority
-                      />
-                    </div>
-                  }
-                  title="Créer votre compte Obillz Associations"
-                  subtitle="Inscription dédiée aux associations — distincte d'Obillz Sport."
-                />
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {errorMessage ? <AuthError message={errorMessage} /> : null}
-
-                  <AuthField id="email" label="Adresse email *">
-                    <AuthInput
-                      id="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      autoComplete="email"
-                    />
-                  </AuthField>
-
-                  <AuthField id="password" label="Mot de passe *">
-                    <AuthInput
-                      id="password"
-                      type="password"
-                      placeholder="8 caractères minimum"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      autoComplete="new-password"
-                    />
-                  </AuthField>
-
-                  <AuthField id="confirmPassword" label="Confirmer le mot de passe *">
-                    <AuthInput
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={loading}
-                      autoComplete="new-password"
-                    />
-                  </AuthField>
-
-                  <AuthSubmitButton loading={loading} loadingLabel="Création en cours...">
-                    Créer mon compte Associations
-                  </AuthSubmitButton>
-
-                  <p className="text-center text-xs leading-relaxed text-blue-100/45">
-                    En créant un compte, vous acceptez nos{" "}
-                    <Link
-                      href="/conditions-utilisation"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      conditions d&apos;utilisation
-                    </Link>{" "}
-                    et notre{" "}
-                    <Link
-                      href="/politique-confidentialite"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      politique de confidentialité
-                    </Link>
-                    .
-                  </p>
-                </form>
-
-                <AuthFooterLink
-                  prompt="Déjà un compte ?"
-                  linkHref="/associations/connexion"
-                  linkLabel="Se connecter"
-                />
-
-                <p className="mt-4 text-center text-xs text-blue-100/45">
-                  Vous cherchez Obillz Sport ?{" "}
-                  <Link
-                    href="/inscription"
-                    className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                  >
-                    Inscription Sport
-                  </Link>
-                </p>
-              </>
-            )}
-          </AuthCard>
+              </p>
+            </>
+          )}
         </div>
-      </AuthPageMotion>
-    </AuthPageLayout>
+      </div>
+    </AssociationsAuthShell>
   );
 }

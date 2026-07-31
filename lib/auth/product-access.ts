@@ -154,6 +154,10 @@ export async function userHasProductAccess(
   return orgs.length > 0;
 }
 
+/**
+ * Après login : home du produit demandé uniquement.
+ * Ne bascule JAMAIS silencieusement vers l'autre produit.
+ */
 export async function resolvePostLoginDestination(
   supabase: SupabaseClient,
   userId: string,
@@ -164,6 +168,7 @@ export async function resolvePostLoginDestination(
   home: string;
   clubId: string | null;
   switchedProduct: boolean;
+  hasAccess: boolean;
 }> {
   const intendedOrg = await resolveOrgForProduct(
     supabase,
@@ -178,24 +183,7 @@ export async function resolvePostLoginDestination(
       home: homeForProduct(intendedProduct),
       clubId: intendedOrg.clubId,
       switchedProduct: false,
-    };
-  }
-
-  const other: ObillzProduct =
-    intendedProduct === "sport" ? "association" : "sport";
-  const otherOrg = await resolveOrgForProduct(
-    supabase,
-    userId,
-    other,
-    preferredClubId
-  );
-
-  if (otherOrg) {
-    return {
-      product: other,
-      home: homeForProduct(other),
-      clubId: otherOrg.clubId,
-      switchedProduct: true,
+      hasAccess: true,
     };
   }
 
@@ -204,5 +192,6 @@ export async function resolvePostLoginDestination(
     home: homeForProduct(intendedProduct),
     clubId: null,
     switchedProduct: false,
+    hasAccess: false,
   };
 }
