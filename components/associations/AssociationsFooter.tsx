@@ -160,7 +160,7 @@ export default function AssociationsFooter() {
           </FooterLinkColumn>
 
           <FooterLinkColumn title="Compte">
-            <FooterLink href="/inscription">Créer un compte</FooterLink>
+            <FooterLink href="/associations/inscription">Créer un compte</FooterLink>
             <FooterLink href="/connexion">Connexion</FooterLink>
           </FooterLinkColumn>
 
