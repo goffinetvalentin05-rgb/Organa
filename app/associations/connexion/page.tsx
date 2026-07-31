@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import AuthPageLayout from "@/components/auth/AuthPageLayout";
@@ -15,27 +16,21 @@ import {
   AuthPageMotion,
   AuthSubmitButton,
 } from "@/components/auth/AuthForm";
-import { useI18n } from "@/components/I18nProvider";
 
-async function resolvePostLoginHome(intendedProduct: "sport" | "association") {
+async function resolvePostLoginHome() {
   const res = await fetch("/api/auth/post-login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ intendedProduct }),
+    body: JSON.stringify({ intendedProduct: "association" }),
   });
-  if (!res.ok) {
-    return intendedProduct === "sport" ? "/tableau-de-bord" : "/associations/espace";
-  }
+  if (!res.ok) return "/associations/espace";
   const data = (await res.json()) as { home?: string };
   return typeof data.home === "string" && data.home.startsWith("/")
     ? data.home
-    : intendedProduct === "sport"
-      ? "/tableau-de-bord"
-      : "/associations/espace";
+    : "/associations/espace";
 }
 
-export default function ConnexionPage() {
-  const { t } = useI18n();
+export default function AssociationsConnexionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,12 +43,12 @@ export default function ConnexionPage() {
     setErrorMessage(null);
 
     if (!email || !email.includes("@")) {
-      toast.error(t("auth.login.invalidEmail"));
+      toast.error("Veuillez entrer une adresse email valide");
       return;
     }
 
     if (!password || password.length < 8) {
-      toast.error(t("auth.login.passwordMin"));
+      toast.error("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
 
@@ -68,8 +63,8 @@ export default function ConnexionPage() {
 
       if (error) {
         const message = error.message?.toLowerCase().includes("invalid login credentials")
-          ? t("auth.login.invalidCredentials")
-          : error.message || t("auth.login.error");
+          ? "Email ou mot de passe incorrect"
+          : error.message || "Erreur de connexion";
 
         setErrorMessage(message);
         toast.error(message);
@@ -78,13 +73,13 @@ export default function ConnexionPage() {
 
       if (data.user) {
         await supabase.auth.getSession();
-        toast.success(t("auth.login.success"));
-        const home = await resolvePostLoginHome("sport");
+        toast.success("Connexion réussie");
+        const home = await resolvePostLoginHome();
         await new Promise((resolve) => setTimeout(resolve, 100));
         window.location.href = home;
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("auth.login.error");
+      const msg = err instanceof Error ? err.message : "Erreur de connexion";
       setErrorMessage(msg);
       toast.error(msg);
     } finally {
@@ -114,18 +109,18 @@ export default function ConnexionPage() {
                   />
                 </div>
               }
-              title={t("auth.login.title")}
-              subtitle={t("auth.login.cardSubtitle")}
+              title="Connexion Obillz Associations"
+              subtitle="Accédez à l’espace dédié aux associations."
             />
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {errorMessage ? <AuthError message={errorMessage} /> : null}
 
-              <AuthField id="email" label={t("auth.login.email")}>
+              <AuthField id="email" label="Adresse email">
                 <AuthInput
                   id="email"
                   type="email"
-                  placeholder={t("auth.login.emailPlaceholder")}
+                  placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -133,7 +128,7 @@ export default function ConnexionPage() {
                 />
               </AuthField>
 
-              <AuthField id="password" label={t("auth.login.password")}>
+              <AuthField id="password" label="Mot de passe">
                 <AuthInput
                   id="password"
                   type="password"
@@ -145,16 +140,26 @@ export default function ConnexionPage() {
                 />
               </AuthField>
 
-              <AuthSubmitButton loading={loading} loadingLabel={t("auth.login.loading")}>
-                {t("auth.login.submit")}
+              <AuthSubmitButton loading={loading} loadingLabel="Connexion…">
+                Se connecter
               </AuthSubmitButton>
             </form>
 
             <AuthFooterLink
-              prompt={t("auth.login.noAccount")}
-              linkHref="/inscription"
-              linkLabel={t("auth.login.signUpFree")}
+              prompt="Pas encore de compte ?"
+              linkHref="/associations/inscription"
+              linkLabel="Créer un compte Associations"
             />
+
+            <p className="mt-4 text-center text-xs text-blue-100/45">
+              Vous cherchez Obillz Sport ?{" "}
+              <Link
+                href="/connexion"
+                className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
+              >
+                Connexion Sport
+              </Link>
+            </p>
           </AuthCard>
         </div>
       </AuthPageMotion>

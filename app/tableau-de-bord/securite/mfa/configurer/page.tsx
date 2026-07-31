@@ -274,7 +274,11 @@ function ConfigurerMfaForm() {
 
           <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
             <Link
-              href="/connexion"
+              href={
+                nextPath.startsWith("/associations/")
+                  ? "/associations/connexion"
+                  : "/connexion"
+              }
               className="font-medium underline decoration-slate-300 underline-offset-2 hover:text-slate-800"
             >
               Retour à la connexion

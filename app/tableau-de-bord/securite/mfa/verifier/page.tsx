@@ -148,7 +148,14 @@ function MfaVerifyForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          <Link href="/connexion" className="underline hover:text-slate-700">
+          <Link
+            href={
+              next.startsWith("/associations/")
+                ? "/associations/connexion"
+                : "/connexion"
+            }
+            className="underline hover:text-slate-700"
+          >
             Retour à la connexion
           </Link>
         </p>

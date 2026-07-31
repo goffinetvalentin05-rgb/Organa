@@ -102,7 +102,7 @@ export default function AssociationsInscriptionPage() {
                   Pensez à vérifier vos courriers indésirables — l&apos;email peut s&apos;y trouver.
                 </p>
                 <Link
-                  href="/connexion"
+                  href="/associations/connexion"
                   className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#1A23FF] via-[#2563EB] to-[#1A23FF] bg-[length:160%_100%] py-3.5 text-base font-bold text-white shadow-[0_0_36px_rgba(26,35,255,0.45)] transition hover:shadow-[0_0_48px_rgba(26,35,255,0.65)]"
                 >
                   Retour à la connexion
@@ -200,7 +200,7 @@ export default function AssociationsInscriptionPage() {
 
                 <AuthFooterLink
                   prompt="Déjà un compte ?"
-                  linkHref="/connexion"
+                  linkHref="/associations/connexion"
                   linkLabel="Se connecter"
                 />
 
