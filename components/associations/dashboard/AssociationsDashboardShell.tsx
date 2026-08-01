@@ -87,7 +87,8 @@ export default function AssociationsDashboardShell({
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/associations/connexion");
+    // `next=` conserve la reconnexion pendant la pause du lancement public
+    router.push("/associations/connexion?next=/associations/espace");
     router.refresh();
   };
 

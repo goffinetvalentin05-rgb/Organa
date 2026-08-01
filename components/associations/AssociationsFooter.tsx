@@ -4,6 +4,10 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import {
+  ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED,
+  ASSOCIATIONS_WAITLIST_HREF,
+} from "@/lib/associations/public-launch";
 import styles from "./associations.module.css";
 
 const INSTAGRAM_URL =
@@ -160,17 +164,31 @@ export default function AssociationsFooter() {
           </FooterLinkColumn>
 
           <FooterLinkColumn title="Compte">
-            <FooterLink href="/associations/inscription">Créer un compte</FooterLink>
-            <FooterLink href="/associations/connexion">Connexion</FooterLink>
+            {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+              <>
+                <FooterLink href="/associations/inscription">Créer un compte</FooterLink>
+                <FooterLink href="/associations/connexion">Connexion</FooterLink>
+              </>
+            ) : (
+              <FooterLink href={ASSOCIATIONS_WAITLIST_HREF}>
+                Rejoindre la liste d’attente
+              </FooterLink>
+            )}
           </FooterLinkColumn>
 
           <FooterLinkColumn title="Contact">
             <li>
               <a href="mailto:contact@obillz.com">contact@obillz.com</a>
             </li>
-            <FooterLink href="mailto:contact@obillz.com?subject=Démonstration Obillz Associations">
-              Réserver une démonstration
-            </FooterLink>
+            {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+              <FooterLink href="mailto:contact@obillz.com?subject=Démonstration Obillz Associations">
+                Réserver une démonstration
+              </FooterLink>
+            ) : (
+              <FooterLink href={ASSOCIATIONS_WAITLIST_HREF}>
+                Être informé du lancement
+              </FooterLink>
+            )}
           </FooterLinkColumn>
         </motion.div>
 
@@ -200,7 +218,11 @@ export default function AssociationsFooter() {
 
           <div className={styles.assoFooterCopyright}>
             <p>© {year} Obillz. Tous droits réservés.</p>
-            <p>Essai gratuit · Sans carte bancaire pour démarrer</p>
+            <p>
+              {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED
+                ? "Essai gratuit · Sans carte bancaire pour démarrer"
+                : "Arrive prochainement · Liste d’attente ouverte"}
+            </p>
           </div>
         </div>
       </div>

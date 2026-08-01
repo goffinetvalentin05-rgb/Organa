@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED } from "@/lib/associations/public-launch";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -23,6 +24,17 @@ function readString(body: unknown, key: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  if (!ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED) {
+    return NextResponse.json(
+      {
+        error:
+          "Obillz Associations arrive prochainement. Les inscriptions publiques ne sont pas encore ouvertes.",
+        code: "ASSOCIATIONS_COMING_SOON",
+      },
+      { status: 403 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();

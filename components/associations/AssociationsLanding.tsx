@@ -40,6 +40,10 @@ import {
 import ObillzFloatingNav from "@/components/ObillzFloatingNav";
 import AssociationsFooter from "@/components/associations/AssociationsFooter";
 import { associationFeatures } from "@/lib/associations";
+import {
+  ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED,
+  ASSOCIATIONS_WAITLIST_HREF,
+} from "@/lib/associations/public-launch";
 import styles from "./associations.module.css";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -872,16 +876,26 @@ function AssociationsClosingChapter() {
           </motion.p>
 
           <motion.div className={styles.finalCtaActions} variants={fadeUp} transition={transition}>
-            <Link href="/associations/inscription" className={styles.finalCtaPrimary}>
-              Créer un compte
-            </Link>
-            <Link href="/associations/connexion" className={styles.finalCtaSecondary}>
-              Connexion
-            </Link>
+            {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+              <>
+                <Link href="/associations/inscription" className={styles.finalCtaPrimary}>
+                  Créer un compte
+                </Link>
+                <Link href="/associations/connexion" className={styles.finalCtaSecondary}>
+                  Connexion
+                </Link>
+              </>
+            ) : (
+              <a href={ASSOCIATIONS_WAITLIST_HREF} className={styles.finalCtaPrimary}>
+                Rejoindre la liste d’attente
+              </a>
+            )}
           </motion.div>
 
           <motion.p className={styles.finalCtaNote} variants={fadeUp} transition={transition}>
-            Sans engagement · Espace dédié aux associations
+            {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED
+              ? "Sans engagement · Espace dédié aux associations"
+              : "Obillz Associations arrive prochainement · Soyez informé du lancement"}
           </motion.p>
         </motion.div>
       </div>
@@ -892,6 +906,25 @@ function AssociationsClosingChapter() {
 }
 
 function AssociationsNav() {
+  if (ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED) {
+    return (
+      <ObillzFloatingNav
+        product="associations"
+        homeHref="/associations"
+        links={[
+          { href: "#histoire", label: "Notre histoire" },
+          { href: "#fonctionnalites", label: "Fonctionnalités" },
+          { href: "#fonctionnement", label: "Comment ça marche" },
+          { href: "/associations/connexion", label: "Connexion" },
+        ]}
+        cta={{
+          href: "/associations/inscription",
+          label: "Créer un compte",
+        }}
+      />
+    );
+  }
+
   return (
     <ObillzFloatingNav
       product="associations"
@@ -900,20 +933,25 @@ function AssociationsNav() {
         { href: "#histoire", label: "Notre histoire" },
         { href: "#fonctionnalites", label: "Fonctionnalités" },
         { href: "#fonctionnement", label: "Comment ça marche" },
-        { href: "/associations/connexion", label: "Connexion" },
       ]}
       cta={{
-        href: "/associations/inscription",
-        label: "Créer un compte",
+        href: ASSOCIATIONS_WAITLIST_HREF,
+        label: "Rejoindre la liste d’attente",
+        external: true,
       }}
     />
   );
 }
 
-export default function AssociationsLanding() {
+export default function AssociationsLanding({
+  showComingSoonNotice = false,
+}: {
+  showComingSoonNotice?: boolean;
+}) {
   const reduceMotion = useReducedMotion();
   const [activeFeatureIndex, setActiveFeatureIndex] = useState<number | null>(null);
   const [hoveredFeatureIndex, setHoveredFeatureIndex] = useState<number | null>(null);
+  const [noticeVisible, setNoticeVisible] = useState(showComingSoonNotice);
   const activeFeature =
     activeFeatureIndex === null ? null : associationFeatures[activeFeatureIndex];
   const transition = { duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] as const };
@@ -921,6 +959,29 @@ export default function AssociationsLanding() {
   return (
     <main className={styles.page}>
       <AssociationsNav />
+
+      {noticeVisible && !ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+        <div className="relative z-30 border-b border-[#ed7059]/20 bg-[#fff7f4] px-5 py-3 text-center">
+          <p className="mx-auto max-w-3xl text-sm font-semibold text-[#8a4334]">
+            Obillz Associations sera bientôt disponible.{" "}
+            <a
+              href={ASSOCIATIONS_WAITLIST_HREF}
+              className="font-extrabold underline decoration-[#ed7059]/40 underline-offset-2 transition hover:decoration-[#ed7059]"
+            >
+              Inscrivez-vous pour être informé du lancement
+            </a>
+            .
+            <button
+              type="button"
+              onClick={() => setNoticeVisible(false)}
+              className="ml-3 text-xs font-bold uppercase tracking-wide text-[#b84e3a]/70 transition hover:text-[#b84e3a]"
+              aria-label="Fermer le message"
+            >
+              Fermer
+            </button>
+          </p>
+        </div>
+      ) : null}
 
       <section className={styles.hero}>
         <div className={styles.noise} />
@@ -938,8 +999,16 @@ export default function AssociationsLanding() {
         />
         <div className="relative mx-auto flex max-w-[1060px] items-center justify-center">
           <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.1 }} className="relative z-10 flex w-full flex-col items-center text-center">
-            <motion.div variants={fadeUp} transition={transition} className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#ed7059]/20 bg-white/70 px-4 py-2 text-xs font-bold text-[#b84e3a] shadow-sm backdrop-blur">
-              <Heart className="h-3.5 w-3.5 fill-current" /> Un nouvel univers Obillz
+            <motion.div variants={fadeUp} transition={transition} className="mb-7 flex flex-wrap items-center justify-center gap-2">
+              {!ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#17211d]/10 bg-[#17211d] px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(23,33,29,.18)]">
+                  <Sparkles className="h-3.5 w-3.5 text-[#ed7059]" />
+                  Bientôt disponible
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#ed7059]/20 bg-white/70 px-4 py-2 text-xs font-bold text-[#b84e3a] shadow-sm backdrop-blur">
+                <Heart className="h-3.5 w-3.5 fill-current" /> Un nouvel univers Obillz
+              </span>
             </motion.div>
             <motion.h1 variants={fadeUp} transition={transition} className={styles.display}>
               Gérez votre association <span className="relative text-[#ed7059]">sans perdre vos soirées.<svg className="absolute -bottom-3 left-0 w-full" viewBox="0 0 520 18" fill="none" aria-hidden><path d="M3 12C135 2 353 3 517 8" stroke="#ed7059" strokeWidth="5" strokeLinecap="round" opacity=".35"/></svg></span>
@@ -947,19 +1016,36 @@ export default function AssociationsLanding() {
             <motion.p variants={fadeUp} transition={transition} className="mx-auto mt-8 max-w-[760px] text-base font-medium leading-relaxed text-[#65716b] sm:text-lg">
               Des membres aux cotisations, en passant par les événements, les documents et la communication, Obillz simplifie la gestion des associations et fait gagner des heures aux bénévoles.
             </motion.p>
+            {!ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+              <motion.p variants={fadeUp} transition={transition} className="mx-auto mt-4 max-w-[640px] text-sm font-semibold leading-relaxed text-[#8a4334]/90 sm:text-[15px]">
+                Obillz Associations arrive prochainement. Nous préparons une plateforme pensée pour les associations.
+              </motion.p>
+            ) : null}
             <motion.div variants={fadeUp} transition={transition} className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/associations/inscription"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#ed7059] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_rgba(237,112,89,.27)] transition hover:-translate-y-0.5 hover:bg-[#d85e48]"
-              >
-                Créer un compte <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/associations/connexion"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#17211d]/15 bg-white/70 px-6 py-3.5 text-sm font-extrabold text-[#17211d] shadow-sm transition hover:-translate-y-0.5 hover:bg-white"
-              >
-                Connexion
-              </Link>
+              {ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED ? (
+                <>
+                  <Link
+                    href="/associations/inscription"
+                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#ed7059] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_rgba(237,112,89,.27)] transition hover:-translate-y-0.5 hover:bg-[#d85e48]"
+                  >
+                    Créer un compte <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    href="/associations/connexion"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-[#17211d]/15 bg-white/70 px-6 py-3.5 text-sm font-extrabold text-[#17211d] shadow-sm transition hover:-translate-y-0.5 hover:bg-white"
+                  >
+                    Connexion
+                  </Link>
+                </>
+              ) : (
+                <a
+                  href={ASSOCIATIONS_WAITLIST_HREF}
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#ed7059] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_rgba(237,112,89,.27)] transition hover:-translate-y-0.5 hover:bg-[#d85e48]"
+                >
+                  Rejoindre la liste d’attente{" "}
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                </a>
+              )}
             </motion.div>
           </motion.div>
         </div>

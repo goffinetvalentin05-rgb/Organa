@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED } from "@/lib/associations/public-launch";
 
 type ProductSwitcherProps = {
   current: "sport" | "associations";
@@ -25,7 +26,9 @@ const products = [
     name: "Obillz Associations",
     description: "Musique • Théâtre • Chorales • Associations",
     href: "/associations",
-    isNew: true,
+    badge: ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED
+      ? ("Nouveau" as const)
+      : ("Bientôt" as const),
   },
 ];
 
@@ -123,6 +126,7 @@ export default function ProductSwitcher({
             >
               {products.map((product) => {
                 const active = product.id === current;
+                const badge = "badge" in product ? product.badge : null;
                 return (
                   <motion.div
                     key={product.id}
@@ -172,11 +176,16 @@ export default function ProductSwitcher({
                           <span className="text-[13px] font-extrabold tracking-[-0.02em]">
                             {product.name}
                           </span>
-                          {product.isNew && (
+                          {badge === "Nouveau" ? (
                             <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[7px] font-black uppercase tracking-[0.1em] text-amber-700">
                               Nouveau
                             </span>
-                          )}
+                          ) : null}
+                          {badge === "Bientôt" ? (
+                            <span className="rounded-full bg-slate-900/90 px-1.5 py-0.5 text-[7px] font-black uppercase tracking-[0.1em] text-white">
+                              Bientôt
+                            </span>
+                          ) : null}
                         </span>
                         <span className="mt-0.5 block text-[10px] font-medium leading-relaxed text-slate-500">
                           {product.description}

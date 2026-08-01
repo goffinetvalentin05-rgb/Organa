@@ -8,6 +8,10 @@ import {
   resolveOrgForProduct,
   type ObillzProduct,
 } from "@/lib/auth/product-access";
+import {
+  ASSOCIATIONS_COMING_SOON_HREF,
+  isAssociationsPublicAuthOpen,
+} from "@/lib/associations/public-launch";
 
 /**
  * Middleware Next.js — session, MFA, séparation Sport / Associations.
@@ -98,10 +102,25 @@ async function enforceProductGate(
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const { pathname } = request.nextUrl;
+  const isAssocAuthPage =
+    pathname === "/associations/connexion" ||
+    pathname === "/associations/inscription";
+  const assocPublicAuthOpen = isAssociationsPublicAuthOpen(
+    pathname,
+    request.nextUrl.searchParams
+  );
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  /* Sans Supabase : bloquer quand même l’ouverture publique Auth Associations */
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (isAssocAuthPage && !assocPublicAuthOpen) {
+      return NextResponse.redirect(
+        new URL(ASSOCIATIONS_COMING_SOON_HREF, request.url)
+      );
+    }
     return response;
   }
 
@@ -122,7 +141,29 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  /* Lancement public fermé : redirect landing, sauf session Associations déjà ouverte */
+  if (isAssocAuthPage && !assocPublicAuthOpen) {
+    if (user) {
+      const preferred = request.cookies.get(OBILLZ_ACTIVE_CLUB_COOKIE)?.value;
+      const org = await resolveOrgForProduct(
+        supabase,
+        user.id,
+        "association",
+        preferred
+      );
+      if (org) {
+        const redirectRes = NextResponse.redirect(
+          new URL(homeForProduct("association"), request.url)
+        );
+        setActiveClubCookie(redirectRes, org.clubId);
+        return redirectRes;
+      }
+    }
+
+    return NextResponse.redirect(
+      new URL(ASSOCIATIONS_COMING_SOON_HREF, request.url)
+    );
+  }
 
   /* --------- API : MFA obligatoire si session présente --------- */
   if (pathname.startsWith("/api/")) {
