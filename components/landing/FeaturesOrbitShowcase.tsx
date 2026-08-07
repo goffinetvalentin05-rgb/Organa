@@ -167,7 +167,7 @@ type FeatureCardProps = {
   reduceMotion: boolean | null;
   onSelect: () => void;
   layout?: FloatLayout;
-  variant: "float" | "rail";
+  variant: "float" | "grid";
 };
 
 function FeatureCard({
@@ -188,23 +188,23 @@ function FeatureCard({
     <motion.button
       type="button"
       className={`features-constellation-card ${
-        isFloat ? "" : "features-constellation-card--rail"
+        isFloat ? "" : "features-constellation-card--grid"
       } ${isActive ? "features-constellation-card--active" : ""} ${
         dimmed ? "features-constellation-card--dimmed" : ""
       }`}
-      initial={reduceMotion ? false : { opacity: 0, y: isFloat ? 22 : 18, scale: 0.92 }}
+      initial={reduceMotion ? false : { opacity: 0, y: isFloat ? 22 : 14, scale: 0.92 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : undefined}
       transition={{
         duration: 0.55,
-        delay: reduceMotion ? 0 : 0.12 + index * 0.04,
+        delay: reduceMotion ? 0 : 0.12 + index * 0.03,
         ease: easePremium,
       }}
       whileHover={
         reduceMotion
           ? undefined
           : {
-              y: -9,
-              scale: 1.06,
+              y: isFloat ? -9 : -4,
+              scale: isFloat ? 1.06 : 1.03,
               transition: { duration: 0.32, ease: easePremium },
             }
       }
@@ -237,14 +237,13 @@ function FeatureCard({
             <Icon strokeWidth={1.85} aria-hidden />
           </span>
           <span className="features-constellation-card__label">{feature.label}</span>
-          {!isFloat ? (
-            <span className="features-constellation-card__desc">{feature.description}</span>
+          {isFloat ? (
+            <span className="features-constellation-card__indicator" aria-hidden>
+              <span />
+              <span />
+              <span />
+            </span>
           ) : null}
-          <span className="features-constellation-card__indicator" aria-hidden>
-            <span />
-            <span />
-            <span />
-          </span>
         </span>
       </motion.span>
     </motion.button>
@@ -392,7 +391,7 @@ export default function FeaturesOrbitShowcase() {
         </div>
       </div>
 
-      {/* Mobile — rail horizontal premium */}
+      {/* Mobile — grille compacte d’icônes */}
       <div ref={mobileRef} className="features-constellation-mobile">
         <div className="features-constellation-mobile__glow" aria-hidden />
         <motion.div
@@ -404,7 +403,7 @@ export default function FeaturesOrbitShowcase() {
           {centerCopy}
         </motion.div>
 
-        <div className="features-constellation-mobile__rail" role="list">
+        <div className="features-constellation-mobile__grid" role="list">
           {features.map((feature, index) => {
             const Icon = FEATURE_ICONS[feature.id];
             const isActive = activeId === feature.id;
@@ -419,7 +418,7 @@ export default function FeaturesOrbitShowcase() {
                   inView={mobileInView}
                   reduceMotion={reduceMotion}
                   onSelect={() => handleSelect(feature.id)}
-                  variant="rail"
+                  variant="grid"
                 />
               </div>
             );

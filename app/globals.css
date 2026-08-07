@@ -1024,7 +1024,7 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* ── Mobile rail ── */
+/* ── Mobile grid (compact, style Associations) ── */
 .features-constellation-mobile {
   position: relative;
   isolation: isolate;
@@ -1073,70 +1073,69 @@ html:has(.dashboard-shell) {
   max-width: 28rem;
 }
 
-.features-constellation-mobile__rail {
+.features-constellation-mobile__grid {
   position: relative;
   z-index: 1;
-  display: flex;
-  gap: 0.85rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 1rem;
-  padding: 0.5rem 1rem 1.1rem;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.features-constellation-mobile__rail::-webkit-scrollbar {
-  display: none;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem 0.45rem;
+  padding: 0.15rem 0 0.35rem;
 }
 
 .features-constellation-mobile__item {
-  flex: 0 0 min(72vw, 16.5rem);
-  scroll-snap-align: start;
+  min-width: 0;
 }
 
-.features-constellation-card--rail {
+.features-constellation-card--grid {
   width: 100%;
-  height: 100%;
 }
 
-.features-constellation-card--rail .features-constellation-card__float {
+.features-constellation-card--grid .features-constellation-card__float {
   display: block;
+  width: 100%;
+}
+
+.features-constellation-card--grid .features-constellation-card__glass {
+  align-items: center;
   height: 100%;
+  min-height: 0;
+  padding: 0.72rem 0.35rem 0.65rem;
+  border-radius: 1.15rem;
+  gap: 0.42rem;
 }
 
-.features-constellation-card--rail .features-constellation-card__glass {
-  align-items: flex-start;
-  height: 100%;
-  min-height: 11.5rem;
-  padding: 1.15rem 1.1rem 1.05rem;
-  border-radius: 1.5rem;
-  gap: 0.7rem;
+.features-constellation-card--grid .features-constellation-card__icon {
+  height: 2.45rem;
+  width: 2.45rem;
+  border-radius: 0.85rem;
 }
 
-.features-constellation-card--rail .features-constellation-card__icon {
-  height: 2.85rem;
-  width: 2.85rem;
-  border-radius: 0.95rem;
+.features-constellation-card--grid .features-constellation-card__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
-.features-constellation-card--rail .features-constellation-card__icon svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.features-constellation-card--rail .features-constellation-card__label {
-  font-size: 0.95rem;
-  text-align: left;
+.features-constellation-card--grid .features-constellation-card__label {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  text-align: center;
   -webkit-line-clamp: 2;
 }
 
-.features-constellation-card--rail .features-constellation-card__desc {
-  flex: 1;
+.features-constellation-card--grid .features-constellation-card__indicator {
+  display: none;
 }
 
-.features-constellation-card--rail .features-constellation-card__indicator {
-  margin-top: auto;
+.features-constellation-card--grid.features-constellation-card--active
+  .features-constellation-card__glass {
+  border-color: rgba(26, 35, 255, 0.38);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.1),
+    0 0 0 1px rgba(26, 35, 255, 0.12),
+    0 10px 28px rgba(26, 35, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 /* ── Detail panel — glass clair premium ── */
@@ -1386,8 +1385,22 @@ html:has(.dashboard-shell) {
 }
 
 @media (max-width: 420px) {
-  .features-constellation-mobile__item {
-    flex-basis: min(78vw, 15.5rem);
+  .features-constellation-mobile__grid {
+    gap: 0.55rem 0.3rem;
+  }
+
+  .features-constellation-card--grid .features-constellation-card__glass {
+    padding: 0.62rem 0.28rem 0.55rem;
+    border-radius: 1rem;
+  }
+
+  .features-constellation-card--grid .features-constellation-card__icon {
+    height: 2.2rem;
+    width: 2.2rem;
+  }
+
+  .features-constellation-card--grid .features-constellation-card__label {
+    font-size: 0.58rem;
   }
 
   .features-constellation-mobile__intro .features-orbit-center__title {
@@ -1468,10 +1481,12 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-title {
+    width: 100%;
     max-width: 100%;
-    font-size: clamp(2.05rem, 9.5vw, 3.25rem);
-    line-height: 1.08;
-    letter-spacing: -0.04em;
+    /* Aligné sur le poids éditorial Associations, identité bleue conservée */
+    font-size: clamp(2.85rem, 11.2vw, 3.55rem);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
   }
 
   .landing-hero-title-line {
@@ -1479,26 +1494,30 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-title-line + .landing-hero-title-line {
-    margin-top: 0.12rem;
+    margin-top: 0.02rem;
   }
 
   .landing-hero-description {
     max-width: 34rem;
-    margin-top: 1.35rem;
-    font-size: clamp(0.95rem, 3.7vw, 1.1rem);
+    margin-top: 1.5rem;
+    font-size: clamp(0.98rem, 3.8vw, 1.125rem);
     line-height: 1.55;
-    padding-inline: 0;
+    padding-inline: 0.15rem;
   }
 
   .landing-hero-cta-wrap {
     width: min(100%, 400px);
-    margin-top: 1.75rem;
+    margin-top: 1.85rem;
   }
 
   .landing-hero-cta-wrap .landing-hero-cta {
     width: 100%;
     padding-inline: 1.35rem;
     font-size: 0.9375rem;
+  }
+
+  .landing-hero-story-cta-slot {
+    margin-top: 1.05rem;
   }
 
   /* RÃ©assurances : sous le fold */
@@ -1566,6 +1585,26 @@ html:has(.dashboard-shell) {
   .landing-light-zone::after {
     opacity: 0.4;
     background-size: 20px 20px, 64px 64px, 64px 64px;
+  }
+
+  .features-constellation-mobile__glow {
+    width: min(120%, 28rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .features-modules-ambiance__glow--b {
+    left: 12%;
+    width: min(420px, 58vw);
+    height: min(420px, 58vw);
+    transform: translate(-30%, -50%);
+  }
+
+  .features-modules-ambiance__glow--c {
+    left: 88%;
+    width: min(380px, 52vw);
+    height: min(380px, 52vw);
+    transform: translate(-70%, -50%);
   }
 
   .landing-light-zone #modules.landing-section--first {
@@ -2354,6 +2393,8 @@ html:has(.dashboard-shell) {
 .why-fan__mobile {
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -2366,15 +2407,15 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Mobile â€” slider horizontal snap */
-
+/* Mobile — une seule carte visible, snap centré */
 .why-fan__scroller {
   display: flex;
-  gap: 1rem;
+  gap: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: calc(50% - min(17rem, 78vw) / 2);
-  padding: 1.25rem calc(50% - min(17rem, 78vw) / 2) 1.5rem;
+  scroll-padding-inline: 0;
+  padding: 1.15rem 0 1.35rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -2383,24 +2424,29 @@ html:has(.dashboard-shell) {
   display: none;
 }
 
-.why-fan-card--mobile {
+.why-fan-card.why-fan-card--mobile {
   position: relative;
-  flex: 0 0 min(17rem, 78vw);
-  width: min(17rem, 78vw);
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+  padding-inline: 1rem;
   scroll-snap-align: center;
-  transform: scale(0.94);
-  opacity: 0.72;
+  scroll-snap-stop: always;
+  transform: none;
+  opacity: 1;
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.35s ease;
 }
 
-.why-fan-card--mobile.is-active {
-  transform: scale(1);
+.why-fan-card.why-fan-card--mobile.is-active {
+  transform: none;
   opacity: 1;
 }
 
-.why-fan-card--mobile .why-fan-card__face {
+.why-fan-card.why-fan-card--mobile .why-fan-card__face {
+  width: 100%;
   min-height: 22.5rem;
 }
 
@@ -3655,7 +3701,9 @@ html:has(.dashboard-shell) {
 /* Breakpoints fins â€” tÃ©lÃ©phone Ã©troit */
 @media (max-width: 430px) {
   .landing-hero-title {
-    font-size: clamp(1.9rem, 8.8vw, 2.45rem);
+    font-size: clamp(2.55rem, 11.5vw, 3.15rem);
+    line-height: 0.97;
+    letter-spacing: -0.052em;
   }
 
   .landing-trust-strip__item {
@@ -3676,17 +3724,17 @@ html:has(.dashboard-shell) {
 
 @media (max-width: 360px) {
   .landing-hero-title {
-    font-size: clamp(1.75rem, 8.4vw, 2.1rem);
-    letter-spacing: -0.035em;
+    font-size: clamp(2.25rem, 11vw, 2.75rem);
+    letter-spacing: -0.048em;
   }
 
   .landing-hero-description {
-    margin-top: 1.1rem;
-    font-size: 0.9rem;
+    margin-top: 1.25rem;
+    font-size: 0.95rem;
   }
 
   .landing-hero-cta-wrap {
-    margin-top: 1.4rem;
+    margin-top: 1.55rem;
   }
 
   .landing-hero-cta-wrap .landing-hero-cta {
@@ -3719,7 +3767,7 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-title {
-    font-size: 1.6rem;
+    font-size: 2.05rem;
   }
 
   .landing-section-title {

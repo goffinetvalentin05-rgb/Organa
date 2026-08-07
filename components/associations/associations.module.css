@@ -2022,11 +2022,13 @@
 
   .collaborationVisual {
     min-height: 400px;
-    margin-inline: -0.25rem;
+    margin-inline: 0;
+    overflow: hidden;
+    contain: paint;
   }
 
   .feedbackChip {
-    max-width: 11.5rem;
+    max-width: min(10.5rem, 42vw);
     padding: 0.58rem 0.75rem;
     font-size: 0.6rem;
   }
