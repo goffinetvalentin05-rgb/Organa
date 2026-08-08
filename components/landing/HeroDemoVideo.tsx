@@ -60,13 +60,15 @@ export default function HeroDemoVideo() {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    /* Visible en bas du hero = tilté ; redressement progressif au scroll */
-    offset: ["start 0.62", "start 0.22"],
+    /* Mobile : progress bas tant que la vidéo est en bas d’écran (reste inclinée) */
+    offset: isCompact
+      ? ["start 0.9", "start 0.32"]
+      : ["start 0.62", "start 0.22"],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
+    stiffness: isCompact ? 140 : 120,
+    damping: isCompact ? 32 : 28,
     restDelta: 0.001,
     mass: 0.35,
   });
@@ -76,17 +78,17 @@ export default function HeroDemoVideo() {
   const rotateX = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [0, 0] : isCompact ? [5.5, 0] : [8.5, 0]
+    reduceMotion ? [0, 0] : isCompact ? [5.25, 0] : [8.5, 0]
   );
   const scale = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [1, 1] : isCompact ? [0.965, 1] : [0.935, 1]
+    reduceMotion ? [1, 1] : isCompact ? [0.972, 1] : [0.935, 1]
   );
   const y = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [0, 0] : isCompact ? [14, 0] : [28, 0]
+    reduceMotion ? [0, 0] : isCompact ? [18, 0] : [28, 0]
   );
   const opacity = useTransform(
     progress,

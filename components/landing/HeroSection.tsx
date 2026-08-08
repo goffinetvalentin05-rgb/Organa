@@ -21,7 +21,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="landing-hero-shell relative flex flex-col overflow-x-hidden"
+      className="landing-hero-shell relative flex flex-col"
     >
       {/* Halo centré — discret */}
       <motion.div
@@ -44,7 +44,7 @@ export default function HeroSection() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="relative z-10 flex w-full flex-col items-center text-center"
+          className="landing-hero-stack relative z-10 flex w-full flex-col items-center text-center"
         >
           <motion.h1
             variants={heroTitleLine}

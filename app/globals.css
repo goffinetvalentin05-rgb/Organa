@@ -1705,12 +1705,13 @@ html:has(.dashboard-shell) {
    ------------------------------------------------------------------ */
 @media (max-width: 768px) {
   .landing-hero-shell {
-    min-height: auto;
+    min-height: 100svh;
     padding: 0;
     overflow-x: clip;
+    overflow-y: visible;
   }
 
-  /* Flux mobile : titre → CTA → vidéo → réassurances */
+  /* Composition premier écran : titre → CTA → vidéo partiellement hors fold */
   .landing-hero-content {
     z-index: 2;
     flex: 0 0 auto;
@@ -1720,20 +1721,33 @@ html:has(.dashboard-shell) {
     justify-content: flex-start;
     box-sizing: border-box;
     width: 100%;
-    min-height: auto;
+    min-height: 100svh;
+    min-height: 100dvh;
     padding:
-      max(7.75rem, calc(env(safe-area-inset-top, 0px) + 6.15rem))
+      calc(env(safe-area-inset-top, 0px) + 5.15rem + clamp(4rem, 9.5vh, 5.5rem))
       var(--landing-gutter, 20px)
-      1.75rem;
+      0;
     text-align: center;
+    /* Pas d’overflow:hidden : le bas de la vidéo sort du fold et se révèle au scroll */
+  }
+
+  .landing-hero-stack {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .landing-hero-title {
     width: 100%;
-    max-width: 100%;
+    max-width: 19.5rem;
+    margin-inline: auto;
     /* Aligné sur le poids éditorial Associations, identité bleue conservée */
-    font-size: clamp(2.85rem, 11.2vw, 3.55rem);
-    line-height: 0.96;
+    font-size: clamp(2.75rem, 10.8vw, 3.45rem);
+    line-height: 0.94;
     letter-spacing: -0.055em;
   }
 
@@ -1742,20 +1756,21 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-title-line + .landing-hero-title-line {
-    margin-top: 0.02rem;
+    margin-top: 0.01rem;
   }
 
   .landing-hero-description {
-    max-width: 34rem;
-    margin-top: 1.5rem;
-    font-size: clamp(0.98rem, 3.8vw, 1.125rem);
-    line-height: 1.55;
-    padding-inline: 0.15rem;
+    max-width: 19.25rem;
+    margin-top: 1.15rem;
+    margin-inline: auto;
+    font-size: clamp(0.9375rem, 3.5vw, 1.05rem);
+    line-height: 1.42;
+    padding-inline: 0.1rem;
   }
 
   .landing-hero-cta-wrap {
-    width: min(100%, 400px);
-    margin-top: 1.85rem;
+    width: min(100%, 360px);
+    margin-top: 1.35rem;
   }
 
   .landing-hero-cta-wrap .landing-hero-cta {
@@ -1765,19 +1780,28 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-video-slot {
-    margin-top: 1.45rem;
     width: 100%;
+    margin-top: auto;
+    margin-bottom: -18%;
+    padding-top: 1.15rem;
+    display: flex;
+    justify-content: center;
     perspective: 900px;
+    -webkit-perspective: 900px;
+    position: relative;
+    z-index: 3;
   }
 
   .landing-hero-video {
-    width: calc(100% - 32px);
-    max-width: 100%;
+    width: calc(100% - 40px);
+    max-width: 420px;
     margin-inline: auto;
   }
 
   .landing-hero-video__stage {
     perspective: 900px;
+    -webkit-perspective: 900px;
+    padding-bottom: 0;
   }
 
   .landing-hero-video__frame {
@@ -1808,9 +1832,11 @@ html:has(.dashboard-shell) {
     height: 2rem;
   }
 
-  /* RÃ©assurances : sous le fold */
+  /* Réassurances : sous le fold, transition sous la vidéo */
   .landing-trust-strip {
-    margin-top: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: -0.5rem;
   }
 
   .landing-trust-strip__grid {
@@ -1818,7 +1844,7 @@ html:has(.dashboard-shell) {
     width: calc(100% - (var(--landing-gutter, 20px) * 2));
     max-width: 680px;
     margin: 0 auto;
-    padding: 2.5rem 0 6.5rem;
+    padding: 3.25rem 0 6.5rem;
   }
 
   .landing-trust-strip__item {
@@ -3986,12 +4012,27 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* Breakpoints fins â€” tÃ©lÃ©phone Ã©troit */
+/* Breakpoints fins — téléphone étroit */
 @media (max-width: 430px) {
   .landing-hero-title {
-    font-size: clamp(2.55rem, 11.5vw, 3.15rem);
-    line-height: 0.97;
-    letter-spacing: -0.052em;
+    max-width: 18.5rem;
+    font-size: clamp(2.65rem, 11vw, 3.25rem);
+    line-height: 0.94;
+    letter-spacing: -0.054em;
+  }
+
+  .landing-hero-description {
+    max-width: 18rem;
+  }
+
+  .landing-hero-content {
+    padding-top: calc(
+      env(safe-area-inset-top, 0px) + 5.05rem + clamp(3.75rem, 8.5vh, 5rem)
+    );
+  }
+
+  .landing-hero-video-slot {
+    margin-bottom: -16%;
   }
 
   .landing-trust-strip__item {
@@ -4012,22 +4053,29 @@ html:has(.dashboard-shell) {
 
 @media (max-width: 360px) {
   .landing-hero-title {
-    font-size: clamp(2.25rem, 11vw, 2.75rem);
-    letter-spacing: -0.048em;
+    max-width: 17.5rem;
+    font-size: clamp(2.45rem, 11vw, 2.95rem);
+    letter-spacing: -0.052em;
   }
 
   .landing-hero-description {
-    margin-top: 1.25rem;
-    font-size: 0.95rem;
+    max-width: 17rem;
+    margin-top: 1rem;
+    font-size: 0.9375rem;
   }
 
   .landing-hero-cta-wrap {
-    margin-top: 1.55rem;
+    margin-top: 1.2rem;
   }
 
   .landing-hero-cta-wrap .landing-hero-cta {
     padding-block: 0.85rem;
     font-size: 0.875rem;
+  }
+
+  .landing-hero-video-slot {
+    margin-bottom: -18%;
+    padding-top: 1rem;
   }
 
   .landing-trust-strip__value {
