@@ -25,6 +25,12 @@
     "convergenceAriaLabel": "Club management unified in Obillz",
     "hubBaseline": "Your whole club, in one place.",
     "fluxLabel": "Scattered → centralized",
+    "videoCaption": "Discover Obillz in a few seconds",
+    "videoPlay": "Play the Obillz presentation video",
+    "videoPause": "Pause the video",
+    "videoReplay": "Replay the video",
+    "videoMute": "Mute",
+    "videoUnmute": "Unmute",
     "hubModules": {
       "membres": "Centralized database",
       "cotisations": "Real-time tracking",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
-import HeroStoryCta from "@/components/landing/HeroStoryCta";
+import HeroDemoVideo from "@/components/landing/HeroDemoVideo";
 import {
   easePremium,
   heroCtaEnter,
@@ -96,8 +96,8 @@ export default function HeroSection() {
             </motion.div>
           </motion.div>
 
-          <div className="landing-hero-story-cta-slot">
-            <HeroStoryCta />
+          <div className="landing-hero-video-slot">
+            <HeroDemoVideo />
           </div>
         </motion.div>
       </div>

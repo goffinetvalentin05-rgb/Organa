@@ -25,6 +25,12 @@
     "convergenceAriaLabel": "Vereinsverwaltung vereint in Obillz",
     "hubBaseline": "Ihr ganzer Verein, an einem Ort.",
     "fluxLabel": "Zerstreut → zentralisiert",
+    "videoCaption": "Entdecken Sie Obillz in wenigen Sekunden",
+    "videoPlay": "Obillz Präsentationsvideo abspielen",
+    "videoPause": "Video pausieren",
+    "videoReplay": "Video erneut abspielen",
+    "videoMute": "Ton aus",
+    "videoUnmute": "Ton an",
     "hubModules": {
       "membres": "Zentrale Datenbank",
       "cotisations": "Echtzeit-Tracking",
