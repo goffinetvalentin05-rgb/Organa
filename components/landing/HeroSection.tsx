@@ -50,11 +50,24 @@ export default function HeroSection() {
             variants={heroTitleLine}
             className="landing-hero-title landing-hero-title-glow display-title text-white"
           >
-            <span className="landing-hero-title-line">
-              {t("marketing.hero.titleLine1")}
+            <span className="landing-hero-title-desktop">
+              <span className="landing-hero-title-line">
+                {t("marketing.hero.titleLine1")}
+              </span>
+              <span className="landing-hero-title-line">
+                {t("marketing.hero.titleLine2")}
+              </span>
             </span>
-            <span className="landing-hero-title-line">
-              {t("marketing.hero.titleLine2")}
+            <span className="landing-hero-title-mobile">
+              <span className="landing-hero-title-line">
+                {t("marketing.hero.titleMobileLine1")}
+              </span>
+              <span className="landing-hero-title-line">
+                {t("marketing.hero.titleMobileLine2")}
+              </span>
+              <span className="landing-hero-title-line">
+                {t("marketing.hero.titleMobileLine3")}
+              </span>
             </span>
           </motion.h1>
 

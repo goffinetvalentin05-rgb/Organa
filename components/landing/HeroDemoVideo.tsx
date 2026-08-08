@@ -78,17 +78,17 @@ export default function HeroDemoVideo() {
   const rotateX = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [0, 0] : isCompact ? [5.25, 0] : [8.5, 0]
+    reduceMotion ? [0, 0] : isCompact ? [4.75, 0] : [8.5, 0]
   );
   const scale = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [1, 1] : isCompact ? [0.972, 1] : [0.935, 1]
+    reduceMotion ? [1, 1] : isCompact ? [0.97, 1] : [0.935, 1]
   );
   const y = useTransform(
     progress,
     [0, 1],
-    reduceMotion ? [0, 0] : isCompact ? [18, 0] : [28, 0]
+    reduceMotion ? [0, 0] : isCompact ? [6, 0] : [28, 0]
   );
   const opacity = useTransform(
     progress,
