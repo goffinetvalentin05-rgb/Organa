@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Plus, Trash, Clock, MapPin, Calendar } from "@/lib/icons";
@@ -10,6 +10,14 @@ import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  clearPlanningCreateDraft,
+  createDefaultPlanningSlots,
+  loadPlanningCreateDraft,
+  savePlanningCreateDraft,
+  type PlanningCreateDraftSlot,
+} from "@/lib/planning/planningCreateDraft";
 import {
   PageLayout,
   PageHeader,
@@ -28,15 +36,7 @@ interface Event {
   name: string;
 }
 
-interface SlotForm {
-  id: string;
-  location: string;
-  slotDate: string;
-  startTime: string;
-  endTime: string;
-  requiredPeople: number;
-  notes: string;
-}
+type SlotForm = PlanningCreateDraftSlot;
 
 const inputClass = dashboardInputClass;
 
@@ -46,9 +46,12 @@ const labelClass = `${dashboardLabelClass} mb-2`;
 
 const compactLabelClass = "mb-1.5 flex items-center gap-1 text-xs font-medium text-white/65";
 
+const DRAFT_SAVE_DEBOUNCE_MS = 400;
+
 export default function NouveauPlanningPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const { clubId, loading: clubLoading } = usePermissions();
   const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
   const [createSuccess, setCreateSuccess] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
@@ -59,13 +62,109 @@ export default function NouveauPlanningPage() {
   const [date, setDate] = useState("");
   const [eventId, setEventId] = useState("");
 
-  const [slots, setSlots] = useState<SlotForm[]>([
-    { id: "1", location: "", slotDate: "", startTime: "08:00", endTime: "10:00", requiredPeople: 1, notes: "" },
-  ]);
+  const [slots, setSlots] = useState<SlotForm[]>(() => createDefaultPlanningSlots());
+
+  /** false tant que la restauration pour le club courant n'est pas terminée */
+  const [draftHydrated, setDraftHydrated] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeClubIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     loadEvents();
   }, []);
+
+  // Restauration du brouillon dès que le club actif est connu (avant tout autosave).
+  useEffect(() => {
+    if (clubLoading) return;
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+
+    if (!clubId) {
+      activeClubIdRef.current = null;
+      setDraftHydrated(true);
+      setDraftRestored(false);
+      setDraftSavedAt(null);
+      return;
+    }
+
+    activeClubIdRef.current = clubId;
+    setDraftHydrated(false);
+
+    const envelope = loadPlanningCreateDraft(clubId);
+    if (envelope) {
+      setName(envelope.data.name);
+      setDescription(envelope.data.description);
+      setDate(envelope.data.date);
+      setEventId(envelope.data.eventId);
+      setSlots(
+        envelope.data.slots.length > 0
+          ? envelope.data.slots
+          : createDefaultPlanningSlots()
+      );
+      setDraftSavedAt(envelope.savedAt);
+      setDraftRestored(true);
+    } else {
+      setName("");
+      setDescription("");
+      setDate("");
+      setEventId("");
+      setSlots(createDefaultPlanningSlots());
+      setDraftSavedAt(null);
+      setDraftRestored(false);
+    }
+
+    setDraftHydrated(true);
+  }, [clubId, clubLoading]);
+
+  // Autosave debounced — uniquement après hydratation, pour le club courant.
+  useEffect(() => {
+    if (!draftHydrated || !clubId || clubLoading) return;
+    if (activeClubIdRef.current !== clubId) return;
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = setTimeout(() => {
+      if (activeClubIdRef.current !== clubId) return;
+      const result = savePlanningCreateDraft(clubId, {
+        name,
+        description,
+        date,
+        eventId,
+        slots,
+      });
+      if (result.saved && result.savedAt) {
+        setDraftSavedAt(result.savedAt);
+        setDraftRestored(true);
+      } else if (!result.saved) {
+        setDraftSavedAt(null);
+        setDraftRestored(false);
+      }
+    }, DRAFT_SAVE_DEBOUNCE_MS);
+
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+    };
+  }, [
+    name,
+    description,
+    date,
+    eventId,
+    slots,
+    clubId,
+    clubLoading,
+    draftHydrated,
+  ]);
 
   const loadEvents = async () => {
     try {
@@ -162,6 +261,7 @@ export default function NouveauPlanningPage() {
       });
 
       if (!response.ok) {
+        // Ne jamais supprimer le brouillon sur erreur API.
         const data = await response.json().catch(() => ({}));
         if (data.error === "LIMIT_REACHED") {
           notifyError(data.message || "Limite de plannings atteinte", "planning-create");
@@ -172,11 +272,24 @@ export default function NouveauPlanningPage() {
       }
 
       const data = await response.json();
+      const createdId =
+        typeof data?.planning?.id === "string" ? data.planning.id : null;
+      if (!createdId) {
+        notifyError("Création incomplète — votre brouillon est conservé", "planning-create");
+        return;
+      }
+
+      // Succès confirmé uniquement : effacer le brouillon du club, puis naviguer.
+      if (clubId) {
+        clearPlanningCreateDraft(clubId);
+      }
+      setDraftSavedAt(null);
+      setDraftRestored(false);
       setCreateSuccess(true);
       notifySuccess("Planning créé avec succès ✓", "planning-create");
       setTimeout(() => setCreateSuccess(false), 2000);
 
-      router.replace(`/tableau-de-bord/plannings/${data.planning.id}`);
+      router.replace(`/tableau-de-bord/plannings/${createdId}`);
     });
   };
 
@@ -203,6 +316,8 @@ export default function NouveauPlanningPage() {
     );
   }, [date]);
 
+  const showDraftStatus = Boolean(draftSavedAt || draftRestored);
+
   return (
     <>
       <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
@@ -220,6 +335,18 @@ export default function NouveauPlanningPage() {
         title="Nouveau planning"
         subtitle="Créez un planning et définissez vos créneaux horaires"
       />
+
+      {showDraftStatus && (
+        <p
+          className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/55"
+          aria-live="polite"
+        >
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" aria-hidden />
+          {draftRestored && draftSavedAt
+            ? "Brouillon restauré · sauvegarde automatique"
+            : "Sauvegardé automatiquement"}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informations générales */}
