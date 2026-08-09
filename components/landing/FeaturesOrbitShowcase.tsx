@@ -21,7 +21,90 @@ type OrbitFeatureContent = {
   id: OrbitFeatureId;
   label: string;
   description: string;
+  teaser?: string;
 };
+
+type MobileCardSize = "xl" | "lg" | "md" | "sm";
+
+type MobileCardLayout = {
+  id: OrbitFeatureId;
+  size: MobileCardSize;
+  align: "start" | "end" | "center";
+  rot: number;
+  featured?: boolean;
+  float?: boolean;
+};
+
+/** Composition mobile primaire — asymétrique, hors grille 4×4. */
+const MOBILE_PRIMARY_LAYOUT: Array<
+  | { kind: "solo"; card: MobileCardLayout }
+  | { kind: "pair"; left: MobileCardLayout; right: MobileCardLayout }
+> = [
+  {
+    kind: "solo",
+    card: {
+      id: "statistiques",
+      size: "xl",
+      align: "start",
+      rot: -1,
+      featured: true,
+      float: true,
+    },
+  },
+  {
+    kind: "solo",
+    card: { id: "membres", size: "md", align: "end", rot: 2 },
+  },
+  {
+    kind: "solo",
+    card: { id: "cotisations", size: "lg", align: "start", rot: -2 },
+  },
+  {
+    kind: "solo",
+    card: { id: "factures", size: "md", align: "end", rot: 1 },
+  },
+  {
+    kind: "solo",
+    card: {
+      id: "encaissements",
+      size: "xl",
+      align: "start",
+      rot: -1,
+      featured: true,
+      float: true,
+    },
+  },
+  {
+    kind: "solo",
+    card: { id: "sponsors", size: "sm", align: "end", rot: 2 },
+  },
+  {
+    kind: "pair",
+    left: { id: "evenements", size: "sm", align: "start", rot: -2 },
+    right: { id: "buvette", size: "sm", align: "end", rot: 1 },
+  },
+  {
+    kind: "solo",
+    card: {
+      id: "plannings",
+      size: "lg",
+      align: "center",
+      rot: -1,
+      featured: true,
+      float: true,
+    },
+  },
+];
+
+const MOBILE_SECONDARY_LAYOUT: MobileCardLayout[] = [
+  { id: "revenus", size: "md", align: "start", rot: -1.2 },
+  { id: "charges", size: "sm", align: "end", rot: 1.5 },
+  { id: "pv", size: "lg", align: "start", rot: -1.8 },
+  { id: "qrcodes", size: "sm", align: "end", rot: 2 },
+  { id: "communication", size: "md", align: "start", rot: -1 },
+  { id: "pagePublique", size: "lg", align: "end", rot: 1.2 },
+  { id: "parametres", size: "sm", align: "center", rot: -1.5 },
+];
 
 type FloatLayout = {
   x: number;
@@ -201,6 +284,90 @@ function FeatureCard({
   );
 }
 
+function MobileEditorialCard({
+  feature,
+  Icon,
+  layout,
+  index,
+  inView,
+  isActive,
+  dimmed,
+  reduceMotion,
+  onSelect,
+}: {
+  feature: OrbitFeatureContent;
+  Icon: LucideIcon;
+  layout: MobileCardLayout;
+  index: number;
+  inView: boolean;
+  isActive: boolean;
+  dimmed: boolean;
+  reduceMotion: boolean | null;
+  onSelect: () => void;
+}) {
+  const teaser =
+    feature.teaser?.trim() ||
+    feature.description.split(/[.!?]/)[0]?.trim() ||
+    feature.description;
+
+  return (
+    <motion.button
+      type="button"
+      className={[
+        "features-mobile-card",
+        `features-mobile-card--${layout.size}`,
+        `features-mobile-card--align-${layout.align}`,
+        layout.featured ? "features-mobile-card--featured" : "",
+        isActive ? "features-mobile-card--active" : "",
+        dimmed ? "features-mobile-card--dimmed" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={{ "--mobile-rot": `${layout.rot}deg` } as CSSProperties}
+      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.96 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : undefined}
+      transition={{
+        duration: 0.55,
+        delay: reduceMotion ? 0 : 0.08 + index * 0.07,
+        ease: easePremium,
+      }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+      onClick={onSelect}
+      aria-pressed={isActive}
+      aria-label={`${feature.label}. ${teaser}`}
+    >
+      <motion.span
+        className="features-mobile-card__inner"
+        animate={
+          reduceMotion || !inView || !layout.float
+            ? undefined
+            : {
+                y: [0, -4.5, 0],
+                rotate: [layout.rot, layout.rot + 0.35, layout.rot],
+              }
+        }
+        transition={{
+          duration: 6.4 + (index % 3) * 0.9,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: index * 0.35,
+        }}
+      >
+        <span className="features-mobile-card__icon" aria-hidden>
+          <Icon strokeWidth={1.9} className="h-4 w-4" />
+        </span>
+        <span className="features-mobile-card__copy">
+          <span className="features-mobile-card__title">{feature.label}</span>
+          <span className="features-mobile-card__teaser">{teaser}</span>
+        </span>
+        <span className="features-mobile-card__arrow" aria-hidden>
+          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
+        </span>
+      </motion.span>
+    </motion.button>
+  );
+}
+
 function SelectedFeatureBubble({
   feature,
   Icon,
@@ -272,6 +439,7 @@ export default function FeaturesOrbitShowcase() {
   const mobileInView = useInView(mobileRef, { once: true, amount: 0.12 });
   const [activeId, setActiveId] = useState<OrbitFeatureId | null>(null);
   const [hoveredId, setHoveredId] = useState<OrbitFeatureId | null>(null);
+  const [showAllMobile, setShowAllMobile] = useState(false);
 
   const features = useMemo(() => {
     const raw = getTranslationValue(locale, "marketing.modules.orbitFeatures");
@@ -284,9 +452,16 @@ export default function FeaturesOrbitShowcase() {
         id,
         label: found?.label ?? catalog?.title ?? id,
         description: found?.description ?? catalog?.description ?? "",
+        teaser: found?.teaser,
       } satisfies OrbitFeatureContent;
     });
   }, [locale]);
+
+  const featureById = useMemo(() => {
+    const map = new Map<OrbitFeatureId, OrbitFeatureContent>();
+    for (const feature of features) map.set(feature.id, feature);
+    return map;
+  }, [features]);
 
   const active = features.find((f) => f.id === activeId) ?? null;
   const activeCatalog = activeId ? getSportFeatureById(activeId) : null;
@@ -302,9 +477,32 @@ export default function FeaturesOrbitShowcase() {
   const learnMoreLabel = t("marketing.modules.learnMore");
   const closeLabel = t("marketing.modules.closeFeature");
   const clickHint = t("marketing.modules.orbitHint");
+  const showAllLabel = t("marketing.modules.showAllFeatures");
+  const hideExtraLabel = t("marketing.modules.hideExtraFeatures");
+  const exploreFooter = t("marketing.modules.exploreFooter");
 
   const handleSelect = (id: OrbitFeatureId) => {
     setActiveId((current) => (current === id ? null : id));
+  };
+
+  const renderMobileCard = (layout: MobileCardLayout, index: number) => {
+    const feature = featureById.get(layout.id);
+    if (!feature) return null;
+    const Icon = sportFeatureIcons[feature.id];
+    return (
+      <MobileEditorialCard
+        key={layout.id}
+        feature={feature}
+        Icon={Icon}
+        layout={layout}
+        index={index}
+        inView={mobileInView}
+        isActive={activeId === feature.id}
+        dimmed={focusId !== null && focusId !== feature.id}
+        reduceMotion={reduceMotion}
+        onSelect={() => handleSelect(feature.id)}
+      />
+    );
   };
 
   const renderSelectedBubble = (keyPrefix: string) =>
@@ -408,9 +606,10 @@ export default function FeaturesOrbitShowcase() {
         </div>
       </div>
 
-      {/* Mobile — grille + carte compacte */}
+      {/* Mobile — composition éditoriale asymétrique */}
       <div ref={mobileRef} className="features-constellation-mobile">
         <div className="features-constellation-mobile__glow" aria-hidden />
+        <div className="features-constellation-mobile__orbit" aria-hidden />
         <motion.div
           className="features-constellation-mobile__intro"
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
@@ -418,45 +617,103 @@ export default function FeaturesOrbitShowcase() {
           transition={{ duration: 0.65, ease: easePremium }}
         >
           {centerCopy}
-          <div className="features-orbit-card-slot features-orbit-card-slot--mobile" aria-live="polite">
-            <AnimatePresence mode="wait">
-              {renderSelectedBubble("mobile") ?? (
-                <motion.p
-                  key="hint-mobile"
-                  className="features-orbit-hint"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {clickHint}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
         </motion.div>
 
-        <div className="features-constellation-mobile__grid" role="list">
-          {features.map((feature, index) => {
-            const Icon = sportFeatureIcons[feature.id];
-            const isActive = activeId === feature.id;
-            const dimmed = focusId !== null && focusId !== feature.id;
-            return (
-              <div key={feature.id} className="features-constellation-mobile__item" role="listitem">
-                <FeatureCard
-                  feature={feature}
-                  Icon={Icon}
-                  isActive={isActive}
-                  dimmed={dimmed}
-                  index={index}
-                  inView={mobileInView}
-                  reduceMotion={reduceMotion}
-                  onSelect={() => handleSelect(feature.id)}
-                  variant="grid"
-                />
-              </div>
-            );
-          })}
+        <div className="features-orbit-card-slot features-orbit-card-slot--mobile" aria-live="polite">
+          <AnimatePresence mode="wait">{renderSelectedBubble("mobile")}</AnimatePresence>
         </div>
+
+        <div className="features-mobile-compose" role="list">
+          {(() => {
+            let cardIndex = 0;
+            return MOBILE_PRIMARY_LAYOUT.map((row, rowIndex) => {
+              if (row.kind === "pair") {
+                const leftIndex = cardIndex++;
+                const rightIndex = cardIndex++;
+                return (
+                  <div
+                    key={`pair-${row.left.id}-${row.right.id}`}
+                    className="features-mobile-compose__pair"
+                    role="presentation"
+                  >
+                    <div className="features-mobile-compose__pair-col features-mobile-compose__pair-col--left">
+                      {renderMobileCard(row.left, leftIndex)}
+                    </div>
+                    <div className="features-mobile-compose__pair-col features-mobile-compose__pair-col--right">
+                      {renderMobileCard(row.right, rightIndex)}
+                    </div>
+                  </div>
+                );
+              }
+
+              const index = cardIndex++;
+              return (
+                <div
+                  key={row.card.id}
+                  className={[
+                    "features-mobile-compose__row",
+                    `features-mobile-compose__row--${row.card.align}`,
+                    `features-mobile-compose__row--size-${row.card.size}`,
+                    rowIndex === 0 ? "features-mobile-compose__row--lead" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  role="listitem"
+                >
+                  {renderMobileCard(row.card, index)}
+                </div>
+              );
+            });
+          })()}
+        </div>
+
+        <div className="features-mobile-compose__actions">
+          <motion.button
+            type="button"
+            className="features-mobile-compose__toggle"
+            onClick={() => setShowAllMobile((open) => !open)}
+            aria-expanded={showAllMobile}
+            whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+          >
+            {showAllMobile ? hideExtraLabel : showAllLabel}
+            <ArrowRight
+              className={`features-mobile-compose__toggle-icon ${
+                showAllMobile ? "features-mobile-compose__toggle-icon--open" : ""
+              }`}
+              aria-hidden
+            />
+          </motion.button>
+        </div>
+
+        <AnimatePresence initial={false}>
+          {showAllMobile ? (
+            <motion.div
+              key="mobile-secondary"
+              className="features-mobile-compose features-mobile-compose--secondary"
+              role="list"
+              initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              transition={{ duration: 0.38, ease: easePremium }}
+            >
+              {MOBILE_SECONDARY_LAYOUT.map((layout, index) => (
+                <div
+                  key={layout.id}
+                  className={[
+                    "features-mobile-compose__row",
+                    `features-mobile-compose__row--${layout.align}`,
+                    `features-mobile-compose__row--size-${layout.size}`,
+                  ].join(" ")}
+                  role="listitem"
+                >
+                  {renderMobileCard(layout, 9 + index)}
+                </div>
+              ))}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+
+        <p className="features-mobile-compose__footer">{exploreFooter}</p>
       </div>
     </div>
   );

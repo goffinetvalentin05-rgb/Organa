@@ -80,14 +80,30 @@
     "ariaLabel": "Club management centralized in Obillz",
     "mobileHint": "All your tools in one place",
     "sources": {
-      "membres": { "subtitle": "Profiles & tracking" },
-      "cotisations": { "subtitle": "Seasons & reminders" },
-      "factures": { "subtitle": "PDF & sending" },
-      "evenements": { "subtitle": "Club calendar" },
-      "paiements": { "subtitle": "Collections" },
-      "depenses": { "subtitle": "Accounting" },
-      "buvette": { "subtitle": "Match-day slots" },
-      "page-publique": { "subtitle": "Online showcase" }
+      "membres": {
+        "subtitle": "Profiles & tracking"
+      },
+      "cotisations": {
+        "subtitle": "Seasons & reminders"
+      },
+      "factures": {
+        "subtitle": "PDF & sending"
+      },
+      "evenements": {
+        "subtitle": "Club calendar"
+      },
+      "paiements": {
+        "subtitle": "Collections"
+      },
+      "depenses": {
+        "subtitle": "Accounting"
+      },
+      "buvette": {
+        "subtitle": "Match-day slots"
+      },
+      "page-publique": {
+        "subtitle": "Online showcase"
+      }
     }
   },
   "threeSteps": {
@@ -106,44 +122,92 @@
         "label": "MEMBERSHIP FEES",
         "title": "A fee sent in 3 clicks.",
         "subtitle": "Understood instantly: members, fee, send.",
-        "summary": ["Members", "Fee", "Send"],
+        "summary": [
+          "Members",
+          "Fee",
+          "Send"
+        ],
         "result": "Fee sent ✓",
         "steps": [
-          { "verb": "Select", "title": "Select", "text": "Members" },
-          { "verb": "Write", "title": "Write", "text": "The fee" },
-          { "verb": "Send", "title": "Send", "text": "By email" }
+          {
+            "verb": "Select",
+            "title": "Select",
+            "text": "Members"
+          },
+          {
+            "verb": "Write",
+            "title": "Write",
+            "text": "The fee"
+          },
+          {
+            "verb": "Send",
+            "title": "Send",
+            "text": "By email"
+          }
         ]
       },
       "plannings": {
         "label": "SCHEDULES",
         "title": "A schedule that almost fills itself.",
         "subtitle": "The committee creates the needs, shares a link, then volunteers sign themselves up.",
-        "summary": ["Assignments", "Link", "Sign-ups"],
+        "summary": [
+          "Assignments",
+          "Link",
+          "Sign-ups"
+        ],
         "result": "8 out of 10 slots filled",
         "steps": [
-          { "verb": "Create", "title": "Create", "text": "Assignments" },
-          { "verb": "Share", "title": "Share", "text": "The link" },
-          { "verb": "Fill", "title": "Fill", "text": "Automatically" }
+          {
+            "verb": "Create",
+            "title": "Create",
+            "text": "Assignments"
+          },
+          {
+            "verb": "Share",
+            "title": "Share",
+            "text": "The link"
+          },
+          {
+            "verb": "Fill",
+            "title": "Fill",
+            "text": "Automatically"
+          }
         ]
       },
       "recapitulatif": {
         "label": "RECAP",
         "title": "A PDF generated automatically.",
         "subtitle": "Sign-ups are organised automatically and the PDF is ready to share.",
-        "summary": ["Sign-ups", "Schedule", "PDF"],
+        "summary": [
+          "Sign-ups",
+          "Schedule",
+          "PDF"
+        ],
         "result": "PDF ready ✓",
         "steps": [
-          { "verb": "Collect", "title": "Collect", "text": "Sign-ups" },
-          { "verb": "Organise", "title": "Organise", "text": "The schedule" },
-          { "verb": "Generate", "title": "Generate", "text": "The PDF" }
+          {
+            "verb": "Collect",
+            "title": "Collect",
+            "text": "Sign-ups"
+          },
+          {
+            "verb": "Organise",
+            "title": "Organise",
+            "text": "The schedule"
+          },
+          {
+            "verb": "Generate",
+            "title": "Generate",
+            "text": "The PDF"
+          }
         ]
       }
     }
   },
   "modules": {
     "label": "01 / THE PLATFORM",
-    "titleLine1": "All your club\u00a0management.",
-    "titleLine2": "Brought together in one\u00a0place.",
+    "titleLine1": "All your club management.",
+    "titleLine2": "Brought together in one place.",
     "titleAccent": "Hours of admin turned into a few minutes.",
     "title": "All your club management. Brought together in one place. Hours of admin turned into a few minutes.",
     "subtitle": "Obillz brings every club feature into one platform and turns tasks that once took {hours} into actions you can complete in a few {minutes}.",
@@ -169,7 +233,8 @@
         "description": "See the state of your club at a glance.",
         "before": "Compiling numbers by hand before every committee meeting.",
         "after": "Open the dashboard — key indicators are already there.",
-        "result": "Faster decisions based on up-to-date data."
+        "result": "Faster decisions based on up-to-date data.",
+        "teaser": "Clear overview at a glance"
       },
       {
         "id": "membres",
@@ -177,7 +242,8 @@
         "description": "Centralise every member profile in one place.",
         "before": "Hunting for info across Excel, emails and paper folders.",
         "after": "A complete profile, always up to date and available to the committee.",
-        "result": "No more scattered lists — everyone sees the same reality."
+        "result": "No more scattered lists — everyone sees the same reality.",
+        "teaser": "Member profiles in one place"
       },
       {
         "id": "cotisations",
@@ -185,7 +251,8 @@
         "description": "Send a membership fee to all members in a few clicks.",
         "before": "Preparing every fee and chasing members by hand.",
         "after": "Select members, enter the details, then send everything in a few clicks.",
-        "result": "Dozens of minutes saved on every fee campaign."
+        "result": "Dozens of minutes saved on every fee campaign.",
+        "teaser": "Simple, automated tracking"
       },
       {
         "id": "factures",
@@ -193,7 +260,8 @@
         "description": "Create and track invoices without friction.",
         "before": "Writing invoices manually and losing track of payments.",
         "after": "Generate, send and follow the status of every invoice.",
-        "result": "Clean tracking — no more spreadsheets or lost files."
+        "result": "Clean tracking — no more spreadsheets or lost files.",
+        "teaser": "Create and track with ease"
       },
       {
         "id": "encaissements",
@@ -201,7 +269,8 @@
         "description": "Clearly follow what has been collected.",
         "before": "Reconciling fees, canteen and events across multiple files.",
         "after": "One readable view of collections, ready to filter.",
-        "result": "Club cash flow becomes clear in seconds."
+        "result": "Club cash flow becomes clear in seconds.",
+        "teaser": "Cash flow you can read instantly"
       },
       {
         "id": "revenus",
@@ -209,7 +278,8 @@
         "description": "Track product and side revenue for the club.",
         "before": "Logging kits, raffles and meals on separate sheets.",
         "after": "Record every product revenue in one place.",
-        "result": "A clear view of what the club actually generates."
+        "result": "A clear view of what the club actually generates.",
+        "teaser": "Side revenue in one place"
       },
       {
         "id": "charges",
@@ -217,7 +287,8 @@
         "description": "Keep club spending under control.",
         "before": "Piling up receipts with no overview.",
         "after": "Log and categorise expenses alongside income.",
-        "result": "Readable accounting without chaotic month-ends."
+        "result": "Readable accounting without chaotic month-ends.",
+        "teaser": "Expenses under control"
       },
       {
         "id": "sponsors",
@@ -225,7 +296,8 @@
         "description": "Track partners, contracts and renewals.",
         "before": "Scattered contracts and forgotten deadlines.",
         "after": "Every partner, amount and status visible at a glance.",
-        "result": "Fewer missed renewals, more partnerships kept on time."
+        "result": "Fewer missed renewals, more partnerships kept on time.",
+        "teaser": "Partners and renewals tracked"
       },
       {
         "id": "evenements",
@@ -233,7 +305,8 @@
         "description": "Organise events without an Excel sheet.",
         "before": "Managing sign-ups across files and scattered messages.",
         "after": "Create the event, open sign-ups and track in real time.",
-        "result": "Organising a match or tournament becomes readable."
+        "result": "Organising a match or tournament becomes readable.",
+        "teaser": "Events without spreadsheets"
       },
       {
         "id": "buvette",
@@ -241,7 +314,8 @@
         "description": "Manage canteen slots and requests simply.",
         "before": "Coordinating the canteen via messages and improvised tables.",
         "after": "Bookings and slots centralised for the committee.",
-        "result": "Less match-day stress, more clarity for the team."
+        "result": "Less match-day stress, more clarity for the team.",
+        "teaser": "Slots and requests, simplified"
       },
       {
         "id": "plannings",
@@ -249,7 +323,8 @@
         "description": "Create roles, share a link, let volunteers sign up.",
         "before": "Chasing everyone to see who’s available.",
         "after": "Volunteers pick their own slots.",
-        "result": "The schedule fills without endless WhatsApp threads."
+        "result": "The schedule fills without endless WhatsApp threads.",
+        "teaser": "Volunteers sign up themselves"
       },
       {
         "id": "pv",
@@ -257,7 +332,8 @@
         "description": "Write and share meeting minutes quickly.",
         "before": "Writing, formatting and redistributing minutes by hand.",
         "after": "Structure the meeting and export a share-ready PDF.",
-        "result": "Clean minutes, ready in a fraction of the time."
+        "result": "Clean minutes, ready in a fraction of the time.",
+        "teaser": "Minutes drafted and ready as PDF"
       },
       {
         "id": "qrcodes",
@@ -265,7 +341,8 @@
         "description": "Create links and QR codes for quick sign-ups.",
         "before": "Collecting sign-ups via forms and scattered messages.",
         "after": "Generate a QR code and share it in one click.",
-        "result": "Sign-ups arrive on their own — no paperwork."
+        "result": "Sign-ups arrive on their own — no paperwork.",
+        "teaser": "Instant links and sign-ups"
       },
       {
         "id": "communication",
@@ -273,7 +350,8 @@
         "description": "Send targeted campaigns to your members.",
         "before": "Copy-pasting email lists and chasing people manually.",
         "after": "Create a campaign and send it to the right audience.",
-        "result": "Less wasted time, more consistent communication."
+        "result": "Less wasted time, more consistent communication.",
+        "teaser": "Targeted member campaigns"
       },
       {
         "id": "pagePublique",
@@ -281,7 +359,8 @@
         "description": "Present your club online simply.",
         "before": "Maintaining a site or posts for every update.",
         "after": "A clear public page: programme, canteen, sign-ups.",
-        "result": "A professional club showcase without complex web work."
+        "result": "A professional club showcase without complex web work.",
+        "teaser": "Club showcase, no complex site"
       },
       {
         "id": "parametres",
@@ -289,7 +368,8 @@
         "description": "Configure the club and committee access.",
         "before": "Everyone has the same access… or no one has the right ones.",
         "after": "Assign the right permissions for each committee role.",
-        "result": "Smooth collaboration without sharing every permission."
+        "result": "Smooth collaboration without sharing every permission.",
+        "teaser": "Roles and committee access"
       }
     ],
     "cta": "Try for free",
@@ -336,124 +416,215 @@
         "title": "Members",
         "tagline": "Centralise your member profiles.",
         "description": "Keep contacts and important information in one place.",
-        "bullets": ["Clear profiles", "Centralised info", "Simpler tracking"],
+        "bullets": [
+          "Clear profiles",
+          "Centralised info",
+          "Simpler tracking"
+        ],
         "preview": {
           "headline": "284 members",
           "sub": "12 new this month",
-          "chips": ["Active", "Committee", "Juniors"]
+          "chips": [
+            "Active",
+            "Committee",
+            "Juniors"
+          ]
         }
       },
       "cotisations": {
         "title": "Membership fees",
         "tagline": "Track fees more simply.",
         "description": "Create, send and view payments at a glance.",
-        "bullets": ["Quick creation", "Easy sending", "Visible statuses"],
+        "bullets": [
+          "Quick creation",
+          "Easy sending",
+          "Visible statuses"
+        ],
         "preview": {
           "headline": "92% paid",
           "sub": "8% pending · season 25/26",
-          "chips": ["Sent", "Paid", "To remind"]
+          "chips": [
+            "Sent",
+            "Paid",
+            "To remind"
+          ]
         }
       },
       "factures": {
         "title": "Invoices",
         "tagline": "Manage invoices without complexity.",
         "description": "Create clear documents and keep clean tracking.",
-        "bullets": ["Clean documents", "Centralised tracking", "Time saved"],
+        "bullets": [
+          "Clean documents",
+          "Centralised tracking",
+          "Time saved"
+        ],
         "preview": {
           "headline": "17 invoices",
           "sub": "4 awaiting payment",
-          "chips": ["Draft", "Sent", "Paid"]
+          "chips": [
+            "Draft",
+            "Sent",
+            "Paid"
+          ]
         }
       },
       "planning": {
         "title": "Scheduling",
         "tagline": "Organise volunteers without 50 messages.",
         "description": "Create slots and share them easily.",
-        "bullets": ["Clear slots", "Shared link", "Smooth organisation"],
+        "bullets": [
+          "Clear slots",
+          "Shared link",
+          "Smooth organisation"
+        ],
         "preview": {
           "headline": "12 slots",
           "sub": "3 matches this weekend",
-          "chips": ["Upcoming", "Confirmed", "Past"]
+          "chips": [
+            "Upcoming",
+            "Confirmed",
+            "Past"
+          ]
         }
       },
       "evenements": {
         "title": "Events",
         "tagline": "Run events more calmly.",
         "description": "Centralise organisation around your events.",
-        "bullets": ["Overview", "Simpler organisation", "Fewer oversights"],
+        "bullets": [
+          "Overview",
+          "Simpler organisation",
+          "Fewer oversights"
+        ],
         "preview": {
           "headline": "3 events",
           "sub": "42 sign-ups this week",
-          "chips": ["Upcoming", "Sign-ups", "Done"]
+          "chips": [
+            "Upcoming",
+            "Sign-ups",
+            "Done"
+          ]
         }
       },
       "paiements": {
         "title": "Payments",
         "tagline": "Track income clearly.",
         "description": "Find payments in a simple, structured view.",
-        "bullets": ["Instant readability", "Quick tracking", "Centralised view"],
+        "bullets": [
+          "Instant readability",
+          "Quick tracking",
+          "Centralised view"
+        ],
         "preview": {
           "headline": "CHF 8,420",
           "sub": "collected · last 30 days",
-          "chips": ["Fees", "Bar", "Events"]
+          "chips": [
+            "Fees",
+            "Bar",
+            "Events"
+          ]
         }
       },
       "utilisateurs": {
         "title": "Users & access",
         "tagline": "Give the right access to the right people.",
         "description": "Manage roles and permissions easily.",
-        "bullets": ["Clear roles", "Secure access", "Simple management"],
+        "bullets": [
+          "Clear roles",
+          "Secure access",
+          "Simple management"
+        ],
         "preview": {
           "headline": "5 accounts",
           "sub": "3 admins · 2 treasurers",
-          "chips": ["Admin", "Treasurer", "Guest"]
+          "chips": [
+            "Admin",
+            "Treasurer",
+            "Guest"
+          ]
         }
       },
       "depenses": {
         "title": "Expenses",
         "tagline": "Club costs under control",
         "description": "Record club expenses and keep readable accounts alongside income and fees.",
-        "bullets": ["Quick entry", "Custom categories", "View with income"],
+        "bullets": [
+          "Quick entry",
+          "Custom categories",
+          "View with income"
+        ],
         "preview": {
           "headline": "Expense tracking",
           "sub": "Equipment, travel, licences",
-          "chips": ["To approve", "Paid", "Archived"]
+          "chips": [
+            "To approve",
+            "Paid",
+            "Archived"
+          ]
         }
       },
       "buvette": {
         "title": "Bar",
         "tagline": "Simplify request management.",
         "description": "Keep a clear view of requests and their follow-up.",
-        "bullets": ["Centralised requests", "Clear tracking", "Simpler processing"],
+        "bullets": [
+          "Centralised requests",
+          "Clear tracking",
+          "Simpler processing"
+        ],
         "preview": {
           "headline": "Bar slots",
           "sub": "Saturday 2–6 pm · confirmed",
-          "chips": ["Requested", "Confirmed", "Past"]
+          "chips": [
+            "Requested",
+            "Confirmed",
+            "Past"
+          ]
         }
       },
       "sponsors": {
         "title": "Sponsors",
         "tagline": "Keep partners well organised.",
         "description": "Contracts, amounts and deadlines in one place.",
-        "bullets": ["Tracked partners", "Visible deadlines", "More professional management"],
+        "bullets": [
+          "Tracked partners",
+          "Visible deadlines",
+          "More professional management"
+        ],
         "preview": {
           "headline": "8 sponsors",
           "sub": "2 contracts to renew",
-          "chips": ["Active", "Contract", "Invoiced"]
+          "chips": [
+            "Active",
+            "Contract",
+            "Invoiced"
+          ]
         }
       },
       "page-publique": {
         "title": "Public page",
         "tagline": "Show your club online simply.",
         "description": "Share a clear page to present your activity.",
-        "bullets": ["Club presentation", "More professional image", "Easy sharing"],
+        "bullets": [
+          "Club presentation",
+          "More professional image",
+          "Easy sharing"
+        ],
         "preview": {
           "headline": "Club page",
           "sub": "Matches · contact · useful links",
-          "chips": ["Schedule", "Bar", "Contact"]
+          "chips": [
+            "Schedule",
+            "Bar",
+            "Contact"
+          ]
         }
       }
-    }
+    },
+    "showAllFeatures": "See all features",
+    "hideExtraFeatures": "Show less",
+    "exploreFooter": "Explore each feature and see how it transforms your club management."
   },
   "clubReassurance": {
     "title": "Built with clubs, for clubs.",

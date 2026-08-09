@@ -80,14 +80,30 @@
     "ariaLabel": "Centralisation de la gestion du club dans Obillz",
     "mobileHint": "Tous vos outils réunis au même endroit",
     "sources": {
-      "membres": { "subtitle": "Fiches & suivi" },
-      "cotisations": { "subtitle": "Saisons & relances" },
-      "factures": { "subtitle": "PDF & envoi" },
-      "evenements": { "subtitle": "Calendrier club" },
-      "paiements": { "subtitle": "Encaissements" },
-      "depenses": { "subtitle": "Comptabilité" },
-      "buvette": { "subtitle": "Créneaux matchs" },
-      "page-publique": { "subtitle": "Vitrine en ligne" }
+      "membres": {
+        "subtitle": "Fiches & suivi"
+      },
+      "cotisations": {
+        "subtitle": "Saisons & relances"
+      },
+      "factures": {
+        "subtitle": "PDF & envoi"
+      },
+      "evenements": {
+        "subtitle": "Calendrier club"
+      },
+      "paiements": {
+        "subtitle": "Encaissements"
+      },
+      "depenses": {
+        "subtitle": "Comptabilité"
+      },
+      "buvette": {
+        "subtitle": "Créneaux matchs"
+      },
+      "page-publique": {
+        "subtitle": "Vitrine en ligne"
+      }
     }
   },
   "threeSteps": {
@@ -106,7 +122,11 @@
         "label": "COTISATIONS",
         "title": "Une cotisation envoyée en 3 clics.",
         "subtitle": "Compris immédiatement : membres, cotisation, envoi.",
-        "summary": ["Membres", "Cotisation", "Envoi"],
+        "summary": [
+          "Membres",
+          "Cotisation",
+          "Envoi"
+        ],
         "result": "Cotisation envoyée ✓",
         "steps": [
           {
@@ -130,7 +150,11 @@
         "label": "PLANNINGS",
         "title": "Un planning qui se remplit tout seul.",
         "subtitle": "Le comité crée les besoins, partage un lien, puis les bénévoles s’inscrivent.",
-        "summary": ["Affectations", "Lien", "Inscriptions"],
+        "summary": [
+          "Affectations",
+          "Lien",
+          "Inscriptions"
+        ],
         "result": "8 postes sur 10 remplis",
         "steps": [
           {
@@ -154,7 +178,11 @@
         "label": "RÉCAPITULATIF",
         "title": "Un PDF généré automatiquement.",
         "subtitle": "Les inscriptions sont organisées automatiquement et le PDF est prêt à partager.",
-        "summary": ["Inscriptions", "Planning", "PDF"],
+        "summary": [
+          "Inscriptions",
+          "Planning",
+          "PDF"
+        ],
         "result": "PDF prêt ✓",
         "steps": [
           {
@@ -178,8 +206,8 @@
   },
   "modules": {
     "label": "01 / LA PLATEFORME",
-    "titleLine1": "Toute la gestion de votre\u00a0club.",
-    "titleLine2": "Réunie au même\u00a0endroit.",
+    "titleLine1": "Toute la gestion de votre club.",
+    "titleLine2": "Réunie au même endroit.",
     "titleAccent": "Des heures de gestion transformées en quelques minutes.",
     "title": "Toute la gestion de votre club. Réunie au même endroit. Des heures de gestion transformées en quelques minutes.",
     "subtitle": "Obillz réunit toutes les fonctionnalités de votre club dans une seule plateforme et transforme des tâches qui prenaient parfois des {hours} en actions réalisables en quelques {minutes}.",
@@ -205,7 +233,8 @@
         "description": "Visualisez d’un coup d’œil l’état de votre club.",
         "before": "Compiler des chiffres à la main avant chaque séance de comité.",
         "after": "Ouvrez le dashboard : les indicateurs clés sont déjà là.",
-        "result": "Des décisions plus rapides, basées sur des données à jour."
+        "result": "Des décisions plus rapides, basées sur des données à jour.",
+        "teaser": "Vue d'ensemble claire et rapide"
       },
       {
         "id": "membres",
@@ -213,7 +242,8 @@
         "description": "Centralisez toutes les fiches membres au même endroit.",
         "before": "Chercher les infos dans Excel, mails et dossiers papier.",
         "after": "Une fiche complète, toujours à jour et accessible au comité.",
-        "result": "Plus de listes dispersées — tout le monde voit la même réalité."
+        "result": "Plus de listes dispersées — tout le monde voit la même réalité.",
+        "teaser": "Fiches centralisées pour le comité"
       },
       {
         "id": "cotisations",
@@ -221,7 +251,8 @@
         "description": "Envoyez une cotisation à tous vos membres en quelques clics.",
         "before": "Préparer chaque cotisation et relancer les membres manuellement.",
         "after": "Sélectionnez les membres, renseignez les informations puis envoyez tout en quelques clics.",
-        "result": "Des dizaines de minutes gagnées à chaque campagne de cotisations."
+        "result": "Des dizaines de minutes gagnées à chaque campagne de cotisations.",
+        "teaser": "Suivi simple et automatisé"
       },
       {
         "id": "factures",
@@ -229,7 +260,8 @@
         "description": "Créez et suivez vos factures sans friction.",
         "before": "Rédiger des factures à la main et perdre le fil des paiements.",
         "after": "Générez, envoyez et suivez le statut de chaque facture.",
-        "result": "Un suivi propre, sans tableurs ni documents égarés."
+        "result": "Un suivi propre, sans tableurs ni documents égarés.",
+        "teaser": "Création et suivi sans friction"
       },
       {
         "id": "encaissements",
@@ -237,7 +269,8 @@
         "description": "Suivez clairement ce qui a été encaissé.",
         "before": "Recouper cotisations, buvette et événements dans plusieurs fichiers.",
         "after": "Une vue unique des encaissements, filtrée et lisible.",
-        "result": "La trésorerie du club devient compréhensible en quelques secondes."
+        "result": "La trésorerie du club devient compréhensible en quelques secondes.",
+        "teaser": "Trésorerie lisible en un coup d'œil"
       },
       {
         "id": "revenus",
@@ -245,7 +278,8 @@
         "description": "Suivez les produits et revenus annexes du club.",
         "before": "Noter maillots, tombolas et repas sur des feuilles séparées.",
         "after": "Enregistrez chaque revenu produit au même endroit.",
-        "result": "Une vision claire de ce que le club génère réellement."
+        "result": "Une vision claire de ce que le club génère réellement.",
+        "teaser": "Produits annexes au même endroit"
       },
       {
         "id": "charges",
@@ -253,7 +287,8 @@
         "description": "Gardez le contrôle sur les dépenses du club.",
         "before": "Accumuler tickets et justifs sans vue d’ensemble.",
         "after": "Saisissez et classez les charges à côté des recettes.",
-        "result": "Une comptabilité lisible, sans fin de mois chaotique."
+        "result": "Une comptabilité lisible, sans fin de mois chaotique.",
+        "teaser": "Dépenses sous contrôle"
       },
       {
         "id": "sponsors",
@@ -261,7 +296,8 @@
         "description": "Suivez partenaires, contrats et renouvellements.",
         "before": "Contrats éparpillés et échéances oubliées.",
         "after": "Chaque partenaire, montant et statut visibles d’un coup d’œil.",
-        "result": "Moins d’oublis, plus de partenariats renouvelés à temps."
+        "result": "Moins d’oublis, plus de partenariats renouvelés à temps.",
+        "teaser": "Partenaires et échéances suivis"
       },
       {
         "id": "evenements",
@@ -269,7 +305,8 @@
         "description": "Organisez vos manifestations sans tableau Excel.",
         "before": "Gérer inscriptions et infos dans des fichiers et messages dispersés.",
         "after": "Créez l’événement, ouvrez les inscriptions et suivez en temps réel.",
-        "result": "L’organisation d’un match ou d’un tournoi devient lisible."
+        "result": "L’organisation d’un match ou d’un tournoi devient lisible.",
+        "teaser": "Organisation sans tableur"
       },
       {
         "id": "buvette",
@@ -277,7 +314,8 @@
         "description": "Gérez les créneaux et demandes de buvette simplement.",
         "before": "Coordonner la buvette par messages et tableaux improvisés.",
         "after": "Réservations et créneaux centralisés, visibles du comité.",
-        "result": "Moins de stress le jour du match, plus de clarté pour l’équipe."
+        "result": "Moins de stress le jour du match, plus de clarté pour l’équipe.",
+        "teaser": "Créneaux et demandes simplifiés"
       },
       {
         "id": "plannings",
@@ -285,7 +323,8 @@
         "description": "Créez les postes, partagez un lien, laissez les bénévoles s’inscrire.",
         "before": "Relancer chacun pour savoir qui est disponible.",
         "after": "Les bénévoles choisissent leurs créneaux eux-mêmes.",
-        "result": "Le planning se remplit sans enchaîner les messages WhatsApp."
+        "result": "Le planning se remplit sans enchaîner les messages WhatsApp.",
+        "teaser": "Inscriptions autonomes des membres"
       },
       {
         "id": "pv",
@@ -293,7 +332,8 @@
         "description": "Rédigez et partagez vos procès-verbaux rapidement.",
         "before": "Rédiger, formater et redistribuer le PV à la main.",
         "after": "Structurez la séance et exportez un PDF prêt à partager.",
-        "result": "Des comptes rendus propres, prêts en une fraction du temps."
+        "result": "Des comptes rendus propres, prêts en une fraction du temps.",
+        "teaser": "Rédaction et export PDF rapides"
       },
       {
         "id": "qrcodes",
@@ -301,7 +341,8 @@
         "description": "Créez des liens et QR codes pour inscriptions et actions rapides.",
         "before": "Demander des inscriptions via formulaires et messages éparpillés.",
         "after": "Générez un QR code et partagez-le en un clic.",
-        "result": "Les inscriptions arrivent toutes seules, sans paperasse."
+        "result": "Les inscriptions arrivent toutes seules, sans paperasse.",
+        "teaser": "Liens et inscriptions instantanés"
       },
       {
         "id": "communication",
@@ -309,7 +350,8 @@
         "description": "Envoyez des campagnes ciblées à vos membres.",
         "before": "Copier-coller des listes d’emails et relancer manuellement.",
         "after": "Créez une campagne et envoyez-la à la bonne audience.",
-        "result": "Moins de temps perdu, une communication plus régulière."
+        "result": "Moins de temps perdu, une communication plus régulière.",
+        "teaser": "Campagnes ciblées aux membres"
       },
       {
         "id": "pagePublique",
@@ -317,7 +359,8 @@
         "description": "Présentez votre club en ligne simplement.",
         "before": "Maintenir un site ou des posts pour chaque info.",
         "after": "Une page publique claire : programme, buvette, inscriptions.",
-        "result": "Votre club a une vitrine pro, sans gestion web complexe."
+        "result": "Votre club a une vitrine pro, sans gestion web complexe.",
+        "teaser": "Vitrine club sans site complexe"
       },
       {
         "id": "parametres",
@@ -325,7 +368,8 @@
         "description": "Configurez le club et les accès du comité.",
         "before": "Tout le monde a les mêmes accès… ou personne n’a les bons.",
         "after": "Attribuez les droits adaptés à chaque rôle du comité.",
-        "result": "Une collaboration fluide, sans partager tous les accès."
+        "result": "Une collaboration fluide, sans partager tous les accès.",
+        "teaser": "Rôles et accès du comité"
       }
     ],
     "cta": "Tester gratuitement",
@@ -372,124 +416,215 @@
         "title": "Membres",
         "tagline": "Centralisez vos fiches membres.",
         "description": "Gardez les contacts et informations importantes au même endroit.",
-        "bullets": ["Fiches claires", "Infos centralisées", "Suivi simplifié"],
+        "bullets": [
+          "Fiches claires",
+          "Infos centralisées",
+          "Suivi simplifié"
+        ],
         "preview": {
           "headline": "284 membres",
           "sub": "12 nouveaux ce mois",
-          "chips": ["Actifs", "Comité", "Juniors"]
+          "chips": [
+            "Actifs",
+            "Comité",
+            "Juniors"
+          ]
         }
       },
       "cotisations": {
         "title": "Cotisations",
         "tagline": "Suivez vos cotisations plus simplement.",
         "description": "Créez, envoyez et visualisez les paiements en un coup d'œil.",
-        "bullets": ["Création rapide", "Envoi facile", "Statuts visibles"],
+        "bullets": [
+          "Création rapide",
+          "Envoi facile",
+          "Statuts visibles"
+        ],
         "preview": {
           "headline": "92% payées",
           "sub": "8% en attente · saison 25/26",
-          "chips": ["Envoyées", "Payées", "À relancer"]
+          "chips": [
+            "Envoyées",
+            "Payées",
+            "À relancer"
+          ]
         }
       },
       "factures": {
         "title": "Factures",
         "tagline": "Gérez vos factures sans complexité.",
         "description": "Créez des documents clairs et gardez un suivi propre.",
-        "bullets": ["Documents propres", "Suivi centralisé", "Gain de temps"],
+        "bullets": [
+          "Documents propres",
+          "Suivi centralisé",
+          "Gain de temps"
+        ],
         "preview": {
           "headline": "17 factures",
           "sub": "4 en attente de paiement",
-          "chips": ["Brouillon", "Envoyée", "Payée"]
+          "chips": [
+            "Brouillon",
+            "Envoyée",
+            "Payée"
+          ]
         }
       },
       "planning": {
         "title": "Planning",
         "tagline": "Organisez les bénévoles sans 50 messages.",
         "description": "Créez des créneaux et partagez-les facilement.",
-        "bullets": ["Créneaux clairs", "Lien partagé", "Organisation fluide"],
+        "bullets": [
+          "Créneaux clairs",
+          "Lien partagé",
+          "Organisation fluide"
+        ],
         "preview": {
           "headline": "12 créneaux",
           "sub": "3 matchs ce week-end",
-          "chips": ["À venir", "Confirmé", "Passé"]
+          "chips": [
+            "À venir",
+            "Confirmé",
+            "Passé"
+          ]
         }
       },
       "evenements": {
         "title": "Événements",
         "tagline": "Pilotez vos événements plus sereinement.",
         "description": "Centralisez l'organisation autour de vos manifestations.",
-        "bullets": ["Vue d'ensemble", "Organisation simplifiée", "Moins d'oublis"],
+        "bullets": [
+          "Vue d'ensemble",
+          "Organisation simplifiée",
+          "Moins d'oublis"
+        ],
         "preview": {
           "headline": "3 événements",
           "sub": "42 inscriptions cette semaine",
-          "chips": ["À venir", "Inscriptions", "Terminé"]
+          "chips": [
+            "À venir",
+            "Inscriptions",
+            "Terminé"
+          ]
         }
       },
       "paiements": {
         "title": "Paiements",
         "tagline": "Suivez les encaissements clairement.",
         "description": "Retrouvez les paiements dans une vue simple et structurée.",
-        "bullets": ["Lisibilité immédiate", "Suivi rapide", "Vue centralisée"],
+        "bullets": [
+          "Lisibilité immédiate",
+          "Suivi rapide",
+          "Vue centralisée"
+        ],
         "preview": {
           "headline": "CHF 8'420",
           "sub": "encaissés · 30 derniers jours",
-          "chips": ["Cotisations", "Buvette", "Événements"]
+          "chips": [
+            "Cotisations",
+            "Buvette",
+            "Événements"
+          ]
         }
       },
       "utilisateurs": {
         "title": "Utilisateurs & accès",
         "tagline": "Donnez les bons accès aux bonnes personnes.",
         "description": "Gérez les rôles et les permissions facilement.",
-        "bullets": ["Rôles clairs", "Accès sécurisés", "Gestion simple"],
+        "bullets": [
+          "Rôles clairs",
+          "Accès sécurisés",
+          "Gestion simple"
+        ],
         "preview": {
           "headline": "5 comptes",
           "sub": "3 admins · 2 trésoriers",
-          "chips": ["Admin", "Trésorier", "Invité"]
+          "chips": [
+            "Admin",
+            "Trésorier",
+            "Invité"
+          ]
         }
       },
       "depenses": {
         "title": "Dépenses",
         "tagline": "Charges du club sous contrôle",
         "description": "Enregistrez les dépenses du club et gardez une comptabilité lisible aux côtés des recettes et cotisations.",
-        "bullets": ["Saisie rapide", "Catégories personnalisées", "Vue avec les recettes"],
+        "bullets": [
+          "Saisie rapide",
+          "Catégories personnalisées",
+          "Vue avec les recettes"
+        ],
         "preview": {
           "headline": "Suivi charges",
           "sub": "Matériel, déplacements, licences",
-          "chips": ["À valider", "Payé", "Archivé"]
+          "chips": [
+            "À valider",
+            "Payé",
+            "Archivé"
+          ]
         }
       },
       "buvette": {
         "title": "Buvette",
         "tagline": "Simplifiez la gestion des demandes.",
         "description": "Gardez une vue claire sur les demandes et leur suivi.",
-        "bullets": ["Demandes centralisées", "Suivi clair", "Traitement simplifié"],
+        "bullets": [
+          "Demandes centralisées",
+          "Suivi clair",
+          "Traitement simplifié"
+        ],
         "preview": {
           "headline": "Créneaux buvette",
           "sub": "Samedi 14h–18h · confirmé",
-          "chips": ["Demandé", "Confirmé", "Passé"]
+          "chips": [
+            "Demandé",
+            "Confirmé",
+            "Passé"
+          ]
         }
       },
       "sponsors": {
         "title": "Sponsors",
         "tagline": "Gardez vos partenaires bien organisés.",
         "description": "Contrats, montants et échéances au même endroit.",
-        "bullets": ["Partenaires suivis", "Échéances visibles", "Gestion plus pro"],
+        "bullets": [
+          "Partenaires suivis",
+          "Échéances visibles",
+          "Gestion plus pro"
+        ],
         "preview": {
           "headline": "8 sponsors",
           "sub": "2 contrats à renouveler",
-          "chips": ["Actif", "Contrat", "Facturé"]
+          "chips": [
+            "Actif",
+            "Contrat",
+            "Facturé"
+          ]
         }
       },
       "page-publique": {
         "title": "Page publique",
         "tagline": "Montrez votre club en ligne simplement.",
         "description": "Partagez une page claire pour présenter votre activité.",
-        "bullets": ["Présentation du club", "Image plus pro", "Partage facile"],
+        "bullets": [
+          "Présentation du club",
+          "Image plus pro",
+          "Partage facile"
+        ],
         "preview": {
           "headline": "Page du club",
           "sub": "Matchs · contact · liens utiles",
-          "chips": ["Programme", "Buvette", "Contact"]
+          "chips": [
+            "Programme",
+            "Buvette",
+            "Contact"
+          ]
         }
       }
-    }
+    },
+    "showAllFeatures": "Voir toutes les fonctionnalités",
+    "hideExtraFeatures": "Réduire",
+    "exploreFooter": "Explorez chaque fonctionnalité et voyez comment elle transforme votre gestion."
   },
   "clubReassurance": {
     "title": "Pensé avec les clubs, pour les clubs.",

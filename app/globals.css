@@ -1597,29 +1597,44 @@ html:has(.dashboard-shell) {
   }
 }
 
-/* ── Mobile grid (compact, style Associations) ── */
+/* ── Mobile composition éditoriale (pas de grille 4×4) ── */
 .features-constellation-mobile {
   position: relative;
   isolation: isolate;
-  padding: 0.25rem 0 0.5rem;
+  padding: 0.25rem 0 0.75rem;
+  overflow-x: clip;
 }
 
 .features-constellation-mobile__glow {
   pointer-events: none;
   position: absolute;
   left: 50%;
-  top: 8%;
-  width: 140%;
-  height: 58%;
+  top: 18%;
+  width: min(120%, 28rem);
+  height: 42%;
   transform: translateX(-50%);
   border-radius: 50%;
   background: radial-gradient(
-    ellipse at 50% 35%,
-    rgba(26, 35, 255, 0.06) 0%,
-    rgba(56, 189, 248, 0.03) 42%,
+    ellipse at 50% 40%,
+    rgba(26, 35, 255, 0.08) 0%,
+    rgba(56, 189, 248, 0.04) 45%,
     transparent 72%
   );
-  filter: blur(28px);
+  filter: blur(32px);
+  z-index: 0;
+}
+
+.features-constellation-mobile__orbit {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: min(118%, 26rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -42%);
+  border-radius: 50%;
+  border: 1px solid rgba(26, 35, 255, 0.06);
+  opacity: 0.55;
   z-index: 0;
 }
 
@@ -1628,32 +1643,344 @@ html:has(.dashboard-shell) {
   z-index: 1;
   max-width: 36rem;
   margin-inline: auto;
-  padding: 0.25rem 0.35rem 1.35rem;
+  padding: 0.25rem 0.35rem 0;
   text-align: center;
+}
+
+.features-constellation-mobile__intro .landing-section-label {
+  margin-bottom: 0.85rem;
 }
 
 .features-constellation-mobile__intro .features-orbit-center__title {
   font-size: clamp(1.7rem, 7.2vw, 2.35rem);
 }
 
+.features-constellation-mobile__intro .features-orbit-center__title-block {
+  display: block;
+  margin-bottom: 1.15rem;
+}
+
 .features-constellation-mobile__intro .features-orbit-center__title-accent {
   font-size: 0.72em;
+  margin-top: 0;
 }
 
 .features-constellation-mobile__intro .features-orbit-center__desc {
-  margin-top: 0.95rem;
+  margin-top: 1.15rem;
   font-size: 0.9rem;
   max-width: 28rem;
+  line-height: 1.55;
 }
 
-.features-constellation-mobile__grid {
+.features-orbit-card-slot--mobile {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 32px);
+  max-width: 26rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.35rem;
+  margin-bottom: 0.35rem;
+  min-height: 0;
+}
+
+.features-orbit-card-slot--mobile:not(:has(.features-orbit-selected-card)) {
+  display: none;
+  margin: 0;
+}
+
+.features-mobile-compose {
   position: relative;
   z-index: 1;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.55rem, 2.2vw, 0.85rem);
   width: 100%;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.7rem 0.45rem;
-  padding: 0.15rem 0 0.35rem;
+  max-width: 26.5rem;
+  margin-inline: auto;
+  padding: 1.65rem 0.15rem 0.35rem;
+  overflow: visible;
+}
+
+.features-mobile-compose--secondary {
+  padding-top: 0.35rem;
+  padding-bottom: 0.15rem;
+}
+
+.features-mobile-compose__row {
+  display: flex;
+  width: 100%;
+}
+
+.features-mobile-compose__row--start {
+  justify-content: flex-start;
+  padding-inline-end: 4%;
+}
+
+.features-mobile-compose__row--end {
+  justify-content: flex-end;
+  padding-inline-start: 8%;
+}
+
+.features-mobile-compose__row--center {
+  justify-content: center;
+  padding-inline: 6%;
+}
+
+.features-mobile-compose__row--lead {
+  margin-top: 0.15rem;
+}
+
+.features-mobile-compose__row--size-xl .features-mobile-card {
+  width: min(100%, 94%);
+}
+
+.features-mobile-compose__row--size-lg .features-mobile-card {
+  width: min(100%, 82%);
+}
+
+.features-mobile-compose__row--size-md .features-mobile-card {
+  width: min(100%, 72%);
+}
+
+.features-mobile-compose__row--size-sm .features-mobile-card {
+  width: min(100%, 64%);
+}
+
+.features-mobile-compose__pair {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+  width: 100%;
+  padding-inline: 0.1rem;
+}
+
+.features-mobile-compose__pair-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+.features-mobile-compose__pair-col--left {
+  justify-content: flex-start;
+  padding-top: 0.55rem;
+  padding-inline-end: 0.1rem;
+}
+
+.features-mobile-compose__pair-col--right {
+  justify-content: flex-end;
+  padding-top: 0;
+  padding-inline-start: 0.1rem;
+}
+
+.features-mobile-compose__pair-col .features-mobile-card {
+  width: 100%;
+}
+
+.features-mobile-card {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+
+.features-mobile-card__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.78rem 0.8rem 0.78rem 0.72rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 255, 0.88) 100%);
+  backdrop-filter: blur(14px) saturate(1.25);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.07),
+    0 3px 10px rgba(26, 35, 255, 0.04),
+    0 0 0 1px rgba(26, 35, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transform: rotate(var(--mobile-rot, 0deg));
+  transform-origin: center center;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.features-mobile-card--featured .features-mobile-card__inner {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(239, 246, 255, 0.92) 48%,
+      rgba(224, 242, 254, 0.78) 100%
+    );
+  box-shadow:
+    0 14px 32px rgba(15, 23, 42, 0.08),
+    0 0 24px rgba(26, 35, 255, 0.08),
+    0 0 0 1px rgba(26, 35, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.features-mobile-card--active .features-mobile-card__inner,
+.features-mobile-card:focus-visible .features-mobile-card__inner {
+  border-color: rgba(26, 35, 255, 0.34);
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.1),
+    0 0 0 1px rgba(26, 35, 255, 0.12),
+    0 10px 28px rgba(26, 35, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.features-mobile-card--dimmed {
+  opacity: 0.42;
+  filter: saturate(0.7);
+}
+
+.features-mobile-card__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.8rem;
+  color: #1a23ff;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.95), transparent 55%),
+    linear-gradient(160deg, rgba(219, 234, 254, 0.95), rgba(191, 219, 254, 0.72));
+  box-shadow:
+    0 6px 14px rgba(26, 35, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.features-mobile-card__copy {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.features-mobile-card__title {
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.features-mobile-card__teaser {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.features-mobile-card__arrow {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a23ff;
+  opacity: 0.72;
+  align-self: flex-end;
+  margin-bottom: 0.05rem;
+}
+
+.features-mobile-compose__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 26.5rem;
+  margin: 1.15rem auto 0;
+  padding-inline: 0.15rem;
+}
+
+.features-mobile-compose__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(26, 35, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.9));
+  color: #1a23ff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 10px 24px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.features-mobile-compose__toggle:hover,
+.features-mobile-compose__toggle:focus-visible {
+  border-color: rgba(26, 35, 255, 0.28);
+  box-shadow:
+    0 14px 30px rgba(26, 35, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+}
+
+.features-mobile-compose__toggle-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  transition: transform 0.28s ease;
+}
+
+.features-mobile-compose__toggle-icon--open {
+  transform: rotate(90deg);
+}
+
+.features-mobile-compose__footer {
+  position: relative;
+  z-index: 1;
+  max-width: 22rem;
+  margin: 1.35rem auto 0.35rem;
+  padding-inline: 0.75rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* Ancienne grille mobile — désactivée (remplacée par features-mobile-compose) */
+.features-constellation-mobile__grid {
+  display: none;
 }
 
 .features-constellation-mobile__item {
@@ -1722,9 +2049,6 @@ html:has(.dashboard-shell) {
 .features-orbit-card-slot--mobile {
   width: calc(100% - 32px);
   max-width: 26rem;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1.25rem;
 }
 
 .features-orbit-selected-card {
@@ -2110,26 +2434,71 @@ html:has(.dashboard-shell) {
 }
 
 @media (max-width: 420px) {
-  .features-constellation-mobile__grid {
-    gap: 0.55rem 0.3rem;
+  .features-mobile-compose {
+    gap: 0.5rem;
+    padding-top: 1.4rem;
   }
 
-  .features-constellation-card--grid .features-constellation-card__glass {
-    padding: 0.62rem 0.28rem 0.55rem;
-    border-radius: 1rem;
+  .features-mobile-card__inner {
+    padding: 0.7rem 0.7rem 0.7rem 0.62rem;
+    border-radius: 1.05rem;
+    gap: 0.55rem;
   }
 
-  .features-constellation-card--grid .features-constellation-card__icon {
-    height: 2.2rem;
-    width: 2.2rem;
+  .features-mobile-card__icon {
+    width: 1.95rem;
+    height: 1.95rem;
+    border-radius: 0.72rem;
   }
 
-  .features-constellation-card--grid .features-constellation-card__label {
-    font-size: 0.58rem;
+  .features-mobile-card__title {
+    font-size: 0.8125rem;
+  }
+
+  .features-mobile-card__teaser {
+    font-size: 0.64rem;
+  }
+
+  .features-mobile-compose__row--size-sm .features-mobile-card {
+    width: min(100%, 70%);
   }
 
   .features-constellation-mobile__intro .features-orbit-center__title {
     font-size: clamp(1.55rem, 8vw, 1.9rem);
+  }
+
+  .features-constellation-mobile__intro .features-orbit-center__title-block {
+    margin-bottom: 1rem;
+  }
+
+  .features-constellation-mobile__intro .features-orbit-center__desc {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .features-mobile-compose__pair {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .features-mobile-compose__pair-col--left,
+  .features-mobile-compose__pair-col--right {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .features-mobile-compose__pair-col--left {
+    padding-inline-end: 12%;
+  }
+
+  .features-mobile-compose__pair-col--right {
+    padding-inline-start: 14%;
+    justify-content: flex-end;
+  }
+
+  .features-mobile-compose__pair-col .features-mobile-card {
+    width: min(100%, 88%);
   }
 }
 
