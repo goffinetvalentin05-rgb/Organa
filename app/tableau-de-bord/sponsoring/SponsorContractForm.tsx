@@ -1,24 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { SectionCard } from "@/components/ui";
 import { Handshake, FileText } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  sponsorContractDraftStore,
+  type SponsorContractDraftData,
+} from "@/lib/drafts/sponsorContractDraft";
 import { addMonthsToStartDate, buildDefaultContractTemplate } from "@/lib/sponsor-contracts";
 
-export type SponsorContractFormValues = {
-  sponsorName: string;
-  title: string;
-  amount: string;
-  startDate: string;
-  endMode: "fixed" | "duration";
-  endDate: string;
-  durationMonths: string;
-  content: string;
-  sponsorType: "" | "gold" | "silver" | "bronze";
-};
+export type SponsorContractFormValues = SponsorContractDraftData;
 
 const defaultForm: SponsorContractFormValues = {
   sponsorName: "",
@@ -35,6 +32,8 @@ const defaultForm: SponsorContractFormValues = {
 type Props = {
   clubName: string;
   defaultValues?: Partial<SponsorContractFormValues>;
+  /** Présent en édition — isole le brouillon par contrat. */
+  entityId?: string | null;
   submitLabel: string;
   savingLabel: string;
   onSubmit: (payload: {
@@ -51,16 +50,29 @@ type Props = {
 export default function SponsorContractForm({
   clubName,
   defaultValues,
+  entityId = null,
   submitLabel,
   savingLabel,
   onSubmit,
 }: Props) {
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [values, setValues] = useState<SponsorContractFormValues>({
     ...defaultForm,
     ...defaultValues,
   });
   const [saving, setSaving] = useState(false);
+
+  const draftData = useMemo(() => values, [values]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: sponsorContractDraftStore,
+    clubId,
+    clubLoading,
+    entityId,
+    data: draftData,
+    onRestore: (data) => setValues(data),
+  });
 
   const set =
     (key: keyof SponsorContractFormValues) =>
@@ -124,8 +136,9 @@ export default function SponsorContractForm({
         endDate,
         sponsorType: values.sponsorType,
       });
+      clearDraft();
     } catch {
-      /* toast côté parent */
+      /* toast côté parent — brouillon conservé */
     } finally {
       setSaving(false);
     }
@@ -133,6 +146,8 @@ export default function SponsorContractForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
+
       <SectionCard title={t("dashboard.sponsoring.detail.title")} icon={Handshake}>
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
           <label className="block text-sm font-medium text-slate-700">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import {
@@ -14,13 +14,19 @@ import {
 } from "@/components/ui";
 import { FileText, Users, Plus, Trash, ClipboardList } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  meetingMinutesDraftStore,
+  type MeetingMinutesDraftData,
+} from "@/lib/drafts/meetingMinutesDraft";
 import type {
   MeetingMinutesPayload,
   MeetingPoint,
   MeetingStatus,
   MeetingType,
   ParticipantEntry,
-  TaskEntry,
   TaskStatus,
 } from "@/lib/meeting-minutes";
 import {
@@ -29,23 +35,7 @@ import {
   createEmptyMeetingPoint,
 } from "@/lib/meeting-minutes";
 
-export type MeetingMinutesFormValues = {
-  title: string;
-  meetingDate: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  meetingType: MeetingType;
-  status: MeetingStatus;
-  chairman: string;
-  secretary: string;
-  attendees: ParticipantEntry[];
-  excused: ParticipantEntry[];
-  absent: ParticipantEntry[];
-  points: MeetingPoint[];
-  miscellaneous: string;
-  nextMeeting: string;
-};
+export type MeetingMinutesFormValues = MeetingMinutesDraftData;
 
 const defaultForm: MeetingMinutesFormValues = {
   title: "",
@@ -72,6 +62,8 @@ type ClubMember = {
 
 type Props = {
   defaultValues?: Partial<MeetingMinutesFormValues>;
+  /** Présent en édition — isole le brouillon par PV. */
+  entityId?: string | null;
   submitLabel: string;
   savingLabel: string;
   onSubmit: (payload: MeetingMinutesPayload) => Promise<void>;
@@ -183,11 +175,13 @@ function ParticipantListEditor({
 
 export default function MeetingMinutesForm({
   defaultValues,
+  entityId = null,
   submitLabel,
   savingLabel,
   onSubmit,
 }: Props) {
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [values, setValues] = useState<MeetingMinutesFormValues>({
     ...defaultForm,
     ...defaultValues,
@@ -204,6 +198,18 @@ export default function MeetingMinutesForm({
   const [attendeeFree, setAttendeeFree] = useState("");
   const [excusedFree, setExcusedFree] = useState("");
   const [absentFree, setAbsentFree] = useState("");
+
+  const draftData = useMemo(() => values, [values]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: meetingMinutesDraftStore,
+    clubId,
+    clubLoading,
+    entityId,
+    data: draftData,
+    onRestore: (data) => setValues(data),
+    // Pas de onEmpty : conserve defaultValues (création avec date du jour / édition DB).
+  });
 
   const loadMembers = useCallback(async () => {
     try {
@@ -318,8 +324,9 @@ export default function MeetingMinutesForm({
     setSaving(true);
     try {
       await onSubmit(buildPayload(status));
+      clearDraft();
     } catch {
-      /* toast côté parent */
+      /* toast côté parent — brouillon conservé */
     } finally {
       setSaving(false);
     }
@@ -336,6 +343,8 @@ export default function MeetingMinutesForm({
       }}
       className="space-y-8"
     >
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
+
       <SectionCard title={t("dashboard.meetingMinutes.form.general")} icon={FileText}>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block sm:col-span-2">

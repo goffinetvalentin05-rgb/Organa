@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import {
@@ -21,8 +21,11 @@ import {
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import type { RecipientType } from "@/lib/documents/recipient";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import {
@@ -32,6 +35,11 @@ import {
   type DocumentFlowPhase,
   type SubmissionMode,
 } from "@/lib/documents/createDocumentFlow";
+import {
+  emptyInvoiceCreateDraftData,
+  invoiceCreateDraftStore,
+  type InvoiceCreateDraftData,
+} from "@/lib/drafts/invoiceCreateDraft";
 
 interface Client {
   id: string;
@@ -58,6 +66,7 @@ function NouvelleFacturePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, locale } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [clients, setClients] = useState<Client[]>([]);
   const [sponsors, setSponsors] = useState<SponsorContract[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -90,6 +99,80 @@ function NouvelleFacturePageContent() {
   const [loadingPhase, setLoadingPhase] = useState<DocumentFlowPhase | null>(null);
   const [emailFailedDocId, setEmailFailedDocId] = useState<string | null>(null);
   const [retryingEmail, setRetryingEmail] = useState(false);
+
+  const draftData = useMemo<InvoiceCreateDraftData>(
+    () => ({
+      recipientType,
+      clientId,
+      sponsorContractId,
+      extName,
+      extContactName,
+      extAddress,
+      extPostalCode,
+      extCity,
+      extCountry,
+      extEmail,
+      extPhone,
+      eventId,
+      lignes,
+      statut,
+      dateEcheance,
+      datePaiement,
+      notes,
+    }),
+    [
+      recipientType,
+      clientId,
+      sponsorContractId,
+      extName,
+      extContactName,
+      extAddress,
+      extPostalCode,
+      extCity,
+      extCountry,
+      extEmail,
+      extPhone,
+      eventId,
+      lignes,
+      statut,
+      dateEcheance,
+      datePaiement,
+      notes,
+    ]
+  );
+
+  const applyDraftData = useCallback((data: InvoiceCreateDraftData) => {
+    setRecipientType(data.recipientType);
+    setClientId(data.clientId);
+    setSponsorContractId(data.sponsorContractId);
+    setExtName(data.extName);
+    setExtContactName(data.extContactName);
+    setExtAddress(data.extAddress);
+    setExtPostalCode(data.extPostalCode);
+    setExtCity(data.extCity);
+    setExtCountry(data.extCountry);
+    setExtEmail(data.extEmail);
+    setExtPhone(data.extPhone);
+    setEventId(data.eventId);
+    setLignes(data.lignes);
+    setStatut(data.statut);
+    setDateEcheance(data.dateEcheance);
+    setDatePaiement(data.datePaiement);
+    setNotes(data.notes);
+  }, []);
+
+  const resetDraftForm = useCallback(() => {
+    applyDraftData(emptyInvoiceCreateDraftData());
+  }, [applyDraftData]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel, draftHydrated } = useAutoDraft({
+    store: invoiceCreateDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
+  });
 
   // Charger les clients et les événements depuis l'API Supabase
   useEffect(() => {
@@ -146,11 +229,12 @@ function NouvelleFacturePageContent() {
   }, []);
 
   useEffect(() => {
+    if (!draftHydrated) return;
     const fromUrl = searchParams.get("eventId");
     if (fromUrl) {
-      setEventId(fromUrl);
+      setEventId((prev) => prev || fromUrl);
     }
-  }, [searchParams]);
+  }, [draftHydrated, searchParams]);
 
   const ajouterLigne = () => {
     setLignes([
@@ -320,6 +404,7 @@ function NouvelleFacturePageContent() {
             createFn: () => persistInvoice(lignesValides, idempotencyKey),
           });
           setDocumentId(outcome.document.documentId);
+          clearDraft();
           setCreateSuccess(true);
           notifySuccess("Facture créée ✓", "invoice-create");
           toast.success(t("dashboard.invoices.form.createdOnlySuccess"));
@@ -338,6 +423,7 @@ function NouvelleFacturePageContent() {
         });
 
         setDocumentId(outcome.document.documentId);
+        clearDraft();
 
         if (outcome.emailSent) {
           setEmailFailedDocId(null);
@@ -383,6 +469,7 @@ function NouvelleFacturePageContent() {
         recipientEmail: resolveRecipientEmail(),
       });
       toast.success(t("dashboard.invoices.form.createdAndSentSuccess"));
+      clearDraft();
       router.replace(`/tableau-de-bord/factures/${emailFailedDocId}`);
     } catch (error: unknown) {
       toast.error(
@@ -513,6 +600,8 @@ function NouvelleFacturePageContent() {
         title={t("dashboard.invoices.form.title")}
         subtitle={t("dashboard.invoices.form.subtitle")}
       />
+
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <GlassCard padding="lg" className="space-y-4">

@@ -20,7 +20,10 @@ import {
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import {
@@ -52,12 +55,18 @@ import {
   type BulkSubmissionMode,
   type BulkSummary,
 } from "@/lib/quotes/bulkCotisations";
+import {
+  emptyQuoteCreateDraftData,
+  quoteCreateDraftStore,
+  type QuoteCreateDraftData,
+} from "@/lib/drafts/quoteCreateDraft";
 
 const COTISATIONS_LIST_PATH = "/tableau-de-bord/devis";
 
 export default function NouveauDevisPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [clients, setClients] = useState<CotisationClient[]>([]);
   const [existingQuotes, setExistingQuotes] = useState<ExistingQuoteSummary[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
@@ -94,6 +103,42 @@ export default function NouveauDevisPage() {
   /** Document créé mais e-mail en échec — retry sans recreate. */
   const [emailFailedDocId, setEmailFailedDocId] = useState<string | null>(null);
   const [retryingEmail, setRetryingEmail] = useState(false);
+
+  const draftData = useMemo<QuoteCreateDraftData>(
+    () => ({
+      recipientType,
+      memberId,
+      teamCategory,
+      lignes,
+      statut,
+      dateEcheance,
+      notes,
+    }),
+    [recipientType, memberId, teamCategory, lignes, statut, dateEcheance, notes]
+  );
+
+  const applyDraftData = useCallback((data: QuoteCreateDraftData) => {
+    setRecipientType(data.recipientType);
+    setMemberId(data.memberId);
+    setTeamCategory(data.teamCategory);
+    setLignes(data.lignes);
+    setStatut(data.statut);
+    setDateEcheance(data.dateEcheance);
+    setNotes(data.notes);
+  }, []);
+
+  const resetDraftForm = useCallback(() => {
+    applyDraftData(emptyQuoteCreateDraftData());
+  }, [applyDraftData]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: quoteCreateDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
+  });
 
   const currencyFormatter = useMemo(
     () =>
@@ -470,6 +515,7 @@ export default function NouveauDevisPage() {
         );
       }
       setSubmitSuccess(summary);
+      clearDraft();
     } finally {
       setIsBulkProcessing(false);
       setBulkProgress(null);
@@ -618,6 +664,7 @@ export default function NouveauDevisPage() {
             },
           });
           setDocumentId(outcome.document.documentId);
+          clearDraft();
           toast.success(t("dashboard.quotes.createdOnlySuccess"));
           router.replace(
             `/tableau-de-bord/devis/${outcome.document.documentId}`
@@ -642,6 +689,7 @@ export default function NouveauDevisPage() {
         });
 
         setDocumentId(outcome.document.documentId);
+        clearDraft();
 
         if (outcome.emailSent) {
           setEmailFailedDocId(null);
@@ -690,6 +738,7 @@ export default function NouveauDevisPage() {
         memberId,
       });
       toast.success(t("dashboard.quotes.createdAndSentSuccess"));
+      clearDraft();
       router.replace(`/tableau-de-bord/devis/${emailFailedDocId}`);
     } catch (error: unknown) {
       const message =
@@ -974,6 +1023,8 @@ export default function NouveauDevisPage() {
         title={t("dashboard.quotes.newTitle")}
         subtitle={t("dashboard.quotes.newSubtitle")}
       />
+
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <GlassCard padding="lg" className="space-y-4">

@@ -67,6 +67,7 @@ export default function ModifierContratSponsorPage() {
       ) : (
         <SponsorContractForm
           key={id}
+          entityId={id}
           clubName={clubName}
           defaultValues={defaults}
           submitLabel={t("dashboard.sponsoring.form.saveAction")}

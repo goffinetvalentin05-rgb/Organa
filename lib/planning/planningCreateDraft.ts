@@ -1,7 +1,9 @@
 /**
- * Brouillon local (localStorage) pour la création de planning.
- * Côté client uniquement — jamais de tokens / credentials.
+ * Brouillon local pour la création de planning.
+ * Wrapper autour du store générique — clé legacy conservée (pas de régression).
  */
+
+import { createLocalDraftStore } from "@/lib/drafts/createLocalDraftStore";
 
 export const PLANNING_CREATE_DRAFT_VERSION = 1 as const;
 
@@ -55,14 +57,6 @@ export function emptyPlanningCreateDraftData(): PlanningCreateDraftData {
   };
 }
 
-export function planningCreateDraftStorageKey(clubId: string): string {
-  return `obillz:planning-draft:sport:${clubId}`;
-}
-
-function isBrowser(): boolean {
-  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-}
-
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -109,26 +103,11 @@ export function hasMeaningfulDraftData(data: PlanningCreateDraftData): boolean {
   });
 }
 
-export function parsePlanningCreateDraft(
-  raw: string,
-  expectedClubId: string
-): PlanningCreateDraftEnvelope | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return null;
-  }
-
-  if (!parsed || typeof parsed !== "object") return null;
-  const env = parsed as Record<string, unknown>;
-
-  if (env.version !== PLANNING_CREATE_DRAFT_VERSION) return null;
-  if (typeof env.clubId !== "string" || env.clubId !== expectedClubId) return null;
-  if (env.product != null && env.product !== "sport") return null;
-  if (!env.data || typeof env.data !== "object") return null;
-
-  const dataRaw = env.data as Record<string, unknown>;
+export function normalizePlanningCreateDraftData(
+  raw: unknown
+): PlanningCreateDraftData | null {
+  if (!raw || typeof raw !== "object") return null;
+  const dataRaw = raw as Record<string, unknown>;
   const slotsRaw = Array.isArray(dataRaw.slots) ? dataRaw.slots : null;
   if (!slotsRaw || slotsRaw.length === 0) return null;
 
@@ -138,90 +117,66 @@ export function parsePlanningCreateDraft(
 
   if (slots.length === 0) return null;
 
-  const data: PlanningCreateDraftData = {
+  return {
     name: typeof dataRaw.name === "string" ? dataRaw.name : "",
     description: typeof dataRaw.description === "string" ? dataRaw.description : "",
     date: typeof dataRaw.date === "string" ? dataRaw.date : "",
     eventId: typeof dataRaw.eventId === "string" ? dataRaw.eventId : "",
     slots,
   };
+}
 
-  if (!hasMeaningfulDraftData(data)) return null;
+/** Clé legacy — ne pas changer (brouillons existants). */
+export function planningCreateDraftStorageKey(clubId: string): string {
+  return `obillz:planning-draft:sport:${clubId}`;
+}
 
+export const planningCreateDraftStore = createLocalDraftStore<PlanningCreateDraftData>({
+  version: PLANNING_CREATE_DRAFT_VERSION,
+  product: "sport",
+  formType: "planning-create",
+  isMeaningful: hasMeaningfulDraftData,
+  normalize: normalizePlanningCreateDraftData,
+  allowMissingFormType: true,
+  buildStorageKey: (clubId) => planningCreateDraftStorageKey(clubId),
+});
+
+export function parsePlanningCreateDraft(
+  raw: string,
+  expectedClubId: string
+): PlanningCreateDraftEnvelope | null {
+  const env = planningCreateDraftStore.parse(raw, expectedClubId);
+  if (!env) return null;
   return {
     version: PLANNING_CREATE_DRAFT_VERSION,
-    savedAt: typeof env.savedAt === "string" ? env.savedAt : new Date(0).toISOString(),
-    clubId: expectedClubId,
+    savedAt: env.savedAt,
+    clubId: env.clubId,
     product: "sport",
-    data,
+    data: env.data,
   };
 }
 
 export function loadPlanningCreateDraft(
   clubId: string
 ): PlanningCreateDraftEnvelope | null {
-  if (!isBrowser() || !clubId) return null;
-  try {
-    const raw = window.localStorage.getItem(planningCreateDraftStorageKey(clubId));
-    if (!raw) return null;
-    return parsePlanningCreateDraft(raw, clubId);
-  } catch {
-    return null;
-  }
+  const env = planningCreateDraftStore.load(clubId);
+  if (!env) return null;
+  return {
+    version: PLANNING_CREATE_DRAFT_VERSION,
+    savedAt: env.savedAt,
+    clubId: env.clubId,
+    product: "sport",
+    data: env.data,
+  };
 }
 
 export function savePlanningCreateDraft(
   clubId: string,
   data: PlanningCreateDraftData
 ): { saved: boolean; savedAt: string | null } {
-  if (!isBrowser() || !clubId) {
-    return { saved: false, savedAt: null };
-  }
-
-  if (!hasMeaningfulDraftData(data)) {
-    clearPlanningCreateDraft(clubId);
-    return { saved: false, savedAt: null };
-  }
-
-  const savedAt = new Date().toISOString();
-  const envelope: PlanningCreateDraftEnvelope = {
-    version: PLANNING_CREATE_DRAFT_VERSION,
-    savedAt,
-    clubId,
-    product: "sport",
-    data: {
-      name: data.name,
-      description: data.description,
-      date: data.date,
-      eventId: data.eventId,
-      slots: data.slots.map((slot) => ({
-        id: slot.id,
-        location: slot.location,
-        slotDate: slot.slotDate,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        requiredPeople: slot.requiredPeople,
-        notes: slot.notes,
-      })),
-    },
-  };
-
-  try {
-    window.localStorage.setItem(
-      planningCreateDraftStorageKey(clubId),
-      JSON.stringify(envelope)
-    );
-    return { saved: true, savedAt };
-  } catch {
-    return { saved: false, savedAt: null };
-  }
+  return planningCreateDraftStore.save(clubId, data);
 }
 
 export function clearPlanningCreateDraft(clubId: string): void {
-  if (!isBrowser() || !clubId) return;
-  try {
-    window.localStorage.removeItem(planningCreateDraftStorageKey(clubId));
-  } catch {
-    // ignore quota / private mode
-  }
+  planningCreateDraftStore.clear(clubId);
 }

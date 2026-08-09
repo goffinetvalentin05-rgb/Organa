@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { Edit, Trash, Mail, Users, CheckCircle } from "@/lib/icons";
 import {
   PageLayout,
@@ -26,8 +27,15 @@ import {
   dashboardCheckboxClass,
 } from "@/components/ui";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import {
+  emptyMarketingCampaignDraftData,
+  marketingCampaignDraftStore,
+  type MarketingCampaignDraftData,
+} from "@/lib/drafts/marketingCampaignDraft";
 
 type MarketingContact = {
   id: string;
@@ -49,7 +57,7 @@ type MarketingCampaign = {
   created_at: string;
 };
 
-type AudienceMode = "all" | "source" | "manual";
+type AudienceMode = MarketingCampaignDraftData["audienceMode"];
 
 const formatDate = (value: string | null) => {
   if (!value) return "-";
@@ -65,6 +73,7 @@ function contactDisplayName(contact: MarketingContact) {
 
 export default function MarketingCampaignsPage() {
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [activeTab, setActiveTab] = useState<"contacts" | "campaigns">("contacts");
   const [loading, setLoading] = useState(true);
 
@@ -100,6 +109,51 @@ export default function MarketingCampaignsPage() {
     phone: "",
     source: "",
   });
+
+  const draftData = useMemo<MarketingCampaignDraftData>(
+    () => ({
+      name,
+      subject,
+      contentHtml,
+      audienceMode,
+      audienceSource,
+      selectedContactIds,
+    }),
+    [name, subject, contentHtml, audienceMode, audienceSource, selectedContactIds]
+  );
+
+  const applyDraftData = useCallback((data: MarketingCampaignDraftData) => {
+    setName(data.name);
+    setSubject(data.subject);
+    setContentHtml(data.contentHtml);
+    setAudienceMode(data.audienceMode);
+    setAudienceSource(data.audienceSource);
+    setSelectedContactIds(data.selectedContactIds);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = data.contentHtml;
+    }
+  }, []);
+
+  const resetDraftForm = useCallback(() => {
+    applyDraftData(emptyMarketingCampaignDraftData());
+  }, [applyDraftData]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel, draftHydrated } = useAutoDraft({
+    store: marketingCampaignDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
+  });
+
+  // Sync contentEditable après hydratation / ouverture de l’onglet campagnes.
+  useEffect(() => {
+    if (!draftHydrated || activeTab !== "campaigns") return;
+    if (!editorRef.current) return;
+    editorRef.current.innerHTML = contentHtml;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync on tab/hydrate only
+  }, [draftHydrated, activeTab]);
 
   const activeContacts = useMemo(() => contacts.filter((contact) => !contact.unsubscribed), [contacts]);
   const campaignsSent = useMemo(
@@ -297,6 +351,7 @@ export default function MarketingCampaignsPage() {
           throw new Error(data.error || "Erreur envoi campagne");
         }
 
+        clearDraft();
         notifySuccess(
           `Campagne envoyée : ${data.sentCount || 0}/${data.recipientCount || 0} emails`,
           "marketing-campaign-send"
@@ -308,6 +363,8 @@ export default function MarketingCampaignsPage() {
           editorRef.current.innerHTML = "<p>Bonjour,</p><p>Votre message ici.</p>";
         }
         setSelectedContactIds([]);
+        setAudienceMode("all");
+        setAudienceSource("");
         await Promise.all([refreshContacts(), refreshCampaigns()]);
       } catch (error) {
         console.error("[MARKETING][campaigns] send error:", error);
@@ -628,6 +685,7 @@ export default function MarketingCampaignsPage() {
             title={t("dashboard.marketing.campaigns.createTitle")}
             description={t("dashboard.marketing.subtitle")}
           >
+            <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
             <form onSubmit={handleSendCampaign} className="space-y-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>

@@ -75,6 +75,7 @@ export default function ModifierPvSeancePage() {
       ) : (
         <MeetingMinutesForm
           key={id}
+          entityId={id}
           defaultValues={defaults}
           submitLabel={t("dashboard.meetingMinutes.form.saveAction")}
           savingLabel={t("dashboard.common.saving")}

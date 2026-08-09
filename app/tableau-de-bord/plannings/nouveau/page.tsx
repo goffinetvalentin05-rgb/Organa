@@ -1,21 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Plus, Trash, Clock, MapPin, Calendar } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import {
-  clearPlanningCreateDraft,
   createDefaultPlanningSlots,
-  loadPlanningCreateDraft,
-  savePlanningCreateDraft,
+  emptyPlanningCreateDraftData,
+  planningCreateDraftStore,
+  type PlanningCreateDraftData,
   type PlanningCreateDraftSlot,
 } from "@/lib/planning/planningCreateDraft";
 import {
@@ -46,8 +48,6 @@ const labelClass = `${dashboardLabelClass} mb-2`;
 
 const compactLabelClass = "mb-1.5 flex items-center gap-1 text-xs font-medium text-white/65";
 
-const DRAFT_SAVE_DEBOUNCE_MS = 400;
-
 export default function NouveauPlanningPage() {
   const { t } = useI18n();
   const router = useRouter();
@@ -64,107 +64,35 @@ export default function NouveauPlanningPage() {
 
   const [slots, setSlots] = useState<SlotForm[]>(() => createDefaultPlanningSlots());
 
-  /** false tant que la restauration pour le club courant n'est pas terminée */
-  const [draftHydrated, setDraftHydrated] = useState(false);
-  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
-  const [draftRestored, setDraftRestored] = useState(false);
+  const draftData = useMemo<PlanningCreateDraftData>(
+    () => ({ name, description, date, eventId, slots }),
+    [name, description, date, eventId, slots]
+  );
 
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeClubIdRef = useRef<string | null>(null);
+  const applyDraftData = useCallback((data: PlanningCreateDraftData) => {
+    setName(data.name);
+    setDescription(data.description);
+    setDate(data.date);
+    setEventId(data.eventId);
+    setSlots(data.slots.length > 0 ? data.slots : createDefaultPlanningSlots());
+  }, []);
+
+  const resetDraftForm = useCallback(() => {
+    applyDraftData(emptyPlanningCreateDraftData());
+  }, [applyDraftData]);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: planningCreateDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
+  });
 
   useEffect(() => {
     loadEvents();
   }, []);
-
-  // Restauration du brouillon dès que le club actif est connu (avant tout autosave).
-  useEffect(() => {
-    if (clubLoading) return;
-
-    if (saveTimerRef.current) {
-      clearTimeout(saveTimerRef.current);
-      saveTimerRef.current = null;
-    }
-
-    if (!clubId) {
-      activeClubIdRef.current = null;
-      setDraftHydrated(true);
-      setDraftRestored(false);
-      setDraftSavedAt(null);
-      return;
-    }
-
-    activeClubIdRef.current = clubId;
-    setDraftHydrated(false);
-
-    const envelope = loadPlanningCreateDraft(clubId);
-    if (envelope) {
-      setName(envelope.data.name);
-      setDescription(envelope.data.description);
-      setDate(envelope.data.date);
-      setEventId(envelope.data.eventId);
-      setSlots(
-        envelope.data.slots.length > 0
-          ? envelope.data.slots
-          : createDefaultPlanningSlots()
-      );
-      setDraftSavedAt(envelope.savedAt);
-      setDraftRestored(true);
-    } else {
-      setName("");
-      setDescription("");
-      setDate("");
-      setEventId("");
-      setSlots(createDefaultPlanningSlots());
-      setDraftSavedAt(null);
-      setDraftRestored(false);
-    }
-
-    setDraftHydrated(true);
-  }, [clubId, clubLoading]);
-
-  // Autosave debounced — uniquement après hydratation, pour le club courant.
-  useEffect(() => {
-    if (!draftHydrated || !clubId || clubLoading) return;
-    if (activeClubIdRef.current !== clubId) return;
-
-    if (saveTimerRef.current) {
-      clearTimeout(saveTimerRef.current);
-    }
-
-    saveTimerRef.current = setTimeout(() => {
-      if (activeClubIdRef.current !== clubId) return;
-      const result = savePlanningCreateDraft(clubId, {
-        name,
-        description,
-        date,
-        eventId,
-        slots,
-      });
-      if (result.saved && result.savedAt) {
-        setDraftSavedAt(result.savedAt);
-        setDraftRestored(true);
-      } else if (!result.saved) {
-        setDraftSavedAt(null);
-        setDraftRestored(false);
-      }
-    }, DRAFT_SAVE_DEBOUNCE_MS);
-
-    return () => {
-      if (saveTimerRef.current) {
-        clearTimeout(saveTimerRef.current);
-        saveTimerRef.current = null;
-      }
-    };
-  }, [
-    name,
-    description,
-    date,
-    eventId,
-    slots,
-    clubId,
-    clubLoading,
-    draftHydrated,
-  ]);
 
   const loadEvents = async () => {
     try {
@@ -280,11 +208,7 @@ export default function NouveauPlanningPage() {
       }
 
       // Succès confirmé uniquement : effacer le brouillon du club, puis naviguer.
-      if (clubId) {
-        clearPlanningCreateDraft(clubId);
-      }
-      setDraftSavedAt(null);
-      setDraftRestored(false);
+      clearDraft();
       setCreateSuccess(true);
       notifySuccess("Planning créé avec succès ✓", "planning-create");
       setTimeout(() => setCreateSuccess(false), 2000);
@@ -316,8 +240,6 @@ export default function NouveauPlanningPage() {
     );
   }, [date]);
 
-  const showDraftStatus = Boolean(draftSavedAt || draftRestored);
-
   return (
     <>
       <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
@@ -336,17 +258,7 @@ export default function NouveauPlanningPage() {
         subtitle="Créez un planning et définissez vos créneaux horaires"
       />
 
-      {showDraftStatus && (
-        <p
-          className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/55"
-          aria-live="polite"
-        >
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" aria-hidden />
-          {draftRestored && draftSavedAt
-            ? "Brouillon restauré · sauvegarde automatique"
-            : "Sauvegardé automatiquement"}
-        </p>
-      )}
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informations générales */}
