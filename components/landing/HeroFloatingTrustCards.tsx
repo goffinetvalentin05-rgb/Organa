@@ -134,7 +134,7 @@ function useTrustItems() {
   return (Array.isArray(raw) ? raw : []) as TrustStat[];
 }
 
-/** Orbit desktop (4 cartes) — sur mobile seules TL/TR restent visibles ici. */
+/** Orbit desktop (4 cartes) — sur mobile aussi, via positions CSS asymétriques. */
 export default function HeroFloatingTrustCards() {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
@@ -151,23 +151,7 @@ export default function HeroFloatingTrustCards() {
   );
 }
 
-/** Bande compacte mobile pour 100% + Simple (sous la vidéo). */
+/** @deprecated Ancienne bande mobile 2×2 — conservé pour éviter les imports cassés, non rendu. */
 export function HeroFloatingTrustMobileStack() {
-  const reduceMotion = useReducedMotion();
-  const items = useTrustItems().filter((item) => item.id === "percent" || item.id === "simple");
-
-  if (items.length === 0) return null;
-
-  return (
-    <div className="hero-float-mobile-stack">
-      {items.map((stat) => (
-        <FloatingCard
-          key={`stack-${stat.id}`}
-          stat={stat}
-          reduceMotion={reduceMotion}
-          className="hero-float-card--stack"
-        />
-      ))}
-    </div>
-  );
+  return null;
 }

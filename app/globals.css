@@ -931,79 +931,245 @@ html:has(.dashboard-shell) {
   .hero-float-card--br { right: 0; top: 42%; }
 }
 
-/* Mobile : 2 flottantes haut + bande compacte sous la vidéo */
+/* Mobile : 4 cards flottantes asymétriques autour de la vidéo (pas de grille 2×2) */
 @media (max-width: 768px) {
   .landing-hero-video-compose {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: calc(100% - 20px);
-    max-width: 420px;
+    display: block;
+    position: relative;
+    width: min(calc(100% - 1.25rem), 26rem);
+    max-width: 26rem;
     margin-inline: auto;
-    padding: 2.85rem 0 0.35rem;
-  }
-
-  .hero-float-cards {
-    position: absolute;
-    inset: 0 0 auto;
-    height: 4.5rem;
-    z-index: 5;
-  }
-
-  .hero-float-card--tl,
-  .hero-float-card--tr {
-    position: absolute;
-    max-width: calc(50% - 0.35rem);
-    width: calc(50% - 0.35rem);
-    padding: 0.48rem 0.52rem;
-    border-radius: 0.95rem;
-  }
-
-  .hero-float-card--tl { top: 0.15rem; left: 0; }
-  .hero-float-card--tr { top: 0; right: 0; }
-
-  .hero-float-card--bl:not(.hero-float-card--stack),
-  .hero-float-card--br:not(.hero-float-card--stack) {
-    display: none;
+    padding: 2.15rem 0.2rem 2.35rem;
+    box-sizing: border-box;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .landing-hero-video-compose > .landing-hero-video {
-    width: 100%;
+    width: 88%;
     max-width: none;
+    margin-inline: auto;
     position: relative;
     z-index: 2;
   }
 
+  .hero-float-cards {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    height: auto;
+  }
+
+  .hero-float-card {
+    pointer-events: auto;
+    align-items: flex-start;
+    gap: 0.38rem;
+    max-width: 9.4rem;
+    width: max-content;
+    padding: 0.42rem 0.5rem 0.44rem;
+    border-radius: 0.92rem;
+  }
+
+  .hero-float-card__icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.02rem;
+  }
+
+  .hero-float-card__icon svg {
+    width: 0.72rem;
+    height: 0.72rem;
+  }
+
+  .hero-float-card__icon::before {
+    inset: -0.18rem;
+  }
+
+  .hero-float-card__value {
+    font-size: 0.68rem;
+    line-height: 1.12;
+  }
+
+  .hero-float-card__desc {
+    margin-top: 0.12rem;
+    font-size: 0.52rem;
+    line-height: 1.3;
+  }
+
+  .hero-float-card__glow {
+    inset: -18% -12%;
+    opacity: 0.72;
+    filter: blur(14px);
+  }
+
+  .hero-float-card__aura {
+    height: 70%;
+    filter: blur(12px);
+    opacity: 0.85;
+  }
+
+  /* Composition organique — hauteurs / largeurs / décalages volontairement différents */
+  .hero-float-card--tl {
+    top: 0.05rem;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    max-width: 9.6rem;
+  }
+
+  .hero-float-card--tr {
+    top: 1.15rem;
+    right: 0;
+    left: auto;
+    bottom: auto;
+    max-width: 6.9rem;
+  }
+
+  .hero-float-card--bl,
+  .hero-float-card--bl:not(.hero-float-card--stack) {
+    display: flex;
+    top: auto;
+    left: 0;
+    right: auto;
+    bottom: 2.55rem;
+    max-width: 9.1rem;
+  }
+
+  .hero-float-card--br,
+  .hero-float-card--br:not(.hero-float-card--stack) {
+    display: flex;
+    top: auto;
+    left: auto;
+    right: 0;
+    bottom: 0.2rem;
+    max-width: 8.4rem;
+  }
+
+  /* Ancienne bande 2 colonnes sous la vidéo — désactivée */
   .hero-float-mobile-stack {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    width: 100%;
-    margin-top: 0.75rem;
+    display: none !important;
   }
 
   .hero-float-card--stack {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    max-width: none;
-    width: 100%;
-    padding: 0.5rem 0.55rem;
-    border-radius: 0.95rem;
+    display: none !important;
   }
 
-  .hero-float-card__value { font-size: 0.7rem; }
-  .hero-float-card__desc { font-size: 0.58rem; }
-  .hero-float-card__icon { width: 1.2rem; height: 1.2rem; }
-  .hero-float-card__icon svg { width: 0.78rem; height: 0.78rem; }
+  .hero-club-proof {
+    padding: 1.35rem 1rem 5.5rem;
+  }
 
-  .hero-club-proof { padding: 0.85rem 1rem 5.5rem; }
-  .hero-club-proof__label { margin-bottom: 1.1rem; font-size: 0.65rem; }
-  .hero-club-proof__logos { gap: 2.25rem; }
-  .hero-club-proof__img { height: 2.85rem; max-width: 128px; }
+  .hero-club-proof__label {
+    margin-bottom: 1.1rem;
+    font-size: 0.65rem;
+  }
+
+  .hero-club-proof__logos {
+    gap: 2.25rem;
+  }
+
+  .hero-club-proof__img {
+    height: 2.85rem;
+    max-width: 128px;
+  }
+}
+
+@media (max-width: 430px) and (min-width: 391px) {
+  .landing-hero-video-compose {
+    padding: 2.05rem 0.15rem 2.2rem;
+  }
+
+  .landing-hero-video-compose > .landing-hero-video {
+    width: 87%;
+  }
+
+  .hero-float-card--tr {
+    top: 1.05rem;
+    max-width: 6.7rem;
+  }
+
+  .hero-float-card--bl {
+    bottom: 2.4rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .landing-hero-video-compose {
+    width: min(calc(100% - 1rem), 24.5rem);
+    padding: 1.95rem 0.1rem 2.1rem;
+  }
+
+  .landing-hero-video-compose > .landing-hero-video {
+    width: 86%;
+  }
+
+  .hero-float-card {
+    max-width: 8.85rem;
+    padding: 0.38rem 0.46rem 0.4rem;
+    gap: 0.32rem;
+  }
+
+  .hero-float-card--tl {
+    max-width: 9rem;
+  }
+
+  .hero-float-card--tr {
+    top: 1rem;
+    max-width: 6.35rem;
+  }
+
+  .hero-float-card--bl {
+    bottom: 2.25rem;
+    max-width: 8.6rem;
+  }
+
+  .hero-float-card--br {
+    bottom: 0.1rem;
+    max-width: 7.9rem;
+  }
+
+  .hero-float-card__value {
+    font-size: 0.64rem;
+  }
+
+  .hero-float-card__desc {
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .landing-hero-video-compose > .landing-hero-video {
+    width: 84%;
+  }
+
+  .hero-float-card {
+    max-width: 8.25rem;
+    padding: 0.34rem 0.42rem;
+  }
+
+  .hero-float-card--tl {
+    max-width: 8.4rem;
+  }
+
+  .hero-float-card--tr {
+    max-width: 5.9rem;
+  }
+
+  .hero-float-card--bl {
+    max-width: 8rem;
+    bottom: 2.1rem;
+  }
+
+  .hero-float-card--br {
+    max-width: 7.4rem;
+  }
+
+  .hero-float-card__desc {
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
