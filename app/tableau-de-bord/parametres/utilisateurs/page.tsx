@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
@@ -15,6 +15,12 @@ import {
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import {
+  clubUserAccessDraftStore,
+  type ClubUserAccessDraftData,
+} from "@/lib/drafts/clubUserAccessDraft";
 
 interface MemberDTO {
   id: string;
@@ -119,6 +125,39 @@ export default function UtilisateursPage() {
     null
   );
   const canManage = myPerms.has("manage_users");
+  const clubId = myPerms.clubId;
+  const clubLoading = myPerms.loading;
+
+  const draftData = useMemo<ClubUserAccessDraftData>(
+    () => ({
+      name: form.name,
+      email: form.email,
+      functionTitle: form.functionTitle,
+      role: form.role,
+      permissions: form.permissions,
+    }),
+    [form]
+  );
+
+  const applyDraftData = useCallback((data: ClubUserAccessDraftData) => {
+    setForm({
+      name: data.name,
+      email: data.email,
+      functionTitle: data.functionTitle,
+      role: data.role,
+      permissions: data.permissions,
+    });
+  }, []);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: clubUserAccessDraftStore,
+    clubId,
+    clubLoading,
+    entityId: editing?.id ?? null,
+    data: draftData,
+    enabled: showForm,
+    onRestore: applyDraftData,
+  });
 
   useEffect(() => {
     fetch("/api/me", { cache: "no-store" })
@@ -298,6 +337,7 @@ export default function UtilisateursPage() {
         toast.success("Accès mis à jour");
       }
 
+      clearDraft();
       cancelForm();
       await fetchAll();
     } catch (e: any) {
@@ -616,6 +656,11 @@ export default function UtilisateursPage() {
           <h2 className="text-lg font-semibold text-slate-800">
             {editing ? "Modifier l'accès" : "Nouvel accès"}
           </h2>
+          <DraftAutosaveHint
+            show={showDraftStatus}
+            label={draftStatusLabel}
+            className="mb-0 flex items-center gap-2 text-xs font-medium tracking-wide text-slate-500"
+          />
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>

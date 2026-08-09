@@ -5,11 +5,18 @@ import { useRouter } from "next/navigation";
 import { buildMonthGrid } from "@/lib/buvette/calendar";
 import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
 import { localeToIntl } from "@/lib/i18n";
 import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, dashboardTextPrimaryClass, dashboardTextSecondaryClass, dashboardTextMutedClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass, cn } from "@/components/ui";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 import BuvetteRequestsPanel from "@/components/buvette/BuvetteRequestsPanel";
 import type { BuvetteRequest } from "@/lib/buvette/requests";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  buvetteMessageDraftStore,
+  type BuvetteMessageDraftData,
+} from "@/lib/drafts/buvetteMessageDraft";
 import {
   createAndSend,
   createOnly,
@@ -38,6 +45,7 @@ function currentMonthKey() {
 export default function BuvettePage() {
   const router = useRouter();
   const { t, tList, locale } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const weekdayLabels = tList("dashboard.buvette.weekdays");
   const [month, setMonth] = useState(currentMonthKey());
   const [days, setDays] = useState<Record<string, DayData>>({});
@@ -60,6 +68,52 @@ export default function BuvettePage() {
   const [retryingInvoiceEmail, setRetryingInvoiceEmail] = useState(false);
   const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null);
   const [archiving, setArchiving] = useState(false);
+
+  const buvetteDraftKind = showInvoiceModal ? "invoice" : "info";
+  const buvetteDraftEnabled =
+    Boolean(selectedRequestId) && (showInfoModal || showInvoiceModal);
+  const buvetteEntityId =
+    buvetteDraftEnabled && selectedRequestId
+      ? `${selectedRequestId}:${buvetteDraftKind}`
+      : null;
+
+  const buvetteDraftData = useMemo<BuvetteMessageDraftData>(
+    () => ({
+      kind: buvetteDraftKind,
+      message: showInvoiceModal ? invoiceMessageDraft : infoMessageDraft,
+      amount: showInvoiceModal ? invoiceAmount : "",
+    }),
+    [
+      buvetteDraftKind,
+      showInvoiceModal,
+      invoiceMessageDraft,
+      infoMessageDraft,
+      invoiceAmount,
+    ]
+  );
+
+  const applyBuvetteDraft = useCallback((data: BuvetteMessageDraftData) => {
+    if (data.kind === "invoice") {
+      setInvoiceMessageDraft(data.message);
+      setInvoiceAmount(data.amount);
+    } else {
+      setInfoMessageDraft(data.message);
+    }
+  }, []);
+
+  const {
+    clearDraft: clearBuvetteDraft,
+    showDraftStatus: showBuvetteDraftStatus,
+    draftStatusLabel: buvetteDraftStatusLabel,
+  } = useAutoDraft({
+    store: buvetteMessageDraftStore,
+    clubId,
+    clubLoading,
+    entityId: buvetteEntityId,
+    data: buvetteDraftData,
+    enabled: buvetteDraftEnabled,
+    onRestore: applyBuvetteDraft,
+  });
 
   const getErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Erreur";
@@ -289,6 +343,7 @@ N'hésite pas à nous contacter si tu as des questions.
         signal: controller.signal,
       }).finally(() => clearTimeout(timeoutId));
       if (!res.ok) throw new Error(await getApiError(res, "Impossible d'envoyer les infos pratiques"));
+      clearBuvetteDraft();
       setShowInfoModal(false);
       toast.success("✅ Email envoyé avec succès !");
     } catch (error: unknown) {
@@ -368,6 +423,7 @@ N'hésite pas à nous contacter si tu as des questions.
           type: "facture",
           createFn: () => createBuvetteInvoice(),
         });
+        clearBuvetteDraft();
         setShowInvoiceModal(false);
         setInvoiceAmount("");
         setEmailFailedInvoiceId(null);
@@ -383,6 +439,9 @@ N'hésite pas à nous contacter si tu as des questions.
         onPhase: setInvoiceLoadingPhase,
         createFn: () => createBuvetteInvoice(existingId),
       });
+
+      // Facture créée côté serveur : clear même si l'email échoue ensuite.
+      clearBuvetteDraft();
 
       if (outcome.emailSent) {
         setShowInvoiceModal(false);
@@ -684,6 +743,11 @@ N'hésite pas à nous contacter si tu as des questions.
                 ✕
               </button>
             </div>
+            <DraftAutosaveHint
+              show={showBuvetteDraftStatus}
+              label={buvetteDraftStatusLabel}
+              className="mb-0 flex items-center gap-2 text-xs font-medium tracking-wide text-slate-500"
+            />
             <textarea
               value={infoMessageDraft}
               onChange={(e) => setInfoMessageDraft(e.target.value)}
@@ -721,6 +785,11 @@ N'hésite pas à nous contacter si tu as des questions.
                 ✕
               </button>
             </div>
+            <DraftAutosaveHint
+              show={showBuvetteDraftStatus}
+              label={buvetteDraftStatusLabel}
+              className="mb-0 flex items-center gap-2 text-xs font-medium tracking-wide text-slate-500"
+            />
             {invoiceStep === "message" ? (
               <>
                 <p className="text-sm text-slate-600">

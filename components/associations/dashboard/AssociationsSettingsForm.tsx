@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -24,6 +26,12 @@ import {
   Upload,
 } from "lucide-react";
 import { formatIbanDisplay } from "@/lib/associations/settings-validation";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import {
+  associationSettingsDraftStore,
+  type AssociationSettingsDraftData,
+} from "@/lib/drafts/associationSettingsDraft";
 import styles from "./associations-dashboard.module.css";
 
 type SettingsFormState = {
@@ -53,12 +61,14 @@ const SECTIONS = [
 ] as const;
 
 type AssociationsSettingsFormProps = {
+  clubId: string;
   initialSettings: SettingsFormState;
   roleLabel: string;
   canEdit: boolean;
 };
 
 export default function AssociationsSettingsForm({
+  clubId,
   initialSettings,
   roleLabel,
   canEdit,
@@ -70,12 +80,64 @@ export default function AssociationsSettingsForm({
   const [form, setForm] = useState<SettingsFormState>(initialSettings);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [logoNeedsReselect, setLogoNeedsReselect] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [removingLogo, setRemovingLogo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
+
+  const draftData = useMemo<AssociationSettingsDraftData>(
+    () => ({
+      company_name: form.company_name,
+      company_email: form.company_email,
+      company_phone: form.company_phone,
+      company_address: form.company_address,
+      company_address_line2: form.company_address_line2,
+      company_postal_code: form.company_postal_code,
+      company_city: form.company_city,
+      company_region: form.company_region,
+      company_country: form.company_country,
+      website: form.website,
+      description: form.description,
+      iban: form.iban,
+      bank_name: form.bank_name,
+      logo_url: form.logo_url,
+      logoPendingReselect: Boolean(pendingFile) || logoNeedsReselect,
+    }),
+    [form, pendingFile, logoNeedsReselect]
+  );
+
+  const applyDraftData = useCallback((data: AssociationSettingsDraftData) => {
+    setForm({
+      company_name: data.company_name,
+      company_email: data.company_email,
+      company_phone: data.company_phone,
+      company_address: data.company_address,
+      company_address_line2: data.company_address_line2,
+      company_postal_code: data.company_postal_code,
+      company_city: data.company_city,
+      company_region: data.company_region,
+      company_country: data.company_country,
+      website: data.website,
+      description: data.description,
+      iban: data.iban,
+      bank_name: data.bank_name,
+      logo_url: data.logo_url,
+    });
+    setPendingFile(null);
+    setLogoNeedsReselect(Boolean(data.logoPendingReselect));
+  }, []);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel, draftRestored } =
+    useAutoDraft({
+      store: associationSettingsDraftStore,
+      clubId,
+      data: draftData,
+      enabled: canEdit,
+      onRestore: applyDraftData,
+    });
 
   useEffect(() => {
     return () => {
@@ -113,6 +175,7 @@ export default function AssociationsSettingsForm({
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setPendingFile(file);
+    setLogoNeedsReselect(false);
     setFieldError(null);
     setSuccess(null);
     setError(null);
@@ -245,6 +308,8 @@ export default function AssociationsSettingsForm({
         }));
       }
 
+      clearDraft();
+      setLogoNeedsReselect(false);
       setSuccess("Modifications enregistrées.");
       router.refresh();
     } catch (err) {
@@ -269,6 +334,17 @@ export default function AssociationsSettingsForm({
           <p className="mt-2 max-w-2xl text-sm font-medium text-[#66736d] sm:text-base">
             Gérez les informations générales et l’identité de votre association.
           </p>
+          <DraftAutosaveHint
+            show={showDraftStatus}
+            label={draftStatusLabel}
+            className="mt-3 mb-0 flex items-center gap-2 text-xs font-medium tracking-wide text-[#66736d]"
+          />
+          {draftRestored && logoNeedsReselect ? (
+            <p className="mt-2 text-xs font-medium text-[#66736d]">
+              Le fichier logo n’est pas conservé localement — resélectionnez-le si
+              besoin.
+            </p>
+          ) : null}
         </div>
       </header>
 

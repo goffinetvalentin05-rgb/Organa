@@ -41,6 +41,7 @@ export default async function AssociationsParametresPage() {
 
   return (
     <AssociationsSettingsForm
+      clubId={settingsAccess.clubId}
       roleLabel={associationsRoleLabel(settingsAccess.role)}
       canEdit={settingsAccess.canEdit}
       initialSettings={{
