@@ -1,5 +1,23 @@
 # Configuration Stripe - Instructions Complètes
 
+## Endpoints webhook (production)
+
+Les deux URLs appellent le **même** handler (`lib/billing/handleStripeWebhook.ts`) :
+
+- **Recommandé / historique** : `https://obillz.com/api/webhook`
+- Alternatif : `https://obillz.com/api/webhooks/stripe`
+
+Événements à activer dans Stripe :
+
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_succeeded`
+- `invoice.payment_failed`
+
+(`invoice.paid` est volontairement ignoré côté app — redondant avec `invoice.payment_succeeded`.)
+
 ## 📋 Étape 1 : Créer le fichier .env.local
 
 1. **À la racine du projet**, créez un fichier nommé exactement `.env.local`
@@ -69,8 +87,10 @@ STRIPE_SECRET_KEY=sk_test_51AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
    - ou `https://votre-domaine.com/api/webhooks/stripe`
 4. Sélectionnez les événements à écouter :
    - `checkout.session.completed`
+   - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
+   - `invoice.payment_succeeded`
    - `invoice.payment_failed`
 5. Après la création, cliquez sur l'endpoint
 6. Dans la section **"Signing secret"**, cliquez sur **"Reveal"** ou **"Reveal test key"**

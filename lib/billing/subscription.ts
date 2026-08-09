@@ -49,6 +49,7 @@ type BillingProfileRow = {
   created_at: string | null;
   is_founder: boolean | null;
   stripe_subscription_id: string | null;
+  stripe_customer_id: string | null;
 };
 
 // ============================================
@@ -111,7 +112,7 @@ export async function getSubscriptionStatus(
     const result = await admin
       .from("profiles")
       .select(
-        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id"
+        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id, stripe_customer_id"
       )
       .eq("user_id", billingUserId)
       .maybeSingle();
@@ -126,7 +127,7 @@ export async function getSubscriptionStatus(
     const result = await supabase
       .from("profiles")
       .select(
-        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id"
+        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id, stripe_customer_id"
       )
       .eq("user_id", billingUserId)
       .maybeSingle();
@@ -212,11 +213,13 @@ export async function getSubscriptionStatus(
 
   const billingCycle = profile.billing_cycle as BillingCycle;
   const status = profile.subscription_status as SubscriptionStatus;
-  const hasStripeSubscription = Boolean(profile.stripe_subscription_id);
+  const hasStripeLink = Boolean(
+    profile.stripe_subscription_id || profile.stripe_customer_id
+  );
 
-  // 6. Si le statut est 'active', vérifier que l'abonnement n'est pas expiré
+  // 6. Si le statut est 'active', faire confiance à la DB (source d'accès).
+  //    Les webhooks Stripe restent la source de vérité pour les changements.
   if (status === "active") {
-    // TODO: Vérifier avec Stripe si l'abonnement est toujours actif
     return {
       status: "active",
       billingCycle,
@@ -238,12 +241,22 @@ export async function getSubscriptionStatus(
     const now = new Date();
     const isTrialExpired = now > trialEndsAt;
 
-    // Un club déjà lié à Stripe ne doit pas être rétrogradé via la logique trial
-    // (désynchronisation possible webhook / statut resté à « trial »).
-    if (isTrialExpired && hasStripeSubscription) {
+    // Lien Stripe déjà connu → jamais de rétrogradation locale trial→expired.
+    // Le webhook (ou un heal) est la seule voie pour changer ce statut.
+    if (hasStripeLink) {
       console.warn(
-        `[BILLING][getSubscriptionStatus] trial expiré mais stripe_subscription_id présent — traité comme active (billing_user_id=${billingUserId})`
+        `[BILLING][getSubscriptionStatus] trial + IDs Stripe présents — traité comme active (billing_user_id=${billingUserId})`
       );
+      if (billingUserId === user.id) {
+        const { healTrialStatusWhenStripeLinked } = await import(
+          "@/lib/billing/reconcileTrialExpiry"
+        );
+        await healTrialStatusWhenStripeLinked({
+          userId: user.id,
+          billingUserId,
+          canWriteProfile: true,
+        });
+      }
       return {
         status: "active",
         billingCycle,
@@ -258,8 +271,48 @@ export async function getSubscriptionStatus(
     }
 
     if (isTrialExpired) {
-      // Mettre à jour le statut en 'expired' (uniquement son propre profil)
+      // Avant d'écrire expired : une seule réconciliation Stripe (email),
+      // uniquement pour le propriétaire du profil (évite appels à chaque page).
       if (billingUserId === user.id) {
+        const { reconcileTrialExpiryBeforeExpire } = await import(
+          "@/lib/billing/reconcileTrialExpiry"
+        );
+        const reconcile = await reconcileTrialExpiryBeforeExpire({
+          userId: billingUserId,
+          email: user.email,
+        });
+
+        if (reconcile.action === "keep_active") {
+          return {
+            status: "active",
+            billingCycle,
+            trialStartedAt,
+            trialDaysRemaining: 0,
+            trialEndsAt,
+            isTrialExpired: true,
+            canWrite: true,
+            subscriptionStartedAt,
+            subscriptionEndsAt,
+          };
+        }
+
+        if (reconcile.action === "grace") {
+          console.warn(
+            `[BILLING][getSubscriptionStatus] trial expiré mais grace (${reconcile.reason}) — accès temporaire conservé billing_user_id=${billingUserId}`
+          );
+          return {
+            status: "trial",
+            billingCycle: null,
+            trialStartedAt,
+            trialDaysRemaining: 0,
+            trialEndsAt,
+            isTrialExpired: true,
+            canWrite: true,
+            subscriptionStartedAt: null,
+            subscriptionEndsAt: null,
+          };
+        }
+
         await supabase
           .from("profiles")
           .update({ subscription_status: "expired" })

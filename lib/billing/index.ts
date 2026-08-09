@@ -43,7 +43,21 @@ export {
   type StripePriceResolution,
 } from "./stripePrices";
 
-export { syncProfileFromStripe, findUserIdByStripeRefs } from "./stripeSync";
+export {
+  syncProfileFromStripe,
+  findUserIdByStripeRefs,
+  findUserIdByCustomerEmail,
+  StripeWebhookSyncError,
+  PERMANENT_SYNC_CODES,
+  isPermanentSyncCode,
+} from "./stripeSync";
+
+export {
+  mapStripeSubscriptionStatus,
+  isStripeSubscriptionEntitled,
+  type StripeAccessDecision,
+  type ObillzSubscriptionStatus,
+} from "./stripeStatusMap";
 
 // Formule Standard / Équipe
 export {
