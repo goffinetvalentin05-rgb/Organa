@@ -90,7 +90,13 @@ export async function getAuthContext(): Promise<AuthContext | null> {
     const jar = await cookies();
     const pref = jar.get(OBILLZ_ACTIVE_CLUB_COOKIE)?.value;
     if (pref && memberships.some((m) => m.clubId === pref)) {
-      current = memberships.find((m) => m.clubId === pref) ?? null;
+      const preferred = memberships.find((m) => m.clubId === pref) ?? null;
+      // Ignorer le cookie collé sur le club perso si un club externe existe
+      // (même logique que pickActiveOrgForProduct — héritage d'abonnement).
+      const preferredIsPersonal = preferred?.clubId === user.id;
+      if (preferred && (!preferredIsPersonal || externalMemberships.length === 0)) {
+        current = preferred;
+      }
     }
   } catch {
     // cookies() indisponible (hors requête Next)

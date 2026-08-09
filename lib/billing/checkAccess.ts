@@ -39,11 +39,15 @@ export interface AccessDeniedResponse {
 /**
  * Vérifie si l'utilisateur peut effectuer une action d'écriture
  *
+ * @param clubId Club facturé explicite (celui de requirePermission). Si omis,
+ *               utilise le club courant de getAuthContext().
  * @returns AccessCheckResult avec le résultat de la vérification
  */
-export async function checkWriteAccess(): Promise<AccessCheckResult> {
+export async function checkWriteAccess(
+  clubId?: string
+): Promise<AccessCheckResult> {
   try {
-    const subscription = await getSubscriptionStatus();
+    const subscription = await getSubscriptionStatus(clubId);
 
     if (subscription.canWrite) {
       return {
@@ -101,19 +105,19 @@ export function createAccessDeniedResponse(
  *
  * Usage:
  * ```ts
- * const accessCheck = await requireWriteAccess();
+ * const accessCheck = await requireWriteAccess(guard.clubId);
  * if (accessCheck.response) {
  *   return accessCheck.response;
  * }
  * // Continuer avec l'action...
  * ```
  */
-export async function requireWriteAccess(): Promise<{
+export async function requireWriteAccess(clubId?: string): Promise<{
   allowed: boolean;
   response?: Response;
   subscription?: SubscriptionInfo;
 }> {
-  const check = await checkWriteAccess();
+  const check = await checkWriteAccess(clubId);
 
   if (check.allowed) {
     return {

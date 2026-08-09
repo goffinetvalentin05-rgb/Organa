@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
   const guard = await requirePermission(PERMISSIONS.MANAGE_MEMBERS);
   if ("error" in guard) return guard.error;
 
-  const accessCheck = await requireWriteAccess();
+  const accessCheck = await requireWriteAccess(guard.clubId);
   if (accessCheck.response) {
     return accessCheck.response;
   }

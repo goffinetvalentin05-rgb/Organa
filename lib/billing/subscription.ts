@@ -9,9 +9,13 @@
  * Tarifs:
  * - Public (nouveaux) : 49 CHF/mois · 490 CHF/an (formule Équipe)
  * - Legacy Standard : 39 CHF/mois · 390 CHF/an (abonnements existants)
+ *
+ * Facturation : l'abonnement appartient au CLUB (profiles.user_id = club_id).
+ * Les membres autorisés héritent du statut du club, pas de leur essai perso.
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthContext } from "@/lib/auth/rbac";
 import { PRICING, STANDARD_PLAN_FEATURES, TRIAL_DURATION_DAYS } from "@/lib/billing/pricing";
 
@@ -36,21 +40,32 @@ export interface SubscriptionInfo {
   subscriptionEndsAt: Date | null;
 }
 
-// ============================================
-// Constantes
-// ============================================
+type BillingProfileRow = {
+  subscription_status: string | null;
+  trial_started_at: string | null;
+  billing_cycle: string | null;
+  subscription_started_at: string | null;
+  subscription_ends_at: string | null;
+  created_at: string | null;
+  is_founder: boolean | null;
+  stripe_subscription_id: string | null;
+};
 
 // ============================================
 // Fonctions principales
 // ============================================
 
 /**
- * Récupère les informations complètes sur l'abonnement de l'utilisateur
+ * Récupère les informations complètes sur l'abonnement du club facturé.
  *
+ * @param clubId Club explicite (recommandé depuis les API après requirePermission).
+ *               Sinon : club courant de getAuthContext(), sinon l'utilisateur.
  * @returns SubscriptionInfo avec toutes les informations de subscription
  * @throws Error si l'utilisateur n'est pas authentifié
  */
-export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
+export async function getSubscriptionStatus(
+  clubId?: string
+): Promise<SubscriptionInfo> {
   const supabase = await createClient();
 
   // 1. Récupérer l'utilisateur authentifié
@@ -71,16 +86,61 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
   // propriétaire du compte club). Un membre invité doit hériter du statut
   // d’abonnement du club, pas de son propre essai « perso ».
   const ctx = await getAuthContext();
-  const billingUserId = ctx?.current?.clubId ?? user.id;
+  const billingUserId = clubId ?? ctx?.current?.clubId ?? user.id;
 
-  // 2. Lire le profil « facturation » (proprio du club courant ou soi-même)
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select(
-      "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder"
-    )
-    .eq("user_id", billingUserId)
-    .maybeSingle();
+  // Sécurité : le club demandé doit être un membership actif de l'utilisateur
+  // (sauf lecture de son propre profil).
+  if (billingUserId !== user.id) {
+    const allowed = ctx?.memberships.some((m) => m.clubId === billingUserId);
+    if (!allowed) {
+      console.warn(
+        `[BILLING][getSubscriptionStatus] Refus: user=${user.id} non membre du club=${billingUserId}`
+      );
+      return createExpiredSubscription();
+    }
+  }
+
+  // 2. Lire le profil facturation via service role (après contrôle membership).
+  //    Évite qu'une RLS profiles trop stricte masque l'abonnement du club aux
+  //    membres légitimes → faux SUBSCRIPTION_REQUIRED.
+  let profile: BillingProfileRow | null = null;
+  let profileError: { message?: string } | null = null;
+
+  try {
+    const admin = createAdminClient();
+    const result = await admin
+      .from("profiles")
+      .select(
+        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id"
+      )
+      .eq("user_id", billingUserId)
+      .maybeSingle();
+    profile = (result.data as BillingProfileRow | null) ?? null;
+    profileError = result.error;
+  } catch (err) {
+    // Fallback RLS si service role indisponible (ex. env local incomplet)
+    console.warn(
+      "[BILLING][getSubscriptionStatus] Admin indisponible, fallback client session",
+      err
+    );
+    const result = await supabase
+      .from("profiles")
+      .select(
+        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id"
+      )
+      .eq("user_id", billingUserId)
+      .maybeSingle();
+    profile = (result.data as BillingProfileRow | null) ?? null;
+    profileError = result.error;
+  }
+
+  if (profileError) {
+    console.error(
+      "[BILLING][getSubscriptionStatus] Erreur lors de la lecture du profil",
+      profileError
+    );
+    return createExpiredSubscription();
+  }
 
   // 3. Si aucun profil : créer un essai uniquement pour SON compte perso
   if (!profile) {
@@ -114,14 +174,6 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
 
     // Profil créé, retourner l'état trial
     return createTrialSubscription(now);
-  }
-
-  if (profileError) {
-    console.error(
-      "[BILLING][getSubscriptionStatus] Erreur lors de la lecture du profil",
-      profileError
-    );
-    return createExpiredSubscription();
   }
 
   // 4. Bypass fondateur: accès total sans vérification trial/abonnement
@@ -160,6 +212,7 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
 
   const billingCycle = profile.billing_cycle as BillingCycle;
   const status = profile.subscription_status as SubscriptionStatus;
+  const hasStripeSubscription = Boolean(profile.stripe_subscription_id);
 
   // 6. Si le statut est 'active', vérifier que l'abonnement n'est pas expiré
   if (status === "active") {
@@ -184,6 +237,25 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
 
     const now = new Date();
     const isTrialExpired = now > trialEndsAt;
+
+    // Un club déjà lié à Stripe ne doit pas être rétrogradé via la logique trial
+    // (désynchronisation possible webhook / statut resté à « trial »).
+    if (isTrialExpired && hasStripeSubscription) {
+      console.warn(
+        `[BILLING][getSubscriptionStatus] trial expiré mais stripe_subscription_id présent — traité comme active (billing_user_id=${billingUserId})`
+      );
+      return {
+        status: "active",
+        billingCycle,
+        trialStartedAt,
+        trialDaysRemaining: 0,
+        trialEndsAt,
+        isTrialExpired: true,
+        canWrite: true,
+        subscriptionStartedAt,
+        subscriptionEndsAt,
+      };
+    }
 
     if (isTrialExpired) {
       // Mettre à jour le statut en 'expired' (uniquement son propre profil)
@@ -261,9 +333,9 @@ export async function getSubscriptionStatus(): Promise<SubscriptionInfo> {
  *
  * @returns true si l'utilisateur peut écrire, false sinon
  */
-export async function canPerformWriteAction(): Promise<boolean> {
+export async function canPerformWriteAction(clubId?: string): Promise<boolean> {
   try {
-    const subscription = await getSubscriptionStatus();
+    const subscription = await getSubscriptionStatus(clubId);
     return subscription.canWrite;
   } catch (error) {
     console.error("[BILLING][canPerformWriteAction] Erreur", error);

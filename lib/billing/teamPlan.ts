@@ -10,6 +10,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthContext } from "@/lib/auth/rbac";
 import { STANDARD_PRICING, TEAM_PRICING } from "@/lib/billing/pricing";
 
@@ -43,6 +44,32 @@ async function resolveBillingClubId(clubId?: string): Promise<string | null> {
   return ctx?.current?.clubId ?? null;
 }
 
+async function readBillingProfile(billingClubId: string): Promise<{
+  subscription_tier: string | null;
+  subscription_status: string | null;
+  is_founder: boolean | null;
+} | null> {
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("profiles")
+      .select("subscription_tier, is_founder, subscription_status")
+      .eq("user_id", billingClubId)
+      .maybeSingle();
+    if (error) return null;
+    return data;
+  } catch {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("subscription_tier, is_founder, subscription_status")
+      .eq("user_id", billingClubId)
+      .maybeSingle();
+    if (error) return null;
+    return data;
+  }
+}
+
 /**
  * Lit la formule Stripe enregistrée (suivi / analytics — pas de gating fonctionnel).
  */
@@ -52,14 +79,8 @@ export async function getClubSubscriptionTier(
   const billingClubId = await resolveBillingClubId(clubId);
   if (!billingClubId) return "standard";
 
-  const supabase = await createClient();
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("subscription_tier, is_founder, subscription_status")
-    .eq("user_id", billingClubId)
-    .maybeSingle();
-
-  if (error || !profile) {
+  const profile = await readBillingProfile(billingClubId);
+  if (!profile) {
     return "standard";
   }
 
@@ -77,12 +98,7 @@ export async function getClubSubscriptionTier(
 async function hasBillingClubProductAccess(
   billingClubId: string
 ): Promise<boolean> {
-  const supabase = await createClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("subscription_status, is_founder")
-    .eq("user_id", billingClubId)
-    .maybeSingle();
+  const profile = await readBillingProfile(billingClubId);
 
   if (!profile) return false;
   if (profile.is_founder === true) return true;

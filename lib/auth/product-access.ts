@@ -116,11 +116,6 @@ export function pickActiveOrgForProduct(
 ): ProductOrg | null {
   if (orgs.length === 0) return null;
 
-  if (preferredClubId) {
-    const match = orgs.find((o) => o.clubId === preferredClubId);
-    if (match) return match;
-  }
-
   const external = orgs
     .filter((o) => o.clubId !== userId)
     .sort((a, b) => {
@@ -128,6 +123,16 @@ export function pickActiveOrgForProduct(
       const tb = b.acceptedAt ? Date.parse(b.acceptedAt) : 0;
       return tb - ta;
     });
+
+  if (preferredClubId) {
+    const match = orgs.find((o) => o.clubId === preferredClubId);
+    // Ne pas rester collé au club « perso » (club_id = user.id) créé à
+    // l'inscription si l'utilisateur a rejoint un vrai club : sinon la
+    // facturation lit l'essai perso expiré au lieu de l'abonnement du club.
+    if (match && (match.clubId !== userId || external.length === 0)) {
+      return match;
+    }
+  }
 
   if (external.length > 0) return external[0] ?? null;
 

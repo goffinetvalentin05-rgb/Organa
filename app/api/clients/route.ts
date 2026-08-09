@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
   const user = guard.ctx.user;
 
   // Vérifier l'accès en écriture (trial actif ou abonnement)
-  const accessCheck = await requireWriteAccess();
+  const accessCheck = await requireWriteAccess(guard.clubId);
   if (accessCheck.response) {
     return accessCheck.response;
   }

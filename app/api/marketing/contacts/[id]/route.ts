@@ -20,7 +20,7 @@ export async function PUT(
 
     const supabase = await createClient();
 
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }
@@ -99,7 +99,7 @@ export async function DELETE(
 
     const supabase = await createClient();
 
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }

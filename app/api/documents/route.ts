@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
     console.log("[API][documents][POST] User authentifié:", user.id);
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }
@@ -775,7 +775,7 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }
@@ -916,7 +916,7 @@ export async function PATCH(request: NextRequest) {
     const user = guard.ctx.user;
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }

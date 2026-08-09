@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    const accessCheck = await requireWriteAccess();
+    const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }
