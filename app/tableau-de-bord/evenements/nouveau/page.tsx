@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
@@ -16,8 +16,16 @@ import {
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import {
+  emptyEventDraftData,
+  eventDraftStore,
+  type EventDraftData,
+} from "@/lib/drafts/eventDraft";
 
 interface EventType {
   id: string;
@@ -31,6 +39,7 @@ const labelClass = `${dashboardLabelClass} mb-2`;
 export default function NouvelEvenementPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const { isSubmitting, showOverlay, run: runCreateEvent } = useSafeSubmit({ overlayDelayMs: 450 });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -44,6 +53,22 @@ export default function NouvelEvenementPage() {
     endDate: "",
     description: "",
     status: "planned" as "planned" | "completed",
+  });
+
+  const draftData = useMemo<EventDraftData>(() => formData, [formData]);
+  const applyDraftData = useCallback((data: EventDraftData) => {
+    setFormData(data);
+  }, []);
+  const resetDraftForm = useCallback(() => {
+    setFormData(emptyEventDraftData());
+  }, []);
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: eventDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
   });
 
   useEffect(() => {
@@ -114,6 +139,7 @@ export default function NouvelEvenementPage() {
           throw new Error(data.error || t("dashboard.events.createError"));
         }
 
+        clearDraft();
         router.replace("/tableau-de-bord/evenements");
       } catch (error: any) {
         console.error("Error creating event:", error);
@@ -138,6 +164,8 @@ export default function NouvelEvenementPage() {
         title={t("dashboard.events.form.title")}
         subtitle={t("dashboard.events.form.subtitle")}
       />
+
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
       {limitReached && <LimitReachedAlert message={t("dashboard.events.limitReached")} />}
 

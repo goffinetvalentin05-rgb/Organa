@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
 } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import MatchProgramSettings from "@/components/public-page/MatchProgramSettings";
 import PublicLinksSettings, { linksToInputs } from "@/components/public-page/PublicLinksSettings";
 import PremiumSwitch from "@/components/public-page/PremiumSwitch";
@@ -43,6 +44,13 @@ import {
 } from "@/components/ui";
 import type { PublicPageLinkInput, PublicPageSettings } from "@/lib/public-page/types";
 import { normalizePublicPageSlug } from "@/lib/public-page/slug";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  publicPageDraftStore,
+  toPublicPageDraftPayload,
+  type PublicPageDraftData,
+} from "@/lib/drafts/publicPageDraft";
 
 function LogoPreview({
   logoUrl,
@@ -80,6 +88,7 @@ function LogoPreview({
 
 export default function PublicPageSettingsPage() {
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -89,6 +98,55 @@ export default function PublicPageSettingsPage() {
     { id: string; name: string; code: string; registrationPath: string }[]
   >([]);
   const [origin, setOrigin] = useState("");
+
+  const draftData = useMemo(
+    () =>
+      form
+        ? toPublicPageDraftPayload(form, links)
+        : toPublicPageDraftPayload(
+            {
+              enabled: false,
+              slug: null,
+              title: "",
+              description: "",
+              primaryColor: "",
+              logoUrl: null,
+              instagramUrl: "",
+              facebookUrl: "",
+              websiteUrl: "",
+              showBuvette: false,
+              showMatchProgram: false,
+              matchProgramType: null,
+              matchProgramUrl: null,
+              matchProgramPdfPath: null,
+              matchProgramPdfName: null,
+              matchProgramPdfUrl: null,
+              showPublicLinks: false,
+              publicUrlPath: null,
+              buvetteSlug: null,
+            },
+            []
+          ),
+    [form, links]
+  );
+
+  const applyDraftData = useCallback((data: PublicPageDraftData) => {
+    setForm((prev) =>
+      prev
+        ? { ...prev, ...data.form }
+        : ({ ...data.form } as PublicPageSettings)
+    );
+    setLinks(data.links);
+  }, []);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: publicPageDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    enabled: !loading && form !== null,
+    onRestore: applyDraftData,
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -140,6 +198,7 @@ export default function PublicPageSettingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Erreur de sauvegarde");
+      clearDraft();
       setForm(data.settings);
       setLinks(linksToInputs(data.links || []));
       setQrcodeOptions(data.qrcodeOptions || []);
@@ -196,6 +255,8 @@ export default function PublicPageSettingsPage() {
         title={t("dashboard.settings.publicPage.title")}
         subtitle={t("dashboard.settings.publicPage.subtitle")}
       />
+
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
       <SectionCard
         icon={Globe}

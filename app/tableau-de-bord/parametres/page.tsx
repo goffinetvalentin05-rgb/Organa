@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef } from "react";
+import { useState, useEffect, Suspense, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -21,6 +21,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 import { PageLayout, PageHeader, SectionCard, cn, dashboardInputClass, dashboardSelectLgClass, dashboardLabelClass, dashboardHintClass, dashboardGlassCardClass } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
@@ -28,8 +29,15 @@ import UsersAccessCard from "@/components/billing/UsersAccessCard";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { TEAM_PRICING } from "@/lib/billing/pricing";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import {
+  clubSettingsDraftStore,
+  toClubSettingsDraftPayload,
+  type ClubSettingsDraftData,
+} from "@/lib/drafts/clubSettingsDraft";
 
 type ApiErrorBody = {
   error?: string;
@@ -88,6 +96,7 @@ function CheckoutHandler({ onSuccess }: { onSuccess: () => void }) {
 export default function ParametresPage() {
   const router = useRouter();
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [parametres, setParametres] = useState<Parametres | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [canManageTeamAccess, setCanManageTeamAccess] = useState(false);
@@ -133,6 +142,31 @@ export default function ParametresPage() {
   } = useSafeSubmit({ overlayDelayMs: 450 });
   const [saveSuccessPulse, setSaveSuccessPulse] = useState(false);
   const initialFormSignatureRef = useRef<string | null>(null);
+
+  const draftData = useMemo(
+    () => toClubSettingsDraftPayload(formData),
+    [formData]
+  );
+
+  const applyDraftData = useCallback((data: ClubSettingsDraftData) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...data,
+      // Ne jamais restaurer de secrets depuis localStorage
+      resendApiKey: "",
+      resendApiKeyTouched: false,
+      resendKeyConfigured: prev.resendKeyConfigured,
+    }));
+  }, []);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: clubSettingsDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    enabled: !loadingSettings,
+    onRestore: applyDraftData,
+  });
 
   /**
    * Helper pour lire le body d'une Response une seule fois
@@ -559,6 +593,7 @@ export default function ParametresPage() {
       
       // IMPORTANT : Recharger depuis la DB après UPDATE pour garantir la synchronisation
       console.log("[PARAMETRES] UPDATE réussi, rechargement depuis DB...");
+      clearDraft();
       await loadSettingsFromDB();
 
       setSaved(true);
@@ -663,6 +698,7 @@ export default function ParametresPage() {
       </Suspense>
       <PageLayout maxWidth="5xl">
         <PageHeader title={t("dashboard.settings.title")} subtitle={t("dashboard.settings.subtitle")} />
+        <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
 
         {saved && (
           <div className="flex items-center gap-2 rounded-2xl border border-emerald-200/80 bg-emerald-50/95 p-4 text-emerald-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">

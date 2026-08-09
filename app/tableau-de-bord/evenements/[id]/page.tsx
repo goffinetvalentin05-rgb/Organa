@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
@@ -20,6 +20,13 @@ import {
   dashboardLabelClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  eventDraftStore,
+  type EventDraftData,
+} from "@/lib/drafts/eventDraft";
 import EventFinancialChart from "./EventFinancialChart";
 
 interface EventType {
@@ -84,6 +91,7 @@ export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params?.id as string;
+  const { clubId, loading: clubLoading } = usePermissions();
 
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,6 +115,20 @@ export default function EventDetailPage() {
   });
   const [savingRevenue, setSavingRevenue] = useState(false);
   const [revenueModalError, setRevenueModalError] = useState<string | null>(null);
+
+  const draftData = useMemo<EventDraftData>(() => formData, [formData]);
+  const applyDraftData = useCallback((data: EventDraftData) => {
+    setFormData(data);
+  }, []);
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: eventDraftStore,
+    clubId,
+    clubLoading,
+    entityId: eventId,
+    data: draftData,
+    enabled: isEditing && !loading,
+    onRestore: applyDraftData,
+  });
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -206,6 +228,7 @@ export default function EventDetailPage() {
         throw new Error(t("dashboard.events.updateError"));
       }
 
+      clearDraft();
       await loadEvent();
       setIsEditing(false);
     } catch (error: any) {
@@ -351,6 +374,7 @@ export default function EventDetailPage() {
 
       {isEditing ? (
         <GlassCard padding="lg">
+          <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
           <form onSubmit={handleUpdate} className="space-y-6">
             <div>
               <label className={labelClass}>{t("dashboard.events.fields.name")}</label>

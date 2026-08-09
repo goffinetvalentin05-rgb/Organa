@@ -7,7 +7,10 @@ import { useI18n } from "@/components/I18nProvider";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import {
@@ -37,6 +40,10 @@ import {
   isAcceptedImportFile,
   parseSpreadsheetFile,
 } from "@/lib/clients/parseSpreadsheet";
+import {
+  memberImportDraftStore,
+  type MemberImportDraftData,
+} from "@/lib/drafts/memberImportDraft";
 
 type Step = "upload" | "mapping" | "preview" | "importing" | "success";
 
@@ -77,6 +84,7 @@ export default function ImportMembersModal({
 }: ImportMembersModalProps) {
   const { t } = useI18n();
   const vis = useMemberFieldSettings();
+  const { clubId, loading: clubLoading } = usePermissions();
   const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
   const importToastId = "clients-import";
   const [step, setStep] = useState<Step>("upload");
@@ -87,6 +95,45 @@ export default function ImportMembersModal({
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
+
+  const draftData = useMemo<MemberImportDraftData>(() => {
+    const draftStep =
+      step === "preview" || step === "importing" ? "preview" : "mapping";
+    return {
+      step: draftStep,
+      loadedFileName,
+      headers: parsed?.headers ?? [],
+      rows: parsed?.rows ?? [],
+      columnMapping,
+      importRows,
+    };
+  }, [step, loadedFileName, parsed, columnMapping, importRows]);
+
+  const applyDraftData = useCallback((data: MemberImportDraftData) => {
+    setLoadedFileName(data.loadedFileName);
+    setColumnMapping(data.columnMapping);
+    setImportRows(data.importRows);
+    if (data.headers.length > 0) {
+      setParsed({ headers: data.headers, rows: data.rows });
+      setStep(data.step === "preview" && data.importRows.length > 0 ? "preview" : "mapping");
+    } else {
+      setParsed(null);
+      setStep("upload");
+    }
+    setFileError(null);
+  }, []);
+
+  const { clearDraft, showDraftStatus, draftStatusLabel, draftRestored } = useAutoDraft({
+    store: memberImportDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    enabled: open,
+    onRestore: applyDraftData,
+    onEmpty: () => {
+      // Conserve l’état courant à l’ouverture ; reset explicite via handleClose.
+    },
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -131,13 +178,14 @@ export default function ImportMembersModal({
   }, [onClose, reset]);
 
   const handleSuccessClose = useCallback(() => {
+    clearDraft();
     reset();
     if (importResult && onSuccess) {
       onSuccess(importResult.imported, importResult.duplicates);
     } else {
       onClose();
     }
-  }, [importResult, onClose, onSuccess, reset]);
+  }, [clearDraft, importResult, onClose, onSuccess, reset]);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -232,6 +280,7 @@ export default function ImportMembersModal({
           duplicates: data.duplicates ?? 0,
           errors: data.errors ?? 0,
         });
+        clearDraft();
         setStep("success");
         notifySuccess("Import terminé ✓", importToastId);
         onImported();
@@ -240,7 +289,7 @@ export default function ImportMembersModal({
         setStep("preview");
       }
     });
-  }, [importRows, onImported, t, isSubmitting, run]);
+  }, [importRows, onImported, t, isSubmitting, run, clearDraft]);
 
   const handleDownloadTemplate = useCallback(() => {
     const headers = buildCsvTemplateHeaders(vis, fieldLabels);
@@ -293,6 +342,14 @@ export default function ImportMembersModal({
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
+          <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
+          {draftRestored && step !== "upload" && step !== "success" ? (
+            <p className={`${dashboardHintClass} mb-4`}>
+              Le fichier source n’est pas conservé localement. Mapping et aperçu
+              restaurés — resélectionnez le fichier uniquement si vous recommencez
+              depuis l’upload.
+            </p>
+          ) : null}
           {step === "upload" && !parsed && (
             <UploadStep
               fileError={fileError}

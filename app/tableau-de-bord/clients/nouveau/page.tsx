@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -12,12 +12,21 @@ import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSe
 import MemberRoleSelect from "@/components/members/MemberRoleSelect";
 import MemberCategorySelect from "@/components/members/MemberCategorySelect";
 import { dashboardInnerPanelClass, dashboardLabelClass, dashboardSecondaryButtonClass } from "@/components/ui";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
+import {
+  emptyMemberDraftData,
+  memberDraftStore,
+  type MemberDraftData,
+} from "@/lib/drafts/memberDraft";
 
 export default function NouveauClientPage() {
   const router = useRouter();
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const vis = useMemberFieldSettings();
   const [formData, setFormData] = useState({
     nom: "",
@@ -40,6 +49,22 @@ export default function NouveauClientPage() {
     type: "LIMIT_REACHED" | "OTHER";
     message: string;
   } | null>(null);
+
+  const draftData = useMemo<MemberDraftData>(() => formData, [formData]);
+  const applyDraftData = useCallback((data: MemberDraftData) => {
+    setFormData(data);
+  }, []);
+  const resetDraftForm = useCallback(() => {
+    setFormData(emptyMemberDraftData());
+  }, []);
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: memberDraftStore,
+    clubId,
+    clubLoading,
+    data: draftData,
+    onRestore: applyDraftData,
+    onEmpty: resetDraftForm,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +145,7 @@ export default function NouveauClientPage() {
           return;
         }
 
+        clearDraft();
         router.push("/tableau-de-bord/clients");
       } catch (err) {
         if (process.env.NODE_ENV === "development") {
@@ -136,6 +162,7 @@ export default function NouveauClientPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
       <div className="flex items-center gap-2 text-sm">
         <Link href="/tableau-de-bord/clients" className="text-white/70 hover:text-white transition-colors">
           Clients

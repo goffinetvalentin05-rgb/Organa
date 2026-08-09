@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -10,6 +10,13 @@ import { ArrowRight, Users } from "@/lib/icons";
 import { useMemberFieldSettings } from "@/components/member-fields/MemberFieldSettingsProvider";
 import MemberRoleSelect from "@/components/members/MemberRoleSelect";
 import MemberCategorySelect from "@/components/members/MemberCategorySelect";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import {
+  memberDraftStore,
+  type MemberDraftData,
+} from "@/lib/drafts/memberDraft";
 
 interface ClientFormData {
   id: string;
@@ -36,6 +43,7 @@ export default function EditClientForm({
 }: EditClientFormProps) {
   const router = useRouter();
   const { t } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const vis = useMemberFieldSettings();
   const [formData, setFormData] = useState({
     nom: initialData.nom || "",
@@ -54,6 +62,19 @@ export default function EditClientForm({
     type: "LIMIT_REACHED" | "OTHER";
     message: string;
   } | null>(null);
+
+  const draftData = useMemo<MemberDraftData>(() => formData, [formData]);
+  const applyDraftData = useCallback((data: MemberDraftData) => {
+    setFormData(data);
+  }, []);
+  const { clearDraft, showDraftStatus, draftStatusLabel } = useAutoDraft({
+    store: memberDraftStore,
+    clubId,
+    clubLoading,
+    entityId: clientId,
+    data: draftData,
+    onRestore: applyDraftData,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +138,7 @@ export default function EditClientForm({
         return;
       }
 
+      clearDraft();
       router.push("/tableau-de-bord/clients");
     } catch {
       setError({
@@ -129,6 +151,7 @@ export default function EditClientForm({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
       <div className="flex items-center gap-2 text-sm">
         <Link
           href="/tableau-de-bord/clients"

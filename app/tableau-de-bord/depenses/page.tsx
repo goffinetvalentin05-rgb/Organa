@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { Eye, Edit, Trash, Download, Receipt } from "@/lib/icons";
 import {
   PageLayout,
@@ -21,9 +21,16 @@ import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
+import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
+import { useAutoDraft } from "@/hooks/useAutoDraft";
+import { usePermissions } from "@/lib/auth/permissions-client";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import {
+  expenseDraftStore,
+  type ExpenseDraftData,
+} from "@/lib/drafts/expenseDraft";
 
 type DepenseStatut = "a_payer" | "paye";
 
@@ -89,6 +96,7 @@ const getStatutColor = (statut: string) => {
 
 export default function DepensesPage() {
   const { t, locale } = useI18n();
+  const { clubId, loading: clubLoading } = usePermissions();
   const [depenses, setDepenses] = useState<Depense[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,6 +134,90 @@ export default function DepensesPage() {
     pieceJointe: null as File | null,
     attachmentUrl: "",
     eventId: "",
+  });
+
+  const createDraftData = useMemo<ExpenseDraftData>(
+    () => ({
+      label: formData.label,
+      amount: formData.amount,
+      date: formData.date,
+      status: formData.status,
+      notes: formData.notes,
+      eventId: formData.eventId,
+      attachmentUrl: "",
+      attachmentPending: Boolean(formData.pieceJointe),
+    }),
+    [formData]
+  );
+
+  const editDraftData = useMemo<ExpenseDraftData>(
+    () => ({
+      label: editFormData.label,
+      amount: editFormData.amount,
+      date: editFormData.date,
+      status: editFormData.status,
+      notes: editFormData.notes,
+      eventId: editFormData.eventId,
+      attachmentUrl: editFormData.attachmentUrl,
+      attachmentPending: Boolean(editFormData.pieceJointe),
+    }),
+    [editFormData]
+  );
+
+  const applyCreateDraft = useCallback((data: ExpenseDraftData) => {
+    setFormData((prev) => ({
+      ...prev,
+      label: data.label,
+      amount: data.amount,
+      date: data.date,
+      status: data.status,
+      notes: data.notes,
+      eventId: data.eventId,
+      pieceJointe: null,
+    }));
+  }, []);
+
+  const applyEditDraft = useCallback((data: ExpenseDraftData) => {
+    setEditFormData((prev) => ({
+      ...prev,
+      label: data.label,
+      amount: data.amount,
+      date: data.date,
+      status: data.status,
+      notes: data.notes,
+      eventId: data.eventId,
+      attachmentUrl: data.attachmentUrl,
+      pieceJointe: null,
+    }));
+  }, []);
+
+  const {
+    clearDraft: clearCreateDraft,
+    showDraftStatus: showCreateDraftStatus,
+    draftStatusLabel: createDraftStatusLabel,
+    draftRestored: createDraftRestored,
+  } = useAutoDraft({
+    store: expenseDraftStore,
+    clubId,
+    clubLoading,
+    data: createDraftData,
+    enabled: showForm,
+    onRestore: applyCreateDraft,
+  });
+
+  const {
+    clearDraft: clearEditDraft,
+    showDraftStatus: showEditDraftStatus,
+    draftStatusLabel: editDraftStatusLabel,
+    draftRestored: editDraftRestored,
+  } = useAutoDraft({
+    store: expenseDraftStore,
+    clubId,
+    clubLoading,
+    entityId: selectedDepense?.id ?? null,
+    data: editDraftData,
+    enabled: showEditModal && Boolean(selectedDepense?.id),
+    onRestore: applyEditDraft,
   });
 
   const formatMontant = (montant: number) => {
@@ -442,6 +534,7 @@ export default function DepensesPage() {
           throw new Error(messageParts.join(" | "));
         }
 
+        clearCreateDraft();
         await loadDepenses();
         resetForm();
         setShowForm(false);
@@ -513,6 +606,7 @@ export default function DepensesPage() {
         throw new Error(t("dashboard.expenses.updateError"));
       }
 
+      clearEditDraft();
       await loadDepenses();
       resetEditForm();
       setShowEditModal(false);
@@ -649,6 +743,12 @@ export default function DepensesPage() {
 
       {showForm ? (
         <GlassCard padding="lg">
+          <DraftAutosaveHint show={showCreateDraftStatus} label={createDraftStatusLabel} />
+          {createDraftRestored ? (
+            <p className="mb-3 text-xs text-white/55">
+              La pièce jointe n’est pas conservée localement — resélectionnez le fichier si besoin.
+            </p>
+          ) : null}
           <form onSubmit={handleCreateSubmit} className="space-y-4">
           {successMessage && (
             <p className="text-sm text-green-600">{successMessage}</p>
@@ -994,6 +1094,12 @@ export default function DepensesPage() {
               </ActionButton>
             </div>
 
+            <DraftAutosaveHint show={showEditDraftStatus} label={editDraftStatusLabel} />
+            {editDraftRestored ? (
+              <p className="text-xs text-slate-500">
+                La nouvelle pièce jointe n’est pas conservée localement — resélectionnez le fichier si besoin.
+              </p>
+            ) : null}
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
