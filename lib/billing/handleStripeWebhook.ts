@@ -55,6 +55,25 @@ export async function handleStripeWebhook(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
+  // Garde production : jamais traiter un événement Stripe TEST ici.
+  if (event.livemode === false) {
+    console.error(
+      `[WEBHOOK][stripe] rejected_test_event ${JSON.stringify({
+        event_id: event.id,
+        event_type: event.type,
+        livemode: false,
+      })}`
+    );
+    return NextResponse.json(
+      {
+        received: true,
+        event_id: event.id,
+        rejected: "test_mode_event",
+      },
+      { status: 200 }
+    );
+  }
+
   const eventCtx = { eventId: event.id, eventType: event.type };
 
   console.log(
