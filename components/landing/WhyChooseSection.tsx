@@ -133,20 +133,26 @@ export default function WhyChooseSection() {
     });
   }, [cards.length]);
 
+  const hasCenteredMobileRef = useRef(false);
+
   useEffect(() => {
-    if (!scrollerRef.current) return;
-    const el = scrollerRef.current.querySelector<HTMLElement>(
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const el = scroller.querySelector<HTMLElement>(
       `[data-fan-index="${active}"]`,
     );
     if (!el) return;
-    // Only scroll mobile scroller into view when it's the visible layout
-    if (window.matchMedia("(max-width: 767px)").matches) {
-      el.scrollIntoView({
-        behavior: reduceMotion ? "auto" : "smooth",
-        inline: "center",
-        block: "nearest",
-      });
-    }
+    /* Scroll horizontal du carrousel uniquement — jamais scrollIntoView
+       (Safari iOS remonte la page vers cette section au montage). */
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+    const targetLeft = el.offsetLeft - (scroller.clientWidth - el.offsetWidth) / 2;
+    const isFirst = !hasCenteredMobileRef.current;
+    hasCenteredMobileRef.current = true;
+    scroller.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: isFirst || reduceMotion ? "auto" : "smooth",
+    });
   }, [active, reduceMotion]);
 
   return (

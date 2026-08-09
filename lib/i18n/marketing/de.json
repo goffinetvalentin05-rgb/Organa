@@ -45,6 +45,8 @@
   },
   "trustStats": {
     "ariaLabel": "Vertrauensindikatoren",
+    "clubsTitle": "Bereits von Schweizer Vereinen genutzt",
+    "clubsAriaLabel": "Vereine, die Obillz nutzen",
     "items": [
       {
         "id": "swiss",
@@ -154,7 +156,9 @@
       "plannings": "Freiwillige tragen sich selbst in die Pläne ein.",
       "recapitulatifs": "Zusammenfassungen werden automatisch erzeugt."
     },
-    "orbitHint": "Entdecken Sie jede Funktion und sehen Sie, wie sie Ihre Vereinsverwaltung verändert.",
+    "orbitHint": "Klicken Sie auf eine Funktion",
+    "learnMore": "Mehr erfahren",
+    "closeFeature": "Schliessen",
     "compareBefore": "Vorher",
     "compareAfter": "Mit Obillz",
     "compareResult": "Ergebnis",

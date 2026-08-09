@@ -2,93 +2,25 @@
 
 import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
-import {
-  Building2,
-  CalendarDays,
-  ClipboardList,
-  Coffee,
-  CreditCard,
-  FilePlus,
-  Globe,
-  Handshake,
-  LayoutDashboard,
-  Mail,
-  QrCode,
-  Receipt,
-  Settings,
-  ShoppingBag,
-  Users,
-  Wallet,
-} from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useI18n } from "@/components/I18nProvider";
-import { featureOrbitMocks } from "@/components/landing/FeaturesOrbitMocks";
 import { easePremium } from "@/components/landing/landing-motion";
 import { getTranslationValue } from "@/lib/i18n";
+import {
+  getSportFeatureById,
+  SPORT_FEATURE_ORDER,
+  sportFeatureIcons,
+  type SportFeatureId,
+} from "@/lib/sport-features";
 
-export type OrbitFeatureId =
-  | "statistiques"
-  | "membres"
-  | "cotisations"
-  | "factures"
-  | "encaissements"
-  | "revenus"
-  | "charges"
-  | "sponsors"
-  | "evenements"
-  | "buvette"
-  | "plannings"
-  | "pv"
-  | "qrcodes"
-  | "communication"
-  | "pagePublique"
-  | "parametres";
+export type OrbitFeatureId = SportFeatureId;
 
 type OrbitFeatureContent = {
   id: OrbitFeatureId;
   label: string;
   description: string;
-  before: string;
-  after: string;
-  result: string;
-};
-
-const FEATURE_ORDER: OrbitFeatureId[] = [
-  "statistiques",
-  "membres",
-  "cotisations",
-  "factures",
-  "encaissements",
-  "revenus",
-  "charges",
-  "sponsors",
-  "evenements",
-  "buvette",
-  "plannings",
-  "pv",
-  "qrcodes",
-  "communication",
-  "pagePublique",
-  "parametres",
-];
-
-const FEATURE_ICONS: Record<OrbitFeatureId, LucideIcon> = {
-  statistiques: LayoutDashboard,
-  membres: Users,
-  cotisations: Wallet,
-  factures: Receipt,
-  encaissements: CreditCard,
-  revenus: ShoppingBag,
-  charges: Building2,
-  sponsors: Handshake,
-  evenements: CalendarDays,
-  buvette: Coffee,
-  plannings: ClipboardList,
-  pv: FilePlus,
-  qrcodes: QrCode,
-  communication: Mail,
-  pagePublique: Globe,
-  parametres: Settings,
 };
 
 type FloatLayout = {
@@ -116,7 +48,7 @@ function buildUniformFloatLayout(count: number): FloatLayout[] {
   });
 }
 
-const FEATURE_FLOAT_LAYOUT = buildUniformFloatLayout(FEATURE_ORDER.length);
+const FEATURE_FLOAT_LAYOUT = buildUniformFloatLayout(SPORT_FEATURE_ORDER.length);
 
 function highlightPhrase(full: string, hours: string, minutes: string): ReactNode {
   const hIdx = full.indexOf(hours);
@@ -269,38 +201,96 @@ function FeatureCard({
   );
 }
 
+function SelectedFeatureBubble({
+  feature,
+  Icon,
+  accent,
+  href,
+  learnMoreLabel,
+  closeLabel,
+  reduceMotion,
+  onClose,
+}: {
+  feature: OrbitFeatureContent;
+  Icon: LucideIcon;
+  accent: string;
+  href: string;
+  learnMoreLabel: string;
+  closeLabel: string;
+  reduceMotion: boolean | null;
+  onClose: () => void;
+}) {
+  return (
+    <motion.div
+      role="dialog"
+      aria-label={feature.label}
+      className="features-orbit-selected-card"
+      style={{ "--selected-accent": accent } as CSSProperties}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+      transition={{
+        duration: reduceMotion ? 0 : 0.32,
+        ease: easePremium,
+      }}
+    >
+      <div className="features-orbit-selected-card__top">
+        <span
+          className="features-orbit-selected-card__icon"
+          style={{ color: accent, backgroundColor: `${accent}18` }}
+        >
+          <Icon className="h-4 w-4" strokeWidth={1.9} aria-hidden />
+        </span>
+        <div className="features-orbit-selected-card__copy">
+          <h3 className="features-orbit-selected-card__title">{feature.label}</h3>
+          <p className="features-orbit-selected-card__text">{feature.description}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="features-orbit-selected-card__close"
+          aria-label={closeLabel}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      <Link href={href} className="features-orbit-selected-card__link">
+        {learnMoreLabel}
+        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+      </Link>
+    </motion.div>
+  );
+}
+
 export default function FeaturesOrbitShowcase() {
   const { locale, t } = useI18n();
   const reduceMotion = useReducedMotion();
   const stageRef = useRef<HTMLDivElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
-  const detailRef = useRef<HTMLDivElement>(null);
   const stageInView = useInView(stageRef, { once: true, amount: 0.18 });
   const mobileInView = useInView(mobileRef, { once: true, amount: 0.12 });
   const [activeId, setActiveId] = useState<OrbitFeatureId | null>(null);
   const [hoveredId, setHoveredId] = useState<OrbitFeatureId | null>(null);
 
-  const raw = getTranslationValue(locale, "marketing.modules.orbitFeatures");
-  const fromI18n = (Array.isArray(raw) ? raw : []) as OrbitFeatureContent[];
+  const features = useMemo(() => {
+    const raw = getTranslationValue(locale, "marketing.modules.orbitFeatures");
+    const fromI18n = (Array.isArray(raw) ? raw : []) as OrbitFeatureContent[];
 
-  const features = useMemo(
-    () =>
-      FEATURE_ORDER.map((id) => {
-        const found = fromI18n.find((f) => f.id === id);
-        return {
-          id,
-          label: found?.label ?? id,
-          description: found?.description ?? "",
-          before: found?.before ?? "",
-          after: found?.after ?? "",
-          result: found?.result ?? "",
-        } satisfies OrbitFeatureContent;
-      }),
-    [fromI18n]
-  );
+    return SPORT_FEATURE_ORDER.map((id) => {
+      const found = fromI18n.find((f) => f.id === id);
+      const catalog = getSportFeatureById(id);
+      return {
+        id,
+        label: found?.label ?? catalog?.title ?? id,
+        description: found?.description ?? catalog?.description ?? "",
+      } satisfies OrbitFeatureContent;
+    });
+  }, [locale]);
 
   const active = features.find((f) => f.id === activeId) ?? null;
-  const ActiveIcon = active ? FEATURE_ICONS[active.id] : null;
+  const activeCatalog = activeId ? getSportFeatureById(activeId) : null;
+  const ActiveIcon = active ? sportFeatureIcons[active.id] : null;
   const focusId = hoveredId ?? activeId;
 
   const titleAccent = t("marketing.modules.titleAccent");
@@ -309,16 +299,28 @@ export default function FeaturesOrbitShowcase() {
   const subtitleTemplate = t("marketing.modules.subtitle");
   const hoursWord = t("marketing.modules.subtitleHours");
   const minutesWord = t("marketing.modules.subtitleMinutes");
+  const learnMoreLabel = t("marketing.modules.learnMore");
+  const closeLabel = t("marketing.modules.closeFeature");
+  const clickHint = t("marketing.modules.orbitHint");
 
   const handleSelect = (id: OrbitFeatureId) => {
-    const next = activeId === id ? null : id;
-    setActiveId(next);
-    if (next && typeof window !== "undefined" && window.innerWidth < 960) {
-      window.requestAnimationFrame(() => {
-        detailRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      });
-    }
+    setActiveId((current) => (current === id ? null : id));
   };
+
+  const renderSelectedBubble = (keyPrefix: string) =>
+    active && ActiveIcon && activeCatalog ? (
+      <SelectedFeatureBubble
+        key={`${keyPrefix}-${active.id}`}
+        feature={active}
+        Icon={ActiveIcon}
+        accent={activeCatalog.accent}
+        href={`/fonctionnalites/${activeCatalog.slug}`}
+        learnMoreLabel={learnMoreLabel}
+        closeLabel={closeLabel}
+        reduceMotion={reduceMotion}
+        onClose={() => setActiveId(null)}
+      />
+    ) : null;
 
   const centerCopy = (
     <>
@@ -340,7 +342,7 @@ export default function FeaturesOrbitShowcase() {
 
   return (
     <div className="features-orbit">
-      {/* Desktop — constellation flottante sur le fond de section */}
+      {/* Desktop — constellation flottante */}
       <div ref={stageRef} className="features-constellation features-constellation--desktop">
         <div className="features-constellation__stage">
           <div className="features-constellation__core">
@@ -351,6 +353,21 @@ export default function FeaturesOrbitShowcase() {
               transition={{ duration: 0.75, ease: easePremium }}
             >
               {centerCopy}
+              <div className="features-orbit-card-slot" aria-live="polite">
+                <AnimatePresence mode="wait">
+                  {renderSelectedBubble("desktop") ?? (
+                    <motion.p
+                      key="hint"
+                      className="features-orbit-hint"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {clickHint}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           </div>
 
@@ -361,7 +378,7 @@ export default function FeaturesOrbitShowcase() {
           >
             {features.map((feature, index) => {
               const layout = FEATURE_FLOAT_LAYOUT[index]!;
-              const Icon = FEATURE_ICONS[feature.id];
+              const Icon = sportFeatureIcons[feature.id];
               const isActive = activeId === feature.id;
               const dimmed = focusId !== null && focusId !== feature.id;
 
@@ -391,7 +408,7 @@ export default function FeaturesOrbitShowcase() {
         </div>
       </div>
 
-      {/* Mobile — grille compacte d’icônes */}
+      {/* Mobile — grille + carte compacte */}
       <div ref={mobileRef} className="features-constellation-mobile">
         <div className="features-constellation-mobile__glow" aria-hidden />
         <motion.div
@@ -401,19 +418,35 @@ export default function FeaturesOrbitShowcase() {
           transition={{ duration: 0.65, ease: easePremium }}
         >
           {centerCopy}
+          <div className="features-orbit-card-slot features-orbit-card-slot--mobile" aria-live="polite">
+            <AnimatePresence mode="wait">
+              {renderSelectedBubble("mobile") ?? (
+                <motion.p
+                  key="hint-mobile"
+                  className="features-orbit-hint"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {clickHint}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
 
         <div className="features-constellation-mobile__grid" role="list">
           {features.map((feature, index) => {
-            const Icon = FEATURE_ICONS[feature.id];
+            const Icon = sportFeatureIcons[feature.id];
             const isActive = activeId === feature.id;
+            const dimmed = focusId !== null && focusId !== feature.id;
             return (
               <div key={feature.id} className="features-constellation-mobile__item" role="listitem">
                 <FeatureCard
                   feature={feature}
                   Icon={Icon}
                   isActive={isActive}
-                  dimmed={false}
+                  dimmed={dimmed}
                   index={index}
                   inView={mobileInView}
                   reduceMotion={reduceMotion}
@@ -424,78 +457,6 @@ export default function FeaturesOrbitShowcase() {
             );
           })}
         </div>
-      </div>
-
-      <div ref={detailRef} className="features-orbit-detail-slot" aria-live="polite">
-        <AnimatePresence mode="wait">
-          {active && ActiveIcon ? (
-            <motion.article
-              key={active.id}
-              className="features-orbit-detail"
-              initial={
-                reduceMotion ? false : { opacity: 0, y: 28, scale: 0.975, filter: "blur(5px)" }
-              }
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: 16, scale: 0.985, filter: "blur(3px)" }}
-              transition={{ duration: 0.52, ease: easePremium }}
-            >
-              <div className="features-orbit-detail__glow" aria-hidden />
-              <div className="features-orbit-detail__grid">
-                <div className="features-orbit-detail__copy">
-                  <div className="features-orbit-detail__heading">
-                    <span className="features-orbit-detail__badge">
-                      <ActiveIcon className="h-5 w-5" strokeWidth={1.85} aria-hidden />
-                    </span>
-                    <div>
-                      <h3 className="features-orbit-detail__title">{active.label}</h3>
-                      <p className="features-orbit-detail__text">{active.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="features-orbit-journey">
-                    <div className="features-orbit-journey__step features-orbit-journey__step--before">
-                      <p className="features-orbit-journey__label">
-                        {t("marketing.modules.compareBefore")}
-                      </p>
-                      <p className="features-orbit-journey__text">{active.before}</p>
-                    </div>
-                    <div className="features-orbit-journey__connector" aria-hidden>
-                      <span />
-                    </div>
-                    <div className="features-orbit-journey__step features-orbit-journey__step--after">
-                      <p className="features-orbit-journey__label">
-                        {t("marketing.modules.compareAfter")}
-                      </p>
-                      <p className="features-orbit-journey__text">{active.after}</p>
-                    </div>
-                    <div className="features-orbit-journey__connector" aria-hidden>
-                      <span />
-                    </div>
-                    <div className="features-orbit-journey__step features-orbit-journey__step--result">
-                      <p className="features-orbit-journey__label">
-                        {t("marketing.modules.compareResult")}
-                      </p>
-                      <p className="features-orbit-journey__text">{active.result}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="features-orbit-detail__visual">
-                  {featureOrbitMocks[active.id]?.() ?? featureOrbitMocks.generic?.() ?? null}
-                </div>
-              </div>
-            </motion.article>
-          ) : (
-            <motion.p
-              key="hint"
-              className="features-orbit-hint"
-              initial={false}
-              animate={{ opacity: 1 }}
-            >
-              {t("marketing.modules.orbitHint")}
-            </motion.p>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

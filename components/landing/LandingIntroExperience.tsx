@@ -1,43 +1,59 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import LandingPreloader from "@/components/landing/LandingPreloader";
+import { useEffect } from "react";
 
 /**
- * Module-scope : évite de rejouer le loader lors d’une navigation client Next.js.
- * Se réinitialise à chaque vrai rechargement de page.
+ * Landing Obillz Sport — pas de splash/loader.
+ * Force l’ouverture en haut du hero (surtout Safari iOS / restauration de scroll).
  */
-let loaderShownThisDocument = false;
+export default function LandingIntroExperience() {
+  useEffect(() => {
+    const previousRestoration =
+      "scrollRestoration" in history ? history.scrollRestoration : undefined;
 
-type LandingIntroExperienceProps = {
-  /** Appelé une fois quand le préloader a terminé (immédiat si déjà joué). */
-  onReady?: () => void;
-};
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
 
-export default function LandingIntroExperience({ onReady }: LandingIntroExperienceProps) {
-  const [isLoading, setIsLoading] = useState(() => !loaderShownThisDocument);
-  const onReadyRef = useRef(onReady);
-  onReadyRef.current = onReady;
+    const resetScroll = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
 
-  const finishLoader = useCallback(() => {
-    loaderShownThisDocument = true;
-    setIsLoading(false);
+    resetScroll();
+
+    const raf = window.requestAnimationFrame(resetScroll);
+    /* Safari iOS restaure souvent le scroll juste après le premier layout */
+    const t0 = window.setTimeout(resetScroll, 0);
+    const t1 = window.setTimeout(resetScroll, 50);
+    const t2 = window.setTimeout(resetScroll, 150);
+
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        resetScroll();
+      }
+    };
+
+    const onLoad = () => {
+      resetScroll();
+    };
+
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("load", onLoad);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(t0);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("load", onLoad);
+      if ("scrollRestoration" in history && previousRestoration !== undefined) {
+        history.scrollRestoration = previousRestoration;
+      }
+    };
   }, []);
 
-  useEffect(() => {
-    if (!isLoading) {
-      onReadyRef.current?.();
-    }
-  }, [isLoading]);
-
-  /* Filet de sécurité si le preloader ne callback pas */
-  useEffect(() => {
-    if (!isLoading) return;
-    const fallback = window.setTimeout(() => {
-      finishLoader();
-    }, 2200);
-    return () => window.clearTimeout(fallback);
-  }, [isLoading, finishLoader]);
-
-  return <LandingPreloader active={isLoading} onFinished={finishLoader} />;
+  return null;
 }

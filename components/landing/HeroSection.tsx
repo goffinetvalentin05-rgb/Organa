@@ -4,7 +4,11 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
+import HeroClubProof from "@/components/landing/HeroClubProof";
 import HeroDemoVideo from "@/components/landing/HeroDemoVideo";
+import HeroFloatingTrustCards, {
+  HeroFloatingTrustMobileStack,
+} from "@/components/landing/HeroFloatingTrustCards";
 import {
   easePremium,
   heroCtaEnter,
@@ -12,7 +16,6 @@ import {
   heroTitleLine,
   staggerContainer,
 } from "@/components/landing/landing-motion";
-import TrustStatsSection from "@/components/landing/TrustStatsSection";
 
 export default function HeroSection() {
   const { t } = useI18n();
@@ -110,12 +113,16 @@ export default function HeroSection() {
           </motion.div>
 
           <div className="landing-hero-video-slot">
-            <HeroDemoVideo />
+            <div className="landing-hero-video-compose">
+              <HeroFloatingTrustCards />
+              <HeroDemoVideo />
+              <HeroFloatingTrustMobileStack />
+            </div>
           </div>
         </motion.div>
       </div>
 
-      <TrustStatsSection />
+      <HeroClubProof />
     </section>
   );
 }

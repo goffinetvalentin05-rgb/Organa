@@ -45,6 +45,8 @@
   },
   "trustStats": {
     "ariaLabel": "Indicateurs de confiance",
+    "clubsTitle": "Déjà utilisé par des clubs suisses",
+    "clubsAriaLabel": "Clubs utilisant Obillz",
     "items": [
       {
         "id": "swiss",
@@ -190,7 +192,9 @@
       "plannings": "Les bénévoles s'inscrivent eux-mêmes aux plannings.",
       "recapitulatifs": "Les récapitulatifs sont générés automatiquement."
     },
-    "orbitHint": "Explorez chaque fonctionnalité et voyez comment elle transforme votre gestion.",
+    "orbitHint": "Cliquez sur une fonctionnalité",
+    "learnMore": "En savoir plus",
+    "closeFeature": "Fermer",
     "compareBefore": "Avant",
     "compareAfter": "Avec Obillz",
     "compareResult": "Résultat",

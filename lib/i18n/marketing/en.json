@@ -45,6 +45,8 @@
   },
   "trustStats": {
     "ariaLabel": "Trust indicators",
+    "clubsTitle": "Already used by Swiss clubs",
+    "clubsAriaLabel": "Clubs using Obillz",
     "items": [
       {
         "id": "swiss",
@@ -154,7 +156,9 @@
       "plannings": "Volunteers sign themselves up to schedules.",
       "recapitulatifs": "Recaps are generated automatically."
     },
-    "orbitHint": "Explore each feature and see how it transforms the way you run your club.",
+    "orbitHint": "Click a feature",
+    "learnMore": "Learn more",
+    "closeFeature": "Close",
     "compareBefore": "Before",
     "compareAfter": "With Obillz",
     "compareResult": "Result",

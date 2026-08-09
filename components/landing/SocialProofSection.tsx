@@ -10,25 +10,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { landingSectionShellClass } from "@/components/landing/LandingSectionIntro";
 import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
-
-type ClubLogo = {
-  id: string;
-  name: string;
-  src: string;
-};
-
-const CLUB_LOGOS: ClubLogo[] = [
-  {
-    id: "fontenais",
-    name: "Fontenais Football Club",
-    src: "/images/clubs/fontenais-fc.png",
-  },
-  {
-    id: "porrentruy",
-    name: "FC Porrentruy",
-    src: "/images/clubs/fc-porrentruy.png",
-  },
-];
+import { CLUB_LOGOS } from "@/lib/landing/club-logos";
 
 const AUTO_MS = 4000;
 
