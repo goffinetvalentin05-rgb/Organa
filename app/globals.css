@@ -9056,7 +9056,7 @@ body.app-bg:has(.obillz-landing-home) {
 @media (max-width: 899px) {
   .lp-demo-invite {
     padding-top: clamp(4.5rem, 10vw, 7rem);
-    padding-bottom: clamp(1.35rem, 4vw, 2rem);
+    padding-bottom: clamp(1.75rem, 5vw, 2.5rem);
     overflow-x: clip;
   }
 
@@ -9065,13 +9065,16 @@ body.app-bg:has(.obillz-landing-home) {
   }
 
   .lp-demo-invite__stage {
-    overflow: visible;
-    padding-bottom: 0.7rem;
+    --lp-demo-phone-w: min(64vw, 15rem);
+    --lp-demo-phone-h: calc(var(--lp-demo-phone-w) * 1018 / 862);
+    overflow: hidden;
+    border-radius: var(--lp-demo-radius);
+    padding-bottom: 0;
   }
 
   .lp-demo-invite__panel {
     height: auto;
-    padding: 2.1rem 1.35rem 0;
+    padding: 2.1rem 1.35rem 0.85rem;
   }
 
   .lp-demo-invite__actions {
@@ -9082,8 +9085,8 @@ body.app-bg:has(.obillz-landing-home) {
   .lp-demo-invite__spacer {
     display: block;
     width: 100%;
-    height: min(62vw, 18.25rem);
-    margin-top: 1.75rem;
+    height: var(--lp-demo-phone-h);
+    margin-top: 1.35rem;
   }
 
   .lp-demo-invite__visual {
@@ -9091,41 +9094,45 @@ body.app-bg:has(.obillz-landing-home) {
     left: 50%;
     right: auto;
     top: auto;
-    bottom: 0;
+    bottom: 0.85rem;
     z-index: 3;
-    width: min(78vw, 18.5rem);
+    width: var(--lp-demo-phone-w);
     margin: 0;
     overflow: visible;
     transform: translateX(-50%);
     justify-content: center;
     align-items: flex-end;
     clip-path: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+    filter: none;
   }
 
   .lp-demo-invite__visual::before {
-    left: 12%;
-    right: 12%;
-    bottom: 6%;
-    height: 42%;
+    display: none;
   }
 
   .lp-demo-invite__photo {
     width: 100%;
-    max-width: 18.5rem;
-    max-height: min(64vw, 17.75rem);
+    max-width: none;
+    max-height: none;
     height: auto;
     object-fit: contain;
-    object-position: center top;
+    object-position: center center;
+    mask-image: none;
+    -webkit-mask-image: none;
+    filter: none;
   }
 }
 
 @media (max-width: 639px) {
   .lp-demo-invite__stage {
     --lp-demo-radius: 1.65rem;
+    --lp-demo-phone-w: min(68vw, 14.25rem);
   }
 
   .lp-demo-invite__panel {
-    padding: 1.75rem 1.15rem 0;
+    padding: 1.75rem 1.15rem 0.75rem;
   }
 
   .lp-demo-invite__cta {
@@ -9138,54 +9145,39 @@ body.app-bg:has(.obillz-landing-home) {
   }
 
   .lp-demo-invite__spacer {
-    height: min(64vw, 16.5rem);
-    margin-top: 1.55rem;
+    margin-top: 1.2rem;
   }
 
   .lp-demo-invite__visual {
-    width: min(82vw, 17.25rem);
-    bottom: 0;
-  }
-
-  .lp-demo-invite__photo {
-    max-width: 17.25rem;
-    max-height: min(66vw, 16.25rem);
+    bottom: 0.75rem;
   }
 }
 
 @media (max-width: 430px) {
-  .lp-demo-invite__spacer {
-    height: min(64vw, 15.75rem);
+  .lp-demo-invite__stage {
+    --lp-demo-phone-w: min(70vw, 13.5rem);
   }
 
   .lp-demo-invite__visual {
-    width: min(84vw, 16.75rem);
-  }
-
-  .lp-demo-invite__photo {
-    max-width: 16.75rem;
-    max-height: min(62vw, 15.25rem);
+    bottom: 0.7rem;
   }
 }
 
 @media (max-width: 389px) {
   .lp-demo-invite__panel {
-    padding: 1.55rem 1rem 0;
+    padding: 1.55rem 1rem 0.65rem;
+  }
+
+  .lp-demo-invite__stage {
+    --lp-demo-phone-w: min(72vw, 12.75rem);
   }
 
   .lp-demo-invite__spacer {
-    height: min(66vw, 14.5rem);
-    margin-top: 1.25rem;
+    margin-top: 1.05rem;
   }
 
   .lp-demo-invite__visual {
-    width: min(85vw, 15.5rem);
-    bottom: 0;
-  }
-
-  .lp-demo-invite__photo {
-    max-width: 15.5rem;
-    max-height: min(64vw, 14rem);
+    bottom: 0.65rem;
   }
 }
 
