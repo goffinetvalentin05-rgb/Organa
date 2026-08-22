@@ -9056,18 +9056,66 @@ body.app-bg:has(.obillz-landing-home) {
 @media (max-width: 899px) {
   .lp-demo-invite {
     padding-top: clamp(4.5rem, 10vw, 7rem);
+    padding-bottom: clamp(1.35rem, 4vw, 2rem);
+    overflow-x: clip;
+  }
+
+  .lp-demo-invite .lp-wrap {
+    overflow: visible;
+  }
+
+  .lp-demo-invite__stage {
+    overflow: visible;
+    padding-bottom: 0.7rem;
   }
 
   .lp-demo-invite__panel {
-    padding-bottom: 0;
+    height: auto;
+    padding: 2.1rem 1.35rem 0;
+  }
+
+  .lp-demo-invite__actions {
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+  }
+
+  .lp-demo-invite__spacer {
+    display: block;
+    width: 100%;
+    height: min(62vw, 18.25rem);
+    margin-top: 1.75rem;
   }
 
   .lp-demo-invite__visual {
-    margin: -2.75rem auto 0;
+    position: absolute;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 0;
+    z-index: 3;
+    width: min(78vw, 18.5rem);
+    margin: 0;
+    overflow: visible;
+    transform: translateX(-50%);
+    justify-content: center;
+    align-items: flex-end;
+    clip-path: none;
+  }
+
+  .lp-demo-invite__visual::before {
+    left: 12%;
+    right: 12%;
+    bottom: 6%;
+    height: 42%;
   }
 
   .lp-demo-invite__photo {
-    width: min(24rem, 92%);
+    width: 100%;
+    max-width: 18.5rem;
+    max-height: min(64vw, 17.75rem);
+    height: auto;
+    object-fit: contain;
+    object-position: center top;
   }
 }
 
@@ -9085,12 +9133,59 @@ body.app-bg:has(.obillz-landing-home) {
     justify-content: space-between;
   }
 
+  .lp-demo-invite__actions {
+    margin-top: 1.35rem;
+  }
+
+  .lp-demo-invite__spacer {
+    height: min(64vw, 16.5rem);
+    margin-top: 1.55rem;
+  }
+
   .lp-demo-invite__visual {
-    margin-top: -1.75rem;
+    width: min(82vw, 17.25rem);
+    bottom: 0;
   }
 
   .lp-demo-invite__photo {
-    width: min(21.5rem, 100%);
+    max-width: 17.25rem;
+    max-height: min(66vw, 16.25rem);
+  }
+}
+
+@media (max-width: 430px) {
+  .lp-demo-invite__spacer {
+    height: min(64vw, 15.75rem);
+  }
+
+  .lp-demo-invite__visual {
+    width: min(84vw, 16.75rem);
+  }
+
+  .lp-demo-invite__photo {
+    max-width: 16.75rem;
+    max-height: min(62vw, 15.25rem);
+  }
+}
+
+@media (max-width: 389px) {
+  .lp-demo-invite__panel {
+    padding: 1.55rem 1rem 0;
+  }
+
+  .lp-demo-invite__spacer {
+    height: min(66vw, 14.5rem);
+    margin-top: 1.25rem;
+  }
+
+  .lp-demo-invite__visual {
+    width: min(85vw, 15.5rem);
+    bottom: 0;
+  }
+
+  .lp-demo-invite__photo {
+    max-width: 15.5rem;
+    max-height: min(64vw, 14rem);
   }
 }
 
