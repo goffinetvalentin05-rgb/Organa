@@ -5,8 +5,9 @@
   },
   "nav": {
     "platform": "Plattform",
-    "modules": "Module",
+    "modules": "Funktionen",
     "howItWorks": "So funktioniert's",
+    "inPractice": "In der Praxis",
     "pricing": "Preise",
     "faq": "FAQ",
     "login": "Anmelden",
@@ -23,7 +24,7 @@
     "subtitle": "Obillz vereinfacht Beiträge, Einsatzpläne, Veranstaltungen und administrative Aufgaben Ihres Vereins und bündelt die gesamte Verwaltung in einer einzigen Plattform.",
     "keywords": "Mitglieder • Beiträge • Rechnungen • Events",
     "ctaPrimary": "Obillz kostenlos testen",
-    "ctaSecondary": "So funktioniert's",
+    "ctaSecondary": "In der Praxis ansehen",
     "hubAriaLabel": "Übersicht der Obillz-Module",
     "convergenceAriaLabel": "Vereinsverwaltung vereint in Obillz",
     "hubBaseline": "Ihr ganzer Verein, an einem Ort.",
@@ -205,12 +206,13 @@
     }
   },
   "modules": {
-    "label": "01 / DIE PLATTFORM",
-    "titleLine1": "Die gesamte Verwaltung Ihres Vereins.",
-    "titleLine2": "An einem Ort vereint.",
+    "label": "Alles an einem Ort",
+    "titleLine1": "Alles, was es braucht,",
+    "titleLine2": "um Ihren Verein zu führen.",
     "titleAccent": "Stunden an Verwaltung werden zu wenigen Minuten.",
-    "title": "Die gesamte Verwaltung Ihres Vereins. An einem Ort vereint. Stunden an Verwaltung werden zu wenigen Minuten.",
-    "subtitle": "Obillz vereint alle Funktionen Ihres Vereins in einer Plattform und verwandelt Aufgaben, die früher {hours} dauerten, in Aktionen von wenigen {minutes}.",
+    "title": "Alles, was es braucht, um Ihren Verein zu führen.",
+    "subtitle": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation, Sponsoring… Obillz vereint die Werkzeuge Ihres Vereins in einem Raum.",
+    "orbitLead": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation… alles vereint in Obillz.",
     "subtitleHours": "Stunden",
     "subtitleMinutes": "Minuten",
     "titleAccentHours": "Stunden",
@@ -220,7 +222,7 @@
       "plannings": "Freiwillige tragen sich selbst in die Pläne ein.",
       "recapitulatifs": "Zusammenfassungen werden automatisch erzeugt."
     },
-    "orbitHint": "Klicken Sie auf eine Funktion",
+    "orbitHint": "Klicken Sie auf eine Funktion, um sie zu entdecken.",
     "learnMore": "Mehr erfahren",
     "closeFeature": "Schliessen",
     "compareBefore": "Vorher",
@@ -274,8 +276,8 @@
       },
       {
         "id": "revenus",
-        "label": "Einnahmen",
-        "description": "Produkte und Nebeneinnahmen des Vereins verfolgen.",
+        "label": "Finanzen",
+        "description": "Behalten Sie Einnahmen, Nebenumsätze und die Finanzlage im Blick.",
         "before": "Trikots, Tombolas und Essen auf getrennten Blättern notieren.",
         "after": "Jede Produkt-Einnahme am gleichen Ort erfassen.",
         "result": "Klarer Blick darauf, was der Verein wirklich erwirtschaftet.",
@@ -626,6 +628,85 @@
     "hideExtraFeatures": "Weniger anzeigen",
     "exploreFooter": "Entdecken Sie jede Funktion und sehen Sie, wie sie Ihre Vereinsverwaltung verändert."
   },
+  "showcases": {
+    "label": "In der Praxis",
+    "titleLine1": "Einige konkrete",
+    "titleLine2": "Beispiele.",
+    "subtitle": "Beiträge, Pläne, Kommunikation, Sponsoring… sehen Sie, wie Obillz den Vereinsalltag konkret vereinfacht.",
+    "cotisations": {
+      "label": "Beiträge",
+      "title": "Sie wissen endlich, wer bezahlt hat.",
+      "description": "Erstellen, versenden und sehen Sie Zahlungen auf einen Blick — statt sie in Excel, WhatsApp oder verstreuten Dateien zu verfolgen.",
+      "season": "Saison 2025/26",
+      "paid": "Bezahlt",
+      "pending": "Ausstehend",
+      "collected": "Beiträge eingegangen",
+      "paymentReceived": "+ 1 Zahlung erhalten"
+    },
+    "plannings": {
+      "label": "Pläne",
+      "title": "Der Plan entsteht ohne Hin und Her.",
+      "description": "Organisieren Sie Verfügbarkeiten, verteilen Sie Zeitfenster und teilen Sie die Infos klar mit dem Vorstand oder den Freiwilligen.",
+      "day": "Samstag, 12. April · Wochenendspiel",
+      "full": "Voll",
+      "confirmed": "Bestätigt",
+      "assign": "Mitglied zuweisen",
+      "member": "Vereinsmitglied",
+      "volunteers": "Freiwillige eingetragen",
+      "ready": "Plan bereit",
+      "exportPdf": "Als PDF exportieren"
+    },
+    "communication": {
+      "label": "Kommunikation",
+      "title": "Die richtigen Infos, am richtigen Ort.",
+      "description": "Bündeln Sie Club-Nachrichten, Erinnerungen und Infos, ohne nur von verstreuten WhatsApp-Gruppen abzuhängen.",
+      "announcement": "Vereinsmitteilung",
+      "audience": "Zielgruppe",
+      "audienceManual": "Manuelle Auswahl",
+      "audienceAll": "Alle Kontakte",
+      "subject": "Betreff",
+      "subjectValue": "Generalversammlung — 12. Mai",
+      "message": "Finden Sie die Traktanden und bestätigen Sie Ihre Anwesenheit mit einem Klick.",
+      "send": "Senden",
+      "sent": "Gesendet ✓",
+      "sentConfirm": "An {count} Empfänger gesendet",
+      "reminderSent": "Erinnerung gesendet"
+    },
+    "evenements": {
+      "label": "Anlässe",
+      "title": "Das Turnier, ohne die Tabelle.",
+      "description": "Anmeldungen, Teams und Einnahmen an einem Ort — das Komitee folgt dem Anlass in Echtzeit.",
+      "planned": "Geplant",
+      "date": "Datum",
+      "revenue": "Einnahmen",
+      "expenses": "Ausgaben",
+      "inscriptions": "Anmeldungen"
+    },
+    "sponsoring": {
+      "label": "Sponsoring",
+      "title": "Ihre Sponsoren bleiben im Blick.",
+      "description": "Behalten Sie Partnerschaften, Beträge, Fristen und Dokumente rund um die Sponsoren des Vereins klar im Blick.",
+      "sponsorName": "Garage du Centre",
+      "contractTitle": "Vertrag 2026/27",
+      "amount": "CHF 2’500.00",
+      "amountLabel": "Betrag",
+      "dueLabel": "Frist",
+      "startDate": "01.07.2026",
+      "endDate": "30.06.2027",
+      "statusActive": "Aktiv",
+      "document": "Vertrags-PDF"
+    }
+  },
+  "timeSaved": {
+    "label": "Weniger Administration",
+    "title": "Stunden an Verwaltung werden zu wenigen Minuten.",
+    "description": "Obillz bündelt die zeitaufwendigsten Aufgaben des Vereins — ohne Hin und Her, verstreute Dateien und manuelle Nachverfolgung.",
+    "aside": "Weniger Excel. Weniger Streuung. Mehr Zeit.",
+    "personAlt": "Ein Vereinsverantwortlicher, überlastet von der Administration.",
+    "collected": "Beiträge eingegangen",
+    "paymentReceived": "+ 1 Zahlung erhalten",
+    "planningReady": "Plan bereit"
+  },
   "clubReassurance": {
     "title": "Mit Vereinen gedacht, für Vereine gemacht.",
     "subtitle": "Obillz ist keine reine Verwaltungssoftware. Die Plattform basiert auf dem Vereinsalltag, den Bedürfnissen des Vorstands und dem Feedback aktiver Vereine.",
@@ -645,7 +726,7 @@
     ]
   },
   "howItWorks": {
-    "label": "02 / SO FUNKTIONIERT'S",
+    "label": "So funktioniert's",
     "title": "Übernehmen Sie Ihren Verein — ganz einfach.",
     "subtitle": "In wenigen Schritten zentralisiert Ihr Vorstand die Organisation und gewinnt Zeit.",
     "cta": "Kostenlos testen",
@@ -784,6 +865,26 @@
     "message": "Hallo, ich möchte mehr über Obillz erfahren.",
     "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
+  },
+  "demoInvite": {
+    "label": "Obillz Demo",
+    "title": "Möchten Sie Obillz in Aktion sehen?",
+    "description": "Fordern Sie eine Demo an, stellen Sie Ihre Fragen oder tauschen Sie sich direkt aus — und sehen Sie, ob Obillz zu Ihrem Verein passt.",
+    "cta": "Demo anfragen",
+    "ctaSecondary": "Kostenlos testen",
+    "imageAlt": "Hand tippt auf das WhatsApp-Symbol eines iPhones",
+    "whatsappMessage": "Hallo, ich möchte eine Demo von Obillz für meinen Verein anfragen.",
+    "bubbleTitle": "Demo in 10 Minuten",
+    "bubbleBody": "Sehen Sie, wie Obillz Beiträge, Pläne, Dokumente und die Kommunikation Ihres Vereins zentralisiert.",
+    "phone": {
+      "club": "FC Horizon",
+      "fees": "Beiträge",
+      "feesMeta": "12 bezahlt",
+      "planning": "Planung",
+      "planningMeta": "Sa. 10:00",
+      "docs": "Dokumente",
+      "docsMeta": "8 Dateien"
+    }
   },
   "pricing": {
     "label": "Preise",
@@ -978,6 +1079,7 @@
     "title": "Ihr Verein verdient mehr als eine Excel-Tabelle.",
     "subtitle": "Verwaltung zentralisieren und ab sofort Zeit sparen.",
     "cta": "Obillz kostenlos testen",
+    "discover": "Funktionen entdecken",
     "loginPrompt": "Bereits ein Konto? Anmelden"
   },
   "footer": {

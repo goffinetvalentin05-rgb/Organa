@@ -5,8 +5,9 @@
   },
   "nav": {
     "platform": "Plateforme",
-    "modules": "Modules",
+    "modules": "Fonctionnalités",
     "howItWorks": "Comment ça marche",
+    "inPractice": "En pratique",
     "pricing": "Tarifs",
     "faq": "FAQ",
     "login": "Connexion",
@@ -23,7 +24,7 @@
     "subtitle": "Des membres aux cotisations, en passant par les manifestations, les plannings et la communication, Obillz regroupe tout dans une seule plateforme et simplifie la gestion de votre club pour faire gagner des heures aux bénévoles.",
     "keywords": "Membres • Cotisations • Factures • Événements",
     "ctaPrimary": "Tester Obillz gratuitement",
-    "ctaSecondary": "Voir comment ça marche",
+    "ctaSecondary": "Voir en pratique",
     "hubAriaLabel": "Aperçu des modules Obillz",
     "convergenceAriaLabel": "La gestion du club réunie dans Obillz",
     "hubBaseline": "Tout votre club, au même endroit.",
@@ -205,12 +206,13 @@
     }
   },
   "modules": {
-    "label": "01 / LA PLATEFORME",
-    "titleLine1": "Toute la gestion de votre club.",
-    "titleLine2": "Réunie au même endroit.",
+    "label": "Tout au même endroit",
+    "titleLine1": "Tout ce qu’il faut",
+    "titleLine2": "pour gérer votre club.",
     "titleAccent": "Des heures de gestion transformées en quelques minutes.",
-    "title": "Toute la gestion de votre club. Réunie au même endroit. Des heures de gestion transformées en quelques minutes.",
-    "subtitle": "Obillz réunit toutes les fonctionnalités de votre club dans une seule plateforme et transforme des tâches qui prenaient parfois des {hours} en actions réalisables en quelques {minutes}.",
+    "title": "Tout ce qu’il faut pour gérer votre club.",
+    "subtitle": "Membres, cotisations, plannings, finances, communication, sponsoring… Obillz réunit les outils de votre club dans un seul espace.",
+    "orbitLead": "Membres, cotisations, plannings, finances, communication… tout est réuni dans Obillz.",
     "subtitleHours": "heures",
     "subtitleMinutes": "minutes",
     "titleAccentHours": "heures",
@@ -220,7 +222,7 @@
       "plannings": "Les bénévoles s'inscrivent eux-mêmes aux plannings.",
       "recapitulatifs": "Les récapitulatifs sont générés automatiquement."
     },
-    "orbitHint": "Cliquez sur une fonctionnalité",
+    "orbitHint": "Cliquez sur une fonctionnalité pour la découvrir.",
     "learnMore": "En savoir plus",
     "closeFeature": "Fermer",
     "compareBefore": "Avant",
@@ -274,8 +276,8 @@
       },
       {
         "id": "revenus",
-        "label": "Revenus",
-        "description": "Suivez les produits et revenus annexes du club.",
+        "label": "Finances",
+        "description": "Suivez recettes, produits et vision financière du club.",
         "before": "Noter maillots, tombolas et repas sur des feuilles séparées.",
         "after": "Enregistrez chaque revenu produit au même endroit.",
         "result": "Une vision claire de ce que le club génère réellement.",
@@ -626,6 +628,85 @@
     "hideExtraFeatures": "Réduire",
     "exploreFooter": "Explorez chaque fonctionnalité et voyez comment elle transforme votre gestion."
   },
+  "showcases": {
+    "label": "En pratique",
+    "titleLine1": "Quelques exemples",
+    "titleLine2": "concrets.",
+    "subtitle": "Cotisations, plannings, communication, sponsoring… découvrez comment Obillz simplifie concrètement les tâches du quotidien du club.",
+    "cotisations": {
+      "label": "Cotisations",
+      "title": "Vous savez enfin qui a payé.",
+      "description": "Créez, envoyez et visualisez les paiements d’un coup d’œil — plutôt que de les suivre dans Excel, WhatsApp ou des fichiers dispersés.",
+      "season": "Saison 2025/26",
+      "paid": "Payée",
+      "pending": "En attente",
+      "collected": "Cotisations encaissées",
+      "paymentReceived": "+ 1 paiement reçu"
+    },
+    "plannings": {
+      "label": "Plannings",
+      "title": "Le planning se fait sans allers-retours.",
+      "description": "Organisez les disponibilités, répartissez les créneaux et partagez les informations clairement avec le comité ou les bénévoles.",
+      "day": "Samedi 12 avril · Match du week-end",
+      "full": "Complet",
+      "confirmed": "Confirmé",
+      "assign": "Affecter un membre",
+      "member": "Membre club",
+      "volunteers": "bénévoles inscrits",
+      "ready": "Planning prêt",
+      "exportPdf": "Exporter en PDF"
+    },
+    "communication": {
+      "label": "Communication",
+      "title": "Les bonnes infos, au bon endroit.",
+      "description": "Centralisez vos messages, rappels et informations club sans dépendre uniquement de groupes WhatsApp dispersés.",
+      "announcement": "Annonce club",
+      "audience": "Audience",
+      "audienceManual": "Sélection manuelle",
+      "audienceAll": "Tous les contacts",
+      "subject": "Objet",
+      "subjectValue": "Assemblée générale — 12 mai",
+      "message": "Retrouvez l’ordre du jour et confirmez votre présence en un clic.",
+      "send": "Envoyer",
+      "sent": "Envoyé ✓",
+      "sentConfirm": "Envoyée à {count} destinataires",
+      "reminderSent": "Rappel envoyé"
+    },
+    "evenements": {
+      "label": "Événements",
+      "title": "Le tournoi, sans le tableur.",
+      "description": "Inscriptions, équipes et recettes au même endroit — le comité suit la manifestation en temps réel.",
+      "planned": "Planifié",
+      "date": "Date",
+      "revenue": "Recettes",
+      "expenses": "Dépenses",
+      "inscriptions": "Inscriptions"
+    },
+    "sponsoring": {
+      "label": "Sponsoring",
+      "title": "Vos sponsors restent suivis.",
+      "description": "Gardez une vue claire sur les partenariats, les montants, les échéances et les documents liés aux sponsors du club.",
+      "sponsorName": "Garage du Centre",
+      "contractTitle": "Contrat 2026/27",
+      "amount": "CHF 2’500.00",
+      "amountLabel": "Montant",
+      "dueLabel": "Échéance",
+      "startDate": "01.07.2026",
+      "endDate": "30.06.2027",
+      "statusActive": "Actif",
+      "document": "Contrat PDF"
+    }
+  },
+  "timeSaved": {
+    "label": "Moins d’administratif",
+    "title": "Des heures de gestion transformées en quelques minutes.",
+    "description": "Obillz centralise les tâches les plus chronophages du club pour éviter les allers-retours, les documents dispersés et les suivis manuels.",
+    "aside": "Moins d’Excel. Moins de dispersion. Plus de temps.",
+    "personAlt": "Un responsable de club, saturé par la gestion administrative.",
+    "collected": "Cotisations encaissées",
+    "paymentReceived": "+ 1 paiement reçu",
+    "planningReady": "Planning prêt"
+  },
   "clubReassurance": {
     "title": "Pensé avec les clubs, pour les clubs.",
     "subtitle": "Obillz n'est pas un simple logiciel administratif. La plateforme est construite à partir de la réalité du terrain, des besoins des comités et des retours des clubs utilisateurs.",
@@ -645,7 +726,7 @@
     ]
   },
   "howItWorks": {
-    "label": "02 / COMMENT ÇA MARCHE",
+    "label": "Comment ça marche",
     "title": "Prenez en main votre club, simplement.",
     "subtitle": "En quelques étapes, votre comité centralise son organisation et commence à gagner du temps.",
     "cta": "Tester gratuitement",
@@ -784,6 +865,26 @@
     "message": "Bonjour, je souhaite en savoir plus sur Obillz.",
     "whatsappPhone": "41788739065",
     "logoAlt": "Obillz"
+  },
+  "demoInvite": {
+    "label": "Démo Obillz",
+    "title": "Vous souhaitez voir Obillz en action ?",
+    "description": "Demandez une démo, posez vos questions ou échangez directement pour voir si Obillz correspond à votre club.",
+    "cta": "Demander une démo",
+    "ctaSecondary": "Tester gratuitement",
+    "imageAlt": "Main appuyant sur l’icône WhatsApp d’un iPhone",
+    "whatsappMessage": "Bonjour, je souhaite demander une démo d’Obillz pour mon club.",
+    "bubbleTitle": "Démo en 10 minutes",
+    "bubbleBody": "Découvrez comment Obillz centralise les cotisations, les plannings, les documents et la communication de votre club.",
+    "phone": {
+      "club": "FC Horizon",
+      "fees": "Cotisations",
+      "feesMeta": "12 payées",
+      "planning": "Planning",
+      "planningMeta": "Sam. 10:00",
+      "docs": "Documents",
+      "docsMeta": "8 fichiers"
+    }
   },
   "pricing": {
     "label": "Tarifs",
@@ -978,6 +1079,7 @@
     "title": "Votre club mérite mieux qu'un fichier Excel.",
     "subtitle": "Centralisez votre gestion et gagnez du temps dès maintenant.",
     "cta": "Tester Obillz gratuitement",
+    "discover": "Découvrir les fonctionnalités",
     "loginPrompt": "Déjà un compte ? Connexion"
   },
   "footer": {

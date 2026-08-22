@@ -100,10 +100,10 @@ export default function LandingFooter() {
   const year = new Date().getFullYear();
 
   const productLinks = [
-    { href: "#comment-ca-marche", label: t("marketing.nav.howItWorks") },
-    { href: "#modules", label: t("marketing.nav.modules") },
-    { href: "#tarifs", label: t("marketing.nav.pricing") },
-    { href: "#faq", label: t("marketing.nav.faq") },
+    { href: "/#modules", label: t("marketing.nav.modules") },
+    { href: "/#en-pratique", label: t("marketing.nav.inPractice") },
+    { href: "/tarifs", label: t("marketing.nav.pricing") },
+    { href: "/#faq", label: t("marketing.nav.faq") },
   ];
 
   const legalLinks = [

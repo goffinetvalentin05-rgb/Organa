@@ -11,15 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
-import {
-  CentralizedMock,
-  ClubCreationMock,
-  CommitteeMock,
-  MemberImportMock,
-  type MockLabels,
-} from "@/components/landing/HowItWorksMocks";
+import { PracticeStepVisual } from "@/components/landing/ProductShowcaseVisuals";
 
-type Step = { title: string; description: string };
+type Step = { label: string; title: string; description: string };
 
 const STEP_NUMBERS = ["01", "02", "03", "04"] as const;
 const STEP_CONTENT_ID = "how-it-works-step-content";
@@ -29,6 +23,12 @@ const MOBILE_VISUAL_PANEL_ID = "how-it-works-mobile-visual-panel";
 const STEP_DURATION_MS = 4500;
 const RESUME_DELAY_MS = 2200;
 const SWIPE_THRESHOLD_PX = 48;
+const visualFade = {
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+  transition: { duration: 0.42, ease: easePremium },
+} as const;
 
 function useStepAutoplay() {
   const reduceMotion = useReducedMotion();
@@ -121,17 +121,20 @@ function useStepAutoplay() {
 }
 
 function StepNav({
+  steps,
   activeIndex,
   onSelect,
 }: {
+  steps: Step[];
   activeIndex: number;
   onSelect: (index: number, event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
-    <nav className="how-it-works-step-nav relative flex flex-row gap-3 lg:flex-col lg:gap-5" aria-label="Étapes">
+    <nav className="how-it-works-step-nav relative flex flex-row gap-3.5 lg:flex-col lg:gap-8" aria-label="Étapes">
       <span className="how-it-works-step-rail" aria-hidden />
       {STEP_NUMBERS.map((num, index) => {
         const isActive = activeIndex === index;
+        const step = steps[index];
         return (
           <button
             key={num}
@@ -141,10 +144,10 @@ function StepNav({
             aria-current={isActive ? "step" : undefined}
             aria-selected={isActive}
             aria-controls={STEP_CONTENT_ID}
-            aria-label={`Étape ${num}`}
+            aria-label={step ? `${num} — ${step.label}` : `Étape ${num}`}
           >
             <span
-              className={`how-it-works-step-dot flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 sm:h-10 sm:w-10 sm:text-xs ${
+              className={`how-it-works-step-dot flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 sm:h-11 sm:w-11 sm:text-[13px] ${
                 isActive ? "how-it-works-step-dot--active how-it-works-blue-fill text-white" : "how-it-works-step-dot--idle"
               }`}
             >
@@ -173,29 +176,30 @@ function StepContent({
   return (
     <div
       id={STEP_CONTENT_ID}
-      className="relative min-h-[160px] sm:min-h-[220px] md:min-h-[240px]"
+      className="relative min-h-[220px] sm:min-h-[280px] md:min-h-[320px]"
       aria-live="polite"
       aria-atomic="true"
     >
       <AnimatePresence mode="wait">
         <motion.div
           key={activeIndex}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.4, ease: easePremium }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.42, ease: easePremium }}
           className="min-w-0"
         >
           <p
-            className="how-it-works-blue-text display-title select-none text-[clamp(2.5rem,12vw,6.75rem)] leading-[0.88]"
+            className="how-it-works-blue-text display-title select-none text-[clamp(3rem,11vw,7.25rem)] leading-[0.86]"
             aria-hidden
           >
             {num}
           </p>
-          <h3 className="how-it-works-step-title mt-2 text-[1.15rem] font-bold tracking-tight sm:mt-1 sm:text-2xl md:text-[1.65rem]">
+          <p className="how-it-works-step-kicker">{step.label}</p>
+          <h3 className="how-it-works-step-title mt-3 text-[1.2rem] font-bold tracking-tight sm:mt-3.5 sm:text-2xl md:text-[1.75rem]">
             {step.title}
           </h3>
-          <p className="how-it-works-step-desc mx-auto mt-2.5 max-w-md text-[0.9375rem] leading-relaxed sm:mt-3 sm:text-[1.05rem] lg:mx-0">
+          <p className="how-it-works-step-desc mx-auto mt-3.5 max-w-md text-[0.975rem] leading-relaxed sm:mt-4 sm:text-[1.0625rem] lg:mx-0">
             {step.description}
           </p>
         </motion.div>
@@ -206,10 +210,8 @@ function StepContent({
 
 function VisualPanel({
   activeIndex,
-  mockLabels,
 }: {
   activeIndex: number;
-  mockLabels: MockLabels;
 }) {
   return (
     <div
@@ -219,23 +221,20 @@ function VisualPanel({
       aria-atomic="true"
     >
       <div className="how-it-works-visual-stage__glow" aria-hidden />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -12 }}
-          transition={{ duration: 0.4, ease: easePremium }}
-          className="how-it-works-visual-stage__card relative z-[1] w-full"
-        >
-          {activeIndex === 0 ? <ClubCreationMock labels={mockLabels.step1} /> : null}
-          {activeIndex === 1 ? (
-            <MemberImportMock labels={mockLabels.step2} active={true} />
-          ) : null}
-          {activeIndex === 2 ? <CommitteeMock labels={mockLabels.step3} /> : null}
-          {activeIndex === 3 ? <CentralizedMock labels={mockLabels.step4} /> : null}
-        </motion.div>
-      </AnimatePresence>
+      <div className="how-it-works-visual-stage__frame">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeIndex}
+            initial={visualFade.initial}
+            animate={visualFade.animate}
+            exit={visualFade.exit}
+            transition={visualFade.transition}
+            className="how-it-works-visual-stage__layer"
+          >
+            <PracticeStepVisual stepIndex={activeIndex} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -243,11 +242,9 @@ function VisualPanel({
 function DesktopHowItWorks({
   intro,
   steps,
-  mockLabels,
 }: {
   intro: ReactNode;
   steps: Step[];
-  mockLabels: MockLabels;
 }) {
   const { activeIndex, selectStep } = useStepAutoplay();
   const reduceMotion = useReducedMotion();
@@ -259,45 +256,47 @@ function DesktopHowItWorks({
   };
 
   return (
-    <div className="how-it-works-desktop grid items-center gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-8 xl:gap-12">
+    <div className="how-it-works-desktop grid items-center gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:gap-12 xl:gap-16">
       <motion.div
-        className="how-it-works-desktop__copy flex min-w-0 flex-col gap-8 sm:gap-10 lg:max-w-[34rem] lg:justify-self-center xl:max-w-[36rem]"
+        className="how-it-works-desktop__copy flex min-w-0 flex-col gap-12 sm:gap-14 lg:max-w-[40rem] lg:justify-self-start"
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewportOnce}
         transition={{ duration: 0.65, ease: easePremium, delay: 0.08 }}
       >
         {intro}
-        <div className="flex flex-col gap-6 sm:gap-6 lg:flex-row lg:items-start">
+        <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
           <div className="flex justify-center lg:justify-start">
-            <StepNav activeIndex={activeIndex} onSelect={onSelect} />
+            <StepNav steps={steps} activeIndex={activeIndex} onSelect={onSelect} />
           </div>
-          <div className="min-w-0 flex-1 pt-0.5 text-center lg:text-left">
+          <div className="min-w-0 flex-1 pt-1 text-center lg:text-left">
             <StepContent steps={steps} activeIndex={activeIndex} />
           </div>
         </div>
       </motion.div>
 
       <motion.div
-        className="how-it-works-desktop__visual flex w-full items-center justify-center px-1 sm:px-2 lg:px-3"
+        className="how-it-works-desktop__visual flex w-full items-center justify-center"
         initial={reduceMotion ? false : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewportOnce}
         transition={{ duration: 0.7, ease: easePremium, delay: 0.18 }}
       >
-        <VisualPanel activeIndex={activeIndex} mockLabels={mockLabels} />
+        <VisualPanel activeIndex={activeIndex} />
       </motion.div>
     </div>
   );
 }
 
 function MobileProgressBar({
+  steps,
   activeIndex,
   progressKey,
   filling,
   held,
   onSelect,
 }: {
+  steps: Step[];
   activeIndex: number;
   progressKey: number;
   filling: boolean;
@@ -308,6 +307,7 @@ function MobileProgressBar({
     <nav className="how-it-works-mobile-progress" aria-label="Progression des étapes">
       {STEP_NUMBERS.map((num, index) => {
         const isActive = activeIndex === index;
+        const step = steps[index];
         return (
           <button
             key={num}
@@ -315,7 +315,7 @@ function MobileProgressBar({
             className="how-it-works-mobile-progress__segment"
             onClick={() => onSelect(index)}
             aria-current={isActive ? "step" : undefined}
-            aria-label={`Étape ${num}`}
+            aria-label={step ? `${num} — ${step.label}` : `Étape ${num}`}
             aria-controls={MOBILE_STEP_CONTENT_ID}
           >
             <span className="how-it-works-mobile-progress__track" aria-hidden>
@@ -346,11 +346,9 @@ function MobileProgressBar({
 function MobileStepBody({
   steps,
   activeIndex,
-  direction,
 }: {
   steps: Step[];
   activeIndex: number;
-  direction: number;
 }) {
   const step = steps[activeIndex] ?? steps[0]!;
   const num = STEP_NUMBERS[activeIndex] ?? STEP_NUMBERS[0];
@@ -362,19 +360,19 @@ function MobileStepBody({
       aria-live="polite"
       aria-atomic="true"
     >
-      <AnimatePresence mode="wait" custom={direction} initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeIndex}
-          custom={direction}
-          initial={{ opacity: 0, x: direction * 28 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction * -22 }}
-          transition={{ duration: 0.38, ease: easePremium }}
+          initial={visualFade.initial}
+          animate={visualFade.animate}
+          exit={visualFade.exit}
+          transition={visualFade.transition}
           className="min-w-0"
         >
           <p className="how-it-works-blue-text display-title how-it-works-mobile-number select-none" aria-hidden>
             {num}
           </p>
+          <p className="how-it-works-step-kicker">{step.label}</p>
           <h3 className="how-it-works-mobile-step-title">{step.title}</h3>
           <p className="how-it-works-mobile-step-desc">{step.description}</p>
         </motion.div>
@@ -385,12 +383,8 @@ function MobileStepBody({
 
 function MobileVisualPanel({
   activeIndex,
-  mockLabels,
-  direction,
 }: {
   activeIndex: number;
-  mockLabels: MockLabels;
-  direction: number;
 }) {
   return (
     <div
@@ -400,44 +394,31 @@ function MobileVisualPanel({
       aria-atomic="true"
     >
       <div className="how-it-works-mobile-visual__glow" aria-hidden />
-      <AnimatePresence mode="wait" custom={direction} initial={false}>
-        <motion.div
-          key={activeIndex}
-          custom={direction}
-          initial={{ opacity: 0, x: direction * 36 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction * -28 }}
-          transition={{ duration: 0.4, ease: easePremium }}
-          className="relative w-full"
-        >
-          {activeIndex === 0 ? (
-            <ClubCreationMock labels={mockLabels.step1} compact />
-          ) : null}
-          {activeIndex === 1 ? (
-            <MemberImportMock labels={mockLabels.step2} active compact />
-          ) : null}
-          {activeIndex === 2 ? (
-            <CommitteeMock labels={mockLabels.step3} compact />
-          ) : null}
-          {activeIndex === 3 ? (
-            <CentralizedMock labels={mockLabels.step4} compact />
-          ) : null}
-        </motion.div>
-      </AnimatePresence>
+      <div className="how-it-works-mobile-visual__frame">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeIndex}
+            initial={visualFade.initial}
+            animate={visualFade.animate}
+            exit={visualFade.exit}
+            transition={visualFade.transition}
+            className="how-it-works-mobile-visual__layer"
+          >
+            <PracticeStepVisual stepIndex={activeIndex} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
 
 function MobileHowItWorks({
   steps,
-  mockLabels,
 }: {
   steps: Step[];
-  mockLabels: MockLabels;
 }) {
   const {
     activeIndex,
-    direction,
     progressKey,
     filling,
     held,
@@ -477,6 +458,7 @@ function MobileHowItWorks({
       onPointerCancel={onPointerCancel}
     >
       <MobileProgressBar
+        steps={steps}
         activeIndex={activeIndex}
         progressKey={progressKey}
         filling={filling}
@@ -484,12 +466,8 @@ function MobileHowItWorks({
         onSelect={selectStep}
       />
 
-      <MobileStepBody steps={steps} activeIndex={activeIndex} direction={direction} />
-      <MobileVisualPanel
-        activeIndex={activeIndex}
-        mockLabels={mockLabels}
-        direction={direction}
-      />
+      <MobileStepBody steps={steps} activeIndex={activeIndex} />
+      <MobileVisualPanel activeIndex={activeIndex} />
     </div>
   );
 }
@@ -497,11 +475,9 @@ function MobileHowItWorks({
 export default function HowItWorksShowcase({
   intro,
   steps,
-  mockLabels,
 }: {
   intro: ReactNode;
   steps: Step[];
-  mockLabels: MockLabels;
 }) {
   return (
     <div className="how-it-works-showcase relative">
@@ -515,11 +491,11 @@ export default function HowItWorksShowcase({
           {intro}
         </motion.div>
         <div className="landing-section-content how-it-works-content">
-          <MobileHowItWorks steps={steps} mockLabels={mockLabels} />
+          <MobileHowItWorks steps={steps} />
         </div>
       </div>
       <div className="hidden lg:block">
-        <DesktopHowItWorks intro={intro} steps={steps} mockLabels={mockLabels} />
+        <DesktopHowItWorks intro={intro} steps={steps} />
       </div>
     </div>
   );

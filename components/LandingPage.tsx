@@ -1,13 +1,16 @@
 "use client";
 
 import HeroSection from "@/components/landing/HeroSection";
-import DiscoveryChapter from "@/components/landing/DiscoveryChapter";
 import LandingIntroExperience from "@/components/landing/LandingIntroExperience";
 import LandingLocaleEffects from "@/components/landing/LandingLocaleEffects";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingNav from "@/components/landing/LandingNav";
 import FeaturesSection from "@/components/landing/FeaturesSection";
-import PricingSection from "@/components/landing/PricingSection";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import TimeSavedSection from "@/components/landing/TimeSavedSection";
+import ClubsProofSection from "@/components/landing/ClubsProofSection";
+import DemoInviteSection from "@/components/landing/DemoInviteSection";
+import FaqSection from "@/components/landing/FaqSection";
 import { obillzLandingHomeClass } from "@/components/ui/styles";
 
 export default function LandingPage() {
@@ -18,15 +21,13 @@ export default function LandingPage() {
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
-        <div className="landing-light-zone">
-          <FeaturesSection />
-          <DiscoveryChapter />
-          <PricingSection />
-        </div>
-
-        <div className="landing-page-end">
-          <LandingFooter />
-        </div>
+        <FeaturesSection />
+        <HowItWorksSection />
+        <TimeSavedSection />
+        <ClubsProofSection />
+        <DemoInviteSection />
+        <FaqSection />
+        <LandingFooter />
       </div>
     </main>
   );

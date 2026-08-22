@@ -1,19 +1,19 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  Banknote,
   Building2,
   CalendarDays,
-  ClipboardList,
+  CalendarHeart,
   Coffee,
-  CreditCard,
-  FilePlus,
+  FileText,
   Globe,
   Handshake,
   LayoutDashboard,
-  Mail,
+  Megaphone,
   QrCode,
   Receipt,
   Settings,
-  ShoppingBag,
+  TrendingUp,
   Users,
   Wallet,
 } from "lucide-react";
@@ -209,21 +209,37 @@ export const sportFeatureIcons: Record<SportFeatureId, LucideIcon> = {
   membres: Users,
   cotisations: Wallet,
   factures: Receipt,
-  encaissements: CreditCard,
-  revenus: ShoppingBag,
+  encaissements: Banknote,
+  revenus: TrendingUp,
   charges: Building2,
   sponsors: Handshake,
-  evenements: CalendarDays,
+  evenements: CalendarHeart,
   buvette: Coffee,
-  plannings: ClipboardList,
-  pv: FilePlus,
+  plannings: CalendarDays,
+  pv: FileText,
   qrcodes: QrCode,
-  communication: Mail,
+  communication: Megaphone,
   pagePublique: Globe,
   parametres: Settings,
 };
 
 export const SPORT_FEATURE_ORDER: SportFeatureId[] = sportFeatures.map((f) => f.id);
+
+/** Fonctionnalités mises en avant sur la landing — les plus vendeuses, 12 max. */
+export const SPORT_SHOWCASE_FEATURE_IDS: SportFeatureId[] = [
+  "membres",
+  "cotisations",
+  "factures",
+  "encaissements",
+  "plannings",
+  "communication",
+  "evenements",
+  "sponsors",
+  "revenus",
+  "qrcodes",
+  "buvette",
+  "pagePublique",
+];
 
 export function getSportFeature(slug: string) {
   return sportFeatures.find((feature) => feature.slug === slug);
