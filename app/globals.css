@@ -109,10 +109,12 @@ body.app-bg {
 
 body.app-bg:has(.obillz-landing-home) {
   background-color: #071a3e !important;
+  overflow-x: clip;
 }
 
 html:has(.obillz-landing-home) {
   background-color: #071a3e;
+  overflow-x: clip;
 }
 
 body.app-bg:has(.obillz-landing:not(.obillz-landing-home)) {
@@ -181,6 +183,9 @@ html:has(.dashboard-shell) {
 @media (max-width: 768px) {
   .obillz-landing-home {
     --landing-gutter: 20px;
+    min-height: 100% !important;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 }
 
@@ -1697,6 +1702,12 @@ html:has(.dashboard-shell) {
   }
 }
 
+@media (max-width: 768px) {
+  .sport-constellation-card__anchor {
+    animation: none;
+  }
+}
+
 .sport-constellation-mobile {
   position: relative;
   isolation: isolate;
@@ -2151,6 +2162,7 @@ html:has(.dashboard-shell) {
     font-size: clamp(2.7rem, 10.2vw, 3.35rem);
     line-height: 0.95;
     letter-spacing: -0.052em;
+    filter: none !important;
   }
 
   .landing-hero-title-line {
@@ -2190,8 +2202,8 @@ html:has(.dashboard-shell) {
     padding-bottom: clamp(1.25rem, 4vw, 2rem);
     display: flex;
     justify-content: center;
-    perspective: 900px;
-    -webkit-perspective: 900px;
+    perspective: none;
+    -webkit-perspective: none;
     position: relative;
     z-index: 2;
   }
@@ -2203,14 +2215,14 @@ html:has(.dashboard-shell) {
   }
 
   .landing-hero-video__stage {
-    perspective: 900px;
-    -webkit-perspective: 900px;
+    perspective: none;
+    -webkit-perspective: none;
     padding-bottom: 0.5rem;
   }
 
   .landing-hero-video__shell {
-    /* Garde la hauteur layout ; scale/rotate ne remontent pas la section suivante */
-    transform-style: preserve-3d;
+    transform: none !important;
+    transform-style: flat;
   }
 
   .landing-hero-video__frame {
@@ -8981,6 +8993,10 @@ body.app-bg:has(.obillz-landing-home) {
   justify-content: center;
 }
 
+.lp-demo-invite__visual--mobile {
+  display: none;
+}
+
 .lp-demo-invite__visual::before {
   content: "";
   position: absolute;
@@ -9032,6 +9048,7 @@ body.app-bg:has(.obillz-landing-home) {
   }
 
   .lp-demo-invite__visual {
+    display: flex;
     position: absolute;
     right: 0;
     bottom: 0;
@@ -9065,16 +9082,26 @@ body.app-bg:has(.obillz-landing-home) {
   }
 
   .lp-demo-invite__stage {
-    --lp-demo-phone-w: min(64vw, 15rem);
-    --lp-demo-phone-h: calc(var(--lp-demo-phone-w) * 1018 / 862);
     overflow: hidden;
     border-radius: var(--lp-demo-radius);
     padding-bottom: 0;
+    transform: none !important;
   }
 
   .lp-demo-invite__panel {
     height: auto;
-    padding: 2.1rem 1.35rem 0.85rem;
+    overflow: hidden;
+    border-radius: var(--lp-demo-radius);
+    padding: 2rem 1.35rem 0;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .lp-demo-invite__panel::before {
+    background:
+      radial-gradient(ellipse 80% 48% at 50% 0%, rgba(50, 91, 255, 0.3), transparent 70%),
+      radial-gradient(circle at 16% 12%, rgba(56, 189, 248, 0.12) 0%, transparent 42%),
+      linear-gradient(180deg, #0c2460 0%, #071634 46%, #061228 100%);
   }
 
   .lp-demo-invite__actions {
@@ -9083,56 +9110,63 @@ body.app-bg:has(.obillz-landing-home) {
   }
 
   .lp-demo-invite__spacer {
-    display: block;
-    width: 100%;
-    height: var(--lp-demo-phone-h);
-    margin-top: 1.35rem;
+    display: none;
   }
 
-  .lp-demo-invite__visual {
-    position: absolute;
-    left: 50%;
+  .lp-demo-invite__visual--desktop {
+    display: none;
+  }
+
+  .lp-demo-invite__visual--mobile {
+    display: flex;
+    position: relative;
+    left: auto;
     right: auto;
     top: auto;
-    bottom: 0.85rem;
-    z-index: 3;
-    width: var(--lp-demo-phone-w);
-    margin: 0;
+    bottom: auto;
+    z-index: 2;
+    width: min(70%, 15.25rem);
+    max-width: 15.25rem;
+    margin: 1.15rem auto 0;
     overflow: visible;
-    transform: translateX(-50%);
-    justify-content: center;
-    align-items: flex-end;
+    transform: none !important;
     clip-path: none;
     mask-image: none;
     -webkit-mask-image: none;
     filter: none;
+    justify-content: center;
+    align-items: flex-end;
   }
 
-  .lp-demo-invite__visual::before {
+  .lp-demo-invite__visual--mobile::before {
     display: none;
   }
 
-  .lp-demo-invite__photo {
+  .lp-demo-invite__visual--mobile .lp-demo-invite__photo,
+  .lp-demo-invite__visual--mobile img {
+    display: block;
     width: 100%;
     max-width: none;
     max-height: none;
     height: auto;
     object-fit: contain;
-    object-position: center center;
+    object-position: center bottom;
+    background: transparent !important;
+    transform: none !important;
     mask-image: none;
     -webkit-mask-image: none;
     filter: none;
+    vertical-align: bottom;
   }
 }
 
 @media (max-width: 639px) {
   .lp-demo-invite__stage {
     --lp-demo-radius: 1.65rem;
-    --lp-demo-phone-w: min(68vw, 14.25rem);
   }
 
   .lp-demo-invite__panel {
-    padding: 1.75rem 1.15rem 0.75rem;
+    padding: 1.75rem 1.15rem 0;
   }
 
   .lp-demo-invite__cta {
@@ -9144,40 +9178,29 @@ body.app-bg:has(.obillz-landing-home) {
     margin-top: 1.35rem;
   }
 
-  .lp-demo-invite__spacer {
-    margin-top: 1.2rem;
-  }
-
-  .lp-demo-invite__visual {
-    bottom: 0.75rem;
+  .lp-demo-invite__visual--mobile {
+    width: min(72%, 14.25rem);
+    max-width: 14.25rem;
+    margin-top: 1.05rem;
   }
 }
 
 @media (max-width: 430px) {
-  .lp-demo-invite__stage {
-    --lp-demo-phone-w: min(70vw, 13.5rem);
-  }
-
-  .lp-demo-invite__visual {
-    bottom: 0.7rem;
+  .lp-demo-invite__visual--mobile {
+    width: min(74%, 13.5rem);
+    max-width: 13.5rem;
   }
 }
 
 @media (max-width: 389px) {
   .lp-demo-invite__panel {
-    padding: 1.55rem 1rem 0.65rem;
+    padding: 1.55rem 1rem 0;
   }
 
-  .lp-demo-invite__stage {
-    --lp-demo-phone-w: min(72vw, 12.75rem);
-  }
-
-  .lp-demo-invite__spacer {
-    margin-top: 1.05rem;
-  }
-
-  .lp-demo-invite__visual {
-    bottom: 0.65rem;
+  .lp-demo-invite__visual--mobile {
+    width: min(78%, 12.75rem);
+    max-width: 12.75rem;
+    margin-top: 0.95rem;
   }
 }
 
@@ -9710,8 +9733,12 @@ body.app-bg:has(.obillz-landing-home) {
   .how-it-works-home .how-it-works-visual-stage__frame,
   .how-it-works-home .how-it-works-mobile-visual__frame {
     height: auto;
-    min-height: 0;
+    min-height: 20.5rem;
     border-radius: 1.35rem;
+  }
+
+  .how-it-works-home .how-it-works-mobile-visual {
+    min-height: 20.5rem;
   }
 
   .how-it-works-home .how-it-works-visual-stage__layer,
@@ -9839,6 +9866,7 @@ body.app-bg:has(.obillz-landing-home) {
 
   .obillz-landing-home .landing-hero-title {
     max-width: 22rem;
+    filter: none !important;
   }
 
   .lp-hero-ctas {
@@ -9852,6 +9880,14 @@ body.app-bg:has(.obillz-landing-home) {
 
   .lp-hero-secondary {
     width: 100%;
+  }
+
+  .lp-time-saved__cluster {
+    transform: none !important;
+  }
+
+  .lp-time-saved__stage {
+    min-height: auto;
   }
 }
 

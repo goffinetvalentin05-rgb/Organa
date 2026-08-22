@@ -8,6 +8,23 @@ import { useI18n } from "@/components/I18nProvider";
 import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
 import { cn, dashboardGlassCardClass } from "@/components/ui";
 
+function useIsCompact() {
+  const [compact, setCompact] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 768px)").matches;
+  });
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return compact;
+}
+
 function FloatCard({
   className,
   delay = 0,
@@ -36,13 +53,18 @@ export default function TimeSavedSection() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sceneRef, { once: true, amount: 0.4 });
   const reduceMotion = useReducedMotion();
+  const isCompact = useIsCompact();
   const [played, setPlayed] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const clusterY = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [8, -10]);
+  const clusterY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    reduceMotion || isCompact ? [0, 0] : [8, -10]
+  );
 
   useEffect(() => {
     if (!inView) return;
@@ -122,8 +144,12 @@ export default function TimeSavedSection() {
                 priority={false}
               />
 
-              <motion.div className="lp-time-saved__cluster" style={{ y: clusterY }} aria-hidden>
-                <FloatCard className="lp-time-saved__card lp-time-saved__card--fees" delay={0} reduceMotion={reduceMotion}>
+              <motion.div
+                className="lp-time-saved__cluster"
+                style={isCompact || reduceMotion ? undefined : { y: clusterY }}
+                aria-hidden
+              >
+                <FloatCard className="lp-time-saved__card lp-time-saved__card--fees" delay={0} reduceMotion={reduceMotion || isCompact}>
                   <div className={cn(dashboardGlassCardClass, "p-4 sm:p-5")}>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#94A3B8]">
                       {t("marketing.timeSaved.collected")}
@@ -160,7 +186,7 @@ export default function TimeSavedSection() {
                   ) : null}
                 </AnimatePresence>
 
-                <FloatCard className="lp-time-saved__card lp-time-saved__card--ready" delay={1.1} reduceMotion={reduceMotion}>
+                <FloatCard className="lp-time-saved__card lp-time-saved__card--ready" delay={1.1} reduceMotion={reduceMotion || isCompact}>
                   <div className="lp-time-saved__pill">
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                       <Check className="h-3 w-3" strokeWidth={2.6} />

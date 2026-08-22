@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
@@ -13,9 +14,27 @@ import {
   staggerContainer,
 } from "@/components/landing/landing-motion";
 
+function useIsCompactHero() {
+  const [compact, setCompact] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 768px)").matches;
+  });
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return compact;
+}
+
 export default function HeroSection() {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
+  const isCompact = useIsCompactHero();
 
   return (
     <section id="hero" className="landing-hero-shell relative flex flex-col">
@@ -23,7 +42,7 @@ export default function HeroSection() {
         className="pointer-events-none absolute left-1/2 top-[42%] h-[min(520px,70vw)] w-[min(720px,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(26,35,255,0.4),rgba(99,102,241,0.1)_50%,transparent_68%)] blur-xl"
         aria-hidden
         animate={
-          reduceMotion
+          reduceMotion || isCompact
             ? undefined
             : { opacity: [0.45, 0.75, 0.45], scale: [1, 1.04, 1] }
         }

@@ -30,6 +30,13 @@ const visualFade = {
   transition: { duration: 0.42, ease: easePremium },
 } as const;
 
+const mobileFade = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.28, ease: easePremium },
+} as const;
+
 function useStepAutoplay() {
   const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -363,10 +370,10 @@ function MobileStepBody({
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeIndex}
-          initial={visualFade.initial}
-          animate={visualFade.animate}
-          exit={visualFade.exit}
-          transition={visualFade.transition}
+          initial={mobileFade.initial}
+          animate={mobileFade.animate}
+          exit={mobileFade.exit}
+          transition={mobileFade.transition}
           className="min-w-0"
         >
           <p className="how-it-works-blue-text display-title how-it-works-mobile-number select-none" aria-hidden>
@@ -398,10 +405,10 @@ function MobileVisualPanel({
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeIndex}
-            initial={visualFade.initial}
-            animate={visualFade.animate}
-            exit={visualFade.exit}
-            transition={visualFade.transition}
+            initial={mobileFade.initial}
+            animate={mobileFade.animate}
+            exit={mobileFade.exit}
+            transition={mobileFade.transition}
             className="how-it-works-mobile-visual__layer"
           >
             <PracticeStepVisual stepIndex={activeIndex} />

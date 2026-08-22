@@ -24,10 +24,10 @@ export default function DemoInviteSection() {
       <div className="lp-wrap">
         <motion.div
           className="lp-demo-invite__stage"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={viewportOnce}
-          transition={{ duration: 0.7, ease: easePremium }}
+          transition={{ duration: 0.55, ease: easePremium }}
         >
           <div className="lp-demo-invite__panel">
             <div className="lp-demo-invite__atmosphere" aria-hidden>
@@ -62,16 +62,28 @@ export default function DemoInviteSection() {
 
               <div className="lp-demo-invite__spacer" aria-hidden />
             </div>
+
+            <div className="lp-demo-invite__visual lp-demo-invite__visual--mobile">
+              <Image
+                src="/images/landing/iphone-whatsapp-hand.png"
+                alt={t("marketing.demoInvite.imageAlt")}
+                width={862}
+                height={1018}
+                className="lp-demo-invite__photo"
+                sizes="(max-width: 899px) 70vw, 1px"
+                priority={false}
+              />
+            </div>
           </div>
 
-          <div className="lp-demo-invite__visual">
+          <div className="lp-demo-invite__visual lp-demo-invite__visual--desktop">
             <Image
               src="/images/landing/iphone-whatsapp-hand.png"
               alt={t("marketing.demoInvite.imageAlt")}
               width={862}
               height={1018}
               className="lp-demo-invite__photo"
-              sizes="(max-width: 899px) 78vw, 42vw"
+              sizes="42vw"
               priority={false}
             />
           </div>

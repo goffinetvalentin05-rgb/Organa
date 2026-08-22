@@ -91,10 +91,10 @@ function FeatureCard({
         ease: easePremium,
       }}
       whileHover={
-        reduceMotion
+        reduceMotion || !isFloat
           ? undefined
           : {
-              y: isFloat ? -5 : -3,
+              y: -5,
               scale: 1.03,
               transition: { duration: 0.32, ease: easePremium },
             }
