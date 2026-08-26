@@ -121,7 +121,7 @@ export default function MatchProgramSettings({
         />
       </div>
 
-      <div className={cn(!form.showMatchProgram && ppDisabledBlockClass)}>
+      <div className={cn("space-y-4", !form.showMatchProgram && ppDisabledBlockClass)}>
         {form.showMatchProgram ? (
           <>
             <div className="flex flex-col gap-2 sm:flex-row">

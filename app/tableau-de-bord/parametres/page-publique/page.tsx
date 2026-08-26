@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
 import { OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,10 +37,7 @@ import {
 import {
   PageLayout,
   PageHeader,
-  SectionCard,
   cn,
-  dashboardGlassCardClass,
-  dashboardInfoPanelClass,
 } from "@/components/ui";
 import type { PublicPageLinkInput, PublicPageSettings } from "@/lib/public-page/types";
 import { normalizePublicPageSlug } from "@/lib/public-page/slug";
@@ -51,6 +48,35 @@ import {
   toPublicPageDraftPayload,
   type PublicPageDraftData,
 } from "@/lib/drafts/publicPageDraft";
+
+function SettingsSection({
+  icon: Icon,
+  title,
+  description,
+  children,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[1.25rem] border border-[#E5E7EB] bg-white px-5 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:px-6 sm:py-6">
+      <div className="mb-5 flex items-start gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#1A23FF]">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold tracking-tight text-[#0F172A]">{title}</h2>
+          {description ? (
+            <p className="mt-0.5 text-sm leading-relaxed text-[#64748B]">{description}</p>
+          ) : null}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function LogoPreview({
   logoUrl,
@@ -225,7 +251,7 @@ export default function PublicPageSettingsPage() {
 
   if (loading || !form) {
     return (
-      <PageLayout maxWidth="5xl">
+      <PageLayout maxWidth="7xl">
         <div className="flex items-center justify-center gap-3 py-20 text-[#64748B]">
           <Loader className="h-6 w-6 animate-spin" />
           <span className="text-sm">{t("dashboard.settings.publicPage.loading")}</span>
@@ -240,42 +266,38 @@ export default function PublicPageSettingsPage() {
     : null;
 
   return (
-    <PageLayout maxWidth="5xl">
-      <div>
+    <PageLayout maxWidth="7xl">
+      <div className="space-y-4">
         <Link
           href="/tableau-de-bord"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#64748B] transition-colors duration-250 hover:text-[#1A23FF]"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#64748B] transition-colors hover:text-[#1A23FF]"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("dashboard.nav.dashboard")}
         </Link>
+        <PageHeader
+          title={t("dashboard.settings.publicPage.title")}
+          subtitle={t("dashboard.settings.publicPage.subtitle")}
+        />
+        <DraftAutosaveHint
+          show={showDraftStatus}
+          label={draftStatusLabel}
+          className="flex items-center gap-2 text-xs font-medium text-[#64748B]"
+        />
       </div>
 
-      <PageHeader
-        title={t("dashboard.settings.publicPage.title")}
-        subtitle={t("dashboard.settings.publicPage.subtitle")}
-      />
-
-      <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
-
-      <SectionCard
+      <SettingsSection
         icon={Globe}
         title={t("dashboard.settings.publicPage.activationTitle")}
         description={t("dashboard.settings.publicPage.activationDescription")}
       >
-        <div
-          className={cn(
-            ppToggleRowClass,
-            form.enabled &&
-              "border-[rgba(26,35,255,0.18)] bg-white shadow-[0_4px_16px_rgba(26,35,255,0.06)]",
-          )}
-        >
+        <div className={ppToggleRowClass}>
           <div className="min-w-0">
-            <p className="text-base font-semibold tracking-tight text-[#0F172A]">
+            <p className={ppToggleTitleClass}>
               {t("dashboard.settings.publicPage.enabledLabel")}
             </p>
             {!form.enabled ? (
-              <p className={cn(ppToggleHintClass, "mt-1.5")}>
+              <p className={ppToggleHintClass}>
                 {t("dashboard.settings.publicPage.pageDisabledHint")}
               </p>
             ) : null}
@@ -293,12 +315,12 @@ export default function PublicPageSettingsPage() {
               <label className={ppLabelClass}>
                 {t("dashboard.settings.publicPage.slugLabel")}
               </label>
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <span className="shrink-0 rounded-xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-3.5 py-3 text-sm font-medium text-[#64748B]">
+              <div className="flex overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] focus-within:border-[#1A23FF] focus-within:ring-2 focus-within:ring-[rgba(26,35,255,0.2)]">
+                <span className="flex shrink-0 items-center border-r border-[#E5E7EB] bg-[#F8FAFC] px-3.5 text-sm font-medium text-[#94A3B8]">
                   obillz.com/p/
                 </span>
                 <input
-                  className={ppInputClass}
+                  className="min-w-0 flex-1 bg-transparent px-3.5 py-2.5 text-sm text-[#0B1220] placeholder:text-[#94A3B8] focus:outline-none"
                   value={form.slug || ""}
                   onChange={(e) => {
                     const nextSlug = normalizePublicPageSlug(e.target.value) || null;
@@ -316,32 +338,23 @@ export default function PublicPageSettingsPage() {
             </div>
 
             {form.publicUrlPath && publicUrl ? (
-              <div
-                className={cn(
-                  dashboardInfoPanelClass,
-                  "relative overflow-hidden p-4 transition-all duration-300 sm:p-5",
-                  "before:pointer-events-none before:absolute before:-inset-px before:rounded-2xl",
-                  "before:bg-[radial-gradient(ellipse_at_top_right,rgba(26,35,255,0.1),transparent_55%)]",
-                )}
-              >
-                <div className="relative z-[1] flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-                  <div className="flex min-w-0 flex-1 items-start gap-3.5 sm:items-center">
-                    <span
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4F57FF] via-[#1A23FF] to-[#151dd9] text-white shadow-[0_4px_12px_rgba(26,35,255,0.22)]"
-                      aria-hidden
-                    >
-                      <ExternalLink className="h-5 w-5" />
+              <div className="relative overflow-hidden rounded-xl border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-4 py-3.5 sm:px-5">
+                <span className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-[#1A23FF]/[0.06]" />
+                <div className="relative z-[1] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#1A23FF] shadow-sm">
+                      <ExternalLink className="h-4 w-4" />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#64748B]">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
                         {t("dashboard.settings.publicPage.publicLinkLabel")}
                       </p>
-                      <p className="mt-1 break-all font-mono text-sm font-medium text-[#1A23FF] sm:truncate sm:break-normal">
+                      <p className="mt-0.5 break-all font-mono text-sm font-medium text-[#1A23FF] sm:truncate sm:break-normal">
                         {publicUrl}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => void copyPublicLink()}
@@ -352,9 +365,9 @@ export default function PublicPageSettingsPage() {
                       )}
                     >
                       {copied ? (
-                        <CheckCircle className="h-4 w-4 transition-transform duration-250" />
+                        <CheckCircle className="h-3.5 w-3.5" />
                       ) : (
-                        <Copy className="h-4 w-4" />
+                        <Copy className="h-3.5 w-3.5" />
                       )}
                       {copied
                         ? t("dashboard.settings.publicPage.copiedShort")
@@ -365,12 +378,9 @@ export default function PublicPageSettingsPage() {
                         href={form.publicUrlPath}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={cn(
-                          ppSecondaryButtonClass,
-                          "border-transparent bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#151dd9] text-white shadow-[0_4px_14px_rgba(26,35,255,0.22)] hover:border-transparent hover:bg-none hover:opacity-95 hover:text-white",
-                        )}
+                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#2563EB] via-[#1A23FF] to-[#6366f1] px-4 text-sm font-medium text-white shadow-[0_4px_14px_rgba(26,35,255,0.22)] transition hover:opacity-95"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        <ExternalLink className="h-3.5 w-3.5" />
                         {t("dashboard.settings.publicPage.preview")}
                       </a>
                     ) : null}
@@ -380,17 +390,17 @@ export default function PublicPageSettingsPage() {
             ) : null}
           </div>
         ) : null}
-      </SectionCard>
+      </SettingsSection>
 
-      <SectionCard
+      <SettingsSection
         icon={FileText}
         title={t("dashboard.settings.publicPage.contentTitle")}
         description={t("dashboard.settings.publicPage.contentDescription")}
       >
         <div className="space-y-5 sm:space-y-6">
-          <div className="flex items-center gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-4 sm:gap-5 sm:p-5">
+          <div className="flex items-center gap-4">
             <LogoPreview logoUrl={form.logoUrl} title={form.title} primaryColor={form.primaryColor} />
-            <p className="text-sm leading-relaxed text-[#64748B] sm:text-[0.9375rem]">
+            <p className="text-sm leading-relaxed text-[#64748B]">
               {t("dashboard.settings.publicPage.logoHint")}
             </p>
           </div>
@@ -427,7 +437,7 @@ export default function PublicPageSettingsPage() {
                 type="color"
                 value={form.primaryColor}
                 onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                className="h-12 w-14 cursor-pointer rounded-xl border border-[rgba(15,23,42,0.12)] bg-white"
+                className="h-10 w-12 cursor-pointer rounded-xl border border-[#E5E7EB] bg-white"
               />
               <input
                 className={cn(ppInputClass, "flex-1 font-mono")}
@@ -438,16 +448,16 @@ export default function PublicPageSettingsPage() {
             <p className={ppHintClass}>{t("dashboard.settings.publicPage.colorHint")}</p>
           </div>
         </div>
-      </SectionCard>
+      </SettingsSection>
 
       {!previewDisabled && form.publicUrlPath ? (
-        <SectionCard
+        <SettingsSection
           icon={Eye}
           title={t("dashboard.settings.publicPage.preview")}
           description={t("dashboard.settings.publicPage.subtitle")}
         >
-          <div className="overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.1)] bg-white shadow-[0_8px_28px_rgba(15,23,42,0.06)]">
-            <div className="flex items-center gap-3 border-b border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
+          <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+            <div className="flex items-center gap-3 border-b border-[#E5E7EB] bg-[#F8FAFC] px-4 py-2.5">
               <div className="flex items-center gap-1.5" aria-hidden>
                 <span className="h-2.5 w-2.5 rounded-full bg-[#F87171]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FBBF24]" />
@@ -472,10 +482,10 @@ export default function PublicPageSettingsPage() {
               className="h-[min(62vh,560px)] w-full min-h-[360px] border-0 bg-white"
             />
           </div>
-        </SectionCard>
+        </SettingsSection>
       ) : null}
 
-      <SectionCard
+      <SettingsSection
         icon={ShoppingBag}
         title={t("dashboard.settings.publicPage.blocksTitle")}
         description={t("dashboard.settings.publicPage.blocksDescription")}
@@ -495,17 +505,17 @@ export default function PublicPageSettingsPage() {
             aria-label={t("dashboard.settings.publicPage.showBuvette")}
           />
         </div>
-      </SectionCard>
+      </SettingsSection>
 
-      <SectionCard
+      <SettingsSection
         icon={Calendar2}
         title={t("dashboard.settings.publicPage.matchProgram.sectionTitle")}
         description={t("dashboard.settings.publicPage.matchProgram.sectionDescription")}
       >
         <MatchProgramSettings form={form} setForm={setForm} />
-      </SectionCard>
+      </SettingsSection>
 
-      <SectionCard
+      <SettingsSection
         icon={QrCode}
         title={t("dashboard.settings.publicPage.publicLinks.sectionTitle")}
         description={t("dashboard.settings.publicPage.publicLinks.sectionDescription")}
@@ -517,9 +527,9 @@ export default function PublicPageSettingsPage() {
           onLinksChange={setLinks}
           qrcodeOptions={qrcodeOptions}
         />
-      </SectionCard>
+      </SettingsSection>
 
-      <SectionCard
+      <SettingsSection
         icon={Instagram}
         title={t("dashboard.settings.publicPage.socialTitle")}
         description={t("dashboard.settings.publicPage.socialDescription")}
@@ -555,14 +565,9 @@ export default function PublicPageSettingsPage() {
             />
           </div>
         </div>
-      </SectionCard>
+      </SettingsSection>
 
-      <div
-        className={cn(
-          dashboardGlassCardClass,
-          "flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6",
-        )}
-      >
+      <div className="flex flex-col gap-3 rounded-[1.25rem] border border-[#E5E7EB] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-sm leading-relaxed text-[#64748B]">
           {t("dashboard.settings.publicPage.saveHint")}
         </p>
@@ -571,6 +576,7 @@ export default function PublicPageSettingsPage() {
           onClick={() => void save()}
           disabled={saving}
           icon="none"
+          size="sm"
           className="w-full justify-center sm:w-auto"
         >
           {saving
