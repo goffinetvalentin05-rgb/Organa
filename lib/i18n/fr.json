@@ -1392,6 +1392,14 @@
       "deleteError": "Erreur lors de la suppression",
       "emptyState": "Aucun contrat de sponsoring",
       "emptyCta": "Créer un contrat",
+      "stats": {
+        "totalAmount": "Montant total",
+        "totalAmountHint": "Somme des contrats enregistrés.",
+        "active": "Sponsors actifs",
+        "expired": "Contrats expirés",
+        "upcoming": "À venir",
+        "total": "Contrats"
+      },
       "backToList": "Retour à la liste",
       "backToDetail": "Retour au contrat",
       "columns": {

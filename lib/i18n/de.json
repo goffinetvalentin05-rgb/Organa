@@ -1377,6 +1377,14 @@
       "deleteError": "Fehler beim Löschen",
       "emptyState": "Keine Sponsorverträge",
       "emptyCta": "Vertrag anlegen",
+      "stats": {
+        "totalAmount": "Gesamtbetrag",
+        "totalAmountHint": "Summe der erfassten Verträge.",
+        "active": "Aktive Sponsoren",
+        "expired": "Abgelaufene Verträge",
+        "upcoming": "Bevorstehend",
+        "total": "Verträge"
+      },
       "backToList": "Zurück zur Liste",
       "backToDetail": "Zurück zum Vertrag",
       "columns": {

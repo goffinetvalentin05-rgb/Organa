@@ -1507,6 +1507,14 @@
       "deleteError": "Error deleting contract",
       "emptyState": "No sponsor contracts yet",
       "emptyCta": "Create a contract",
+      "stats": {
+        "totalAmount": "Total amount",
+        "totalAmountHint": "Sum of recorded contracts.",
+        "active": "Active sponsors",
+        "expired": "Expired contracts",
+        "upcoming": "Upcoming",
+        "total": "Contracts"
+      },
       "backToList": "Back to list",
       "backToDetail": "Back to contract",
       "columns": {
