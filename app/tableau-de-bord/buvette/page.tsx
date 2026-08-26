@@ -550,27 +550,27 @@ N'hésite pas à nous contacter si tu as des questions.
       <PageHeader title="Buvette" subtitle="Gestion des disponibilités et demandes externes." />
 
       <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.15fr_1fr] lg:gap-6">
-        <div className="relative flex min-h-[15.5rem] flex-col overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B82F6] via-[#1A23FF] to-[#102d78] p-7 text-white shadow-[0_16px_40px_rgba(26,35,255,0.22)] sm:min-h-[16.5rem] sm:p-8">
-          <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
-          <span className="pointer-events-none absolute -bottom-16 right-8 h-48 w-48 rounded-full bg-sky-300/10" />
-          <p className="relative text-sm font-medium text-white/75">Buvette</p>
-          <p className="relative mt-3 text-3xl font-semibold capitalize tracking-tight sm:text-4xl">
+        <div className="relative flex min-h-[13.5rem] flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:min-h-[14.5rem] sm:p-7">
+          <span className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-[#1A23FF]/[0.06]" />
+          <span className="pointer-events-none absolute -bottom-14 right-6 h-40 w-40 rounded-full bg-[#3B82F6]/[0.05]" />
+          <p className="relative text-sm font-medium text-[#64748B]">Buvette</p>
+          <p className="relative mt-2 text-[1.75rem] font-semibold capitalize tracking-tight text-[#0F172A] sm:text-3xl">
             {monthLabel}
           </p>
-          <p className="relative mt-3 max-w-sm text-sm leading-relaxed text-white/70">
+          <p className="relative mt-2 max-w-sm text-sm leading-relaxed text-[#64748B]">
             Vue du mois et des disponibilités.
           </p>
-          <div className="relative mt-auto flex flex-wrap gap-2 pt-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+          <div className="relative mt-auto flex flex-wrap gap-2 pt-5">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1 text-xs font-medium text-[#475569]">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               {t("dashboard.buvette.legendAvailable")}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1 text-xs font-medium text-[#475569]">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
               {t("dashboard.buvette.legendOccupied")}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1 text-xs font-medium text-[#475569]">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
               {t("dashboard.buvette.legendReserved")}
             </span>
           </div>

@@ -3,10 +3,21 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { ChevronDown, Copy, ExternalLink, Loader, Trash, Upload } from "@/lib/icons";
+import { ChevronDown, Copy, ExternalLink, Globe, Loader, Trash, Upload } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
-import { cn, unifiedSectionBodyClass, unifiedSectionShellClass, dashboardCardDescriptionClass, dashboardCardTitleClass, dashboardInnerPanelClass, dashboardInputClass, dashboardSecondaryButtonClass } from "@/components/ui";
+import {
+  cn,
+  GlassCard,
+  unifiedSectionBodyClass,
+  dashboardCardDescriptionClass,
+  dashboardCardTitleClass,
+  dashboardInnerPanelClass,
+  dashboardInputClass,
+  dashboardLabelClass,
+  dashboardHintClass,
+  dashboardSecondaryButtonClass,
+} from "@/components/ui";
 import { normalizeBuvetteSlug } from "@/lib/buvette/slug";
 import type { BuvettePublicSettings } from "@/lib/buvette/settings";
 
@@ -137,44 +148,51 @@ export default function BuvettePublicSettingsPanel() {
   };
 
   return (
-    <div className={cn(unifiedSectionShellClass, "mt-2")}>
+    <GlassCard padding="none" className="overflow-hidden">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-start justify-between gap-3 px-4 py-4 text-left transition hover:bg-[#F8FAFC] sm:px-6 sm:py-5"
+        className="flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-[#F8FAFC] sm:gap-4 sm:px-6 sm:py-5"
       >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[#1A23FF]">
+          <Globe className="h-5 w-5" />
+        </span>
         <div className="min-w-0 flex-1">
-          <p className={`text-base sm:text-lg ${dashboardCardTitleClass}`}>
+          <p className={dashboardCardTitleClass}>
             {t("dashboard.buvette.settings.accordionTitle")}
           </p>
           <p className={dashboardCardDescriptionClass}>
             {t("dashboard.buvette.settings.subtitle")}
           </p>
         </div>
-        <ChevronDown
-          className={cn(
-            "mt-1 h-5 w-5 shrink-0 text-[#94A3B8] transition-transform duration-200",
-            open && "rotate-180"
-          )}
-          aria-hidden
-        />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#64748B] shadow-sm">
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform duration-200",
+              open && "rotate-180"
+            )}
+            aria-hidden
+          />
+        </span>
       </button>
 
       {open ? (
         <div className={cn(unifiedSectionBodyClass, "space-y-6 border-t border-[rgba(15,23,42,0.06)]")}>
           {loading || !form ? (
-            <p className="text-sm text-slate-600">{t("dashboard.common.loading")}</p>
+            <p className="text-sm text-[#64748B]">{t("dashboard.common.loading")}</p>
           ) : (
             <>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-800">
+                <label className={dashboardLabelClass}>
                   {t("dashboard.buvette.settings.slugLabel")}
                 </label>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <span className="shrink-0 text-sm font-medium text-slate-600">/club/</span>
+                <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-[rgba(15,23,42,0.12)] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center">
+                  <span className="shrink-0 px-3 pt-2.5 text-sm font-medium text-[#94A3B8] sm:pt-0">
+                    /club/
+                  </span>
                   <input
-                    className="input-obillz flex-1"
+                    className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-sm text-[#0B1220] outline-none placeholder:text-[#94A3B8] focus:ring-0"
                     value={form.slug || ""}
                     onChange={(e) => {
                       const next = normalizeBuvetteSlug(e.target.value) || null;
@@ -186,50 +204,54 @@ export default function BuvettePublicSettingsPanel() {
                     }}
                     placeholder={form.suggestedSlug}
                   />
-                  <span className="shrink-0 text-sm font-medium text-slate-600">/buvette</span>
+                  <span className="shrink-0 px-3 pb-2.5 text-sm font-medium text-[#94A3B8] sm:pb-0">
+                    /buvette
+                  </span>
                 </div>
-                <p className="mt-1.5 text-xs text-slate-500">{t("dashboard.buvette.settings.slugHint")}</p>
+                <p className={dashboardHintClass}>{t("dashboard.buvette.settings.slugHint")}</p>
               </div>
 
               {publicUrl ? (
-                <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-4 py-3">
-                  <span className="min-w-0 flex-1 break-all text-sm font-medium text-emerald-900">
+                <div className="flex flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] px-4 py-3 sm:flex-row sm:items-center">
+                  <span className="min-w-0 flex-1 break-all text-sm font-medium text-[#334155]">
                     {publicUrl}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => void copyLink()}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/12 px-3 py-1.5 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                    {t("dashboard.buvette.copy")}
-                  </button>
-                  <a
-                    href={form.publicUrlPath || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/12 px-3 py-1.5 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    {t("dashboard.buvette.open")}
-                  </a>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void copyLink()}
+                      className={cn(dashboardSecondaryButtonClass, "rounded-full px-3 py-1.5 text-xs")}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                      {t("dashboard.buvette.copy")}
+                    </button>
+                    <a
+                      href={form.publicUrlPath || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#1A23FF] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(26,35,255,0.22)] transition hover:bg-[#151dd9]"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      {t("dashboard.buvette.open")}
+                    </a>
+                  </div>
                 </div>
               ) : null}
 
-              <label className="block text-sm font-medium text-slate-800">
-                {t("dashboard.buvette.settings.pageTitleLabel")}
+              <label className="block">
+                <span className={dashboardLabelClass}>{t("dashboard.buvette.settings.pageTitleLabel")}</span>
                 <input
-                  className="input-obillz mt-1.5 w-full"
+                  className={cn(dashboardInputClass, "mt-1.5")}
                   value={form.title || ""}
                   onChange={(e) => setForm({ ...form, title: e.target.value || null })}
                   placeholder={t("dashboard.buvette.settings.pageTitlePlaceholder")}
                 />
               </label>
 
-              <label className="block text-sm font-medium text-slate-800">
-                {t("dashboard.buvette.settings.descriptionLabel")}
+              <label className="block">
+                <span className={dashboardLabelClass}>{t("dashboard.buvette.settings.descriptionLabel")}</span>
                 <textarea
-                  className="input-obillz mt-1.5 min-h-[88px] w-full"
+                  className={cn(dashboardInputClass, "mt-1.5 min-h-[88px] resize-y")}
                   value={form.description || ""}
                   onChange={(e) => setForm({ ...form, description: e.target.value || null })}
                   placeholder={t("dashboard.buvette.settings.descriptionPlaceholder")}
@@ -238,33 +260,33 @@ export default function BuvettePublicSettingsPanel() {
               </label>
 
               <div className="grid gap-5 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-slate-800">
-                  {t("dashboard.buvette.settings.primaryColorLabel")}
+                <label className="block">
+                  <span className={dashboardLabelClass}>{t("dashboard.buvette.settings.primaryColorLabel")}</span>
                   <div className="mt-1.5 flex items-center gap-3">
                     <input
                       type="color"
                       value={form.primaryColor}
                       onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                      className="h-10 w-14 cursor-pointer rounded-lg border border-white/15 bg-white/[0.06] p-1"
+                      className="h-10 w-12 cursor-pointer rounded-xl border border-[#E5E7EB] bg-white p-1"
                     />
                     <input
-                      className="input-obillz flex-1"
+                      className={dashboardInputClass}
                       value={form.primaryColor}
                       onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
                     />
                   </div>
                 </label>
-                <label className="block text-sm font-medium text-slate-800">
-                  {t("dashboard.buvette.settings.accentColorLabel")}
+                <label className="block">
+                  <span className={dashboardLabelClass}>{t("dashboard.buvette.settings.accentColorLabel")}</span>
                   <div className="mt-1.5 flex items-center gap-3">
                     <input
                       type="color"
                       value={form.accentColor || form.primaryColor}
                       onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
-                      className="h-10 w-14 cursor-pointer rounded-lg border border-white/15 bg-white/[0.06] p-1"
+                      className="h-10 w-12 cursor-pointer rounded-xl border border-[#E5E7EB] bg-white p-1"
                     />
                     <input
-                      className="input-obillz flex-1"
+                      className={dashboardInputClass}
                       value={form.accentColor || ""}
                       onChange={(e) => setForm({ ...form, accentColor: e.target.value || null })}
                       placeholder={t("dashboard.buvette.settings.accentColorPlaceholder")}
@@ -273,12 +295,12 @@ export default function BuvettePublicSettingsPanel() {
                 </label>
               </div>
 
-              <div className={`${dashboardInnerPanelClass} p-4`}>
-                <p className="mb-3 text-sm font-medium text-slate-800">
+              <div className={`${dashboardInnerPanelClass} p-4 sm:p-5`}>
+                <p className="mb-3 text-sm font-medium text-[#0F172A]">
                   {t("dashboard.buvette.settings.logoLabel")}
                 </p>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.06]">
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
                     {form.logoUrl ? (
                       <Image
                         src={form.logoUrl}
@@ -289,13 +311,13 @@ export default function BuvettePublicSettingsPanel() {
                         unoptimized={form.logoUrl.includes("supabase.co")}
                       />
                     ) : (
-                      <span className="text-2xl font-bold text-slate-400">
+                      <span className="text-2xl font-bold text-[#94A3B8]">
                         {(form.companyName.charAt(0) || "C").toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div>
-                    <label className={`inline-flex cursor-pointer items-center gap-2 ${dashboardSecondaryButtonClass} px-4 py-2 text-sm`}>
+                    <label className={`inline-flex cursor-pointer items-center gap-2 ${dashboardSecondaryButtonClass} rounded-full px-4 py-2 text-sm`}>
                       {uploadingLogo ? (
                         <>
                           <Loader className="h-4 w-4 animate-spin" />
@@ -315,19 +337,19 @@ export default function BuvettePublicSettingsPanel() {
                         className="hidden"
                       />
                     </label>
-                    <p className="mt-2 text-xs text-slate-500">{t("dashboard.buvette.settings.logoHint")}</p>
+                    <p className={cn(dashboardHintClass, "mt-2")}>{t("dashboard.buvette.settings.logoHint")}</p>
                   </div>
                 </div>
               </div>
 
-              <div className={`${dashboardInnerPanelClass} p-4`}>
-                <p className="text-sm font-medium text-slate-800">
+              <div className={`${dashboardInnerPanelClass} p-4 sm:p-5`}>
+                <p className="text-sm font-medium text-[#0F172A]">
                   {t("dashboard.buvette.settings.bannerLabel")}
                 </p>
-                <p className="mt-1 text-sm text-slate-600">{t("dashboard.buvette.settings.bannerDescription")}</p>
+                <p className="mt-1 text-sm text-[#64748B]">{t("dashboard.buvette.settings.bannerDescription")}</p>
 
                 {form.bannerUrl ? (
-                  <div className="relative mt-4 aspect-[3/1] w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+                  <div className="relative mt-4 aspect-[3/1] w-full max-w-xl overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
                     <Image
                       src={form.bannerUrl}
                       alt=""
@@ -340,7 +362,7 @@ export default function BuvettePublicSettingsPanel() {
                 ) : null}
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <label className={`inline-flex cursor-pointer items-center gap-2 ${dashboardSecondaryButtonClass} px-4 py-2 text-sm`}>
+                  <label className={`inline-flex cursor-pointer items-center gap-2 ${dashboardSecondaryButtonClass} rounded-full px-4 py-2 text-sm`}>
                     {uploadingBanner ? (
                       <>
                         <Loader className="h-4 w-4 animate-spin" />
@@ -367,7 +389,7 @@ export default function BuvettePublicSettingsPanel() {
                       type="button"
                       onClick={() => void handleBannerDelete()}
                       disabled={deletingBanner}
-                      className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-50"
+                      className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 disabled:opacity-50"
                     >
                       {deletingBanner ? (
                         <Loader className="h-4 w-4 animate-spin" />
@@ -378,7 +400,7 @@ export default function BuvettePublicSettingsPanel() {
                     </button>
                   ) : null}
                 </div>
-                <p className="mt-2 text-xs text-slate-500">{t("dashboard.buvette.settings.bannerHint")}</p>
+                <p className={cn(dashboardHintClass, "mt-2")}>{t("dashboard.buvette.settings.bannerHint")}</p>
               </div>
 
               <DashboardPrimaryButton type="button" icon="none" disabled={saving} onClick={() => void save()}>
@@ -388,6 +410,6 @@ export default function BuvettePublicSettingsPanel() {
           )}
         </div>
       ) : null}
-    </div>
+    </GlassCard>
   );
 }
