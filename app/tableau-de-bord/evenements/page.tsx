@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Edit, Trash, Calendar } from "@/lib/icons";
+import { Eye, Edit, Trash, Calendar, Wallet, Clock } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -34,6 +34,12 @@ interface Event {
   totalExpenses: number;
   netResult: number;
 }
+
+const headerSelectClass =
+  "dashboard-select h-[38px] w-full rounded-full border border-[#E5E7EB] bg-white px-3.5 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] sm:w-[13.5rem] [color-scheme:light]";
+
+const ROW_GRID =
+  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(10rem,12rem)_minmax(12.5rem,1fr)_7rem_minmax(13rem,auto)] lg:gap-4";
 
 export default function EvenementsPage() {
   const { t, locale } = useI18n();
@@ -103,6 +109,43 @@ export default function EvenementsPage() {
     return result.sort((a, b) => b.start_date.localeCompare(a.start_date));
   }, [events, filterStatus]);
 
+  const stats = useMemo(() => {
+    return {
+      total: events.length,
+      planned: events.filter((event) => event.status === "planned").length,
+      revenue: events.reduce((sum, event) => sum + event.totalRevenue, 0),
+      expenses: events.reduce((sum, event) => sum + event.totalExpenses, 0),
+      netResult: events.reduce((sum, event) => sum + event.netResult, 0),
+    };
+  }, [events]);
+
+  const summaryCards = [
+    {
+      label: t("dashboard.events.stats.total"),
+      value: stats.total,
+      icon: Calendar,
+      iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
+    },
+    {
+      label: t("dashboard.events.stats.planned"),
+      value: stats.planned,
+      icon: Clock,
+      iconClass: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: t("dashboard.events.stats.revenue"),
+      value: formatMontant(stats.revenue),
+      icon: Wallet,
+      iconClass: "bg-emerald-50 text-emerald-600",
+    },
+    {
+      label: t("dashboard.events.stats.expenses"),
+      value: formatMontant(stats.expenses),
+      icon: Wallet,
+      iconClass: "bg-rose-50 text-rose-600",
+    },
+  ];
+
   const netAmountClass = (result: number) => {
     if (result > 0) return "font-semibold text-emerald-700";
     if (result < 0) return "font-semibold text-rose-700";
@@ -116,8 +159,7 @@ export default function EvenementsPage() {
     return formatDate(event.start_date);
   };
 
-  const ROW_GRID =
-    "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(10rem,12rem)_minmax(12.5rem,1fr)_7rem_minmax(13rem,auto)] lg:gap-4";
+  const showDashboard = !loading && !errorMessage && events.length > 0;
 
   return (
     <PageLayout maxWidth="7xl">
@@ -129,7 +171,7 @@ export default function EvenementsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="dashboard-select h-[38px] w-full rounded-full border border-[#E5E7EB] bg-white px-3.5 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] sm:w-[13.5rem] [color-scheme:light]"
+              className={headerSelectClass}
             >
               <option value="all">{t("dashboard.plannings.filters.all")}</option>
               <option value="planned">{t("dashboard.events.status.planned")}</option>
@@ -143,6 +185,56 @@ export default function EvenementsPage() {
       />
 
       {limitReached ? <LimitReachedAlert message={t("dashboard.events.limitReached")} /> : null}
+
+      {showDashboard ? (
+        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_1fr] lg:gap-5">
+          <div className="relative flex min-h-[13.5rem] flex-col overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#2563EB] via-[#1A23FF] to-[#4F46E5] p-6 text-white shadow-[0_16px_40px_rgba(26,35,255,0.28)] sm:min-h-[15rem] sm:p-7">
+            <span className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/12" />
+            <span className="pointer-events-none absolute -bottom-16 right-6 h-48 w-48 rounded-full bg-[#93C5FD]/25" />
+            <p className="relative text-sm font-medium text-white/80">
+              {t("dashboard.events.stats.netResult")}
+            </p>
+            <p className="relative mt-2 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
+              {formatMontant(stats.netResult)}
+            </p>
+            <p className="relative mt-2 max-w-sm text-sm leading-relaxed text-white/75">
+              {t("dashboard.events.stats.netResultHint")}
+            </p>
+            <div className="relative mt-auto pt-5">
+              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+                {t("dashboard.events.stats.plannedBadge", { n: stats.planned })}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {summaryCards.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.label}
+                  className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
+                >
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-xl",
+                      item.iconClass
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
+                    {item.label}
+                  </p>
+                  <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
+                    {item.value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="rounded-[1.25rem] border border-[#E5E7EB] bg-white p-12 text-center text-sm text-[#64748B] shadow-[0_1px_2px_rgba(15,23,42,0.04)]">

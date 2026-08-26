@@ -1911,6 +1911,15 @@
     "plannings": {
       "title": "Pläne",
       "subtitle": "Organisieren Sie Veranstaltungen und teilen Sie Mitglieder auf Zeitfenster ein",
+      "stats": {
+        "fillRate": "Gesamtauslastung",
+        "fillRateHint": "Zuweisungen über alle Zeitfenster",
+        "publishedBadge": "{n} veröffentlicht",
+        "total": "Pläne",
+        "slots": "Slots",
+        "assignments": "Zuweisungen",
+        "drafts": "Entwürfe"
+      },
       "newPlanning": "Neuer Plan",
       "emptyState": "Keine Pläne gefunden",
       "emptyCta": "Ersten Plan anlegen",

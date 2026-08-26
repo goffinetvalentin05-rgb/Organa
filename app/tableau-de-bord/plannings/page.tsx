@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Trash, ClipboardList } from "@/lib/icons";
+import Link from "next/link";
+import { Eye, Trash, ClipboardList, Calendar, Users, FileText } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import {
@@ -10,11 +11,8 @@ import {
   GlassCard,
   EmptyState,
   ActionButton,
-  EntityCard,
-  EntityCardList,
-  EntityMetaRow,
-  dashboardInputClass,
-  dashboardSelectClass,
+  DashboardBadge,
+  cn,
 } from "@/components/ui";
 import { localeToIntl } from "@/lib/i18n";
 import LimitReachedAlert from "@/components/LimitReachedAlert";
@@ -34,6 +32,12 @@ interface Planning {
   totalAssigned: number;
   fillRate: number;
 }
+
+const headerSelectClass =
+  "dashboard-select h-[38px] w-full rounded-full border border-[#E5E7EB] bg-white px-3.5 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] sm:w-[13.5rem] [color-scheme:light]";
+
+const ROW_GRID =
+  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(8.75rem,11rem)_minmax(7.5rem,9.5rem)_minmax(7.5rem,9rem)_6.75rem_minmax(11rem,auto)] lg:gap-4";
 
 export default function PlanningsPage() {
   const { t, locale } = useI18n();
@@ -101,21 +105,56 @@ export default function PlanningsPage() {
     return result.sort((a, b) => b.date.localeCompare(a.date));
   }, [plannings, filterStatus]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "published":
-        return "bg-green-100 text-green-700";
-      case "archived":
-        return "bg-slate-100 text-slate-600";
-      default:
-        return "bg-amber-100 text-amber-700";
-    }
-  };
+  const stats = useMemo(() => {
+    const totalAssigned = plannings.reduce((sum, planning) => sum + planning.totalAssigned, 0);
+    const totalRequired = plannings.reduce((sum, planning) => sum + planning.totalRequired, 0);
+    return {
+      total: plannings.length,
+      slots: plannings.reduce((sum, planning) => sum + planning.slotsCount, 0),
+      assignments: totalAssigned,
+      drafts: plannings.filter((planning) => planning.status === "draft").length,
+      published: plannings.filter((planning) => planning.status === "published").length,
+      fillRate: totalRequired > 0 ? Math.round((totalAssigned / totalRequired) * 100) : 0,
+    };
+  }, [plannings]);
+
+  const summaryCards = [
+    {
+      label: t("dashboard.plannings.stats.total"),
+      value: stats.total,
+      icon: ClipboardList,
+      iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
+    },
+    {
+      label: t("dashboard.plannings.stats.slots"),
+      value: stats.slots,
+      icon: Calendar,
+      iconClass: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: t("dashboard.plannings.stats.assignments"),
+      value: stats.assignments,
+      icon: Users,
+      iconClass: "bg-emerald-50 text-emerald-600",
+    },
+    {
+      label: t("dashboard.plannings.stats.drafts"),
+      value: stats.drafts,
+      icon: FileText,
+      iconClass: "bg-amber-50 text-amber-600",
+    },
+  ];
 
   const getStatusLabel = (status: string) => {
     if (status === "published") return t("dashboard.plannings.status.published");
     if (status === "archived") return t("dashboard.plannings.status.archived");
     return t("dashboard.plannings.status.draft");
+  };
+
+  const getStatusVariant = (status: string): "success" | "warning" | "default" => {
+    if (status === "published") return "success";
+    if (status === "archived") return "default";
+    return "warning";
   };
 
   const getFillRateColor = (rate: number) => {
@@ -124,27 +163,35 @@ export default function PlanningsPage() {
     return "text-red-600";
   };
 
+  const getFillBarClass = (rate: number) => {
+    if (rate === 100) return "bg-emerald-500";
+    if (rate >= 50) return "bg-amber-400";
+    return "bg-rose-400";
+  };
+
+  const showDashboard = !loading && !errorMessage && plannings.length > 0;
+
   return (
-    <PageLayout maxWidth="7xl" className="pb-10">
+    <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.plannings.title")}
         subtitle={t("dashboard.plannings.subtitle")}
         actions={
-          <>
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className={dashboardSelectClass}
+              className={headerSelectClass}
             >
               <option value="all">{t("dashboard.plannings.filters.all")}</option>
               <option value="draft">{t("dashboard.plannings.filters.draft")}</option>
               <option value="published">{t("dashboard.plannings.filters.published")}</option>
               <option value="archived">{t("dashboard.plannings.filters.archived")}</option>
             </select>
-            <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau">
+            <DashboardPrimaryButton href="/tableau-de-bord/plannings/nouveau" size="sm">
               {t("dashboard.plannings.newPlanning")}
             </DashboardPrimaryButton>
-          </>
+          </div>
         }
       />
 
@@ -152,8 +199,58 @@ export default function PlanningsPage() {
         <LimitReachedAlert message="Limite de plannings atteinte. Passez au plan Pro pour en créer plus." />
       )}
 
+      {showDashboard ? (
+        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_1fr] lg:gap-5">
+          <div className="relative flex min-h-[13.5rem] flex-col overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#2563EB] via-[#1A23FF] to-[#4F46E5] p-6 text-white shadow-[0_16px_40px_rgba(26,35,255,0.28)] sm:min-h-[15rem] sm:p-7">
+            <span className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/12" />
+            <span className="pointer-events-none absolute -bottom-16 right-6 h-48 w-48 rounded-full bg-[#93C5FD]/25" />
+            <p className="relative text-sm font-medium text-white/80">
+              {t("dashboard.plannings.stats.fillRate")}
+            </p>
+            <p className="relative mt-2 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
+              {stats.fillRate}%
+            </p>
+            <p className="relative mt-2 max-w-sm text-sm leading-relaxed text-white/75">
+              {t("dashboard.plannings.stats.fillRateHint")}
+            </p>
+            <div className="relative mt-auto pt-5">
+              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+                {t("dashboard.plannings.stats.publishedBadge", { n: stats.published })}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {summaryCards.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.label}
+                  className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
+                >
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-xl",
+                      item.iconClass
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
+                    {item.label}
+                  </p>
+                  <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
+                    {item.value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       {loading ? (
-        <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center text-slate-500 shadow-sm">
+        <div className="rounded-[1.25rem] border border-[#E5E7EB] bg-white p-12 text-center text-sm text-[#64748B] shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           {t("dashboard.plannings.loading")}
         </div>
       ) : errorMessage ? (
@@ -172,78 +269,103 @@ export default function PlanningsPage() {
           }
         />
       ) : (
-        <EntityCardList>
-          {filteredPlannings.map((planning) => (
-            <EntityCard
-              key={planning.id}
-              layout="row"
-              href={`/tableau-de-bord/plannings/${planning.id}`}
-              title={planning.name}
-              subtitle={planning.description || undefined}
-              status={
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(planning.status)}`}>
-                  {getStatusLabel(planning.status)}
-                </span>
-              }
-              badges={
-                planning.event ? (
-                  <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-semibold text-purple-800">
-                    {planning.event.name}
-                  </span>
-                ) : null
-              }
-              amount={
-                <>
-                  <span className={getFillRateColor(planning.fillRate)}>
-                    {planning.fillRate}%
-                  </span>
-                  <span className="ml-1.5 text-sm font-medium text-[#94A3B8]">
-                    {t("dashboard.plannings.complete")}
-                  </span>
-                </>
-              }
-              meta={
-                <>
-                  <EntityMetaRow inline label={t("dashboard.common.date")} value={formatDate(planning.date)} />
-                  <EntityMetaRow
-                    inline
-                    label={t("dashboard.plannings.slots")}
-                    value={`${planning.slotsCount} ${
-                      planning.slotsCount > 1
-                        ? t("dashboard.plannings.slots")
-                        : t("dashboard.plannings.slot")
-                    }`}
-                  />
-                  <EntityMetaRow
-                    inline
-                    label={t("dashboard.plannings.assignments")}
-                    value={`${planning.totalAssigned} / ${planning.totalRequired}`}
-                  />
-                </>
-              }
-              actions={
-                <>
-                  <ActionButton
-                    href={`/tableau-de-bord/plannings/${planning.id}`}
-                    className="inline-flex items-center gap-1.5"
-                  >
-                    <Eye className="h-4 w-4" />
-                    {t("dashboard.plannings.viewManage")}
-                  </ActionButton>
-                  <ActionButton
-                    type="button"
-                    variant="dangerSoft"
-                    onClick={() => handleDelete(planning.id)}
-                    title={t("dashboard.common.delete")}
-                    className="inline-flex p-2"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </ActionButton>
-                </>
-              }
-            />
-          ))}
-        </EntityCardList>
+        <div className="min-w-0 space-y-2">
+          {filteredPlannings.map((planning) => {
+            const fillWidth = Math.min(100, Math.max(0, planning.fillRate));
+            return (
+              <article
+                key={planning.id}
+                className="rounded-xl border border-[#E5E7EB] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_6px_16px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-200 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)] sm:px-5"
+              >
+                <div className={ROW_GRID}>
+                  <div className="min-w-0">
+                    <Link
+                      href={`/tableau-de-bord/plannings/${planning.id}`}
+                      className="block truncate text-sm font-semibold tracking-tight text-[#0F172A] transition-colors hover:text-[#1A23FF]"
+                    >
+                      {planning.name}
+                    </Link>
+                    {planning.description ? (
+                      <p className="mt-0.5 truncate text-sm text-[#64748B]">{planning.description}</p>
+                    ) : null}
+                    {planning.event ? (
+                      <span className="mt-1.5 inline-flex rounded-full bg-[#EEF2FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#1A23FF]">
+                        {planning.event.name}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#94A3B8]">
+                      {t("dashboard.common.date")}
+                    </p>
+                    <p className="mt-0.5 truncate text-sm tabular-nums text-[#334155]">
+                      {formatDate(planning.date)}
+                    </p>
+                  </div>
+
+                  <div className="min-w-0 space-y-1">
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8]">{t("dashboard.plannings.slots")}</p>
+                      <p className="truncate text-sm font-medium tabular-nums text-[#0F172A]">
+                        {planning.slotsCount}{" "}
+                        {planning.slotsCount > 1
+                          ? t("dashboard.plannings.slots")
+                          : t("dashboard.plannings.slot")}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8]">{t("dashboard.plannings.assignments")}</p>
+                      <p className="truncate text-sm font-medium tabular-nums text-[#0F172A]">
+                        {planning.totalAssigned} / {planning.totalRequired}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className={cn("text-[15px] font-semibold tabular-nums", getFillRateColor(planning.fillRate))}>
+                      {planning.fillRate}%
+                      <span className="ml-1 text-xs font-medium text-[#94A3B8]">
+                        {t("dashboard.plannings.complete")}
+                      </span>
+                    </p>
+                    <div className="mt-1.5 h-1.5 w-full max-w-[6.5rem] overflow-hidden rounded-full bg-[#E5E7EB]">
+                      <div
+                        className={cn("h-full rounded-full", getFillBarClass(planning.fillRate))}
+                        style={{ width: `${fillWidth}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="min-w-0">
+                    <DashboardBadge variant={getStatusVariant(planning.status)}>
+                      {getStatusLabel(planning.status)}
+                    </DashboardBadge>
+                  </div>
+
+                  <div className="flex min-w-0 flex-wrap items-center gap-2 lg:flex-nowrap lg:justify-end">
+                    <ActionButton
+                      href={`/tableau-de-bord/plannings/${planning.id}`}
+                      className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      {t("dashboard.plannings.viewManage")}
+                    </ActionButton>
+                    <ActionButton
+                      type="button"
+                      variant="dangerSoft"
+                      onClick={() => handleDelete(planning.id)}
+                      title={t("dashboard.common.delete")}
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0"
+                    >
+                      <Trash className="h-3.5 w-3.5" />
+                    </ActionButton>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       )}
     </PageLayout>
   );

@@ -2041,6 +2041,15 @@
     "plannings": {
       "title": "Schedules",
       "subtitle": "Organise events and assign members to slots",
+      "stats": {
+        "fillRate": "Overall completion rate",
+        "fillRateHint": "Assignments across all time slots",
+        "publishedBadge": "{n} published",
+        "total": "Schedules",
+        "slots": "Slots",
+        "assignments": "Assignments",
+        "drafts": "Drafts"
+      },
       "newPlanning": "New schedule",
       "emptyState": "No schedules found",
       "emptyCta": "Create your first schedule",
@@ -2200,6 +2209,15 @@
     "events": {
       "title": "Events",
       "subtitle": "Manage club events and their financial overview",
+      "stats": {
+        "netResult": "Overall result",
+        "netResultHint": "Net result across all events",
+        "plannedBadge": "{n} planned",
+        "total": "Events",
+        "planned": "Planned",
+        "revenue": "Total revenue",
+        "expenses": "Total expenses"
+      },
       "list": {
         "columns": {
           "name": "Event",
