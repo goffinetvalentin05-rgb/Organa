@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { QRCodeSVG } from "qrcode.react";
@@ -11,6 +12,7 @@ import {
   Eye,
   Download,
   X,
+  Copy,
 } from "@/lib/icons";
 import {
   PageLayout,
@@ -19,9 +21,6 @@ import {
   EmptyState,
   ActionButton,
   DashboardBadge,
-  EntityCard,
-  EntityCardList,
-  EntityMetaRow,
   glassCardHeaderClass,
   cn,
 } from "@/components/ui";
@@ -179,22 +178,16 @@ export default function QRCodesPage() {
         title={t("dashboard.qrcodes.title")}
         subtitle={t("dashboard.qrcodes.subtitle")}
         actions={
-          <DashboardPrimaryButton type="button" onClick={() => setShowCreateModal(true)}>
+          <DashboardPrimaryButton type="button" size="sm" onClick={() => setShowCreateModal(true)}>
             {t("dashboard.qrcodes.newAction")}
           </DashboardPrimaryButton>
         }
       />
 
       {loading ? (
-        <GlassCard padding="lg" className="text-center text-slate-600 shadow-xl shadow-blue-950/10">
-          <div className="inline-flex items-center gap-3">
-            <svg className="h-5 w-5 animate-spin text-[#2563EB]" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            {t("dashboard.common.loading")}
-          </div>
-        </GlassCard>
+        <div className="rounded-[1.25rem] border border-[#E5E7EB] bg-white p-12 text-center text-sm text-[#64748B] shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+          {t("dashboard.common.loading")}
+        </div>
       ) : qrcodes.length === 0 ? (
         <EmptyState
           icon={QrCode}
@@ -206,90 +199,100 @@ export default function QRCodesPage() {
           }
         />
       ) : (
-        <EntityCardList>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {qrcodes.map((qr) => (
-            <EntityCard
+            <article
               key={qr.id}
-              layout="row"
-              href={`/tableau-de-bord/qrcodes/${qr.id}`}
-              leading={
-                <div className="rounded-lg bg-white p-1.5 ring-1 ring-[rgba(15,23,42,0.08)]">
+              className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-200 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)] sm:p-6"
+            >
+              <span className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#1A23FF]/[0.06]" />
+              <span className="pointer-events-none absolute -bottom-12 right-4 h-32 w-32 rounded-full bg-[#3B82F6]/[0.05]" />
+
+              <Link
+                href={`/tableau-de-bord/qrcodes/${qr.id}`}
+                className="relative flex justify-center"
+              >
+                <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-[#E5E7EB]">
                   <QRCodeSVG
                     id={`qr-${qr.code}`}
                     value={`${typeof window !== "undefined" ? window.location.origin : ""}/inscription/${qr.code}`}
-                    size={56}
+                    size={148}
                     level="M"
+                    bgColor="#FFFFFF"
+                    fgColor="#0F172A"
                   />
                 </div>
-              }
-              title={qr.name}
-              subtitle={qr.description || undefined}
-              badges={
-                <DashboardBadge variant={getEventBadgeVariant(qr.event_type)}>
-                  {getEventTypeLabel(qr.event_type)}
-                </DashboardBadge>
-              }
-              meta={
-                <>
-                  <EntityMetaRow
-                    inline
-                    label={t("dashboard.qrcodes.card.registrations")}
-                    value={
-                      qr.registrationsCount > 0
-                        ? String(qr.registrationsCount)
-                        : t("dashboard.qrcodes.card.noRegistrations")
-                    }
-                  />
-                  {qr.event_date ? (
-                    <EntityMetaRow
-                      inline
-                      label={t("dashboard.common.date")}
-                      value={formatEventSchedule(qr.event_date, qr.event_time)}
-                    />
-                  ) : null}
-                </>
-              }
-              actions={
-                <>
+              </Link>
+
+              <div className="relative mt-5 min-w-0">
+                <Link
+                  href={`/tableau-de-bord/qrcodes/${qr.id}`}
+                  className="block truncate text-base font-semibold tracking-tight text-[#0F172A] transition-colors hover:text-[#1A23FF]"
+                >
+                  {qr.name}
+                </Link>
+                {qr.description ? (
+                  <p className="mt-1 line-clamp-2 text-sm text-[#64748B]">{qr.description}</p>
+                ) : null}
+                <div className="mt-2.5">
+                  <DashboardBadge variant={getEventBadgeVariant(qr.event_type)}>
+                    {getEventTypeLabel(qr.event_type)}
+                  </DashboardBadge>
+                </div>
+                <p className="mt-3 text-sm text-[#64748B]">
+                  {qr.registrationsCount > 0
+                    ? `${qr.registrationsCount} ${t("dashboard.qrcodes.card.registrations")}`
+                    : t("dashboard.qrcodes.card.noRegistrations")}
+                </p>
+                {qr.event_date ? (
+                  <p className="mt-1 truncate text-xs text-[#94A3B8]">
+                    {formatEventSchedule(qr.event_date, qr.event_time)}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="relative mt-auto flex flex-col gap-2 pt-5">
+                <div className="flex flex-wrap gap-2">
                   <ActionButton
                     href={`/tableau-de-bord/qrcodes/${qr.id}`}
-                    className="inline-flex items-center gap-1.5"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-3.5 w-3.5" />
                     {t("dashboard.qrcodes.card.viewDetails")}
                   </ActionButton>
                   <ActionButton
                     type="button"
                     onClick={() => downloadQR(qr.code, qr.name)}
-                    className="inline-flex items-center gap-1.5"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
                     title={t("dashboard.qrcodes.card.download")}
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-3.5 w-3.5" />
                     {t("dashboard.qrcodes.card.download")}
                   </ActionButton>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
                   <ActionButton
                     type="button"
                     onClick={() => copyLink(qr.code)}
-                    className="inline-flex items-center gap-1.5"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
                     title={t("dashboard.qrcodes.card.copyLink")}
                   >
-                    <QrCode className="h-4 w-4" />
+                    <Copy className="h-3.5 w-3.5" />
                     {t("dashboard.qrcodes.card.copyLink")}
                   </ActionButton>
-                  <ActionButton
+                  <button
                     type="button"
-                    variant="dangerSoft"
                     onClick={() => handleDelete(qr.id)}
-                    className="inline-flex p-2"
                     title={t("dashboard.common.delete")}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-700 transition hover:bg-rose-100"
                   >
-                    <Trash className="h-4 w-4" />
-                  </ActionButton>
-                </>
-              }
-            />
+                    <Trash className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            </article>
           ))}
-        </EntityCardList>
+        </div>
       )}
 
       {showCreateModal ? (
