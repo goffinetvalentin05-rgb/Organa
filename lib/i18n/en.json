@@ -2209,11 +2209,11 @@
       "title": "Events",
       "subtitle": "Manage club events and their financial overview",
       "stats": {
-        "netResult": "Overall result",
-        "netResultHint": "Net result across all events",
-        "plannedBadge": "{n} planned",
-        "total": "Events",
+        "currentEvent": "Today’s event",
+        "nextEvent": "Next event",
+        "noneUpcoming": "None upcoming",
         "planned": "Planned",
+        "completed": "Completed",
         "revenue": "Total revenue",
         "expenses": "Total expenses"
       },

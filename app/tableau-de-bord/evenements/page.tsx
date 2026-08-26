@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Edit, Trash, Calendar, Wallet, Clock } from "@/lib/icons";
+import { Eye, Edit, Trash, Calendar, Wallet, Clock, CheckCircle } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -39,7 +39,16 @@ const headerSelectClass =
   "dashboard-select h-[38px] w-full rounded-full border border-[#E5E7EB] bg-white px-3.5 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] sm:w-[13.5rem] [color-scheme:light]";
 
 const ROW_GRID =
-  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(10rem,12rem)_minmax(12.5rem,1fr)_7rem_minmax(13rem,auto)] lg:gap-4";
+  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(10rem,12rem)_minmax(12.5rem,1fr)_7rem_minmax(14rem,auto)] lg:gap-4";
+
+const dayKey = (value: string) => {
+  const date = new Date(value.includes("T") ? value : `${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export default function EvenementsPage() {
   const { t, locale } = useI18n();
@@ -109,28 +118,40 @@ export default function EvenementsPage() {
     return result.sort((a, b) => b.start_date.localeCompare(a.start_date));
   }, [events, filterStatus]);
 
+  const featuredEvent = useMemo(() => {
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const upcoming = events
+      .map((event) => ({ event, day: dayKey(event.start_date) }))
+      .filter((item) => item.day)
+      .filter((item) => item.day >= todayKey)
+      .sort((a, b) => a.day.localeCompare(b.day));
+    const next = upcoming[0];
+    if (!next) return null;
+    return { event: next.event, isCurrent: next.day === todayKey };
+  }, [events]);
+
   const stats = useMemo(() => {
     return {
-      total: events.length,
       planned: events.filter((event) => event.status === "planned").length,
+      completed: events.filter((event) => event.status === "completed").length,
       revenue: events.reduce((sum, event) => sum + event.totalRevenue, 0),
       expenses: events.reduce((sum, event) => sum + event.totalExpenses, 0),
-      netResult: events.reduce((sum, event) => sum + event.netResult, 0),
     };
   }, [events]);
 
   const summaryCards = [
     {
-      label: t("dashboard.events.stats.total"),
-      value: stats.total,
-      icon: Calendar,
-      iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
-    },
-    {
       label: t("dashboard.events.stats.planned"),
       value: stats.planned,
       icon: Clock,
       iconClass: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: t("dashboard.events.stats.completed"),
+      value: stats.completed,
+      icon: CheckCircle,
+      iconClass: "bg-emerald-50 text-emerald-600",
     },
     {
       label: t("dashboard.events.stats.revenue"),
@@ -187,27 +208,33 @@ export default function EvenementsPage() {
       {limitReached ? <LimitReachedAlert message={t("dashboard.events.limitReached")} /> : null}
 
       {showDashboard ? (
-        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_1fr] lg:gap-5">
-          <div className="relative flex min-h-[13.5rem] flex-col overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#2563EB] via-[#1A23FF] to-[#4F46E5] p-6 text-white shadow-[0_16px_40px_rgba(26,35,255,0.28)] sm:min-h-[15rem] sm:p-7">
-            <span className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/12" />
-            <span className="pointer-events-none absolute -bottom-16 right-6 h-48 w-48 rounded-full bg-[#93C5FD]/25" />
-            <p className="relative text-sm font-medium text-white/80">
-              {t("dashboard.events.stats.netResult")}
-            </p>
-            <p className="relative mt-2 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
-              {formatMontant(stats.netResult)}
-            </p>
-            <p className="relative mt-2 max-w-sm text-sm leading-relaxed text-white/75">
-              {t("dashboard.events.stats.netResultHint")}
-            </p>
-            <div className="relative mt-auto pt-5">
-              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
-                {t("dashboard.events.stats.plannedBadge", { n: stats.planned })}
-              </span>
+        <div className="space-y-4 sm:space-y-5">
+          <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-6 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
+            <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#1A23FF]/[0.06]" />
+            <span className="pointer-events-none absolute -bottom-12 right-16 h-36 w-36 rounded-full bg-[#3B82F6]/[0.05]" />
+            <div className="relative min-w-0">
+              <p className="text-sm font-medium text-[#64748B]">
+                {featuredEvent?.isCurrent
+                  ? t("dashboard.events.stats.currentEvent")
+                  : t("dashboard.events.stats.nextEvent")}
+              </p>
+              <p className="mt-1 truncate text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
+                {featuredEvent
+                  ? featuredEvent.event.name
+                  : t("dashboard.events.stats.noneUpcoming")}
+              </p>
+              {featuredEvent ? (
+                <p className="mt-1.5 text-sm text-[#64748B]">{dateLabel(featuredEvent.event)}</p>
+              ) : null}
             </div>
+            {featuredEvent?.event.eventType ? (
+              <span className="relative mt-4 inline-flex w-fit items-center rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#475569] sm:mt-0">
+                {featuredEvent.event.eventType.name}
+              </span>
+            ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             {summaryCards.map((item) => {
               const Icon = item.icon;
               return (
@@ -315,7 +342,7 @@ export default function EvenementsPage() {
                   </DashboardBadge>
                 </div>
 
-                <div className="flex min-w-0 flex-wrap items-center gap-2 lg:flex-nowrap lg:justify-end">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible lg:flex-nowrap lg:justify-end">
                   <ActionButton
                     href={`/tableau-de-bord/evenements/${event.id}`}
                     className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
@@ -330,15 +357,14 @@ export default function EvenementsPage() {
                     <Edit className="h-3.5 w-3.5" />
                     {t("dashboard.common.edit")}
                   </ActionButton>
-                  <ActionButton
+                  <button
                     type="button"
-                    variant="dangerSoft"
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0"
                     title={t("dashboard.common.delete")}
                     onClick={() => void handleDelete(event.id)}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-700 transition hover:bg-rose-100"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                  </ActionButton>
+                  </button>
                 </div>
               </div>
             </article>

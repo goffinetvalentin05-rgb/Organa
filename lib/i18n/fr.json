@@ -2060,11 +2060,11 @@
       "title": "Événements",
       "subtitle": "Gérez les événements du club et leur bilan financier",
       "stats": {
-        "netResult": "Bilan global",
-        "netResultHint": "Résultat net de tous les événements",
-        "plannedBadge": "{n} planifiés",
-        "total": "Événements",
+        "currentEvent": "Événement du jour",
+        "nextEvent": "Prochain événement",
+        "noneUpcoming": "Aucun à venir",
         "planned": "Planifiés",
+        "completed": "Terminés",
         "revenue": "Revenus totaux",
         "expenses": "Dépenses totales"
       },
