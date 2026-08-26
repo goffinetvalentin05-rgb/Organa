@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  FINANCE_DEFAULT_HREF,
+  isFinancePath,
+} from "@/components/dashboard/FinanceSectionNav";
 import { cn } from "@/components/ui/cn";
 import { createClient } from "@/lib/supabase/client";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -15,23 +19,17 @@ import DashboardNotificationBellConnected from "@/components/announcements/Dashb
 import {
   LayoutDashboard,
   Users,
-  FileText,
-  Receipt,
   Settings,
   Home,
   Menu,
   X,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
   Wallet,
-  Building2,
   QrCode,
   Calendar,
   ClipboardList,
   Mail,
-  ShoppingBag,
   Handshake,
   Globe,
   FilePlus,
@@ -116,38 +114,11 @@ export default function DashboardShell({
     }
   };
 
-  const FINANCE_ROUTES = [
-    "/tableau-de-bord/devis",
-    "/tableau-de-bord/factures",
-    "/tableau-de-bord/paiements",
-    "/tableau-de-bord/produits",
-    "/tableau-de-bord/depenses",
-  ] as const;
-
-  const isFinanceRoute =
-    pathname != null && FINANCE_ROUTES.some((href) => pathname.startsWith(href));
-
-  const financesSubmenuId = useId();
-
-  const [financesOpen, setFinancesOpen] = useState(isFinanceRoute);
-
-  useEffect(() => {
-    if (isFinanceRoute) {
-      setFinancesOpen(true);
-    }
-  }, [isFinanceRoute]);
+  const isFinanceRoute = isFinancePath(pathname);
 
   const navigationPrimary = [
     { name: t("dashboard.nav.dashboard"), href: "/tableau-de-bord", icon: LayoutDashboard },
     { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
-  ];
-
-  const navigationFinances = [
-    { name: t("dashboard.nav.quotes"), href: "/tableau-de-bord/devis", icon: FileText },
-    { name: t("dashboard.nav.invoices"), href: "/tableau-de-bord/factures", icon: Receipt },
-    { name: t("dashboard.nav.payments"), href: "/tableau-de-bord/paiements", icon: CreditCard },
-    { name: t("dashboard.nav.productRevenues"), href: "/tableau-de-bord/produits", icon: ShoppingBag },
-    { name: t("dashboard.nav.expenses"), href: "/tableau-de-bord/depenses", icon: Building2 },
   ];
 
   const navigationSecondary = [
@@ -292,93 +263,22 @@ export default function DashboardShell({
                 );
               })}
 
-              <div className="dashboard-sidebar-finances-expanded pt-1">
-                <button
-                  type="button"
-                  onClick={() => setFinancesOpen((open) => !open)}
-                  aria-expanded={financesOpen}
-                  aria-controls={financesSubmenuId}
-                  title={t("dashboard.nav.finances")}
+              <Link
+                href={FINANCE_DEFAULT_HREF}
+                onClick={() => setSidebarOpen(false)}
+                title={t("dashboard.nav.finances")}
+                className={cn("dashboard-sidebar-nav-link", isFinanceRoute && "is-active")}
+              >
+                <Wallet
                   className={cn(
-                    "dashboard-sidebar-nav-link w-full",
-                    isFinanceRoute && !financesOpen && "bg-white/[0.04]"
+                    "h-[17px] w-[17px] shrink-0",
+                    isFinanceRoute ? "text-cyan-200" : "text-blue-200/55"
                   )}
-                >
-                  <Wallet
-                    className={cn(
-                      "h-[17px] w-[17px] shrink-0",
-                      isFinanceRoute ? "text-cyan-200" : "text-blue-200/55"
-                    )}
-                  />
-                  <span className="dashboard-sidebar-nav-text flex-1 text-left font-medium">
-                    {t("dashboard.nav.finances")}
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 shrink-0 text-blue-200/45 transition-transform duration-200",
-                      financesOpen && "rotate-180"
-                    )}
-                    aria-hidden
-                  />
-                </button>
-
-                <div
-                  id={financesSubmenuId}
-                  role="region"
-                  aria-label={t("dashboard.nav.finances")}
-                  className={cn(
-                    "grid transition-[grid-template-rows] duration-200 ease-out",
-                    financesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                  )}
-                >
-                  <div className="overflow-hidden">
-                    <div className="ml-3 mt-1 space-y-0.5 border-l border-white/10 py-1 pl-3">
-                      {navigationFinances.map((item) => {
-                        const active = isActive(item.href);
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setSidebarOpen(false)}
-                            className={cn(
-                              "block rounded-xl px-3 py-2 text-sm transition-all duration-200",
-                              active
-                                ? "bg-white/10 font-semibold text-white shadow-[0_0_16px_rgba(26,35,255,0.2)]"
-                                : "text-blue-100/60 hover:bg-white/[0.05] hover:text-white"
-                            )}
-                          >
-                            {item.name}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="dashboard-sidebar-finances-collapsed space-y-0.5 pt-1">
-                {navigationFinances.map((item) => {
-                  const IconComponent = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      title={item.name}
-                      className={cn("dashboard-sidebar-nav-link", active && "is-active")}
-                    >
-                      <IconComponent
-                        className={cn(
-                          "h-[17px] w-[17px] shrink-0",
-                          active ? "text-cyan-200" : "text-blue-200/55"
-                        )}
-                      />
-                      <span className="dashboard-sidebar-nav-text sr-only">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+                />
+                <span className="dashboard-sidebar-nav-text font-medium">
+                  {t("dashboard.nav.finances")}
+                </span>
+              </Link>
 
               <div className="dashboard-sidebar-divider mx-3 my-3 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
