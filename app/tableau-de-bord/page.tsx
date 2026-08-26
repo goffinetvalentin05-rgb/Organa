@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { calculerTotalTTC } from "@/lib/utils/calculations";
+import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
 import {
   Users,
   FileText,
@@ -42,7 +42,7 @@ interface DocumentItem {
   statut: string;
   dateCreation: string;
   dateEcheance?: string | null;
-  lignes: unknown[];
+  lignes: LigneDocument[];
   totalTTC?: number;
   client?: DocumentClient;
   createdAt?: string | null;
