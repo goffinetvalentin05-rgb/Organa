@@ -11,7 +11,7 @@ import {
   GlassCard,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -133,10 +133,11 @@ export default function SponsoringPage() {
           }
         />
       ) : (
-        <EntityCardGrid>
+        <EntityCardList>
           {contracts.map((c) => (
             <EntityCard
               key={c.id}
+              layout="row"
               href={`/tableau-de-bord/sponsoring/${c.id}`}
               title={c.sponsorName}
               subtitle={c.title}
@@ -147,14 +148,17 @@ export default function SponsoringPage() {
               meta={
                 <>
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.sponsoring.columns.type")}
                     value={sponsorTypeLabel(c.sponsorType)}
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.sponsoring.columns.start")}
                     value={formatDate(c.startDate)}
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.sponsoring.columns.end")}
                     value={formatDate(c.endDate)}
                   />
@@ -189,7 +193,7 @@ export default function SponsoringPage() {
               }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
     </PageLayout>
   );

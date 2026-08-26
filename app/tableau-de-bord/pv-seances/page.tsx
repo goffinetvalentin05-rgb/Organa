@@ -11,7 +11,7 @@ import {
   GlassCard,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -134,10 +134,11 @@ export default function PvSeancesPage() {
           }
         />
       ) : (
-        <EntityCardGrid>
+        <EntityCardList>
           {minutes.map((m) => (
             <EntityCard
               key={m.id}
+              layout="row"
               href={`/tableau-de-bord/pv-seances/${m.id}`}
               title={m.title}
               status={
@@ -153,10 +154,12 @@ export default function PvSeancesPage() {
               meta={
                 <>
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.meetingMinutes.columns.date")}
                     value={formatDate(m.meetingDate)}
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.meetingMinutes.columns.updated")}
                     value={formatDateTime(m.updatedAt)}
                   />
@@ -200,7 +203,7 @@ export default function PvSeancesPage() {
               }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
     </PageLayout>
   );

@@ -16,16 +16,15 @@ import {
   cn,
   dashboardCardDescriptionClass,
   dashboardCardTitleClass,
-  dashboardSecondaryButtonClass,
   dashboardTabActiveClass,
   dashboardTabInactiveClass,
-  dashboardTextMutedClass,
-  dashboardTextPrimaryClass,
-  dashboardTextSecondaryClass,
   EmptyState,
   DashboardBadge,
   GlassCard,
-  sectionListRowClass,
+  ActionButton,
+  EntityCard,
+  EntityCardList,
+  EntityMetaRow,
   unifiedSectionBodyClass,
   unifiedSectionHeaderClass,
 } from "@/components/ui";
@@ -105,21 +104,23 @@ export default function BuvetteRequestsPanel({
 
       <div className={cn(unifiedSectionBodyClass, "space-y-3")}>
         {loading ? (
-          <p className={cn("text-sm", dashboardTextSecondaryClass)}>Chargement des demandes…</p>
+          <p className="text-sm text-[#64748B]">Chargement des demandes…</p>
         ) : visibleRequests.length === 0 ? (
           <EmptyState embedded title={BUVETTE_REQUEST_EMPTY_LABELS[activeTab]} />
         ) : (
-          visibleRequests.map((request) => (
-            <RequestCard
-              key={request.id}
-              request={request}
-              formatDate={formatDate}
-              submitting={submitting}
-              onSelect={() => onSelectRequest(request)}
-              onDecide={onDecide}
-              onRequestArchive={() => onRequestArchive(request.id)}
-            />
-          ))
+          <EntityCardList>
+            {visibleRequests.map((request) => (
+              <RequestCard
+                key={request.id}
+                request={request}
+                formatDate={formatDate}
+                submitting={submitting}
+                onSelect={() => onSelectRequest(request)}
+                onDecide={onDecide}
+                onRequestArchive={() => onRequestArchive(request.id)}
+              />
+            ))}
+          </EntityCardList>
         )}
       </div>
     </GlassCard>
@@ -146,99 +147,67 @@ function RequestCard({
   const fullName = `${request.first_name} ${request.last_name}`.trim();
 
   return (
-    <article className={cn(sectionListRowClass, "flex-col items-stretch gap-3 sm:flex-row sm:items-start")}>
-      <button
-        type="button"
-        onClick={onSelect}
-        className="min-w-0 flex-1 space-y-2 text-left"
-      >
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className={cn("truncate text-sm font-semibold", dashboardTextPrimaryClass)}>{fullName}</p>
-            <p className={cn("mt-0.5 text-xs", dashboardTextMutedClass)}>
-              Demandée le{" "}
-              {new Date(request.created_at).toLocaleDateString("fr-CH", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </p>
-          </div>
-          <DashboardBadge variant={statusBadgeVariant(request.status)}>
-            {formatBuvetteStatus(request.status)}
-          </DashboardBadge>
-        </div>
-
-        <div className={cn("grid gap-1.5 text-sm sm:grid-cols-2", dashboardTextSecondaryClass)}>
-          <p>
-            <span className={dashboardTextMutedClass}>Date : </span>
-            {formatDate(request.reservation_date)}
-          </p>
-          <p>
-            <span className={dashboardTextMutedClass}>Type : </span>
-            {request.event_type}
-          </p>
-          {request.email ? (
-            <p className="truncate sm:col-span-2">
-              <span className={dashboardTextMutedClass}>Email : </span>
-              {request.email}
-            </p>
+    <EntityCard
+      layout="row"
+      onClick={onSelect}
+      title={fullName}
+      subtitle={request.email || undefined}
+      status={
+        <DashboardBadge variant={statusBadgeVariant(request.status)}>
+          {formatBuvetteStatus(request.status)}
+        </DashboardBadge>
+      }
+      meta={
+        <>
+          <EntityMetaRow
+            inline
+            label="Demandée le"
+            value={new Date(request.created_at).toLocaleDateString("fr-CH", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          />
+          <EntityMetaRow inline label="Date" value={formatDate(request.reservation_date)} />
+          <EntityMetaRow inline label="Type" value={request.event_type} />
+          {request.phone ? <EntityMetaRow inline label="Tél." value={request.phone} /> : null}
+          {request.message ? (
+            <p className="text-sm leading-relaxed text-[#475569]">{request.message}</p>
           ) : null}
-          {request.phone ? (
-            <p>
-              <span className={dashboardTextMutedClass}>Tél. : </span>
-              {request.phone}
-            </p>
+        </>
+      }
+      actions={
+        <>
+          {request.status === "pending" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onDecide(request.id, "accepted")}
+                disabled={submitting}
+                className="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+              >
+                Accepter
+              </button>
+              <button
+                type="button"
+                onClick={() => onDecide(request.id, "refused")}
+                disabled={submitting}
+                className="rounded-xl bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+              >
+                Refuser
+              </button>
+            </>
           ) : null}
-        </div>
-
-        {request.message ? (
-          <p className="rounded-lg border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-3 py-2 text-sm leading-relaxed text-[#475569]">
-            {request.message}
-          </p>
-        ) : null}
-      </button>
-
-      <div className="flex shrink-0 flex-wrap gap-2 sm:w-44 sm:flex-col">
-        {request.status === "pending" ? (
-          <>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDecide(request.id, "accepted");
-              }}
-              disabled={submitting}
-              className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
-            >
-              Accepter
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDecide(request.id, "refused");
-              }}
-              disabled={submitting}
-              className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
-            >
-              Refuser
-            </button>
-          </>
-        ) : null}
-
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRequestArchive();
-          }}
-          disabled={submitting}
-          className={cn(dashboardSecondaryButtonClass, "text-xs disabled:opacity-50")}
-        >
-          Archiver
-        </button>
-      </div>
-    </article>
+          <ActionButton
+            type="button"
+            onClick={onRequestArchive}
+            disabled={submitting}
+            className="inline-flex items-center gap-1.5 text-xs"
+          >
+            Archiver
+          </ActionButton>
+        </>
+      }
+    />
   );
 }

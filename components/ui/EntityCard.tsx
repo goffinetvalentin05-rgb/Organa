@@ -23,9 +23,11 @@ export type EntityCardProps = {
   children?: ReactNode;
   /**
    * `stack` = carte verticale (grille).
-   * `row` = carte horizontale pleine largeur (listes finances).
+   * `row` = carte horizontale pleine largeur (listes).
    */
   layout?: "stack" | "row";
+  /** Clic sur la ligne (hors actions). */
+  onClick?: () => void;
 };
 
 /**
@@ -44,6 +46,7 @@ export default function EntityCard({
   className,
   children,
   layout = "stack",
+  onClick,
 }: EntityCardProps) {
   const isRow = layout === "row";
 
@@ -72,46 +75,58 @@ export default function EntityCard({
         titleNode
       )}
       {subtitle ? (
-        <p className="mt-0.5 text-sm leading-snug text-[#64748B]">{subtitle}</p>
+        <p
+          className={cn(
+            "mt-0.5 text-sm leading-snug text-[#64748B]",
+            isRow && "line-clamp-2",
+          )}
+        >
+          {subtitle}
+        </p>
       ) : null}
-      {badges ? <div className="mt-2 flex flex-wrap gap-1.5">{badges}</div> : null}
+      {badges ? (
+        <div className={cn("flex flex-wrap gap-1.5", isRow ? "mt-1" : "mt-2")}>{badges}</div>
+      ) : null}
     </div>
   );
 
   if (isRow) {
     return (
       <article
+        onClick={onClick}
         className={cn(
-          dashboardGlassCardClass,
-          "group/entity px-4 py-4 transition-all duration-250 sm:px-5 sm:py-4",
-          "hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)]",
+          "group/entity relative overflow-hidden rounded-xl border border-[rgba(15,23,42,0.08)] bg-white text-[#0F172A]",
+          "px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_6px_16px_rgba(15,23,42,0.04)] sm:px-5",
+          "transition-[border-color,box-shadow] duration-200",
+          "hover:border-[rgba(26,35,255,0.14)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)]",
+          onClick && "cursor-pointer",
           className,
         )}
       >
-        <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:gap-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
           <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-3.5">
             {leading ? <div className="shrink-0">{leading}</div> : null}
             {titleBlock}
-            {status ? <div className="shrink-0 lg:hidden">{status}</div> : null}
+            {status ? <div className="shrink-0 md:hidden">{status}</div> : null}
           </div>
 
           {(meta || children) && (
-            <div className="min-w-0 flex-1 space-y-1 text-sm text-[#64748B] lg:max-w-[18rem] xl:max-w-[22rem]">
+            <div className="min-w-0 space-y-0.5 text-sm text-[#64748B] md:w-[15.5rem] md:shrink-0 lg:w-[18rem] xl:w-[20rem]">
               {meta}
               {children}
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:shrink-0 lg:justify-end">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 md:shrink-0 md:justify-end">
             {amount ? (
-              <div className="text-lg font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-xl">
+              <div className="text-base font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-lg">
                 {amount}
               </div>
             ) : null}
-            {status ? <div className="hidden shrink-0 lg:block">{status}</div> : null}
+            {status ? <div className="hidden shrink-0 md:block">{status}</div> : null}
             {actions ? (
               <div
-                className="flex flex-wrap items-center gap-2 border-t border-[rgba(15,23,42,0.06)] pt-3 sm:border-0 sm:pt-0 lg:pl-1"
+                className="flex flex-wrap items-center gap-2 border-t border-[rgba(15,23,42,0.06)] pt-3 sm:border-0 sm:pt-0 md:pl-1"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
               >
@@ -190,7 +205,7 @@ export function EntityCardGrid({ children, className, columns = 3 }: EntityCardG
   );
 }
 
-/** Liste verticale de cartes horizontales — modules finances. */
+/** Liste verticale de cartes horizontales — pages de listing dashboard. */
 export function EntityCardList({
   children,
   className,
@@ -198,7 +213,7 @@ export function EntityCardList({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={cn("flex flex-col gap-3 sm:gap-3.5", className)}>{children}</div>;
+  return <div className={cn("flex flex-col gap-2.5 sm:gap-3", className)}>{children}</div>;
 }
 
 /** Avatar initiales premium pour les cartes membres / contacts. */

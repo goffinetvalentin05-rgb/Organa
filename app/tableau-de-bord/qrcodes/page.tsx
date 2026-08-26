@@ -11,9 +11,6 @@ import {
   Eye,
   Download,
   X,
-  Users,
-  Calendar2,
-  ArrowRight,
 } from "@/lib/icons";
 import {
   PageLayout,
@@ -22,8 +19,10 @@ import {
   EmptyState,
   ActionButton,
   DashboardBadge,
+  EntityCard,
+  EntityCardList,
+  EntityMetaRow,
   glassCardHeaderClass,
-  dashboardSecondaryButtonClass,
   cn,
 } from "@/components/ui";
 import { formatEventDateTime, normalizeEventTimeForApi } from "@/lib/qrcodes/eventDateTime";
@@ -207,97 +206,90 @@ export default function QRCodesPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 sm:gap-7 xl:grid-cols-3">
+        <EntityCardList>
           {qrcodes.map((qr) => (
-            <GlassCard
+            <EntityCard
               key={qr.id}
-              padding="none"
-              className="flex h-full min-h-0 flex-col overflow-hidden shadow-xl shadow-blue-950/10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-blue-950/15"
-            >
-              <div className="relative flex justify-center bg-gradient-to-br from-white/95 via-sky-50/70 to-indigo-100/55 px-6 pb-2 pt-8">
-                <div className="rounded-2xl bg-white p-4 shadow-lg ring-1 ring-white/90">
+              layout="row"
+              href={`/tableau-de-bord/qrcodes/${qr.id}`}
+              leading={
+                <div className="rounded-lg bg-white p-1.5 ring-1 ring-[rgba(15,23,42,0.08)]">
                   <QRCodeSVG
                     id={`qr-${qr.code}`}
                     value={`${typeof window !== "undefined" ? window.location.origin : ""}/inscription/${qr.code}`}
-                    size={128}
+                    size={56}
                     level="M"
                   />
                 </div>
-              </div>
-
-              <div className="flex flex-1 flex-col border-t border-white/45 p-5">
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <h3 className="line-clamp-2 min-w-0 text-base font-bold leading-snug text-slate-900">{qr.name}</h3>
-                  <DashboardBadge variant={getEventBadgeVariant(qr.event_type)} className="shrink-0">
-                    {getEventTypeLabel(qr.event_type)}
-                  </DashboardBadge>
-                </div>
-
-                {qr.description ? (
-                  <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-600">{qr.description}</p>
-                ) : null}
-
-                <div className="mb-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 shrink-0 text-[#2563EB]" />
-                    <span className="font-medium">
-                      {qr.registrationsCount > 0
-                        ? `${qr.registrationsCount} ${t("dashboard.qrcodes.card.registrations")}`
-                        : t("dashboard.qrcodes.card.noRegistrations")}
-                    </span>
-                  </div>
+              }
+              title={qr.name}
+              subtitle={qr.description || undefined}
+              badges={
+                <DashboardBadge variant={getEventBadgeVariant(qr.event_type)}>
+                  {getEventTypeLabel(qr.event_type)}
+                </DashboardBadge>
+              }
+              meta={
+                <>
+                  <EntityMetaRow
+                    inline
+                    label={t("dashboard.qrcodes.card.registrations")}
+                    value={
+                      qr.registrationsCount > 0
+                        ? String(qr.registrationsCount)
+                        : t("dashboard.qrcodes.card.noRegistrations")
+                    }
+                  />
                   {qr.event_date ? (
-                    <div className="flex items-center gap-2">
-                      <Calendar2 className="h-4 w-4 shrink-0 text-[#2563EB]" />
-                      <span className="font-medium">{formatEventSchedule(qr.event_date, qr.event_time)}</span>
-                    </div>
+                    <EntityMetaRow
+                      inline
+                      label={t("dashboard.common.date")}
+                      value={formatEventSchedule(qr.event_date, qr.event_time)}
+                    />
                   ) : null}
-                </div>
-
-                <div className="mt-auto space-y-3">
+                </>
+              }
+              actions={
+                <>
                   <ActionButton
                     href={`/tableau-de-bord/qrcodes/${qr.id}`}
-                    variant="premiumInline"
-                    className="w-full justify-center rounded-full py-3"
+                    className="inline-flex items-center gap-1.5"
                   >
                     <Eye className="h-4 w-4" />
                     {t("dashboard.qrcodes.card.viewDetails")}
-                    <ArrowRight className="h-4 w-4 opacity-90" />
                   </ActionButton>
-                  <div className="flex flex-wrap items-center justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => downloadQR(qr.code, qr.name)}
-                      className={`${dashboardSecondaryButtonClass} px-3 py-2 text-xs`}
-                      title={t("dashboard.qrcodes.card.download")}
-                    >
-                      <Download className="h-4 w-4" />
-                      {t("dashboard.qrcodes.card.download")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => copyLink(qr.code)}
-                      className={`${dashboardSecondaryButtonClass} px-3 py-2 text-xs`}
-                      title={t("dashboard.qrcodes.card.copyLink")}
-                    >
-                      <QrCode className="h-4 w-4" />
-                      {t("dashboard.qrcodes.card.copyLink")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(qr.id)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-red-400/25 bg-red-500/12 px-3 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500/20"
-                      title={t("dashboard.common.delete")}
-                    >
-                      <Trash className="h-4 w-4" />
-                      {t("dashboard.common.delete")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
+                  <ActionButton
+                    type="button"
+                    onClick={() => downloadQR(qr.code, qr.name)}
+                    className="inline-flex items-center gap-1.5"
+                    title={t("dashboard.qrcodes.card.download")}
+                  >
+                    <Download className="h-4 w-4" />
+                    {t("dashboard.qrcodes.card.download")}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    onClick={() => copyLink(qr.code)}
+                    className="inline-flex items-center gap-1.5"
+                    title={t("dashboard.qrcodes.card.copyLink")}
+                  >
+                    <QrCode className="h-4 w-4" />
+                    {t("dashboard.qrcodes.card.copyLink")}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    variant="dangerSoft"
+                    onClick={() => handleDelete(qr.id)}
+                    className="inline-flex p-2"
+                    title={t("dashboard.common.delete")}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </ActionButton>
+                </>
+              }
+            />
           ))}
-        </div>
+        </EntityCardList>
       )}
 
       {showCreateModal ? (

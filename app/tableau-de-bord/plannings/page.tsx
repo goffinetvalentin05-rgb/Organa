@@ -11,7 +11,7 @@ import {
   EmptyState,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
   dashboardInputClass,
   dashboardSelectClass,
@@ -119,9 +119,9 @@ export default function PlanningsPage() {
   };
 
   const getFillRateColor = (rate: number) => {
-    if (rate === 100) return "text-green-600 bg-green-50";
-    if (rate >= 50) return "text-amber-600 bg-amber-50";
-    return "text-red-600 bg-red-50";
+    if (rate === 100) return "text-green-600";
+    if (rate >= 50) return "text-amber-600";
+    return "text-red-600";
   };
 
   return (
@@ -172,12 +172,14 @@ export default function PlanningsPage() {
           }
         />
       ) : (
-        <EntityCardGrid columns={2}>
+        <EntityCardList>
           {filteredPlannings.map((planning) => (
             <EntityCard
               key={planning.id}
+              layout="row"
               href={`/tableau-de-bord/plannings/${planning.id}`}
               title={planning.name}
+              subtitle={planning.description || undefined}
               status={
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(planning.status)}`}>
                   {getStatusLabel(planning.status)}
@@ -191,23 +193,20 @@ export default function PlanningsPage() {
                 ) : null
               }
               amount={
-                <div className="flex flex-wrap items-end gap-3">
-                  <span className={`rounded-xl px-3.5 py-2 text-base ${getFillRateColor(planning.fillRate)}`}>
+                <>
+                  <span className={getFillRateColor(planning.fillRate)}>
                     {planning.fillRate}%
-                    <span className="ml-1.5 text-xs font-medium opacity-90">
-                      {t("dashboard.plannings.complete")}
-                    </span>
                   </span>
-                  <span className="text-sm font-medium text-[#64748B]">
-                    {planning.totalAssigned} / {planning.totalRequired}{" "}
-                    {t("dashboard.plannings.assignments")}
+                  <span className="ml-1.5 text-sm font-medium text-[#94A3B8]">
+                    {t("dashboard.plannings.complete")}
                   </span>
-                </div>
+                </>
               }
               meta={
                 <>
-                  <EntityMetaRow label={t("dashboard.common.date")} value={formatDate(planning.date)} />
+                  <EntityMetaRow inline label={t("dashboard.common.date")} value={formatDate(planning.date)} />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.plannings.slots")}
                     value={`${planning.slotsCount} ${
                       planning.slotsCount > 1
@@ -215,9 +214,11 @@ export default function PlanningsPage() {
                         : t("dashboard.plannings.slot")
                     }`}
                   />
-                  {planning.description ? (
-                    <p className="line-clamp-2 pt-1 text-sm text-[#64748B]">{planning.description}</p>
-                  ) : null}
+                  <EntityMetaRow
+                    inline
+                    label={t("dashboard.plannings.assignments")}
+                    value={`${planning.totalAssigned} / ${planning.totalRequired}`}
+                  />
                 </>
               }
               actions={
@@ -242,7 +243,7 @@ export default function PlanningsPage() {
               }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
     </PageLayout>
   );

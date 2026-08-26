@@ -19,7 +19,7 @@ import {
   EmptyState,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityAvatar,
   EntityMetaRow,
   glassCardClass,
@@ -234,7 +234,7 @@ export default function ClientsPage() {
           }
         />
       ) : (
-        <EntityCardGrid>
+        <EntityCardList>
           {filteredClients.map((client) => {
             const displayName = `${client.prenom ? `${client.prenom} ` : ""}${
               client.nom || t("dashboard.clients.noName")
@@ -242,8 +242,9 @@ export default function ClientsPage() {
             return (
               <EntityCard
                 key={client.id}
+                layout="row"
                 href={`/tableau-de-bord/clients/${client.id}`}
-                leading={<EntityAvatar label={client.nom || "?"} />}
+                leading={<EntityAvatar label={client.nom || "?"} size="sm" />}
                 title={displayName}
                 badges={
                   <>
@@ -267,18 +268,21 @@ export default function ClientsPage() {
                   <>
                     {vis.email.enabled ? (
                       <EntityMetaRow
+                        inline
                         label="Email"
                         value={client.email || t("dashboard.clients.notProvided")}
                       />
                     ) : null}
                     {vis.phone.enabled ? (
                       <EntityMetaRow
+                        inline
                         label="Tél."
                         value={client.telephone || t("dashboard.clients.notProvided")}
                       />
                     ) : null}
                     {vis.address.enabled ? (
                       <EntityMetaRow
+                        inline
                         label="Adresse"
                         value={
                           client.adresse || client.postal_code || client.city
@@ -315,7 +319,7 @@ export default function ClientsPage() {
               />
             );
           })}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
 
       {/* Footer avec compteur */}

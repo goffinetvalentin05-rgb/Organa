@@ -13,7 +13,7 @@ import {
   GlassCard,
   ActionButton,
   EntityCard,
-  EntityCardGrid,
+  EntityCardList,
   EntityMetaRow,
   dashboardSelectLgClass,
 } from "@/components/ui";
@@ -168,10 +168,11 @@ export default function EvenementsPage() {
           }
         />
       ) : (
-        <EntityCardGrid columns={2}>
+        <EntityCardList>
           {filteredEvents.map((event) => (
             <EntityCard
               key={event.id}
+              layout="row"
               href={`/tableau-de-bord/evenements/${event.id}`}
               title={event.name}
               subtitle={event.description || undefined}
@@ -197,10 +198,12 @@ export default function EvenementsPage() {
               meta={
                 <>
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.events.list.columns.date")}
                     value={dateLabel(event)}
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.events.detail.totalRevenue")}
                     value={
                       <span className="font-medium text-emerald-700">
@@ -209,6 +212,7 @@ export default function EvenementsPage() {
                     }
                   />
                   <EntityMetaRow
+                    inline
                     label={t("dashboard.events.detail.totalExpenses")}
                     value={
                       <span className="font-medium text-rose-700">
@@ -247,7 +251,7 @@ export default function EvenementsPage() {
               }
             />
           ))}
-        </EntityCardGrid>
+        </EntityCardList>
       )}
     </PageLayout>
   );
