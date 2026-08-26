@@ -1893,11 +1893,10 @@
       "title": "Plannings",
       "subtitle": "Organisez vos événements et affectez vos membres aux créneaux",
       "stats": {
-        "fillRate": "Taux de complétion global",
-        "fillRateHint": "Affectations sur l’ensemble des créneaux",
-        "publishedBadge": "{n} publiés",
-        "total": "Plannings",
-        "slots": "Créneaux",
+        "currentPlanning": "Planning actuel",
+        "nextPlanning": "Prochain planning",
+        "noneUpcoming": "Aucun à venir",
+        "toFill": "À pourvoir",
         "assignments": "Affectations",
         "drafts": "Brouillons"
       },

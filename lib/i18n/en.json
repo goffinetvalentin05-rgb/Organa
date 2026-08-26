@@ -2042,11 +2042,10 @@
       "title": "Schedules",
       "subtitle": "Organise events and assign members to slots",
       "stats": {
-        "fillRate": "Overall completion rate",
-        "fillRateHint": "Assignments across all time slots",
-        "publishedBadge": "{n} published",
-        "total": "Schedules",
-        "slots": "Slots",
+        "currentPlanning": "Current schedule",
+        "nextPlanning": "Next schedule",
+        "noneUpcoming": "None upcoming",
+        "toFill": "Open slots",
         "assignments": "Assignments",
         "drafts": "Drafts"
       },

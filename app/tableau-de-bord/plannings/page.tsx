@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Trash, ClipboardList, Calendar, Users, FileText } from "@/lib/icons";
+import { Eye, Trash, ClipboardList, Calendar, Users, FileText, Clock } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import {
@@ -37,7 +37,16 @@ const headerSelectClass =
   "dashboard-select h-[38px] w-full rounded-full border border-[#E5E7EB] bg-white px-3.5 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] focus:border-[#1A23FF] focus:outline-none focus:ring-2 focus:ring-[rgba(26,35,255,0.2)] sm:w-[13.5rem] [color-scheme:light]";
 
 const ROW_GRID =
-  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(8.75rem,11rem)_minmax(7.5rem,9.5rem)_minmax(7.5rem,9rem)_6.75rem_minmax(11rem,auto)] lg:gap-4";
+  "grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(8.75rem,11rem)_minmax(7.5rem,9.5rem)_minmax(7.5rem,9rem)_6.75rem_minmax(13.5rem,auto)] lg:gap-4";
+
+const dayKey = (value: string) => {
+  const date = new Date(value.includes("T") ? value : `${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export default function PlanningsPage() {
   const { t, locale } = useI18n();
@@ -105,45 +114,28 @@ export default function PlanningsPage() {
     return result.sort((a, b) => b.date.localeCompare(a.date));
   }, [plannings, filterStatus]);
 
+  const featuredPlanning = useMemo(() => {
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const upcoming = plannings
+      .map((planning) => ({ planning, day: dayKey(planning.date) }))
+      .filter((item) => item.day)
+      .filter((item) => item.day >= todayKey)
+      .sort((a, b) => a.day.localeCompare(b.day));
+    const next = upcoming[0];
+    if (!next) return null;
+    return { planning: next.planning, isCurrent: next.day === todayKey };
+  }, [plannings]);
+
   const stats = useMemo(() => {
     const totalAssigned = plannings.reduce((sum, planning) => sum + planning.totalAssigned, 0);
     const totalRequired = plannings.reduce((sum, planning) => sum + planning.totalRequired, 0);
     return {
-      total: plannings.length,
-      slots: plannings.reduce((sum, planning) => sum + planning.slotsCount, 0),
+      toFill: Math.max(0, totalRequired - totalAssigned),
       assignments: totalAssigned,
       drafts: plannings.filter((planning) => planning.status === "draft").length,
-      published: plannings.filter((planning) => planning.status === "published").length,
-      fillRate: totalRequired > 0 ? Math.round((totalAssigned / totalRequired) * 100) : 0,
     };
   }, [plannings]);
-
-  const summaryCards = [
-    {
-      label: t("dashboard.plannings.stats.total"),
-      value: stats.total,
-      icon: ClipboardList,
-      iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
-    },
-    {
-      label: t("dashboard.plannings.stats.slots"),
-      value: stats.slots,
-      icon: Calendar,
-      iconClass: "bg-blue-50 text-blue-600",
-    },
-    {
-      label: t("dashboard.plannings.stats.assignments"),
-      value: stats.assignments,
-      icon: Users,
-      iconClass: "bg-emerald-50 text-emerald-600",
-    },
-    {
-      label: t("dashboard.plannings.stats.drafts"),
-      value: stats.drafts,
-      icon: FileText,
-      iconClass: "bg-amber-50 text-amber-600",
-    },
-  ];
 
   const getStatusLabel = (status: string) => {
     if (status === "published") return t("dashboard.plannings.status.published");
@@ -200,52 +192,72 @@ export default function PlanningsPage() {
       )}
 
       {showDashboard ? (
-        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_1fr] lg:gap-5">
-          <div className="relative flex min-h-[13.5rem] flex-col overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#2563EB] via-[#1A23FF] to-[#4F46E5] p-6 text-white shadow-[0_16px_40px_rgba(26,35,255,0.28)] sm:min-h-[15rem] sm:p-7">
-            <span className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/12" />
-            <span className="pointer-events-none absolute -bottom-16 right-6 h-48 w-48 rounded-full bg-[#93C5FD]/25" />
-            <p className="relative text-sm font-medium text-white/80">
-              {t("dashboard.plannings.stats.fillRate")}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+          <div className="relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5">
+            <span className="pointer-events-none absolute -right-6 -top-8 h-24 w-24 rounded-full bg-[#1A23FF]/[0.06]" />
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#1A23FF] shadow-sm">
+              <Calendar className="h-5 w-5" />
+            </span>
+            <p className="relative mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
+              {featuredPlanning?.isCurrent
+                ? t("dashboard.plannings.stats.currentPlanning")
+                : t("dashboard.plannings.stats.nextPlanning")}
             </p>
-            <p className="relative mt-2 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
-              {stats.fillRate}%
+            <p className="relative mt-1.5 truncate text-lg font-semibold tracking-tight text-[#0F172A] sm:text-xl">
+              {featuredPlanning
+                ? featuredPlanning.planning.name
+                : t("dashboard.plannings.stats.noneUpcoming")}
             </p>
-            <p className="relative mt-2 max-w-sm text-sm leading-relaxed text-white/75">
-              {t("dashboard.plannings.stats.fillRateHint")}
-            </p>
-            <div className="relative mt-auto pt-5">
-              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
-                {t("dashboard.plannings.stats.publishedBadge", { n: stats.published })}
-              </span>
-            </div>
+            {featuredPlanning ? (
+              <p className="relative mt-0.5 truncate text-xs text-[#64748B]">
+                {formatDate(featuredPlanning.planning.date)}
+              </p>
+            ) : null}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {summaryCards.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.label}
-                  className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
+          {[
+            {
+              label: t("dashboard.plannings.stats.toFill"),
+              value: stats.toFill,
+              icon: Clock,
+              iconClass: "bg-amber-50 text-amber-600",
+            },
+            {
+              label: t("dashboard.plannings.stats.assignments"),
+              value: stats.assignments,
+              icon: Users,
+              iconClass: "bg-emerald-50 text-emerald-600",
+            },
+            {
+              label: t("dashboard.plannings.stats.drafts"),
+              value: stats.drafts,
+              icon: FileText,
+              iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
+            },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
+              >
+                <span
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl",
+                    item.iconClass
+                  )}
                 >
-                  <span
-                    className={cn(
-                      "flex h-10 w-10 items-center justify-center rounded-xl",
-                      item.iconClass
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
-                    {item.label}
-                  </p>
-                  <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
-                    {item.value}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
+                  {item.label}
+                </p>
+                <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
+                  {item.value}
+                </p>
+              </div>
+            );
+          })}
         </div>
       ) : null}
 
@@ -343,7 +355,7 @@ export default function PlanningsPage() {
                     </DashboardBadge>
                   </div>
 
-                  <div className="flex min-w-0 flex-wrap items-center gap-2 lg:flex-nowrap lg:justify-end">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible lg:flex-nowrap lg:justify-end">
                     <ActionButton
                       href={`/tableau-de-bord/plannings/${planning.id}`}
                       className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
@@ -351,15 +363,14 @@ export default function PlanningsPage() {
                       <Eye className="h-3.5 w-3.5" />
                       {t("dashboard.plannings.viewManage")}
                     </ActionButton>
-                    <ActionButton
+                    <button
                       type="button"
-                      variant="dangerSoft"
                       onClick={() => handleDelete(planning.id)}
                       title={t("dashboard.common.delete")}
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-700 transition hover:bg-rose-100"
                     >
                       <Trash className="h-3.5 w-3.5" />
-                    </ActionButton>
+                    </button>
                   </div>
                 </div>
               </article>
