@@ -53,8 +53,8 @@ export default function EntityCard({
   const titleNode = (
     <h3
       className={cn(
-        "font-semibold tracking-tight text-[#0F172A] text-balance",
-        isRow ? "text-[0.975rem] sm:text-base" : "text-base",
+        "font-semibold tracking-tight text-[#0F172A]",
+        isRow ? "text-[0.975rem] sm:text-base" : "text-base text-balance",
         href && "transition-colors group-hover/entity:text-[#1A23FF]",
       )}
     >
@@ -67,7 +67,7 @@ export default function EntityCard({
       {href ? (
         <Link
           href={href}
-          className="rounded-lg outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
+          className="block min-w-0 rounded-lg outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
         >
           {titleNode}
         </Link>
@@ -91,6 +91,16 @@ export default function EntityCard({
   );
 
   if (isRow) {
+    const hasMeta = Boolean(meta || children);
+    const hasAside = Boolean(amount || status);
+    const rowGridClass = hasMeta
+      ? hasAside
+        ? "lg:grid-cols-[minmax(0,1.2fr)_16rem_9.25rem_minmax(11rem,0.95fr)] xl:grid-cols-[minmax(0,1.25fr)_18rem_10.5rem_minmax(13rem,0.9fr)]"
+        : "lg:grid-cols-[minmax(0,1.3fr)_16rem_minmax(11rem,0.95fr)] xl:grid-cols-[minmax(0,1.35fr)_18rem_minmax(13rem,0.9fr)]"
+      : hasAside
+        ? "lg:grid-cols-[minmax(0,1.3fr)_9.25rem_minmax(11rem,0.95fr)] xl:grid-cols-[minmax(0,1.35fr)_10.5rem_minmax(13rem,0.9fr)]"
+        : "lg:grid-cols-[minmax(0,1fr)_minmax(11rem,0.9fr)] xl:grid-cols-[minmax(0,1fr)_minmax(13rem,0.85fr)]";
+
     return (
       <article
         onClick={onClick}
@@ -103,37 +113,38 @@ export default function EntityCard({
           className,
         )}
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
-          <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-3.5">
+        <div className={cn("grid grid-cols-1 items-start gap-3 lg:gap-x-5 lg:gap-y-0", rowGridClass)}>
+          <div className="flex min-w-0 items-start gap-3 sm:items-center">
             {leading ? <div className="shrink-0">{leading}</div> : null}
             {titleBlock}
-            {status ? <div className="shrink-0 md:hidden">{status}</div> : null}
           </div>
 
-          {(meta || children) && (
-            <div className="min-w-0 space-y-0.5 text-sm text-[#64748B] md:w-[15.5rem] md:shrink-0 lg:w-[18rem] xl:w-[20rem]">
-              {meta}
-              {children}
+          {hasMeta ? (
+            <div className="min-w-0 w-full">
+              <div className="space-y-0.5 text-sm text-[#64748B]">{meta}{children}</div>
             </div>
-          )}
+          ) : null}
 
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 md:shrink-0 md:justify-end">
-            {amount ? (
-              <div className="text-base font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-lg">
-                {amount}
-              </div>
-            ) : null}
-            {status ? <div className="hidden shrink-0 md:block">{status}</div> : null}
-            {actions ? (
-              <div
-                className="flex flex-wrap items-center gap-2 border-t border-[rgba(15,23,42,0.06)] pt-3 sm:border-0 sm:pt-0 md:pl-1"
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
-                {actions}
-              </div>
-            ) : null}
-          </div>
+          {hasAside ? (
+            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3 lg:flex-col lg:items-end lg:gap-1">
+              {amount ? (
+                <div className="text-base font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-lg lg:w-full lg:text-right">
+                  {amount}
+                </div>
+              ) : null}
+              {status ? <div className="shrink-0 lg:max-w-full">{status}</div> : null}
+            </div>
+          ) : null}
+
+          {actions ? (
+            <div
+              className="flex min-w-0 flex-wrap items-center gap-2 border-t border-[rgba(15,23,42,0.06)] pt-3 sm:border-0 sm:pt-0 lg:justify-end"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              {actions}
+            </div>
+          ) : null}
         </div>
       </article>
     );
@@ -259,9 +270,9 @@ export function EntityMetaRow({
 }) {
   if (inline) {
     return (
-      <p className="truncate text-sm text-[#64748B]">
-        <span className="font-medium text-[#94A3B8]">{label} · </span>
-        <span className="text-[#475569]">{value}</span>
+      <p className="grid grid-cols-[9.5rem_minmax(0,1fr)] items-start gap-x-2 text-sm leading-5">
+        <span className="font-medium text-[#94A3B8]">{label}</span>
+        <span className="min-w-0 break-words tabular-nums text-[#475569]">{value}</span>
       </p>
     );
   }
