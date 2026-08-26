@@ -160,26 +160,28 @@ export default function SponsoringPage() {
       />
 
       {!loading && !errorMessage && contracts.length > 0 ? (
-        <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.15fr_1fr] lg:gap-6">
-          <div className="relative flex min-h-[15.5rem] flex-col overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B82F6] via-[#1A23FF] to-[#102d78] p-7 text-white shadow-[0_16px_40px_rgba(26,35,255,0.22)] sm:min-h-[16.5rem] sm:p-8">
-            <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
-            <span className="pointer-events-none absolute -bottom-16 right-8 h-48 w-48 rounded-full bg-sky-300/10" />
-            <p className="relative text-sm font-medium text-white/75">
-              {t("dashboard.sponsoring.stats.totalAmount")}
-            </p>
-            <p className="relative mt-4 text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
-              {formatMontant(stats.totalAmount)}
-            </p>
-            <p className="relative mt-3 max-w-sm text-sm leading-relaxed text-white/70">
-              {t("dashboard.sponsoring.stats.totalAmountHint")}
-            </p>
-            <span className="relative mt-auto inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-medium text-white">
-              <Wallet className="h-3.5 w-3.5" />
+        <div className="space-y-4 sm:space-y-5">
+          <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-6 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
+            <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#1A23FF]/[0.06]" />
+            <span className="pointer-events-none absolute -bottom-12 right-16 h-36 w-36 rounded-full bg-[#3B82F6]/[0.05]" />
+            <div className="relative min-w-0">
+              <p className="text-sm font-medium text-[#64748B]">
+                {t("dashboard.sponsoring.stats.totalAmount")}
+              </p>
+              <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-4xl">
+                {formatMontant(stats.totalAmount)}
+              </p>
+              <p className="mt-1.5 text-sm text-[#64748B]">
+                {t("dashboard.sponsoring.stats.totalAmountHint")}
+              </p>
+            </div>
+            <span className="relative mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#475569] sm:mt-0">
+              <Wallet className="h-3.5 w-3.5 text-[#1A23FF]" />
               {stats.total} {t("dashboard.sponsoring.stats.total").toLowerCase()}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             {summaryCards.map((item) => {
               const Icon = item.icon;
               return (
@@ -229,18 +231,6 @@ export default function SponsoringPage() {
         />
       ) : (
         <div className="min-w-0 space-y-2">
-          <div
-            className={cn(
-              ROW_GRID,
-              "hidden px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8] lg:grid"
-            )}
-          >
-            <span className="min-w-0">{t("dashboard.sponsoring.columns.sponsor")}</span>
-            <span>{t("dashboard.sponsoring.detail.period")}</span>
-            <span>{t("dashboard.sponsoring.columns.amount")}</span>
-            <span>{t("dashboard.common.status")}</span>
-            <span className="text-right">{t("dashboard.common.actions")}</span>
-          </div>
           {contracts.map((c) => {
             const typeLabel = sponsorTypeLabel(c.sponsorType);
             const hasType = Boolean(c.sponsorType);
