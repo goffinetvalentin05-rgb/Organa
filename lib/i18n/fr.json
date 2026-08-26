@@ -1557,8 +1557,8 @@
       }
     },
     "overview": {
-      "title": "Dashboard du club",
-      "subtitle": "Vue d'ensemble de votre club : membres, cotisations, finances.",
+      "title": "Tableau de bord",
+      "subtitle": "L’essentiel de votre club, en un coup d’œil.",
       "statusNote": "Votre club est sous contrôle",
       "checkoutSuccess": "Paiement réussi ! Votre compte est maintenant Pro.",
       "kpis": {
@@ -1576,15 +1576,26 @@
         "lateQuotes": "en retard",
         "collected": "encaissées :",
         "pendingAmount": "en attente :",
-        "billedTotal": "facturé :"
+        "billedTotal": "facturé :",
+        "toCollect": "À encaisser",
+        "toCollectHint": "Cotisations et factures encore ouvertes.",
+        "toCollectCta": "Voir les encaissements",
+        "activeMembers": "Membres actifs",
+        "membershipsCollected": "Cotisations encaissées",
+        "activeSponsors": "Sponsors actifs",
+        "upcomingEventsCount": "Événements à venir"
       },
       "priorities": {
         "title": "Actions prioritaires",
         "badge": "Synthèse",
-        "empty": "Tout est à jour pour le moment.",
+        "empty": "Rien à traiter pour le moment.",
         "membershipsPending": "Cotisations en attente",
+        "membershipsUnpaidDetail": "{count} membres n’ont pas payé leur cotisation",
         "invoicesUnpaid": "Factures non payées",
+        "invoiceDue": "Facture {numero} à relancer",
         "expensesPending": "Charges à payer",
+        "expenseDue": "Charge {label} arrivée à échéance",
+        "planningSlots": "{count} postes restent libres pour {name}",
         "sponsorsExpired": "Contrats sponsors expirés",
         "sponsorsExpiring": "Contrats à renouveler bientôt",
         "upcomingEvents": "Événements à venir",
@@ -1592,7 +1603,10 @@
         "urgent": "Urgent",
         "toHandle": "À traiter",
         "soon": "À venir",
-        "info": "Info"
+        "info": "Info",
+        "relance": "Relancer",
+        "view": "Voir",
+        "complete": "Compléter"
       },
       "activity": {
         "clubRevenue": "Revenu club"
@@ -1678,7 +1692,13 @@
       "saveAction": "Enregistrer",
       "downloadAttachment": "Télécharger la pièce jointe",
       "replaceAttachment": "Remplacer la pièce jointe",
-      "attachmentHint": "Formats acceptés : PDF, JPG, PNG. Une seule pièce jointe.",
+      "attachmentHint": "Formats acceptés : PDF, JPG, PNG ou photo. Une seule pièce jointe.",
+      "addJustificatif": "Ajouter un justificatif",
+      "viewJustificatif": "Voir le justificatif",
+      "saveJustificatif": "Enregistrer le justificatif",
+      "justificatifCamera": "Photographier la facture",
+      "justificatifHint": "Joignez un PDF, une image ou une photo de la facture. Le fichier reste lié à cette charge.",
+      "justificatifSuccess": "Justificatif enregistré.",
       "fields": {
         "supplier": "Fournisseur / Prestataire",
         "dueDate": "Date d'échéance",

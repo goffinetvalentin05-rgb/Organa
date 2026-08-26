@@ -1543,7 +1543,7 @@
     },
     "overview": {
       "title": "Dashboard",
-      "subtitle": "Ein klarer Überblick über Dokumente und Fristen.",
+      "subtitle": "Das Wesentliche Ihres Vereins auf einen Blick.",
       "statusNote": "Ihre Aktivität ist unter Kontrolle",
       "checkoutSuccess": "Zahlung erfolgreich! Ihr Konto ist jetzt Pro.",
       "kpis": {
@@ -1562,15 +1562,26 @@
         "lateQuotes": "überfällig",
         "collected": "eingenommen:",
         "pendingAmount": "ausstehend:",
-        "billedTotal": "fakturiert:"
+        "billedTotal": "fakturiert:",
+        "toCollect": "Einzuziehen",
+        "toCollectHint": "Noch offene Beiträge und Rechnungen.",
+        "toCollectCta": "Einzüge ansehen",
+        "activeMembers": "Aktive Mitglieder",
+        "membershipsCollected": "Eingenommene Beiträge",
+        "activeSponsors": "Aktive Sponsoren",
+        "upcomingEventsCount": "Anstehende Veranstaltungen"
       },
       "priorities": {
         "title": "Prioritäre Aktionen",
         "badge": "Übersicht",
-        "empty": "Aktuell ist alles auf dem neuesten Stand.",
+        "empty": "Zurzeit nichts zu erledigen.",
         "membershipsPending": "Ausstehende Beiträge",
+        "membershipsUnpaidDetail": "{count} Mitglieder haben ihren Beitrag nicht bezahlt",
         "invoicesUnpaid": "Unbezahlte Rechnungen",
+        "invoiceDue": "Rechnung {numero} nachfassen",
         "expensesPending": "Zu zahlende Ausgaben",
+        "expenseDue": "Ausgabe {label} ist fällig",
+        "planningSlots": "{count} offene Posten bleiben für {name}",
         "sponsorsExpired": "Abgelaufene Sponsorenverträge",
         "sponsorsExpiring": "Bald zu erneuernde Verträge",
         "upcomingEvents": "Anstehende Veranstaltungen",
@@ -1578,7 +1589,10 @@
         "urgent": "Dringend",
         "toHandle": "Zu erledigen",
         "soon": "Bald",
-        "info": "Info"
+        "info": "Info",
+        "relance": "Nachfassen",
+        "view": "Ansehen",
+        "complete": "Ergänzen"
       },
       "activity": {
         "clubRevenue": "Vereinseinnahme"
@@ -1675,7 +1689,13 @@
       "saveAction": "Speichern",
       "downloadAttachment": "Anhang herunterladen",
       "replaceAttachment": "Anhang ersetzen",
-      "attachmentHint": "Akzeptierte Formate: PDF, JPG, PNG. Nur ein Anhang.",
+      "attachmentHint": "Akzeptierte Formate: PDF, JPG, PNG oder Foto. Nur ein Anhang.",
+      "addJustificatif": "Beleg hinzufügen",
+      "viewJustificatif": "Beleg ansehen",
+      "saveJustificatif": "Beleg speichern",
+      "justificatifCamera": "Rechnung fotografieren",
+      "justificatifHint": "Fügen Sie ein PDF, ein Bild oder ein Foto der Rechnung hinzu. Die Datei bleibt mit dieser Ausgabe verknüpft.",
+      "justificatifSuccess": "Beleg gespeichert.",
       "fields": {
         "supplier": "Lieferant",
         "dueDate": "Fälligkeitsdatum",

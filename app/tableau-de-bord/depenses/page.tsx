@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { Eye, Edit, Trash, Download, Receipt } from "@/lib/icons";
+import { Eye, Edit, Trash, Download, Receipt, Paperclip, Camera } from "@/lib/icons";
 import {
   PageLayout,
   PageHeader,
@@ -110,6 +110,9 @@ export default function DepensesPage() {
   const [showForm, setShowForm] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showJustificatifModal, setShowJustificatifModal] = useState(false);
+  const [justificatifFile, setJustificatifFile] = useState<File | null>(null);
+  const [justificatifLoading, setJustificatifLoading] = useState(false);
   const [selectedDepense, setSelectedDepense] = useState<Depense | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -400,21 +403,19 @@ export default function DepensesPage() {
 
   const uploadAttachment = async (
     supabase: ReturnType<typeof createClient>,
-    userId: string,
+    ownerId: string,
     file: File
   ) => {
-    // Bucket "expenses" = PRIVÉ. On stocke uniquement le PATH dans la base
+    // Bucket "expenses" = PRIVÉ. Path : <clubId>/<timestamp>-<safeName>
     // (`attachment_url` = misnomer historique, contient désormais le path).
-    // L'affichage/téléchargement passe par /api/storage/sign qui re-signe
-    // une URL fraîche à chaque clic.
-    // Convention de chemin : <userId>/<timestamp>-<safeName>
+    // L'affichage/téléchargement passe par /api/storage/sign.
     const safeName = file.name
       .replace(/\\/g, "/")
       .split("/")
       .pop()!
       .replace(/[^A-Za-z0-9._-]+/g, "_")
       .slice(0, 200);
-    const filePath = `${userId}/${Date.now()}-${safeName}`;
+    const filePath = `${ownerId}/${Date.now()}-${safeName}`;
 
     const { error: uploadError } = await supabase.storage
       .from("expenses")
@@ -501,7 +502,7 @@ export default function DepensesPage() {
         if (formData.pieceJointe) {
           attachmentUrl = await uploadAttachment(
             supabase,
-            user.id,
+            clubId || user.id,
             formData.pieceJointe
           );
         }
@@ -582,7 +583,7 @@ export default function DepensesPage() {
       if (editFormData.pieceJointe) {
         attachmentUrl = await uploadAttachment(
           supabase,
-          user.id,
+          clubId || user.id,
           editFormData.pieceJointe
         );
       }
@@ -669,6 +670,49 @@ export default function DepensesPage() {
       eventId: depense.eventId || "",
     });
     setShowEditModal(true);
+  };
+
+  const openJustificatifModal = (depense: Depense) => {
+    setSelectedDepense(depense);
+    setJustificatifFile(null);
+    setShowJustificatifModal(true);
+  };
+
+  const closeJustificatifModal = () => {
+    setShowJustificatifModal(false);
+    setJustificatifFile(null);
+    if (!showViewModal && !showEditModal) {
+      setSelectedDepense(null);
+    }
+  };
+
+  const onSaveJustificatif = async () => {
+    if (!selectedDepense || !justificatifFile || justificatifLoading) return;
+    setJustificatifLoading(true);
+    setErrorMessage(null);
+    try {
+      const payload = new FormData();
+      payload.append("expenseId", selectedDepense.id);
+      payload.append("file", justificatifFile);
+      const res = await fetch("/api/depenses/justificatif", {
+        method: "POST",
+        body: payload,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || t("dashboard.expenses.uploadError"));
+      }
+      await loadDepenses();
+      closeJustificatifModal();
+      notifySuccess(t("dashboard.expenses.justificatifSuccess"), "expense-justificatif");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : t("dashboard.expenses.uploadError");
+      setErrorMessage(message);
+      notifyError(message, "expense-justificatif");
+    } finally {
+      setJustificatifLoading(false);
+    }
   };
 
   const handleExportAccounting = () => {
@@ -861,7 +905,7 @@ export default function DepensesPage() {
             </label>
             <input
               type="file"
-              accept=".pdf,image/jpeg,image/png"
+              accept="image/*,.pdf,application/pdf"
               onChange={(event) =>
                 setFormData({
                   ...formData,
@@ -1005,6 +1049,30 @@ export default function DepensesPage() {
                       <Edit className="h-4 w-4" />
                       {t("dashboard.common.edit")}
                     </ActionButton>
+                    {hrefPJ ? (
+                      <ActionButton
+                        href={hrefPJ}
+                        target="_blank"
+                        rel="noreferrer"
+                        variant="ghost"
+                        className="inline-flex items-center gap-1.5"
+                        title={t("dashboard.expenses.viewJustificatif")}
+                      >
+                        <Paperclip className="h-4 w-4" />
+                        {t("dashboard.expenses.viewJustificatif")}
+                      </ActionButton>
+                    ) : (
+                      <ActionButton
+                        type="button"
+                        variant="ghost"
+                        className="inline-flex items-center gap-1.5"
+                        title={t("dashboard.expenses.addJustificatif")}
+                        onClick={() => openJustificatifModal(depense)}
+                      >
+                        <Paperclip className="h-4 w-4" />
+                        {t("dashboard.expenses.addJustificatif")}
+                      </ActionButton>
+                    )}
                     <ActionButton
                       type="button"
                       variant="dangerSoft"
@@ -1066,10 +1134,26 @@ export default function DepensesPage() {
               </p>
             </div>
 
-            {selectedDepense.attachmentUrl && (
+            {selectedDepense.attachmentUrl ? (
               <div className="flex justify-end">
-                <ActionButton href={buildAttachmentHref(selectedDepense.attachmentUrl) ?? "#"} target="_blank" rel="noreferrer">
-                  {t("dashboard.expenses.downloadAttachment")}
+                <ActionButton
+                  href={buildAttachmentHref(selectedDepense.attachmentUrl) ?? "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t("dashboard.expenses.viewJustificatif")}
+                </ActionButton>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <ActionButton
+                  type="button"
+                  onClick={() => {
+                    setShowViewModal(false);
+                    openJustificatifModal(selectedDepense);
+                  }}
+                >
+                  {t("dashboard.expenses.addJustificatif")}
                 </ActionButton>
               </div>
             )}
@@ -1203,7 +1287,7 @@ export default function DepensesPage() {
                 </label>
                 <input
                   type="file"
-                  accept=".pdf,image/jpeg,image/png"
+                  accept="image/*,.pdf,application/pdf"
                   onChange={(event) =>
                     setEditFormData({
                       ...editFormData,
@@ -1245,6 +1329,67 @@ export default function DepensesPage() {
           </div>
         </div>
       )}
+
+      {showJustificatifModal && selectedDepense ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200/70 bg-white p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {t("dashboard.expenses.addJustificatif")}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">{selectedDepense.label}</p>
+              </div>
+              <ActionButton type="button" onClick={closeJustificatifModal}>
+                Fermer
+              </ActionButton>
+            </div>
+            <p className="text-sm text-slate-600">{t("dashboard.expenses.justificatifHint")}</p>
+            <div className="space-y-3">
+              <label className="block">
+                <span className="sr-only">{t("dashboard.expenses.addJustificatif")}</span>
+                <input
+                  type="file"
+                  accept="image/*,.pdf,application/pdf"
+                  onChange={(event) => setJustificatifFile(event.target.files?.[0] ?? null)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+                />
+              </label>
+              <label className="block sm:hidden">
+                <span className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <Camera className="h-4 w-4" />
+                  {t("dashboard.expenses.justificatifCamera")}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(event) => setJustificatifFile(event.target.files?.[0] ?? null)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm"
+                />
+              </label>
+              {justificatifFile ? (
+                <p className="text-sm text-slate-600">{justificatifFile.name}</p>
+              ) : null}
+            </div>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
+              <ActionButton type="button" onClick={closeJustificatifModal} className="flex-1 justify-center">
+                {t("dashboard.common.cancel")}
+              </ActionButton>
+              <DashboardPrimaryButton
+                type="button"
+                icon="none"
+                disabled={!justificatifFile || justificatifLoading}
+                loading={justificatifLoading}
+                className="flex-1 justify-center"
+                onClick={() => void onSaveJustificatif()}
+              >
+                {t("dashboard.expenses.saveJustificatif")}
+              </DashboardPrimaryButton>
+            </div>
+          </div>
+        </div>
+      ) : null}
       </PageLayout>
     </>
   );

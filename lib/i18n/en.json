@@ -1672,8 +1672,8 @@
       }
     },
     "overview": {
-      "title": "Club Dashboard",
-      "subtitle": "Overview of your club: members, memberships, finances.",
+      "title": "Dashboard",
+      "subtitle": "Your club at a glance.",
       "statusNote": "Your club is under control",
       "checkoutSuccess": "Payment successful! Your account is now Pro.",
       "kpis": {
@@ -1692,15 +1692,26 @@
         "lateQuotes": "overdue",
         "collected": "collected:",
         "pendingAmount": "pending:",
-        "billedTotal": "billed:"
+        "billedTotal": "billed:",
+        "toCollect": "To collect",
+        "toCollectHint": "Open memberships and invoices still unpaid.",
+        "toCollectCta": "View collections",
+        "activeMembers": "Active members",
+        "membershipsCollected": "Memberships collected",
+        "activeSponsors": "Active sponsors",
+        "upcomingEventsCount": "Upcoming events"
       },
       "priorities": {
         "title": "Priority actions",
         "badge": "Summary",
-        "empty": "Everything is up to date for now.",
+        "empty": "Nothing to handle right now.",
         "membershipsPending": "Memberships pending",
+        "membershipsUnpaidDetail": "{count} members have not paid their membership",
         "invoicesUnpaid": "Unpaid invoices",
+        "invoiceDue": "Invoice {numero} needs a follow-up",
         "expensesPending": "Expenses to pay",
+        "expenseDue": "Expense {label} is due",
+        "planningSlots": "{count} open slots remain for {name}",
         "sponsorsExpired": "Expired sponsor contracts",
         "sponsorsExpiring": "Contracts to renew soon",
         "upcomingEvents": "Upcoming events",
@@ -1708,7 +1719,10 @@
         "urgent": "Urgent",
         "toHandle": "To handle",
         "soon": "Soon",
-        "info": "Info"
+        "info": "Info",
+        "relance": "Follow up",
+        "view": "View",
+        "complete": "Complete"
       },
       "activity": {
         "clubRevenue": "Club revenue"
@@ -1805,7 +1819,13 @@
       "saveAction": "Save",
       "downloadAttachment": "Download attachment",
       "replaceAttachment": "Replace attachment",
-      "attachmentHint": "Accepted formats: PDF, JPG, PNG. One attachment only.",
+      "attachmentHint": "Accepted formats: PDF, JPG, PNG or photo. One attachment only.",
+      "addJustificatif": "Add receipt",
+      "viewJustificatif": "View receipt",
+      "saveJustificatif": "Save receipt",
+      "justificatifCamera": "Photograph the invoice",
+      "justificatifHint": "Attach a PDF, image or photo of the invoice. The file stays linked to this expense.",
+      "justificatifSuccess": "Receipt saved.",
       "fields": {
         "supplier": "Supplier",
         "dueDate": "Due date",
