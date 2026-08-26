@@ -1119,6 +1119,13 @@
         "secretary": "Secretary"
       },
       "filtersLabel": "Filters",
+      "filterAction": "Filter",
+      "stats": {
+        "total": "Total members",
+        "committee": "Committee members",
+        "coaches": "Coaches",
+        "players": "Players"
+      },
       "filters": {
         "allRoles": "All roles",
         "allCategories": "All categories",

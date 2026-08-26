@@ -997,6 +997,13 @@
         "secretary": "Secrétaire"
       },
       "filtersLabel": "Filtres",
+      "filterAction": "Filtrer",
+      "stats": {
+        "total": "Total des membres",
+        "committee": "Membres du comité",
+        "coaches": "Entraîneurs",
+        "players": "Joueurs"
+      },
       "filters": {
         "allRoles": "Tous les rôles",
         "allCategories": "Toutes les catégories",
