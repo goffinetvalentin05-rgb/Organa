@@ -8,7 +8,32 @@ import { useI18n } from "@/components/I18nProvider";
 import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useAutoDraft } from "@/hooks/useAutoDraft";
 import { localeToIntl } from "@/lib/i18n";
-import { PageLayout, PageHeader, GlassCard, dashboardSecondaryButtonClass, dashboardModalClass, dashboardInputClass, dashboardInnerPanelClass, dashboardTextPrimaryClass, dashboardTextSecondaryClass, dashboardTextMutedClass, buvetteDayAvailableClass, buvetteDayReservedClass, buvetteDayOccupiedClass, buvetteDayEmptyClass, cn } from "@/components/ui";
+import {
+  PageLayout,
+  PageHeader,
+  GlassCard,
+  DashboardBadge,
+  dashboardSecondaryButtonClass,
+  dashboardModalClass,
+  dashboardInputClass,
+  dashboardInnerPanelClass,
+  dashboardTextPrimaryClass,
+  dashboardTextSecondaryClass,
+  dashboardTextMutedClass,
+  buvetteDayAvailableClass,
+  buvetteDayReservedClass,
+  buvetteDayOccupiedClass,
+  buvetteDayEmptyClass,
+  cn,
+} from "@/components/ui";
+import {
+  Calendar,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Mail,
+} from "@/lib/icons";
 import BuvettePublicSettingsPanel from "@/components/buvette/BuvettePublicSettings";
 import BuvetteRequestsPanel from "@/components/buvette/BuvetteRequestsPanel";
 import type { BuvetteRequest } from "@/lib/buvette/requests";
@@ -164,6 +189,33 @@ export default function BuvettePage() {
   }, [loadData]);
 
   const grid = useMemo(() => buildMonthGrid(month), [month]);
+
+  const monthLabel = useMemo(() => {
+    const [year, monthNum] = month.split("-").map(Number);
+    return new Date(year, monthNum - 1, 1).toLocaleDateString(localeToIntl[locale], {
+      month: "long",
+      year: "numeric",
+    });
+  }, [month, locale]);
+
+  const monthStats = useMemo(() => {
+    const dates = grid.flat().filter((value): value is string => Boolean(value));
+    let available = 0;
+    let occupied = 0;
+    let reserved = 0;
+    for (const date of dates) {
+      const status = days[date]?.status;
+      if (status === "reserved") reserved += 1;
+      else if (status === "occupied") occupied += 1;
+      else available += 1;
+    }
+    return {
+      available,
+      occupied,
+      reserved,
+      pending: requests.filter((request) => request.status === "pending").length,
+    };
+  }, [grid, days, requests]);
 
   const selectedDayData = selectedDate ? days[selectedDate] : null;
   const selectedRequest = selectedRequestId
@@ -497,65 +549,187 @@ N'hésite pas à nous contacter si tu as des questions.
     <PageLayout maxWidth="7xl">
       <PageHeader title="Buvette" subtitle="Gestion des disponibilités et demandes externes." />
 
-      <div className="flex items-center gap-2 text-sm">
-        <span className="inline-flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-green-500" /> {t("dashboard.buvette.legendAvailable")}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-red-500" /> {t("dashboard.buvette.legendOccupied")}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-amber-500" /> {t("dashboard.buvette.legendReserved")}
-        </span>
+      <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.15fr_1fr] lg:gap-6">
+        <div className="relative flex min-h-[15.5rem] flex-col overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B82F6] via-[#1A23FF] to-[#102d78] p-7 text-white shadow-[0_16px_40px_rgba(26,35,255,0.22)] sm:min-h-[16.5rem] sm:p-8">
+          <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
+          <span className="pointer-events-none absolute -bottom-16 right-8 h-48 w-48 rounded-full bg-sky-300/10" />
+          <p className="relative text-sm font-medium text-white/75">Buvette</p>
+          <p className="relative mt-3 text-3xl font-semibold capitalize tracking-tight sm:text-4xl">
+            {monthLabel}
+          </p>
+          <p className="relative mt-3 max-w-sm text-sm leading-relaxed text-white/70">
+            Vue du mois et des disponibilités.
+          </p>
+          <div className="relative mt-auto flex flex-wrap gap-2 pt-6">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              {t("dashboard.buvette.legendAvailable")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+              {t("dashboard.buvette.legendOccupied")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+              {t("dashboard.buvette.legendReserved")}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {[
+            {
+              label: "Disponibilités",
+              value: monthStats.available,
+              icon: Calendar,
+              iconClass: "bg-emerald-50 text-emerald-600",
+            },
+            {
+              label: "Occupations",
+              value: monthStats.occupied,
+              icon: Clock,
+              iconClass: "bg-rose-50 text-rose-600",
+            },
+            {
+              label: "Réservations",
+              value: monthStats.reserved,
+              icon: CheckCircle,
+              iconClass: "bg-amber-50 text-amber-600",
+            },
+            {
+              label: "Demandes en attente",
+              value: monthStats.pending,
+              icon: Mail,
+              iconClass: "bg-[#EEF2FF] text-[#1A23FF]",
+            },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
+              >
+                <span
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-full",
+                    item.iconClass
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+                <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
+                  {item.label}
+                </p>
+                <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
+                  {loading ? "—" : item.value}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {message ? (
-        <GlassCard padding="md" className="border-[rgba(15,23,42,0.08)] text-sm text-[#334155]">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#334155] shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           {message}
-        </GlassCard>
+        </div>
       ) : null}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-6">
-        <GlassCard padding="md">
-          <div className="mb-4 flex items-center justify-between">
-            <button onClick={() => goMonth(-1)} className={dashboardSecondaryButtonClass}>{"<"}</button>
-            <p className={cn("font-semibold", dashboardTextPrimaryClass)}>{month}</p>
-            <button onClick={() => goMonth(1)} className={dashboardSecondaryButtonClass}>{">"}</button>
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(17rem,0.7fr)] xl:gap-6">
+        <GlassCard padding="md" className="min-w-0">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-base font-semibold tracking-tight text-[#0F172A] sm:text-lg">
+              Disponibilités
+            </h2>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => goMonth(-1)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.25)] hover:text-[#1A23FF]"
+                aria-label="Mois précédent"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <p className="min-w-[9.25rem] text-center text-sm font-semibold capitalize tracking-tight text-[#0F172A]">
+                {monthLabel}
+              </p>
+              <button
+                type="button"
+                onClick={() => goMonth(1)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.25)] hover:text-[#1A23FF]"
+                aria-label="Mois suivant"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {loading ? (
-            <p className={dashboardTextSecondaryClass}>{t("dashboard.buvette.calendarLoading")}</p>
+            <p className={cn("py-8 text-sm", dashboardTextSecondaryClass)}>
+              {t("dashboard.buvette.calendarLoading")}
+            </p>
           ) : (
             <>
-              <div className={cn("mb-2 grid grid-cols-7 gap-2 text-xs", dashboardTextMutedClass)}>
-                {(weekdayLabels.length ? weekdayLabels : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]).map((d) => (
-                  <div key={d} className="text-center">{d}</div>
-                ))}
+              <div className="mb-2 grid grid-cols-7 gap-1.5 sm:gap-2">
+                {(weekdayLabels.length ? weekdayLabels : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]).map(
+                  (d) => (
+                    <div
+                      key={d}
+                      className="text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-[#94A3B8] sm:text-[11px]"
+                    >
+                      {d}
+                    </div>
+                  )
+                )}
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {grid.map((week, idx) => (
-                  <div key={idx} className="grid grid-cols-7 gap-2">
-                    {week.map((date) => {
-                      if (!date) return <div key={`${idx}-empty`} className={`h-14 rounded-lg ${buvetteDayEmptyClass}`} />;
+                  <div key={idx} className="grid grid-cols-7 gap-1.5 sm:gap-2">
+                    {week.map((date, cellIdx) => {
+                      if (!date) {
+                        return (
+                          <div
+                            key={`${idx}-${cellIdx}`}
+                            className={cn("h-9 rounded-xl sm:h-11", buvetteDayEmptyClass)}
+                          />
+                        );
+                      }
                       const data = days[date];
                       const isSelected = selectedDate === date;
                       const color = !data
                         ? buvetteDayAvailableClass
                         : data.status === "reserved"
-                        ? buvetteDayReservedClass
-                        : buvetteDayOccupiedClass;
+                          ? buvetteDayReservedClass
+                          : buvetteDayOccupiedClass;
+                      const dotClass = !data
+                        ? "bg-emerald-400"
+                        : data.status === "reserved"
+                          ? "bg-amber-400"
+                          : "bg-rose-400";
                       return (
                         <button
                           key={date}
+                          type="button"
                           onClick={() => {
                             setSelectedDate(date);
                             setSelectedRequestId(days[date]?.request?.id || null);
                           }}
-                          className={`h-14 rounded-lg border text-sm font-medium transition ${color} ${
-                            isSelected ? "ring-2 ring-blue-400/60 ring-offset-1 ring-offset-transparent" : ""
-                          }`}
+                          className={cn(
+                            "relative flex h-9 w-full min-w-0 items-center justify-center rounded-xl border text-xs font-semibold tabular-nums transition sm:h-11 sm:text-sm",
+                            isSelected
+                              ? "border-transparent bg-[#1A23FF] text-white shadow-[0_4px_14px_rgba(26,35,255,0.3)]"
+                              : color
+                          )}
                         >
                           {date.slice(-2)}
+                          {!isSelected ? (
+                            <span
+                              className={cn(
+                                "absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full sm:bottom-1.5",
+                                dotClass
+                              )}
+                            />
+                          ) : null}
                         </button>
                       );
                     })}
@@ -566,109 +740,149 @@ N'hésite pas à nous contacter si tu as des questions.
           )}
         </GlassCard>
 
-        <GlassCard padding="md" className="space-y-4">
-          <h2 className={cn("font-semibold", dashboardTextPrimaryClass)}>Détails date</h2>
+        <GlassCard
+          padding="md"
+          className={cn("min-w-0 space-y-4", !selectedDate && "xl:self-start")}
+        >
+          <h2 className="text-base font-semibold tracking-tight text-[#0F172A] sm:text-lg">
+            Détails date
+          </h2>
           {!selectedDate ? (
-            <p className={cn("text-sm", dashboardTextSecondaryClass)}>Sélectionne une date dans le calendrier.</p>
+            <div className="flex flex-col items-center justify-center px-3 py-8 text-center">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#EEF2FF] text-[#1A23FF]">
+                <Calendar className="h-5 w-5" />
+              </span>
+              <p className="text-sm font-semibold text-[#0F172A]">Sélectionnez une date</p>
+              <p className={cn("mt-1 text-xs leading-relaxed", dashboardTextMutedClass)}>
+                Choisissez un jour dans le calendrier.
+              </p>
+            </div>
           ) : (
             <>
-              <p className="text-sm"><span className="font-medium">Date :</span> {selectedDate}</p>
-              <p className="text-sm">
-                <span className="font-medium">Statut :</span>{" "}
-                {!selectedDayData
-                  ? "Disponible"
-                  : selectedDayData.status === "reserved"
-                  ? "Réservée"
-                  : selectedRequest
-                  ? formatStatus(selectedRequest.status)
-                  : "Occupée"}
-              </p>
-              {selectedDayData?.reason && (
-                <p className="text-sm"><span className="font-medium">Raison :</span> {selectedDayData.reason}</p>
-              )}
+              <div className="space-y-2 text-sm">
+                <p>
+                  <span className="font-medium text-[#64748B]">Date :</span>{" "}
+                  <span className={dashboardTextPrimaryClass}>{selectedDate}</span>
+                </p>
+                <p className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium text-[#64748B]">Statut :</span>
+                  <DashboardBadge
+                    variant={
+                      !selectedDayData
+                        ? "success"
+                        : selectedDayData.status === "reserved"
+                          ? "warning"
+                          : selectedRequest?.status === "pending"
+                            ? "warning"
+                            : "danger"
+                    }
+                  >
+                    {!selectedDayData
+                      ? "Disponible"
+                      : selectedDayData.status === "reserved"
+                        ? "Réservée"
+                        : selectedRequest
+                          ? formatStatus(selectedRequest.status)
+                          : "Occupée"}
+                  </DashboardBadge>
+                </p>
+                {selectedDayData?.reason ? (
+                  <p className="text-sm">
+                    <span className="font-medium text-[#64748B]">Raison :</span>{" "}
+                    <span className={dashboardTextPrimaryClass}>{selectedDayData.reason}</span>
+                  </p>
+                ) : null}
+              </div>
 
-              {!selectedDayData && (
+              {!selectedDayData ? (
                 <button
+                  type="button"
                   onClick={blockDate}
                   disabled={submitting}
-                  className="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                  className="w-full rounded-xl bg-[#1A23FF] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(26,35,255,0.22)] transition hover:bg-[#151dd9] disabled:opacity-50"
                 >
                   Bloquer la date
                 </button>
-              )}
+              ) : null}
 
-              {selectedDayData?.status === "occupied" && selectedDayData?.source === "admin" && (
+              {selectedDayData?.status === "occupied" && selectedDayData?.source === "admin" ? (
                 <button
+                  type="button"
                   onClick={unblockDate}
                   disabled={submitting}
-                  className={`w-full px-4 py-2 ${dashboardSecondaryButtonClass} disabled:opacity-50`}
+                  className={cn("w-full px-4 py-2.5", dashboardSecondaryButtonClass, "disabled:opacity-50")}
                 >
                   Débloquer la date
                 </button>
-              )}
+              ) : null}
 
-              {selectedRequest && (
-                <div className={`${dashboardInnerPanelClass} space-y-2 p-3`}>
-                  <p className="font-medium text-sm">Réservation sélectionnée</p>
-                  <p className="text-sm">
+              {selectedRequest ? (
+                <div className={`${dashboardInnerPanelClass} space-y-2 p-4`}>
+                  <p className="text-sm font-medium text-[#0F172A]">Réservation sélectionnée</p>
+                  <p className="text-sm font-semibold text-[#0F172A]">
                     {selectedRequest.first_name} {selectedRequest.last_name}
                   </p>
-                  <p className="text-xs text-slate-500">{selectedRequest.email}</p>
-                  <p className="text-sm">Date : {selectedRequest.reservation_date}</p>
-                  <p className="text-sm">Type : {selectedRequest.event_type}</p>
-                  {selectedRequest.phone && (
-                    <p className="text-sm">Téléphone : {selectedRequest.phone}</p>
-                  )}
-                  <p className="text-sm">Statut : {formatStatus(selectedRequest.status)}</p>
-                  {selectedRequest.message && (
-                    <p className="text-sm text-slate-600">{selectedRequest.message}</p>
-                  )}
+                  <p className="text-xs text-[#64748B]">{selectedRequest.email}</p>
+                  <p className="text-sm text-[#334155]">Date : {selectedRequest.reservation_date}</p>
+                  <p className="text-sm text-[#334155]">Type : {selectedRequest.event_type}</p>
+                  {selectedRequest.phone ? (
+                    <p className="text-sm text-[#334155]">Téléphone : {selectedRequest.phone}</p>
+                  ) : null}
+                  <p className="text-sm text-[#334155]">Statut : {formatStatus(selectedRequest.status)}</p>
+                  {selectedRequest.message ? (
+                    <p className="text-sm leading-relaxed text-[#475569]">{selectedRequest.message}</p>
+                  ) : null}
 
-                  {selectedRequest.status === "pending" && (
-                    <div className="flex gap-2">
+                  {selectedRequest.status === "pending" ? (
+                    <div className="flex gap-2 pt-1">
                       <button
+                        type="button"
                         onClick={() => decideRequest(selectedRequest.id, "accepted")}
                         disabled={submitting}
-                        className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                        className="flex-1 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
                       >
                         Accepter
                       </button>
                       <button
+                        type="button"
                         onClick={() => decideRequest(selectedRequest.id, "refused")}
                         disabled={submitting}
-                        className="flex-1 px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
+                        className="flex-1 rounded-xl bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
                       >
                         Refuser
                       </button>
                     </div>
-                  )}
+                  ) : null}
 
-                  {selectedRequest.status === "accepted" && (
-                    <div className="flex gap-2">
+                  {selectedRequest.status === "accepted" ? (
+                    <div className="flex gap-2 pt-1">
                       <button
+                        type="button"
                         onClick={openInfoModal}
-                        className={`flex-1 px-3 py-2 ${dashboardSecondaryButtonClass}`}
+                        className={cn("flex-1 px-3 py-2 text-xs", dashboardSecondaryButtonClass)}
                       >
                         Envoyer les infos
                       </button>
                       <button
+                        type="button"
                         onClick={openInvoiceModal}
-                        className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
+                        className="flex-1 rounded-xl bg-[#1A23FF] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#151dd9]"
                       >
                         Envoyer la facture
                       </button>
                     </div>
-                  )}
+                  ) : null}
 
                   <button
+                    type="button"
                     onClick={() => requestArchive(selectedRequest.id)}
                     disabled={submitting}
-                    className={`w-full px-3 py-2 ${dashboardSecondaryButtonClass} disabled:opacity-50`}
+                    className={cn("w-full px-3 py-2 text-xs", dashboardSecondaryButtonClass, "disabled:opacity-50")}
                   >
                     Archiver
                   </button>
                 </div>
-              )}
+              ) : null}
             </>
           )}
         </GlassCard>

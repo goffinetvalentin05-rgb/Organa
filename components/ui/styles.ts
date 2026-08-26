@@ -144,15 +144,15 @@ export const dashboardModalClass =
   "dashboard-modal-surface overflow-hidden rounded-[1.75rem] border border-[rgba(15,23,42,0.1)] bg-white text-[#0F172A] shadow-[0_24px_64px_rgba(15,23,42,0.14)]";
 
 export const buvetteDayAvailableClass =
-  "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100";
+  "border-[#E5E7EB] bg-[#F0FDF4] text-[#047857] hover:border-emerald-200 hover:bg-emerald-50";
 
 export const buvetteDayReservedClass =
-  "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100";
+  "border-[#F3E6D4] bg-[#FFF8F1] text-[#B45309] hover:border-amber-200 hover:bg-amber-50";
 
 export const buvetteDayOccupiedClass =
-  "border-red-200 bg-red-50 text-red-700 hover:bg-red-100";
+  "border-[#F8D7DC] bg-[#FFF1F2] text-[#BE123C] hover:border-rose-200 hover:bg-rose-50";
 
-export const buvetteDayEmptyClass = "border-transparent bg-[#F1F5F9]";
+export const buvetteDayEmptyClass = "border-transparent bg-transparent";
 
 export const dashboardInfoPanelClass =
   "rounded-2xl border border-[rgba(26,35,255,0.14)] bg-[rgba(26,35,255,0.05)]";
