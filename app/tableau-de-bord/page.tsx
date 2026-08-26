@@ -143,7 +143,7 @@ export default function TableauDeBordPage() {
 
   const getMontantDocument = (doc: DocumentItem) => {
     if (typeof doc.totalTTC === "number") return doc.totalTTC;
-    return calculerTotalTTC(doc.lignes || []);
+    return calculerTotalTTC(doc.lignes);
   };
 
   useEffect(() => {
