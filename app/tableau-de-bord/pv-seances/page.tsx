@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, Edit, Trash, Download, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -13,6 +13,7 @@ import {
   EntityCard,
   EntityCardList,
   EntityMetaRow,
+  DashboardBadge,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import type { MeetingStatus, MeetingType } from "@/lib/meeting-minutes";
@@ -82,6 +83,14 @@ export default function PvSeancesPage() {
     return "bg-slate-100 text-slate-600";
   };
 
+  const draftToHighlight = useMemo(() => {
+    const drafts = minutes.filter((minute) => minute.status === "draft");
+    if (drafts.length === 0) return null;
+    return [...drafts].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+  }, [minutes]);
+
+  const showBanner = !loading && !errorMessage && minutes.length > 0;
+
   const handleDelete = async (id: string) => {
     if (!confirm(t("dashboard.meetingMinutes.deleteConfirm"))) return;
     try {
@@ -103,11 +112,40 @@ export default function PvSeancesPage() {
         title={t("dashboard.meetingMinutes.title")}
         subtitle={t("dashboard.meetingMinutes.subtitle")}
         actions={
-          <DashboardPrimaryButton href="/tableau-de-bord/pv-seances/nouveau" icon="none">
+          <DashboardPrimaryButton href="/tableau-de-bord/pv-seances/nouveau" size="sm">
             {t("dashboard.meetingMinutes.newAction")}
           </DashboardPrimaryButton>
         }
       />
+
+      {showBanner ? (
+        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-6 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
+          <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#1A23FF]/[0.06]" />
+          <span className="pointer-events-none absolute -bottom-12 right-16 h-36 w-36 rounded-full bg-[#3B82F6]/[0.05]" />
+          <div className="relative min-w-0">
+            <p className="text-sm font-medium text-[#64748B]">
+              {draftToHighlight
+                ? t("dashboard.meetingMinutes.banner.draftLabel")
+                : t("dashboard.meetingMinutes.banner.allClearLabel")}
+            </p>
+            <p className="mt-1 truncate text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
+              {draftToHighlight
+                ? draftToHighlight.title
+                : t("dashboard.meetingMinutes.banner.allClearTitle")}
+            </p>
+            {draftToHighlight ? (
+              <p className="mt-1.5 text-sm text-[#64748B]">
+                {t("dashboard.meetingMinutes.columns.date")} · {formatDate(draftToHighlight.meetingDate)}
+              </p>
+            ) : null}
+          </div>
+          {draftToHighlight ? (
+            <span className="relative mt-4 sm:mt-0">
+              <DashboardBadge variant="info">{statusLabel(draftToHighlight.status)}</DashboardBadge>
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="rounded-[1.25rem] border border-[rgba(15,23,42,0.08)] bg-white p-12 text-center text-slate-500 shadow-sm">

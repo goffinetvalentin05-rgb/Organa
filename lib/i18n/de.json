@@ -1443,6 +1443,11 @@
     "meetingMinutes": {
       "title": "Sitzungsprotokolle",
       "subtitle": "Protokolle Ihrer Vereinssitzungen verfassen und exportieren.",
+      "banner": {
+        "draftLabel": "Protokoll zu finalisieren",
+        "allClearLabel": "Sitzungsprotokolle",
+        "allClearTitle": "Alle Protokolle sind aktuell"
+      },
       "newAction": "Protokoll erstellen",
       "createSuccess": "Protokoll gespeichert",
       "loadError": "Fehler beim Laden der Protokolle",

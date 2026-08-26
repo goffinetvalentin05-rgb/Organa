@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Edit, Trash, Calendar, Wallet, Clock, CheckCircle } from "@/lib/icons";
+import { Eye, Edit, Trash, Calendar } from "@/lib/icons";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -131,42 +131,6 @@ export default function EvenementsPage() {
     return { event: next.event, isCurrent: next.day === todayKey };
   }, [events]);
 
-  const stats = useMemo(() => {
-    return {
-      planned: events.filter((event) => event.status === "planned").length,
-      completed: events.filter((event) => event.status === "completed").length,
-      revenue: events.reduce((sum, event) => sum + event.totalRevenue, 0),
-      expenses: events.reduce((sum, event) => sum + event.totalExpenses, 0),
-    };
-  }, [events]);
-
-  const summaryCards = [
-    {
-      label: t("dashboard.events.stats.planned"),
-      value: stats.planned,
-      icon: Clock,
-      iconClass: "bg-blue-50 text-blue-600",
-    },
-    {
-      label: t("dashboard.events.stats.completed"),
-      value: stats.completed,
-      icon: CheckCircle,
-      iconClass: "bg-emerald-50 text-emerald-600",
-    },
-    {
-      label: t("dashboard.events.stats.revenue"),
-      value: formatMontant(stats.revenue),
-      icon: Wallet,
-      iconClass: "bg-emerald-50 text-emerald-600",
-    },
-    {
-      label: t("dashboard.events.stats.expenses"),
-      value: formatMontant(stats.expenses),
-      icon: Wallet,
-      iconClass: "bg-rose-50 text-rose-600",
-    },
-  ];
-
   const netAmountClass = (result: number) => {
     if (result > 0) return "font-semibold text-emerald-700";
     if (result < 0) return "font-semibold text-rose-700";
@@ -208,58 +172,29 @@ export default function EvenementsPage() {
       {limitReached ? <LimitReachedAlert message={t("dashboard.events.limitReached")} /> : null}
 
       {showDashboard ? (
-        <div className="space-y-4 sm:space-y-5">
-          <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-6 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
-            <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#1A23FF]/[0.06]" />
-            <span className="pointer-events-none absolute -bottom-12 right-16 h-36 w-36 rounded-full bg-[#3B82F6]/[0.05]" />
-            <div className="relative min-w-0">
-              <p className="text-sm font-medium text-[#64748B]">
-                {featuredEvent?.isCurrent
-                  ? t("dashboard.events.stats.currentEvent")
-                  : t("dashboard.events.stats.nextEvent")}
-              </p>
-              <p className="mt-1 truncate text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
-                {featuredEvent
-                  ? featuredEvent.event.name
-                  : t("dashboard.events.stats.noneUpcoming")}
-              </p>
-              {featuredEvent ? (
-                <p className="mt-1.5 text-sm text-[#64748B]">{dateLabel(featuredEvent.event)}</p>
-              ) : null}
-            </div>
-            {featuredEvent?.event.eventType ? (
-              <span className="relative mt-4 inline-flex w-fit items-center rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#475569] sm:mt-0">
-                {featuredEvent.event.eventType.name}
-              </span>
+        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] px-6 py-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
+          <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#1A23FF]/[0.06]" />
+          <span className="pointer-events-none absolute -bottom-12 right-16 h-36 w-36 rounded-full bg-[#3B82F6]/[0.05]" />
+          <div className="relative min-w-0">
+            <p className="text-sm font-medium text-[#64748B]">
+              {featuredEvent?.isCurrent
+                ? t("dashboard.events.stats.currentEvent")
+                : t("dashboard.events.stats.nextEvent")}
+            </p>
+            <p className="mt-1 truncate text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
+              {featuredEvent
+                ? featuredEvent.event.name
+                : t("dashboard.events.stats.noneUpcoming")}
+            </p>
+            {featuredEvent ? (
+              <p className="mt-1.5 text-sm text-[#64748B]">{dateLabel(featuredEvent.event)}</p>
             ) : null}
           </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-            {summaryCards.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.label}
-                  className="flex min-w-0 flex-col rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] sm:p-5"
-                >
-                  <span
-                    className={cn(
-                      "flex h-10 w-10 items-center justify-center rounded-xl",
-                      item.iconClass
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
-                    {item.label}
-                  </p>
-                  <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums text-[#0F172A] sm:text-[1.75rem]">
-                    {item.value}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+          {featuredEvent?.event.eventType ? (
+            <span className="relative mt-4 inline-flex w-fit items-center rounded-full border border-[#E5E7EB] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#475569] sm:mt-0">
+              {featuredEvent.event.eventType.name}
+            </span>
+          ) : null}
         </div>
       ) : null}
 

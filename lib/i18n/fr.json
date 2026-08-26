@@ -1458,6 +1458,11 @@
     "meetingMinutes": {
       "title": "PV de séances",
       "subtitle": "Rédigez et exportez les procès-verbaux de vos réunions.",
+      "banner": {
+        "draftLabel": "PV à finaliser",
+        "allClearLabel": "PV de séances",
+        "allClearTitle": "Tous les PV sont à jour"
+      },
       "newAction": "Créer un PV",
       "createSuccess": "Procès-verbal enregistré",
       "loadError": "Erreur lors du chargement des procès-verbaux",

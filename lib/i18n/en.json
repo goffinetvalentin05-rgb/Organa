@@ -1573,6 +1573,11 @@
     "meetingMinutes": {
       "title": "Meeting minutes",
       "subtitle": "Write and export minutes for your club meetings.",
+      "banner": {
+        "draftLabel": "Minutes to complete",
+        "allClearLabel": "Meeting minutes",
+        "allClearTitle": "All minutes are up to date"
+      },
       "newAction": "Create minutes",
       "createSuccess": "Minutes saved",
       "loadError": "Error loading meeting minutes",
