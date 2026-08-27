@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
 import HeroDemoVideo from "@/components/landing/HeroDemoVideo";
@@ -13,6 +13,57 @@ import {
   heroTitleLine,
   staggerContainer,
 } from "@/components/landing/landing-motion";
+
+const HERO_PHRASE_MS = 3000;
+
+function HeroRotatingPhrases({
+  phrases,
+  reduceMotion,
+}: {
+  phrases: string[];
+  reduceMotion: boolean | null;
+}) {
+  const [index, setIndex] = useState(0);
+  const phrasesKey = phrases.join("\n");
+  const count = phrases.length;
+  const current = phrases[index] ?? phrases[0] ?? "";
+
+  useEffect(() => {
+    setIndex(0);
+  }, [phrasesKey]);
+
+  useEffect(() => {
+    if (count < 2) return;
+    const timeout = window.setTimeout(() => {
+      setIndex((currentIndex) => (currentIndex + 1) % count);
+    }, HERO_PHRASE_MS);
+    return () => window.clearTimeout(timeout);
+  }, [count, index, phrasesKey]);
+
+  return (
+    <span className="landing-hero-title-rotator">
+      <span className="landing-hero-title-rotator-sizer" aria-hidden>
+        {phrases.map((phrase) => (
+          <span key={phrase}>{phrase}</span>
+        ))}
+      </span>
+      <span className="landing-hero-title-rotator-viewport">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={current}
+            className="landing-hero-title-rotator-item"
+            initial={reduceMotion ? false : { opacity: 0, y: "0.38em" }}
+            animate={{ opacity: 1, y: 0, filter: "none" }}
+            exit={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: "-0.38em" }}
+            transition={{ duration: reduceMotion ? 0 : 0.48, ease: easePremium }}
+          >
+            {current}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </span>
+  );
+}
 
 function useIsCompactHero() {
   const [compact, setCompact] = useState(() => {
@@ -32,9 +83,15 @@ function useIsCompactHero() {
 }
 
 export default function HeroSection() {
-  const { t } = useI18n();
+  const { t, tList } = useI18n();
   const reduceMotion = useReducedMotion();
   const isCompact = useIsCompactHero();
+  const phrases = useMemo(() => {
+    const list = tList("marketing.hero.titlePhrases");
+    if (list.length > 0) return list;
+    const fallback = t("marketing.hero.titleLine2");
+    return fallback ? [fallback] : [];
+  }, [t, tList]);
 
   return (
     <section id="hero" className="landing-hero-shell relative flex flex-col">
@@ -57,15 +114,10 @@ export default function HeroSection() {
           className="landing-hero-stack relative z-10 flex w-full flex-col items-center text-center"
         >
           <motion.h1 variants={heroTitleLine} className="landing-hero-title landing-hero-title-glow display-title">
-            <span className="landing-hero-title-desktop">
-              <span className="landing-hero-title-line">{t("marketing.hero.titleLine1")}</span>
-              <span className="landing-hero-title-line">{t("marketing.hero.titleLine2")}</span>
-            </span>
-            <span className="landing-hero-title-mobile">
-              <span className="landing-hero-title-line">{t("marketing.hero.titleMobileLine1")}</span>
-              <span className="landing-hero-title-line">{t("marketing.hero.titleMobileLine2")}</span>
-              <span className="landing-hero-title-line">{t("marketing.hero.titleMobileLine3")}</span>
-            </span>
+            <span className="landing-hero-title-line">{t("marketing.hero.titleLine1")}</span>
+            {phrases.length > 0 ? (
+              <HeroRotatingPhrases phrases={phrases} reduceMotion={reduceMotion} />
+            ) : null}
           </motion.h1>
 
           <motion.p variants={heroSubtitleLine} className="landing-hero-description text-pretty">

@@ -16,12 +16,18 @@
   },
   "hero": {
     "title": "Verein verwalten, ohne den Abend zu verlieren.",
-    "titleLine1": "Verein verwalten,",
+    "titleLine1": "Verein verwalten",
     "titleLine2": "ohne den Abend zu verlieren.",
     "titleMobileLine1": "Verein verwalten,",
     "titleMobileLine2": "ohne den Abend",
     "titleMobileLine3": "zu verlieren.",
-    "subtitle": "Obillz vereinfacht Beiträge, Einsatzpläne, Veranstaltungen und administrative Aufgaben Ihres Vereins und bündelt die gesamte Verwaltung in einer einzigen Plattform.",
+    "titlePhrases": [
+      "ohne Ihre Abende dafür zu opfern.",
+      "ohne zwischen mehreren Tools zu jonglieren.",
+      "während sich repetitive Aufgaben von selbst erledigen.",
+      "und neue Einnahmequellen erschließen."
+    ],
+    "subtitle": "Obillz bündelt das Wesentliche Ihres Vereins, spart dem Vorstand Stunden und ermöglicht neue Einnahmequellen.",
     "keywords": "Mitglieder • Beiträge • Rechnungen • Events",
     "ctaPrimary": "Obillz kostenlos testen",
     "ctaSecondary": "In der Praxis ansehen",

@@ -21,7 +21,13 @@
     "titleMobileLine1": "Gérez votre club",
     "titleMobileLine2": "sans perdre vos",
     "titleMobileLine3": "soirées.",
-    "subtitle": "Des membres aux cotisations, en passant par les manifestations, les plannings et la communication, Obillz regroupe tout dans une seule plateforme et simplifie la gestion de votre club pour faire gagner des heures aux bénévoles.",
+    "titlePhrases": [
+      "sans y passer vos soirées.",
+      "sans vous éparpiller entre plusieurs outils.",
+      "en laissant les tâches répétitives se faire toutes seules.",
+      "et créez de nouvelles sources de revenus."
+    ],
+    "subtitle": "Obillz réunit l’essentiel de votre club, fait gagner des heures au comité et permet de créer de nouvelles sources de revenus.",
     "keywords": "Membres • Cotisations • Factures • Événements",
     "ctaPrimary": "Tester Obillz gratuitement",
     "ctaSecondary": "Voir en pratique",

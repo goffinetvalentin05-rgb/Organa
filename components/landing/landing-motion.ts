@@ -71,7 +71,7 @@ export const heroTitleLine = {
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
+    filter: "none",
     transition: { duration: 0.75, ease: easePremium },
   },
 };

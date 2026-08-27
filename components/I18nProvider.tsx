@@ -76,7 +76,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       t,
       tList,
     }),
-    [locale, t]
+    [locale, t, tList]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

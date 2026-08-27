@@ -21,7 +21,13 @@
     "titleMobileLine1": "Run your club",
     "titleMobileLine2": "without losing",
     "titleMobileLine3": "your evenings.",
-    "subtitle": "Obillz simplifies membership fees, schedules, event organisation and admin tasks for your club, while bringing all your management together in a single platform.",
+    "titlePhrases": [
+      "without spending your evenings on it.",
+      "without juggling several tools.",
+      "while repetitive tasks take care of themselves.",
+      "and create new sources of revenue."
+    ],
+    "subtitle": "Obillz brings together the essentials of your club, saves the committee hours, and helps create new sources of revenue.",
     "keywords": "Members • Fees • Invoices • Events",
     "ctaPrimary": "Try Obillz for free",
     "ctaSecondary": "See it in practice",
