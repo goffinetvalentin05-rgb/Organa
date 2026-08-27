@@ -30,12 +30,17 @@
     "subtitle": "Obillz bündelt das Wesentliche Ihres Vereins, spart dem Vorstand Stunden und ermöglicht neue Einnahmequellen.",
     "keywords": "Mitglieder • Beiträge • Rechnungen • Events",
     "ctaPrimary": "Obillz kostenlos testen",
-    "ctaSecondary": "In der Praxis ansehen",
+    "ctaSecondary": "Demo ansehen",
     "hubAriaLabel": "Übersicht der Obillz-Module",
     "convergenceAriaLabel": "Vereinsverwaltung vereint in Obillz",
     "hubBaseline": "Ihr ganzer Verein, an einem Ort.",
     "fluxLabel": "Zerstreut → zentralisiert",
     "videoCaption": "Entdecken Sie Obillz in wenigen Sekunden",
+    "videoLauncherTitle": "Obillz in Aktion sehen",
+    "videoLauncherSubtitle": "Kurze Präsentation",
+    "videoDialogLabel": "Obillz Präsentation",
+    "videoClose": "Video schließen",
+    "videoDismissLauncher": "Präsentation ausblenden",
     "videoPlay": "Obillz Präsentationsvideo abspielen",
     "videoPause": "Video pausieren",
     "videoReplay": "Video erneut abspielen",
@@ -213,12 +218,12 @@
   },
   "modules": {
     "label": "Alles an einem Ort",
-    "titleLine1": "Alles, was es braucht,",
+    "titleLine1": "Ein einziger Ort,",
     "titleLine2": "um Ihren Verein zu führen.",
     "titleAccent": "Stunden an Verwaltung werden zu wenigen Minuten.",
-    "title": "Alles, was es braucht, um Ihren Verein zu führen.",
-    "subtitle": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation, Sponsoring… Obillz vereint die Werkzeuge Ihres Vereins in einem Raum.",
-    "orbitLead": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation… alles vereint in Obillz.",
+    "title": "Ein einziger Ort, um Ihren Verein zu führen.",
+    "subtitle": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation, Events, Sponsoring… alles vereint in Obillz.",
+    "orbitLead": "Mitglieder, Beiträge, Pläne, Finanzen, Kommunikation, Events, Sponsoring… alles vereint in Obillz.",
     "subtitleHours": "Stunden",
     "subtitleMinutes": "Minuten",
     "titleAccentHours": "Stunden",
@@ -229,6 +234,53 @@
       "recapitulatifs": "Zusammenfassungen werden automatisch erzeugt."
     },
     "orbitHint": "Klicken Sie auf eine Funktion, um sie zu entdecken.",
+    "seeExample": "Ein konkretes Beispiel ansehen",
+    "orbitFocus": {
+      "membres": {
+        "title": "Alle Mitglieder, endlich übersichtlich organisiert.",
+        "description": "Kontaktdaten, Informationen und Nachverfolgung bleiben an einem Ort."
+      },
+      "cotisations": {
+        "title": "Zahlungen verfolgen, ohne Mitgliedern hinterherzulaufen.",
+        "description": "Sehen Sie, wer bezahlt hat, was offen ist, und vereinfachen Sie das Beitrags-Follow-up."
+      },
+      "factures": {
+        "title": "Klare Rechnungen, ohne verlorene Dokumente.",
+        "description": "Erstellen, versenden und verfolgen Sie jede Rechnung an einem Ort."
+      },
+      "plannings": {
+        "title": "Freiwillige organisieren, ohne Dutzende Nachrichten.",
+        "description": "Erfassen Sie den Bedarf, teilen Sie den Plan und lassen Sie alle ihr Zeitfenster wählen."
+      },
+      "communication": {
+        "title": "Die richtigen Infos, ohne verstreute Gruppen.",
+        "description": "Senden Sie eine gezielte Nachricht an Vorstand oder Mitglieder — direkt aus Obillz."
+      },
+      "evenements": {
+        "title": "Ihre Anlässe, ohne die Tabelle.",
+        "description": "Anmeldungen, Teams und Verlauf bleiben für den ganzen Vorstand lesbar."
+      },
+      "sponsors": {
+        "title": "Keine Partner-Frist mehr verpassen.",
+        "description": "Verträge, Beträge und Verlängerungen bleiben unter Kontrolle."
+      },
+      "revenus": {
+        "title": "Die Vereinsfinanzen, endlich lesbar.",
+        "description": "Zahlungen, Eingänge und Einnahmen bleiben an einem Ort nachverfolgt."
+      },
+      "qrcodes": {
+        "title": "Ein Link, ein QR-Code, und es ist geteilt.",
+        "description": "Anmeldungen und schnelle Aktionen, ohne Papierkram oder Extra-Tools."
+      },
+      "buvette": {
+        "title": "Die Festwirtschaft am Spieltag, ohne Chaos.",
+        "description": "Zeitfenster und Anfragen für den ganzen Vorstand sichtbar."
+      },
+      "pagePublique": {
+        "title": "Die Visitenkarte Ihres Vereins, ohne Website.",
+        "description": "Programm, Festwirtschaft und Infos zum Teilen mit einem Link."
+      }
+    },
     "learnMore": "Mehr erfahren",
     "closeFeature": "Schliessen",
     "compareBefore": "Vorher",
@@ -635,10 +687,10 @@
     "exploreFooter": "Entdecken Sie jede Funktion und sehen Sie, wie sie Ihre Vereinsverwaltung verändert."
   },
   "showcases": {
-    "label": "In der Praxis",
-    "titleLine1": "Einige konkrete",
-    "titleLine2": "Beispiele.",
-    "subtitle": "Beiträge, Pläne, Kommunikation, Sponsoring… sehen Sie, wie Obillz den Vereinsalltag konkret vereinfacht.",
+    "label": "Konkret",
+    "titleLine1": "Entdecken Sie Obillz in der Praxis.",
+    "titleLine2": "",
+    "subtitle": "Beiträge, Pläne, Kommunikation, Sponsoring… sehen Sie, wie Obillz die alltägliche Vereinsverwaltung konkret vereinfacht.",
     "cotisations": {
       "label": "Beiträge",
       "title": "Sie wissen endlich, wer bezahlt hat.",
@@ -873,13 +925,14 @@
     "logoAlt": "Obillz"
   },
   "demoInvite": {
-    "label": "Obillz Demo",
-    "title": "Möchten Sie Obillz in Aktion sehen?",
-    "description": "Fordern Sie eine Demo an, stellen Sie Ihre Fragen oder tauschen Sie sich direkt aus — und sehen Sie, ob Obillz zu Ihrem Verein passt.",
-    "cta": "Demo anfragen",
+    "label": "Ein direkter Austausch",
+    "title": "Sprechen Sie direkt mit\ndem Gründer von Obillz.",
+    "description": "Eine Frage, ein besonderer Bedarf oder Lust, die Plattform zu entdecken? Tauschen Sie sich direkt auf WhatsApp mit dem Gründer von Obillz aus und sehen Sie, wie die Lösung zu Ihrem Verein passen kann.",
+    "cta": "Mit dem Gründer sprechen",
+    "note": "Austausch über WhatsApp",
     "ctaSecondary": "Kostenlos testen",
-    "imageAlt": "Hand tippt auf das WhatsApp-Symbol eines iPhones",
-    "whatsappMessage": "Hallo, ich möchte eine Demo von Obillz für meinen Verein anfragen.",
+    "imageAlt": "Direkter Austausch mit dem Gründer von Obillz",
+    "whatsappMessage": "Hallo, ich möchte mit dem Gründer von Obillz über meinen Verein sprechen.",
     "bubbleTitle": "Demo in 10 Minuten",
     "bubbleBody": "Sehen Sie, wie Obillz Beiträge, Pläne, Dokumente und die Kommunikation Ihres Vereins zentralisiert.",
     "phone": {

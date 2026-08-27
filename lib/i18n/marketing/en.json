@@ -30,12 +30,17 @@
     "subtitle": "Obillz brings together the essentials of your club, saves the committee hours, and helps create new sources of revenue.",
     "keywords": "Members • Fees • Invoices • Events",
     "ctaPrimary": "Try Obillz for free",
-    "ctaSecondary": "See it in practice",
+    "ctaSecondary": "Watch a demo",
     "hubAriaLabel": "Obillz modules overview",
     "convergenceAriaLabel": "Club management unified in Obillz",
     "hubBaseline": "Your whole club, in one place.",
     "fluxLabel": "Scattered → centralized",
     "videoCaption": "Discover Obillz in a few seconds",
+    "videoLauncherTitle": "See Obillz in action",
+    "videoLauncherSubtitle": "Quick walkthrough",
+    "videoDialogLabel": "Obillz presentation",
+    "videoClose": "Close the video",
+    "videoDismissLauncher": "Hide the presentation",
     "videoPlay": "Play the Obillz presentation video",
     "videoPause": "Pause the video",
     "videoReplay": "Replay the video",
@@ -213,12 +218,12 @@
   },
   "modules": {
     "label": "All in one place",
-    "titleLine1": "Everything you need",
+    "titleLine1": "One space",
     "titleLine2": "to run your club.",
     "titleAccent": "Hours of admin turned into a few minutes.",
-    "title": "Everything you need to run your club.",
-    "subtitle": "Members, fees, schedules, finances, communication, sponsoring… Obillz brings your club’s tools together in one space.",
-    "orbitLead": "Members, fees, schedules, finances, communication… everything together in Obillz.",
+    "title": "One space to run your club.",
+    "subtitle": "Members, fees, schedules, finances, communication, events, sponsoring… everything together in Obillz.",
+    "orbitLead": "Members, fees, schedules, finances, communication, events, sponsoring… everything together in Obillz.",
     "subtitleHours": "hours",
     "subtitleMinutes": "minutes",
     "titleAccentHours": "Hours",
@@ -229,6 +234,53 @@
       "recapitulatifs": "Recaps are generated automatically."
     },
     "orbitHint": "Click a feature to explore it.",
+    "seeExample": "See a concrete example",
+    "orbitFocus": {
+      "membres": {
+        "title": "All your members, finally properly organised.",
+        "description": "Contact details, records and follow-up stay available in one place."
+      },
+      "cotisations": {
+        "title": "Track payments without chasing members.",
+        "description": "See who has paid, what is still open, and simplify fee follow-up."
+      },
+      "factures": {
+        "title": "Clear invoices, no lost documents.",
+        "description": "Create, send and track every invoice from a single place."
+      },
+      "plannings": {
+        "title": "Organise volunteers without dozens of messages.",
+        "description": "Create the needs, share the schedule and let people pick their slot."
+      },
+      "communication": {
+        "title": "The right information, without scattered groups.",
+        "description": "Send a targeted message to the committee or members, from Obillz."
+      },
+      "evenements": {
+        "title": "Your events, without the spreadsheet.",
+        "description": "Registrations, teams and tracking stay readable for the whole committee."
+      },
+      "sponsors": {
+        "title": "Never miss a partner deadline again.",
+        "description": "Contracts, amounts and renewals stay under control."
+      },
+      "revenus": {
+        "title": "Club finances, finally readable.",
+        "description": "Payments, collections and revenue stay tracked in one place."
+      },
+      "qrcodes": {
+        "title": "A link, a QR code, and it’s shared.",
+        "description": "Sign-ups and quick actions, without paperwork or extra tools."
+      },
+      "buvette": {
+        "title": "Match-day canteen, without last-minute chaos.",
+        "description": "Slots and requests visible to the whole committee."
+      },
+      "pagePublique": {
+        "title": "Your club’s showcase, without a site to maintain.",
+        "description": "Fixtures, canteen and practical info to share with one link."
+      }
+    },
     "learnMore": "Learn more",
     "closeFeature": "Close",
     "compareBefore": "Before",
@@ -635,10 +687,10 @@
     "exploreFooter": "Explore each feature and see how it transforms your club management."
   },
   "showcases": {
-    "label": "In practice",
-    "titleLine1": "A few concrete",
-    "titleLine2": "examples.",
-    "subtitle": "Membership fees, schedules, communication, sponsoring… see how Obillz concretely simplifies everyday club tasks.",
+    "label": "Concretely",
+    "titleLine1": "Discover Obillz in action.",
+    "titleLine2": "",
+    "subtitle": "Fees, schedules, communication, sponsoring… see how Obillz concretely simplifies the day-to-day running of a club.",
     "cotisations": {
       "label": "Fees",
       "title": "You finally know who has paid.",
@@ -873,13 +925,14 @@
     "logoAlt": "Obillz"
   },
   "demoInvite": {
-    "label": "Obillz demo",
-    "title": "Want to see Obillz in action?",
-    "description": "Request a demo, ask your questions or talk it through directly to see if Obillz is a fit for your club.",
-    "cta": "Request a demo",
+    "label": "A direct conversation",
+    "title": "Talk directly to\nObillz’s founder.",
+    "description": "A question, a specific need, or want to discover the platform? Talk directly on WhatsApp with Obillz’s founder to see how the solution can fit your club.",
+    "cta": "Talk to the founder",
+    "note": "Conversation via WhatsApp",
     "ctaSecondary": "Try for free",
-    "imageAlt": "Hand tapping the WhatsApp icon on an iPhone",
-    "whatsappMessage": "Hello, I would like to request an Obillz demo for my club.",
+    "imageAlt": "Direct conversation with Obillz’s founder",
+    "whatsappMessage": "Hello, I would like to talk to Obillz’s founder about my club.",
     "bubbleTitle": "A 10-minute demo",
     "bubbleBody": "See how Obillz centralises membership fees, schedules, documents and communication for your club.",
     "phone": {

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
 import HeroDemoVideo from "@/components/landing/HeroDemoVideo";
 import {
@@ -86,6 +86,9 @@ export default function HeroSection() {
   const { t, tList } = useI18n();
   const reduceMotion = useReducedMotion();
   const isCompact = useIsCompactHero();
+  const [demoOpen, setDemoOpen] = useState(false);
+  const demoTriggerRef = useRef<HTMLButtonElement>(null);
+  const closeDemo = useCallback(() => setDemoOpen(false), []);
   const phrases = useMemo(() => {
     const list = tList("marketing.hero.titlePhrases");
     if (list.length > 0) return list;
@@ -143,20 +146,26 @@ export default function HeroSection() {
                   />
                 </Link>
               </motion.div>
-              <Link href="/#en-pratique" className="lp-hero-secondary">
+              <button
+                ref={demoTriggerRef}
+                type="button"
+                className="lp-hero-secondary"
+                onClick={() => setDemoOpen(true)}
+              >
+                <Play className="h-3.5 w-3.5 fill-current" strokeWidth={2.25} aria-hidden />
                 {t("marketing.hero.ctaSecondary")}
-              </Link>
+              </button>
             </div>
           </motion.div>
         </motion.div>
       </div>
 
-      <div className="landing-hero-video-slot">
-        <div className="landing-hero-video-compose relative">
-          <div className="lp-hero-product-glow" aria-hidden />
-          <HeroDemoVideo />
-        </div>
-      </div>
+      <div className="landing-hero-fade" aria-hidden />
+      <HeroDemoVideo
+        open={demoOpen}
+        onClose={closeDemo}
+        triggerRef={demoTriggerRef}
+      />
     </section>
   );
 }

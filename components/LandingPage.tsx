@@ -21,10 +21,10 @@ export default function LandingPage() {
         <LandingLocaleEffects />
         <LandingNav />
         <HeroSection />
+        <ClubsProofSection />
         <FeaturesSection />
         <HowItWorksSection />
         <TimeSavedSection />
-        <ClubsProofSection />
         <DemoInviteSection />
         <FaqSection />
         <LandingFooter />

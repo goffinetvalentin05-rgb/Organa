@@ -230,7 +230,6 @@ export const SPORT_SHOWCASE_FEATURE_IDS: SportFeatureId[] = [
   "membres",
   "cotisations",
   "factures",
-  "encaissements",
   "plannings",
   "communication",
   "evenements",

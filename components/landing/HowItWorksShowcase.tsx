@@ -12,6 +12,7 @@ import {
 } from "react";
 import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
 import { PracticeStepVisual } from "@/components/landing/ProductShowcaseVisuals";
+import { PRACTICE_EVENT, practiceIndexFromHash } from "@/lib/landing/practice-anchors";
 
 type Step = { label: string; title: string; description: string };
 
@@ -113,6 +114,31 @@ function useStepAutoplay() {
     }, STEP_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [activeIndex, autoplayPaused, goTo, reduceMotion, tabVisible]);
+
+  useEffect(() => {
+    const applyIndex = (index: number) => {
+      if (index < 0 || index >= STEP_NUMBERS.length) return;
+      selectStep(index);
+    };
+
+    const fromHash = () => {
+      const index = practiceIndexFromHash(window.location.hash);
+      if (index != null) applyIndex(index);
+    };
+
+    const onPractice = (event: Event) => {
+      const index = (event as CustomEvent<{ index?: number }>).detail?.index;
+      if (typeof index === "number") applyIndex(index);
+    };
+
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    window.addEventListener(PRACTICE_EVENT, onPractice);
+    return () => {
+      window.removeEventListener("hashchange", fromHash);
+      window.removeEventListener(PRACTICE_EVENT, onPractice);
+    };
+  }, [selectStep]);
 
   return {
     activeIndex,
@@ -263,16 +289,16 @@ function DesktopHowItWorks({
   };
 
   return (
-    <div className="how-it-works-desktop grid items-center gap-12 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:gap-12 xl:gap-16">
+    <div className="how-it-works-desktop grid items-center gap-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10 xl:gap-12">
       <motion.div
-        className="how-it-works-desktop__copy flex min-w-0 flex-col gap-12 sm:gap-14 lg:max-w-[40rem] lg:justify-self-start"
+        className="how-it-works-desktop__copy flex min-w-0 flex-col gap-10 sm:gap-12 lg:max-w-[36rem] lg:justify-self-start"
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewportOnce}
         transition={{ duration: 0.65, ease: easePremium, delay: 0.08 }}
       >
         {intro}
-        <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
+        <div className="flex flex-col gap-8 sm:gap-9 lg:flex-row lg:items-start lg:gap-8">
           <div className="flex justify-center lg:justify-start">
             <StepNav steps={steps} activeIndex={activeIndex} onSelect={onSelect} />
           </div>
