@@ -2603,30 +2603,32 @@ html:has(.dashboard-shell) {
   background-color: #071634;
 }
 
-/* Inverse du hero : blanc → bleu, fondu large sans bande horizontale */
+/* Inverse exact du hero (mêmes couleurs / stops / radials, orientation verticale inversée) */
 .site-footer::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #ffffff 8%,
-    #f8fbff 14%,
-    #eef6ff 20%,
-    #dbeafe 28%,
-    #bfdbfe 36%,
-    #93c5fd 44%,
-    #60a5fa 52%,
-    #3b82f6 60%,
-    #2563eb 68%,
-    #1a23ff 76%,
-    #1234b8 84%,
-    #0a1f5c 92%,
-    #071634 100%
-  );
+  background:
+    radial-gradient(
+      ellipse 80% 42% at 50% 62%,
+      rgba(50, 91, 255, 0.32),
+      transparent 70%
+    ),
+    radial-gradient(circle at 50% 28%, rgba(56, 189, 248, 0.14) 0%, transparent 46%),
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fbff 4%,
+      #dbeafe 10%,
+      #7dd3fc 22%,
+      #3b82f6 34%,
+      #1a23ff 46%,
+      #1234b8 60%,
+      #0a1f5c 80%,
+      #071634 100%
+    );
 }
 
 .site-footer::after {
@@ -2635,18 +2637,18 @@ html:has(.dashboard-shell) {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.2;
+  opacity: 0.28;
   background:
     linear-gradient(rgba(96, 165, 250, 0.14) 1px, transparent 1px),
     linear-gradient(90deg, rgba(96, 165, 250, 0.14) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image:
-    radial-gradient(ellipse 110% 72% at 50% 70%, black 10%, transparent 74%),
-    linear-gradient(180deg, transparent 0%, transparent 28%, black 55%, black 100%);
+    radial-gradient(ellipse 100% 70% at 50% 58%, black 8%, transparent 72%),
+    linear-gradient(180deg, transparent 0%, transparent 22%, black 48%, black 100%);
   mask-composite: intersect;
   -webkit-mask-image:
-    radial-gradient(ellipse 110% 72% at 50% 70%, black 10%, transparent 74%),
-    linear-gradient(180deg, transparent 0%, transparent 28%, black 55%, black 100%);
+    radial-gradient(ellipse 100% 70% at 50% 58%, black 8%, transparent 72%),
+    linear-gradient(180deg, transparent 0%, transparent 22%, black 48%, black 100%);
   -webkit-mask-composite: source-in;
 }
 
@@ -9063,28 +9065,30 @@ body.app-bg:has(.obillz-landing-home) {
 }
 
 .obillz-landing-home .site-footer::before {
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #ffffff 8%,
-    #f8fbff 14%,
-    #eef6ff 20%,
-    #dbeafe 28%,
-    #bfdbfe 36%,
-    #93c5fd 44%,
-    #60a5fa 52%,
-    #3b82f6 60%,
-    #2563eb 68%,
-    #1a23ff 76%,
-    #1234b8 84%,
-    #0a1f5c 92%,
-    #071634 100%
-  );
+  background:
+    radial-gradient(
+      ellipse 80% 42% at 50% 62%,
+      rgba(50, 91, 255, 0.32),
+      transparent 70%
+    ),
+    radial-gradient(circle at 50% 28%, rgba(56, 189, 248, 0.14) 0%, transparent 46%),
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fbff 4%,
+      #dbeafe 10%,
+      #7dd3fc 22%,
+      #3b82f6 34%,
+      #1a23ff 46%,
+      #1234b8 60%,
+      #0a1f5c 80%,
+      #071634 100%
+    );
 }
 
 .obillz-landing-home .site-footer::after {
   display: block;
-  opacity: 0.22;
+  opacity: 0.28;
 }
 
 .lp-clubs-proof {
