@@ -688,13 +688,34 @@
   },
   "showcases": {
     "label": "Konkret",
-    "titleLine1": "Entdecken Sie Obillz in der Praxis.",
-    "titleLine2": "",
-    "subtitle": "Beiträge, Pläne, Kommunikation, Sponsoring… sehen Sie, wie Obillz die alltägliche Vereinsverwaltung konkret vereinfacht.",
+    "titleLine1": "Obillz im Alltag",
+    "titleLine2": "Ihres Vereins.",
+    "subtitle": "Einige konkrete Beispiele dafür, was Sie im Alltag einfacher erledigen können.",
+    "outro": {
+      "label": "Einblick",
+      "title": "Das sind nur einige Beispiele.",
+      "description": "Obillz bündelt weit mehr, um den Alltag Ihres Vereins zu begleiten.",
+      "visualCaption": "Und vieles mehr."
+    },
+    "documents": {
+      "label": "Dokumente",
+      "title": "Das richtige Dokument ist immer am richtigen Ort.",
+      "before": "Vorher sucht man zwischen Mails, Ordnern und Nachrichten nach der richtigen Information.",
+      "description": "Mit Obillz bleiben die wichtigen Dokumente des Vereins zentral und für die richtigen Personen zugänglich.",
+      "heading": "Dokumente des Vereins",
+      "committee": "Vorstand",
+      "shared": "Geteilt",
+      "items": [
+        { "name": "Protokoll — Generalversammlung", "meta": "PDF · 12. Mai 2026" },
+        { "name": "Vereinsstatuten", "meta": "PDF · im März aktualisiert" },
+        { "name": "Sponsorenvertrag 2026/27", "meta": "PDF · 3 Unterzeichnende" }
+      ]
+    },
     "cotisations": {
       "label": "Beiträge",
-      "title": "Sie wissen endlich, wer bezahlt hat.",
-      "description": "Erstellen, versenden und sehen Sie Zahlungen auf einen Blick — statt sie in Excel, WhatsApp oder verstreuten Dateien zu verfolgen.",
+      "title": "Die Beiträge gehen mit wenigen Klicks raus.",
+      "before": "Vorher muss man jeden Beitrag von Hand vorbereiten, versenden und nachverfolgen.",
+      "description": "Mit Obillz wählen Sie das Team oder die Gruppe, versenden alles mit wenigen Klicks und sehen sofort, wer bezahlt hat.",
       "season": "Saison 2025/26",
       "paid": "Bezahlt",
       "pending": "Ausstehend",
@@ -702,9 +723,10 @@
       "paymentReceived": "+ 1 Zahlung erhalten"
     },
     "plannings": {
-      "label": "Pläne",
-      "title": "Der Plan entsteht ohne Hin und Her.",
-      "description": "Organisieren Sie Verfügbarkeiten, verteilen Sie Zeitfenster und teilen Sie die Infos klar mit dem Vorstand oder den Freiwilligen.",
+      "label": "Freiwillige",
+      "title": "Der Plan füllt sich fast von allein.",
+      "before": "Vorher legt man eine Datei an, kontaktiert alle einzeln, sammelt die Antworten und passt den Plan von Hand an.",
+      "description": "Mit Obillz erstellen Sie die Einsätze, teilen den Link, und die Freiwilligen tragen sich direkt ein.",
       "day": "Samstag, 12. April · Wochenendspiel",
       "full": "Voll",
       "confirmed": "Bestätigt",
@@ -755,15 +777,57 @@
       "document": "Vertrags-PDF"
     }
   },
-  "timeSaved": {
-    "label": "Weniger Administration",
-    "title": "Stunden an Verwaltung werden zu wenigen Minuten.",
-    "description": "Obillz bündelt die zeitaufwendigsten Aufgaben des Vereins — ohne Hin und Her, verstreute Dateien und manuelle Nachverfolgung.",
-    "aside": "Weniger Excel. Weniger Streuung. Mehr Zeit.",
-    "personAlt": "Ein Vereinsverantwortlicher, überlastet von der Administration.",
-    "collected": "Beiträge eingegangen",
-    "paymentReceived": "+ 1 Zahlung erhalten",
-    "planningReady": "Plan bereit"
+  "story": {
+    "ariaLabel": "Das Problem der Vereine, die verlorene Zeit und die Antwort von Obillz",
+    "steps": [
+      {
+        "label": "Das Problem",
+        "lead": "In vielen Vereinen stemmen Freiwillige alles neben ihrem eigenen Job.",
+        "tail": "Zwischen Mitgliedern, Beiträgen, Anlässen, Freiwilligen und Kommunikation stützt sich die Organisation oft auf viel zu viele verstreute Werkzeuge."
+      },
+      {
+        "label": "Die verlorene Zeit",
+        "lead": "Das Ergebnis: enorm viel Zeit geht für Administration, Mahnungen, die Suche nach Informationen und die tägliche Organisation verloren.",
+        "tail": "Zeit, die nicht mehr in die Entwicklung des Vereins, in seine Mitglieder oder schlicht in das Privatleben der Verantwortlichen fliesst."
+      },
+      {
+        "label": "Die Lösung",
+        "lead": "Wir haben Obillz entwickelt, um den Flickenteppich an Werkzeugen durch einen einzigen Raum rund um den Verein zu ersetzen.",
+        "tail": "Jedes Vorstandsmitglied findet, was es braucht, Informationen laufen endlich an einem Ort zusammen, und der Verein kommt voran, ohne Dateien, Nachrichten und Programme zu vervielfachen.",
+        "emphasis": ["Obillz", "einen einzigen Raum rund um den Verein"]
+      }
+    ]
+  },
+  "ecosystem": {
+    "badge": "Alles an einem Ort",
+    "title": "Alles, was Ihr Verein braucht, endlich an einem Ort vereint",
+    "subtitle": "Mitglieder, Beiträge, Kommunikation, Anlässe, Freiwillige, Dokumente und Auswertung: Obillz bündelt das Wesentliche in einem einzigen Raum.",
+    "coreLabel": "Ein einziger Raum für den ganzen Verein",
+    "stageAriaLabel": "Die Werkzeuge des Vereins, vereint in Obillz"
+  },
+  "simpleStart": {
+    "label": "Einfach von Anfang an",
+    "title": "Vier Schritte. Und Ihr Verein ist bereit.",
+    "stepLabel": "Schritt {number}",
+    "aside": "Sie müssen nicht alles einrichten, bevor Sie starten. Obillz passt sich dem Tempo Ihres Vereins an.",
+    "steps": [
+      {
+        "title": "Erstellen Sie Ihren Verein",
+        "description": "Erfassen Sie die wichtigsten Angaben und bereiten Sie Ihren Obillz-Bereich vor."
+      },
+      {
+        "title": "Fügen Sie Ihre Mitglieder hinzu",
+        "description": "Importieren Sie Ihre bestehende Liste oder erfassen Sie Mitglieder direkt in Obillz."
+      },
+      {
+        "title": "Laden Sie Ihren Vorstand ein",
+        "description": "Geben Sie den richtigen Personen Zugang, damit jeder findet, was er braucht."
+      },
+      {
+        "title": "Beginnen Sie zu verwalten",
+        "description": "Ihr Bereich ist bereit. Sie können die Werkzeuge, die Ihr Verein braucht, direkt nutzen."
+      }
+    ]
   },
   "clubReassurance": {
     "title": "Mit Vereinen gedacht, für Vereine gemacht.",
@@ -926,13 +990,15 @@
   },
   "demoInvite": {
     "label": "Ein direkter Austausch",
-    "title": "Sprechen Sie direkt mit\ndem Gründer von Obillz.",
-    "description": "Eine Frage, ein besonderer Bedarf oder Lust, die Plattform zu entdecken? Tauschen Sie sich direkt auf WhatsApp mit dem Gründer von Obillz aus und sehen Sie, wie die Lösung zu Ihrem Verein passen kann.",
+    "title": "Sprechen Sie direkt mit dem Gründer von Obillz.",
+    "description": "Eine Frage, ein besonderer Bedarf oder Lust, die Plattform zu entdecken? Schreiben Sie direkt auf WhatsApp und sehen Sie, wie Obillz zu Ihrem Verein passen kann.",
     "cta": "Mit dem Gründer sprechen",
     "note": "Austausch über WhatsApp",
     "ctaSecondary": "Kostenlos testen",
     "imageAlt": "Direkter Austausch mit dem Gründer von Obillz",
     "whatsappMessage": "Hallo, ich möchte mit dem Gründer von Obillz über meinen Verein sprechen.",
+    "decorIncoming": "Zeit für eine Demo?",
+    "decorOutgoing": "Klar — schauen wir es uns gemeinsam an.",
     "bubbleTitle": "Demo in 10 Minuten",
     "bubbleBody": "Sehen Sie, wie Obillz Beiträge, Pläne, Dokumente und die Kommunikation Ihres Vereins zentralisiert.",
     "phone": {

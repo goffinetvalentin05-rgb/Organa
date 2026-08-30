@@ -5,8 +5,7 @@ export const PRACTICE_EVENT = "obillz:select-practice";
 export const PRACTICE_FEATURE_IDS = [
   "cotisations",
   "plannings",
-  "communication",
-  "sponsors",
+  "pv",
 ] as const satisfies readonly SportFeatureId[];
 
 export type PracticeFeatureId = (typeof PRACTICE_FEATURE_IDS)[number];
@@ -14,15 +13,13 @@ export type PracticeFeatureId = (typeof PRACTICE_FEATURE_IDS)[number];
 const HASH_BY_FEATURE: Record<PracticeFeatureId, string> = {
   cotisations: "en-pratique-cotisations",
   plannings: "en-pratique-plannings",
-  communication: "en-pratique-communication",
-  sponsors: "en-pratique-sponsoring",
+  pv: "en-pratique-documents",
 };
 
 const INDEX_BY_FEATURE: Record<PracticeFeatureId, number> = {
   cotisations: 0,
   plannings: 1,
-  communication: 2,
-  sponsors: 3,
+  pv: 2,
 };
 
 const FEATURE_BY_HASH = Object.fromEntries(

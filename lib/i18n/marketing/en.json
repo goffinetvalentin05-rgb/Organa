@@ -688,13 +688,34 @@
   },
   "showcases": {
     "label": "Concretely",
-    "titleLine1": "Discover Obillz in action.",
-    "titleLine2": "",
-    "subtitle": "Fees, schedules, communication, sponsoring… see how Obillz concretely simplifies the day-to-day running of a club.",
+    "titleLine1": "Obillz in the daily life",
+    "titleLine2": "of your club.",
+    "subtitle": "A few concrete examples of what you can handle more simply, day after day.",
+    "outro": {
+      "label": "A glimpse",
+      "title": "These are only a few examples.",
+      "description": "Obillz brings together much more to support the daily life of your club.",
+      "visualCaption": "And much more."
+    },
+    "documents": {
+      "label": "Documents",
+      "title": "The right document is always in the right place.",
+      "before": "Before, you have to dig through emails, folders and chats to find the right information.",
+      "description": "With Obillz, the club’s important documents stay centralised and available to the right people.",
+      "heading": "Club documents",
+      "committee": "Committee",
+      "shared": "Shared",
+      "items": [
+        { "name": "Minutes — General meeting", "meta": "PDF · 12 May 2026" },
+        { "name": "Club statutes", "meta": "PDF · updated in March" },
+        { "name": "Sponsor contract 2026/27", "meta": "PDF · 3 signatories" }
+      ]
+    },
     "cotisations": {
       "label": "Fees",
-      "title": "You finally know who has paid.",
-      "description": "Create, send and see payments at a glance — instead of tracking them in Excel, WhatsApp or scattered files.",
+      "title": "Fees go out in just a few clicks.",
+      "before": "Before, you have to prepare, send and track every fee by hand.",
+      "description": "With Obillz, you pick the team or group, send everything in a few clicks and see straight away who has paid.",
       "season": "2025/26 season",
       "paid": "Paid",
       "pending": "Pending",
@@ -702,9 +723,10 @@
       "paymentReceived": "+ 1 payment received"
     },
     "plannings": {
-      "label": "Schedules",
-      "title": "The schedule happens without the back-and-forth.",
-      "description": "Organise availability, assign time slots and share the information clearly with the committee or volunteers.",
+      "label": "Volunteers",
+      "title": "The schedule fills in almost by itself.",
+      "before": "Before, you have to build a file, contact everyone, collect the answers and adjust the schedule by hand.",
+      "description": "With Obillz, you create the slots, share the link, and volunteers sign up directly.",
       "day": "Saturday 12 April · Weekend match",
       "full": "Full",
       "confirmed": "Confirmed",
@@ -755,15 +777,57 @@
       "document": "Contract PDF"
     }
   },
-  "timeSaved": {
-    "label": "Less admin",
-    "title": "Hours of admin turned into a few minutes.",
-    "description": "Obillz centralises the club’s most time-consuming tasks, so you avoid back-and-forth, scattered files and manual follow-ups.",
-    "aside": "Less Excel. Less scatter. More time.",
-    "personAlt": "A club volunteer overwhelmed by administrative work.",
-    "collected": "Fees collected",
-    "paymentReceived": "+ 1 payment received",
-    "planningReady": "Schedule ready"
+  "story": {
+    "ariaLabel": "The problem clubs face, the time it costs and the Obillz answer",
+    "steps": [
+      {
+        "label": "The problem",
+        "lead": "In most clubs, volunteers run everything alongside their own job.",
+        "tail": "Between members, fees, events, volunteers and communication, the whole organisation often relies on far too many scattered tools."
+      },
+      {
+        "label": "The time lost",
+        "lead": "The result: a huge amount of time disappears into admin, reminders, looking for information and day-to-day coordination.",
+        "tail": "Time that is no longer invested in growing the club, in its members, or simply in the personal life of the people running it."
+      },
+      {
+        "label": "The solution",
+        "lead": "We built Obillz to replace the patchwork of tools with a single space designed around the club.",
+        "tail": "Every committee member finds what they need, information finally flows in one place, and the club can move forward without piling up files, messages and software.",
+        "emphasis": ["Obillz", "a single space designed around the club"]
+      }
+    ]
+  },
+  "ecosystem": {
+    "badge": "All in one place",
+    "title": "Everything your club needs, finally gathered in one place",
+    "subtitle": "Members, fees, communication, events, volunteers, documents and tracking: Obillz brings the essentials together in a single space.",
+    "coreLabel": "One single space for the whole club",
+    "stageAriaLabel": "The club’s tools gathered inside Obillz"
+  },
+  "simpleStart": {
+    "label": "Simple from the start",
+    "title": "Four steps. And your club is ready.",
+    "stepLabel": "Step {number}",
+    "aside": "No need to configure everything before you begin. Obillz adapts to your club’s pace.",
+    "steps": [
+      {
+        "title": "Create your club",
+        "description": "Add the essentials and set up your Obillz space."
+      },
+      {
+        "title": "Add your members",
+        "description": "Import your existing list or add members directly in Obillz."
+      },
+      {
+        "title": "Invite your committee",
+        "description": "Give the right people access so everyone finds what they need."
+      },
+      {
+        "title": "Start managing",
+        "description": "Your space is ready. You can start using the tools your club needs right away."
+      }
+    ]
   },
   "clubReassurance": {
     "title": "Built with clubs, for clubs.",
@@ -926,13 +990,15 @@
   },
   "demoInvite": {
     "label": "A direct conversation",
-    "title": "Talk directly to\nObillz’s founder.",
-    "description": "A question, a specific need, or want to discover the platform? Talk directly on WhatsApp with Obillz’s founder to see how the solution can fit your club.",
+    "title": "Talk directly to Obillz’s founder.",
+    "description": "A question, a specific need, or curious about the platform? Chat on WhatsApp to see how Obillz can fit your club.",
     "cta": "Talk to the founder",
     "note": "Conversation via WhatsApp",
     "ctaSecondary": "Try for free",
     "imageAlt": "Direct conversation with Obillz’s founder",
     "whatsappMessage": "Hello, I would like to talk to Obillz’s founder about my club.",
+    "decorIncoming": "Available for a demo?",
+    "decorOutgoing": "Of course — let’s look at it together.",
     "bubbleTitle": "A 10-minute demo",
     "bubbleBody": "See how Obillz centralises membership fees, schedules, documents and communication for your club.",
     "phone": {

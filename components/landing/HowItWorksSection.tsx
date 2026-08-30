@@ -5,17 +5,24 @@ import LandingSectionIntro from "@/components/landing/LandingSectionIntro";
 import { useI18n } from "@/components/I18nProvider";
 import { PRACTICE_HASHES } from "@/lib/landing/practice-anchors";
 
-const SHOWCASE_KEYS = ["cotisations", "plannings", "communication", "sponsoring"] as const;
+/** 3 exemples concrets, puis un écran de conclusion. */
+const SHOWCASE_KEYS = ["cotisations", "plannings", "documents", "outro"] as const;
 
 export default function HowItWorksSection() {
   const { t } = useI18n();
   const titleLine2 = t("marketing.showcases.titleLine2");
 
-  const steps = SHOWCASE_KEYS.map((key) => ({
-    label: t(`marketing.showcases.${key}.label`),
-    title: t(`marketing.showcases.${key}.title`),
-    description: t(`marketing.showcases.${key}.description`),
-  }));
+  const steps = SHOWCASE_KEYS.map((key) => {
+    const before = t(`marketing.showcases.${key}.before`);
+
+    return {
+      label: t(`marketing.showcases.${key}.label`),
+      title: t(`marketing.showcases.${key}.title`),
+      description: t(`marketing.showcases.${key}.description`),
+      before: before.startsWith("marketing.") ? undefined : before,
+      variant: key === "outro" ? ("outro" as const) : ("example" as const),
+    };
+  });
 
   return (
     <section

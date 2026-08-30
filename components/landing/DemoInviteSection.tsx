@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
+import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
 
 function buildWhatsAppUrl(phone: string, message: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -18,189 +18,63 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-function useIsCompact() {
-  const [compact, setCompact] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 899px)");
-    const sync = () => setCompact(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  return compact;
-}
-
-function FounderAtmosphere({
-  progress,
-  reduceMotion,
-  compact,
-}: {
-  progress: MotionValue<number>;
-  reduceMotion: boolean;
-  compact: boolean;
-}) {
-  const still = reduceMotion;
-  const s = compact ? 0.42 : 1;
-
-  // Courbe principale : traverse le bloc de gauche→droite au scroll
-  const ribbonAX = useTransform(progress, [0, 1], still ? [0, 0] : [-160 * s, 110 * s]);
-  const ribbonAY = useTransform(progress, [0, 1], still ? [0, 0] : [50 * s, -70 * s]);
-  const ribbonAR = useTransform(progress, [0, 1], still ? [0, 0] : [-7 * s, 4 * s]);
-
-  // Masse droite : descend / glisse
-  const ribbonBX = useTransform(progress, [0, 1], still ? [0, 0] : [120 * s, -90 * s]);
-  const ribbonBY = useTransform(progress, [0, 0.55, 1], still ? [0, 0, 0] : [-130 * s, -20 * s, 70 * s]);
-  const ribbonBR = useTransform(progress, [0, 1], still ? [0, 0] : [6 * s, -4 * s]);
-
-  // Accent bas : léger pivot
-  const ribbonCX = useTransform(progress, [0, 1], still ? [0, 0] : [-80 * s, 95 * s]);
-  const ribbonCY = useTransform(progress, [0, 1], still ? [0, 0] : [60 * s, -45 * s]);
-  const ribbonCR = useTransform(progress, [0, 1], still ? [0, 0] : [-3 * s, 5 * s]);
-
-  // Voile de dégradé qui se décale
-  const washX = useTransform(progress, [0, 1], still ? [0, 0] : [-40 * s, 50 * s]);
-  const washY = useTransform(progress, [0, 1], still ? [0, 0] : [30 * s, -35 * s]);
-  const washOpacity = useTransform(progress, [0, 0.45, 1], still ? [0.55, 0.55, 0.55] : [0.35, 0.7, 0.5]);
-
-  return (
-    <div className="lp-demo-invite__atmosphere" aria-hidden>
-      <motion.div
-        className="lp-demo-invite__wash"
-        style={{ x: washX, y: washY, opacity: washOpacity }}
-      />
-
-      <motion.svg
-        className="lp-demo-invite__ribbon lp-demo-invite__ribbon--a"
-        viewBox="0 0 1400 900"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="xMidYMid slice"
-        style={{ x: ribbonAX, y: ribbonAY, rotate: ribbonAR }}
-      >
-        <path
-          d="M-200 560C60 180 280 120 480 280C700 460 900 500 1280 240C1420 120 1520 60 1600 20"
-          stroke="rgba(59, 130, 246, 0.42)"
-          strokeWidth="180"
-          strokeLinecap="round"
-        />
-      </motion.svg>
-
-      <motion.svg
-        className="lp-demo-invite__ribbon lp-demo-invite__ribbon--b"
-        viewBox="0 0 1200 800"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="xMidYMid slice"
-        style={{ x: ribbonBX, y: ribbonBY, rotate: ribbonBR }}
-      >
-        <path
-          d="M1360 -60C1060 40 960 200 820 340C640 520 400 580 80 500C-40 460 -120 430 -200 410"
-          stroke="rgba(26, 35, 255, 0.38)"
-          strokeWidth="150"
-          strokeLinecap="round"
-        />
-      </motion.svg>
-
-      {!compact ? (
-        <motion.svg
-          className="lp-demo-invite__ribbon lp-demo-invite__ribbon--c"
-          viewBox="0 0 1000 700"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
-          style={{ x: ribbonCX, y: ribbonCY, rotate: ribbonCR }}
-        >
-          <path
-            d="M-120 520C140 380 320 460 520 420C740 370 900 260 1180 320"
-            stroke="rgba(125, 211, 252, 0.28)"
-            strokeWidth="110"
-            strokeLinecap="round"
-          />
-        </motion.svg>
-      ) : null}
-    </div>
-  );
-}
-
 export default function DemoInviteSection() {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
-  const compact = useIsCompact();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const still = Boolean(reduceMotion);
-  const amp = compact ? 0.45 : 1;
-
-  const contentY = useTransform(
-    scrollYProgress,
-    [0, 0.3, 0.7],
-    still ? [0, 0, 0] : [22 * amp, 0, -10 * amp]
-  );
-  const contentOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.18, 0.85],
-    still ? [1, 1, 1] : [0.55, 1, 1]
-  );
 
   const whatsappUrl = buildWhatsAppUrl(
     t("marketing.askChatGpt.whatsappPhone"),
     t("marketing.demoInvite.whatsappMessage")
   );
 
-  const titleLines = t("marketing.demoInvite.title").split("\n").filter(Boolean);
-
   return (
-    <section className="lp-demo-invite" id="demo" ref={sectionRef}>
+    <section className="lp-founder-cta" id="demo">
       <div className="lp-wrap">
-        <div className="lp-demo-invite__stage">
-          <div className="lp-demo-invite__panel">
-            <FounderAtmosphere
-              progress={scrollYProgress}
-              reduceMotion={still}
-              compact={compact}
-            />
+        <motion.div
+          className="lp-founder-cta__card"
+          initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.985 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={viewportOnce}
+          transition={{ duration: 0.75, ease: easePremium }}
+        >
+          <div className="lp-founder-cta__glow" aria-hidden />
+          <div className="lp-founder-cta__mesh" aria-hidden />
 
-            <motion.div
-              className="lp-demo-invite__copy"
-              style={{ y: contentY, opacity: contentOpacity }}
-            >
-              <p className="lp-demo-invite__label">{t("marketing.demoInvite.label")}</p>
-
-              <h2 className="lp-demo-invite__title display-title">
-                {titleLines.map((line) => (
-                  <span key={line} className="lp-demo-invite__title-line">
-                    {line}
-                  </span>
-                ))}
-              </h2>
-
-              <p className="lp-demo-invite__lead">{t("marketing.demoInvite.description")}</p>
-
-              <div className="lp-demo-invite__actions">
-                <a
-                  href={whatsappUrl}
-                  className="lp-demo-invite__cta"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="lp-demo-invite__wa" aria-hidden>
-                    <WhatsAppIcon className="lp-demo-invite__wa-icon" />
-                  </span>
-                  <span className="lp-demo-invite__cta-label">{t("marketing.demoInvite.cta")}</span>
-                  <span className="lp-demo-invite__cta-arrow" aria-hidden>
-                    <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-                  </span>
-                </a>
-                <p className="lp-demo-invite__note">{t("marketing.demoInvite.note")}</p>
-              </div>
-            </motion.div>
+          <div className="lp-founder-cta__decor lp-founder-cta__decor--left" aria-hidden>
+            <span className="lp-founder-cta__bubble lp-founder-cta__bubble--in">
+              {t("marketing.demoInvite.decorIncoming")}
+            </span>
+            <span className="lp-founder-cta__wa-orb">
+              <WhatsAppIcon className="lp-founder-cta__wa-orb-icon" />
+            </span>
           </div>
-        </div>
+
+          <div className="lp-founder-cta__decor lp-founder-cta__decor--right" aria-hidden>
+            <span className="lp-founder-cta__bubble lp-founder-cta__bubble--out">
+              {t("marketing.demoInvite.decorOutgoing")}
+            </span>
+          </div>
+
+          <div className="lp-founder-cta__content">
+            <p className="lp-founder-cta__label">{t("marketing.demoInvite.label")}</p>
+            <h2 className="lp-founder-cta__title">{t("marketing.demoInvite.title")}</h2>
+            <p className="lp-founder-cta__lead">{t("marketing.demoInvite.description")}</p>
+
+            <a
+              href={whatsappUrl}
+              className="lp-founder-cta__button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="lp-founder-cta__button-wa" aria-hidden>
+                <WhatsAppIcon className="lp-founder-cta__button-wa-icon" />
+              </span>
+              <span>{t("marketing.demoInvite.cta")}</span>
+              <ArrowUpRight className="lp-founder-cta__button-arrow" strokeWidth={2.4} aria-hidden />
+            </a>
+            <p className="lp-founder-cta__note">{t("marketing.demoInvite.note")}</p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

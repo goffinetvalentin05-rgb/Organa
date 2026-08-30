@@ -14,7 +14,15 @@ import { easePremium, scrollReveal, viewportOnce } from "@/components/landing/la
 import { PracticeStepVisual } from "@/components/landing/ProductShowcaseVisuals";
 import { PRACTICE_EVENT, practiceIndexFromHash } from "@/lib/landing/practice-anchors";
 
-type Step = { label: string; title: string; description: string };
+type Step = {
+  label: string;
+  title: string;
+  description: string;
+  /** Situation « avant Obillz », affichée en retrait au-dessus de la description. */
+  before?: string;
+  /** Le dernier écran conclut la série au lieu de présenter un 4e exemple. */
+  variant?: "example" | "outro";
+};
 
 const STEP_NUMBERS = ["01", "02", "03", "04"] as const;
 const STEP_CONTENT_ID = "how-it-works-step-content";
@@ -222,19 +230,34 @@ function StepContent({
           transition={{ duration: 0.42, ease: easePremium }}
           className="min-w-0"
         >
-          <p
-            className="how-it-works-blue-text display-title select-none text-[clamp(3rem,11vw,7.25rem)] leading-[0.86]"
-            aria-hidden
-          >
-            {num}
-          </p>
-          <p className="how-it-works-step-kicker">{step.label}</p>
-          <h3 className="how-it-works-step-title mt-3 text-[1.2rem] font-bold tracking-tight sm:mt-3.5 sm:text-2xl md:text-[1.75rem]">
-            {step.title}
-          </h3>
-          <p className="how-it-works-step-desc mx-auto mt-3.5 max-w-md text-[0.975rem] leading-relaxed sm:mt-4 sm:text-[1.0625rem] lg:mx-0">
-            {step.description}
-          </p>
+          {step.variant === "outro" ? (
+            <div className="how-it-works-outro">
+              <p className="how-it-works-step-kicker">{step.label}</p>
+              <h3 className="how-it-works-outro__title display-title">{step.title}</h3>
+              <p className="how-it-works-outro__desc">{step.description}</p>
+            </div>
+          ) : (
+            <>
+              <p
+                className="how-it-works-blue-text display-title select-none text-[clamp(3rem,11vw,7.25rem)] leading-[0.86]"
+                aria-hidden
+              >
+                {num}
+              </p>
+              <p className="how-it-works-step-kicker">{step.label}</p>
+              <h3 className="how-it-works-step-title mt-3 text-[1.2rem] font-bold tracking-tight sm:mt-3.5 sm:text-2xl md:text-[1.75rem]">
+                {step.title}
+              </h3>
+              {step.before ? (
+                <p className="how-it-works-step-before mx-auto mt-3.5 max-w-md sm:mt-4 lg:mx-0">
+                  {step.before}
+                </p>
+              ) : null}
+              <p className="how-it-works-step-desc mx-auto mt-3.5 max-w-md text-[0.975rem] leading-relaxed sm:mt-4 sm:text-[1.0625rem] lg:mx-0">
+                {step.description}
+              </p>
+            </>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -402,12 +425,25 @@ function MobileStepBody({
           transition={mobileFade.transition}
           className="min-w-0"
         >
-          <p className="how-it-works-blue-text display-title how-it-works-mobile-number select-none" aria-hidden>
-            {num}
-          </p>
-          <p className="how-it-works-step-kicker">{step.label}</p>
-          <h3 className="how-it-works-mobile-step-title">{step.title}</h3>
-          <p className="how-it-works-mobile-step-desc">{step.description}</p>
+          {step.variant === "outro" ? (
+            <div className="how-it-works-outro">
+              <p className="how-it-works-step-kicker">{step.label}</p>
+              <h3 className="how-it-works-outro__title display-title">{step.title}</h3>
+              <p className="how-it-works-outro__desc">{step.description}</p>
+            </div>
+          ) : (
+            <>
+              <p className="how-it-works-blue-text display-title how-it-works-mobile-number select-none" aria-hidden>
+                {num}
+              </p>
+              <p className="how-it-works-step-kicker">{step.label}</p>
+              <h3 className="how-it-works-mobile-step-title">{step.title}</h3>
+              {step.before ? (
+                <p className="how-it-works-step-before how-it-works-mobile-step-before">{step.before}</p>
+              ) : null}
+              <p className="how-it-works-mobile-step-desc">{step.description}</p>
+            </>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

@@ -688,13 +688,34 @@
   },
   "showcases": {
     "label": "Concrètement",
-    "titleLine1": "Découvrez Obillz en situation.",
-    "titleLine2": "",
-    "subtitle": "Cotisations, plannings, communication, sponsoring… découvrez comment Obillz simplifie concrètement la gestion quotidienne d’un club.",
+    "titleLine1": "Obillz dans la vie",
+    "titleLine2": "de votre club.",
+    "subtitle": "Quelques exemples concrets de ce que vous pouvez gérer plus simplement au quotidien.",
+    "outro": {
+      "label": "Aperçu",
+      "title": "Ce ne sont que quelques exemples.",
+      "description": "Obillz regroupe bien plus pour accompagner le quotidien de votre club.",
+      "visualCaption": "Et bien plus encore."
+    },
+    "documents": {
+      "label": "Documents",
+      "title": "Le bon document est toujours au bon endroit.",
+      "before": "Avant, il faut chercher entre les mails, les dossiers et les messages pour retrouver la bonne information.",
+      "description": "Avec Obillz, les documents importants du club restent centralisés et accessibles aux bonnes personnes.",
+      "heading": "Documents du club",
+      "committee": "Comité",
+      "shared": "Partagé",
+      "items": [
+        { "name": "PV — Assemblée générale", "meta": "PDF · 12 mai 2026" },
+        { "name": "Statuts du club", "meta": "PDF · mis à jour en mars" },
+        { "name": "Contrat sponsor 2026/27", "meta": "PDF · 3 signataires" }
+      ]
+    },
     "cotisations": {
       "label": "Cotisations",
-      "title": "Vous savez enfin qui a payé.",
-      "description": "Créez, envoyez et visualisez les paiements d’un coup d’œil — plutôt que de les suivre dans Excel, WhatsApp ou des fichiers dispersés.",
+      "title": "Les cotisations partent en quelques clics.",
+      "before": "Avant, il faut préparer, envoyer et suivre les cotisations manuellement.",
+      "description": "Avec Obillz, vous choisissez l’équipe ou le groupe concerné, vous envoyez en quelques clics et vous voyez directement qui a payé.",
       "season": "Saison 2025/26",
       "paid": "Payée",
       "pending": "En attente",
@@ -702,9 +723,10 @@
       "paymentReceived": "+ 1 paiement reçu"
     },
     "plannings": {
-      "label": "Plannings",
-      "title": "Le planning se fait sans allers-retours.",
-      "description": "Organisez les disponibilités, répartissez les créneaux et partagez les informations clairement avec le comité ou les bénévoles.",
+      "label": "Bénévoles",
+      "title": "Le planning se remplit presque tout seul.",
+      "before": "Avant, il faut créer un fichier, contacter chacun, récupérer les réponses et adapter le planning à la main.",
+      "description": "Avec Obillz, vous créez les postes, vous partagez le lien, et les bénévoles s’inscrivent directement.",
       "day": "Samedi 12 avril · Match du week-end",
       "full": "Complet",
       "confirmed": "Confirmé",
@@ -755,15 +777,57 @@
       "document": "Contrat PDF"
     }
   },
-  "timeSaved": {
-    "label": "Moins d’administratif",
-    "title": "Des heures de gestion transformées en quelques minutes.",
-    "description": "Obillz centralise les tâches les plus chronophages du club pour éviter les allers-retours, les documents dispersés et les suivis manuels.",
-    "aside": "Moins d’Excel. Moins de dispersion. Plus de temps.",
-    "personAlt": "Un responsable de club, saturé par la gestion administrative.",
-    "collected": "Cotisations encaissées",
-    "paymentReceived": "+ 1 paiement reçu",
-    "planningReady": "Planning prêt"
+  "story": {
+    "ariaLabel": "Le problème des clubs, le temps perdu et la réponse d’Obillz",
+    "steps": [
+      {
+        "label": "Le problème",
+        "lead": "Dans beaucoup de clubs, ce sont des bénévoles qui gèrent tout à côté de leur travail.",
+        "tail": "Entre les membres, les cotisations, les événements, les bénévoles et la communication, l’organisation repose souvent sur trop d’outils dispersés."
+      },
+      {
+        "label": "Le temps perdu",
+        "lead": "Résultat : un temps énorme est perdu dans l’administratif, les relances, les recherches d’informations et l’organisation du quotidien.",
+        "tail": "Un temps qui n’est plus investi dans le développement du club, ses membres, ou simplement dans la vie personnelle de ceux qui s’en occupent."
+      },
+      {
+        "label": "La solution",
+        "lead": "Nous avons créé Obillz pour remplacer le patchwork d’outils par un seul espace pensé autour du club.",
+        "tail": "Chaque membre du comité retrouve ce dont il a besoin, les informations circulent enfin au même endroit, et le club peut avancer sans multiplier les fichiers, les messages et les logiciels.",
+        "emphasis": ["Obillz", "un seul espace pensé autour du club"]
+      }
+    ]
+  },
+  "ecosystem": {
+    "badge": "Tout au même endroit",
+    "title": "Tout ce dont votre club a besoin, enfin réuni au même endroit",
+    "subtitle": "Membres, cotisations, communication, événements, bénévoles, documents et suivi : Obillz rassemble l’essentiel dans un seul espace.",
+    "coreLabel": "Un seul espace pour tout le club",
+    "stageAriaLabel": "Les outils du club réunis dans Obillz"
+  },
+  "simpleStart": {
+    "label": "Simple dès le départ",
+    "title": "Quatre étapes. Et votre club est prêt.",
+    "stepLabel": "Étape {number}",
+    "aside": "Pas besoin de tout configurer avant de commencer. Obillz s’adapte au rythme de votre club.",
+    "steps": [
+      {
+        "title": "Créez votre club",
+        "description": "Ajoutez les informations essentielles et préparez votre espace Obillz."
+      },
+      {
+        "title": "Ajoutez vos membres",
+        "description": "Importez votre liste existante ou ajoutez vos membres directement dans Obillz."
+      },
+      {
+        "title": "Invitez votre comité",
+        "description": "Donnez accès aux bonnes personnes pour que chacun retrouve ce dont il a besoin."
+      },
+      {
+        "title": "Commencez à gérer",
+        "description": "Votre espace est prêt. Vous pouvez directement commencer à utiliser les outils dont votre club a besoin."
+      }
+    ]
   },
   "clubReassurance": {
     "title": "Pensé avec les clubs, pour les clubs.",
@@ -926,13 +990,15 @@
   },
   "demoInvite": {
     "label": "Un échange direct",
-    "title": "Parlez directement au\nfondateur d’Obillz.",
-    "description": "Une question, un besoin spécifique ou envie de découvrir la plateforme ? Échangez directement sur WhatsApp avec le fondateur d’Obillz pour voir comment la solution peut s’adapter à votre club.",
+    "title": "Parlez directement au fondateur d’Obillz.",
+    "description": "Une question, un besoin spécifique ou envie de découvrir la plateforme ? Échangez directement sur WhatsApp pour voir comment Obillz peut s’adapter à votre club.",
     "cta": "Parler au fondateur",
     "note": "Échange via WhatsApp",
     "ctaSecondary": "Tester gratuitement",
     "imageAlt": "Échange direct avec le fondateur d’Obillz",
     "whatsappMessage": "Bonjour, je souhaite parler au fondateur d’Obillz à propos de mon club.",
+    "decorIncoming": "Dispo pour une démo ?",
+    "decorOutgoing": "Bien sûr — on regarde ça ensemble.",
     "bubbleTitle": "Démo en 10 minutes",
     "bubbleBody": "Découvrez comment Obillz centralise les cotisations, les plannings, les documents et la communication de votre club.",
     "phone": {

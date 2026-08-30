@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Bell, Calendar, Check, FileText, MapPin } from "lucide-react";
+import { Calendar, Check, FileText, FolderOpen, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { easePremium } from "@/components/landing/landing-motion";
-import { cn, DashboardBadge, EntityAvatar } from "@/components/ui";
+import { DashboardBadge, EntityAvatar } from "@/components/ui";
+import { getTranslationValue } from "@/lib/i18n";
 
 function useProductPlay(delayMs: number) {
   const reduceMotion = useReducedMotion();
@@ -181,103 +183,75 @@ function PlanningsVisual() {
   );
 }
 
-function CommunicationVisual() {
-  const { t } = useI18n();
-  const reduceMotion = useReducedMotion();
-  const [sent, setSent] = useState(false);
+type DocumentItem = { name: string; meta: string };
 
-  useEffect(() => {
-    if (reduceMotion) {
-      setSent(true);
-      return;
-    }
-    const timer = window.setTimeout(() => setSent(true), 1100);
-    return () => window.clearTimeout(timer);
-  }, [reduceMotion]);
+function DocumentsVisual() {
+  const { t, locale } = useI18n();
+  const { played, reduceMotion } = useProductPlay(900);
+  const raw = getTranslationValue(locale, "marketing.showcases.documents.items");
+  const items = (Array.isArray(raw) ? raw : []) as DocumentItem[];
 
   return (
     <div className="lp-practice-demo" aria-hidden>
       <div className="lp-practice-demo__card">
         <header className="lp-practice-demo__header lp-practice-demo__header--plain">
           <span className="lp-practice-demo__icon">
-            <Bell className="h-4 w-4" />
+            <FolderOpen className="h-4 w-4" />
           </span>
           <div className="min-w-0">
-            <p className="lp-practice-demo__kicker">{t("marketing.showcases.communication.label")}</p>
-            <p className="lp-practice-demo__heading">{t("marketing.showcases.communication.announcement")}</p>
+            <p className="lp-practice-demo__kicker">{t("marketing.showcases.documents.label")}</p>
+            <p className="lp-practice-demo__heading">{t("marketing.showcases.documents.heading")}</p>
           </div>
         </header>
 
-        <div className="lp-practice-demo__message">
-          <p className="lp-practice-demo__message-title">{t("marketing.showcases.communication.subjectValue")}</p>
-          <p className="lp-practice-demo__message-body">{t("marketing.showcases.communication.message")}</p>
-        </div>
-
-        <div className="lp-practice-demo__people">
-          {["Léa Martin", "Noah Berger", "Emma Rossi"].map((name) => (
-            <span key={name} className="lp-practice-demo__person">
-              <EntityAvatar label={name} size="sm" className="!h-7 !w-7 !text-[10px]" />
-              <span>{name.split(" ")[0]}</span>
-            </span>
-          ))}
-        </div>
-
-        <div className="lp-practice-demo__footer lp-practice-demo__footer--split">
-          <span className={cn("lp-practice-demo__send", sent && "lp-practice-demo__send--done")}>
-            {sent
-              ? t("marketing.showcases.communication.sent")
-              : t("marketing.showcases.communication.send")}
-          </span>
-          <AnimatePresence>
-            {sent ? (
+        <ul className="lp-practice-demo__rows">
+          {items.map((item, index) => (
+            <li key={item.name} className="lp-practice-demo__row">
+              <span className="lp-practice-demo__slot-pin">
+                <FileText className="h-3.5 w-3.5" />
+              </span>
+              <div className="lp-practice-demo__row-copy">
+                <p className="lp-practice-demo__row-title">{item.name}</p>
+                <p className="lp-practice-demo__row-meta">{item.meta}</p>
+              </div>
               <motion.span
-                className="lp-practice-demo__hint"
-                initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex"
+                initial={reduceMotion || index !== 0 ? false : { opacity: 0.4 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.35, ease: easePremium }}
               >
-                {t("marketing.showcases.communication.reminderSent")}
+                <DashboardBadge variant={index === 0 && played ? "success" : "default"}>
+                  {index === 0
+                    ? t("marketing.showcases.documents.shared")
+                    : t("marketing.showcases.documents.committee")}
+                </DashboardBadge>
               </motion.span>
-            ) : null}
-          </AnimatePresence>
-        </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
 }
 
-function SponsoringVisual() {
+function OutroVisual() {
   const { t } = useI18n();
 
   return (
-    <div className="lp-practice-demo" aria-hidden>
-      <div className="lp-practice-demo__card">
-        <header className="lp-practice-demo__header lp-practice-demo__header--plain">
-          <div className="min-w-0">
-            <p className="lp-practice-demo__kicker">{t("marketing.showcases.sponsoring.label")}</p>
-            <p className="lp-practice-demo__heading">{t("marketing.showcases.sponsoring.sponsorName")}</p>
-            <p className="lp-practice-demo__row-meta mt-1">{t("marketing.showcases.sponsoring.contractTitle")}</p>
-          </div>
-          <DashboardBadge variant="success">{t("marketing.showcases.sponsoring.statusActive")}</DashboardBadge>
-        </header>
-
-        <div className="lp-practice-demo__facts">
-          <div className="lp-practice-demo__fact">
-            <p className="lp-practice-demo__metric-label">{t("marketing.showcases.sponsoring.amountLabel")}</p>
-            <p className="lp-practice-demo__fact-value">{t("marketing.showcases.sponsoring.amount")}</p>
-          </div>
-          <div className="lp-practice-demo__fact">
-            <p className="lp-practice-demo__metric-label">{t("marketing.showcases.sponsoring.dueLabel")}</p>
-            <p className="lp-practice-demo__fact-value">{t("marketing.showcases.sponsoring.endDate")}</p>
-          </div>
-        </div>
-
-        <div className="lp-practice-demo__footer">
-          <span className="lp-practice-demo__doc">
-            <FileText className="h-3.5 w-3.5" />
-            {t("marketing.showcases.sponsoring.document")}
-          </span>
-        </div>
+    <div className="lp-practice-outro" aria-hidden>
+      <span className="lp-practice-outro__halo" />
+      <div className="lp-practice-outro__card">
+        <Image
+          src="/logo-obillz-bleu.png"
+          alt=""
+          width={500}
+          height={114}
+          className="lp-practice-outro__logo"
+        />
+        <span className="lp-practice-outro__rule" />
+        <p className="lp-practice-outro__caption">
+          {t("marketing.showcases.outro.visualCaption")}
+        </p>
       </div>
     </div>
   );
@@ -285,7 +259,7 @@ function SponsoringVisual() {
 
 export function PracticeStepVisual({ stepIndex }: { stepIndex: number }) {
   if (stepIndex === 1) return <PlanningsVisual />;
-  if (stepIndex === 2) return <CommunicationVisual />;
-  if (stepIndex === 3) return <SponsoringVisual />;
+  if (stepIndex === 2) return <DocumentsVisual />;
+  if (stepIndex === 3) return <OutroVisual />;
   return <CotisationsVisual />;
 }
