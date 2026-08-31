@@ -687,7 +687,7 @@
     "exploreFooter": "Explorez chaque fonctionnalité et voyez comment elle transforme votre gestion."
   },
   "showcases": {
-    "label": "Concrètement",
+    "label": "Quelques exemples concrets",
     "titleLine1": "Obillz dans la vie",
     "titleLine2": "de votre club.",
     "subtitle": "Quelques exemples concrets de ce que vous pouvez gérer plus simplement au quotidien.",
@@ -799,8 +799,8 @@
     ]
   },
   "ecosystem": {
-    "badge": "Tout au même endroit",
-    "title": "Tout ce dont votre club a besoin, enfin réuni au même endroit",
+    "badge": "Nos fonctionnalités",
+    "title": "Tout ce dont votre club a besoin, réuni dans un seul espace",
     "subtitle": "Membres, cotisations, communication, événements, bénévoles, documents et suivi : Obillz rassemble l’essentiel dans un seul espace.",
     "coreLabel": "Un seul espace pour tout le club",
     "stageAriaLabel": "Les outils du club réunis dans Obillz"

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { Check } from "lucide-react";
@@ -17,7 +16,7 @@ type EcoVisual = "none" | "members" | "progress" | "calendar" | "checks" | "bubb
 
 type EcoNodeConfig = {
   id: SportFeatureId;
-  /** Position en % de la scène — anneau volontairement irrégulier. */
+  /** Position en % de la scène — composition éditoriale libre. */
   x: number;
   y: number;
   size: "sm" | "lg";
@@ -25,59 +24,23 @@ type EcoNodeConfig = {
 };
 
 /**
- * Les 11 modules de l'ancienne section « Fonctionnalités » + le Dashboard.
- * Les cartes `lg` portent un mini-visuel, les `sm` restent de simples pastilles
- * pour aérer l'anneau.
+ * Les cartes sont réparties autour d'une zone éditoriale protégée, sans anneau
+ * régulier ni relation fonctionnelle avec un centre.
  */
 const ECO_NODES: EcoNodeConfig[] = [
-  { id: "membres", x: 50, y: 10, size: "lg", visual: "members" },
-  { id: "cotisations", x: 68.5, y: 14, size: "lg", visual: "progress" },
-  { id: "factures", x: 85, y: 28, size: "sm", visual: "none" },
-  { id: "revenus", x: 88, y: 51, size: "lg", visual: "bars" },
-  { id: "buvette", x: 85, y: 72.5, size: "sm", visual: "none" },
-  { id: "evenements", x: 68.5, y: 86, size: "lg", visual: "calendar" },
-  { id: "communication", x: 50.5, y: 90, size: "lg", visual: "bubbles" },
-  { id: "plannings", x: 32, y: 86, size: "lg", visual: "checks" },
-  { id: "qrcodes", x: 15, y: 72.5, size: "sm", visual: "none" },
-  { id: "statistiques", x: 12, y: 49, size: "lg", visual: "spark" },
-  { id: "pagePublique", x: 15, y: 28, size: "sm", visual: "none" },
-  { id: "sponsors", x: 32, y: 14, size: "sm", visual: "none" },
+  { id: "sponsors", x: 19, y: 11, size: "sm", visual: "none" },
+  { id: "membres", x: 47, y: 7, size: "lg", visual: "members" },
+  { id: "cotisations", x: 78, y: 13, size: "lg", visual: "progress" },
+  { id: "pagePublique", x: 10, y: 34, size: "sm", visual: "none" },
+  { id: "factures", x: 91, y: 34, size: "sm", visual: "none" },
+  { id: "statistiques", x: 13, y: 59, size: "lg", visual: "spark" },
+  { id: "revenus", x: 89, y: 59, size: "lg", visual: "bars" },
+  { id: "qrcodes", x: 14, y: 82, size: "sm", visual: "none" },
+  { id: "plannings", x: 35, y: 88, size: "lg", visual: "checks" },
+  { id: "communication", x: 57, y: 91, size: "lg", visual: "bubbles" },
+  { id: "evenements", x: 78, y: 84, size: "lg", visual: "calendar" },
+  { id: "buvette", x: 94, y: 79, size: "sm", visual: "none" },
 ];
-
-/** Décalage initial de chaque module : le long de l'axe centre → module. */
-const SPREAD_PX = 42;
-
-function radial(node: EcoNodeConfig) {
-  const dx = node.x - 50;
-  const dy = node.y - 50;
-  const length = Math.hypot(dx, dy) || 1;
-  return { dx, dy, ux: dx / length, uy: dy / length };
-}
-
-function awayVector(node: EcoNodeConfig) {
-  const { ux, uy } = radial(node);
-  return { x: ux * SPREAD_PX, y: uy * SPREAD_PX };
-}
-
-/**
- * Courbe très légère entre le noyau et un module. Elle démarre en dehors du bloc
- * central et s'arrête avant la carte : la connexion est suggérée, jamais tracée
- * en entier.
- */
-function connectorPath(node: EcoNodeConfig) {
-  const { ux, uy } = radial(node);
-  const startX = 50 + ux * 9;
-  const startY = 50 + uy * 9;
-  const endX = node.x - ux * 5;
-  const endY = node.y - uy * 5;
-  const bend = 5.5;
-  const controlX = (startX + endX) / 2 - uy * bend;
-  const controlY = (startY + endY) / 2 + ux * bend;
-
-  return `M${startX.toFixed(2)} ${startY.toFixed(2)}Q${controlX.toFixed(2)} ${controlY.toFixed(
-    2
-  )} ${endX.toFixed(2)} ${endY.toFixed(2)}`;
-}
 
 /** Volontairement `false` au premier rendu : SSR et hydratation doivent produire les mêmes styles inline. */
 function useIsCompact() {
@@ -188,14 +151,13 @@ function EcoNode({
   progress: MotionValue<number>;
   compact: boolean;
 }) {
-  const start = 0.14 + index * 0.015;
-  const away = awayVector(node);
+  const start = 0.08 + index * 0.018;
   const Icon = sportFeatureIcons[node.id];
 
-  const x = useTransform(progress, [start, start + 0.6], [compact ? 0 : away.x, 0]);
-  const y = useTransform(progress, [start, start + 0.6], [compact ? 14 : away.y, 0]);
+  const x = useTransform(progress, [start, start + 0.5], [compact ? 0 : index % 2 === 0 ? -18 : 18, 0]);
+  const y = useTransform(progress, [start, start + 0.5], [compact ? 12 : 22, 0]);
   const opacity = useTransform(progress, [start, start + 0.24], [0, 1]);
-  const scale = useTransform(progress, [start, start + 0.6], [0.965, 1]);
+  const scale = useTransform(progress, [start, start + 0.5], [0.975, 1]);
 
   return (
     <li
@@ -228,11 +190,6 @@ export default function ClubEcosystemSection() {
     offset: ["start end", "center center"],
   });
 
-  const coreOpacity = useTransform(scrollYProgress, [0.1, 0.4], [0, 1]);
-  const coreScale = useTransform(scrollYProgress, [0.1, 0.9], [0.975, 1]);
-  const haloOpacity = useTransform(scrollYProgress, [0.3, 1], [0.25, 1]);
-  const linksOpacity = useTransform(scrollYProgress, [0.4, 0.95], [0, 1]);
-
   const labels = useMemo(() => {
     const raw = getTranslationValue(locale, "marketing.modules.orbitFeatures");
     const list = (Array.isArray(raw) ? raw : []) as Array<{ id?: string; label?: string }>;
@@ -247,18 +204,6 @@ export default function ClubEcosystemSection() {
   return (
     <section id="modules" className="lp-eco scroll-mt-32 md:scroll-mt-36">
       <div className="lp-eco__wrap">
-        <motion.header
-          className="lp-eco__head"
-          variants={scrollReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
-          <span className="lp-eco__badge">{t("marketing.ecosystem.badge")}</span>
-          <h2 className="lp-eco__title">{t("marketing.ecosystem.title")}</h2>
-          <p className="lp-eco__lead">{t("marketing.ecosystem.subtitle")}</p>
-        </motion.header>
-
         <div
           ref={stageRef}
           className="lp-eco__stage"
@@ -270,36 +215,30 @@ export default function ClubEcosystemSection() {
             <span className="lp-eco__glow lp-eco__glow--b" />
           </div>
 
-          <motion.svg
-            className="lp-eco__links"
+          <svg
+            className="lp-eco__curves"
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
-            style={{ opacity: linksOpacity }}
             aria-hidden
           >
-            {ECO_NODES.map((node) => (
-              <path
-                key={node.id}
-                d={connectorPath(node)}
-                fill="none"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-          </motion.svg>
+            <path d="M-5 30C18 12 28 19 38 34" />
+            <path d="M65 14C82 20 83 35 105 39" />
+            <path d="M7 76C25 65 31 70 42 99" />
+            <path d="M66 100C70 78 86 70 105 75" />
+          </svg>
 
-          <div className="lp-eco__core-anchor">
-            <motion.div className="lp-eco__core" style={{ opacity: coreOpacity, scale: coreScale }}>
-              <motion.span className="lp-eco__core-halo" style={{ opacity: haloOpacity }} aria-hidden />
-              <Image
-                src="/logo-obillz-bleu.png"
-                alt="Obillz"
-                width={500}
-                height={114}
-                className="lp-eco__core-logo"
-              />
-              <p className="lp-eco__core-label">{t("marketing.ecosystem.coreLabel")}</p>
-            </motion.div>
+          <div className="lp-eco__editorial">
+            <motion.header
+              className="lp-eco__head"
+              variants={scrollReveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            >
+              <p className="lp-eyebrow">{t("marketing.ecosystem.badge")}</p>
+              <h2 className="lp-eco__title">{t("marketing.ecosystem.title")}</h2>
+              <p className="lp-eco__lead">{t("marketing.ecosystem.subtitle")}</p>
+            </motion.header>
           </div>
 
           <ul className="lp-eco__nodes">

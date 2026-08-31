@@ -687,7 +687,7 @@
     "exploreFooter": "Explore each feature and see how it transforms your club management."
   },
   "showcases": {
-    "label": "Concretely",
+    "label": "A few concrete examples",
     "titleLine1": "Obillz in the daily life",
     "titleLine2": "of your club.",
     "subtitle": "A few concrete examples of what you can handle more simply, day after day.",
@@ -799,8 +799,8 @@
     ]
   },
   "ecosystem": {
-    "badge": "All in one place",
-    "title": "Everything your club needs, finally gathered in one place",
+    "badge": "Our features",
+    "title": "Everything your club needs, gathered in a single space",
     "subtitle": "Members, fees, communication, events, volunteers, documents and tracking: Obillz brings the essentials together in a single space.",
     "coreLabel": "One single space for the whole club",
     "stageAriaLabel": "The club’s tools gathered inside Obillz"

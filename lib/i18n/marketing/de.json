@@ -687,7 +687,7 @@
     "exploreFooter": "Entdecken Sie jede Funktion und sehen Sie, wie sie Ihre Vereinsverwaltung verändert."
   },
   "showcases": {
-    "label": "Konkret",
+    "label": "Einige konkrete Beispiele",
     "titleLine1": "Obillz im Alltag",
     "titleLine2": "Ihres Vereins.",
     "subtitle": "Einige konkrete Beispiele dafür, was Sie im Alltag einfacher erledigen können.",
@@ -799,8 +799,8 @@
     ]
   },
   "ecosystem": {
-    "badge": "Alles an einem Ort",
-    "title": "Alles, was Ihr Verein braucht, endlich an einem Ort vereint",
+    "badge": "Unsere Funktionen",
+    "title": "Alles, was Ihr Verein braucht, vereint in einem einzigen Raum",
     "subtitle": "Mitglieder, Beiträge, Kommunikation, Anlässe, Freiwillige, Dokumente und Auswertung: Obillz bündelt das Wesentliche in einem einzigen Raum.",
     "coreLabel": "Ein einziger Raum für den ganzen Verein",
     "stageAriaLabel": "Die Werkzeuge des Vereins, vereint in Obillz"

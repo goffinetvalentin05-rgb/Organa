@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   motion,
-  useMotionTemplate,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -16,37 +15,58 @@ type StoryStep = {
   label: string;
   lead: string;
   tail: string;
-  /** Fragments du `lead` mis en avant en bleu Obillz. */
+  /** Fragments du texte mis en avant en bleu Obillz une fois actifs. */
   emphasis?: string[];
 };
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+type StoryToken = {
+  text: string;
+  emphasis: boolean;
+};
 
-function renderLead(step: StoryStep): ReactNode {
-  const fragments = (step.emphasis ?? []).filter((fragment) => fragment.length > 0);
-  if (fragments.length === 0) return step.lead;
-
-  const parts = step.lead.split(new RegExp(`(${fragments.map(escapeRegExp).join("|")})`, "g"));
-
-  return parts.map((part, index) =>
-    fragments.includes(part) ? (
-      <span key={`${part}-${index}`} className="lp-story__accent">
-        {part}
-      </span>
-    ) : (
-      part
-    )
-  );
-}
-
-/** Fenêtres de progression (0 → 1) : entrée, plein écran, sortie de chaque étape. */
+/**
+ * Fenêtres [entrée début, entrée fin / révélation début, révélation fin / sortie début, sortie fin].
+ * Laisser assez de « hold » pour que 100 % des mots s’allument avant le crossfade suivant.
+ */
 const STEP_RANGES: [number, number, number, number][] = [
-  [-0.3, -0.14, 0.26, 0.37],
-  [0.3, 0.42, 0.58, 0.7],
-  [0.63, 0.76, 1.3, 1.46],
+  [0, 0.045, 0.27, 0.33],
+  [0.3, 0.355, 0.6, 0.66],
+  [0.63, 0.69, 0.96, 1],
 ];
 
-/** Volontairement `false` au premier rendu : le SSR et l'hydratation doivent produire les mêmes styles inline. */
+const COLOR_INACTIVE = "#94a3b8";
+const COLOR_ACTIVE = "#0b1220";
+const COLOR_EMPHASIS = "#1a23ff";
+
+function buildTokens(step: StoryStep): StoryToken[] {
+  const full = `${step.lead} ${step.tail}`.replace(/\s+/g, " ").trim();
+  if (!full) return [];
+
+  const marks = new Array<boolean>(full.length).fill(false);
+  for (const fragment of step.emphasis ?? []) {
+    if (!fragment) continue;
+    let from = 0;
+    while (from < full.length) {
+      const index = full.indexOf(fragment, from);
+      if (index < 0) break;
+      for (let i = index; i < index + fragment.length; i += 1) marks[i] = true;
+      from = index + fragment.length;
+    }
+  }
+
+  const tokens: StoryToken[] = [];
+  const wordRe = /\S+/g;
+  let match: RegExpExecArray | null;
+  while ((match = wordRe.exec(full))) {
+    const start = match.index;
+    const end = start + match[0].length;
+    const emphasis = marks.slice(start, end).some(Boolean);
+    tokens.push({ text: match[0], emphasis });
+  }
+  return tokens;
+}
+
+/** Volontairement `false` au premier rendu : SSR et hydratation alignés. */
 function useIsCompact() {
   const [compact, setCompact] = useState(false);
 
@@ -65,29 +85,99 @@ function StoryLayer({
   progress,
   range,
   distance,
-  blurAmount,
   className,
   children,
 }: {
   progress: MotionValue<number>;
   range: [number, number, number, number];
   distance: number;
-  blurAmount: number;
   className: string;
   children: ReactNode;
 }) {
   const opacity = useTransform(progress, range, [0, 1, 1, 0]);
-  const y = useTransform(progress, range, [distance, 0, 0, -distance]);
-  const blur = useTransform(progress, range, [blurAmount, 0, 0, blurAmount]);
-  const filter = useMotionTemplate`blur(${blur}px)`;
+  const y = useTransform(progress, range, [distance, 0, 0, -distance * 0.45]);
 
   return (
-    <motion.div
-      className={className}
-      style={blurAmount > 0 ? { opacity, y, filter } : { opacity, y }}
-    >
+    <motion.div className={className} style={{ opacity, y }}>
       {children}
     </motion.div>
+  );
+}
+
+function StoryWord({
+  progress,
+  index,
+  total,
+  emphasis,
+  children,
+}: {
+  progress: MotionValue<number>;
+  index: number;
+  total: number;
+  emphasis: boolean;
+  children: string;
+}) {
+  const start = index / total;
+  const end = Math.min(1, (index + 1.15) / total);
+  const opacity = useTransform(progress, [start, end], [0.55, 1]);
+  const color = useTransform(
+    progress,
+    [start, end],
+    [COLOR_INACTIVE, emphasis ? COLOR_EMPHASIS : COLOR_ACTIVE]
+  );
+
+  return (
+    <motion.span className="lp-story__word" style={{ opacity, color }}>
+      {children}
+      {index < total - 1 ? " " : ""}
+    </motion.span>
+  );
+}
+
+function StoryRevealText({
+  step,
+  progress,
+  staticActive = false,
+}: {
+  step: StoryStep;
+  progress: MotionValue<number>;
+  staticActive?: boolean;
+}) {
+  const tokens = useMemo(
+    () => buildTokens(step),
+    [step.lead, step.tail, (step.emphasis ?? []).join("\0")]
+  );
+
+  if (staticActive) {
+    return (
+      <p className="lp-story__text lp-story__text--static">
+        {tokens.map((token, index) => (
+          <span
+            key={`${token.text}-${index}`}
+            className={token.emphasis ? "lp-story__accent" : undefined}
+          >
+            {token.text}
+            {index < tokens.length - 1 ? " " : ""}
+          </span>
+        ))}
+      </p>
+    );
+  }
+
+  return (
+    <p className="lp-story__text">
+      {tokens.map((token, index) => (
+        <StoryWord
+          key={`${token.text}-${index}`}
+          progress={progress}
+          index={index}
+          total={tokens.length}
+          emphasis={token.emphasis}
+        >
+          {token.text}
+        </StoryWord>
+      ))}
+    </p>
   );
 }
 
@@ -171,6 +261,85 @@ function StoryRibbons({
   );
 }
 
+function StepPanels({
+  steps,
+  scrollYProgress,
+  isCompact,
+}: {
+  steps: StoryStep[];
+  scrollYProgress: MotionValue<number>;
+  isCompact: boolean;
+}) {
+  const total = String(steps.length).padStart(2, "0");
+  const distance = isCompact ? 18 : 36;
+
+  const railScale = useTransform(scrollYProgress, [0, 1], [0.1, 1]);
+
+  /** Progressions locales 0→1 pendant le « hold » de chaque étape (révélation des mots). */
+  const reveal0 = useTransform(
+    scrollYProgress,
+    [STEP_RANGES[0][1], STEP_RANGES[0][2]],
+    [0, 1]
+  );
+  const reveal1 = useTransform(
+    scrollYProgress,
+    [STEP_RANGES[1][1], STEP_RANGES[1][2]],
+    [0, 1]
+  );
+  const reveal2 = useTransform(
+    scrollYProgress,
+    [STEP_RANGES[2][1], STEP_RANGES[2][2]],
+    [0, 1]
+  );
+  const reveals = [reveal0, reveal1, reveal2];
+
+  return (
+    <div className="lp-story__grid lp-story__wrap">
+      <div className="lp-story__aside">
+        <div className="lp-story__stack">
+          {steps.map((step, index) => (
+            <StoryLayer
+              key={step.label}
+              progress={scrollYProgress}
+              range={STEP_RANGES[index] ?? STEP_RANGES[STEP_RANGES.length - 1]!}
+              distance={12}
+              className="lp-story__aside-item"
+            >
+              <span className="lp-story__count">
+                {String(index + 1).padStart(2, "0")}
+                <span className="lp-story__count-sep">/</span>
+                {total}
+              </span>
+              <p className="lp-story__label">{step.label}</p>
+            </StoryLayer>
+          ))}
+        </div>
+
+        <div className="lp-story__rail" aria-hidden>
+          <motion.span className="lp-story__rail-fill" style={{ scaleX: railScale }} />
+        </div>
+      </div>
+
+      <div className="lp-story__stack lp-story__stage">
+        {steps.map((step, index) => (
+          <StoryLayer
+            key={step.label}
+            progress={scrollYProgress}
+            range={STEP_RANGES[index] ?? STEP_RANGES[STEP_RANGES.length - 1]!}
+            distance={distance}
+            className={`lp-story__panel lp-story__panel--${index + 1}`}
+          >
+            <StoryRevealText
+              step={step}
+              progress={reveals[index] ?? reveal0}
+            />
+          </StoryLayer>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function StorySequenceSection() {
   const { t, locale } = useI18n();
   const reduceMotion = useReducedMotion();
@@ -187,13 +356,12 @@ export default function StorySequenceSection() {
     offset: ["start start", "end end"],
   });
 
-  const railScale = useTransform(scrollYProgress, [0, 1], [0.1, 1]);
-  const opacityA = useTransform(scrollYProgress, [0, 0.26, 0.45], [1, 1, 0]);
-  const opacityB = useTransform(scrollYProgress, [0.26, 0.46, 0.62, 0.8], [0, 1, 1, 0]);
-  const opacityC = useTransform(scrollYProgress, [0.62, 0.82, 1], [0, 1, 1]);
-  const yA = useTransform(scrollYProgress, [0, 1], [0, -90]);
-  const yB = useTransform(scrollYProgress, [0, 1], [50, -55]);
-  const yC = useTransform(scrollYProgress, [0, 1], [80, -20]);
+  const opacityA = useTransform(scrollYProgress, [0, 0.26, 0.42], [1, 1, 0]);
+  const opacityB = useTransform(scrollYProgress, [0.28, 0.42, 0.58, 0.74], [0, 1, 1, 0]);
+  const opacityC = useTransform(scrollYProgress, [0.62, 0.76, 1], [0, 1, 1]);
+  const yA = useTransform(scrollYProgress, [0, 1], [0, isCompact ? -40 : -90]);
+  const yB = useTransform(scrollYProgress, [0, 1], [isCompact ? 24 : 50, isCompact ? -28 : -55]);
+  const yC = useTransform(scrollYProgress, [0, 1], [isCompact ? 36 : 80, isCompact ? -12 : -20]);
 
   const raw = getTranslationValue(locale, "marketing.story.steps");
   const steps = (Array.isArray(raw) ? raw : []) as StoryStep[];
@@ -219,10 +387,7 @@ export default function StorySequenceSection() {
                 </span>
                 <p className="lp-story__label">{step.label}</p>
               </div>
-              <p className="lp-story__text">
-                {renderLead(step)}{" "}
-                <span className="lp-story__tail">{step.tail}</span>
-              </p>
+              <StoryRevealText step={step} progress={scrollYProgress} staticActive />
             </article>
           ))}
         </div>
@@ -246,51 +411,11 @@ export default function StorySequenceSection() {
           yC={yC}
         />
 
-        <div className="lp-story__grid lp-story__wrap">
-          <div className="lp-story__aside">
-            <div className="lp-story__stack">
-              {steps.map((step, index) => (
-                <StoryLayer
-                  key={step.label}
-                  progress={scrollYProgress}
-                  range={STEP_RANGES[index] ?? STEP_RANGES[STEP_RANGES.length - 1]}
-                  distance={16}
-                  blurAmount={0}
-                  className="lp-story__aside-item"
-                >
-                  <span className="lp-story__count">
-                    {String(index + 1).padStart(2, "0")}
-                    <span className="lp-story__count-sep">/</span>
-                    {total}
-                  </span>
-                  <p className="lp-story__label">{step.label}</p>
-                </StoryLayer>
-              ))}
-            </div>
-
-            <div className="lp-story__rail" aria-hidden>
-              <motion.span className="lp-story__rail-fill" style={{ scaleX: railScale }} />
-            </div>
-          </div>
-
-          <div className="lp-story__stack lp-story__stage">
-            {steps.map((step, index) => (
-              <StoryLayer
-                key={step.label}
-                progress={scrollYProgress}
-                range={STEP_RANGES[index] ?? STEP_RANGES[STEP_RANGES.length - 1]}
-                distance={isCompact ? 26 : 44}
-                blurAmount={isCompact ? 0 : 5}
-                className={`lp-story__panel lp-story__panel--${index + 1}`}
-              >
-                <p className="lp-story__text">
-                  {renderLead(step)}{" "}
-                  <span className="lp-story__tail">{step.tail}</span>
-                </p>
-              </StoryLayer>
-            ))}
-          </div>
-        </div>
+        <StepPanels
+          steps={steps}
+          scrollYProgress={scrollYProgress}
+          isCompact={isCompact}
+        />
       </div>
     </section>
   );
