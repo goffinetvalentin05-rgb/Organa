@@ -26,7 +26,7 @@ interface FacturePdfProps {
   qrBill?: {
     hasQRBill: boolean;
     errorMessage: string | null;
-  };
+  } | null;
   client: {
     name: string;
     address?: string;
