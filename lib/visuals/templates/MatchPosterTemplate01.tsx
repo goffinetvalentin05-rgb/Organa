@@ -24,11 +24,9 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
   const [line1, line2] = splitDisplayTitle(data.title || "Prochain match", "MATCH");
   const home = data.homeTeam || "Domicile";
   const away = data.awayTeam || "Extérieur";
-  const footerH = story ? 340 : 250;
-  const logoSize = story ? 156 : 118;
-  const photoTop = story ? 300 : 220;
-  const nameSize = story ? 56 : 38;
-  const metaSize = story ? 28 : 20;
+  const logoSize = story ? 168 : 120;
+  const photoTop = story ? 280 : 200;
+  const nameSize = story ? 42 : 28;
 
   return (
     <div className={visualDisplayFont.className} style={visualRootStyle(format)}>
@@ -79,7 +77,7 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
           style={{
             position: "absolute",
             inset: 0,
-            background: `linear-gradient(180deg, rgba(0,0,0,0.06) 0%, transparent 32%, ${fade} 78%, ${mixToward(primary, "#000000", 0.72)} 100%)`,
+            background: `linear-gradient(180deg, rgba(0,0,0,0.04) 0%, transparent 28%, ${fade} 58%, ${mixToward(primary, "#000000", 0.78)} 100%)`,
           }}
         />
       </div>
@@ -135,126 +133,145 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
       <div
         style={{
           position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          minHeight: footerH,
-          padding: story ? "48px 40px 44px" : "32px 28px 28px",
+          left: story ? 48 : 36,
+          right: story ? 48 : 36,
+          bottom: story ? 88 : 48,
           color: ink,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          background: `linear-gradient(180deg, transparent 0%, ${mixToward(primary, "#000000", 0.15)} 28%, ${mixToward(primary, "#000000", 0.62)} 100%)`,
+          textAlign: "center",
         }}
       >
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: story ? 20 : 14,
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            alignItems: "start",
+            columnGap: story ? 20 : 14,
           }}
         >
-          <LogoMark
+          <ClubStack
             src={data.clubLogoUrl}
-            size={logoSize}
-            alt={home}
-            background="rgba(255,255,255,0.96)"
-            foreground="#0B1220"
-            paddingRatio={0.14}
+            name={home}
+            logoSize={logoSize}
+            nameSize={nameSize}
           />
           <div
             style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: nameSize,
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              textTransform: "uppercase",
-              lineHeight: 0.92,
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {home}
-          </div>
-          <div
-            style={{
-              fontSize: story ? 36 : 26,
+              alignSelf: "center",
+              fontSize: story ? 34 : 24,
               fontWeight: 800,
               fontStyle: "italic",
-              letterSpacing: "0.02em",
-              opacity: 0.78,
-              flexShrink: 0,
-              padding: story ? "0 6px" : "0 2px",
+              letterSpacing: "0.06em",
+              opacity: 0.8,
+              paddingTop: story ? 52 : 36,
             }}
           >
             vs
           </div>
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: nameSize,
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              textTransform: "uppercase",
-              lineHeight: 0.92,
-              textAlign: "right",
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {away}
-          </div>
-          <LogoMark
+          <ClubStack
             src={data.opponentLogoUrl}
-            size={logoSize}
-            alt={away}
-            background="rgba(255,255,255,0.96)"
-            foreground="#0B1220"
-            paddingRatio={0.14}
+            name={away}
+            logoSize={logoSize}
+            nameSize={nameSize}
           />
         </div>
 
         <div
           style={{
-            marginTop: story ? 22 : 14,
-            height: 3,
+            margin: story ? "28px auto 0" : "18px auto 0",
+            width: story ? 120 : 88,
+            height: 4,
             background: accent,
-            opacity: 0.9,
           }}
         />
 
         <div
           style={{
-            marginTop: story ? 16 : 12,
-            display: "grid",
-            gridTemplateColumns: "1.15fr 0.7fr 1fr",
-            gap: story ? 18 : 12,
-            fontSize: metaSize,
+            marginTop: story ? 22 : 14,
+            fontSize: story ? 42 : 28,
             fontWeight: 800,
             letterSpacing: "0.04em",
             textTransform: "uppercase",
-            lineHeight: 1.15,
+            lineHeight: 1.1,
           }}
         >
-          <span style={clamp2}>{data.date || "Date à confirmer"}</span>
-          <span>{data.time || "—"}</span>
-          <span style={{ ...clamp2, textAlign: "right" }}>{data.venue || "—"}</span>
+          {data.date || "Date à confirmer"}
+        </div>
+        <div
+          style={{
+            marginTop: story ? 10 : 6,
+            fontSize: story ? 64 : 42,
+            fontWeight: 900,
+            letterSpacing: "-0.03em",
+            textTransform: "uppercase",
+            lineHeight: 1,
+            color: accent,
+          }}
+        >
+          {data.time || "—"}
+        </div>
+        <div
+          style={{
+            marginTop: story ? 12 : 8,
+            fontSize: story ? 32 : 22,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            lineHeight: 1.15,
+            opacity: 0.92,
+          }}
+        >
+          {data.venue || "—"}
         </div>
       </div>
     </div>
   );
 }
 
-const clamp2 = {
-  minWidth: 0,
-  overflow: "hidden" as const,
-  display: "-webkit-box" as const,
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: "vertical" as const,
-};
+function ClubStack({
+  src,
+  name,
+  logoSize,
+  nameSize,
+}: {
+  src: string | null;
+  name: string;
+  logoSize: number;
+  nameSize: number;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        minWidth: 0,
+        gap: 12,
+      }}
+    >
+      <LogoMark
+        src={src}
+        size={logoSize}
+        alt={name}
+        background="rgba(255,255,255,0.96)"
+        foreground="#0B1220"
+        paddingRatio={0.14}
+      />
+      <div
+        style={{
+          fontSize: nameSize,
+          fontWeight: 800,
+          letterSpacing: "-0.02em",
+          textTransform: "uppercase",
+          lineHeight: 1.05,
+          maxWidth: "100%",
+          overflow: "hidden",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+        }}
+      >
+        {name}
+      </div>
+    </div>
+  );
+}
