@@ -1214,12 +1214,13 @@
         "qrDescription": "Mitglieder erhalten eine Schweizer QR-Rechnung und zahlen per Überweisung.",
         "qrDetail": "Schweizer QR-Rechnung",
         "stripe": "Online-Zahlung",
-        "stripeDescription": "Mitglieder zahlen direkt online. Die Beträge gehen auf das verbundene Stripe-Konto des Vereins.",
+        "stripeDescription": "Mitglieder zahlen direkt online über Stripe.",
         "stripeDetail": "Online-Zahlung über Stripe",
         "notConfigured": "Zahlungskonto nicht konfiguriert",
         "configureStripe": "Stripe einrichten",
+        "configure": "Einrichten",
         "saved": "Inkassomodus gespeichert",
-        "saveError": "Inkassomodus konnte nicht gespeichert werden",
+        "saveError": "Inkassomodus konnte nicht geändert werden.",
         "overrideHint": "Sie können den Modus nur für diesen Beitrag ändern, ohne die Vereinsvorgabe zu ändern."
       },
       "fields": {

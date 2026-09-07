@@ -1344,12 +1344,13 @@
         "qrDescription": "Members receive a Swiss QR invoice and pay by bank transfer.",
         "qrDetail": "Swiss QR invoice",
         "stripe": "Online payment",
-        "stripeDescription": "Members pay online. Funds are sent to the club’s connected Stripe account.",
+        "stripeDescription": "Members pay online via Stripe.",
         "stripeDetail": "Online payment via Stripe",
         "notConfigured": "Payment account not configured",
         "configureStripe": "Set up Stripe",
+        "configure": "Set up",
         "saved": "Collection method saved",
-        "saveError": "Unable to save the collection method",
+        "saveError": "Unable to change the collection method.",
         "overrideHint": "You can change the method for this membership only, without changing the club default."
       },
       "fields": {

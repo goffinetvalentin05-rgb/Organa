@@ -1219,15 +1219,16 @@
       "paymentMethod": {
         "label": "Mode d’encaissement",
         "qr": "QR-facture",
-        "qrDescription": "Les membres reçoivent une QR-facture suisse et effectuent leur paiement par virement.",
+        "qrDescription": "Les membres reçoivent une QR-facture suisse et paient par virement.",
         "qrDetail": "QR-facture suisse",
         "stripe": "Paiement en ligne",
-        "stripeDescription": "Les membres paient directement en ligne. Les fonds sont versés sur le compte Stripe connecté du club.",
+        "stripeDescription": "Les membres paient directement en ligne via Stripe.",
         "stripeDetail": "Paiement en ligne via Stripe",
         "notConfigured": "Compte de paiement non configuré",
         "configureStripe": "Configurer Stripe",
+        "configure": "Configurer",
         "saved": "Mode d’encaissement enregistré",
-        "saveError": "Impossible d’enregistrer le mode d’encaissement",
+        "saveError": "Impossible de modifier le mode d’encaissement.",
         "overrideHint": "Vous pouvez changer le mode pour cette cotisation uniquement, sans modifier la préférence du club."
       },
       "fields": {
