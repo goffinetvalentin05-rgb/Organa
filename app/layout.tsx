@@ -1,9 +1,9 @@
 import "./globals.css";
 import type { Viewport } from "next";
-import { Toaster } from "react-hot-toast";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { I18nProvider } from "@/components/I18nProvider";
+import ObillzToaster from "@/components/ObillzToaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,29 +39,7 @@ export default function RootLayout({
         {/* CONTENU DES PAGES */}
         {/* Note: Les pages gèrent leur propre structure HTML (balise <main> incluse) */}
         <I18nProvider>{children}</I18nProvider>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: "#1a1a1f",
-              color: "#fff",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            },
-            success: {
-              iconTheme: {
-                primary: "#10b981",
-                secondary: "#fff",
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: "#ef4444",
-                secondary: "#fff",
-              },
-            },
-          }}
-        />
+        <ObillzToaster />
         <div id="obillz-portal-root" className="fixed inset-0 z-[9999] pointer-events-none" />
         <Analytics />
       </body>

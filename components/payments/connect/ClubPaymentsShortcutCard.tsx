@@ -20,20 +20,20 @@ export default function ClubPaymentsShortcutCard() {
       >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <div className="flex min-w-0 items-start gap-4 sm:gap-5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[rgba(26,35,255,0.08)] text-[#1A23FF]">
-              <CreditCard className="h-5 w-5" />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[rgba(26,35,255,0.08)] text-[#1A23FF] sm:h-[3.75rem] sm:w-[3.75rem]">
+              <CreditCard className="h-7 w-7" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base font-semibold text-[#0F172A]">
+              <h2 className="text-lg font-semibold tracking-tight text-[#0F172A] sm:text-xl">
                 {t("dashboard.paymentAccount.shortcutTitle")}
               </h2>
-              <p className="mt-1 text-sm leading-relaxed text-[#64748B]">
+              <p className="mt-1.5 max-w-xl text-sm font-normal leading-relaxed text-[#64748B] sm:text-[0.9375rem]">
                 {t("dashboard.paymentAccount.shortcutBody")}
               </p>
             </div>
           </div>
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#1A23FF]">
-            {t("dashboard.paymentAccount.configureCta")}
+            {t("dashboard.paymentAccount.shortcutCta")}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </span>
         </div>

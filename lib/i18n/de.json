@@ -615,8 +615,10 @@
       "loadError": "Die Stripe-Oberfläche konnte nicht geladen werden.",
       "retry": "Erneut versuchen",
       "clubScope": "Dieses Konto gehört zum Verein. Es kann später für Shop, Beiträge, Ticketing und Spenden genutzt werden.",
-      "shortcutTitle": "Stripe-Zahlungskonto",
-      "shortcutBody": "Richten Sie Stripe ein, um Vereinszahlungen ohne Verlassen von Obillz zu empfangen.",
+      "manageLink": "Zahlungskonto verwalten",
+      "shortcutTitle": "Zahlungskonto",
+      "shortcutBody": "Richten Sie das Konto ein, mit dem Zahlungen aus Shop, Beiträgen, Ticketing und anderen Diensten empfangen werden.",
+      "shortcutCta": "Verwalten",
       "viewOnly": "Sie können den Status einsehen. Die Einrichtung ist den Vereinsverantwortlichen vorbehalten.",
       "missingPublishableKey": "Der öffentliche Stripe-Schlüssel ist nicht konfiguriert."
     },

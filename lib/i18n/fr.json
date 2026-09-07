@@ -610,8 +610,10 @@
       "loadError": "Impossible de charger l’interface Stripe.",
       "retry": "Réessayer",
       "clubScope": "Ce compte appartient au club. Il pourra être réutilisé pour la boutique, les cotisations, la billetterie et les dons.",
-      "shortcutTitle": "Compte de paiement Stripe",
-      "shortcutBody": "Configurez Stripe pour recevoir les paiements du club, sans quitter Obillz.",
+      "manageLink": "Gérer le compte de paiement",
+      "shortcutTitle": "Compte de paiement",
+      "shortcutBody": "Configurez le compte utilisé pour recevoir les paiements de la boutique, des cotisations, de la billetterie et des autres services.",
+      "shortcutCta": "Gérer",
       "viewOnly": "Vous pouvez consulter le statut. La configuration est réservée aux responsables du club.",
       "missingPublishableKey": "La clé publique Stripe n’est pas configurée."
     },

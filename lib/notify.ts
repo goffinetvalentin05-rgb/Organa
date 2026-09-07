@@ -9,6 +9,16 @@ export function notifyError(message: string, id?: string) {
 }
 
 export function notifyInfo(message: string, id?: string) {
-  return toast(message, id ? { id } : undefined);
+  return toast(message, {
+    className: "obillz-toast-info",
+    ...(id ? { id } : {}),
+  });
+}
+
+export function notifyWarning(message: string, id?: string) {
+  return toast(message, {
+    className: "obillz-toast-warning",
+    ...(id ? { id } : {}),
+  });
 }
 

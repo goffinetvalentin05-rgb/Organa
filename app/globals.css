@@ -6287,6 +6287,54 @@ h3 {
   content: none;
 }
 
+@keyframes obillz-toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes obillz-toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+.obillz-toast--in {
+  animation: obillz-toast-enter 0.28s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+.obillz-toast--out {
+  animation: obillz-toast-exit 0.2s cubic-bezier(0.06, 0.71, 0.55, 1) both;
+}
+
+@media (max-width: 640px) {
+  .obillz-toaster-container > div {
+    justify-content: stretch !important;
+  }
+
+  .obillz-toast {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .obillz-toast--in,
+  .obillz-toast--out {
+    animation-duration: 0.01ms;
+  }
+}
+
 .dashboard-modal-surface {
   color: #0F172A;
 }

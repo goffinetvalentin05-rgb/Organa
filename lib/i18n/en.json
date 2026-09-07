@@ -617,8 +617,10 @@
       "loadError": "Unable to load the Stripe interface.",
       "retry": "Try again",
       "clubScope": "This account belongs to the club. It can later be reused for the shop, memberships, ticketing and donations.",
-      "shortcutTitle": "Stripe payment account",
-      "shortcutBody": "Set up Stripe to receive club payments without leaving Obillz.",
+      "manageLink": "Manage payment account",
+      "shortcutTitle": "Payment account",
+      "shortcutBody": "Set up the account used to receive payments from the shop, memberships, ticketing and other services.",
+      "shortcutCta": "Manage",
       "viewOnly": "You can view the status. Setup is reserved for club administrators.",
       "missingPublishableKey": "The Stripe publishable key is not configured."
     },

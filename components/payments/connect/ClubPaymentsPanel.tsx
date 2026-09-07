@@ -9,6 +9,7 @@ import {
 } from "@stripe/react-connect-js";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import {
+  ActionButton,
   DashboardBadge,
   GlassCard,
   dashboardTextSecondaryClass,
@@ -129,6 +130,40 @@ export default function ClubPaymentsPanel({
     );
   }
 
+  if (variant === "shop") {
+    const current = status ?? statusOrEmpty();
+    const ready = current.uiMode === "ready";
+    return (
+      <GlassCard>
+        <h2 className="text-lg font-semibold text-[#0F172A]">
+          {t("dashboard.paymentAccount.paymentsLabel")}
+        </h2>
+        <p className={cn("mt-2 max-w-2xl text-sm leading-relaxed", dashboardTextSecondaryClass)}>
+          {t("dashboard.paymentAccount.clubScope")}
+        </p>
+        {current.account?.providerAccountId ? (
+          <p className="mt-4 flex items-center gap-2 text-sm font-medium text-[#0F172A]">
+            {ready ? (
+              <CheckCircle className="h-4 w-4 text-[#1A23FF]" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+            )}
+            {ready
+              ? `${t("dashboard.paymentAccount.connected")} ✓`
+              : current.uiMode === "action_required"
+                ? t("dashboard.paymentAccount.actionRequired")
+                : t("dashboard.paymentAccount.onboardingTitle")}
+          </p>
+        ) : null}
+        <div className="mt-6">
+          <ActionButton href="/tableau-de-bord/compte-de-paiement" variant="surface">
+            {t("dashboard.paymentAccount.manageLink")}
+          </ActionButton>
+        </div>
+      </GlassCard>
+    );
+  }
+
   const current = status ?? statusOrEmpty();
   const mode: ConnectUiMode = current.uiMode;
   const showConnect =
@@ -138,12 +173,6 @@ export default function ClubPaymentsPanel({
 
   return (
     <div className="space-y-5">
-      {variant === "shop" ? (
-        <p className={cn("text-sm leading-relaxed", dashboardTextSecondaryClass)}>
-          {t("dashboard.paymentAccount.clubScope")}
-        </p>
-      ) : null}
-
       {mode === "intro" && !showConnect ? (
         <GlassCard>
           <h2 className="text-lg font-semibold text-[#0F172A]">
