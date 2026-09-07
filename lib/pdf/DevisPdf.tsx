@@ -9,6 +9,7 @@ import {
   sanitizePdfNotes,
 } from "@/lib/pdf/clubPdfLayout";
 import { SwissQRBillSlip } from "@/lib/pdf/SwissQRBillSlip";
+import { OnlinePaymentSection } from "@/lib/pdf/OnlinePaymentSection";
 
 // Types pour les données
 interface DevisPdfProps {
@@ -61,11 +62,16 @@ interface DevisPdfProps {
     clientLabel: string; // "CONCERNE" ou "CLIENT"
     numberLabel: string; // "Référence" ou "Numéro"
   };
-  /** Swiss QR Bill : la zone de paiement est incrustée après le rendu. */
+  /** Swiss QR Bill : données validées, incrustées après le rendu react-pdf. */
   qrBill?: {
     hasQRBill: boolean;
     errorMessage: string | null;
-  };
+  } | null;
+  /** Paiement en ligne Stripe : jamais de QR-facture suisse. */
+  onlinePayment?: {
+    url: string;
+    qrImageSrc?: string | null;
+  } | null;
 }
 
 export const DevisPdf: React.FC<DevisPdfProps> = ({
@@ -75,6 +81,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
   lines,
   totals,
   qrBill,
+  onlinePayment,
   primaryColor = "#3B82F6",
   documentLabel,
 }) => {
@@ -104,7 +111,7 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
       <Page size="A4" style={styles.page}>
         {/* Le retrait bas réserve la place du pied de page en position absolue ;
             avec une QR-facture ce pied est masqué, l'espace est donc rendu. */}
-        <View style={[styles.content, qrBill?.hasQRBill ? { paddingBottom: 0 } : {}]}>
+        <View style={[styles.content, qrBill?.hasQRBill && !onlinePayment ? { paddingBottom: 0 } : {}]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.companyBlock}>
@@ -277,15 +284,22 @@ export const DevisPdf: React.FC<DevisPdfProps> = ({
         </View>
 
         {/* Réserve le bas de la dernière page pour la zone de paiement */}
-        {qrBill && (
+        {onlinePayment?.url ? (
+          <OnlinePaymentSection
+            url={onlinePayment.url}
+            qrImageSrc={onlinePayment.qrImageSrc}
+          />
+        ) : qrBill ? (
           <SwissQRBillSlip
             hasQRBill={qrBill.hasQRBill}
             errorMessage={qrBill.errorMessage || undefined}
           />
-        )}
+        ) : null}
 
-        {/* Footer IBAN texte — affiché seulement si pas de QR Bill */}
-        {!qrBill?.hasQRBill && (company.iban || company.bankName || company.conditionsPaiement) && (
+        {/* Footer IBAN texte — affiché seulement si pas de QR Bill ni de paiement en ligne */}
+        {!onlinePayment &&
+          !qrBill?.hasQRBill &&
+          (company.iban || company.bankName || company.conditionsPaiement) && (
           <View style={styles.footer} fixed>
             {(company.iban || company.bankName) && (
               <Text style={styles.footerText}>

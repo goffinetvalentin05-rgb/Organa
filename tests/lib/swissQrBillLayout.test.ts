@@ -229,3 +229,71 @@ describe("réservation de la zone de paiement", () => {
     expect(lowest).toBeLessThan(QR_BILL_HEIGHT_PT);
   });
 });
+
+async function pdfVisibleText(pdf: Buffer): Promise<string> {
+  const raw = pdf.toString("latin1");
+  const doc = await PDFDocument.load(pdf);
+  let decoded = raw;
+  for (const page of doc.getPages()) {
+    const contents = page.node.Contents();
+    const streams =
+      contents instanceof PDFArray
+        ? contents.asArray().map((ref) => doc.context.lookup(ref))
+        : [contents];
+    for (const stream of streams) {
+      if (stream instanceof PDFRawStream) {
+        decoded += Buffer.from(decodePDFRawStream(stream).decode()).toString("latin1");
+      }
+    }
+  }
+  const fromHex = [...decoded.matchAll(/<([0-9A-Fa-f]+)>/g)]
+    .map((match) => Buffer.from(match[1], "hex").toString("latin1"))
+    .join("");
+  return `${decoded}\n${fromHex}`;
+}
+
+describe("cotisation PDF selon payment_method", () => {
+  const baseProps = {
+    company,
+    client,
+    document: { ...documentMeta("COT-2026-011"), type: "quote" as const },
+    lines: buildLines(1),
+    totals: totalsFor(1),
+    primaryColor: "#1A23FF",
+    documentLabel: {
+      title: "COTISATION",
+      clientLabel: "Concerne",
+      numberLabel: "Référence",
+    },
+  };
+
+  it("conserve le message QR-facture si le document n’est pas Stripe", async () => {
+    const pdf = await renderPdf(
+      React.createElement(DevisPdf, {
+        ...baseProps,
+        qrBill: { hasQRBill: false, errorMessage: "IBAN manquant" },
+      })
+    );
+    const text = await pdfVisibleText(pdf);
+    expect(text).toContain("QR-facture indisponible");
+    expect(text).toContain("IBAN manquant");
+    expect(text).not.toContain("Paiement en ligne");
+  });
+
+  it("affiche le paiement en ligne et aucune mention QR-facture si Stripe", async () => {
+    const url = "https://obillz.ch/cotisation/tokentestsecurevalue123";
+    const pdf = await renderPdf(
+      React.createElement(DevisPdf, {
+        ...baseProps,
+        qrBill: null,
+        onlinePayment: { url },
+      })
+    );
+    const text = await pdfVisibleText(pdf);
+    expect(text).not.toContain("QR-facture");
+    expect(text).not.toContain("QR-IBAN");
+    expect(text).toContain("Paiement en ligne");
+    expect(text).toContain("Payer ma cotisation");
+    expect(text).toContain("/cotisation/tokentestsecurevalue123");
+  });
+});

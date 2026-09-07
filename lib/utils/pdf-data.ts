@@ -24,6 +24,9 @@ import {
   generateQRRReference,
 } from "@/lib/swiss-qr-bill";
 import type { QRBillData } from "@/lib/swiss-qr-bill/types";
+import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
+import { createMembershipPaymentToken } from "@/lib/quotes/membership-settings";
+import { appBaseUrl } from "@/lib/payments/connect/stripe-client";
 
 type DocumentType = "quote" | "invoice";
 
@@ -134,7 +137,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, payment_token, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -223,14 +226,70 @@ export async function getDocumentPdfData(
     ? { title: "COTISATION", clientLabel: "Concerne", numberLabel: "Référence" }
     : { title: "DEVIS", clientLabel: "Client", numberLabel: "Numéro" };
 
+  const paymentMethod =
+    type === "quote"
+      ? resolveMembershipPaymentMethod(
+          (document as { payment_method?: string | null }).payment_method
+        )
+      : null;
+
+  const docNum = document.numero || "";
+
+  if (type === "quote" && paymentMethod === "stripe") {
+    let token =
+      typeof (document as { payment_token?: string | null }).payment_token ===
+        "string" &&
+      (document as { payment_token?: string | null }).payment_token!.length >= 16
+        ? (document as { payment_token?: string | null }).payment_token
+        : null;
+    if (!token) {
+      token = createMembershipPaymentToken();
+      try {
+        await supabase
+          .from("documents")
+          .update({ payment_token: token })
+          .eq("id", id)
+          .eq("user_id", scopeUserId);
+      } catch {
+        // Non bloquant : le PDF peut encore afficher le texte sans lien public.
+      }
+    }
+
+    return {
+      company,
+      client: {
+        name: clientDisplayName,
+        email: resolvedRecipient.email || "",
+        phone: resolvedRecipient.phone || "",
+        address: clientAddress,
+        postalCode: resolvedRecipient.postalCode || "",
+        city: resolvedRecipient.city || "",
+      },
+      document: {
+        number: docNum,
+        subject: String((document as { title?: string }).title || "").trim(),
+        date: document.date_creation,
+        dueDate: document.date_echeance,
+        currency,
+        currencySymbol,
+        vatRate,
+        notes: document.notes || "",
+        type,
+      },
+      lines,
+      totals,
+      primaryColor,
+      documentLabel,
+      qrBill: null,
+      onlinePayment: token
+        ? { url: `${appBaseUrl()}/cotisation/${token}` }
+        : null,
+    };
+  }
+
   // ================================================================
   // Swiss QR Bill
   // ================================================================
-  const skipQrBill =
-    type === "quote" &&
-    (document as { payment_method?: string | null }).payment_method === "stripe";
-
-  const docNum = document.numero || "";
   const existingQRRef = (document as Record<string, unknown>).qr_reference as string | null | undefined;
 
   // Référence : stable, persistée en DB. Si déjà générée, on la réutilise.
@@ -240,12 +299,12 @@ export async function getDocumentPdfData(
   const useQRIBAN = iban ? isQRIBAN(iban) : false;
 
   let qrReference: string | undefined;
-  if (!skipQrBill && useQRIBAN) {
+  if (useQRIBAN) {
     qrReference = existingQRRef || generateQRRReference(scopeUserId, docNum);
   }
 
   // Si pas de référence en DB, on la sauvegarde de manière transparente
-  if (!skipQrBill && useQRIBAN && qrReference && !existingQRRef) {
+  if (useQRIBAN && qrReference && !existingQRRef) {
     try {
       await supabase
         .from("documents")
@@ -300,11 +359,10 @@ export async function getDocumentPdfData(
   // La zone de paiement n'est pas dessinée ici : elle est produite en vectoriel
   // par PDFKit puis incrustée dans le PDF final (voir lib/pdf/mergeQRBill.ts).
   // À ce stade on se contente de valider les données et de les transmettre.
-  const qrValidation = skipQrBill ? null : validateQRBillData(qrBillData);
-  const qrBillError =
-    qrValidation && !qrValidation.valid
-      ? formatValidationErrors(qrValidation)
-      : null;
+  const qrValidation = validateQRBillData(qrBillData);
+  const qrBillError = qrValidation.valid
+    ? null
+    : formatValidationErrors(qrValidation);
 
   if (qrBillError) {
     console.warn("[pdf-data] QR-facture non générée:", qrBillError);
@@ -337,10 +395,11 @@ export async function getDocumentPdfData(
     documentLabel,
     /** Swiss QR Bill : données validées, incrustées après le rendu react-pdf. */
     qrBill: {
-      data: qrValidation?.valid ? qrBillData : null,
-      hasQRBill: Boolean(qrValidation?.valid),
+      data: qrValidation.valid ? qrBillData : null,
+      hasQRBill: qrValidation.valid,
       errorMessage: qrBillError,
     },
+    onlinePayment: null,
   };
 }
 
