@@ -55,6 +55,7 @@ export default function DeleteClientButton({
 
   return (
     <button
+      type="button"
       onClick={handleDelete}
       disabled={isDeleting}
       className={

@@ -17,9 +17,10 @@ export default function SubmittingOverlay({
           key="submitting-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          exit={{ opacity: 0, pointerEvents: "none" }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-[4px] pointer-events-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-[4px]"
+          style={{ pointerEvents: "auto" }}
           role="status"
           aria-live="polite"
         >

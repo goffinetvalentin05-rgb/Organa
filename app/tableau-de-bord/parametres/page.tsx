@@ -20,6 +20,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import PremiumSwitch from "@/components/public-page/PremiumSwitch";
 import SubmittingOverlay from "@/components/SubmittingOverlay";
 import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
@@ -1230,31 +1231,19 @@ export default function ParametresPage() {
                   <p className="text-sm font-medium text-slate-900">{t("dashboard.settings.email.customToggle")}</p>
                   <p className="mt-0.5 text-xs text-slate-600">{t("dashboard.settings.email.customToggleHelp")}</p>
                 </div>
-                <label className="inline-flex shrink-0 cursor-pointer items-center self-start sm:self-center">
-                  <input
-                    type="checkbox"
-                    className="sr-only"
+                <div className="inline-flex min-h-11 shrink-0 items-center self-start sm:self-center">
+                  <PremiumSwitch
                     checked={formData.emailCustomEnabled}
-                    onChange={(e) =>
+                    onChange={(emailCustomEnabled) =>
                       setFormData({
                         ...formData,
-                        emailCustomEnabled: e.target.checked,
+                        emailCustomEnabled,
                         resendApiKeyTouched: false,
                       })
                     }
+                    aria-label={t("dashboard.settings.email.customToggle")}
                   />
-                  <span
-                    className={`relative h-6 w-11 rounded-full transition-colors ${
-                      formData.emailCustomEnabled ? "bg-[#2563EB]" : "bg-slate-300"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                        formData.emailCustomEnabled ? "right-0.5" : "left-0.5"
-                      }`}
-                    />
-                  </span>
-                </label>
+                </div>
               </div>
 
               {!formData.emailCustomEnabled ? (

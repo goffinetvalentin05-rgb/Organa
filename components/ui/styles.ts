@@ -134,7 +134,7 @@ export const dashboardSettingsRowClass =
   "flex flex-col gap-2 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4";
 
 export const dashboardCheckboxClass =
-  "mt-1 h-4 w-4 shrink-0 rounded border-[#94A3B8] bg-white text-[#1A23FF] accent-[#1A23FF] focus:ring-[#1A23FF]/40";
+  "mt-1 h-5 w-5 shrink-0 rounded border-[#94A3B8] bg-white text-[#1A23FF] accent-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/40";
 
 /** Popover / modal — surface claire */
 export const dashboardPopoverPanelClass =

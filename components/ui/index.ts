@@ -72,6 +72,8 @@ export { default as SectionCard } from "./SectionCard";
 export { default as GlassSection } from "./SectionCard";
 export { default as StatCard } from "./StatCard";
 export { default as ActionButton } from "./ActionButton";
+export { default as ButtonSpinner } from "./ButtonSpinner";
+export { default as CheckboxRow } from "./CheckboxRow";
 export { default as EmptyState } from "./EmptyState";
 export { default as TableCard } from "./TableCard";
 export { default as FormSection } from "./FormSection";

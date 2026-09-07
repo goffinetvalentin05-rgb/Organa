@@ -801,7 +801,7 @@ export default function MarketingCampaignsPage() {
                       activeContacts.map((contact) => (
                         <label
                           key={contact.id}
-                          className="flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 text-sm text-[#0F172A] transition-colors duration-200 hover:bg-white"
+                          className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl px-2 py-2 text-sm text-[#0F172A] transition-colors duration-200 hover:bg-white"
                         >
                           <input
                             type="checkbox"

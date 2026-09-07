@@ -15,6 +15,7 @@ import {
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { CheckboxRow } from "@/components/ui";
 import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import { useAutoDraft } from "@/hooks/useAutoDraft";
 import {
@@ -777,20 +778,13 @@ export default function UtilisateursPage() {
                     </legend>
                     <div className="space-y-2">
                       {group.permissions.map((p) => (
-                        <label
+                        <CheckboxRow
                           key={p}
-                          className="flex items-center gap-2 text-sm text-slate-700"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={form.permissions[p] === true}
-                            onChange={(e) =>
-                              togglePermission(p, e.target.checked)
-                            }
-                            className="h-4 w-4 rounded border-slate-300"
-                          />
-                          {PERMISSION_LABELS[p]}
-                        </label>
+                          className="px-0 py-1"
+                          checked={form.permissions[p] === true}
+                          onChange={(next) => togglePermission(p, next)}
+                          label={PERMISSION_LABELS[p]}
+                        />
                       ))}
                     </div>
                   </fieldset>

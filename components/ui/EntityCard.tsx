@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "./cn";
 import { dashboardGlassCardClass } from "./styles";
+import { isInteractiveTarget } from "@/lib/ui/optimistic";
 
 export type EntityCardProps = {
   /** Lien principal de la carte (titre / zone contenu). */
@@ -103,7 +104,14 @@ export default function EntityCard({
 
     return (
       <article
-        onClick={onClick}
+        onClick={
+          onClick
+            ? (event) => {
+                if (isInteractiveTarget(event.target)) return;
+                onClick();
+              }
+            : undefined
+        }
         className={cn(
           "group/entity relative overflow-hidden rounded-xl border border-[rgba(15,23,42,0.08)] bg-white text-[#0F172A]",
           "px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_6px_16px_rgba(15,23,42,0.04)] sm:px-5",

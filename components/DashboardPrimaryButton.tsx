@@ -130,6 +130,7 @@ export default function DashboardPrimaryButton(props: DashboardPrimaryButtonProp
         href={href}
         className={cn(classes, isBusy && "pointer-events-none opacity-50")}
         aria-disabled={isBusy}
+        aria-busy={loading || undefined}
         tabIndex={isBusy ? -1 : linkRest.tabIndex}
         onClick={(e) => {
           if (isBusy) {
@@ -161,6 +162,7 @@ export default function DashboardPrimaryButton(props: DashboardPrimaryButtonProp
       type={btnProps.type ?? "button"}
       className={classes}
       disabled={isBusy || btnProps.disabled}
+      aria-busy={loading || undefined}
       style={minWidth ? { minWidth } : undefined}
       {...btnProps}
     >

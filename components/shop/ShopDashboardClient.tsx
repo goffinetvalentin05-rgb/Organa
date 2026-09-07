@@ -23,6 +23,7 @@ import {
 } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import { usePermissions } from "@/lib/auth/permissions-client";
+import PremiumSwitch from "@/components/public-page/PremiumSwitch";
 import { formatChf } from "@/lib/shop/money";
 import type {
   ShopOrder,
@@ -313,6 +314,10 @@ export default function ShopDashboardClient() {
   };
 
   const saveSettings = async (patch: Record<string, unknown>) => {
+    const previous = settings;
+    if (previous) {
+      setSettings({ ...previous, ...patch } as ShopSettings);
+    }
     setSettingsSaving(true);
     try {
       const res = await fetch("/api/shop/settings", {
@@ -325,6 +330,7 @@ export default function ShopDashboardClient() {
       setSettings(data.settings);
       toast.success("Paramètres enregistrés");
     } catch (error: unknown) {
+      if (previous) setSettings(previous);
       toast.error(error instanceof Error ? error.message : "Erreur");
     } finally {
       setSettingsSaving(false);
@@ -605,15 +611,15 @@ export default function ShopDashboardClient() {
           <GlassCard className="lg:col-span-3">
             <h2 className="text-lg font-semibold text-[#0F172A]">Paramètres boutique</h2>
             <div className="mt-5 space-y-4">
-              <label className="flex items-center justify-between gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
+              <div className="flex min-h-11 items-center justify-between gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
                 <span className="text-sm font-medium text-[#0F172A]">Boutique active</span>
-                <input
-                  type="checkbox"
+                <PremiumSwitch
                   checked={settings.isEnabled}
                   disabled={!canManage}
-                  onChange={(e) => saveSettings({ isEnabled: e.target.checked })}
+                  onChange={(isEnabled) => void saveSettings({ isEnabled })}
+                  aria-label="Boutique active"
                 />
-              </label>
+              </div>
               {!paymentsReady ? (
                 <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                   Terminez la configuration des paiements avant d’ouvrir les ventes publiques.
@@ -668,17 +674,17 @@ export default function ShopDashboardClient() {
                   onBlur={(e) => saveSettings({ ordersEmail: e.target.value })}
                 />
               </div>
-              <label className="flex items-center justify-between gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
+              <div className="flex min-h-11 items-center justify-between gap-4 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
                 <span className="text-sm font-medium text-[#0F172A]">
                   Suivi du stock activé par défaut
                 </span>
-                <input
-                  type="checkbox"
+                <PremiumSwitch
                   checked={settings.trackStockDefault}
                   disabled={!canManage}
-                  onChange={(e) => saveSettings({ trackStockDefault: e.target.checked })}
+                  onChange={(trackStockDefault) => void saveSettings({ trackStockDefault })}
+                  aria-label="Suivi du stock activé par défaut"
                 />
-              </label>
+              </div>
               <p className="text-sm text-[#64748B]">Devise : CHF</p>
               {settingsSaving ? <p className="text-sm text-[#64748B]">Enregistrement…</p> : null}
             </div>
@@ -757,8 +763,8 @@ export default function ShopDashboardClient() {
                   <input className={dashboardInputClass} value={form.promotionalPrice} onChange={(e) => setForm({ ...form, promotionalPrice: e.target.value })} />
                 </div>
               </div>
-              <label className="flex items-center gap-3 text-sm">
-                <input type="checkbox" checked={form.trackStock} onChange={(e) => setForm({ ...form, trackStock: e.target.checked })} />
+              <label className="flex min-h-11 items-center gap-3 text-sm">
+                <input type="checkbox" className="h-5 w-5 accent-[#1A23FF]" checked={form.trackStock} onChange={(e) => setForm({ ...form, trackStock: e.target.checked })} />
                 Suivre le stock
               </label>
               {!form.hasVariants && form.trackStock ? (
@@ -767,9 +773,10 @@ export default function ShopDashboardClient() {
                   <input className={dashboardInputClass} value={form.stockQuantity} onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })} />
                 </div>
               ) : null}
-              <label className="flex items-center gap-3 text-sm">
+              <label className="flex min-h-11 items-center gap-3 text-sm">
                 <input
                   type="checkbox"
+                  className="h-5 w-5 accent-[#1A23FF]"
                   checked={form.hasVariants}
                   onChange={(e) =>
                     setForm({

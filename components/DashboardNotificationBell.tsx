@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { Bell } from "lucide-react";
 import { cn } from "@/components/ui/cn";
 import { useI18n } from "@/components/I18nProvider";
+import { useDismissibleMenu } from "@/lib/ui/useDismissibleMenu";
 
 export type DashboardNotification = {
   id: string;
@@ -28,30 +29,10 @@ export default function NotificationBell({
 }: NotificationBellProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  const containerRef = useDismissibleMenu(open, close);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open]);
 
   const isTopbar = variant === "topbar";
 

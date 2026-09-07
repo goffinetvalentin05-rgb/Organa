@@ -12,6 +12,7 @@ import {
   dashboardPopoverPanelClass,
   dashboardSecondaryButtonClass,
 } from "@/components/ui";
+import { useDismissibleMenu } from "@/lib/ui/useDismissibleMenu";
 import type { MembershipPaymentMethod } from "@/lib/quotes/payment-method";
 
 type PaymentMethodResponse = {
@@ -30,7 +31,6 @@ export default function MembershipPaymentMethodControl() {
   const [method, setMethod] = useState<MembershipPaymentMethod>("qr_invoice");
   const [stripeReady, setStripeReady] = useState(false);
   const [loading, setLoading] = useState(true);
-  const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | HTMLAnchorElement | null>>([]);
   const persistGen = useRef(0);
@@ -54,29 +54,12 @@ export default function MembershipPaymentMethodControl() {
     void load();
   }, [load]);
 
+  const dismiss = useCallback(() => setOpen(false), []);
+  const rootRef = useDismissibleMenu(open, dismiss);
   const closeMenu = useCallback(() => {
     setOpen(false);
     triggerRef.current?.focus();
   }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closeMenu();
-      }
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, closeMenu]);
 
   useEffect(() => {
     if (!open) return;

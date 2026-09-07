@@ -13,10 +13,10 @@ import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import {
   dashboardCardDescriptionClass,
   dashboardCardTitleClass,
-  dashboardCheckboxClass,
   dashboardHintClass,
   dashboardInnerPanelClass,
   dashboardSettingsRowClass,
+  CheckboxRow,
 } from "@/components/ui";
 
 const FIELD_ORDER: MemberFieldKey[] = [
@@ -153,23 +153,18 @@ export default function MemberFieldsSettingsCard({
             {FIELD_ORDER.map((key) => (
               <li key={key} className={dashboardSettingsRowClass}>
                 <div className="min-w-0 flex-1">
-                  <label className="flex cursor-pointer items-start gap-3">
-                    <input
-                      type="checkbox"
-                      className={dashboardCheckboxClass}
-                      checked={fields[key].enabled}
-                      disabled={!canSave}
-                      onChange={(e) => toggle(key, e.target.checked)}
-                    />
-                    <span>
-                      <span className="block font-medium text-[#0F172A]">{t(labelKey(key))}</span>
-                      {key === "avs_number" && (
-                        <span className="mt-1.5 block rounded-xl border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs leading-relaxed text-amber-800">
-                          {t("dashboard.settings.memberFields.avsWarning")}
-                        </span>
-                      )}
-                    </span>
-                  </label>
+                  <CheckboxRow
+                    className="w-full px-0 py-0"
+                    checked={fields[key].enabled}
+                    disabled={!canSave}
+                    onChange={(enabled) => toggle(key, enabled)}
+                    label={t(labelKey(key))}
+                  />
+                  {key === "avs_number" ? (
+                    <p className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs leading-relaxed text-amber-800">
+                      {t("dashboard.settings.memberFields.avsWarning")}
+                    </p>
+                  ) : null}
                 </div>
               </li>
             ))}
