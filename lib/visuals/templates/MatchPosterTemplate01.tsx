@@ -1,5 +1,5 @@
 import type { VisualRenderProps } from "../types";
-import { contrastText, mixToward } from "../colors";
+import { mixToward } from "../colors";
 import {
   BrushStroke,
   CoverPhoto,
@@ -20,13 +20,15 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
   const primary = data.primaryColor;
   const accent = data.accentColor;
   const secondary = data.secondaryColor;
-  const onAccent = contrastText(accent);
+  const fade = mixToward(primary, "#000000", 0.45);
   const [line1, line2] = splitDisplayTitle(data.title || "Prochain match", "MATCH");
   const home = data.homeTeam || "Domicile";
   const away = data.awayTeam || "Extérieur";
-  const bannerH = story ? 210 : 168;
-  const logoSize = story ? 118 : 92;
-  const photoTop = story ? 310 : 230;
+  const footerH = story ? 340 : 250;
+  const logoSize = story ? 156 : 118;
+  const photoTop = story ? 300 : 220;
+  const nameSize = story ? 56 : 38;
+  const metaSize = story ? 28 : 20;
 
   return (
     <div className={visualDisplayFont.className} style={visualRootStyle(format)}>
@@ -39,13 +41,13 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
         }}
       />
       <HalftoneCorner color={mixToward(accent, "#FFFFFF", 0.15)} size={story ? 460 : 300} top={-40} left={-40} />
-      <HalftoneCorner color={mixToward(accent, "#FFFFFF", 0.1)} size={story ? 360 : 240} bottom={bannerH - 20} right={-30} />
+      <HalftoneCorner color={mixToward(accent, "#FFFFFF", 0.1)} size={story ? 360 : 240} bottom={80} right={-30} />
       <DiagonalStripes
         color={accent}
         width={story ? 130 : 90}
         right={0}
         top={photoTop + 40}
-        height={story ? 780 : 420}
+        height={story ? 900 : 520}
       />
       <BrushStroke
         color={accent}
@@ -62,7 +64,7 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
           left: 0,
           right: 0,
           top: photoTop,
-          bottom: bannerH,
+          bottom: 0,
           overflow: "hidden",
           clipPath: TORN_PHOTO_CLIP,
         }}
@@ -77,7 +79,7 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
           style={{
             position: "absolute",
             inset: 0,
-            background: `linear-gradient(180deg, rgba(0,0,0,0.08) 0%, transparent 28%, rgba(0,0,0,0.35) 100%)`,
+            background: `linear-gradient(180deg, rgba(0,0,0,0.06) 0%, transparent 32%, ${fade} 78%, ${mixToward(primary, "#000000", 0.72)} 100%)`,
           }}
         />
       </div>
@@ -106,7 +108,7 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
         <div
           style={{
             marginTop: 8,
-            fontSize: story ? 132 : 86,
+            fontSize: story ? 124 : 80,
             fontWeight: 900,
             lineHeight: 0.78,
             letterSpacing: "-0.05em",
@@ -118,7 +120,7 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
         <div
           style={{
             marginTop: -4,
-            fontSize: story ? 92 : 62,
+            fontSize: story ? 86 : 56,
             fontWeight: 800,
             lineHeight: 0.82,
             letterSpacing: "-0.04em",
@@ -136,20 +138,20 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
           left: 0,
           right: 0,
           bottom: 0,
-          height: bannerH,
-          background: accent,
-          color: onAccent,
+          minHeight: footerH,
+          padding: story ? "48px 40px 44px" : "32px 28px 28px",
+          color: ink,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: story ? "0 36px" : "0 28px",
+          justifyContent: "flex-end",
+          background: `linear-gradient(180deg, transparent 0%, ${mixToward(primary, "#000000", 0.15)} 28%, ${mixToward(primary, "#000000", 0.62)} 100%)`,
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: story ? 22 : 16,
+            gap: story ? 20 : 14,
           }}
         >
           <LogoMark
@@ -164,26 +166,28 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: story ? 42 : 30,
+              fontSize: nameSize,
               fontWeight: 800,
               letterSpacing: "-0.03em",
               textTransform: "uppercase",
-              lineHeight: 0.9,
+              lineHeight: 0.92,
               overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {home}
           </div>
           <div
             style={{
-              fontSize: story ? 28 : 20,
+              fontSize: story ? 36 : 26,
               fontWeight: 800,
               fontStyle: "italic",
-              letterSpacing: "0.04em",
-              opacity: 0.7,
+              letterSpacing: "0.02em",
+              opacity: 0.78,
               flexShrink: 0,
+              padding: story ? "0 6px" : "0 2px",
             }}
           >
             vs
@@ -192,15 +196,16 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: story ? 42 : 30,
+              fontSize: nameSize,
               fontWeight: 800,
               letterSpacing: "-0.03em",
               textTransform: "uppercase",
-              lineHeight: 0.9,
+              lineHeight: 0.92,
               textAlign: "right",
               overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {away}
@@ -214,35 +219,42 @@ export function MatchPosterTemplate01({ data, format }: VisualRenderProps) {
             paddingRatio={0.14}
           />
         </div>
+
         <div
           style={{
-            marginTop: story ? 12 : 8,
-            display: "flex",
-            justifyContent: "center",
-            gap: 18,
-            fontSize: story ? 18 : 14,
-            fontWeight: 700,
-            letterSpacing: "0.16em",
+            marginTop: story ? 22 : 14,
+            height: 3,
+            background: accent,
+            opacity: 0.9,
+          }}
+        />
+
+        <div
+          style={{
+            marginTop: story ? 16 : 12,
+            display: "grid",
+            gridTemplateColumns: "1.15fr 0.7fr 1fr",
+            gap: story ? 18 : 12,
+            fontSize: metaSize,
+            fontWeight: 800,
+            letterSpacing: "0.04em",
             textTransform: "uppercase",
-            opacity: 0.72,
+            lineHeight: 1.15,
           }}
         >
-          <span>{data.date || "Date à confirmer"}</span>
-          <span>·</span>
+          <span style={clamp2}>{data.date || "Date à confirmer"}</span>
           <span>{data.time || "—"}</span>
-          <span>·</span>
-          <span
-            style={{
-              maxWidth: 360,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {data.venue || "—"}
-          </span>
+          <span style={{ ...clamp2, textAlign: "right" }}>{data.venue || "—"}</span>
         </div>
       </div>
     </div>
   );
 }
+
+const clamp2 = {
+  minWidth: 0,
+  overflow: "hidden" as const,
+  display: "-webkit-box" as const,
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical" as const,
+};
