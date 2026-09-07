@@ -716,7 +716,43 @@
       "logout": "Se déconnecter",
       "notifications": "Notifications",
       "notificationsEmpty": "Aucune notification",
-      "notificationsEmptyHint": "Les nouveautés et annonces Obillz apparaîtront ici."
+      "notificationsEmptyHint": "Les nouveautés et annonces Obillz apparaîtront ici.",
+      "markAllRead": "Tout marquer comme lu",
+      "notificationNew": "Nouveau",
+      "unreadCount": "{count} non lues",
+      "unreadHint": "{count} non lue(s)"
+    },
+    "notifications": {
+      "onlinePayments": {
+        "title": "Nouveau : paiements en ligne",
+        "message": "Les clubs peuvent maintenant connecter Stripe et recevoir directement leurs paiements en ligne dans Obillz. Ce compte sera utilisé pour les modules compatibles.",
+        "cta": "Configurer les paiements",
+        "date": "Septembre 2026"
+      },
+      "shop": {
+        "title": "La boutique du club est disponible",
+        "message": "Créez vos produits, partagez votre boutique et recevez les paiements directement sur le compte du club.",
+        "cta": "Découvrir la boutique",
+        "date": "Septembre 2026"
+      },
+      "visuals": {
+        "title": "Nouveau : créez vos visuels",
+        "message": "Créez rapidement vos affiches de match, résultats et contenus pour les réseaux du club à partir de templates Obillz.",
+        "cta": "Créer un visuel",
+        "date": "Septembre 2026"
+      },
+      "legacyFeatures": {
+        "title": "Nouveautés disponibles",
+        "message": "Import de membres par Excel/CSV et création de PV de séances sont maintenant disponibles.",
+        "cta": "Découvrir",
+        "date": "16 juin 2026"
+      },
+      "toast": {
+        "title": "Nouveau sur Obillz",
+        "message": "Les paiements en ligne, la boutique et les visuels sont disponibles.",
+        "cta": "Voir les nouveautés",
+        "close": "Fermer"
+      }
     },
     "common": {
       "loading": "Chargement...",

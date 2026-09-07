@@ -5,11 +5,16 @@ import { createPortal } from "react-dom";
 
 const PORTAL_ROOT_ID = "obillz-portal-root";
 
+function getExistingPortalRoot(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  return document.getElementById(PORTAL_ROOT_ID);
+}
+
 function usePortalRoot(): HTMLElement | null {
-  const [root, setRoot] = useState<HTMLElement | null>(null);
+  const [root, setRoot] = useState<HTMLElement | null>(getExistingPortalRoot);
 
   useLayoutEffect(() => {
-    let el = document.getElementById(PORTAL_ROOT_ID);
+    let el = getExistingPortalRoot();
     if (!el) {
       el = document.createElement("div");
       el.id = PORTAL_ROOT_ID;

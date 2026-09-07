@@ -723,7 +723,43 @@
       "logout": "Sign out",
       "notifications": "Notifications",
       "notificationsEmpty": "No notifications",
-      "notificationsEmptyHint": "Obillz updates and announcements will appear here."
+      "notificationsEmptyHint": "Obillz updates and announcements will appear here.",
+      "markAllRead": "Mark all as read",
+      "notificationNew": "New",
+      "unreadCount": "{count} unread",
+      "unreadHint": "{count} unread"
+    },
+    "notifications": {
+      "onlinePayments": {
+        "title": "New: online payments",
+        "message": "Clubs can now connect Stripe and receive online payments directly in Obillz. This account will be used for compatible modules.",
+        "cta": "Set up payments",
+        "date": "September 2026"
+      },
+      "shop": {
+        "title": "The club shop is available",
+        "message": "Create your products, share your shop and receive payments directly on the club account.",
+        "cta": "Discover the shop",
+        "date": "September 2026"
+      },
+      "visuals": {
+        "title": "New: create your visuals",
+        "message": "Quickly create match posters, results and social content for your club from Obillz templates.",
+        "cta": "Create a visual",
+        "date": "September 2026"
+      },
+      "legacyFeatures": {
+        "title": "New features available",
+        "message": "Excel/CSV member import and meeting minutes are now available.",
+        "cta": "Discover",
+        "date": "16 June 2026"
+      },
+      "toast": {
+        "title": "New on Obillz",
+        "message": "Online payments, the shop and visuals are now available.",
+        "cta": "See what’s new",
+        "close": "Close"
+      }
     },
     "assistant": {
       "badge": "Administrative assistant",

@@ -9,7 +9,8 @@ import { useEffect, useRef, type RefObject } from "react";
  */
 export function useDismissibleMenu(
   open: boolean,
-  onClose: () => void
+  onClose: () => void,
+  extraRef?: RefObject<HTMLElement | null>
 ): RefObject<HTMLDivElement | null> {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +18,9 @@ export function useDismissibleMenu(
     if (!open) return;
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) onClose();
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target) || extraRef?.current?.contains(target)) return;
+      onClose();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -32,7 +35,7 @@ export function useDismissibleMenu(
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, onClose]);
+  }, [open, onClose, extraRef]);
 
   return rootRef;
 }

@@ -721,7 +721,43 @@
       "logout": "Abmelden",
       "notifications": "Benachrichtigungen",
       "notificationsEmpty": "Keine Benachrichtigungen",
-      "notificationsEmptyHint": "Obillz-Neuigkeiten und Ankündigungen erscheinen hier."
+      "notificationsEmptyHint": "Obillz-Neuigkeiten und Ankündigungen erscheinen hier.",
+      "markAllRead": "Alle als gelesen markieren",
+      "notificationNew": "Neu",
+      "unreadCount": "{count} ungelesen",
+      "unreadHint": "{count} ungelesen"
+    },
+    "notifications": {
+      "onlinePayments": {
+        "title": "Neu: Online-Zahlungen",
+        "message": "Vereine können Stripe jetzt verbinden und Online-Zahlungen direkt in Obillz empfangen. Dieses Konto wird für kompatible Module verwendet.",
+        "cta": "Zahlungen einrichten",
+        "date": "September 2026"
+      },
+      "shop": {
+        "title": "Der Vereins-Shop ist verfügbar",
+        "message": "Erstellen Sie Produkte, teilen Sie Ihren Shop und erhalten Sie Zahlungen direkt auf dem Vereinskonto.",
+        "cta": "Shop entdecken",
+        "date": "September 2026"
+      },
+      "visuals": {
+        "title": "Neu: Visuals erstellen",
+        "message": "Erstellen Sie schnell Matchplakate, Resultate und Inhalte für die sozialen Netzwerke Ihres Vereins aus Obillz-Vorlagen.",
+        "cta": "Visual erstellen",
+        "date": "September 2026"
+      },
+      "legacyFeatures": {
+        "title": "Neue Funktionen verfügbar",
+        "message": "Mitgliederimport per Excel/CSV und Sitzungsprotokolle sind jetzt verfügbar.",
+        "cta": "Entdecken",
+        "date": "16. Juni 2026"
+      },
+      "toast": {
+        "title": "Neu bei Obillz",
+        "message": "Online-Zahlungen, der Shop und Visuals sind verfügbar.",
+        "cta": "Neuigkeiten ansehen",
+        "close": "Schließen"
+      }
     },
     "assistant": {
       "badge": "Verwaltungsassistent",
