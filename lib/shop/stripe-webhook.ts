@@ -8,6 +8,11 @@ import {
 } from "./checkout";
 import { sendOrderPaidEmails } from "./email";
 import { syncStripeAccountRow } from "./stripe-connect";
+import {
+  handleMembershipCheckoutSession,
+  isMembershipStripeEvent,
+} from "@/lib/quotes/stripe-membership";
+import { MEMBERSHIP_STRIPE_PURPOSE } from "@/lib/quotes/payment-method";
 
 const SHOP_PURPOSE = "club_shop";
 
@@ -16,7 +21,8 @@ export function isShopStripeEvent(event: Stripe.Event): boolean {
   const obj = event.data.object as {
     metadata?: Record<string, string> | null;
   };
-  return obj?.metadata?.obillz_purpose === SHOP_PURPOSE;
+  const purpose = obj?.metadata?.obillz_purpose;
+  return purpose === SHOP_PURPOSE || purpose === MEMBERSHIP_STRIPE_PURPOSE;
 }
 
 async function claimEvent(
@@ -261,6 +267,10 @@ export async function handleShopStripeEvent(
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (isMembershipStripeEvent(event)) {
+        await handleMembershipCheckoutSession(event, session, connectedAccount);
+        break;
+      }
       if (session.metadata?.obillz_purpose !== SHOP_PURPOSE) return;
 
       const clubId = session.metadata?.club_id;

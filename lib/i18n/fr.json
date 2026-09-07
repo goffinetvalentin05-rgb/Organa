@@ -615,7 +615,10 @@
       "shortcutBody": "Configurez le compte utilisé pour recevoir les paiements de la boutique, des cotisations, de la billetterie et des autres services.",
       "shortcutCta": "Gérer",
       "viewOnly": "Vous pouvez consulter le statut. La configuration est réservée aux responsables du club.",
-      "missingPublishableKey": "La clé publique Stripe n’est pas configurée."
+      "missingPublishableKey": "La clé publique Stripe n’est pas configurée.",
+      "feesTitle": "0 % de commission Obillz",
+      "feesBody": "Obillz ne prélève aucune commission sur vos encaissements. Des frais de traitement Stripe s’appliquent selon le moyen de paiement utilisé et sont directement prélevés par Stripe.",
+      "feesStripeLink": "Voir les tarifs Stripe"
     },
     "topbar": {
       "upToDate": "Tout est à jour",
@@ -1213,6 +1216,20 @@
       "saving": "Sauvegarde...",
       "previewPdf": "Prévisualiser PDF",
       "downloadPdf": "Télécharger PDF",
+      "paymentMethod": {
+        "label": "Mode d’encaissement",
+        "qr": "QR-facture",
+        "qrDescription": "Les membres reçoivent une QR-facture suisse et effectuent leur paiement par virement.",
+        "qrDetail": "QR-facture suisse",
+        "stripe": "Paiement en ligne",
+        "stripeDescription": "Les membres paient directement en ligne. Les fonds sont versés sur le compte Stripe connecté du club.",
+        "stripeDetail": "Paiement en ligne via Stripe",
+        "notConfigured": "Compte de paiement non configuré",
+        "configureStripe": "Configurer Stripe",
+        "saved": "Mode d’encaissement enregistré",
+        "saveError": "Impossible d’enregistrer le mode d’encaissement",
+        "overrideHint": "Vous pouvez changer le mode pour cette cotisation uniquement, sans modifier la préférence du club."
+      },
       "fields": {
         "client": "Membre *",
         "dueDate": "Date d'échéance",

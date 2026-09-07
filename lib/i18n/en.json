@@ -622,7 +622,10 @@
       "shortcutBody": "Set up the account used to receive payments from the shop, memberships, ticketing and other services.",
       "shortcutCta": "Manage",
       "viewOnly": "You can view the status. Setup is reserved for club administrators.",
-      "missingPublishableKey": "The Stripe publishable key is not configured."
+      "missingPublishableKey": "The Stripe publishable key is not configured.",
+      "feesTitle": "0% Obillz commission",
+      "feesBody": "Obillz does not take any commission on your payments. Stripe processing fees apply depending on the payment method used and are charged directly by Stripe.",
+      "feesStripeLink": "See Stripe pricing"
     },
     "topbar": {
       "upToDate": "All up to date",
@@ -1335,6 +1338,20 @@
       "saving": "Saving...",
       "previewPdf": "Preview PDF",
       "downloadPdf": "Download PDF",
+      "paymentMethod": {
+        "label": "Collection method",
+        "qr": "QR invoice",
+        "qrDescription": "Members receive a Swiss QR invoice and pay by bank transfer.",
+        "qrDetail": "Swiss QR invoice",
+        "stripe": "Online payment",
+        "stripeDescription": "Members pay online. Funds are sent to the club’s connected Stripe account.",
+        "stripeDetail": "Online payment via Stripe",
+        "notConfigured": "Payment account not configured",
+        "configureStripe": "Set up Stripe",
+        "saved": "Collection method saved",
+        "saveError": "Unable to save the collection method",
+        "overrideHint": "You can change the method for this membership only, without changing the club default."
+      },
       "fields": {
         "client": "Client *",
         "dueDate": "Due date",

@@ -10,6 +10,8 @@ import {
   renderInvoicePdfBuffer,
   renderQuotePdfBuffer,
 } from "@/lib/pdf/renderDocumentPdf";
+import { appBaseUrl } from "@/lib/payments/connect/stripe-client";
+import { createMembershipPaymentToken } from "@/lib/quotes/membership-settings";
 
 export const runtime = "nodejs";
 
@@ -118,7 +120,7 @@ export async function POST(request: NextRequest) {
     const { data: documentData, error: documentError } = await supabase
       .from("documents")
       .select(
-        "id, numero, title, type, items, notes, total_ttc, date_echeance, client_id, recipient_type, sponsor_contract_id, recipient_data, client:clients(id, nom, email, adresse), sponsor:sponsor_contracts(id, sponsor_name, title)"
+        "id, numero, title, type, items, notes, total_ttc, date_echeance, client_id, recipient_type, sponsor_contract_id, recipient_data, payment_method, payment_token, client:clients(id, nom, email, adresse), sponsor:sponsor_contracts(id, sponsor_name, title)"
       )
       .eq("id", documentId)
       .eq("user_id", guard.clubId)
@@ -191,6 +193,28 @@ export async function POST(request: NextRequest) {
         ? `<p><strong>Date d'échéance :</strong> ${dateEcheance}</p>`
         : "";
 
+    const isStripeQuote =
+      expectedType === "quote" &&
+      (document as { payment_method?: string | null }).payment_method === "stripe";
+
+    let stripePayUrl: string | null = null;
+    if (isStripeQuote) {
+      let token =
+        typeof (document as { payment_token?: string | null }).payment_token ===
+        "string"
+          ? (document as { payment_token?: string | null }).payment_token
+          : null;
+      if (!token) {
+        token = createMembershipPaymentToken();
+        await supabase
+          .from("documents")
+          .update({ payment_token: token })
+          .eq("id", documentId)
+          .eq("user_id", guard.clubId);
+      }
+      stripePayUrl = `${appBaseUrl()}/cotisation/${token}`;
+    }
+
     // Le PDF est produit dans ce même processus. Un aller-retour HTTP vers
     // /api/pdf/... rejouerait le middleware d'authentification avec un cookie
     // recopié à la main : lors d'un envoi groupé, la session Supabase peut déjà
@@ -250,7 +274,20 @@ export async function POST(request: NextRequest) {
             </div>
             <div class="content">
               ${
-                expectedType === "quote"
+                expectedType === "quote" && isStripeQuote && stripePayUrl
+                  ? `<p>Bonjour ${firstName},</p>
+              <p>Ta cotisation n°<strong>${numero}</strong> pour <strong>${clubName}</strong> est à régler en ligne.</p>
+              ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}
+              <p><strong>Montant total :</strong> ${montantFormate}</p>
+              <p><strong>Destinataire :</strong> ${clientNom}</p>
+              ${dueDateLine}
+              <p style="margin: 24px 0;">
+                <a href="${stripePayUrl}" class="button" style="display:inline-block;padding:12px 24px;background:#7C5CFF;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">Payer ma cotisation</a>
+              </p>
+              <p>Tu trouveras également le détail en pièce jointe.</p>
+              <p>Si tu as la moindre question, n'hesite pas a nous contacter.</p>
+              <p>A bientot !</p>`
+                  : expectedType === "quote"
                   ? `<p>Bonjour ${firstName},</p>
               <p>Tu trouveras en piece jointe ta cotisation n°<strong>${numero}</strong> pour <strong>${clubName}</strong>.</p>
               ${docTitle ? `<p><strong>Objet :</strong> ${docTitle}</p>` : ""}

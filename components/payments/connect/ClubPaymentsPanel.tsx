@@ -20,7 +20,7 @@ import { usePermissions } from "@/lib/auth/permissions-client";
 import { CONNECT_COLLECTION_OPTIONS } from "@/lib/payments/connect/appearance";
 import type { ClubConnectStatusDto } from "@/lib/payments/connect/types";
 import type { ConnectUiMode } from "@/lib/payments/connect/ui-state";
-import { AlertCircle, CheckCircle } from "@/lib/icons";
+import { AlertCircle, CheckCircle, ExternalLink } from "@/lib/icons";
 import ClubStripeConnectProvider from "./ClubStripeConnectProvider";
 
 type ClubPaymentsPanelProps = {
@@ -218,7 +218,32 @@ export default function ClubPaymentsPanel({
           {t("dashboard.paymentAccount.viewOnly")}
         </p>
       ) : null}
+
+      <FeesInfo />
     </div>
+  );
+}
+
+function FeesInfo() {
+  const { t } = useI18n();
+  return (
+    <GlassCard>
+      <p className="text-sm font-semibold tracking-tight text-[#0F172A]">
+        {t("dashboard.paymentAccount.feesTitle")}
+      </p>
+      <p className={cn("mt-2 max-w-2xl text-sm leading-relaxed", dashboardTextSecondaryClass)}>
+        {t("dashboard.paymentAccount.feesBody")}
+      </p>
+      <a
+        href="https://stripe.com/ch/pricing"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#1A23FF] hover:underline"
+      >
+        {t("dashboard.paymentAccount.feesStripeLink")}
+        <ExternalLink className="h-3.5 w-3.5" />
+      </a>
+    </GlassCard>
   );
 }
 

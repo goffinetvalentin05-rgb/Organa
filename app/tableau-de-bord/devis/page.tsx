@@ -6,6 +6,7 @@ import { getErrorMessage } from "@/lib/utils/error-message";
 import { Eye, Trash, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import MembershipPaymentMethodControl from "@/components/quotes/MembershipPaymentMethodControl";
 import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
@@ -26,6 +27,7 @@ interface Devis {
   lignes: LigneDocument[];
   statut: string;
   dateCreation: string;
+  paymentMethod?: "qr_invoice" | "stripe" | null;
 }
 
 export default function DevisPage() {
@@ -113,9 +115,12 @@ export default function DevisPage() {
         title={t("dashboard.quotes.title")}
         subtitle={t("dashboard.quotes.subtitle")}
         actions={
-          <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau">
-            {t("dashboard.quotes.newAction")}
-          </DashboardPrimaryButton>
+          <>
+            <MembershipPaymentMethodControl />
+            <DashboardPrimaryButton href="/tableau-de-bord/devis/nouveau">
+              {t("dashboard.quotes.newAction")}
+            </DashboardPrimaryButton>
+          </>
         }
       />
 
@@ -156,6 +161,13 @@ export default function DevisPage() {
                   href={`/tableau-de-bord/devis/${devisItem.id}`}
                   title={devisItem.title || devisItem.numero}
                   subtitle={devisItem.numero}
+                  badges={
+                    <span className="text-[11px] font-medium tracking-wide text-[#94A3B8]">
+                      {devisItem.paymentMethod === "stripe"
+                        ? t("dashboard.quotes.paymentMethod.stripe")
+                        : t("dashboard.quotes.paymentMethod.qr")}
+                    </span>
+                  }
                   amount={
                     <>
                       {formatMontant(montant)}

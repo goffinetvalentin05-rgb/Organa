@@ -134,7 +134,7 @@ export async function getDocumentPdfData(
   const { data: document, error: docError } = await supabase
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)
@@ -226,6 +226,10 @@ export async function getDocumentPdfData(
   // ================================================================
   // Swiss QR Bill
   // ================================================================
+  const skipQrBill =
+    type === "quote" &&
+    (document as { payment_method?: string | null }).payment_method === "stripe";
+
   const docNum = document.numero || "";
   const existingQRRef = (document as Record<string, unknown>).qr_reference as string | null | undefined;
 
@@ -236,12 +240,12 @@ export async function getDocumentPdfData(
   const useQRIBAN = iban ? isQRIBAN(iban) : false;
 
   let qrReference: string | undefined;
-  if (useQRIBAN) {
+  if (!skipQrBill && useQRIBAN) {
     qrReference = existingQRRef || generateQRRReference(scopeUserId, docNum);
   }
 
   // Si pas de référence en DB, on la sauvegarde de manière transparente
-  if (useQRIBAN && qrReference && !existingQRRef) {
+  if (!skipQrBill && useQRIBAN && qrReference && !existingQRRef) {
     try {
       await supabase
         .from("documents")
@@ -296,10 +300,13 @@ export async function getDocumentPdfData(
   // La zone de paiement n'est pas dessinée ici : elle est produite en vectoriel
   // par PDFKit puis incrustée dans le PDF final (voir lib/pdf/mergeQRBill.ts).
   // À ce stade on se contente de valider les données et de les transmettre.
-  const qrValidation = validateQRBillData(qrBillData);
-  const qrBillError = qrValidation.valid ? null : formatValidationErrors(qrValidation);
+  const qrValidation = skipQrBill ? null : validateQRBillData(qrBillData);
+  const qrBillError =
+    qrValidation && !qrValidation.valid
+      ? formatValidationErrors(qrValidation)
+      : null;
 
-  if (!qrValidation.valid) {
+  if (qrBillError) {
     console.warn("[pdf-data] QR-facture non générée:", qrBillError);
   }
 
@@ -330,8 +337,8 @@ export async function getDocumentPdfData(
     documentLabel,
     /** Swiss QR Bill : données validées, incrustées après le rendu react-pdf. */
     qrBill: {
-      data: qrValidation.valid ? qrBillData : null,
-      hasQRBill: qrValidation.valid,
+      data: qrValidation?.valid ? qrBillData : null,
+      hasQRBill: Boolean(qrValidation?.valid),
       errorMessage: qrBillError,
     },
   };

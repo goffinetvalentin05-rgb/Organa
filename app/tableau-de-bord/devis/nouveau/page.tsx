@@ -60,6 +60,8 @@ import {
   quoteCreateDraftStore,
   type QuoteCreateDraftData,
 } from "@/lib/drafts/quoteCreateDraft";
+import QuotePaymentMethodField from "@/components/quotes/QuotePaymentMethodField";
+import type { MembershipPaymentMethod } from "@/lib/quotes/payment-method";
 
 const COTISATIONS_LIST_PATH = "/tableau-de-bord/devis";
 
@@ -79,6 +81,8 @@ export default function NouveauDevisPage() {
   const [statut, setStatut] = useState<"brouillon" | "envoye" | "accepte" | "refuse">("brouillon");
   const [dateEcheance, setDateEcheance] = useState("");
   const [notes, setNotes] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<MembershipPaymentMethod>("qr_invoice");
+  const [stripeReady, setStripeReady] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
   const {
@@ -155,9 +159,10 @@ export default function NouveauDevisPage() {
     const loadData = async () => {
       try {
         setLoadingClients(true);
-        const [clientsRes, quotesRes] = await Promise.all([
+        const [clientsRes, quotesRes, methodRes] = await Promise.all([
           fetch("/api/clients", { cache: "no-store" }),
           fetch("/api/documents?type=quote", { cache: "no-store" }),
+          fetch("/api/quotes/payment-method", { cache: "no-store" }),
         ]);
 
         if (!clientsRes.ok) {
@@ -184,6 +189,19 @@ export default function NouveauDevisPage() {
             })
           );
           setExistingQuotes(summaries);
+        }
+
+        if (methodRes.ok) {
+          const methodData = (await methodRes.json()) as {
+            method?: MembershipPaymentMethod;
+            stripeReady?: boolean;
+          };
+          const nextMethod =
+            methodData.method === "stripe" && methodData.stripeReady
+              ? "stripe"
+              : "qr_invoice";
+          setPaymentMethod(nextMethod);
+          setStripeReady(Boolean(methodData.stripeReady));
         }
       } catch (error) {
         console.error("[Devis] Erreur chargement données:", error);
@@ -281,6 +299,7 @@ export default function NouveauDevisPage() {
     lignes: lignesValides,
     statut,
     dateCreation: new Date().toISOString().split("T")[0],
+    paymentMethod,
     ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
     ...(notes && notes.trim() !== "" ? { notes } : {}),
   });
@@ -793,6 +812,7 @@ export default function NouveauDevisPage() {
           lignes: lignesValides,
           statut,
           dateCreation: new Date().toISOString().split("T")[0],
+          paymentMethod,
           ...(dateEcheance && dateEcheance.trim() !== "" ? { dateEcheance } : {}),
           ...(notes && notes.trim() !== "" ? { notes } : {}),
         };
@@ -1164,6 +1184,13 @@ export default function NouveauDevisPage() {
               className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF] disabled:opacity-50"
             />
           </div>
+
+          <QuotePaymentMethodField
+            method={paymentMethod}
+            stripeReady={stripeReady}
+            disabled={isBulkProcessing}
+            onChange={setPaymentMethod}
+          />
         </GlassCard>
 
         <GlassCard padding="lg">

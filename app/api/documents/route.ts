@@ -20,6 +20,11 @@ import {
   type RecipientType,
 } from "@/lib/documents/recipient";
 import { withIdempotency } from "@/lib/api/idempotency";
+import {
+  createMembershipPaymentToken,
+  resolveQuotePaymentMethodForInsert,
+} from "@/lib/quotes/membership-settings";
+import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -92,12 +97,13 @@ type DocumentDbRow = {
   updated_by?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
+  payment_method?: string | null;
   client?: unknown;
   sponsor?: unknown;
 };
 
 const DOCUMENT_SELECT =
-  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
+  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, payment_method, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
 
 type DocumentInsertPayload = Record<string, unknown> & {
   user_id: string;
@@ -234,6 +240,7 @@ export async function POST(request: NextRequest) {
       datePaiement,
       notes,
       eventId,
+      paymentMethod,
     } = body;
 
     // Log du payload reçu pour debugging
@@ -517,6 +524,25 @@ export async function POST(request: NextRequest) {
     // Ajouter event_id uniquement si fourni
     if (eventId) {
       documentData.event_id = eventId;
+    }
+
+    if (type === "quote") {
+      const resolvedMethod = await resolveQuotePaymentMethodForInsert({
+        supabase,
+        clubId: guard.clubId,
+        requested: paymentMethod,
+      });
+      if (resolvedMethod.error) {
+        return {
+          status: 400,
+          body: { error: resolvedMethod.error },
+          resourceId: null,
+        };
+      }
+      documentData.payment_method = resolvedMethod.method;
+      if (resolvedMethod.method === "stripe") {
+        documentData.payment_token = createMembershipPaymentToken();
+      }
     }
 
     console.log("[API][documents][POST] Tentative d'insertion dans public.documents:", {
@@ -890,6 +916,10 @@ function formatDocument(
     updatedBy: doc.updated_by ?? null,
     createdAt: doc.created_at ?? null,
     updatedAt: doc.updated_at ?? null,
+    paymentMethod:
+      doc.type === "quote"
+        ? resolveMembershipPaymentMethod(doc.payment_method)
+        : null,
     client: (() => {
       if (!client) return null;
       const n = normalizeClientsDbRow(client as Record<string, unknown>);

@@ -42,6 +42,7 @@ interface Devis {
   dateEcheance?: string | null;
   notes?: string | null;
   type?: string;
+  paymentMethod?: "qr_invoice" | "stripe" | null;
 }
 
 interface CompanySettings {
@@ -383,6 +384,14 @@ export default function DevisDetailPage() {
                   <span className="font-medium">{formatDate(devis.dateEcheance)}</span>
                 </div>
               )}
+              <div className="flex items-center justify-between gap-4">
+                <span>{t("dashboard.quotes.paymentMethod.label")}</span>
+                <span className="font-medium">
+                  {devis.paymentMethod === "stripe"
+                    ? t("dashboard.quotes.paymentMethod.stripeDetail")
+                    : t("dashboard.quotes.paymentMethod.qrDetail")}
+                </span>
+              </div>
             </div>
           </div>
         </div>

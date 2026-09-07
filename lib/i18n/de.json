@@ -620,7 +620,10 @@
       "shortcutBody": "Richten Sie das Konto ein, mit dem Zahlungen aus Shop, Beiträgen, Ticketing und anderen Diensten empfangen werden.",
       "shortcutCta": "Verwalten",
       "viewOnly": "Sie können den Status einsehen. Die Einrichtung ist den Vereinsverantwortlichen vorbehalten.",
-      "missingPublishableKey": "Der öffentliche Stripe-Schlüssel ist nicht konfiguriert."
+      "missingPublishableKey": "Der öffentliche Stripe-Schlüssel ist nicht konfiguriert.",
+      "feesTitle": "0 % Obillz-Kommission",
+      "feesBody": "Obillz erhebt keine Kommission auf Ihre Einnahmen. Stripe-Verarbeitungsgebühren gelten je nach Zahlungsmittel und werden direkt von Stripe abgezogen.",
+      "feesStripeLink": "Stripe-Preise ansehen"
     },
     "topbar": {
       "upToDate": "Alles aktuell",
@@ -1205,6 +1208,20 @@
       "saving": "Wird gespeichert...",
       "previewPdf": "PDF-Vorschau",
       "downloadPdf": "PDF herunterladen",
+      "paymentMethod": {
+        "label": "Inkassomodus",
+        "qr": "QR-Rechnung",
+        "qrDescription": "Mitglieder erhalten eine Schweizer QR-Rechnung und zahlen per Überweisung.",
+        "qrDetail": "Schweizer QR-Rechnung",
+        "stripe": "Online-Zahlung",
+        "stripeDescription": "Mitglieder zahlen direkt online. Die Beträge gehen auf das verbundene Stripe-Konto des Vereins.",
+        "stripeDetail": "Online-Zahlung über Stripe",
+        "notConfigured": "Zahlungskonto nicht konfiguriert",
+        "configureStripe": "Stripe einrichten",
+        "saved": "Inkassomodus gespeichert",
+        "saveError": "Inkassomodus konnte nicht gespeichert werden",
+        "overrideHint": "Sie können den Modus nur für diesen Beitrag ändern, ohne die Vereinsvorgabe zu ändern."
+      },
       "fields": {
         "client": "Kunde *",
         "dueDate": "Fälligkeitsdatum",
