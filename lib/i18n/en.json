@@ -537,6 +537,7 @@
       "productRevenues": "Revenue",
       "events": "Events",
       "buvette": "Club Bar",
+      "shop": "Shop",
       "plannings": "Plannings",
       "meetingMinutes": "Meeting minutes",
       "qrcodes": "QR Codes",
@@ -564,6 +565,7 @@
       "productRevenues": "Products & revenue",
       "events": "Events",
       "buvette": "Club Bar",
+      "shop": "Shop",
       "plannings": "Plannings",
       "meetingMinutes": "Meeting minutes",
       "meetingMinutesNew": "New minutes",
@@ -577,6 +579,16 @@
       "publicPage": "Public club page",
       "assistant": "AI Assistant",
       "reminders": "Reminders"
+    },
+    "shop": {
+      "title": "Shop",
+      "subtitle": "Sell club products and receive payments directly.",
+      "tabs": {
+        "products": "Products",
+        "orders": "Orders",
+        "settings": "Shop settings",
+        "payments": "Payments"
+      }
     },
     "topbar": {
       "upToDate": "All up to date",

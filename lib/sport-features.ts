@@ -13,6 +13,7 @@ import {
   QrCode,
   Receipt,
   Settings,
+  ShoppingBag,
   TrendingUp,
   Users,
   Wallet,
@@ -29,6 +30,7 @@ export type SportFeatureId =
   | "sponsors"
   | "evenements"
   | "buvette"
+  | "boutique"
   | "plannings"
   | "pv"
   | "qrcodes"
@@ -149,6 +151,15 @@ export const sportFeatures: SportFeature[] = [
     accent: BLUE.cyan,
   },
   {
+    id: "boutique",
+    slug: "boutique",
+    title: "Boutique",
+    description:
+      "Vendez maillots, trainings et accessoires avec une boutique publique et des paiements directement sur le compte du club.",
+    highlights: ["Boutique publique", "Stripe Connect", "Commandes du club"],
+    accent: BLUE.electric,
+  },
+  {
     id: "plannings",
     slug: "plannings",
     title: "Plannings",
@@ -215,6 +226,7 @@ export const sportFeatureIcons: Record<SportFeatureId, LucideIcon> = {
   sponsors: Handshake,
   evenements: CalendarHeart,
   buvette: Coffee,
+  boutique: ShoppingBag,
   plannings: CalendarDays,
   pv: FileText,
   qrcodes: QrCode,

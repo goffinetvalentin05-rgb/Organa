@@ -9,6 +9,7 @@ import {
   handleSubscriptionUpdated,
 } from "@/lib/billing/stripeWebhookHandlers";
 import { StripeWebhookSyncError } from "@/lib/billing/stripeSync";
+import { handleShopStripeEvent, isShopStripeEvent } from "@/lib/shop/stripe-webhook";
 
 /**
  * Handler POST partagé par /api/webhook et /api/webhooks/stripe.
@@ -83,6 +84,17 @@ export async function handleStripeWebhook(request: NextRequest) {
       livemode: event.livemode,
     })}`
   );
+
+  if (isShopStripeEvent(event)) {
+    try {
+      await handleShopStripeEvent(stripe, event);
+      return NextResponse.json({ received: true, event_id: event.id, scope: "shop" });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Shop handler error";
+      console.error("[WEBHOOK][stripe] shop handler", error);
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  }
 
   try {
     switch (event.type) {

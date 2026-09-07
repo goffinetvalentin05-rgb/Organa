@@ -536,6 +536,7 @@
       "productRevenues": "Revenus",
       "events": "Événements",
       "buvette": "Buvette",
+      "shop": "Boutique",
       "plannings": "Plannings",
       "meetingMinutes": "PV de séances",
       "qrcodes": "QR Codes",
@@ -560,6 +561,7 @@
       "productRevenues": "Produits & revenus",
       "events": "Événements",
       "buvette": "Buvette",
+      "shop": "Boutique",
       "plannings": "Plannings",
       "meetingMinutes": "PV de séances",
       "meetingMinutesNew": "Nouveau PV",
@@ -570,6 +572,16 @@
       "expenses": "Charges du club",
       "settings": "Paramètres du club",
       "publicPage": "Page publique du club"
+    },
+    "shop": {
+      "title": "Boutique",
+      "subtitle": "Vendez les produits du club et recevez les paiements directement.",
+      "tabs": {
+        "products": "Produits",
+        "orders": "Commandes",
+        "settings": "Paramètres boutique",
+        "payments": "Paiements"
+      }
     },
     "topbar": {
       "upToDate": "Tout est à jour",

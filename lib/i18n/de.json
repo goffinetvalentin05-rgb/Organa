@@ -536,6 +536,7 @@
       "payments": "Zahlungseingänge",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
+      "shop": "Shop",
       "plannings": "Planungen",
       "meetingMinutes": "Sitzungsprotokolle",
       "qrcodes": "QR-Codes",
@@ -562,6 +563,7 @@
       "payments": "Zahlungseingänge",
       "events": "Veranstaltungen",
       "buvette": "Vereinsbar",
+      "shop": "Shop",
       "plannings": "Planungen",
       "meetingMinutes": "Sitzungsprotokolle",
       "meetingMinutesNew": "Neues Protokoll",
@@ -575,6 +577,16 @@
       "publicPage": "Öffentliche Vereinsseite",
       "assistant": "KI-Assistent",
       "reminders": "Nicht vergessen"
+    },
+    "shop": {
+      "title": "Shop",
+      "subtitle": "Verkaufen Sie Vereinsprodukte und erhalten Sie Zahlungen direkt.",
+      "tabs": {
+        "products": "Produkte",
+        "orders": "Bestellungen",
+        "settings": "Shop-Einstellungen",
+        "payments": "Zahlungen"
+      }
     },
     "topbar": {
       "upToDate": "Alles aktuell",

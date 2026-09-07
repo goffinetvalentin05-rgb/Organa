@@ -13,6 +13,9 @@ export const PERMISSIONS = {
   MANAGE_MEMBERS: "manage_members",
   DELETE_MEMBERS: "delete_members",
 
+  VIEW_SHOP: "view_shop",
+  MANAGE_SHOP: "manage_shop",
+
   VIEW_EXPENSES: "view_expenses",
   MANAGE_EXPENSES: "manage_expenses",
   DELETE_EXPENSES: "delete_expenses",
@@ -56,6 +59,8 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   manage_plannings: "Modifier les plannings",
   view_meeting_minutes: "Voir les PV de séances",
   manage_meeting_minutes: "Créer / modifier les PV de séances",
+  view_shop: "Voir la boutique",
+  manage_shop: "Gérer la boutique",
   access_settings: "Accéder aux paramètres",
   manage_users: "Gérer les utilisateurs / accès",
 };
@@ -108,6 +113,10 @@ export const PERMISSION_GROUPS: Array<{
     ],
   },
   {
+    title: "Boutique",
+    permissions: [PERMISSIONS.VIEW_SHOP, PERMISSIONS.MANAGE_SHOP],
+  },
+  {
     title: "Paramètres",
     permissions: [PERMISSIONS.ACCESS_SETTINGS, PERMISSIONS.MANAGE_USERS],
   },
@@ -141,6 +150,7 @@ export function suggestedDefaultPermissions(): Record<Permission, boolean> {
   map.view_documents = true;
   map.view_plannings = true;
   map.view_meeting_minutes = true;
+  map.view_shop = true;
   return map;
 }
 
