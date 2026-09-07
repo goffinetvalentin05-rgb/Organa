@@ -26,6 +26,7 @@ import MemberFieldsSettingsCard from "./MemberFieldsSettingsCard";
 import { PageLayout, PageHeader, SectionCard, cn, dashboardInputClass, dashboardSelectLgClass, dashboardLabelClass, dashboardHintClass, dashboardGlassCardClass } from "@/components/ui";
 import SettingsAccordion from "./SettingsAccordion";
 import UsersAccessCard from "@/components/billing/UsersAccessCard";
+import ClubPaymentsShortcutCard from "@/components/payments/connect/ClubPaymentsShortcutCard";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { TEAM_PRICING } from "@/lib/billing/pricing";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
@@ -711,6 +712,7 @@ export default function ParametresPage() {
           canManageTeamAccess={canManageTeamAccess}
           loading={loadingPlan}
         />
+        <ClubPaymentsShortcutCard />
         <SectionCard
           icon={Users}
           title={t("dashboard.settings.layout.sections.members")}

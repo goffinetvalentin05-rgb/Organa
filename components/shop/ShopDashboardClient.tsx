@@ -25,7 +25,6 @@ import { useI18n } from "@/components/I18nProvider";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { formatChf } from "@/lib/shop/money";
 import type {
-  ClubPaymentAccount,
   ShopOrder,
   ShopProduct,
   ShopSettings,
@@ -49,6 +48,7 @@ import {
   X,
 } from "@/lib/icons";
 import { QRCodeSVG } from "qrcode.react";
+import ClubPaymentsPanel from "@/components/payments/connect/ClubPaymentsPanel";
 
 type TabId = "produits" | "commandes" | "parametres" | "paiements";
 
@@ -108,9 +108,7 @@ export default function ShopDashboardClient() {
   const [products, setProducts] = useState<ShopProduct[]>([]);
   const [orders, setOrders] = useState<ShopOrder[]>([]);
   const [settings, setSettings] = useState<ShopSettings | null>(null);
-  const [account, setAccount] = useState<ClubPaymentAccount | null>(null);
   const [paymentsReady, setPaymentsReady] = useState(false);
-  const [paymentsIncomplete, setPaymentsIncomplete] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<ShopOrder | null>(null);
 
   const [formOpen, setFormOpen] = useState(false);
@@ -119,7 +117,6 @@ export default function ShopDashboardClient() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
-  const [connecting, setConnecting] = useState(false);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -149,9 +146,7 @@ export default function ShopDashboardClient() {
       }
       if (payRes.ok) {
         const data = await payRes.json();
-        setAccount(data.account);
         setPaymentsReady(Boolean(data.ready));
-        setPaymentsIncomplete(Boolean(data.incomplete));
       }
     } catch {
       toast.error("Impossible de charger la boutique.");
@@ -165,12 +160,10 @@ export default function ShopDashboardClient() {
   }, [permsLoading, loadAll]);
 
   useEffect(() => {
-    const stripe = searchParams.get("stripe");
-    if (stripe === "return" || stripe === "refresh") {
+    if (searchParams.get("tab") === "paiements") {
       setTab("paiements");
-      loadAll();
     }
-  }, [searchParams, loadAll]);
+  }, [searchParams]);
 
   const money = (cents: number) => formatChf(cents, intlLocale);
 
@@ -336,29 +329,6 @@ export default function ShopDashboardClient() {
     } finally {
       setSettingsSaving(false);
     }
-  };
-
-  const connectStripe = async () => {
-    setConnecting(true);
-    try {
-      const res = await fetch("/api/shop/payments", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Connexion Stripe impossible");
-      window.location.href = data.url;
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Erreur Stripe");
-      setConnecting(false);
-    }
-  };
-
-  const openStripeDashboard = async () => {
-    const res = await fetch("/api/shop/payments", { method: "PUT" });
-    const data = await res.json();
-    if (!res.ok) {
-      toast.error(data.error || "Impossible d’ouvrir Stripe");
-      return;
-    }
-    window.open(data.url, "_blank", "noopener,noreferrer");
   };
 
   const shopUrl = useMemo(() => {
@@ -740,73 +710,7 @@ export default function ShopDashboardClient() {
         </div>
       )}
 
-      {tab === "paiements" && (
-        <GlassCard>
-          <h2 className="text-lg font-semibold text-[#0F172A]">Paiements</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#64748B]">
-            Connectez votre compte de paiement pour recevoir directement les revenus de votre boutique.
-          </p>
-          {!account?.providerAccountId ? (
-            <div className="mt-6">
-              <DashboardPrimaryButton
-                type="button"
-                icon="none"
-                loading={connecting}
-                onClick={connectStripe}
-                disabled={!canManage}
-              >
-                Connecter Stripe
-              </DashboardPrimaryButton>
-            </div>
-          ) : (
-            <div className="mt-6 space-y-4">
-              {paymentsIncomplete ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  Configuration du paiement incomplète
-                </div>
-              ) : paymentsReady ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                  Stripe connecté ✓
-                </div>
-              ) : null}
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[#94A3B8]">Nom du compte</dt>
-                  <dd className="text-sm font-medium text-[#0F172A]">
-                    {account.displayName || "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[#94A3B8]">Statut</dt>
-                  <dd className="text-sm font-medium text-[#0F172A]">{account.status}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[#94A3B8]">Paiements</dt>
-                  <dd className="text-sm font-medium">
-                    {account.chargesEnabled ? "Activés" : "Non activés"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[#94A3B8]">Versements</dt>
-                  <dd className="text-sm font-medium">
-                    {account.payoutsEnabled ? "Activés" : "Non activés"}
-                  </dd>
-                </div>
-              </dl>
-              <div className="flex flex-wrap gap-3">
-                {paymentsIncomplete ? (
-                  <DashboardPrimaryButton type="button" icon="none" loading={connecting} onClick={connectStripe}>
-                    Continuer la configuration
-                  </DashboardPrimaryButton>
-                ) : null}
-                <ActionButton variant="surface" onClick={openStripeDashboard}>
-                  Gérer mon compte Stripe
-                </ActionButton>
-              </div>
-            </div>
-          )}
-        </GlassCard>
-      )}
+      {tab === "paiements" && <ClubPaymentsPanel variant="shop" />}
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#071634]/50 p-4 sm:items-center">

@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { requireClubPaymentsAccess } from "@/lib/payments/connect/guard";
 import { getClubConnectStatus } from "@/lib/payments/connect/status";
 
 export const runtime = "nodejs";
 
-/** Statut de paiement du club, exposé à la boutique (raccourci module). */
 export async function GET() {
   try {
-    const guard = await requirePermission(PERMISSIONS.VIEW_SHOP);
+    const guard = await requireClubPaymentsAccess("view");
     if ("error" in guard) return guard.error;
+
     const supabase = await createClient();
     const status = await getClubConnectStatus(supabase, guard.clubId);
     return NextResponse.json(status);
