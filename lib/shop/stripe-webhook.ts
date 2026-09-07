@@ -9,19 +9,38 @@ import {
 import { sendOrderPaidEmails } from "./email";
 import { syncStripeAccountRow } from "./stripe-connect";
 import {
+  findMembershipDocument,
   handleMembershipCheckoutSession,
+  handleMembershipPaymentIntent,
+  hydrateStripeCheckoutSession,
+  isMembershipCheckoutSession,
   isMembershipStripeEvent,
 } from "@/lib/quotes/stripe-membership";
 import { MEMBERSHIP_STRIPE_PURPOSE } from "@/lib/quotes/payment-method";
 
 const SHOP_PURPOSE = "club_shop";
 
+function isConnectDirectChargeEvent(event: Stripe.Event): boolean {
+  if (typeof event.account !== "string" || !event.account) return false;
+  return (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded" ||
+    event.type === "checkout.session.async_payment_failed" ||
+    event.type === "checkout.session.expired" ||
+    event.type === "payment_intent.succeeded" ||
+    event.type === "payment_intent.payment_failed" ||
+    event.type === "charge.refunded"
+  );
+}
+
 export function isShopStripeEvent(event: Stripe.Event): boolean {
   if (event.type === "account.updated") return true;
+  // Direct charge Connect : boutique + cotisations. Le SaaS Obillz n’a jamais event.account.
+  if (isConnectDirectChargeEvent(event)) return true;
   const obj = event.data.object as {
     metadata?: Record<string, string> | null;
   };
-  const purpose = obj?.metadata?.obillz_purpose;
+  const purpose = obj?.metadata?.obillz_purpose || obj?.metadata?.type;
   return purpose === SHOP_PURPOSE || purpose === MEMBERSHIP_STRIPE_PURPOSE;
 }
 
@@ -241,7 +260,7 @@ async function releaseEvent(providerEventId: string) {
 }
 
 export async function handleShopStripeEvent(
-  _stripe: Stripe,
+  stripe: Stripe,
   event: Stripe.Event
 ): Promise<void> {
   const claimed = await claimEvent(event.id, event.type);
@@ -252,6 +271,15 @@ export async function handleShopStripeEvent(
 
   const connectedAccount =
     typeof event.account === "string" ? event.account : null;
+
+  console.log(
+    `[SHOP][webhook] event ${JSON.stringify({
+      event_id: event.id,
+      event_type: event.type,
+      event_account: connectedAccount,
+      livemode: event.livemode,
+    })}`
+  );
 
   try {
   switch (event.type) {
@@ -266,9 +294,31 @@ export async function handleShopStripeEvent(
 
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      if (isMembershipStripeEvent(event)) {
-        await handleMembershipCheckoutSession(event, session, connectedAccount);
+      let session = event.data.object as Stripe.Checkout.Session;
+      const looksLikeMembership =
+        isMembershipStripeEvent(event) || isMembershipCheckoutSession(session);
+      if (looksLikeMembership || !session.metadata?.obillz_purpose) {
+        session = await hydrateStripeCheckoutSession(
+          stripe,
+          session,
+          connectedAccount
+        );
+      }
+
+      const membershipDoc =
+        looksLikeMembership || isMembershipCheckoutSession(session)
+          ? true
+          : session.metadata?.obillz_purpose === SHOP_PURPOSE
+            ? false
+            : Boolean(await findMembershipDocument({ sessionId: session.id }));
+
+      if (membershipDoc) {
+        await handleMembershipCheckoutSession(
+          stripe,
+          event,
+          session,
+          connectedAccount
+        );
         break;
       }
       if (session.metadata?.obillz_purpose !== SHOP_PURPOSE) return;
@@ -328,6 +378,13 @@ export async function handleShopStripeEvent(
         restoreStock: true,
         paymentRecordStatus: "expired",
       });
+      break;
+    }
+
+    case "payment_intent.succeeded": {
+      const pi = event.data.object as Stripe.PaymentIntent;
+      if (!isMembershipStripeEvent(event)) return;
+      await handleMembershipPaymentIntent(event, pi, connectedAccount);
       break;
     }
 

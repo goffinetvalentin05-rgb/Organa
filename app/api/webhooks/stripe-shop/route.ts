@@ -38,7 +38,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
+  console.log(
+    `[SHOP][webhook] received ${JSON.stringify({
+      event_id: event.id,
+      event_type: event.type,
+      event_account: typeof event.account === "string" ? event.account : null,
+      livemode: event.livemode,
+    })}`
+  );
+
   if (process.env.NODE_ENV === "production" && event.livemode === false) {
+    console.log(
+      `[SHOP][webhook] rejected_test_event ${JSON.stringify({
+        event_id: event.id,
+        event_type: event.type,
+      })}`
+    );
     return NextResponse.json(
       { received: true, event_id: event.id, rejected: "test_mode_event" },
       { status: 200 }

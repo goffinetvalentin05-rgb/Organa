@@ -82,6 +82,7 @@ export async function handleStripeWebhook(request: NextRequest) {
       event_id: event.id,
       event_type: event.type,
       livemode: event.livemode,
+      event_account: typeof event.account === "string" ? event.account : null,
     })}`
   );
 

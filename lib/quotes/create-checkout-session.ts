@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getClubStripeAccount, getStripe } from "@/lib/shop/stripe-connect";
 import { isPaymentReady } from "@/lib/shop/payment-provider";
 import { appBaseUrl } from "@/lib/payments/connect/stripe-client";
-import { MEMBERSHIP_STRIPE_PURPOSE, francsToStripeCents } from "./payment-method";
+import { MEMBERSHIP_STRIPE_PURPOSE, francsToStripeCents, isMembershipPaidStatus } from "./payment-method";
 
 export async function createMembershipCheckoutSession(params: {
   token: string;
@@ -25,7 +25,7 @@ export async function createMembershipCheckoutSession(params: {
   if (document.payment_method !== "stripe") {
     return { error: "Cette cotisation ne se paie pas en ligne.", status: 400 };
   }
-  if (document.status === "accepte") {
+  if (isMembershipPaidStatus(document.status)) {
     return { error: "Cette cotisation est déjà payée.", status: 409 };
   }
   if (document.status === "refuse") {
@@ -57,6 +57,7 @@ export async function createMembershipCheckoutSession(params: {
 
   const metadata = {
     obillz_purpose: MEMBERSHIP_STRIPE_PURPOSE,
+    type: MEMBERSHIP_STRIPE_PURPOSE,
     club_id: clubId,
     document_id: document.id,
     connected_account_id: account.providerAccountId,

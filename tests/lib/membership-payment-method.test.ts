@@ -1,10 +1,18 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import {
   francsToStripeCents,
+  isMembershipPaidStatus,
+  membershipPurposeFromMetadata,
   parseMembershipPaymentMethod,
   resolveMembershipPaymentMethod,
 } from "@/lib/quotes/payment-method";
-import { markMembershipPaidFromStripe } from "@/lib/quotes/stripe-membership";
+import {
+  handleMembershipCheckoutSession,
+  isMembershipStripeEvent,
+  markMembershipPaidFromStripe,
+} from "@/lib/quotes/stripe-membership";
+import { isShopStripeEvent } from "@/lib/shop/stripe-webhook";
+import type Stripe from "stripe";
 
 describe("membership payment method", () => {
   it("parses known methods only", () => {
@@ -25,6 +33,22 @@ describe("membership payment method", () => {
     expect(francsToStripeCents(0)).toBeNull();
     expect(francsToStripeCents(-1)).toBeNull();
   });
+
+  it("treats accepte and paye as paid", () => {
+    expect(isMembershipPaidStatus("accepte")).toBe(true);
+    expect(isMembershipPaidStatus("paye")).toBe(true);
+    expect(isMembershipPaidStatus("envoye")).toBe(false);
+  });
+
+  it("detects membership purpose from metadata aliases", () => {
+    expect(
+      membershipPurposeFromMetadata({ obillz_purpose: "club_membership" })
+    ).toBe(true);
+    expect(membershipPurposeFromMetadata({ type: "club_membership" })).toBe(true);
+    expect(membershipPurposeFromMetadata({ obillz_purpose: "club_shop" })).toBe(
+      false
+    );
+  });
 });
 
 const documents = new Map<string, Record<string, unknown>>();
@@ -37,6 +61,17 @@ function createDocumentsQuery() {
   let payload: Record<string, unknown> | null = null;
 
   const executeSelect = async () => {
+    if (filters.stripe_checkout_session_id && !filters.id) {
+      const row =
+        [...documents.values()].find(
+          (r) =>
+            r.stripe_checkout_session_id === filters.stripe_checkout_session_id
+        ) ?? null;
+      if (row && filters.type && row.type !== filters.type) {
+        return { data: null, error: null };
+      }
+      return { data: row, error: null };
+    }
     const id = String(filters.id ?? "");
     const row = documents.get(id) ?? null;
     if (row && filters.user_id && row.user_id !== filters.user_id) {
@@ -186,4 +221,92 @@ describe("markMembershipPaidFromStripe", () => {
     expect(lastUpdate).toBeNull();
     expect(documents.get("doc-1")!.stripe_payment_intent_id).toBe("pi_old");
   });
+
+  it("finds the document by checkout session id when metadata id is missing", async () => {
+    await markMembershipPaidFromStripe({
+      documentId: "unknown",
+      clubId: "club-a",
+      expectedAccountId: "acct_club",
+      eventAccountId: "acct_club",
+      sessionId: "cs_1",
+      paymentIntentId: "pi_1",
+      chargeId: "ch_1",
+      amountCents: 15000,
+    });
+    expect(documents.get("doc-1")!.status).toBe("accepte");
+    expect(lastUpdate).toMatchObject({ status: "accepte" });
+  });
+
+  it("marks the cotisation paid from a Checkout session payload", async () => {
+    const session = {
+      id: "cs_1",
+      payment_status: "paid",
+      amount_total: 100,
+      metadata: {
+        obillz_purpose: "club_membership",
+        club_id: "club-a",
+        document_id: "doc-1",
+        connected_account_id: "acct_club",
+      },
+      payment_intent: {
+        id: "pi_1",
+        latest_charge: "ch_1",
+      },
+    } as unknown as Stripe.Checkout.Session;
+    const stripe = {
+      checkout: {
+        sessions: {
+          retrieve: vi.fn(async () => session),
+        },
+      },
+    } as unknown as Stripe;
+    const event = {
+      id: "evt_1",
+      type: "checkout.session.completed",
+      account: "acct_club",
+      data: { object: session },
+    } as unknown as Stripe.Event;
+
+    await handleMembershipCheckoutSession(stripe, event, session, "acct_club");
+    expect(documents.get("doc-1")!.status).toBe("accepte");
+    expect(documents.get("doc-1")!.stripe_charge_id).toBe("ch_1");
+  });
 });
+
+describe("membership stripe event routing", () => {
+  it("detects membership checkout events from obillz_purpose", () => {
+    const event = {
+      type: "checkout.session.completed",
+      data: {
+        object: { metadata: { obillz_purpose: "club_membership" } },
+      },
+    } as unknown as Stripe.Event;
+    expect(isMembershipStripeEvent(event)).toBe(true);
+  });
+
+  it("detects membership events from metadata.type alias", () => {
+    const event = {
+      type: "checkout.session.completed",
+      data: { object: { metadata: { type: "club_membership" } } },
+    } as unknown as Stripe.Event;
+    expect(isMembershipStripeEvent(event)).toBe(true);
+  });
+
+  it("routes Connect checkout events to the shop/membership handler even without metadata", () => {
+    const event = {
+      type: "checkout.session.completed",
+      account: "acct_club",
+      data: { object: { metadata: {} } },
+    } as unknown as Stripe.Event;
+    expect(isShopStripeEvent(event)).toBe(true);
+  });
+
+  it("does not treat platform SaaS checkout as a shop event", () => {
+    const event = {
+      type: "checkout.session.completed",
+      data: { object: { metadata: { user_id: "user-1" } } },
+    } as unknown as Stripe.Event;
+    expect(isShopStripeEvent(event)).toBe(false);
+  });
+});
+

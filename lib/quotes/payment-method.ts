@@ -3,6 +3,20 @@ export type MembershipPaymentMethod = (typeof MEMBERSHIP_PAYMENT_METHODS)[number
 
 export const MEMBERSHIP_STRIPE_PURPOSE = "club_membership";
 
+export function isMembershipPaidStatus(status: string | null | undefined): boolean {
+  return status === "accepte" || status === "paye";
+}
+
+export function membershipPurposeFromMetadata(
+  metadata?: Record<string, string> | null
+): boolean {
+  if (!metadata) return false;
+  return (
+    metadata.obillz_purpose === MEMBERSHIP_STRIPE_PURPOSE ||
+    metadata.type === MEMBERSHIP_STRIPE_PURPOSE
+  );
+}
+
 export function parseMembershipPaymentMethod(
   value: unknown
 ): MembershipPaymentMethod | null {

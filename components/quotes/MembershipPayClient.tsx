@@ -28,6 +28,9 @@ function formatAmount(amount: number, currency: string) {
   }).format(amount);
 }
 
+const SUCCESS_POLL_MS = 2000;
+const SUCCESS_POLL_MAX = 15;
+
 export default function MembershipPayClient({
   token,
   mode = "pay",
@@ -41,6 +44,7 @@ export default function MembershipPayClient({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [pollAttempts, setPollAttempts] = useState(0);
 
   const load = useCallback(async () => {
     try {
@@ -51,8 +55,10 @@ export default function MembershipPayClient({
       if (!res.ok) throw new Error(json.error || "Cotisation introuvable.");
       setData(json);
       setError(null);
+      return json;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Impossible de charger la cotisation.");
+      return null;
     } finally {
       setLoading(false);
     }
@@ -64,11 +70,13 @@ export default function MembershipPayClient({
 
   useEffect(() => {
     if (mode !== "success" || !data || data.status === "paid") return;
+    if (pollAttempts >= SUCCESS_POLL_MAX) return;
     const timer = window.setTimeout(() => {
+      setPollAttempts((n) => n + 1);
       void load();
-    }, 2500);
+    }, SUCCESS_POLL_MS);
     return () => window.clearTimeout(timer);
-  }, [mode, data, load]);
+  }, [mode, data, load, pollAttempts]);
 
   const startCheckout = async () => {
     if (!data?.canPay || paying) return;
@@ -112,30 +120,60 @@ export default function MembershipPayClient({
   const cancelledQuote = data.status === "cancelled";
   const color = data.primaryColor || "#1A23FF";
 
+  if (mode === "success") {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center bg-[#F4F7FB] px-4 py-10">
+        <div className="w-full max-w-lg rounded-[1.5rem] bg-white px-6 py-8 text-center shadow-sm">
+          <ClubHeader data={data} color={color} />
+          {paid ? (
+            <>
+              <h2 className="mt-6 text-xl font-semibold text-[#0F172A]">Paiement reçu</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[#475569]">
+                Merci, votre cotisation a bien été payée.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="mt-6 text-xl font-semibold text-[#0F172A]">
+                Paiement en cours de confirmation
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-[#475569]">
+                Votre paiement a bien été transmis. La confirmation peut prendre quelques instants.
+              </p>
+            </>
+          )}
+
+          <div className="mt-6 space-y-3 text-left text-sm">
+            <Row label="Club" value={data.clubName} />
+            {data.numero ? <Row label="Référence" value={data.numero} /> : null}
+            <Row label="Montant" value={formatAmount(data.amount, data.currency)} />
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => window.close()}
+              className="inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-semibold text-white"
+              style={{ backgroundColor: color }}
+            >
+              Fermer
+            </button>
+            <a
+              href={`/cotisation/${encodeURIComponent(token)}`}
+              className="inline-flex w-full items-center justify-center rounded-full border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#334155]"
+            >
+              Retour
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-[#F4F7FB] px-4 py-10">
       <div className="w-full max-w-lg rounded-[1.5rem] bg-white px-6 py-8 shadow-sm">
-        <div className="flex items-center gap-3">
-          {data.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={data.logoUrl}
-              alt=""
-              className="h-12 w-12 rounded-xl object-contain"
-            />
-          ) : (
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-semibold text-white"
-              style={{ backgroundColor: color }}
-            >
-              {data.clubName.slice(0, 1).toUpperCase()}
-            </div>
-          )}
-          <div>
-            <p className="text-sm font-medium text-[#64748B]">Cotisation</p>
-            <h1 className="text-lg font-semibold text-[#0F172A]">{data.clubName}</h1>
-          </div>
-        </div>
+        <ClubHeader data={data} color={color} />
 
         <div className="mt-6 space-y-3 text-sm">
           <Row label="Intitulé" value={data.title} />
@@ -144,25 +182,15 @@ export default function MembershipPayClient({
           <Row label="Montant" value={formatAmount(data.amount, data.currency)} />
           <Row
             label="Statut"
-            value={
-              paid ? "Payée" : cancelledQuote ? "Annulée" : "À payer"
-            }
+            value={paid ? "Payée" : cancelledQuote ? "Annulée" : "À payer"}
           />
         </div>
-
-        {mode === "success" ? (
-          <p className="mt-6 rounded-2xl bg-[#F8FAFC] px-4 py-3 text-sm leading-relaxed text-[#475569]">
-            {paid
-              ? "Votre paiement a été confirmé. Merci."
-              : "Votre paiement est en cours de confirmation. Cette page ne suffit pas à marquer la cotisation comme payée : la confirmation est automatique dès réception du paiement."}
-          </p>
-        ) : null}
 
         {cancelled && !paid ? (
           <p className="mt-4 text-sm text-amber-800">Le paiement a été interrompu. Vous pouvez réessayer.</p>
         ) : null}
 
-        {mode === "pay" && data.canPay ? (
+        {data.canPay ? (
           <button
             type="button"
             disabled={paying}
@@ -174,13 +202,39 @@ export default function MembershipPayClient({
           </button>
         ) : null}
 
-        {mode === "pay" && paid ? (
+        {paid ? (
           <p className="mt-6 text-center text-sm font-medium text-emerald-700">Cette cotisation est déjà payée.</p>
         ) : null}
 
         {cancelledQuote ? (
           <p className="mt-6 text-center text-sm text-[#64748B]">Cette cotisation n’est plus payable.</p>
         ) : null}
+      </div>
+    </div>
+  );
+}
+
+function ClubHeader({ data, color }: { data: QuotePayDto; color: string }) {
+  return (
+    <div className="flex items-center gap-3 text-left">
+      {data.logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={data.logoUrl}
+          alt=""
+          className="h-12 w-12 rounded-xl object-contain"
+        />
+      ) : (
+        <div
+          className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-semibold text-white"
+          style={{ backgroundColor: color }}
+        >
+          {data.clubName.slice(0, 1).toUpperCase()}
+        </div>
+      )}
+      <div>
+        <p className="text-sm font-medium text-[#64748B]">Cotisation</p>
+        <h1 className="text-lg font-semibold text-[#0F172A]">{data.clubName}</h1>
       </div>
     </div>
   );

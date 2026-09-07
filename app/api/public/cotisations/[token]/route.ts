@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
-import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
+import { resolveMembershipPaymentMethod, isMembershipPaidStatus } from "@/lib/quotes/payment-method";
 
 export const runtime = "nodejs";
 
@@ -38,22 +38,29 @@ export async function GET(
 
     const client = Array.isArray(document.client) ? document.client[0] : document.client;
     const method = resolveMembershipPaymentMethod(document.payment_method);
-    const paid = document.status === "accepte";
+    const paid = isMembershipPaidStatus(document.status);
 
-    return NextResponse.json({
-      title: document.title || "Cotisation",
-      numero: document.numero,
-      memberName: (client as { nom?: string } | null)?.nom || "Membre",
-      amount: Number(document.total_ttc) || 0,
-      currency: "CHF",
-      status: paid ? "paid" : document.status === "refuse" ? "cancelled" : "pending",
-      dueDate: document.date_echeance,
-      paymentMethod: method,
-      canPay: method === "stripe" && !paid && document.status !== "refuse",
-      clubName: profile?.company_name || "Club",
-      logoUrl: profile?.logo_url || null,
-      primaryColor: profile?.primary_color || OBILLZ_BRAND_PRIMARY,
-    });
+    return NextResponse.json(
+      {
+        title: document.title || "Cotisation",
+        numero: document.numero,
+        memberName: (client as { nom?: string } | null)?.nom || "Membre",
+        amount: Number(document.total_ttc) || 0,
+        currency: "CHF",
+        status: paid ? "paid" : document.status === "refuse" ? "cancelled" : "pending",
+        dueDate: document.date_echeance,
+        paymentMethod: method,
+        canPay: method === "stripe" && !paid && document.status !== "refuse",
+        clubName: profile?.company_name || "Club",
+        logoUrl: profile?.logo_url || null,
+        primaryColor: profile?.primary_color || OBILLZ_BRAND_PRIMARY,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erreur serveur";
     return NextResponse.json({ error: message }, { status: 500 });
