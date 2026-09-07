@@ -1,7 +1,9 @@
 import type { VisualRenderProps } from "../types";
-import { mixToward } from "../colors";
+import { contrastText, mixToward } from "../colors";
 import {
+  ArcBurst,
   CoverPhoto,
+  GrainOverlay,
   LogoMark,
   isStory,
   visualDisplayFont,
@@ -10,147 +12,187 @@ import {
 
 export function ClubEventTemplate01({ data, format }: VisualRenderProps) {
   const story = isStory(format);
-  const ink = data.textColor || "#FFFFFF";
+  const primary = data.primaryColor;
+  const accent = data.accentColor;
+  const secondary = data.secondaryColor;
+  const paper = mixToward(secondary, "#FFFFFF", 0.92);
+  const ink = contrastText(paper);
+  const onPrimary = contrastText(primary);
+  const padX = story ? 64 : 48;
+  const collageTop = story ? 210 : 150;
+  const collageH = story ? 820 : 430;
+  const photoW = story ? 620 : 560;
+  const photoH = story ? 620 : 360;
 
   return (
-    <div className={visualDisplayFont.className} style={visualRootStyle(format)}>
-      <CoverPhoto
-        src={data.eventImageUrl}
-        fit={data.eventImageFit}
-        alt="Photo événement"
-        fallback={`linear-gradient(200deg, ${mixToward(data.primaryColor, "#000000", 0.2)} 0%, ${data.secondaryColor} 70%)`}
-      />
+    <div
+      className={visualDisplayFont.className}
+      style={{ ...visualRootStyle(format), color: ink, background: paper }}
+    >
       <div
+        aria-hidden
         style={{
           position: "absolute",
           inset: 0,
-          background: `linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.08) 40%, ${data.secondaryColor} 100%)`,
+          opacity: 0.55,
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.85  0 0 0 0 0.85  0 0 0 0 0.82  0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>\")",
+          backgroundSize: "240px 240px",
         }}
       />
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: story ? "46%" : "42%",
-          height: story ? "38%" : "44%",
-          background: data.primaryColor,
-          clipPath: "polygon(28% 0, 100% 0, 100% 100%, 0 100%)",
-          opacity: 0.92,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: story ? 36 : 28,
-          right: story ? 36 : 28,
-          width: story ? 18 : 14,
-          height: story ? 160 : 110,
-          background: data.accentColor,
-        }}
-      />
+      <GrainOverlay opacity={0.08} />
 
-      <div style={{ position: "absolute", left: story ? 56 : 44, top: story ? 56 : 40 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: padX,
+          top: story ? 48 : 36,
+        }}
+      >
         <LogoMark
           src={data.eventLogoUrl || data.clubLogoUrl}
-          size={story ? 112 : 88}
+          size={story ? 92 : 72}
           alt={data.title || "Club"}
-          ring="rgba(255,255,255,0.7)"
+          background="#FFFFFF"
+          foreground="#0B1220"
+          paddingRatio={0.14}
         />
       </div>
 
       <div
         style={{
           position: "absolute",
-          left: story ? 56 : 44,
-          right: story ? 56 : 44,
-          bottom: story ? 64 : 48,
-          color: ink,
+          left: story ? 90 : 70,
+          top: collageTop,
+          width: story ? 520 : 480,
+          height: collageH,
+          background: primary,
+          overflow: "hidden",
         }}
       >
-        {data.subtitle ? (
-          <div
-            style={{
-              fontSize: 20,
-              letterSpacing: "0.32em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              marginBottom: 18,
-              opacity: 0.85,
-            }}
-          >
-            {data.subtitle}
-          </div>
-        ) : null}
+        <ArcBurst color={accent} size={story ? 560 : 420} top={-40} left={-80} rotate={-18} />
+        <ArcBurst color={mixToward(accent, "#FFFFFF", 0.15)} size={story ? 420 : 300} bottom={-60} right={-90} rotate={140} />
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: story ? 280 : 220,
+          top: collageTop + (story ? 90 : 40),
+          width: photoW,
+          height: photoH,
+          background: "#111",
+          boxShadow: "18px 22px 0 rgba(11,18,32,0.12)",
+          transform: "rotate(3.5deg)",
+          overflow: "hidden",
+        }}
+      >
+        <CoverPhoto
+          src={data.eventImageUrl}
+          fit={data.eventImageFit}
+          alt="Photo événement"
+          fallback={`linear-gradient(145deg, ${mixToward(secondary, "#000000", 0.2)}, ${secondary})`}
+        />
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: padX,
+          right: padX,
+          bottom: story ? 56 : 40,
+        }}
+      >
         <div
           style={{
-            fontSize: story ? 92 : 68,
-            lineHeight: 0.9,
+            display: "inline-block",
+            background: "#FFFFFF",
+            border: `3px solid ${ink}`,
+            color: ink,
+            fontSize: story ? 20 : 15,
             fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "-0.03em",
-            maxWidth: "96%",
+            letterSpacing: "0.02em",
+            padding: "8px 14px",
+            marginBottom: 10,
           }}
         >
-          {data.title || "Événement du club"}
+          {data.subtitle || "Événement du club"}
         </div>
+
+        <div style={{ background: primary, color: onPrimary, padding: story ? "22px 28px 18px" : "16px 22px 14px" }}>
+          <div
+            style={{
+              fontSize: story ? 64 : 44,
+              fontWeight: 900,
+              lineHeight: 0.9,
+              letterSpacing: "-0.04em",
+              textTransform: "uppercase",
+            }}
+          >
+            {data.title || "Soirée du club"}
+          </div>
+        </div>
+        <div style={{ height: 10, background: accent }} />
 
         <div
           style={{
-            marginTop: story ? 36 : 24,
+            marginTop: story ? 22 : 16,
             display: "flex",
-            gap: 16,
-            flexWrap: "wrap",
+            alignItems: "stretch",
+            gap: 22,
+            color: ink,
           }}
         >
-          <Chip color={data.primaryColor} label={data.date || "Date à confirmer"} />
-          <Chip color="rgba(255,255,255,0.12)" label={data.time || "—"} />
-        </div>
-        <div
-          style={{
-            marginTop: 18,
-            fontSize: story ? 32 : 26,
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          {data.venue || "Lieu à confirmer"}
+          <div
+            style={{
+              fontSize: story ? 36 : 26,
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {data.date || "Date à confirmer"}
+          </div>
+          <div style={{ width: 3, background: ink, opacity: 0.85 }} />
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 4 }}>
+            <div style={{ fontSize: story ? 32 : 22, fontWeight: 800, textTransform: "uppercase" }}>
+              {data.time || "—"}
+            </div>
+            <div
+              style={{
+                fontSize: story ? 26 : 18,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                maxWidth: 520,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {data.venue || "Lieu à confirmer"}
+            </div>
+          </div>
         </div>
         {data.extraText ? (
           <div
             style={{
-              marginTop: 16,
-              fontSize: 22,
-              fontWeight: 400,
-              maxWidth: 760,
-              opacity: 0.82,
-              lineHeight: 1.35,
-              textTransform: "none",
-              letterSpacing: 0,
+              marginTop: story ? 16 : 12,
+              fontSize: story ? 20 : 16,
+              fontWeight: 500,
+              opacity: 0.72,
+              maxWidth: 820,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {data.extraText}
           </div>
         ) : null}
       </div>
-    </div>
-  );
-}
-
-function Chip({ color, label }: { color: string; label: string }) {
-  return (
-    <div
-      style={{
-        background: color,
-        padding: "12px 18px",
-        fontSize: 20,
-        fontWeight: 600,
-        letterSpacing: "0.08em",
-        textTransform: "uppercase",
-      }}
-    >
-      {label}
     </div>
   );
 }

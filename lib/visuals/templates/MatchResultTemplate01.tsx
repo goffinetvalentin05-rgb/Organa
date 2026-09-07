@@ -1,197 +1,407 @@
 import type { VisualRenderProps } from "../types";
-import { mixToward } from "../colors";
+import { contrastText, mixToward } from "../colors";
 import {
+  BrushStroke,
   CoverPhoto,
+  DiagonalStripes,
+  GrainOverlay,
+  HalftoneCorner,
   LogoMark,
+  MarbleField,
+  TORN_PHOTO_CLIP,
   isStory,
+  scoreFontSize,
+  splitDisplayTitle,
   visualDisplayFont,
   visualRootStyle,
 } from "./shared";
 
 export function MatchResultTemplate01({ data, format }: VisualRenderProps) {
+  if (data.teamImageUrl) {
+    return <MatchResultPhoto data={data} format={format} />;
+  }
+  return <MatchResultBlocks data={data} format={format} />;
+}
+
+function MatchResultBlocks({ data, format }: VisualRenderProps) {
   const story = isStory(format);
   const ink = data.textColor || "#FFFFFF";
+  const primary = data.primaryColor;
+  const accent = data.accentColor;
+  const secondary = data.secondaryColor;
+  const onAccent = contrastText(accent);
+  const onPrimary = contrastText(primary);
+  const [line1, line2] = splitDisplayTitle(data.title || "Résultat", "MATCH");
+  const home = data.homeTeam || "Domicile";
+  const away = data.awayTeam || "Extérieur";
+  const label = (data.resultLabel || "FULL-TIME").toUpperCase();
+  const padX = story ? 72 : 56;
+  const padY = story ? 64 : 44;
+  const towerW = story ? 430 : 360;
+  const towerH = story ? 720 : 520;
+  const tile = story ? 168 : 128;
+  const homeScoreSize = scoreFontSize(data.homeScore || "0", story);
+  const awayScoreSize = scoreFontSize(data.awayScore || "0", story);
 
   return (
     <div className={visualDisplayFont.className} style={visualRootStyle(format)}>
-      <CoverPhoto
-        src={data.teamImageUrl}
-        fit={data.teamImageFit}
-        alt="Photo équipe"
-        fallback={`radial-gradient(circle at 30% 20%, ${mixToward(data.primaryColor, "#FFFFFF", 0.12)}, ${data.secondaryColor})`}
-      />
+      <MarbleField primary={primary} secondary={secondary} />
+      <HalftoneCorner color={mixToward(primary, "#000000", 0.45)} size={story ? 380 : 280} top={-20} left={-20} />
+      <HalftoneCorner color={mixToward(primary, "#000000", 0.45)} size={story ? 340 : 240} bottom={-30} right={-20} />
+
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: `linear-gradient(180deg, ${mixToward(data.secondaryColor, "#000000", 0.15)} 0%, rgba(0,0,0,0.18) 38%, ${data.secondaryColor} 100%)`,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: story ? 18 : 14,
-          background: data.primaryColor,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          width: story ? 28 : 20,
-          height: "100%",
-          background: data.accentColor,
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          left: story ? 56 : 48,
-          right: story ? 72 : 56,
-          top: story ? 72 : 48,
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          flexDirection: "column",
+          padding: `${padY}px ${padX}px ${story ? 56 : 40}px`,
           color: ink,
         }}
       >
-        <div>
+        <header style={{ textAlign: "center" }}>
           <div
             style={{
-              fontSize: 18,
+              fontSize: story ? 22 : 16,
+              fontWeight: 700,
               letterSpacing: "0.42em",
               textTransform: "uppercase",
-              opacity: 0.7,
-              fontWeight: 600,
+              opacity: 0.78,
             }}
           >
-            {data.title || "Résultat"}
+            {home}
           </div>
-          {data.resultLabel ? (
-            <div
-              style={{
-                marginTop: 16,
-                display: "inline-block",
-                background: data.primaryColor,
-                color: ink,
-                padding: "10px 18px",
-                fontSize: 18,
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-              }}
-            >
-              {data.resultLabel}
-            </div>
-          ) : null}
-        </div>
-        <LogoMark src={data.clubLogoUrl} size={story ? 96 : 80} alt={data.homeTeam || "DOM"} />
-      </div>
+          <div
+            style={{
+              marginTop: story ? 18 : 8,
+              fontSize: story ? 168 : 108,
+              fontWeight: 900,
+              lineHeight: 0.78,
+              letterSpacing: "-0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            {line1}
+          </div>
+          <div
+            style={{
+              marginTop: story ? -8 : -4,
+              fontSize: story ? 118 : 78,
+              fontWeight: 800,
+              lineHeight: 0.82,
+              letterSpacing: "-0.04em",
+              textTransform: "uppercase",
+              color: accent,
+            }}
+          >
+            {line2}
+          </div>
+          <div
+            style={{
+              marginTop: story ? 22 : 12,
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "center",
+              gap: 14,
+              fontSize: story ? 34 : 24,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span style={ellipsis(story ? 380 : 300)}>{home}</span>
+            <span style={{ color: accent, fontSize: story ? 28 : 20, fontWeight: 800 }}>V</span>
+            <span style={ellipsis(story ? 380 : 300)}>{away}</span>
+          </div>
+        </header>
 
-      <div
-        style={{
-          position: "absolute",
-          left: story ? 48 : 40,
-          right: story ? 64 : 48,
-          top: story ? "34%" : "30%",
-          color: ink,
-        }}
-      >
-        <TeamRow
-          name={data.homeTeam || "Domicile"}
-          logo={data.clubLogoUrl}
-          score={data.homeScore || "0"}
-          color={data.primaryColor}
-          story={story}
-        />
         <div
           style={{
-            height: 4,
-            margin: story ? "22px 0" : "14px 0",
-            background: "rgba(255,255,255,0.18)",
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 0,
           }}
-        />
-        <TeamRow
-          name={data.awayTeam || "Extérieur"}
-          logo={data.opponentLogoUrl}
-          score={data.awayScore || "0"}
-          color="transparent"
-          story={story}
-        />
-      </div>
+        >
+          <div style={{ position: "relative", width: towerW, height: towerH }}>
+            <div style={{ position: "absolute", left: -tile * 0.42, top: tile * 0.12, zIndex: 2 }}>
+              <LogoMark
+                src={data.clubLogoUrl}
+                size={tile}
+                alt={home}
+                background={accent}
+                foreground={onAccent}
+                paddingRatio={0.18}
+              />
+            </div>
 
-      <div
-        style={{
-          position: "absolute",
-          left: story ? 56 : 48,
-          bottom: story ? 64 : 48,
-          fontSize: 16,
-          letterSpacing: "0.36em",
-          textTransform: "uppercase",
-          opacity: 0.55,
-          color: ink,
-        }}
-      >
-        Full time
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                background: "#F8FAFC",
+                display: "flex",
+                flexDirection: "column",
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <div style={scoreCell(primary, homeScoreSize, { paddingTop: tile * 0.12 })}>
+                {data.homeScore || "0"}
+              </div>
+              <div
+                style={{
+                  position: "relative",
+                  background: primary,
+                  color: onPrimary,
+                  textAlign: "center",
+                  fontSize: story ? 22 : 16,
+                  fontWeight: 800,
+                  letterSpacing: "0.28em",
+                  padding: story ? "14px 16px" : "10px 12px",
+                }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    left: -28,
+                    right: -28,
+                    top: "50%",
+                    height: 3,
+                    background: primary,
+                    transform: "translateY(-50%)",
+                  }}
+                />
+                <span style={{ position: "relative" }}>{label}</span>
+              </div>
+              <div style={scoreCell(primary, awayScoreSize, { paddingBottom: tile * 0.12 })}>
+                {data.awayScore || "0"}
+              </div>
+            </div>
+
+            <div style={{ position: "absolute", right: -tile * 0.42, bottom: tile * 0.12, zIndex: 2 }}>
+              <LogoMark
+                src={data.opponentLogoUrl}
+                size={tile}
+                alt={away}
+                background={accent}
+                foreground={onAccent}
+                paddingRatio={0.18}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function TeamRow({
-  name,
-  logo,
-  score,
-  color,
-  story,
-}: {
-  name: string;
-  logo: string | null;
-  score: string;
-  color: string;
-  story: boolean;
-}) {
+function MatchResultPhoto({ data, format }: VisualRenderProps) {
+  const story = isStory(format);
+  const ink = data.textColor || "#FFFFFF";
+  const primary = data.primaryColor;
+  const accent = data.accentColor;
+  const secondary = data.secondaryColor;
+  const onAccent = contrastText(accent);
+  const [line1, line2] = splitDisplayTitle(data.title || "Résultat", "MATCH");
+  const home = data.homeTeam || "Domicile";
+  const away = data.awayTeam || "Extérieur";
+  const bannerH = story ? 240 : 188;
+  const logoSize = story ? 108 : 84;
+  const photoTop = story ? 300 : 220;
+  const scoreSize = scoreFontSize(
+    (data.homeScore || "0").length >= (data.awayScore || "0").length
+      ? data.homeScore || "0"
+      : data.awayScore || "0",
+    story
+  );
+
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 24,
-        padding: story ? "18px 22px" : "12px 16px",
-        background: color === "transparent" ? "rgba(255,255,255,0.06)" : color,
-      }}
-    >
-      <LogoMark src={logo} size={story ? 84 : 68} alt={name} />
+    <div className={visualDisplayFont.className} style={visualRootStyle(format)}>
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(180deg, ${mixToward(primary, "#000000", 0.06)} 0%, ${primary} 40%, ${mixToward(primary, "#000000", 0.2)} 100%)`,
+        }}
+      />
+      <HalftoneCorner color={mixToward(accent, "#FFFFFF", 0.18)} size={story ? 440 : 300} top={-30} left={-30} />
+      <HalftoneCorner color={mixToward(accent, "#FFFFFF", 0.12)} size={story ? 320 : 220} bottom={bannerH} right={-20} />
+      <DiagonalStripes color={accent} width={story ? 120 : 84} right={0} top={photoTop + 30} height={story ? 760 : 400} />
+      <BrushStroke color={accent} width={story ? 72 : 52} height={story ? 600 : 340} left={0} top={photoTop + 90} />
+      <GrainOverlay opacity={0.1} />
+
       <div
         style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: story ? 42 : 32,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "-0.02em",
-          lineHeight: 1,
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: photoTop,
+          bottom: bannerH,
+          overflow: "hidden",
+          clipPath: TORN_PHOTO_CLIP,
         }}
       >
-        {name}
+        <CoverPhoto
+          src={data.teamImageUrl}
+          fit={data.teamImageFit}
+          alt="Photo équipe"
+          fallback={`linear-gradient(160deg, ${secondary}, ${mixToward(secondary, "#000000", 0.2)})`}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(180deg, rgba(0,0,0,0.06) 0%, transparent 30%, rgba(0,0,0,0.28) 100%)",
+          }}
+        />
       </div>
+
       <div
         style={{
-          fontSize: story ? 128 : 96,
-          fontWeight: 700,
-          lineHeight: 0.8,
-          letterSpacing: "-0.04em",
-          minWidth: story ? 140 : 110,
-          textAlign: "right",
+          position: "absolute",
+          left: story ? 48 : 36,
+          right: story ? 48 : 36,
+          top: story ? 48 : 32,
+          color: ink,
+          textAlign: "center",
         }}
       >
-        {score}
+        <div
+          style={{
+            fontSize: story ? 20 : 15,
+            fontWeight: 700,
+            letterSpacing: "0.38em",
+            textTransform: "uppercase",
+            opacity: 0.8,
+          }}
+        >
+          {home}
+        </div>
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: story ? 128 : 84,
+            fontWeight: 900,
+            lineHeight: 0.78,
+            letterSpacing: "-0.05em",
+            textTransform: "uppercase",
+          }}
+        >
+          {line1}
+        </div>
+        <div
+          style={{
+            marginTop: -4,
+            fontSize: story ? 88 : 58,
+            fontWeight: 800,
+            lineHeight: 0.82,
+            letterSpacing: "-0.04em",
+            textTransform: "uppercase",
+            color: accent,
+          }}
+        >
+          {line2}
+        </div>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: bannerH,
+          background: accent,
+          color: onAccent,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: story ? "0 32px" : "0 24px",
+          gap: 16,
+        }}
+      >
+        <LogoMark
+          src={data.clubLogoUrl}
+          size={logoSize}
+          alt={home}
+          background="rgba(11,18,32,0.92)"
+          foreground="#FFFFFF"
+          paddingRatio={0.14}
+        />
+        <div
+          style={{
+            fontSize: scoreSize * 0.55,
+            fontWeight: 900,
+            lineHeight: 0.8,
+            letterSpacing: "-0.06em",
+            minWidth: story ? 90 : 70,
+            textAlign: "center",
+          }}
+        >
+          {data.homeScore || "0"}
+        </div>
+        <div
+          style={{
+            fontSize: story ? 28 : 20,
+            fontWeight: 700,
+            fontStyle: "italic",
+            opacity: 0.7,
+          }}
+        >
+          vs
+        </div>
+        <div
+          style={{
+            fontSize: scoreSize * 0.55,
+            fontWeight: 900,
+            lineHeight: 0.8,
+            letterSpacing: "-0.06em",
+            minWidth: story ? 90 : 70,
+            textAlign: "center",
+          }}
+        >
+          {data.awayScore || "0"}
+        </div>
+        <LogoMark
+          src={data.opponentLogoUrl}
+          size={logoSize}
+          alt={away}
+          background="rgba(11,18,32,0.92)"
+          foreground="#FFFFFF"
+          paddingRatio={0.14}
+        />
       </div>
     </div>
   );
+}
+
+function ellipsis(maxWidth: number) {
+  return {
+    maxWidth,
+    overflow: "hidden" as const,
+    textOverflow: "ellipsis" as const,
+    whiteSpace: "nowrap" as const,
+  };
+}
+
+function scoreCell(
+  color: string,
+  fontSize: number,
+  extra: Record<string, number>
+) {
+  return {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color,
+    fontSize,
+    fontWeight: 900,
+    lineHeight: 0.8,
+    letterSpacing: "-0.06em",
+    ...extra,
+  };
 }
