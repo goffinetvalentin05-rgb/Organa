@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { syncMemberParticipationsWithPlanning } from "@/lib/planning/memberParticipations";
+import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
 import { CLIENTS_PLANNING_COLUMNS } from "@/lib/clients/safeSelect";
 
 export const runtime = "nodejs";
