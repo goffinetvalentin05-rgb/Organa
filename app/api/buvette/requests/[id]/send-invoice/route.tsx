@@ -139,7 +139,7 @@ export async function POST(
         .from("clients")
         .insert({
           user_id: guard.clubId,
-          name: fullName || reqData.email,
+          nom: fullName || reqData.email,
           email: reqData.email,
           role: "player",
         })
