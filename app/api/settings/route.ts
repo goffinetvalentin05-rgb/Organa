@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { DEFAULT_COMPANY_SETTINGS, getCompanySettings } from "@/lib/utils/company-settings";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -77,13 +78,15 @@ export async function GET(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
     const actorId = guard.userId;
 
     console.log("[API][settings] GET - club:", clubId, "actor:", actorId);
 
-    // Profil Â« entreprise Â» du club = ligne profiles.user_id = propriÃ©taire du club
-    const { data: profileData, error: fetchError } = await supabase
+    // Lecture privÃ©e (iban, clÃ© Resend, QR) : service_role aprÃ¨s ACCESS_SETTINGS.
+    // Un member n'a plus de SELECT RLS sur public.profiles.
+    const { data: profileData, error: fetchError } = await admin
       .from("profiles")
       .select(
         "user_id, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"

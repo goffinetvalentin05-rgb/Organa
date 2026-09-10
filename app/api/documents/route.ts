@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { calculerTotalHT, calculerTVA, calculerTotalTTC } from "@/lib/utils/calculations";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
+import { CLIENTS_SAFE_COLUMNS } from "@/lib/clients/safeSelect";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
 import type { LigneDocument } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
@@ -103,7 +105,7 @@ type DocumentDbRow = {
 };
 
 const DOCUMENT_SELECT =
-  "id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, payment_method, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)";
+  `id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, payment_method, client:clients(${CLIENTS_SAFE_COLUMNS}), sponsor:sponsor_contracts(id, sponsor_name, title)`;
 
 type DocumentInsertPayload = Record<string, unknown> & {
   user_id: string;
@@ -141,12 +143,13 @@ export async function GET(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const { searchParams } = request.nextUrl;
     const type = searchParams.get("type");
     const id = searchParams.get("id");
 
-    let query = supabase
+    let query = admin
       .from("documents")
       .select(DOCUMENT_SELECT)
       .eq("user_id", guard.clubId);
@@ -216,6 +219,7 @@ export async function POST(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const user = guard.ctx.user;
 
     console.log("[API][documents][POST] User authentifié:", user.id);
@@ -307,11 +311,12 @@ export async function POST(request: NextRequest) {
 
     if (type === "quote" || resolvedRecipientType === "member") {
       const memberId = clientId as string;
-      const { data: client, error: clientError } = await supabase
+      const { data: client, error: clientError } = await admin
         .from("clients")
         .select("id")
         .eq("id", memberId)
         .eq("user_id", guard.clubId)
+        .is("deleted_at", null)
         .single();
 
       if (clientError || !client) {
@@ -943,6 +948,7 @@ export async function PATCH(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const user = guard.ctx.user;
 
     // Vérifier l'accès en écriture (trial actif ou abonnement)
@@ -1138,11 +1144,12 @@ export async function PATCH(request: NextRequest) {
 
       if (recipientCheck.type === "member") {
         const memberId = clientId as string;
-        const { data: client, error: clientError } = await supabase
+        const { data: client, error: clientError } = await admin
           .from("clients")
           .select("id")
           .eq("id", memberId)
           .eq("user_id", guard.clubId)
+          .is("deleted_at", null)
           .single();
 
         if (clientError || !client) {
@@ -1189,11 +1196,12 @@ export async function PATCH(request: NextRequest) {
       );
     } else if (clientId) {
       // Vérifier que le client appartient au club
-      const { data: client, error: clientError } = await supabase
+      const { data: client, error: clientError } = await admin
         .from("clients")
         .select("id")
         .eq("id", clientId)
         .eq("user_id", guard.clubId)
+        .is("deleted_at", null)
         .single();
 
       if (clientError || !client) {

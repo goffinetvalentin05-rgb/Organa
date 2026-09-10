@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -46,13 +47,16 @@ export async function GET(
   const guard = await requirePermission(PERMISSIONS.VIEW_MEMBERS);
   if ("error" in guard) return guard.error;
 
-  const supabase = await createClient();
+  // Lecture service_role après VIEW_MEMBERS : un member n’a plus de SELECT RLS
+  // sur public.clients. Filtre club + deleted_at (équivalent de l’ancienne policy).
+  const admin = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from("clients")
     .select("*")
     .eq("id", id)
     .eq("user_id", guard.clubId)
+    .is("deleted_at", null)
     .single();
 
   if (error) {
@@ -72,7 +76,7 @@ export async function GET(
   }
 
   const normalized = normalizeClientsDbRow(data as Record<string, unknown>);
-  if (!normalized) {
+  if (!normalized || normalized.user_id !== guard.clubId) {
     return NextResponse.json(
       { error: "Client introuvable", code: "CLIENT_NOT_FOUND" },
       { status: 404 }
@@ -111,6 +115,7 @@ export async function PUT(
   if ("error" in guard) return guard.error;
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   const user = guard.ctx.user;
 
   // Vérifier l'accès en écriture (trial actif ou abonnement)
@@ -139,11 +144,12 @@ export async function PUT(
     );
   }
 
-  const { data: existingRow, error: loadExistingErr } = await supabase
+  const { data: existingRow, error: loadExistingErr } = await admin
     .from("clients")
     .select("*")
     .eq("id", id)
     .eq("user_id", guard.clubId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (loadExistingErr || !existingRow) {
@@ -161,7 +167,7 @@ export async function PUT(
     user.id
   );
 
-  const { data: updated, error: updateError } = await supabase
+  const { data: updated, error: updateError } = await admin
     .from("clients")
     .update(patch)
     .eq("id", id)
@@ -177,7 +183,7 @@ export async function PUT(
     );
   }
 
-  if (!updated) {
+  if (!updated || (updated as { user_id?: string }).user_id !== guard.clubId) {
     return NextResponse.json(
       { error: "Client introuvable ou non autorisé" },
       { status: 404 }

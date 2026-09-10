@@ -115,6 +115,9 @@ export function createThenableSupabaseMock(matchers: OpMatcher[]) {
       order() {
         return chain;
       },
+      limit() {
+        return chain;
+      },
       ...buildTerminal(),
     };
 
@@ -151,6 +154,8 @@ export function createThenableSupabaseMock(matchers: OpMatcher[]) {
       select() {
         return {
           single: () =>
+            resolve({ ...state, filters: cloneFilters(state.filters) }),
+          maybeSingle: () =>
             resolve({ ...state, filters: cloneFilters(state.filters) }),
         };
       },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
@@ -82,9 +83,10 @@ export async function GET(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     if (resource === "invoices") {
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from("documents")
         .select(
           "numero, status, date_creation, total_ht, total_tva, total_ttc, client:clients(nom)"
@@ -137,10 +139,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (resource === "clients") {
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from("clients")
         .select("nom, email, telephone, adresse, created_at")
         .eq("user_id", guard.clubId)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false });
 
       if (error) {

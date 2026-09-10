@@ -16,7 +16,7 @@ async function loadAssociationsContext() {
   const [{ data: profile }, { data: membership }, { data: authUser }] =
     await Promise.all([
       supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("company_name, product_type, logo_url, logo_path")
         .eq("user_id", access.clubId)
         .maybeSingle(),

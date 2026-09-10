@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
@@ -33,6 +34,7 @@ export async function POST(
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const body = await request.json();
     const amount = Number(body?.amount);
@@ -124,18 +126,19 @@ export async function POST(
     const fullName = `${reqData.first_name} ${reqData.last_name}`.trim();
     let clientId: string | null = null;
 
-    const { data: existingClientByEmail } = await supabase
+    const { data: existingClientByEmail } = await admin
       .from("clients")
       .select("id")
       .eq("user_id", guard.clubId)
       .eq("email", reqData.email)
+      .is("deleted_at", null)
       .limit(1)
       .maybeSingle();
 
     if (existingClientByEmail?.id) {
       clientId = existingClientByEmail.id;
     } else {
-      const { data: createdClient, error: createClientError } = await supabase
+      const { data: createdClient, error: createClientError } = await admin
         .from("clients")
         .insert({
           user_id: guard.clubId,

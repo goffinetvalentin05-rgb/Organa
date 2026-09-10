@@ -12,7 +12,7 @@ export default async function AssociationsEspacePage() {
 
   const [{ data: profile }, { data: membership }] = await Promise.all([
     supabase
-      .from("profiles")
+      .from("profiles_public")
       .select("company_name, logo_url")
       .eq("user_id", access.clubId)
       .maybeSingle(),

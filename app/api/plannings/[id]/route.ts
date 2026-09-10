@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { syncMemberParticipationsWithPlanning } from "@/lib/planning/memberParticipations";
-import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
+import { CLIENTS_PLANNING_COLUMNS } from "@/lib/clients/safeSelect";
 
 export const runtime = "nodejs";
 
@@ -95,7 +96,8 @@ export async function GET(
     let assignments: any[] = [];
 
     if (slotIds.length > 0) {
-      const { data: assignmentsData } = await supabase
+      const admin = createAdminClient();
+      const { data: assignmentsData } = await admin
         .from("planning_assignments")
         .select(`
           id,
@@ -109,12 +111,7 @@ export async function GET(
           public_phone,
           member_link_status,
           clients (
-            id,
-            nom,
-            email,
-            telephone,
-            role,
-            category
+            ${CLIENTS_PLANNING_COLUMNS}
           )
         `)
         .in("slot_id", slotIds);

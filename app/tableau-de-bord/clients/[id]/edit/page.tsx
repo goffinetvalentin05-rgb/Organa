@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import EditClientForm from "./EditClientForm";
 import { requireCurrentClub } from "@/lib/auth/rbac";
@@ -22,13 +22,14 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
     notFound();
   }
 
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from("clients")
     .select("*")
     .eq("id", id)
     .eq("user_id", clubId)
+    .is("deleted_at", null)
     .single();
 
   if (error || !data) {

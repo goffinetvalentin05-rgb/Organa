@@ -78,7 +78,7 @@ export async function requireAssociationSettingsAccess(options?: {
         .is("deleted_at", null)
         .maybeSingle(),
       supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("product_type")
         .eq("user_id", clubId)
         .maybeSingle(),

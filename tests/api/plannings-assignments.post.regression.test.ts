@@ -20,6 +20,10 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: vi.fn(),
+}));
+
 vi.mock("@/lib/auth/permissions", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/auth/permissions")>();
   return {
@@ -29,6 +33,7 @@ vi.mock("@/lib/auth/permissions", async (importOriginal) => {
 });
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/lib/auth/permissions";
 
 function guardOk() {
@@ -155,6 +160,7 @@ describe("POST /api/plannings/[id]/assignments — créneaux", () => {
       ]),
     ]);
     vi.mocked(createClient).mockResolvedValue(client as never);
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
 
     const req = new NextRequest(
       `http://localhost/api/plannings/${PLANNING_ID}/assignments`,

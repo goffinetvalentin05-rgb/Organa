@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireCurrentClub } from "@/lib/auth/rbac";
 import { checkPermission, PERMISSIONS } from "@/lib/auth/permissions";
 import MemberDetailView, {
@@ -31,11 +32,13 @@ export default async function ClientDetailPage({ params }: PageProps) {
   const manageOk = await checkPermission(PERMISSIONS.MANAGE_MEMBERS);
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("clients")
     .select("*")
     .eq("id", id)
     .eq("user_id", clubId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (error || !data) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { sumClubRevenues, sumInvoiceRevenueFromDocuments, totalEventRevenue } from "@/lib/financial/eventFinancials";
@@ -20,6 +20,7 @@ export async function GET(
 
     const { id } = await params;
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     if (!id) {
       return NextResponse.json({ error: "ID de l'événement requis" }, { status: 400 });
@@ -56,7 +57,7 @@ export async function GET(
     }
 
     // Factures (documents type invoice) liées à l'événement
-    const { data: documents } = await supabase
+    const { data: documents } = await admin
       .from("documents")
       .select(`
         id,

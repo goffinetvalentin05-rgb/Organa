@@ -1,7 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
+
+async function requireViewDocumentsOrInvoices() {
+  const gDocs = await requirePermission(PERMISSIONS.VIEW_DOCUMENTS);
+  if (!("error" in gDocs)) return gDocs;
+
+  const gInv = await requirePermission(PERMISSIONS.VIEW_INVOICES);
+  if (!("error" in gInv)) return gInv;
+
+  return {
+    error: NextResponse.json(
+      {
+        error: "Accès refusé",
+        requiredAny: [PERMISSIONS.VIEW_DOCUMENTS, PERMISSIONS.VIEW_INVOICES],
+      },
+      { status: 403 }
+    ),
+  } as const;
+}
 
 // GET /api/documents/[id] - Récupérer un document avec son client
 export async function GET(
@@ -19,24 +38,12 @@ export async function GET(
       );
     }
 
-    const supabase = await createClient();
+    const guard = await requireViewDocumentsOrInvoices();
+    if ("error" in guard) return guard.error;
 
-    // Authentification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const admin = createAdminClient();
 
-    if (authError || !user || !user.id) {
-      console.error("[API][documents][GET] Erreur auth:", authError);
-      return NextResponse.json(
-        { error: "Non authentifié" },
-        { status: 401 }
-      );
-    }
-
-    // Récupérer le document
-    const { data: document, error: docError } = await supabase
+    const { data: document, error: docError } = await admin
       .from("documents")
       .select(`
         id,
@@ -57,7 +64,7 @@ export async function GET(
         updated_at
       `)
       .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
       .single();
 
     if (docError || !document) {
@@ -72,12 +79,37 @@ export async function GET(
       );
     }
 
-    // Récupérer le client séparément
-    const { data: client, error: clientError } = await supabase
+    if (!document.client_id) {
+      return NextResponse.json({
+        document: {
+          id: document.id.toString(),
+          numero: document.numero,
+          type: document.type,
+          clientId: null,
+          client: null,
+          lignes: document.items || [],
+          statut: document.status,
+          dateCreation: document.date_creation,
+          dateEcheance: document.date_echeance,
+          datePaiement: document.date_paiement,
+          notes: document.notes,
+          totals: {
+            totalHT: document.total_ht || 0,
+            totalTVA: document.total_tva || 0,
+            totalTTC: document.total_ttc || 0,
+          },
+          created_at: document.created_at,
+          updated_at: document.updated_at,
+        },
+      });
+    }
+
+    const { data: client, error: clientError } = await admin
       .from("clients")
       .select("id, nom, email, telephone, adresse")
       .eq("id", document.client_id)
-      .eq("user_id", user.id)
+      .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .single();
 
     if (clientError || !client) {
@@ -91,7 +123,6 @@ export async function GET(
       );
     }
 
-    // Formater la réponse
     const response = {
       id: document.id.toString(),
       numero: document.numero,
@@ -119,19 +150,13 @@ export async function GET(
       updated_at: document.updated_at,
     };
 
-    console.log("[API][documents][GET] Document récupéré avec succès:", {
-      id: response.id,
-      numero: response.numero,
-      type: response.type,
-    });
-
     return NextResponse.json({ document: response });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erreur";
     console.error("[API][documents][GET] Erreur inattendue:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la récupération du document", details: error.message },
+      { error: "Erreur lors de la récupération du document", details: message },
       { status: 500 }
     );
   }
 }
-

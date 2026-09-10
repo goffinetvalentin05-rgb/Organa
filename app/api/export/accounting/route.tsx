@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import JSZip from "jszip";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getDocumentPdfData } from "@/lib/utils/pdf-data";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -122,6 +123,7 @@ export async function GET(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const startDate = `${year}-01-01`;
     const endDate = `${year}-12-31`;
@@ -218,7 +220,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { data: documents, error } = await supabase
+    const { data: documents, error } = await admin
       .from("documents")
       .select(
         "id, numero, status, date_creation, total_ht, total_tva, total_ttc, client:clients(nom)"

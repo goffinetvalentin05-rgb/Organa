@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -30,6 +31,7 @@ export async function POST(
 
     const { id: planningId } = await params;
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
@@ -80,11 +82,12 @@ export async function POST(
 
     // Vérifier que le membre appartient à l'utilisateur
     let memberRecord: { id: string; displayName: string; email: string | null } | null = null;
-    const { data: memberByNom, error: memberByNomError } = await supabase
+    const { data: memberByNom, error: memberByNomError } = await admin
       .from("clients")
       .select("id, nom, email")
       .eq("id", clientId)
       .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (memberByNom && !memberByNomError) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -91,12 +92,14 @@ export async function POST(request: NextRequest) {
     resourceType: "client_import",
     operation: async () => {
       const supabase = await createClient();
+      const admin = createAdminClient();
       const user = guard.ctx.user;
 
-      const { data: existingData, error: listError } = await supabase
+      const { data: existingData, error: listError } = await admin
         .from("clients")
         .select("nom, email")
-        .eq("user_id", clubId);
+        .eq("user_id", clubId)
+        .is("deleted_at", null);
 
       if (listError) {
         console.error("[API][clients/import] list_error", listError);
@@ -156,7 +159,7 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        const { data: newClient, error: insertError } = await supabase
+        const { data: newClient, error: insertError } = await admin
           .from("clients")
           .insert(insertPayload)
           .select("id")

@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Accès multi-produit Obillz — partie utilisable partout (middleware Edge inclus).
- * Source de vérité : public.profiles.product_type (profiles.user_id = club_id).
+ * Source de vérité : public.profiles_public.product_type (user_id = club_id).
  */
 
 export type ObillzProduct = "sport" | "association";
@@ -49,7 +49,7 @@ export async function fetchProductTypesByClubIds(
   if (clubIds.length === 0) return map;
 
   const { data, error } = await supabase
-    .from("profiles")
+    .from("profiles_public")
     .select("user_id, product_type")
     .in("user_id", clubIds);
 

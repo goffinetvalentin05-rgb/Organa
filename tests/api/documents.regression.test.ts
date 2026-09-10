@@ -18,6 +18,10 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: vi.fn(),
+}));
+
 vi.mock("@/lib/auth/permissions", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/auth/permissions")>();
   return {
@@ -37,6 +41,7 @@ vi.mock("@/lib/auth/audit", () => ({
 }));
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/lib/auth/permissions";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
@@ -128,6 +133,7 @@ describe("POST /api/documents — facture", () => {
       ]),
     ]);
     vi.mocked(createClient).mockResolvedValue(client as never);
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
 
     const req = new NextRequest("http://localhost/api/documents", {
       method: "POST",
@@ -184,6 +190,7 @@ describe("POST /api/documents — facture", () => {
       ]),
     ]);
     vi.mocked(createClient).mockResolvedValue(client as never);
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
 
     const req = new NextRequest("http://localhost/api/documents", {
       method: "POST",
@@ -226,6 +233,7 @@ describe("PATCH /api/documents — isolation club", () => {
       ]),
     ]);
     vi.mocked(createClient).mockResolvedValue(client as never);
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
 
     const req = new NextRequest("http://localhost/api/documents", {
       method: "PATCH",
@@ -267,7 +275,6 @@ describe("PATCH /api/documents — isolation club", () => {
             const p = r.payload as Record<string, unknown>;
             return (
               p.title === "Nouveau titre" &&
-              p.numero === "FAC-2026-010" &&
               !Object.prototype.hasOwnProperty.call(p, "total_ttc") &&
               !Object.prototype.hasOwnProperty.call(p, "items") &&
               p.updated_by === USER
@@ -287,6 +294,7 @@ describe("PATCH /api/documents — isolation club", () => {
       ]),
     ]);
     vi.mocked(createClient).mockResolvedValue(client as never);
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
 
     const req = new NextRequest("http://localhost/api/documents", {
       method: "PATCH",

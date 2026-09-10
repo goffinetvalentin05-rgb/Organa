@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
@@ -22,6 +23,7 @@ export async function PATCH(
 
     const { id: planningId, assignmentId } = await params;
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const { data: planning, error: planningError } = await supabase
       .from("plannings")
@@ -77,11 +79,12 @@ export async function PATCH(
 
     const previousClientId = assignment.client_id as string | null;
 
-    const { data: memberRow, error: mErr } = await supabase
+    const { data: memberRow, error: mErr } = await admin
       .from("clients")
-      .select("id")
+      .select("id, nom, email, telephone, role, category")
       .eq("id", clientId)
       .eq("user_id", guard.clubId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (mErr || !memberRow) {
@@ -117,8 +120,7 @@ export async function PATCH(
         client_id,
         source,
         public_name,
-        member_link_status,
-        clients ( id, nom, email, telephone, role, category )
+        member_link_status
       `
       )
       .single();
@@ -150,8 +152,7 @@ export async function PATCH(
       revalidatePath(`/tableau-de-bord/clients/${previousClientId}`);
     }
 
-    const relRaw = updated.clients;
-    const rel = Array.isArray(relRaw) ? relRaw[0] : relRaw;
+    const rel = memberRow;
 
     return NextResponse.json(
       {

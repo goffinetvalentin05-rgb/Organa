@@ -69,7 +69,7 @@ export async function GET() {
       clubId = ctx?.current?.clubId ?? null;
       if (clubId) {
         const { data: clubProfile, error: clubProfileError } = await supabase
-          .from("profiles")
+          .from("profiles_public")
           .select("company_name")
           .eq("user_id", clubId)
           .maybeSingle();

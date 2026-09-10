@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -145,14 +146,17 @@ export async function GET() {
   const guard = await requirePermission(PERMISSIONS.VIEW_MEMBERS);
   if ("error" in guard) return guard.error;
 
-  const supabase = await createClient();
+  // Lecture service_role après VIEW_MEMBERS : un member n’a plus de SELECT RLS
+  // sur public.clients. Filtre club + deleted_at (équivalent de l’ancienne policy).
+  const admin = createAdminClient();
 
   // select('*') : évite les 500 si certaines colonnes (postal_code, created_by…) ne sont pas
   // encore en prod ; normalizeClientsDbRow gère nom/name, telephone/phone, etc.
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from("clients")
     .select("*")
     .eq("user_id", guard.clubId)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -182,6 +186,7 @@ export async function POST(request: NextRequest) {
   if ("error" in guard) return guard.error;
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   const user = guard.ctx.user;
 
   // Vérifier l'accès en écriture (trial actif ou abonnement)
@@ -234,7 +239,7 @@ export async function POST(request: NextRequest) {
           payloadSummary: summarizeInsertPayloadForLog(insertPayload),
         });
 
-        const { data: newClient, error: insertError } = await supabase
+        const { data: newClient, error: insertError } = await admin
           .from("clients")
           .insert(insertPayload)
           .select("*")
@@ -252,7 +257,7 @@ export async function POST(request: NextRequest) {
         const normalized = newClient
           ? normalizeClientsDbRow(newClient as Record<string, unknown>)
           : null;
-        if (!normalized || !normalized.id) {
+        if (!normalized || !normalized.id || normalized.user_id !== guard.clubId) {
           return {
             status: 500,
             body: { error: "Erreur lors de la création du client" },

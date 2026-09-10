@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   calculerTotalHT,
   calculerTVA,
@@ -128,16 +129,17 @@ export async function getDocumentPdfData(
   }
 
   const scopeUserId = options?.dataUserId ?? user.id;
+  const admin = createAdminClient();
 
   const { company, primaryColor, currency, currencySymbol } = await getClubCompanyPdfData(
-    supabase,
+    admin,
     scopeUserId
   );
 
-  const { data: document, error: docError } = await supabase
+  const { data: document, error: docError } = await admin
     .from("documents")
     .select(
-      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, payment_token, client:clients(*), sponsor:sponsor_contracts(id, sponsor_name, title)"
+      "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, payment_token, client:clients(id, nom, email, telephone, adresse, postal_code, city), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
     .eq("id", id)
     .eq("user_id", scopeUserId)

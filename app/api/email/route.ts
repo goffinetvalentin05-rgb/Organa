@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const body = await request.json();
     const { type, documentId } = body; // type: 'devis' | 'facture', documentId: string
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "documentId requis" }, { status: 400 });
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select(
         "company_name, company_email, company_phone, company_address, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
@@ -117,7 +119,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Type de document invalide" }, { status: 400 });
     }
 
-    const { data: documentData, error: documentError } = await supabase
+    const { data: documentData, error: documentError } = await admin
       .from("documents")
       .select(
         "id, numero, title, type, items, notes, total_ttc, date_echeance, client_id, recipient_type, sponsor_contract_id, recipient_data, payment_method, payment_token, client:clients(id, nom, email, adresse), sponsor:sponsor_contracts(id, sponsor_name, title)"

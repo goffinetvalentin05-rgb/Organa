@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PlanningPdf } from "@/lib/pdf/PlanningPdf";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   formatVolunteerDisplayNameForPdf,
   sortPlanningSlotsForPdf,
@@ -26,6 +27,7 @@ export async function GET(request: Request) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     // Récupérer le planning
     const { data: planning, error: planningError } = await supabase
@@ -113,11 +115,12 @@ export async function GET(request: Request) {
     ];
     const clientById = new Map<string, Record<string, unknown>>();
     if (clientIds.length > 0) {
-      const { data: clientRows, error: clientsErr } = await supabase
+      const { data: clientRows, error: clientsErr } = await admin
         .from("clients")
-        .select("*")
+        .select("id, nom, email, telephone, role, category")
         .in("id", clientIds)
-        .eq("user_id", guard.clubId);
+        .eq("user_id", guard.clubId)
+        .is("deleted_at", null);
 
       if (clientsErr) {
         console.error("[PDF][planning] clients batch:", clientsErr.message);
