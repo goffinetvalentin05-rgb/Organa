@@ -114,7 +114,7 @@ async function loadClientsMap(
   const baseIds = Array.from(new Set(clientIds));
   const { data, error } = await supabase
     .from("clients")
-    .select("id, nom, email, telephone")
+    .select("id, nom")
     .in("id", baseIds);
 
   if (error || !data) return map;
@@ -142,10 +142,9 @@ async function loadMembersMap(
 
   const uniqueIds = Array.from(new Set(memberIds));
   const attempts = [
-    "id, first_name, last_name, email, phone",
-    "id, first_name, last_name, email, telephone",
-    "id, nom, email, telephone",
-    "id, name, email, phone",
+    "id, first_name, last_name",
+    "id, nom",
+    "id, name",
   ];
 
   for (const selectClause of attempts) {
@@ -180,8 +179,6 @@ function mapAssignment(assignment: PlanningAssignmentRow, displayName: string) {
     member: {
       id: assignment.member_id || assignment.client_id || `public-${assignment.id}`,
       nom: displayName,
-      email: isPublic ? assignment.public_email || assignment.email || undefined : undefined,
-      telephone: isPublic ? assignment.public_phone || assignment.phone || undefined : undefined,
       status: isPublic ? "public" : "member",
     },
   };
@@ -262,9 +259,7 @@ export async function GET(
           *,
           clients (
             id,
-            nom,
-            email,
-            telephone
+            nom
           )
         `)
         .in("slot_id", slotIds);
@@ -289,19 +284,10 @@ export async function GET(
             const memberAsClient = clientsMap.get(assignment.member_id);
             const displayName =
               getPersonFullName(member) || getClientFullName(memberAsClient);
-            const mapped = mapAssignment(
+            return mapAssignment(
               assignment,
               displayName || getPublicVolunteerName(assignment)
             );
-            if (member) {
-              mapped.member.email = member.email || undefined;
-              mapped.member.telephone = member.telephone || member.phone || undefined;
-            } else if (memberAsClient) {
-              mapped.member.email = memberAsClient.email || undefined;
-              mapped.member.telephone =
-                memberAsClient.telephone || memberAsClient.phone || undefined;
-            }
-            return mapped;
           }
 
           const relationClient = Array.isArray(assignment.clients)
@@ -314,16 +300,7 @@ export async function GET(
             getClientFullName(client) ||
             getClientFullName(relationClient || undefined) ||
             getPublicVolunteerName(assignment);
-          const mapped = mapAssignment(assignment, fullName);
-          if (client) {
-            mapped.member.email = client.email || mapped.member.email;
-            mapped.member.telephone = client.telephone || client.phone || mapped.member.telephone;
-          } else if (relationClient) {
-            mapped.member.email = relationClient.email || mapped.member.email;
-            mapped.member.telephone =
-              relationClient.telephone || relationClient.phone || mapped.member.telephone;
-          }
-          return mapped;
+          return mapAssignment(assignment, fullName);
         });
 
       return {
