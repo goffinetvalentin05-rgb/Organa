@@ -112,31 +112,22 @@ async function loadClientsMap(
   if (clientIds.length === 0) return map;
 
   const baseIds = Array.from(new Set(clientIds));
-  const attempts = [
-    "id, first_name, last_name, nom, email, telephone",
-    "id, first_name, last_name, name, email, phone",
-    "id, nom, email, telephone",
-    "id, name, email, phone",
-  ];
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, nom, email, telephone")
+    .in("id", baseIds);
 
-  for (const selectClause of attempts) {
-    const { data, error } = await supabase
-      .from("clients")
-      .select(selectClause)
-      .in("id", baseIds);
+  if (error || !data) return map;
 
-    if (error || !data) continue;
-
-    for (const row of data) {
-      if (!row || typeof row !== "object") continue;
-      const candidate = row as Partial<ClientRow>;
-      if (!candidate.id || typeof candidate.id !== "string") continue;
-      const previous = map.get(candidate.id) || ({ id: candidate.id } as ClientRow);
-      map.set(candidate.id, {
-        ...previous,
-        ...candidate,
-      });
-    }
+  for (const row of data) {
+    if (!row || typeof row !== "object") continue;
+    const candidate = row as Partial<ClientRow>;
+    if (!candidate.id || typeof candidate.id !== "string") continue;
+    const previous = map.get(candidate.id) || ({ id: candidate.id } as ClientRow);
+    map.set(candidate.id, {
+      ...previous,
+      ...candidate,
+    });
   }
 
   return map;

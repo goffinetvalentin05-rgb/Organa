@@ -3,19 +3,15 @@ import type { ClubMemberForMatch } from "@/lib/planning/matchPublicNameToMember"
 
 /**
  * Charge les membres du club pour le matching d’inscription publique.
- * Tolère l’absence de colonnes optionnelles (`deleted_at`, `name`, etc.).
+ * Colonnes clients : `id, nom` ; `deleted_at` si présent.
  */
 export async function fetchClubMembersForNameMatch(
   supabase: SupabaseClient,
   clubId: string
 ): Promise<{ members: ClubMemberForMatch[]; selectUsed: string; error?: string }> {
   const selectAttempts = [
-    "id, nom, name, first_name, last_name, deleted_at",
-    "id, nom, name, deleted_at",
     "id, nom, deleted_at",
-    "id, nom, name",
     "id, nom",
-    "id, name",
   ];
 
   for (const sel of selectAttempts) {

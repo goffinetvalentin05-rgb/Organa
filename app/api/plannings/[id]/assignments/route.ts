@@ -79,47 +79,30 @@ export async function POST(
     }
 
     // Vérifier que le membre appartient à l'utilisateur
-    // Compatibilité schéma: certains environnements utilisent `name`, d'autres `nom`.
     let memberRecord: { id: string; displayName: string; email: string | null } | null = null;
-    const { data: memberByName, error: memberByNameError } = await supabase
+    const { data: memberByNom, error: memberByNomError } = await supabase
       .from("clients")
-      .select("id, name, email")
+      .select("id, nom, email")
       .eq("id", clientId)
       .eq("user_id", guard.clubId)
       .maybeSingle();
 
-    if (memberByName && !memberByNameError) {
+    if (memberByNom && !memberByNomError) {
       memberRecord = {
-        id: memberByName.id,
-        displayName: memberByName.name || "Membre",
-        email: memberByName.email || null,
+        id: memberByNom.id,
+        displayName: memberByNom.nom || "Membre",
+        email: memberByNom.email || null,
       };
     } else {
-      const { data: memberByNom, error: memberByNomError } = await supabase
-        .from("clients")
-        .select("id, nom, email")
-        .eq("id", clientId)
-        .eq("user_id", guard.clubId)
-        .maybeSingle();
-
-      if (memberByNom && !memberByNomError) {
-        memberRecord = {
-          id: memberByNom.id,
-          displayName: memberByNom.nom || "Membre",
-          email: memberByNom.email || null,
-        };
-      } else {
-        console.error("[API][assignments][POST] Membre introuvable:", {
-          clientId,
-          userId: guard.userId,
-          memberByNameError: memberByNameError?.message || null,
-          memberByNomError: memberByNomError?.message || null,
-        });
-        return NextResponse.json(
-          { error: "Membre non trouvé" },
-          { status: 404 }
-        );
-      }
+      console.error("[API][assignments][POST] Membre introuvable:", {
+        clientId,
+        userId: guard.userId,
+        memberByNomError: memberByNomError?.message || null,
+      });
+      return NextResponse.json(
+        { error: "Membre non trouvé" },
+        { status: 404 }
+      );
     }
 
     // Vérifier que le créneau n'est pas déjà plein
