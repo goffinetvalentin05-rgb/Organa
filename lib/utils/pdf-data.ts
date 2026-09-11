@@ -248,7 +248,7 @@ export async function getDocumentPdfData(
     if (!token) {
       token = createMembershipPaymentToken();
       try {
-        await supabase
+        await admin
           .from("documents")
           .update({ payment_token: token })
           .eq("id", id)
@@ -309,7 +309,7 @@ export async function getDocumentPdfData(
   // Si pas de référence en DB, on la sauvegarde de manière transparente
   if (useQRIBAN && qrReference && !existingQRRef) {
     try {
-      await supabase
+      await admin
         .from("documents")
         .update({ qr_reference: qrReference })
         .eq("id", id)

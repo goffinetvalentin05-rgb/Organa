@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -16,6 +17,7 @@ export async function GET() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     // Récupérer les événements avec le type
     const { data: events, error } = await supabase
@@ -47,7 +49,7 @@ export async function GET() {
     }
 
     // Revenus factures (invoices) liés aux événements
-    const { data: documentsData } = await supabase
+    const { data: documentsData } = await admin
       .from("documents")
       .select("event_id, total_ttc, type")
       .eq("user_id", guard.clubId)

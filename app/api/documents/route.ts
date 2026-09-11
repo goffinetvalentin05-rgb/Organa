@@ -379,7 +379,7 @@ export async function POST(request: NextRequest) {
     // (nouveau clic, « réessayer », clé d'idempotence perdue) doit retrouver la
     // cotisation existante au lieu d'en insérer une identique.
     if (type === "quote" && resolvedClientId) {
-      let duplicateQuery = supabase
+      let duplicateQuery = admin
         .from("documents")
         .select("id, numero, type")
         .eq("user_id", guard.clubId)
@@ -427,7 +427,7 @@ export async function POST(request: NextRequest) {
     // Générer le numéro du document (unicité: user_id + type + btrim(numero) avec deleted_at IS NULL)
     const year = new Date().getFullYear();
     // On compte les documents "actifs" (deleted_at IS NULL) pour coller à l’index unique partiel.
-    const { count: docCount, error: countError } = await supabase
+    const { count: docCount, error: countError } = await admin
       .from("documents")
       .select("*", { count: "exact", head: true })
       .eq("user_id", guard.clubId)
@@ -587,7 +587,7 @@ export async function POST(request: NextRequest) {
       const removedColumns: string[] = [];
 
       for (let attempt = 0; attempt < 12; attempt += 1) {
-        const { data, error } = await supabase
+        const { data, error } = await admin
           .from("documents")
           .insert(working)
           .select("id, numero, type, created_at")
@@ -803,13 +803,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
-    // Vérifier l'accès en écriture (trial actif ou abonnement)
     const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
       return accessCheck.response;
     }
+
+    const admin = createAdminClient();
 
     const { searchParams } = request.nextUrl;
     const id = searchParams.get("id");
@@ -822,14 +821,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Récupérer le doc avant delete pour audit
-    const { data: docInfo } = await supabase
+    const { data: docInfo } = await admin
       .from("documents")
       .select("numero, type, total_ttc")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .maybeSingle();
 
-    const { error } = await supabase
+    const { error } = await admin
       .from("documents")
       .delete()
       .eq("id", id)
@@ -990,7 +989,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Vérifier que le document appartient au club
-    const { data: existingDoc, error: fetchError } = await supabase
+    const { data: existingDoc, error: fetchError } = await admin
       .from("documents")
       .select("id, numero, title, event_id, type")
       .eq("id", id)
@@ -1225,7 +1224,7 @@ export async function PATCH(request: NextRequest) {
     updateData.updated_by = user.id;
 
     // Garde-fou : toujours filtrer par user_id (club) — ne jamais faire d’UPDATE documents global.
-    const { data: updatedDoc, error: updateError } = await supabase
+    const { data: updatedDoc, error: updateError } = await admin
       .from("documents")
       .update(updateData)
       .eq("id", id)

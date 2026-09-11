@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import {
@@ -22,15 +22,15 @@ export async function GET(
     const guard = await requirePermission(PERMISSIONS.VIEW_SHOP);
     if ("error" in guard) return guard.error;
     const { id } = await params;
-    const supabase = await createClient();
-    const { data, error } = await supabase
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from("shop_orders")
       .select(ORDER_SELECT)
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .maybeSingle();
     if (error || !data) return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
-    const { data: items } = await supabase
+    const { data: items } = await admin
       .from("shop_order_items")
       .select(ORDER_ITEM_SELECT)
       .eq("order_id", id)
@@ -57,8 +57,8 @@ export async function PATCH(
     const body = await request.json().catch(() => null);
     const action = body && typeof body === "object" ? (body as { action?: string }).action : null;
 
-    const supabase = await createClient();
-    const { data: current } = await supabase
+    const admin = createAdminClient();
+    const { data: current } = await admin
       .from("shop_orders")
       .select("id, payment_status, fulfillment_status")
       .eq("id", id)
@@ -95,7 +95,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Aucune transition possible." }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { error } = await admin
       .from("shop_orders")
       .update({ fulfillment_status: next })
       .eq("id", id)
@@ -103,16 +103,17 @@ export async function PATCH(
       .eq("payment_status", "paid");
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    const { data } = await supabase
+    const { data } = await admin
       .from("shop_orders")
       .select(ORDER_SELECT)
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .single();
-    const { data: items } = await supabase
+    const { data: items } = await admin
       .from("shop_order_items")
       .select(ORDER_ITEM_SELECT)
-      .eq("order_id", id);
+      .eq("order_id", id)
+      .eq("club_id", guard.clubId);
 
     return NextResponse.json({
       order: mapOrder(data as OrderRow, (items || []) as ItemRow[]),

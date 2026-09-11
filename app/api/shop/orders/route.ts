@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { mapOrder, ORDER_ITEM_SELECT, ORDER_SELECT, type ItemRow, type OrderRow } from "@/lib/shop/orders";
 
@@ -9,8 +9,8 @@ export async function GET() {
   try {
     const guard = await requirePermission(PERMISSIONS.VIEW_SHOP);
     if ("error" in guard) return guard.error;
-    const supabase = await createClient();
-    const { data: rows, error } = await supabase
+    const admin = createAdminClient();
+    const { data: rows, error } = await admin
       .from("shop_orders")
       .select(ORDER_SELECT)
       .eq("club_id", guard.clubId)
@@ -22,7 +22,7 @@ export async function GET() {
     const ids = orders.map((o) => o.id);
     let items: ItemRow[] = [];
     if (ids.length > 0) {
-      const { data } = await supabase
+      const { data } = await admin
         .from("shop_order_items")
         .select(ORDER_ITEM_SELECT)
         .eq("club_id", guard.clubId)

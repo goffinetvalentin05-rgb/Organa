@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calculerTotalTTC } from "@/lib/utils/calculations";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
@@ -52,7 +51,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
     const admin = createAdminClient();
 
     const body = await request.json();
@@ -208,7 +206,7 @@ export async function POST(request: NextRequest) {
           : null;
       if (!token) {
         token = createMembershipPaymentToken();
-        await supabase
+        await admin
           .from("documents")
           .update({ payment_token: token })
           .eq("id", documentId)

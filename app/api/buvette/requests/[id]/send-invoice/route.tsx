@@ -46,7 +46,7 @@ export async function POST(
 
     // Reprise après échec d'envoi : ne jamais recréer la facture.
     if (existingInvoiceId) {
-      const { data: existing } = await supabase
+      const { data: existing } = await admin
         .from("documents")
         .select("id, numero")
         .eq("id", existingInvoiceId)
@@ -114,7 +114,7 @@ export async function POST(
     const todayIso = new Date().toISOString().split("T")[0];
 
     const year = new Date().getFullYear();
-    const { count: invoiceCount } = await supabase
+    const { count: invoiceCount } = await admin
       .from("documents")
       .select("*", { count: "exact", head: true })
       .eq("user_id", guard.clubId)
@@ -181,7 +181,7 @@ export async function POST(
       tva: 0,
     };
 
-    const { data: insertedInvoice, error: insertInvoiceError } = await supabase
+    const { data: insertedInvoice, error: insertInvoiceError } = await admin
       .from("documents")
       .insert({
         user_id: guard.clubId,
