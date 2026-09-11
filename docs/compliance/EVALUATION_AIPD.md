@@ -32,9 +32,9 @@ Ceci n’est **pas** une AIPD complète au sens d’un dossier formel (descripti
 ## Logs / IP
 
 - Audit et rate-limit peuvent retenir une IP.
-- Finalité sécurité. Durée de conservation encore `[À VALIDER]`.
-- AIPD logs : à envisager si conservation longue ou corrélation fine des parcours.
+- Finalité sécurité. Durée de conservation : **12 mois** (`RETENTION.md`).
+- AIPD logs : à envisager si conservation plus longue ou corrélation fine des parcours.
 
 ## Synthèse
 
-Priorité : AVS (si activation large) et mineurs. Les paiements s’appuient sur Stripe. Le marketing a été ramené à un opt-in. Les logs IP restent un point à borner (durée).
+Priorité : AVS (si activation large) et mineurs. Les paiements s’appuient sur Stripe. Le marketing a été ramené à un opt-in. Les logs IP sont bornés à 12 mois (application manuelle de la politique).

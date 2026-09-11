@@ -1,7 +1,7 @@
 # Accord de sous-traitance (DPA) — Obillz / Club
 
-Version : 11 septembre 2026  
-Statut : modèle à joindre ou à accepter lors de la relation contractuelle. **Non certifié LPD.**
+Version : 2026-09  
+Statut : fait partie du contrat pour les **nouveaux clubs** créés après la mise en production de cette version. Acceptation enregistrée électroniquement à l’inscription (`legal_acceptances` : `terms_version`, `dpa_version`, `accepted_at`). **Aucun backfill** et aucun flux d’acceptation pour les clubs déjà existants. **Non certifié LPD.** Page publique : `/accord-traitement-donnees`.
 
 Entre :
 
@@ -52,9 +52,13 @@ Sur demande écrite du Club, Obillz fournit les informations raisonnablement né
 
 Obillz informe le Club sans retard injustifié après avoir pris connaissance d’une violation de données personnelles concernant les données du Club, avec les éléments alors disponibles (nature, données/clubs potentiellement concernés, mesures). Le Club évalue, en tant que responsable, l’information des personnes et une éventuelle notification au PFPDT. Obillz coopère.
 
-## 9. Fin de contrat — retour et suppression
+## 9. Conservation, fin de contrat — retour et suppression
 
-À la fin du contrat, le Club peut exporter ses données via le service tant que l’accès est ouvert. Sur instruction écrite, Obillz supprime ou restitue les données du Club dans un délai raisonnable, **sauf** conservation imposée par le droit (notamment pièces comptables) ou copies de sauvegarde jusqu’à leur rotation. Aucune suppression automatique des données comptables n’est effectuée par le produit.
+Purge automatique limitée aux données opérationnelles temporaires : invitations expirées ou annulées (90 jours), clés d’idempotence (30 jours), journaux d’audit (12 mois), historique d’e-mails déjà soft-deleted (30 jours), jetons publics de planning (désactivation à la date de l’événement, suppression 90 jours après).
+
+Les factures, pièces comptables, transactions, commandes boutique, membres, paiements Stripe et données pouvant être nécessaires légalement ou contractuellement **ne sont pas purgés automatiquement**. Les documents et pièces comptables restent documentés à 10 ans. Pour ces catégories : conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future.
+
+À la fin du contrat, le Club peut exporter ses données via le service tant que l’accès est ouvert. Sur instruction écrite, Obillz supprime ou restitue les données du Club dans un délai raisonnable, **sauf** conservation imposée par le droit (notamment pièces comptables) ou copies de sauvegarde jusqu’à leur rotation.
 
 ## 10. Responsabilité du Club
 

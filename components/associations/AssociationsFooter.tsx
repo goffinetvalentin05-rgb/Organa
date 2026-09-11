@@ -120,6 +120,7 @@ export default function AssociationsFooter() {
     { href: "/politique-confidentialite", label: "Confidentialité" },
     { href: "/politique-cookies", label: "Cookies" },
     { href: "/securite-protection-donnees", label: "Sécurité et données" },
+    { href: "/accord-traitement-donnees", label: "Accord de traitement des données" },
   ];
 
   return (

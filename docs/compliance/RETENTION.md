@@ -2,27 +2,37 @@
 
 Document interne. Dernière mise à jour : 11 septembre 2026.
 
-**Aucune suppression automatique des données comptables n’est mise en place dans le produit.**
+La purge automatique existe **uniquement** pour les catégories listées comme « automatique » ci-dessous. Elle est exécutée par la RPC `purge_operational_data()` (service_role), via `POST`/`GET` `/api/internal/retention-purge` protégée par `CRON_SECRET` (cron Vercel quotidien 03:00 UTC). Idempotente, journalisée (`retention_purge_runs` + `audit_logs.action = retention_purge`).
 
-Principes :
+Pour toute autre catégorie : **Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future.**
 
-- données personnelles ordinaires : suppression ou anonymisation lorsqu’elles ne sont plus nécessaires ;
-- documents / pièces comptables : **10 ans** lorsqu’ils entrent dans l’obligation comptable ;
-- `[À VALIDER]` uniquement lorsqu’une durée opérationnelle précise n’est pas encore tranchée.
+Ne pas prétendre qu’une purge existe si elle n’est pas dans la colonne « Méthode ».
 
 | Catégorie | Durée | Justification | Méthode de suppression |
 | --- | --- | --- | --- |
-| Compte utilisateur / memberships | Durée du compte, puis suppression/anonymisation lorsqu’ils ne sont plus nécessaires `[À VALIDER]` le délai opérationnel après clôture | Accès au service | Manuel (DSAR / clôture de compte) |
-| Données membres (`clients`) | Suppression ou anonymisation lorsqu’elles ne sont plus nécessaires à la gestion du club `[À VALIDER]` le délai club | Effectif | Outils club + procédure manuelle `contact@obillz.com` |
-| AVS | Aussi courte que possible ; dès que plus nécessaire `[À VALIDER]` | Donnée sensible | Suppression manuelle (désactiver le champ ne l’efface pas) |
-| Cotisations, factures, devis, paiements (pièces comptables) | **10 ans** | Obligation comptable | **Pas de job automatique** ; conservation puis archivage/export |
-| Boutique (commandes constitutives de pièces comptables) | **10 ans** | Obligation comptable si vente | Soft-delete produit ≠ purge commande |
-| Inscriptions événements / buvette (hors compta) | Lorsqu’elles ne sont plus nécessaires `[À VALIDER]` | Organisation | Suppression staff ; pas de purge auto |
-| Planning / affectations | Lorsqu’elles ne sont plus nécessaires `[À VALIDER]` | Organisation interne | Suppression manuelle |
-| Contacts marketing | Jusqu’à opposition / désinscription, puis suppression lorsqu’ils ne sont plus nécessaires `[À VALIDER]` | Opt-in | `unsubscribed` ; suppression de ligne staff |
-| Logs d’audit / IP | Lorsqu’ils ne sont plus nécessaires à la sécurité `[À VALIDER]` | Sécurité, incidents | Pas de purge auto aujourd’hui |
-| Fichiers Storage liés à un objet métier | Aligné à l’objet (10 ans si pièce comptable) | Preuve / illustration | Suppression à la suppression de l’objet (dépense, visuel, produit) ; orphelins historiques non scannés |
-| Brouillons localStorage | 72 h + vidage à la déconnexion | Confort de saisie | TTL + `clearAllLocalDrafts` |
-| Abonnement Stripe / factures Obillz | **10 ans** | Comptabilité de l’exploitant | Conservé chez Stripe + exports |
+| Invitations expirées | 90 jours après `expires_at` | Sécurité des liens | **Automatique** (`club_invitations` status `expired`) |
+| Invitations annulées | 90 jours après `cancelled_at` | Tokens d’accès morts | **Automatique** (`club_invitations` status `cancelled`) |
+| Clés d’idempotence | 30 jours après `created_at` | Anti-doublon des écritures | **Automatique** (`idempotency_keys`) |
+| Audit logs / logs sécurité (y compris IP) | 12 mois après `created_at` | Sécurité, incidents | **Automatique** (`audit_logs`) |
+| Historique d’e-mails déjà soft-deleted | 30 jours après `deleted_at` | Hygiène ; table clairement non comptable une fois marquée supprimée | **Automatique** (`email_history` uniquement si `deleted_at` non null) |
+| Tokens planning / liens publics | Désactivation à la date de l’événement (`plannings.date`) ; suppression 90 jours après cette date ; soft-deleted 30 jours | Accès public limité | **Automatique** (`public_planning_links`) |
+| Factures, devis, cotisations, paiements, pièces comptables, transactions | 10 ans | Obligation comptable | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Abonnement SaaS / factures Obillz | 10 ans | Comptabilité de l’exploitant | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. Conservé chez Stripe + exports. |
+| Commandes boutique | Données comptables : 10 ans. Données de livraison non nécessaires : suppression ou anonymisation plus tôt | Preuve de transaction vs minimisation | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. Soft-delete produit ≠ purge commande. |
+| Anciens membres (`clients`) | Durée de l’adhésion + 12 mois, sauf données liées à des obligations comptables (alors 10 ans) | Gestion de l’effectif | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| AVS / date de naissance | Aligné sur la fiche membre (adhésion + 12 mois), dès que plus nécessaire | Donnée sensible | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. Désactiver le champ ne l’efface pas. |
+| Comptes utilisateurs / memberships staff | Durée du compte ; 12 mois après clôture, sauf facturation (10 ans) | Accès au service | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Inscriptions événement, demandes buvette, affectations planning | 12 mois après l’événement | Organisation | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Contacts marketing | Jusqu’au retrait du consentement (désinscription) ; suppression après 24 mois d’inactivité | Opt-in / opposition | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Contrats sponsors | 10 ans si montants / pièces comptables ; sinon durée de la relation + 12 mois | Sponsoring / compta | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| PV (procès-verbaux) | Tant que nécessaire à la gouvernance ; 10 ans s’ils documentent des décisions financières | Gouvernance | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Autres enregistrements soft-deleted (documents, dépenses, membres, commandes, etc.) | 30 jours de fenêtre de récupération puis nettoyage **manuel** | Ne pas hard-delete du comptable | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. **Pas** de purge auto hors `email_history` et tokens planning. |
+| Tables legacy | Suppression après vérification qu’elles ne sont plus utilisées | Hygiène schéma | Conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
+| Brouillons localStorage | 72 h + vidage à la déconnexion | Confort de saisie | TTL produit + `clearAllLocalDrafts` (côté client, pas la RPC) |
+| Fichiers Storage liés à un objet | Aligné à l’objet (10 ans si justificatif comptable) | Preuve / illustration | Déjà à la suppression dépense / visuel / produit ; orphelins historiques : conservation gérée manuellement selon la finalité et les obligations légales jusqu’à automatisation future. |
 
-En cas de fin de contrat club : restitution/export puis suppression des données ordinaires sur demande, **sauf** pièces comptables à conserver 10 ans.
+La RPC ne supprime jamais : `documents`, `clients`, `shop_*`, `expenses`/`depenses`, `club_revenues`, `profiles`, `registrations`, `marketing_*`.
+
+En cas de fin de contrat club : restitution/export, puis suppression des données ordinaires selon ce tableau, **sauf** pièces comptables à conserver 10 ans.
+
+Déclenchement : variable d’environnement `CRON_SECRET` (Bearer) obligatoire ; sans secret, la route refuse l’appel.

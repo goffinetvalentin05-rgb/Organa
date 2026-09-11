@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { ASSOCIATIONS_PUBLIC_LAUNCH_ENABLED } from "@/lib/associations/public-launch";
+import { legalAcceptanceError } from "@/lib/legal/requireAcceptance";
+import { recordClubLegalAcceptance } from "@/lib/legal/recordAcceptance";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -52,6 +54,11 @@ export async function POST(request: NextRequest) {
   const associationName = readString(body, "associationName");
   const firstName = readString(body, "firstName");
   const lastName = readString(body, "lastName");
+
+  const acceptanceError = legalAcceptanceError(body);
+  if (acceptanceError) {
+    return NextResponse.json({ error: acceptanceError }, { status: 400 });
+  }
 
   if (!associationName) {
     return NextResponse.json(
@@ -155,6 +162,20 @@ export async function POST(request: NextRequest) {
         })
         .eq("club_id", userId)
         .eq("user_id", userId);
+
+      const { error: legalError } = await recordClubLegalAcceptance(admin, {
+        clubId: userId,
+        userId,
+      });
+      if (legalError) {
+        return NextResponse.json(
+          {
+            error:
+              "Compte créé mais l’enregistrement de l’acceptation a échoué. Contactez contact@obillz.com.",
+          },
+          { status: 500 }
+        );
+      }
     } catch (err) {
       console.error("[associations/inscription] post-signup enrich KO:", err);
     }

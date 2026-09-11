@@ -90,8 +90,12 @@ export default function SecuriteProtectionDonneesPage() {
 
       <LegalSection title="Accord de sous-traitance">
         <p>
-          Un accord de sous-traitance (DPA) décrivant le rôle d’Obillz vis-à-vis
-          des clubs est disponible sur demande à <LegalEmailLink />. Voir aussi la{" "}
+          L’
+          <LegalInlineLink href="/accord-traitement-donnees">
+            Accord de traitement des données (DPA)
+          </LegalInlineLink>{" "}
+          décrit le rôle d’Obillz vis-à-vis des clubs. Pour les nouveaux clubs, il
+          fait partie du contrat et est accepté à l’inscription. Voir aussi la{" "}
           <LegalInlineLink href="/politique-confidentialite">
             politique de confidentialité
           </LegalInlineLink>

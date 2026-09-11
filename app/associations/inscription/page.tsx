@@ -13,6 +13,7 @@ export default function AssociationsInscriptionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptLegal, setAcceptLegal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -41,6 +42,12 @@ export default function AssociationsInscriptionPage() {
       toast.error("Les mots de passe ne correspondent pas");
       return;
     }
+    if (!acceptLegal) {
+      toast.error(
+        "Vous devez accepter les Conditions d’utilisation et l’Accord de traitement des données (DPA)."
+      );
+      return;
+    }
 
     setLoading(true);
     try {
@@ -53,6 +60,7 @@ export default function AssociationsInscriptionPage() {
           associationName: associationName.trim(),
           firstName: firstName.trim(),
           lastName: lastName.trim(),
+          acceptLegal: true,
         }),
       });
 
@@ -215,6 +223,33 @@ export default function AssociationsInscriptionPage() {
                   />
                 </div>
 
+                <label className="flex items-start gap-3 text-xs leading-relaxed text-[#65716b]">
+                  <input
+                    type="checkbox"
+                    checked={acceptLegal}
+                    onChange={(e) => setAcceptLegal(e.target.checked)}
+                    disabled={loading}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#d5ddd8]"
+                  />
+                  <span>
+                    J’accepte les{" "}
+                    <Link
+                      href="/conditions-utilisation"
+                      className="font-semibold text-[#17211d] underline-offset-2 hover:underline"
+                    >
+                      Conditions d’utilisation
+                    </Link>{" "}
+                    et l’{" "}
+                    <Link
+                      href="/accord-traitement-donnees"
+                      className="font-semibold text-[#17211d] underline-offset-2 hover:underline"
+                    >
+                      Accord de traitement des données (DPA)
+                    </Link>
+                    .
+                  </span>
+                </label>
+
                 <button
                   type="submit"
                   disabled={loading}
@@ -222,24 +257,6 @@ export default function AssociationsInscriptionPage() {
                 >
                   {loading ? "Création en cours…" : "Créer mon espace"}
                 </button>
-
-                <p className="text-center text-xs leading-relaxed text-[#9aa49e]">
-                  En créant un compte, vous acceptez nos{" "}
-                  <Link
-                    href="/conditions-utilisation"
-                    className="underline-offset-2 hover:text-[#17211d] hover:underline"
-                  >
-                    conditions d’utilisation
-                  </Link>{" "}
-                  et notre{" "}
-                  <Link
-                    href="/politique-confidentialite"
-                    className="underline-offset-2 hover:text-[#17211d] hover:underline"
-                  >
-                    politique de confidentialité
-                  </Link>
-                  .
-                </p>
               </form>
 
               <p className="mt-7 text-center text-sm text-[#65716b]">

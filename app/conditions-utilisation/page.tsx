@@ -28,6 +28,17 @@ export default function ConditionsUtilisationPage() {
           la confidentialité de ses identifiants et de toute activité effectuée via
           son compte.
         </p>
+        <p>
+          Pour tout nouveau club créé après la mise en production de cette version,
+          la création du compte exige l’acceptation des présentes conditions et de
+          l’
+          <LegalInlineLink href="/accord-traitement-donnees">
+            Accord de traitement des données (DPA)
+          </LegalInlineLink>
+          . Cette acceptation est enregistrée électroniquement (versions CGU et DPA
+          2026-09, horodatage). Les clubs déjà existants ne sont pas soumis à ce
+          flux et n’ont pas d’acceptation rétroactive.
+        </p>
       </LegalSection>
 
       <LegalSection title="Utilisation acceptable">
@@ -57,7 +68,11 @@ export default function ConditionsUtilisationPage() {
           <LegalInlineLink href="/politique-confidentialite">
             politique de confidentialité
           </LegalInlineLink>{" "}
-          et à l’accord de sous-traitance disponible sur demande.
+          et à l’
+          <LegalInlineLink href="/accord-traitement-donnees">
+            Accord de traitement des données (DPA)
+          </LegalInlineLink>
+          , qui fait partie du contrat pour les nouveaux clubs.
         </p>
       </LegalSection>
 

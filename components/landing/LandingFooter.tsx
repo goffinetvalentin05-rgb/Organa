@@ -112,6 +112,7 @@ export default function LandingFooter() {
     { href: "/politique-confidentialite", label: t("marketing.footer.legalPrivacy") },
     { href: "/politique-cookies", label: t("marketing.footer.legalCookies") },
     { href: "/securite-protection-donnees", label: t("marketing.footer.legalSecurity") },
+    { href: "/accord-traitement-donnees", label: t("marketing.footer.legalDpa") },
   ];
 
   return (

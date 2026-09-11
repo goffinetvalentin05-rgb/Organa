@@ -2,29 +2,24 @@
 
 Document interne. Dernière mise à jour : 11 septembre 2026.
 
-Obillz n’est pas « certifié LPD ». Ce fichier décrit l’état réel après le lot de corrections produit, ce qui a été fait dans le code, et ce qui reste manuel.
+Obillz n’est pas « certifié LPD ». Ce fichier décrit l’état réel du produit.
 
 ## Corrections effectuées dans le produit
 
-- **Marketing** : plus de création automatique de contact depuis une inscription événement ou une demande buvette. Opt-in facultatif, non coché par défaut. Preuve minimale (`consented_at`, `consent_source`, `consent_text_version`) si la case est cochée. Campagnes `sendTo: all` (et les autres modes) limitées à `unsubscribed = false` et `consented_at IS NOT NULL`. Anciens contacts `evenement` / `buvette` sans opt-in : pas de `consented_at`, donc exclus des envois. Contact staff : confirmation de base valable + `consent_source = staff_declared`.
+- **Marketing** : plus de création automatique de contact depuis une inscription événement ou une demande buvette. Opt-in facultatif, non coché par défaut. Preuve minimale (`consented_at`, `consent_source`, `consent_text_version`) si la case est cochée. Campagnes limitées à `unsubscribed = false` et `consented_at IS NOT NULL`. Anciens contacts `evenement` / `buvette` sans opt-in exclus des envois. Contact staff : confirmation de base valable + `consent_source = staff_declared`.
 - **Analytics** : Vercel Analytics conservé ; jetons d’URL masqués (`/cotisation/[token]`, `/invitations/[token]`, `/desinscription/[token]`).
 - **Brouillons** : AVS, IBAN et champs `qr_creditor_*` non persistés ; TTL 72 h ; suppression des drafts à la déconnexion (client). Import membres : mapping conservé, valeurs AVS vidées.
-- **AVS** : toujours désactivé par défaut et facultatif ; confirmation explicite à l’activation.
-- **Storage** : suppression des fichiers lors de la suppression d’une dépense (justificatif), d’un visuel (assets `visual-assets`) et d’un produit (images `shop-products`). Pas de scanner automatique des buckets.
-- **Pages légales** : politique, mentions, CGU et cookies alignées LPD / droit suisse. Page publique `/securite-protection-donnees`. DPA club rédigé.
+- **AVS** : désactivé par défaut et facultatif ; confirmation explicite à l’activation.
+- **Storage** : suppression des fichiers lors de la suppression d’une dépense, d’un visuel et d’un produit. Pas de scanner automatique des buckets.
+- **Pages légales** : politique, mentions, CGU et cookies alignées LPD / droit suisse. Page publique `/securite-protection-donnees`. DPA public `/accord-traitement-donnees`. Adresse : Les Courtats 7, 2942 Alle, Suisse.
+- **Rétention automatique** (RPC `purge_operational_data`, route interne `/api/internal/retention-purge`) : invitations expirées/annulées 90 j, idempotency 30 j, audit logs 12 mois, `email_history` soft-deleted 30 j, tokens planning (désactivation à la date de l’événement, suppression 90 j après). Factures, documents comptables, transactions, commandes, membres, paiements Stripe : **pas** de purge auto.
+- **DPA / CGU** : pour les **nouveaux** clubs uniquement, case obligatoire à l’inscription ; preuve dans `legal_acceptances` (`terms_version` / `dpa_version` = `2026-09`). Aucune modale ni blocage pour les clubs déjà existants. Aucun backfill.
 
-## Éléments restant manuels
+## Actions opérationnelles restantes
 
-- Appliquer la migration `077_marketing_consent.sql` (non exécutée par l’application).
-- Conserver une **preuve de la région réelle** du projet Supabase (indication actuelle : Suisse).
-- Valider les durées de conservation marquées `[À VALIDER]` dans `RETENTION.md`.
-- Processus DSAR : aujourd’hui manuel via `contact@obillz.com` (voir `DROITS_PERSONNES.md`).
-- Décider d’une AIPD formelle pour AVS / mineurs / paiements si le volume ou le risque augmente (`EVALUATION_AIPD.md`).
-- Relecture juridique externe souhaitable avant toute communication commerciale forte.
-- Cookie `obillz_active_club_id` : toujours non HttpOnly (hors lot).
-- AVS / DOB restent en clair en base si le club active ces champs ; pas de module mineurs.
-- Pas de purge automatique des données comptables (volontaire).
-- Orphelins Storage historiques non scannés.
+- Appliquer les migrations SQL non encore appliquées (dont 077 et 078).
+- Définir `CRON_SECRET` en production pour que le cron de purge puisse s’exécuter.
+- Conserver une preuve de la région Supabase Suisse.
 
 ## Formulation publique autorisée
 

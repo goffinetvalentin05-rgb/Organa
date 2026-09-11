@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import AuthPageLayout from "@/components/auth/AuthPageLayout";
 import {
@@ -22,6 +21,7 @@ export default function InscriptionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptLegal, setAcceptLegal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -45,16 +45,28 @@ export default function InscriptionPage() {
       return;
     }
 
+    if (!acceptLegal) {
+      toast.error(
+        "Vous devez accepter les Conditions d’utilisation et l’Accord de traitement des données (DPA)."
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { error: signUpError } = await supabase.auth.signUp({ email, password });
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, acceptLegal: true }),
+      });
 
-      if (signUpError) {
-        setErrorMessage(signUpError.message);
-        toast.error(signUpError.message);
-        setLoading(false);
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+
+      if (!res.ok) {
+        const msg = data?.error || "Erreur lors de la création du compte";
+        setErrorMessage(msg);
+        toast.error(msg);
         return;
       }
 
@@ -158,27 +170,36 @@ export default function InscriptionPage() {
                     />
                   </AuthField>
 
+                  <label className="flex items-start gap-3 text-xs leading-relaxed text-blue-100/70">
+                    <input
+                      type="checkbox"
+                      checked={acceptLegal}
+                      onChange={(e) => setAcceptLegal(e.target.checked)}
+                      disabled={loading}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/30 bg-white/5"
+                    />
+                    <span>
+                      J’accepte les{" "}
+                      <Link
+                        href="/conditions-utilisation"
+                        className="text-blue-100/90 underline-offset-2 hover:text-white hover:underline"
+                      >
+                        Conditions d’utilisation
+                      </Link>{" "}
+                      et l’{" "}
+                      <Link
+                        href="/accord-traitement-donnees"
+                        className="text-blue-100/90 underline-offset-2 hover:text-white hover:underline"
+                      >
+                        Accord de traitement des données (DPA)
+                      </Link>
+                      .
+                    </span>
+                  </label>
+
                   <AuthSubmitButton loading={loading} loadingLabel="Création en cours...">
                     Créer mon compte
                   </AuthSubmitButton>
-
-                  <p className="text-center text-xs leading-relaxed text-blue-100/45">
-                    En créant un compte, vous acceptez nos{" "}
-                    <Link
-                      href="/conditions-utilisation"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      conditions d&apos;utilisation
-                    </Link>{" "}
-                    et notre{" "}
-                    <Link
-                      href="/politique-confidentialite"
-                      className="text-blue-100/70 underline-offset-2 hover:text-white hover:underline"
-                    >
-                      politique de confidentialité
-                    </Link>
-                    .
-                  </p>
                 </form>
 
                 <AuthFooterLink

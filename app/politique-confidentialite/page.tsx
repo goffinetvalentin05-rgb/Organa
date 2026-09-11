@@ -46,8 +46,13 @@ export default function PolitiqueConfidentialitePage() {
           <strong>Le club est responsable du traitement</strong> des données métier
           qu’il saisit ou collecte via Obillz (membres, cotisations, boutique,
           événements, bénévoles, communications, etc.). Dans ce cadre, Obillz agit
-          comme <strong>sous-traitant</strong> du club. Un accord de sous-traitance
-          (DPA) est disponible sur demande à <LegalEmailLink />.
+          comme <strong>sous-traitant</strong> du club. L’
+          <LegalInlineLink href="/accord-traitement-donnees">
+            Accord de traitement des données (DPA)
+          </LegalInlineLink>{" "}
+          fait partie du contrat pour les nouveaux clubs ; l’acceptation est
+          enregistrée électroniquement à l’inscription. Les clubs déjà existants
+          n’ont pas d’acceptation rétroactive.
         </p>
       </LegalSection>
 
@@ -146,9 +151,14 @@ export default function PolitiqueConfidentialitePage() {
         <p>
           Les données de compte sont conservées pendant la relation contractuelle,
           puis selon les durées nécessaires aux obligations légales (notamment
-          comptables). Les données métier du club suivent la politique de
-          conservation du club, dans les limites techniques du service. Les données
-          comptables ne sont pas effacées automatiquement par Obillz.
+          comptables). Une purge automatique s’applique uniquement aux données
+          opérationnelles temporaires (invitations expirées, clés d’idempotence,
+          journaux d’audit, e-mails déjà marqués supprimés, jetons publics de
+          planning). Les factures, pièces comptables, transactions, commandes,
+          membres et paiements Stripe ne sont pas purgés automatiquement.
+          Conservation gérée manuellement selon la finalité et les obligations
+          légales jusqu’à automatisation future pour ces catégories. Les documents
+          comptables restent documentés à 10 ans.
         </p>
       </LegalSection>
 
@@ -188,6 +198,10 @@ export default function PolitiqueConfidentialitePage() {
           {" · "}
           <LegalInlineLink href="/conditions-utilisation">
             Conditions d’utilisation
+          </LegalInlineLink>
+          {" · "}
+          <LegalInlineLink href="/accord-traitement-donnees">
+            Accord de traitement des données (DPA)
           </LegalInlineLink>
         </p>
       </LegalSection>

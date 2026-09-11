@@ -11,7 +11,7 @@ Cette procédure est **manuelle**. Elle n’est pas un portail self-service.
 - Distinguer **compte Obillz** (Obillz responsable) et **données d’un club** (club responsable, Obillz sous-traitant).
 - Vérifier l’identité du demandeur avant export ou suppression.
 - Ne pas retirer des pièces comptables uniquement parce qu’une personne le demande si une obligation de conservation s’applique ; expliquer et anonymiser si possible.
-- Délai interne cible : accusé sous 7 jours, réponse de fond sous 30 jours `[À VALIDER]`.
+- Délai interne cible : accusé sous 7 jours, réponse de fond sous 30 jours.
 
 ## Accès
 

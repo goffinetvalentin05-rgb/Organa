@@ -46,6 +46,8 @@ function isPublicApiPath(pathname: string): boolean {
   if (pathname === "/api/registrations") return true;
   if (pathname.startsWith("/api/invitations/")) return true;
   if (pathname === "/api/associations/inscription") return true;
+  if (pathname === "/api/auth/signup") return true;
+  if (pathname === "/api/internal/retention-purge") return true;
   if (pathname === "/api/auth/post-login") return true;
   return false;
 }
