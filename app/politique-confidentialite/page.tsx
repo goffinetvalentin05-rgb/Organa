@@ -27,7 +27,7 @@ export default function PolitiqueConfidentialitePage() {
         <p>
           Contact : <LegalEmailLink />
           <br />
-          Adresse postale : [ADRESSE POSTALE À COMPLÉTER]
+          Adresse postale : Les Courtats 7, 2942 Alle, Suisse
         </p>
       </LegalSection>
 

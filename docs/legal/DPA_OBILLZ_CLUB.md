@@ -9,7 +9,7 @@ Entre :
 - **Obillz**, service exploité par **Valentin Goffinet**, **sous-traitant**.
 
 Contact Obillz : contact@obillz.com  
-Adresse : [ADRESSE POSTALE À COMPLÉTER]
+Adresse : Les Courtats 7, 2942 Alle, Suisse
 
 ## 1. Objet
 

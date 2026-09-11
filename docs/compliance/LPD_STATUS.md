@@ -17,7 +17,6 @@ Obillz n’est pas « certifié LPD ». Ce fichier décrit l’état réel aprè
 
 - Appliquer la migration `077_marketing_consent.sql` (non exécutée par l’application).
 - Conserver une **preuve de la région réelle** du projet Supabase (indication actuelle : Suisse).
-- Compléter `[ADRESSE POSTALE À COMPLÉTER]` (mentions, politique, DPA si besoin).
 - Valider les durées de conservation marquées `[À VALIDER]` dans `RETENTION.md`.
 - Processus DSAR : aujourd’hui manuel via `contact@obillz.com` (voir `DROITS_PERSONNES.md`).
 - Décider d’une AIPD formelle pour AVS / mineurs / paiements si le volume ou le risque augmente (`EVALUATION_AIPD.md`).
