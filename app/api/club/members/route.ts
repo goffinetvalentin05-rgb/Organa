@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
   const permissions = sanitizePermissions(body.permissions);
 
   const supabase = await createClient();
+  const admin = createAdminClient();
 
   // Existe-t-il déjà une membership active sur ce club avec cet email ?
   const { data: existing } = await supabase
@@ -156,8 +157,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Résout un user_id existant pour cet email via la RPC SECURITY DEFINER.
-  const { data: targetUserId, error: rpcError } = await supabase.rpc(
+  // Résout un user_id existant pour cet email via la RPC SECURITY DEFINER
+  // (service_role uniquement — EXECUTE authenticated révoqué en 074).
+  const { data: targetUserId, error: rpcError } = await admin.rpc(
     "find_user_id_by_email",
     { p_email: email }
   );
@@ -171,7 +173,6 @@ export async function POST(request: NextRequest) {
   }
 
   const meta = extractRequestMetadata(request);
-  const admin = createAdminClient();
 
   // ============================================
   // Branche 1 : email inconnu → créer une invitation pending
