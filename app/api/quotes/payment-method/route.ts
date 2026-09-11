@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import {
@@ -27,8 +28,9 @@ export async function GET() {
     const guard = await requireQuotesAccess("view");
     if ("error" in guard) return guard.error;
     const supabase = await createClient();
+    const admin = createAdminClient();
     const [method, stripeReady] = await Promise.all([
-      getClubMembershipPaymentMethod(supabase, guard.clubId),
+      getClubMembershipPaymentMethod(admin, guard.clubId),
       isClubStripeReadyForCharges(supabase, guard.clubId),
     ]);
     return NextResponse.json({ method, stripeReady });
@@ -52,6 +54,7 @@ export async function PUT(request: Request) {
     }
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     if (method === "stripe") {
       const ready = await isClubStripeReadyForCharges(supabase, guard.clubId);
       if (!ready) {
@@ -62,7 +65,7 @@ export async function PUT(request: Request) {
       }
     }
 
-    await setClubMembershipPaymentMethod(supabase, guard.clubId, method);
+    await setClubMembershipPaymentMethod(admin, guard.clubId, method);
     const stripeReady = await isClubStripeReadyForCharges(supabase, guard.clubId);
     return NextResponse.json({ method, stripeReady });
   } catch (error: unknown) {

@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   getClubStripeAccount,
   snapshotFromAccount,
@@ -73,9 +73,13 @@ export async function resolveQuotePaymentMethodForInsert(params: {
   return { method };
 }
 
+/**
+ * Profil club pour les cotisations.
+ * Callers must already have validated `clubId` (permission / membership guard).
+ */
 export async function clubContactForQuote(clubId: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("profiles")
     .select("company_name, logo_url, primary_color")
     .eq("user_id", clubId)

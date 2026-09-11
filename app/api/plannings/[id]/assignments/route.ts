@@ -167,7 +167,7 @@ export async function POST(
     if (sendNotification) {
       try {
         // Récupérer les paramètres email de l'utilisateur
-        const { data: profile } = await supabase
+        const { data: profile } = await admin
           .from("profiles")
           .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
           .eq("user_id", guard.clubId)

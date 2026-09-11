@@ -67,10 +67,11 @@ export type ClubCompanyPdfPayload = {
  * Profil club + logo pour tous les PDF documents (facture, cotisation, contrat sponsor).
  */
 export async function getClubCompanyPdfData(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   scopeUserId: string
 ): Promise<ClubCompanyPdfPayload> {
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select(
       "company_name, company_email, company_phone, company_address, logo_url, logo_path, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
@@ -78,7 +79,7 @@ export async function getClubCompanyPdfData(
     .eq("user_id", scopeUserId)
     .maybeSingle();
 
-  const logoUrl = await getClubLogoDataUrlForPdf(supabase, profile, scopeUserId);
+  const logoUrl = await getClubLogoDataUrlForPdf(admin, profile, scopeUserId);
 
   const currency = profile?.currency || "CHF";
   const currencySymbol =
@@ -421,9 +422,10 @@ export async function getSponsorContractPdfData(
 
   const scopeUserId = options?.dataUserId ?? user.id;
   const locale: SponsorContractPdfLocale = options?.locale ?? "fr";
+  const admin = createAdminClient();
 
   const { company, primaryColor, currencySymbol } = await getClubCompanyPdfData(
-    supabase,
+    admin,
     scopeUserId
   );
 
@@ -495,8 +497,9 @@ export async function getMeetingMinutesPdfData(
 
   const scopeUserId = options?.dataUserId ?? user.id;
   const locale: MeetingMinutesPdfLocale = options?.locale ?? "fr";
+  const admin = createAdminClient();
 
-  const { company, primaryColor } = await getClubCompanyPdfData(supabase, scopeUserId);
+  const { company, primaryColor } = await getClubCompanyPdfData(admin, scopeUserId);
 
   const { data: row, error } = await supabase
     .from("meeting_minutes")

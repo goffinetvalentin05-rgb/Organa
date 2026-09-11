@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
   mapProfileToBuvetteSettings,
@@ -18,8 +18,8 @@ export async function GET() {
     const guard = await requirePermission(PERMISSIONS.VIEW_PLANNINGS);
     if ("error" in guard) return guard.error;
 
-    const supabase = await createClient();
-    const { data: profile, error } = await supabase
+    const admin = createAdminClient();
+    const { data: profile, error } = await admin
       .from("profiles")
       .select(BUVETTE_SETTINGS_PROFILE_SELECT)
       .eq("user_id", guard.clubId)
@@ -56,8 +56,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Corps de requête invalide" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const result = await updateBuvettePublicSettings(supabase, guard.clubId, {
+    const admin = createAdminClient();
+    const result = await updateBuvettePublicSettings(admin, guard.clubId, {
       slug: body.slug,
       title: body.title,
       description: body.description,

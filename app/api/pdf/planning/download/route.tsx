@@ -131,7 +131,7 @@ export async function GET(request: Request) {
     }
 
     // Récupérer les infos du club (profil)
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("company_name, company_address, company_email, company_phone, logo_url")
       .eq("user_id", guard.clubId)

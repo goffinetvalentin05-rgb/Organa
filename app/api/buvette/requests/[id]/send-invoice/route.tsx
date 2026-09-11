@@ -94,7 +94,7 @@ export async function POST(
       );
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("currency, currency_symbol")
       .eq("user_id", guard.clubId)

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import {
   mapMeetingMinutesRow,
@@ -19,6 +20,7 @@ export async function GET() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const [{ data: rows, error }, { data: profile }] = await Promise.all([
       supabase
@@ -27,7 +29,7 @@ export async function GET() {
         .eq("club_id", guard.clubId)
         .order("meeting_date", { ascending: false })
         .order("updated_at", { ascending: false }),
-      supabase
+      admin
         .from("profiles")
         .select("company_name")
         .eq("user_id", guard.clubId)

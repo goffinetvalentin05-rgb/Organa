@@ -10,6 +10,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getSubscriptionStatus } from "./subscription";
 
 export type Plan = "free" | "pro";
@@ -72,14 +73,15 @@ async function getLegacyPlan(): Promise<PlanResult> {
     throw new Error("Utilisateur non authentifié");
   }
 
-  const { data: profile, error: profileError } = await supabase
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
     .from("profiles")
     .select("plan, subscription_status")
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!profile) {
-    const { error: insertError } = await supabase.from("profiles").insert({
+    const { error: insertError } = await admin.from("profiles").insert({
       user_id: user.id,
       plan: "free",
       subscription_status: "trial",

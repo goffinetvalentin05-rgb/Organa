@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { buildUniqueSlug } from "@/lib/buvette/slug";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
@@ -12,6 +13,7 @@ export async function GET() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const { data: requests, error } = await supabase
       .from("buvette_requests")
@@ -26,7 +28,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("company_name, buvette_slug")
       .eq("user_id", guard.clubId)
@@ -35,7 +37,7 @@ export async function GET() {
     let slug = profile?.buvette_slug || null;
     if (!slug) {
       slug = buildUniqueSlug(profile?.company_name || "Club", guard.clubId);
-      const { error: slugErr } = await supabase
+      const { error: slugErr } = await admin
         .from("profiles")
         .update({ buvette_slug: slug, updated_at: new Date().toISOString() })
         .eq("user_id", guard.clubId);

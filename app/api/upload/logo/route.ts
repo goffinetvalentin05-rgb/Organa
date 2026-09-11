@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 /**
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
     const actorId = guard.userId;
 
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupérer l'ancien logo_path pour le supprimer après
-    let { data: profile, error: profileError } = await supabase
+    let { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("logo_path, logo_url")
       .eq("user_id", clubId)
@@ -68,7 +70,7 @@ export async function POST(request: NextRequest) {
         );
       }
       console.log("[API][upload-logo] POST - Profil inexistant, création...");
-      const { data: newProfile, error: createError } = await supabase
+      const { data: newProfile, error: createError } = await admin
         .from("profiles")
         .insert({
           user_id: actorId,
@@ -142,7 +144,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sauvegarder logo_path ET logo_url dans profiles
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         logo_path: fileName,
@@ -204,12 +206,13 @@ export async function DELETE(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
 
     console.log("[API][upload-logo] DELETE - club:", clubId);
 
     // Récupérer le logo_path actuel
-    const { data: profile, error: fetchError } = await supabase
+    const { data: profile, error: fetchError } = await admin
       .from("profiles")
       .select("logo_path, logo_url")
       .eq("user_id", clubId)
@@ -255,7 +258,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Mettre à jour profiles pour retirer logo_path ET logo_url
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         logo_path: null,

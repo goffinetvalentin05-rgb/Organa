@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import { deriveContractStatus } from "@/lib/sponsor-contracts";
 
@@ -43,6 +44,7 @@ export async function GET(
 
     const id = await readId(context.params);
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const [{ data, error }, { data: profile }] = await Promise.all([
       supabase
@@ -53,7 +55,7 @@ export async function GET(
         .eq("id", id)
         .eq("club_id", guard.clubId)
         .maybeSingle(),
-      supabase
+      admin
         .from("profiles")
         .select("company_name")
         .eq("user_id", guard.clubId)

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
   MATCH_PROGRAM_BUCKET,
@@ -19,6 +20,7 @@ export async function POST(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("public_page_match_program_pdf_path")
       .eq("user_id", guard.clubId)
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     const displayName = file.name?.trim() || "programme-matchs.pdf";
 
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await admin
       .from("profiles")
       .update({
         public_page_match_program_type: "pdf",
@@ -115,8 +117,9 @@ export async function DELETE() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("public_page_match_program_pdf_path, public_page_match_program_pdf_name")
       .eq("user_id", guard.clubId)
@@ -133,7 +136,7 @@ export async function DELETE() {
 
     await supabase.storage.from(MATCH_PROGRAM_BUCKET).remove([pdfPath]).catch(() => undefined);
 
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await admin
       .from("profiles")
       .update({
         public_page_match_program_pdf_path: null,

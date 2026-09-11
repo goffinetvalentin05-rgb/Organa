@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
 export const runtime = "nodejs";
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
 
     const formData = await request.formData();
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Fichier trop volumineux (max. 5 Mo)." }, { status: 400 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("buvette_public_banner_path")
       .eq("user_id", clubId)
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Impossible de générer l'URL publique" }, { status: 500 });
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         buvette_public_banner_url: bannerUrl,
@@ -94,9 +96,10 @@ export async function DELETE() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from("profiles")
       .select("buvette_public_banner_path")
       .eq("user_id", clubId)
@@ -108,7 +111,7 @@ export async function DELETE() {
       await supabase.storage.from("Logos").remove([bannerPath]).catch(() => undefined);
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         buvette_public_banner_url: null,

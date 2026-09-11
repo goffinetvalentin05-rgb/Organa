@@ -113,6 +113,7 @@ export async function POST(
   if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   const { data: invitation } = await supabase
     .from("club_invitations")
     .select(
@@ -135,7 +136,7 @@ export async function POST(
   }
 
   // Profil + inviteur
-  const { data: clubProfile } = await supabase
+  const { data: clubProfile } = await admin
     .from("profiles")
     .select(
       "company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
@@ -172,7 +173,6 @@ export async function POST(
   });
 
   // Met à jour le compteur même si l'email a échoué — utile pour le debug
-  const admin = createAdminClient();
   await admin
     .from("club_invitations")
     .update({

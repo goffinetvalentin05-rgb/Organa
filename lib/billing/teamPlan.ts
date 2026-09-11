@@ -9,7 +9,6 @@
  * Stripe mais ne conditionne plus l'accès aux fonctionnalités.
  */
 
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthContext } from "@/lib/auth/rbac";
 import { STANDARD_PRICING, TEAM_PRICING } from "@/lib/billing/pricing";
@@ -49,25 +48,14 @@ async function readBillingProfile(billingClubId: string): Promise<{
   subscription_status: string | null;
   is_founder: boolean | null;
 } | null> {
-  try {
-    const admin = createAdminClient();
-    const { data, error } = await admin
-      .from("profiles")
-      .select("subscription_tier, is_founder, subscription_status")
-      .eq("user_id", billingClubId)
-      .maybeSingle();
-    if (error) return null;
-    return data;
-  } catch {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("subscription_tier, is_founder, subscription_status")
-      .eq("user_id", billingClubId)
-      .maybeSingle();
-    if (error) return null;
-    return data;
-  }
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("profiles")
+    .select("subscription_tier, is_founder, subscription_status")
+    .eq("user_id", billingClubId)
+    .maybeSingle();
+  if (error) return null;
+  return data;
 }
 
 /**

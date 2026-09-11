@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   deriveAccountStatus,
   type PaymentAccountSnapshot,
@@ -158,8 +158,8 @@ export async function loadLiveClubConnectAccount(
 }
 
 async function clubContact(clubId: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("profiles")
     .select("company_name, company_email")
     .eq("user_id", clubId)

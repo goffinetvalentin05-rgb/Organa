@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
   fetchPublicPageSettingsBundle,
@@ -14,8 +14,8 @@ export async function GET() {
     const guard = await requirePermission(PERMISSIONS.ACCESS_SETTINGS);
     if ("error" in guard) return guard.error;
 
-    const supabase = await createClient();
-    const bundle = await fetchPublicPageSettingsBundle(supabase, guard.clubId);
+    const admin = createAdminClient();
+    const bundle = await fetchPublicPageSettingsBundle(admin, guard.clubId);
 
     if (!bundle) {
       return NextResponse.json({ error: "Profil club introuvable" }, { status: 404 });
@@ -45,8 +45,8 @@ export async function PUT(request: NextRequest) {
           ? null
           : undefined;
 
-    const supabase = await createClient();
-    const result = await updatePublicPageSettings(supabase, guard.clubId, {
+    const admin = createAdminClient();
+    const result = await updatePublicPageSettings(admin, guard.clubId, {
       enabled: body.enabled,
       slug: body.slug,
       title: body.title,
@@ -67,7 +67,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: result.status || 500 });
     }
 
-    const bundle = await fetchPublicPageSettingsBundle(supabase, guard.clubId);
+    const bundle = await fetchPublicPageSettingsBundle(admin, guard.clubId);
 
     return NextResponse.json({
       settings: result.settings ?? bundle?.settings,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requireTeamPlan } from "@/lib/billing/teamPlan";
@@ -28,8 +28,8 @@ export async function GET() {
   const teamPlan = await requireTeamPlan(guard.clubId);
   if (!teamPlan.allowed && teamPlan.response) return teamPlan.response;
 
-  const supabase = await createClient();
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select(
       "company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"

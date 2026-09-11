@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { resolveClubLogoUrlForClient } from "@/lib/club/resolveClubLogoUrl";
 import { normalizeHexColor } from "@/lib/visuals/colors";
@@ -11,9 +11,9 @@ export async function GET() {
   try {
     const guard = await requirePermission(PERMISSIONS.VIEW_VISUALS);
     if ("error" in guard) return guard.error;
-    const supabase = await createClient();
+    const admin = createAdminClient();
 
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await admin
       .from("profiles")
       .select("company_name, logo_url, logo_path, primary_color, company_address")
       .eq("user_id", guard.clubId)
@@ -24,7 +24,7 @@ export async function GET() {
     }
 
     const logoUrl = profile
-      ? await resolveClubLogoUrlForClient(supabase, profile, guard.clubId)
+      ? await resolveClubLogoUrlForClient(admin, profile, guard.clubId)
       : null;
 
     const storedColor =

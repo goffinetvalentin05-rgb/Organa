@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         console.log("[API][settings] GET - Profil inexistant, crÃ©ation avec valeurs par dÃ©faut...");
         const defaultCurrencySymbol = getCurrencySymbol(DEFAULT_COMPANY_SETTINGS.currency);
 
-        const { data: newProfile, error: createError } = await supabase
+        const { data: newProfile, error: createError } = await admin
           .from("profiles")
           .insert({
             user_id: actorId,
@@ -212,6 +212,7 @@ export async function PUT(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const clubId = guard.clubId;
     const actorId = guard.userId;
 
@@ -275,7 +276,7 @@ export async function PUT(request: NextRequest) {
     ] as const;
 
     // RÃ©cupÃ©rer le profil existant avec TOUS les champs nÃ©cessaires AVANT de construire le payload
-    const { data: existingProfile, error: checkError } = await supabase
+    const { data: existingProfile, error: checkError } = await admin
       .from("profiles")
       .select(
         "user_id, plan, company_name, company_email, company_phone, company_address, logo_path, logo_url, primary_color, currency, currency_symbol, iban, bank_name, payment_terms, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled, qr_creditor_name, qr_creditor_street, qr_creditor_building_num, qr_creditor_zip, qr_creditor_city, qr_creditor_country"
@@ -457,7 +458,7 @@ export async function PUT(request: NextRequest) {
             }
           }
           
-          const { data: profile, error: updateError } = await supabase
+          const { data: profile, error: updateError } = await admin
             .from("profiles")
             .update(updateData)
             .eq("user_id", clubId)
@@ -471,7 +472,7 @@ export async function PUT(request: NextRequest) {
         } else {
           // Le profil n'existe pas, le crÃ©er avec TOUS les champs
           console.log("[API][settings] PUT - Profil inexistant, crÃ©ation avec TOUS les champs");
-          const { data: newProfile, error: createError } = await supabase
+          const { data: newProfile, error: createError } = await admin
             .from("profiles")
             .insert(profilePayload)
             .select(

@@ -533,7 +533,7 @@ export async function POST(request: NextRequest) {
 
     if (type === "quote") {
       const resolvedMethod = await resolveQuotePaymentMethodForInsert({
-        supabase,
+        supabase: admin,
         clubId: guard.clubId,
         requested: paymentMethod,
       });

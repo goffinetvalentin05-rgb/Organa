@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
 import { deriveContractStatus } from "@/lib/sponsor-contracts";
 
@@ -34,6 +35,7 @@ export async function GET() {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const [{ data: rows, error }, { data: profile }] = await Promise.all([
       supabase
@@ -43,7 +45,7 @@ export async function GET() {
         )
         .eq("club_id", guard.clubId)
         .order("end_date", { ascending: true }),
-      supabase
+      admin
         .from("profiles")
         .select("company_name")
         .eq("user_id", guard.clubId)

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const accessCheck = await requireWriteAccess(guard.clubId);
     if (accessCheck.response) {
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Sélectionnez au moins un contact" }, { status: 400 });
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
       .eq("user_id", guard.clubId)

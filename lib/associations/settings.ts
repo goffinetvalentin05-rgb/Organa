@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthContext, type ClubRole } from "@/lib/auth/rbac";
 import {
   checkPermission,
@@ -122,11 +123,12 @@ export async function requireAssociationSettingsAccess(options?: {
   };
 }
 
+/** Called only after `requireAssociationSettingsAccess`. `clubId` must already be validated. */
 export async function loadAssociationSettingsProfile(
   clubId: string
 ): Promise<AssociationSettingsProfile | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("profiles")
     .select(ASSOCIATION_SETTINGS_PROFILE_SELECT)
     .eq("user_id", clubId)

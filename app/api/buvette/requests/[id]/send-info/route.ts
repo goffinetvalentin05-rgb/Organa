@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveResendFromProfile } from "@/lib/email/resend-delivery";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 
@@ -21,6 +22,7 @@ export async function POST(
     if ("error" in guard) return guard.error;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const body = await request.json();
     const message = typeof body?.message === "string" ? body.message.trim() : "";
@@ -53,7 +55,7 @@ export async function POST(
       );
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled")
       .eq("user_id", guard.clubId)

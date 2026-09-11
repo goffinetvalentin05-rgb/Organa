@@ -104,36 +104,16 @@ export async function getSubscriptionStatus(
   // 2. Lire le profil facturation via service role (après contrôle membership).
   //    Évite qu'une RLS profiles trop stricte masque l'abonnement du club aux
   //    membres légitimes → faux SUBSCRIPTION_REQUIRED.
-  let profile: BillingProfileRow | null = null;
-  let profileError: { message?: string } | null = null;
-
-  try {
-    const admin = createAdminClient();
-    const result = await admin
-      .from("profiles")
-      .select(
-        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id, stripe_customer_id"
-      )
-      .eq("user_id", billingUserId)
-      .maybeSingle();
-    profile = (result.data as BillingProfileRow | null) ?? null;
-    profileError = result.error;
-  } catch (err) {
-    // Fallback RLS si service role indisponible (ex. env local incomplet)
-    console.warn(
-      "[BILLING][getSubscriptionStatus] Admin indisponible, fallback client session",
-      err
-    );
-    const result = await supabase
-      .from("profiles")
-      .select(
-        "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id, stripe_customer_id"
-      )
-      .eq("user_id", billingUserId)
-      .maybeSingle();
-    profile = (result.data as BillingProfileRow | null) ?? null;
-    profileError = result.error;
-  }
+  const admin = createAdminClient();
+  const result = await admin
+    .from("profiles")
+    .select(
+      "subscription_status, trial_started_at, billing_cycle, subscription_started_at, subscription_ends_at, created_at, is_founder, stripe_subscription_id, stripe_customer_id"
+    )
+    .eq("user_id", billingUserId)
+    .maybeSingle();
+  const profile = (result.data as BillingProfileRow | null) ?? null;
+  const profileError = result.error;
 
   if (profileError) {
     console.error(
@@ -157,7 +137,7 @@ export async function getSubscriptionStatus(
     );
 
     const now = new Date();
-    const { error: insertError } = await supabase.from("profiles").insert({
+    const { error: insertError } = await admin.from("profiles").insert({
       user_id: user.id,
       subscription_status: "trial",
       trial_started_at: now.toISOString(),
@@ -313,7 +293,7 @@ export async function getSubscriptionStatus(
           };
         }
 
-        await supabase
+        await admin
           .from("profiles")
           .update({ subscription_status: "expired" })
           .eq("user_id", billingUserId);
@@ -409,7 +389,7 @@ export async function activateSubscription(
   stripeSubscriptionId?: string,
   subscriptionTier: "standard" | "team" = "standard"
 ): Promise<void> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
   const now = new Date();
   const endsAt = new Date(now);
@@ -434,7 +414,7 @@ export async function activateSubscription(
     updateData.stripe_subscription_id = stripeSubscriptionId;
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("profiles")
     .update(updateData)
     .eq("user_id", userId);
@@ -458,9 +438,9 @@ export async function activateSubscription(
  * @param userId ID de l'utilisateur
  */
 export async function deactivateSubscription(userId: string): Promise<void> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("profiles")
     .update({
       subscription_status: "expired",

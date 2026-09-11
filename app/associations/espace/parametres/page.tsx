@@ -1,5 +1,5 @@
 import { requireProductAccess } from "@/lib/auth/require-product-access";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   ASSOCIATION_SETTINGS_PROFILE_SELECT,
   associationsRoleLabel,
@@ -15,7 +15,6 @@ function asFormString(value: string | null | undefined): string {
 export default async function AssociationsParametresPage() {
   await requireProductAccess("association");
   const settingsAccess = await requireAssociationSettingsAccess();
-  const supabase = await createClient();
 
   if (!settingsAccess.ok) {
     return (
@@ -25,14 +24,15 @@ export default async function AssociationsParametresPage() {
     );
   }
 
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select(ASSOCIATION_SETTINGS_PROFILE_SELECT)
     .eq("user_id", settingsAccess.clubId)
     .maybeSingle();
 
   const logoUrl = await resolveClubLogoUrlForClient(
-    supabase,
+    admin,
     profile
       ? { logo_url: profile.logo_url, logo_path: profile.logo_path }
       : null,

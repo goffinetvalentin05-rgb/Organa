@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAssociationSettingsAccess } from "@/lib/associations/settings";
 import { resolveClubLogoUrlForClient } from "@/lib/club/resolveClubLogoUrl";
 
@@ -65,6 +66,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
+  const admin = createAdminClient();
+
   const formData = await request.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
@@ -106,7 +109,7 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const clubId = access.clubId;
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await admin
     .from("profiles")
     .select("logo_path, logo_url, product_type")
     .eq("user_id", clubId)
@@ -154,7 +157,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await admin
     .from("profiles")
     .update({
       logo_path: fileName,
@@ -182,7 +185,7 @@ export async function POST(request: NextRequest) {
   }
 
   const clientUrl = await resolveClubLogoUrlForClient(
-    supabase,
+    admin,
     { logo_path: fileName, logo_url: logoUrl },
     clubId
   );
@@ -200,9 +203,10 @@ export async function DELETE() {
   }
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   const clubId = access.clubId;
 
-  const { data: profile, error: fetchError } = await supabase
+  const { data: profile, error: fetchError } = await admin
     .from("profiles")
     .select("logo_path, product_type")
     .eq("user_id", clubId)
@@ -231,7 +235,7 @@ export async function DELETE() {
   const logoPath = profile.logo_path;
   await supabase.storage.from("Logos").remove([logoPath]);
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await admin
     .from("profiles")
     .update({
       logo_path: null,

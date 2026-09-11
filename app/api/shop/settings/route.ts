@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { getOrCreateShopSettings, mapSettingsRow, updateShopSettings } from "@/lib/shop/settings";
@@ -11,8 +12,8 @@ export const runtime = "nodejs";
 const err = (e: unknown) => (e instanceof Error ? e.message : "Erreur serveur");
 
 async function clubProfile(clubId: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("profiles")
     .select("company_name, company_email, public_page_slug, buvette_slug")
     .eq("user_id", clubId)

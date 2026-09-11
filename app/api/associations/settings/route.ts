@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   associationsRoleLabel,
   loadAssociationSettingsProfile,
@@ -37,7 +37,7 @@ export async function GET() {
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
-  const supabase = await createClient();
+  const admin = createAdminClient();
   const profile = await loadAssociationSettingsProfile(access.clubId);
   if (!profile) {
     return NextResponse.json({
@@ -51,7 +51,7 @@ export async function GET() {
   }
 
   const logoUrl = await resolveClubLogoUrlForClient(
-    supabase,
+    admin,
     {
       logo_url: profile.logo_url,
       logo_path: profile.logo_path,
@@ -112,9 +112,9 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: current, error: readErr } = await supabase
+  const { data: current, error: readErr } = await admin
     .from("profiles")
     .select("user_id, product_type")
     .eq("user_id", access.clubId)
@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const { error: updateErr } = await supabase
+  const { error: updateErr } = await admin
     .from("profiles")
     .update({
       company_name: validated.company_name,

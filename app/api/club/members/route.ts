@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupère le profil et l'inviteur pour l'email
-    const { data: clubProfile } = await supabase
+    const { data: clubProfile } = await admin
       .from("profiles")
       .select(
         "company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"

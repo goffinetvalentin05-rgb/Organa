@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
 
   const permissions = sanitizePermissions(body.permissions);
   const supabase = await createClient();
+  const admin = createAdminClient();
 
   // Vérif : pas déjà membre actif
   const { data: existingMember } = await supabase
@@ -192,7 +193,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Profil club pour résoudre Resend custom + nom du club
-  const { data: clubProfile } = await supabase
+  const { data: clubProfile } = await admin
     .from("profiles")
     .select(
       "company_name, company_email, email_sender_name, email_sender_email, resend_api_key, email_custom_enabled"
@@ -215,7 +216,6 @@ export async function POST(request: NextRequest) {
   // INSERT : on contourne via service_role (la RLS exige is_club_admin
   // mais un committee avec manage_users doit pouvoir inviter — on a déjà
   // validé la permission applicative ci-dessus).
-  const admin = createAdminClient();
   const { data: inserted, error: insertError } = await admin
     .from("club_invitations")
     .insert({
