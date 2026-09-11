@@ -56,9 +56,13 @@ export function isMeaningfulMemberDraft(data: MemberDraftData): boolean {
   if (data.city.trim()) return true;
   if (data.category) return true;
   if (data.date_of_birth.trim()) return true;
-  if (data.avs_number.trim()) return true;
   if (data.role && data.role !== "player") return true;
   return false;
+}
+
+/** Jamais persister le numéro AVS dans localStorage. */
+export function sanitizeMemberDraftData(data: MemberDraftData): MemberDraftData {
+  return { ...data, avs_number: "" };
 }
 
 export const memberDraftStore = createLocalDraftStore<MemberDraftData>({
@@ -67,4 +71,5 @@ export const memberDraftStore = createLocalDraftStore<MemberDraftData>({
   formType: "member",
   isMeaningful: isMeaningfulMemberDraft,
   normalize: normalizeMemberDraftData,
+  sanitize: sanitizeMemberDraftData,
 });

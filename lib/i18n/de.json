@@ -961,6 +961,7 @@
         "loadError": "Feldeinstellungen konnten nicht geladen werden.",
         "readOnlyHint": "Sie können die Liste einsehen; Änderungen sind für berechtigte Personen reserviert.",
         "avsWarning": "Die AHV-Nummer ist sensibel. Aktivieren Sie dieses Feld nur, wenn Ihr Verein es wirklich braucht.",
+        "avsConfirm": "Aktivieren Sie dieses Feld nur, wenn die Erhebung der AHV-Nummer für Ihren Verein wirklich notwendig ist.",
         "fields": {
           "email": "E-Mail",
           "phone": "Telefon",
@@ -2079,7 +2080,8 @@
         "email": "E-Mail *",
         "phone": "Telefon (optional)",
         "comment": "Kommentar (optional)",
-        "commentPlaceholder": "Z.B.: Ernährungswünsche, Anzahl der Gäste..."
+        "commentPlaceholder": "Z.B.: Ernährungswünsche, Anzahl der Gäste...",
+        "marketingOptIn": "Ich bin damit einverstanden, Club-Mitteilungen per E-Mail zu erhalten."
       },
       "submitAction": "Anmelden",
       "submitting": "Anmeldung läuft...",
@@ -2243,6 +2245,8 @@
         "deleteConfirm": "Diesen Kontakt löschen?",
         "modalAddTitle": "Kontakt hinzufügen",
         "modalEditTitle": "Kontakt bearbeiten",
+        "staffDeclaresLawfulBasis": "Ich bestätige, dass der Verein eine gültige Grundlage hat, diese Person per E-Mail zu kontaktieren (Einwilligung oder eine andere rechtmässige Grundlage).",
+        "staffBasisRequired": "Bestätigen Sie, dass der Verein eine gültige Grundlage hat, diese Person zu kontaktieren.",
         "save": "Speichern",
         "cancel": "Abbrechen"
       },
@@ -2251,7 +2255,7 @@
         "nameLabel": "Interner Name",
         "subjectLabel": "Betreff",
         "audienceLabel": "Zielgruppe",
-        "audienceAll": "Alle Kontakte",
+        "audienceAll": "Alle eingewilligten Kontakte",
         "audienceSource": "Nach Quelle",
         "audienceManual": "Manuelle Auswahl",
         "send": "Kampagne senden",

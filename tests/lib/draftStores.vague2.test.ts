@@ -87,6 +87,40 @@ describe("drafts métier Vague 2", () => {
       memberImportDraftStore.clear("club-i");
       expect(memberImportDraftStore.load("club-i")).toBeNull();
     });
+
+    it("vide les valeurs AVS tout en gardant le mapping", () => {
+      memberImportDraftStore.save("club-i", {
+        step: "preview",
+        loadedFileName: "membres.csv",
+        headers: ["Nom", "AVS"],
+        rows: [["Dupont", "756.1111.2222.33"]],
+        columnMapping: { Nom: "nom", AVS: "avs_number" },
+        importRows: [
+          {
+            rowIndex: 1,
+            prenom: "",
+            nom: "Dupont",
+            email: "",
+            telephone: "",
+            adresse: "",
+            postal_code: "",
+            city: "",
+            role: "",
+            category: "",
+            date_of_birth: "",
+            avs_number: "756.1111.2222.33",
+            status: "valid",
+            errors: [],
+          },
+        ],
+      });
+      const loaded = memberImportDraftStore.load("club-i");
+      expect(loaded?.data.columnMapping.AVS).toBe("avs_number");
+      expect(loaded?.data.rows[0]?.[1]).toBe("");
+      expect(loaded?.data.importRows[0]?.avs_number).toBe("");
+      const raw = storeMap.get(memberImportDraftStore.storageKey("club-i")) as string;
+      expect(raw).not.toContain("756.1111.2222.33");
+    });
   });
 
   describe("club-settings", () => {
@@ -114,6 +148,23 @@ describe("drafts métier Vague 2", () => {
       });
       expect(normalized).not.toBeNull();
       expect(JSON.stringify(normalized)).not.toContain("leaked");
+    });
+
+    it("ne persiste jamais iban ni qr_creditor_*", () => {
+      clubSettingsDraftStore.save("club-s", {
+        ...emptyClubSettingsDraftData(),
+        nomEntreprise: "FC Test",
+        iban: "CH9300762011623852957",
+        qrCreditorName: "Secret Creditor",
+        qrCreditorStreet: "Rue secrète",
+      });
+      const loaded = clubSettingsDraftStore.load("club-s");
+      expect(loaded?.data.nomEntreprise).toBe("FC Test");
+      expect(loaded?.data.iban).toBe("");
+      expect(loaded?.data.qrCreditorName).toBe("");
+      const raw = storeMap.get(clubSettingsDraftStore.storageKey("club-s")) as string;
+      expect(raw).not.toContain("CH9300762011623852957");
+      expect(raw).not.toContain("Secret Creditor");
     });
   });
 
@@ -236,6 +287,19 @@ describe("drafts métier Vague 2", () => {
       expect(memberDraftStore.load("club-m")).toBeNull();
       // edit drafts intacts
       expect(memberDraftStore.load("club-m", "mem-a")).not.toBeNull();
+    });
+
+    it("ne persiste jamais avs_number", () => {
+      memberDraftStore.save("club-m", {
+        ...emptyMemberDraftData(),
+        nom: "Ada",
+        avs_number: "756.1234.5678.90",
+      });
+      const loaded = memberDraftStore.load("club-m");
+      expect(loaded?.data.nom).toBe("Ada");
+      expect(loaded?.data.avs_number).toBe("");
+      const raw = storeMap.get(memberDraftStore.storageKey("club-m")) as string;
+      expect(raw).not.toContain("756.1234.5678.90");
     });
   });
 });

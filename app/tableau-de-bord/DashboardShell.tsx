@@ -10,6 +10,7 @@ import {
 } from "@/components/dashboard/FinanceSectionNav";
 import { cn } from "@/components/ui/cn";
 import { createClient } from "@/lib/supabase/client";
+import { clearAllLocalDrafts } from "@/lib/drafts/clearLocalDrafts";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { dashboardShellRootClass } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
@@ -104,6 +105,7 @@ export default function DashboardShell({
 
   const handleLogout = async () => {
     try {
+      clearAllLocalDrafts();
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("[AUTH][Logout] Erreur lors de la déconnexion", error);

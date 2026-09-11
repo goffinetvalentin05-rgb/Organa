@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { withIdempotency } from "@/lib/api/idempotency";
+import {
+  MARKETING_CONSENT_TEXT_VERSION,
+  isStaffLawfulBasisDeclared,
+} from "@/lib/marketing/consent";
 
 export const runtime = "nodejs";
 
@@ -19,7 +23,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("marketing_contacts")
       .select(
-        "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed, unsubscribed_at"
+        "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed, unsubscribed_at, consented_at, consent_source"
       )
       .eq("club_id", guard.clubId)
       .order("created_at", { ascending: false });
@@ -74,6 +78,16 @@ export async function POST(request: NextRequest) {
     const phone = body?.phone?.trim() || null;
     const source = body?.source?.trim() || "manual";
 
+    if (!isStaffLawfulBasisDeclared(body?.staffDeclaresLawfulBasis)) {
+      return NextResponse.json(
+        {
+          error:
+            "Confirmez que le club dispose d’une base valable pour contacter cette personne.",
+        },
+        { status: 400 }
+      );
+    }
+
     if (!firstName || !lastName || !email) {
       return NextResponse.json(
         { error: "Nom, prénom et email sont obligatoires" },
@@ -107,6 +121,7 @@ export async function POST(request: NextRequest) {
           };
         }
 
+        const now = new Date().toISOString();
         const { data: contact, error } = await supabase
           .from("marketing_contacts")
           .insert({
@@ -116,9 +131,13 @@ export async function POST(request: NextRequest) {
             email,
             phone,
             source,
+            consented_at: now,
+            consent_source: "staff_declared",
+            consent_text_version: MARKETING_CONSENT_TEXT_VERSION,
+            unsubscribed: false,
           })
           .select(
-            "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed"
+            "id, first_name, last_name, email, phone, source, source_id, created_at, unsubscribed, consented_at, consent_source"
           )
           .single();
 

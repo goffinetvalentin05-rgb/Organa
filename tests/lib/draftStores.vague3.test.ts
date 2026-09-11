@@ -169,6 +169,21 @@ describe("drafts métier Vague 3", () => {
       expect(associationSettingsDraftStore.load("club-asso")).toBeNull();
     });
 
+    it("ne persiste pas l’IBAN", () => {
+      associationSettingsDraftStore.save("club-asso", {
+        ...emptyAssociationSettingsDraftData(),
+        company_name: "Asso Test",
+        iban: "CH9300762011623852957",
+      });
+      const loaded = associationSettingsDraftStore.load("club-asso");
+      expect(loaded?.data.company_name).toBe("Asso Test");
+      expect(loaded?.data.iban).toBe("");
+      const raw = storeMap.get(
+        associationSettingsDraftStore.storageKey("club-asso")
+      ) as string;
+      expect(raw).not.toContain("CH9300762011623852957");
+    });
+
     it("JSON invalide = aucun crash", () => {
       expect(
         associationSettingsDraftStore.parse("%%%", "club-asso")

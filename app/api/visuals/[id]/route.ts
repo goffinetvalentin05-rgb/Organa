@@ -9,6 +9,9 @@ import {
   sanitizeVisualData,
 } from "@/lib/visuals/data";
 import { mapVisualRow } from "@/lib/visuals/map";
+import { visualAssetPathsFromData } from "@/lib/visuals/assetPaths";
+import { removeStorageObjects } from "@/lib/storage/removeObjects";
+import type { VisualData } from "@/lib/visuals/types";
 
 export const runtime = "nodejs";
 
@@ -124,7 +127,7 @@ export async function DELETE(
     const supabase = await createClient();
     const { data: existing } = await supabase
       .from("club_visuals")
-      .select("id")
+      .select("id, data_json")
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .maybeSingle();
@@ -137,6 +140,11 @@ export async function DELETE(
       .eq("id", id)
       .eq("club_id", guard.clubId);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await removeStorageObjects(
+      supabase,
+      "visual-assets",
+      visualAssetPathsFromData(existing.data_json as VisualData)
+    );
     return NextResponse.json({ ok: true });
   } catch (error: unknown) {
     return NextResponse.json({ error: err(error) }, { status: 500 });

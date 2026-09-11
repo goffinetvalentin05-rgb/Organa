@@ -4,7 +4,7 @@
  */
 
 export type RecordedSupabaseOp = {
-  op: "select" | "insert" | "update" | "delete";
+  op: "select" | "insert" | "update" | "delete" | "upsert";
   table: string;
   filters: Record<string, unknown>;
   payload?: unknown;
@@ -112,6 +112,15 @@ export function createThenableSupabaseMock(matchers: OpMatcher[]) {
         state.filters[`${col}__lte`] = val;
         return chain;
       },
+      not(col: string, operator: string, val: unknown) {
+        state.filters[`${col}__not_${operator}`] = val;
+        return chain;
+      },
+      upsert(payload: unknown) {
+        state.op = "upsert";
+        state.payload = payload;
+        return insertChain;
+      },
       order() {
         return chain;
       },
@@ -190,7 +199,21 @@ export function createThenableSupabaseMock(matchers: OpMatcher[]) {
   }
 
   return {
-    client: { from: (table: string) => startQuery(table) },
+    client: {
+      from: (table: string) => startQuery(table),
+      storage: {
+        from: (bucket: string) => ({
+          remove: (paths: string[]) => {
+            log.push({
+              op: "delete",
+              table: `storage:${bucket}`,
+              filters: { paths },
+            });
+            return Promise.resolve({ error: null });
+          },
+        }),
+      },
+    },
     log,
   };
 }

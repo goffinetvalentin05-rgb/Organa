@@ -119,6 +119,7 @@ export default function AssociationsFooter() {
     { href: "/conditions-utilisation", label: "Conditions d'utilisation" },
     { href: "/politique-confidentialite", label: "Confidentialité" },
     { href: "/politique-cookies", label: "Cookies" },
+    { href: "/securite-protection-donnees", label: "Sécurité et données" },
   ];
 
   return (

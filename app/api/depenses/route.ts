@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import { withIdempotency } from "@/lib/api/idempotency";
+import { removeStorageObjects } from "@/lib/storage/removeObjects";
 
 export const runtime = "nodejs";
 
@@ -229,7 +230,7 @@ export async function DELETE(request: NextRequest) {
 
     const { data: expenseInfo } = await supabase
       .from("expenses")
-      .select("description, amount")
+      .select("description, amount, attachment_url")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .maybeSingle();
@@ -265,6 +266,10 @@ export async function DELETE(request: NextRequest) {
       },
       ...meta,
     });
+
+    await removeStorageObjects(supabase, "expenses", [
+      expenseInfo?.attachment_url,
+    ]);
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/depenses");

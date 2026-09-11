@@ -1021,6 +1021,7 @@
         "loadError": "Could not load field settings.",
         "readOnlyHint": "You can review this list; changes are limited to people allowed in club settings.",
         "avsWarning": "The AVS number is sensitive. Enable it only if your club truly needs it.",
+        "avsConfirm": "Only enable this field if collecting the AVS number is genuinely necessary for your club.",
         "fields": {
           "email": "Email",
           "phone": "Phone",
@@ -2209,7 +2210,8 @@
         "email": "Email *",
         "phone": "Phone (optional)",
         "comment": "Comment (optional)",
-        "commentPlaceholder": "E.g.: Dietary requirements, number of guests..."
+        "commentPlaceholder": "E.g.: Dietary requirements, number of guests...",
+        "marketingOptIn": "I agree to receive club communications by email."
       },
       "submitAction": "Register",
       "submitting": "Registering...",
@@ -2373,6 +2375,8 @@
         "deleteConfirm": "Delete this contact?",
         "modalAddTitle": "Add contact",
         "modalEditTitle": "Edit contact",
+        "staffDeclaresLawfulBasis": "I confirm that the club has a valid basis to contact this person by email (consent or another lawful basis).",
+        "staffBasisRequired": "Confirm that the club has a valid basis to contact this person.",
         "save": "Save",
         "cancel": "Cancel"
       },
@@ -2381,7 +2385,7 @@
         "nameLabel": "Internal name",
         "subjectLabel": "Subject",
         "audienceLabel": "Audience",
-        "audienceAll": "All contacts",
+        "audienceAll": "All consented contacts",
         "audienceSource": "By source",
         "audienceManual": "Manual selection",
         "send": "Send campaign",

@@ -3,6 +3,9 @@
  * Aucun token / secret / File.
  */
 
+/** TTL par défaut : 72 h. */
+export const DEFAULT_LOCAL_DRAFT_TTL_MS = 72 * 60 * 60 * 1000;
+
 export type LocalDraftEnvelope<TData> = {
   version: number;
   savedAt: string;
@@ -20,6 +23,8 @@ export type CreateLocalDraftStoreConfig<TData> = {
   isMeaningful: (data: TData) => boolean;
   /** Retourne null si les données brutes sont inutilisables. */
   normalize: (raw: unknown) => TData | null;
+  /** Retire secrets (AVS, IBAN, etc.) avant persist / restore. */
+  sanitize?: (data: TData) => TData;
   /**
    * Override de clé (ex. legacy planning).
    * Par défaut : obillz:draft:{product}:{formType}:{clubId}[:{entityId}]
@@ -30,6 +35,8 @@ export type CreateLocalDraftStoreConfig<TData> = {
    * @default false
    */
   allowMissingFormType?: boolean;
+  /** Durée de vie du brouillon. @default DEFAULT_LOCAL_DRAFT_TTL_MS */
+  ttlMs?: number;
 };
 
 export type LocalDraftStore<TData> = {
@@ -84,6 +91,17 @@ function entityIdsMatch(
   return raw === expectedNorm;
 }
 
+export function isLocalDraftExpired(
+  savedAt: unknown,
+  ttlMs: number = DEFAULT_LOCAL_DRAFT_TTL_MS,
+  nowMs: number = Date.now()
+): boolean {
+  if (typeof savedAt !== "string" || !savedAt) return true;
+  const t = Date.parse(savedAt);
+  if (Number.isNaN(t)) return true;
+  return nowMs - t > ttlMs;
+}
+
 export function createLocalDraftStore<TData>(
   config: CreateLocalDraftStoreConfig<TData>
 ): LocalDraftStore<TData> {
@@ -93,7 +111,9 @@ export function createLocalDraftStore<TData>(
     formType,
     isMeaningful,
     normalize,
+    sanitize = (data: TData) => data,
     allowMissingFormType = false,
+    ttlMs = DEFAULT_LOCAL_DRAFT_TTL_MS,
   } = config;
 
   function storageKey(clubId: string, entityId?: string | null): string {
@@ -131,8 +151,12 @@ export function createLocalDraftStore<TData>(
     if (!entityIdsMatch(env.entityId, entityId)) return null;
     if (!env.data || typeof env.data !== "object") return null;
 
+    if (isLocalDraftExpired(env.savedAt, ttlMs)) return null;
+
     const data = normalize(env.data);
-    if (!data || !isMeaningful(data)) return null;
+    if (!data) return null;
+    const sanitized = sanitize(data);
+    if (!isMeaningful(sanitized)) return null;
 
     const resolvedEntityId =
       typeof entityId === "string" && entityId.trim() ? entityId.trim() : null;
@@ -145,7 +169,7 @@ export function createLocalDraftStore<TData>(
       product,
       formType,
       entityId: resolvedEntityId,
-      data,
+      data: sanitized,
     };
   }
 
@@ -155,9 +179,20 @@ export function createLocalDraftStore<TData>(
   ): LocalDraftEnvelope<TData> | null {
     if (!isBrowser() || !clubId) return null;
     try {
-      const raw = window.localStorage.getItem(storageKey(clubId, entityId));
+      const key = storageKey(clubId, entityId);
+      const raw = window.localStorage.getItem(key);
       if (!raw) return null;
-      return parse(raw, clubId, entityId);
+      const loaded = parse(raw, clubId, entityId);
+      if (loaded) return loaded;
+      try {
+        const env = JSON.parse(raw) as { savedAt?: unknown };
+        if (isLocalDraftExpired(env?.savedAt, ttlMs)) {
+          window.localStorage.removeItem(key);
+        }
+      } catch {
+        // envelope illisible : on ne touche pas
+      }
+      return null;
     } catch {
       return null;
     }
@@ -181,7 +216,8 @@ export function createLocalDraftStore<TData>(
       return { saved: false, savedAt: null };
     }
 
-    if (!isMeaningful(data)) {
+    const sanitized = sanitize(data);
+    if (!isMeaningful(sanitized)) {
       clear(clubId, entityId);
       return { saved: false, savedAt: null };
     }
@@ -196,7 +232,7 @@ export function createLocalDraftStore<TData>(
       product,
       formType,
       entityId: resolvedEntityId,
-      data,
+      data: sanitized,
     };
 
     try {

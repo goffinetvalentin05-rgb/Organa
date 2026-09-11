@@ -5,6 +5,10 @@ import {
   sendRequestReceivedToClub,
 } from "@/lib/buvette/email";
 import { upsertMarketingContact } from "@/lib/marketing/contacts";
+import {
+  MARKETING_CONSENT_TEXT_VERSION,
+  isTruthyMarketingOptIn,
+} from "@/lib/marketing/consent";
 import { rateLimitGuard } from "@/lib/security/rateLimit";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 
@@ -106,15 +110,19 @@ export async function POST(
       return NextResponse.json({ error: createError?.message || "Erreur création demande" }, { status: 500 });
     }
 
-    await upsertMarketingContact({
-      clubId: profile.user_id,
-      firstName,
-      lastName,
-      email,
-      phone,
-      source: "buvette",
-      sourceId: created.id,
-    });
+    if (isTruthyMarketingOptIn(body?.marketingOptIn)) {
+      await upsertMarketingContact({
+        clubId: profile.user_id,
+        firstName,
+        lastName,
+        email,
+        phone,
+        source: "buvette",
+        sourceId: created.id,
+        consentSource: "buvette_form",
+        consentTextVersion: MARKETING_CONSENT_TEXT_VERSION,
+      });
+    }
 
     await supabase.from("buvette_slots").insert({
       user_id: profile.user_id,

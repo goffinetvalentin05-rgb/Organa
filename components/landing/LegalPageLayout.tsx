@@ -12,6 +12,7 @@ import LegalTocNav, { type LegalTocItem } from "@/components/landing/LegalTocNav
 type LegalPageLayoutProps = {
   title: string;
   lastUpdated: string;
+  eyebrow?: string;
   children: ReactNode;
 };
 
@@ -47,6 +48,7 @@ function extractToc(children: ReactNode): LegalTocItem[] {
 export default function LegalPageLayout({
   title,
   lastUpdated,
+  eyebrow = "INFORMATIONS LÉGALES",
   children,
 }: LegalPageLayoutProps) {
   const toc = extractToc(children);
@@ -57,7 +59,7 @@ export default function LegalPageLayout({
 
       <main className="legal-main">
         <header className="legal-hero">
-          <span className="legal-eyebrow">INFORMATIONS LÉGALES</span>
+          <span className="legal-eyebrow">{eyebrow}</span>
           <h1>{title}</h1>
           <p>Dernière mise à jour : {lastUpdated}</p>
         </header>

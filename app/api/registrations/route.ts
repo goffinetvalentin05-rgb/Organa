@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { upsertMarketingContact } from "@/lib/marketing/contacts";
+import {
+  MARKETING_CONSENT_TEXT_VERSION,
+  isTruthyMarketingOptIn,
+} from "@/lib/marketing/consent";
 import { rateLimitGuard } from "@/lib/security/rateLimit";
 import { logAudit, AuditAction, extractRequestMetadata } from "@/lib/auth/audit";
 
@@ -110,15 +114,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (qrcode.user_id) {
-      await upsertMarketingContact({
-        clubId: qrcode.user_id,
-        firstName,
-        lastName,
-        email,
-        phone,
-        source: "evenement",
-        sourceId: registration.id,
-      });
+      if (isTruthyMarketingOptIn(body?.marketingOptIn)) {
+        await upsertMarketingContact({
+          clubId: qrcode.user_id,
+          firstName,
+          lastName,
+          email,
+          phone,
+          source: "evenement",
+          sourceId: registration.id,
+          consentSource: "event_form",
+          consentTextVersion: MARKETING_CONSENT_TEXT_VERSION,
+        });
+      }
 
       await logAudit({
         clubId: qrcode.user_id,

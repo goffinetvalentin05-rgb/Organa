@@ -1,9 +1,9 @@
 import "./globals.css";
 import type { Viewport } from "next";
 import { Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { I18nProvider } from "@/components/I18nProvider";
 import ObillzToaster from "@/components/ObillzToaster";
+import ObillzAnalytics from "@/components/ObillzAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,7 +41,7 @@ export default function RootLayout({
         <I18nProvider>{children}</I18nProvider>
         <ObillzToaster />
         <div id="obillz-portal-root" className="fixed inset-0 z-[9999] pointer-events-none" />
-        <Analytics />
+        <ObillzAnalytics />
       </body>
     </html>
   );

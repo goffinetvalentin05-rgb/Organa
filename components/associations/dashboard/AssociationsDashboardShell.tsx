@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { clearAllLocalDrafts } from "@/lib/drafts/clearLocalDrafts";
 import {
   ASSOCIATIONS_NAV,
   associationsNavTitle,
@@ -85,6 +86,7 @@ export default function AssociationsDashboardShell({
   };
 
   const handleLogout = async () => {
+    clearAllLocalDrafts();
     const supabase = createClient();
     await supabase.auth.signOut();
     // `next=` conserve la reconnexion pendant la pause du lancement public

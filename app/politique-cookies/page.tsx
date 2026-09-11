@@ -1,51 +1,53 @@
 import type { Metadata } from "next";
-import { LegalSection } from "@/components/landing/LegalDocument";
+import {
+  LegalEmailLink,
+  LegalInlineLink,
+  LegalSection,
+} from "@/components/landing/LegalDocument";
 import LegalPageLayout from "@/components/landing/LegalPageLayout";
 
 export const metadata: Metadata = {
   title: "Politique de cookies | Obillz",
-  description: "Politique de cookies et traceurs — Obillz.",
+  description: "Cookies, session et mesure d’audience — Obillz.",
 };
 
 export default function PolitiqueCookiesPage() {
   return (
-    <LegalPageLayout title="Politique de cookies" lastUpdated="6 février 2026">
+    <LegalPageLayout title="Politique de cookies" lastUpdated="11 septembre 2026">
       <LegalSection title="Vue d'ensemble">
         <p>
-          Obillz utilise des cookies strictement nécessaires au fonctionnement du service de
-          gestion pour clubs sportifs. Aucun cookie de suivi publicitaire n&apos;est installé par
-          défaut.
+          Obillz utilise des cookies ou stockages strictement nécessaires au
+          fonctionnement du service (session, sécurité). Aucun cookie de suivi
+          publicitaire n’est installé par défaut.
         </p>
       </LegalSection>
 
-      <LegalSection title="Cookies essentiels">
+      <LegalSection title="Cookies et stockage essentiels">
         <p>
-          Ces cookies permettent notamment la connexion sécurisée, la gestion de session et la
-          prévention des usages frauduleux. Ils sont indispensables au bon fonctionnement du
-          service.
+          Ils permettent la connexion sécurisée, la gestion de session, le club
+          actif et la prévention des usages abusifs. Sans eux, le service ne peut
+          pas fonctionner correctement.
         </p>
       </LegalSection>
 
       <LegalSection title="Mesure d'audience">
         <p>
-          Si des statistiques d&apos;usage basiques sont activées, elles servent uniquement à
-          améliorer le service (performance, stabilité, compréhension des parcours). Ces mesures
-          sont limitées et ne visent pas à vous profiler à des fins publicitaires.
+          Vercel Analytics est utilisé pour comprendre l’usage du site (pages
+          visitées, performance). Il s’agit d’une mesure d’audience limitée, sans
+          publicité ciblée. Les URL contenant un jeton secret (cotisation,
+          invitation, désinscription) sont masquées avant transmission.
         </p>
       </LegalSection>
 
-      <LegalSection title="Gestion des cookies">
+      <LegalSection title="Gestion">
         <p>
-          Vous pouvez gérer ou supprimer les cookies via les paramètres de votre navigateur. Le
-          refus des cookies essentiels peut empêcher l&apos;accès au service ou en dégrader le
-          fonctionnement.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Durée de conservation">
-        <p>
-          Les cookies essentiels sont conservés pour la durée de la session ou selon une durée
-          limitée afin d&apos;assurer la sécurité et la continuité du service.
+          Vous pouvez gérer ou supprimer les cookies via les paramètres de votre
+          navigateur. Le refus des cookies essentiels peut empêcher l’accès au
+          service. Pour toute question : <LegalEmailLink />. Voir aussi la{" "}
+          <LegalInlineLink href="/politique-confidentialite">
+            politique de confidentialité
+          </LegalInlineLink>
+          .
         </p>
       </LegalSection>
     </LegalPageLayout>

@@ -1,6 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  MARKETING_CONSENT_TEXT_VERSION,
+  type MarketingConsentSource,
+} from "@/lib/marketing/consent";
 
-type UpsertMarketingContactInput = {
+export type UpsertMarketingContactInput = {
   clubId: string;
   firstName?: string | null;
   lastName?: string | null;
@@ -8,15 +12,27 @@ type UpsertMarketingContactInput = {
   phone?: string | null;
   source: string;
   sourceId?: string | null;
+  consentSource: MarketingConsentSource;
+  consentTextVersion?: string;
 };
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-export async function upsertMarketingContact(input: UpsertMarketingContactInput) {
+/**
+ * Crée ou met à jour un contact marketing uniquement lorsqu’un opt-in
+ * (ou une déclaration staff) est fourni. Sans consentement : no-op.
+ */
+export async function upsertMarketingContact(
+  input: UpsertMarketingContactInput
+): Promise<{ upserted: boolean }> {
   const email = normalizeEmail(input.email);
-  if (!email) return;
+  if (!email) return { upserted: false };
+  if (!input.consentSource) return { upserted: false };
 
   const supabase = createAdminClient();
+  const now = new Date().toISOString();
+  const consentTextVersion =
+    input.consentTextVersion?.trim() || MARKETING_CONSENT_TEXT_VERSION;
 
   const { error } = await supabase.from("marketing_contacts").upsert(
     {
@@ -27,7 +43,11 @@ export async function upsertMarketingContact(input: UpsertMarketingContactInput)
       phone: input.phone?.trim() || null,
       source: input.source || "unknown",
       source_id: input.sourceId || null,
-      updated_at: new Date().toISOString(),
+      consented_at: now,
+      consent_source: input.consentSource,
+      consent_text_version: consentTextVersion,
+      unsubscribed: false,
+      updated_at: now,
     },
     {
       onConflict: "club_id,email_normalized",
@@ -37,6 +57,7 @@ export async function upsertMarketingContact(input: UpsertMarketingContactInput)
 
   if (error) {
     console.error("[MARKETING][contacts] upsert error:", error);
+    return { upserted: false };
   }
+  return { upserted: true };
 }
-

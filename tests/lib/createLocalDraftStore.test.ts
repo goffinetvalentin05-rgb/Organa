@@ -141,4 +141,16 @@ describe("createLocalDraftStore", () => {
     expect(store.load("club-a")).toBeNull();
     expect(store.save("club-a", { title: "x", notes: "" }).saved).toBe(false);
   });
+
+  it("TTL : un brouillon expiré est ignoré et retiré", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-11T12:00:00.000Z"));
+    const store = createSampleStore();
+    store.save("club-a", { title: "Expirera", notes: "" });
+    expect(store.load("club-a")?.data.title).toBe("Expirera");
+
+    vi.setSystemTime(new Date("2026-09-15T12:00:00.000Z"));
+    expect(store.load("club-a")).toBeNull();
+    vi.useRealTimers();
+  });
 });

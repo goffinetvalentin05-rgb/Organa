@@ -44,6 +44,7 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
     phone: "",
     eventType: "",
     message: "",
+    marketingOptIn: false,
   });
 
   const brand = useMemo(
@@ -137,6 +138,7 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
         phone: "",
         eventType: "",
         message: "",
+        marketingOptIn: false,
       });
       setSelectedDate(null);
       await load();
@@ -383,6 +385,17 @@ export default function PublicBuvettePage({ params }: { params: Promise<{ slug: 
               rows={4}
               className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 outline-none transition focus:border-slate-400"
             />
+            <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={formData.marketingOptIn}
+                onChange={(e) =>
+                  setFormData({ ...formData, marketingOptIn: e.target.checked })
+                }
+                className="mt-0.5 h-4 w-4 rounded border-slate-300"
+              />
+              <span>J’accepte de recevoir les communications du club par e-mail.</span>
+            </label>
             <button
               type="submit"
               disabled={submitting}

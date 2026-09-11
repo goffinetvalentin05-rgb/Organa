@@ -45,6 +45,7 @@ type MarketingContact = {
   phone: string | null;
   source: string;
   unsubscribed: boolean;
+  consented_at: string | null;
 };
 
 type MarketingCampaign = {
@@ -108,6 +109,7 @@ export default function MarketingCampaignsPage() {
     email: "",
     phone: "",
     source: "",
+    staffDeclaresLawfulBasis: false,
   });
 
   const draftData = useMemo<MarketingCampaignDraftData>(
@@ -155,7 +157,11 @@ export default function MarketingCampaignsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sync on tab/hydrate only
   }, [draftHydrated, activeTab]);
 
-  const activeContacts = useMemo(() => contacts.filter((contact) => !contact.unsubscribed), [contacts]);
+  const activeContacts = useMemo(
+    () =>
+      contacts.filter((contact) => !contact.unsubscribed && Boolean(contact.consented_at)),
+    [contacts]
+  );
   const campaignsSent = useMemo(
     () => campaigns.filter((c) => c.status === "sent").length,
     [campaigns],
@@ -237,6 +243,7 @@ export default function MarketingCampaignsPage() {
       email: "",
       phone: "",
       source: "",
+      staffDeclaresLawfulBasis: false,
     });
     setContactModalOpen(true);
   };
@@ -249,6 +256,7 @@ export default function MarketingCampaignsPage() {
       email: contact.email || "",
       phone: contact.phone || "",
       source: contact.source || "",
+      staffDeclaresLawfulBasis: false,
     });
     setContactModalOpen(true);
   };
@@ -270,9 +278,17 @@ export default function MarketingCampaignsPage() {
           email: contactForm.email,
           phone: contactForm.phone,
           source: contactForm.source,
+          staffDeclaresLawfulBasis: contactForm.staffDeclaresLawfulBasis,
         };
 
         const isEdit = Boolean(editingContactId);
+        if (!isEdit && !contactForm.staffDeclaresLawfulBasis) {
+          notifyError(
+            t("dashboard.marketing.contacts.staffBasisRequired"),
+            "marketing-contact-save"
+          );
+          return;
+        }
         const endpoint = isEdit
           ? `/api/marketing/contacts/${editingContactId}`
           : "/api/marketing/contacts";
@@ -657,6 +673,24 @@ export default function MarketingCampaignsPage() {
                   className={dashboardInputClass}
                 />
               </div>
+
+              {!editingContactId ? (
+                <label className="flex items-start gap-3 rounded-xl border border-[rgba(15,23,42,0.1)] bg-[#F8FAFC] px-3 py-3 text-sm leading-relaxed text-[#334155]">
+                  <input
+                    type="checkbox"
+                    className={`${dashboardCheckboxClass} mt-0.5`}
+                    checked={contactForm.staffDeclaresLawfulBasis}
+                    onChange={(e) =>
+                      setContactForm((prev) => ({
+                        ...prev,
+                        staffDeclaresLawfulBasis: e.target.checked,
+                      }))
+                    }
+                    required
+                  />
+                  <span>{t("dashboard.marketing.contacts.staffDeclaresLawfulBasis")}</span>
+                </label>
+              ) : null}
 
               <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
                 <ActionButton type="button" onClick={closeContactModal}>

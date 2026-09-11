@@ -86,11 +86,16 @@ export function isMeaningfulAssociationSettingsDraft(
   if (data.company_country.trim()) return true;
   if (data.website.trim()) return true;
   if (data.description.trim()) return true;
-  if (data.iban.trim()) return true;
   if (data.bank_name.trim()) return true;
   if (data.logo_url?.trim()) return true;
   if (data.logoPendingReselect) return true;
   return false;
+}
+
+export function sanitizeAssociationSettingsDraftData(
+  data: AssociationSettingsDraftData
+): AssociationSettingsDraftData {
+  return { ...data, iban: "" };
 }
 
 export const associationSettingsDraftStore =
@@ -100,4 +105,5 @@ export const associationSettingsDraftStore =
     formType: "association-settings",
     isMeaningful: isMeaningfulAssociationSettingsDraft,
     normalize: normalizeAssociationSettingsDraftData,
+    sanitize: sanitizeAssociationSettingsDraftData,
   });

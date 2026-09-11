@@ -109,10 +109,27 @@ export function isMeaningfulClubSettingsDraft(
   return Object.entries(data).some(([key, value]) => {
     if (key === "styleEnTete") return value !== "moderne";
     if (key === "emailCustomEnabled") return value === true;
-    if (key === "qrCreditorCountry") return value !== "CH" && value !== "";
+    if (key === "iban" || key.startsWith("qrCreditor")) return false;
+    if (key === "qrCreditorCountry") return false;
     if (typeof value === "string") return value.trim().length > 0;
     return false;
   });
+}
+
+/** Jamais persister IBAN / coordonnées QR créancier. */
+export function sanitizeClubSettingsDraftData(
+  data: ClubSettingsDraftData
+): ClubSettingsDraftData {
+  return {
+    ...data,
+    iban: "",
+    qrCreditorName: "",
+    qrCreditorStreet: "",
+    qrCreditorBuildingNum: "",
+    qrCreditorZip: "",
+    qrCreditorCity: "",
+    qrCreditorCountry: "CH",
+  };
 }
 
 /** Garantit qu’aucune clé secrète n’est sérialisée. */
@@ -120,7 +137,7 @@ export function toClubSettingsDraftPayload(
   form: Record<string, unknown>
 ): ClubSettingsDraftData {
   const normalized = normalizeClubSettingsDraftData(form);
-  return normalized ?? emptyClubSettingsDraftData();
+  return sanitizeClubSettingsDraftData(normalized ?? emptyClubSettingsDraftData());
 }
 
 export const clubSettingsDraftStore = createLocalDraftStore<ClubSettingsDraftData>({
@@ -129,4 +146,5 @@ export const clubSettingsDraftStore = createLocalDraftStore<ClubSettingsDraftDat
   formType: "club-settings",
   isMeaningful: isMeaningfulClubSettingsDraft,
   normalize: normalizeClubSettingsDraftData,
+  sanitize: sanitizeClubSettingsDraftData,
 });

@@ -4,6 +4,7 @@ import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
 import { mapProduct, PRODUCT_SELECT, type ImageRow, type ProductRow, type VariantRow } from "@/lib/shop/products";
 import { parseProductInput } from "@/lib/shop/product-input";
+import { removeStorageObjects } from "@/lib/storage/removeObjects";
 
 export const runtime = "nodejs";
 
@@ -140,6 +141,11 @@ export async function DELETE(
     if (access.response) return access.response;
     const { id } = await params;
     const supabase = await createClient();
+    const { data: images } = await supabase
+      .from("shop_product_images")
+      .select("storage_path")
+      .eq("product_id", id)
+      .eq("club_id", guard.clubId);
     const { error } = await supabase
       .from("shop_products")
       .update({
@@ -150,6 +156,11 @@ export async function DELETE(
       .eq("id", id)
       .eq("club_id", guard.clubId);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await removeStorageObjects(
+      supabase,
+      "shop-products",
+      (images || []).map((row) => row.storage_path)
+    );
     return NextResponse.json({ ok: true });
   } catch (error: unknown) {
     return NextResponse.json({ error: err(error) }, { status: 500 });

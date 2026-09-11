@@ -31,6 +31,7 @@ export default function PublicRegistrationPage({ params }: { params: Promise<{ c
     email: "",
     phone: "",
     comment: "",
+    marketingOptIn: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -318,6 +319,18 @@ export default function PublicRegistrationPage({ params }: { params: Promise<{ c
                 rows={3}
               />
             </div>
+
+            <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={formData.marketingOptIn}
+                onChange={(e) =>
+                  setFormData({ ...formData, marketingOptIn: e.target.checked })
+                }
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span>{t("dashboard.publicRegistration.fields.marketingOptIn")}</span>
+            </label>
 
             {/* Submit */}
             <button

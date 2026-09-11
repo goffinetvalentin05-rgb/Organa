@@ -84,6 +84,12 @@ export default function MemberFieldsSettingsCard({
   }, [load]);
 
   const toggle = (key: MemberFieldKey, enabled: boolean) => {
+    if (key === "avs_number" && enabled && !fields.avs_number.enabled) {
+      const confirmed = window.confirm(
+        t("dashboard.settings.memberFields.avsConfirm")
+      );
+      if (!confirmed) return;
+    }
     setFields((prev) => ({
       ...prev,
       [key]: { ...prev[key], enabled },

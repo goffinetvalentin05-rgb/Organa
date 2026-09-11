@@ -137,10 +137,38 @@ export function isMeaningfulMemberImportDraft(
   return false;
 }
 
+/** Conserve mapping/headers ; vide les valeurs AVS. */
+export function sanitizeMemberImportDraftData(
+  data: MemberImportDraftData
+): MemberImportDraftData {
+  const avsKeys = Object.entries(data.columnMapping)
+    .filter(([, value]) => value === "avs_number")
+    .map(([key]) => key);
+
+  const avsIndexes = new Set<number>();
+  for (const key of avsKeys) {
+    const asNum = Number(key);
+    if (Number.isInteger(asNum) && String(asNum) === key) {
+      avsIndexes.add(asNum);
+    }
+    const headerIndex = data.headers.indexOf(key);
+    if (headerIndex >= 0) avsIndexes.add(headerIndex);
+  }
+
+  return {
+    ...data,
+    rows: data.rows.map((row) =>
+      row.map((cell, index) => (avsIndexes.has(index) ? "" : cell))
+    ),
+    importRows: data.importRows.map((row) => ({ ...row, avs_number: "" })),
+  };
+}
+
 export const memberImportDraftStore = createLocalDraftStore<MemberImportDraftData>({
   version: MEMBER_IMPORT_DRAFT_VERSION,
   product: "sport",
   formType: "member-import",
   isMeaningful: isMeaningfulMemberImportDraft,
   normalize: normalizeMemberImportDraftData,
+  sanitize: sanitizeMemberImportDraftData,
 });

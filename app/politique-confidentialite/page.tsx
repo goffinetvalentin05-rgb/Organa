@@ -1,96 +1,194 @@
 import type { Metadata } from "next";
 import {
   LegalEmailLink,
+  LegalInlineLink,
   LegalSection,
 } from "@/components/landing/LegalDocument";
 import LegalPageLayout from "@/components/landing/LegalPageLayout";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité | Obillz",
-  description: "Politique de confidentialité et protection des données (RGPD) — Obillz.",
+  description:
+    "Politique de confidentialité d’Obillz selon la Loi fédérale suisse sur la protection des données (LPD).",
 };
 
 export default function PolitiqueConfidentialitePage() {
   return (
     <LegalPageLayout
-      title="Politique de confidentialité (RGPD)"
-      lastUpdated="6 février 2026"
+      title="Politique de confidentialité"
+      lastUpdated="11 septembre 2026"
     >
-      <LegalSection title="Responsable du traitement">
+      <LegalSection title="Qui nous sommes">
         <p>
-          Les données personnelles collectées via Obillz sont traitées par la société éditrice du
-          service. Pour toute question relative à la protection des données, vous pouvez nous
-          contacter à <LegalEmailLink />.
+          Obillz est un service de gestion pour clubs sportifs, exploité par Valentin
+          Goffinet. Cette politique décrit comment les données personnelles sont
+          traitées lorsque vous utilisez le site et la plateforme Obillz.
+        </p>
+        <p>
+          Contact : <LegalEmailLink />
+          <br />
+          Adresse postale : [ADRESSE POSTALE À COMPLÉTER]
         </p>
       </LegalSection>
 
-      <LegalSection title="Données traitées">
+      <LegalSection title="Deux rôles distincts">
         <p>
-          Obillz collecte uniquement les données nécessaires au fonctionnement du service de
-          gestion pour clubs sportifs, notamment : informations de compte (nom, email,
-          identifiants), informations relatives au club (membres, cotisations, événements,
-          finances), ainsi que des données techniques d&apos;accès (logs, sécurité, métriques de
-          performance).
+          La Loi fédérale suisse sur la protection des données (LPD) distingue le
+          responsable du traitement et le sous-traitant. Sur Obillz, deux situations
+          coexistent.
+        </p>
+        <p>
+          <strong>Obillz est responsable du traitement</strong> pour les données du
+          compte utilisateur, de l’abonnement, du support, de la sécurité de la
+          plateforme et des statistiques d’audience du site.
+        </p>
+        <p>
+          <strong>Le club est responsable du traitement</strong> des données métier
+          qu’il saisit ou collecte via Obillz (membres, cotisations, boutique,
+          événements, bénévoles, communications, etc.). Dans ce cadre, Obillz agit
+          comme <strong>sous-traitant</strong> du club. Un accord de sous-traitance
+          (DPA) est disponible sur demande à <LegalEmailLink />.
         </p>
       </LegalSection>
 
-      <LegalSection title="Finalités">
+      <LegalSection title="Données dont Obillz est responsable">
+        <p>Lorsque vous créez un compte ou utilisez le service pour votre club :</p>
+        <ul>
+          <li>
+            <strong>Compte utilisateur</strong> : identifiants, e-mail, nom affiché,
+            rôle au sein du club, préférences de connexion (y compris
+            authentification à plusieurs facteurs si activée).
+          </li>
+          <li>
+            <strong>Abonnement</strong> : plan, statut de facturation, identifiants
+            de paiement gérés par Stripe (Obillz ne stocke pas le numéro complet de
+            carte).
+          </li>
+          <li>
+            <strong>Support</strong> : contenu des demandes envoyées à{" "}
+            <LegalEmailLink />.
+          </li>
+          <li>
+            <strong>Sécurité</strong> : journaux techniques (horodatage, actions,
+            parfois adresse IP) nécessaires pour détecter les abus, tracer les
+            accès et protéger le service.
+          </li>
+          <li>
+            <strong>Analytics</strong> : mesures d’audience via Vercel Analytics, sans
+            cookie publicitaire. Les chemins d’URL contenant un jeton secret sont
+            masqués avant envoi.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="Données dont le club est responsable">
         <p>
-          Les données sont utilisées pour : fournir et opérer le service de gestion de club,
-          gérer les comptes et les abonnements, sécuriser l&apos;accès, assurer la maintenance,
-          améliorer l&apos;expérience utilisateur et répondre aux demandes d&apos;assistance.
+          Le club décide quelles données il collecte et pour quelles finalités. Obillz
+          les traite uniquement pour fournir le service. Cela peut inclure notamment :
+        </p>
+        <ul>
+          <li>
+            <strong>Membres</strong> : identité, coordonnées, éventuellement date de
+            naissance et, seulement si le club active ce champ, numéro AVS.
+          </li>
+          <li>
+            <strong>Cotisations et factures</strong> : montants, statuts de paiement,
+            documents.
+          </li>
+          <li>
+            <strong>Boutique</strong> : commandes, produits, coordonnées de
+            livraison/facturation saisies par le club ou ses clients.
+          </li>
+          <li>
+            <strong>Événements, planning, buvette</strong> : inscriptions,
+            affectations, demandes de réservation.
+          </li>
+          <li>
+            <strong>Bénévoles et communications</strong> : contacts marketing
+            uniquement en cas d’opt-in (formulaire public) ou de déclaration
+            explicite du staff.
+          </li>
+        </ul>
+        <p>
+          Le club est responsable de la licéité de ses collectes, de ses imports et
+          de ses envois d’e-mails.
         </p>
       </LegalSection>
 
-      <LegalSection title="Base légale">
+      <LegalSection title="Finalités et bases">
         <p>
-          Les traitements reposent sur l&apos;exécution du contrat (fourniture du service), le
-          respect d&apos;obligations légales, et l&apos;intérêt légitime à sécuriser et améliorer
-          la plateforme.
+          Obillz traite les données du compte et de la plateforme pour exécuter le
+          contrat de service, sécuriser l’accès, facturer l’abonnement, fournir le
+          support et améliorer le produit. Les traitements du club reposent sur les
+          bases que le club détermine (contrat d’affiliation, obligation légale,
+          intérêt prépondérant ou consentement, selon le cas).
         </p>
       </LegalSection>
 
-      <LegalSection title="Destinataires et sous-traitants">
+      <LegalSection title="Sous-traitants et traitements internationaux">
         <p>
-          Les données sont accessibles aux équipes Obillz habilitées et à des prestataires
-          techniques agissant comme sous-traitants (hébergement cloud sécurisé, email
-          transactionnel, support, paiement). Aucun usage publicitaire n&apos;est réalisé et
-          aucun partage à des fins de prospection n&apos;est effectué.
+          Obillz recourt à des prestataires pour héberger et faire fonctionner le
+          service, notamment Supabase (base de données et stockage), Vercel
+          (hébergement de l’application et analytics), Stripe (paiements) et Resend
+          (e-mails).
+        </p>
+        <p>
+          La base de données principale Supabase est configurée, selon
+          l’indication actuelle du propriétaire, en Suisse. Cette localisation doit
+          être vérifiée et documentée (preuve de région du projet). D’autres
+          prestataires peuvent traiter des données en Suisse, dans l’EEE ou dans
+          d’autres pays. Obillz ne prétend pas que toutes les données restent en
+          Suisse.
         </p>
       </LegalSection>
 
-      <LegalSection title="Transferts internationaux">
+      <LegalSection title="Conservation">
         <p>
-          Obillz privilégie un hébergement en Europe. Si un transfert hors de l&apos;UE devait
-          intervenir, il serait encadré par des garanties appropriées (clauses contractuelles types
-          ou mécanismes équivalents) conformément au RGPD.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Durées de conservation">
-        <p>
-          Les données sont conservées pendant la durée de la relation contractuelle. Certaines
-          données peuvent être conservées plus longtemps pour répondre à des obligations légales
-          (notamment comptables et fiscales). Les comptes inactifs sont supprimés ou anonymisés
-          après une période raisonnable.
+          Les données de compte sont conservées pendant la relation contractuelle,
+          puis selon les durées nécessaires aux obligations légales (notamment
+          comptables). Les données métier du club suivent la politique de
+          conservation du club, dans les limites techniques du service. Les données
+          comptables ne sont pas effacées automatiquement par Obillz.
         </p>
       </LegalSection>
 
       <LegalSection title="Sécurité">
         <p>
-          Obillz met en place des mesures techniques et organisationnelles adaptées afin de
-          protéger les données contre la perte, l&apos;accès non autorisé ou l&apos;altération
-          (contrôles d&apos;accès, chiffrement en transit, sauvegardes).
+          Obillz applique des mesures techniques et organisationnelles visant à
+          respecter les exigences applicables de la Loi fédérale suisse sur la
+          protection des données (LPD) : isolation des clubs, contrôles d’accès et
+          politiques RLS, chiffrement en transit, journaux d’audit, possibilité de
+          MFA. Ces mesures réduisent les risques ; elles ne constituent pas une
+          certification.
         </p>
       </LegalSection>
 
       <LegalSection title="Vos droits">
         <p>
-          Conformément au RGPD, vous disposez de droits d&apos;accès, de rectification,
-          d&apos;effacement, de limitation, d&apos;opposition et de portabilité. Vous pouvez
-          exercer vos droits en nous contactant à <LegalEmailLink />. Vous pouvez également
-          déposer une réclamation auprès de l&apos;autorité de protection des données compétente
-          (CNIL en France ou autorité locale au sein de l&apos;UE).
+          Selon la LPD, vous pouvez demander l’accès, la rectification, la
+          suppression ou la remise de vos données, ainsi que vous opposer à
+          certaines communications. Pour un compte Obillz ou une question
+          plateforme : <LegalEmailLink />.
+        </p>
+        <p>
+          Pour des données de membre, de cotisation ou d’événement gérées par un
+          club, adressez-vous d’abord au club, qui est responsable du traitement.
+          Obillz peut assister le club. Vous pouvez aussi vous adresser au Préposé
+          fédéral à la protection des données et à la transparence (PFPDT).
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Pages associées">
+        <p>
+          <LegalInlineLink href="/securite-protection-donnees">
+            Sécurité et protection des données
+          </LegalInlineLink>
+          {" · "}
+          <LegalInlineLink href="/mentions-legales">Mentions légales</LegalInlineLink>
+          {" · "}
+          <LegalInlineLink href="/conditions-utilisation">
+            Conditions d’utilisation
+          </LegalInlineLink>
         </p>
       </LegalSection>
     </LegalPageLayout>

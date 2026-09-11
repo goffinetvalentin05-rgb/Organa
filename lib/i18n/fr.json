@@ -899,6 +899,7 @@
         "loadError": "Impossible de charger la configuration des champs.",
         "readOnlyHint": "Vous pouvez consulter cette liste ; la modification est réservée aux personnes autorisées dans les paramètres du club.",
         "avsWarning": "Le numéro AVS est une donnée sensible. Activez ce champ uniquement si votre club en a réellement besoin.",
+        "avsConfirm": "N’activez ce champ que si la collecte du numéro AVS est réellement nécessaire pour votre club.",
         "fields": {
           "email": "Email",
           "phone": "Téléphone",
@@ -2060,7 +2061,8 @@
         "email": "Email *",
         "phone": "Téléphone (optionnel)",
         "comment": "Commentaire (optionnel)",
-        "commentPlaceholder": "Ex: Régime alimentaire, nombre de personnes..."
+        "commentPlaceholder": "Ex: Régime alimentaire, nombre de personnes...",
+        "marketingOptIn": "J’accepte de recevoir les communications du club par e-mail."
       },
       "submitAction": "S'inscrire",
       "submitting": "Inscription en cours...",
@@ -2224,6 +2226,8 @@
         "deleteConfirm": "Supprimer ce contact ?",
         "modalAddTitle": "Ajouter un contact",
         "modalEditTitle": "Modifier un contact",
+        "staffDeclaresLawfulBasis": "Je confirme que le club dispose d’une base valable pour contacter cette personne par e-mail (consentement ou autre base licite).",
+        "staffBasisRequired": "Confirmez que le club dispose d’une base valable pour contacter cette personne.",
         "save": "Enregistrer",
         "cancel": "Annuler"
       },
@@ -2232,7 +2236,7 @@
         "nameLabel": "Nom interne",
         "subjectLabel": "Objet",
         "audienceLabel": "Audience",
-        "audienceAll": "Tous les contacts",
+        "audienceAll": "Tous les contacts ayant consenti",
         "audienceSource": "Par source",
         "audienceManual": "Sélection manuelle",
         "send": "Envoyer la campagne",

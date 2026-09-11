@@ -111,7 +111,8 @@ export async function POST(request: NextRequest) {
           .from("marketing_contacts")
           .select("id, email")
           .eq("club_id", guard.clubId)
-          .eq("unsubscribed", false);
+          .eq("unsubscribed", false)
+          .not("consented_at", "is", null);
 
         if (sendTo === "source" && source) {
           contactsQuery = contactsQuery.eq("source", source);
