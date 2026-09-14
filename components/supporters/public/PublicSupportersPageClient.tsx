@@ -261,9 +261,13 @@ function SupportersCatalog({
               </p>
             ) : (
               <div
-                className={`grid gap-4 ${
-                  page.offers.length === 1 ? "mx-auto max-w-md" : "sm:grid-cols-2 lg:grid-cols-3"
-                }`}
+                className={
+                  page.offers.length === 1
+                    ? "mx-auto grid w-full max-w-md gap-4"
+                    : page.offers.length === 2
+                      ? "mx-auto grid w-full max-w-[46rem] gap-4 sm:grid-cols-2"
+                      : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                }
               >
                 {page.offers.map((offer) => (
                   <OfferCard
