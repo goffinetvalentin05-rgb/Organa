@@ -1,3 +1,5 @@
+import type { PublicVisualTheme } from "@/lib/public-branding/types";
+
 export const SHOP_CURRENCY = "CHF" as const;
 export type ShopCurrency = typeof SHOP_CURRENCY;
 
@@ -64,6 +66,16 @@ export type ShopSettings = {
   currency: ShopCurrency;
   publicUrlPath: string | null;
   canEnablePublicSales: boolean;
+  label: string | null;
+  title: string | null;
+  subtitle: string | null;
+  publicPrimaryColor: string | null;
+  publicSecondaryColor: string | null;
+  publicAccentColor: string | null;
+  pageStyle: "colors" | "banner" | "fullscreen";
+  bannerUrl: string | null;
+  imagePosition: "top" | "center" | "bottom";
+  overlayIntensity: "light" | "normal" | "dark";
 };
 
 export type ShopProductImage = {
@@ -163,6 +175,8 @@ export type ShopStats = {
   topProducts: Array<{ name: string; units: number; revenueCents: number }>;
 };
 
+export type PublicShopTheme = PublicVisualTheme;
+
 export type PublicShopCatalog = {
   slug: string;
   clubName: string;
@@ -174,6 +188,7 @@ export type PublicShopCatalog = {
   canCheckout: boolean;
   checkoutBlockedReason: string | null;
   currency: ShopCurrency;
+  theme: PublicShopTheme;
 };
 
 export type CartItemInput = {

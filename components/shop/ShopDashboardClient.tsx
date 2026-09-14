@@ -50,6 +50,7 @@ import {
 } from "@/lib/icons";
 import { QRCodeSVG } from "qrcode.react";
 import ClubPaymentsPanel from "@/components/payments/connect/ClubPaymentsPanel";
+import ShopAppearanceSettings from "@/components/shop/ShopAppearanceSettings";
 
 type TabId = "produits" | "commandes" | "parametres" | "paiements";
 
@@ -607,7 +608,9 @@ export default function ShopDashboardClient() {
       )}
 
       {tab === "parametres" && settings && (
-        <div className="grid gap-6 lg:grid-cols-5">
+        <div className="space-y-6">
+          <ShopAppearanceSettings canManage={canManage} />
+          <div className="grid gap-6 lg:grid-cols-5">
           <GlassCard className="lg:col-span-3">
             <h2 className="text-lg font-semibold text-[#0F172A]">Paramètres boutique</h2>
             <div className="mt-5 space-y-4">
@@ -654,6 +657,9 @@ export default function ShopDashboardClient() {
                   disabled={!canManage}
                   onBlur={(e) => saveSettings({ introText: e.target.value })}
                 />
+                <p className={cn("mt-1 text-xs", dashboardTextSecondaryClass)}>
+                  Affiché sur la boutique publique. Vous pouvez aussi le peaufiner dans Apparence.
+                </p>
               </div>
               <div>
                 <label className={dashboardLabelClass}>Informations de retrait</label>
@@ -713,6 +719,7 @@ export default function ShopDashboardClient() {
               <p className="mt-4 text-sm text-[#64748B]">Définissez un slug pour générer le QR code.</p>
             )}
           </GlassCard>
+        </div>
         </div>
       )}
 

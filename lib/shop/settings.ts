@@ -1,19 +1,25 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  parseImagePosition,
+  parseOverlayIntensity,
+  parsePageStyle,
+  trimOrNull,
+  validateHexColor,
+} from "@/lib/public-branding/parse";
 import type { ShopSettings } from "./types";
 import { isPaymentReady, type PaymentAccountSnapshot } from "./payment-provider";
 import { getShopPublicUrlPath, isValidShopSlug, normalizeShopSlug } from "./slug";
+import {
+  brandingUpdatesFromPatch,
+  selectShopSettingsRow,
+  SHOP_SETTINGS_SELECT_BRANDING,
+  SHOP_SETTINGS_SELECT_CORE,
+  validateAppearancePatch,
+  type ShopAppearanceUpdate,
+  type ShopSettingsBrandingRow,
+} from "./page-settings";
 
-type SettingsRow = {
-  club_id: string;
-  slug: string | null;
-  is_enabled: boolean;
-  display_name: string | null;
-  intro_text: string | null;
-  pickup_info: string | null;
-  orders_email: string | null;
-  track_stock_default: boolean;
-  currency: string;
-};
+type SettingsRow = ShopSettingsBrandingRow;
 
 export function mapSettingsRow(
   row: SettingsRow | null,
@@ -34,6 +40,16 @@ export function mapSettingsRow(
     currency: "CHF",
     publicUrlPath: row.slug ? getShopPublicUrlPath(row.slug) : null,
     canEnablePublicSales: ready,
+    label: trimOrNull(row.public_label),
+    title: trimOrNull(row.public_title),
+    subtitle: trimOrNull(row.public_subtitle),
+    publicPrimaryColor: validateHexColor(row.public_primary_color),
+    publicSecondaryColor: validateHexColor(row.public_secondary_color),
+    publicAccentColor: validateHexColor(row.public_accent_color),
+    pageStyle: parsePageStyle(row.public_page_style),
+    bannerUrl: trimOrNull(row.public_banner_url),
+    imagePosition: parseImagePosition(row.public_image_position),
+    overlayIntensity: parseOverlayIntensity(row.public_overlay_intensity),
   };
 }
 
@@ -42,16 +58,8 @@ export async function getOrCreateShopSettings(
   clubId: string,
   defaults: { displayName: string; ordersEmail?: string; slug?: string | null }
 ) {
-  const { data: existing, error } = await supabase
-    .from("shop_settings")
-    .select(
-      "club_id, slug, is_enabled, display_name, intro_text, pickup_info, orders_email, track_stock_default, currency"
-    )
-    .eq("club_id", clubId)
-    .maybeSingle();
-
-  if (error) throw error;
-  if (existing) return existing as SettingsRow;
+  const existing = await selectShopSettingsRow(supabase, clubId);
+  if (existing) return existing;
 
   const insert = {
     club_id: clubId,
@@ -62,12 +70,10 @@ export async function getOrCreateShopSettings(
       "Votre commande pourra être récupérée au club. Les horaires vous seront indiqués par e-mail.",
   };
 
-    const { data: created, error: insertError } = await supabase
+  const { data: created, error: insertError } = await supabase
     .from("shop_settings")
     .insert(insert)
-    .select(
-      "club_id, slug, is_enabled, display_name, intro_text, pickup_info, orders_email, track_stock_default, currency"
-    )
+    .select(SHOP_SETTINGS_SELECT_CORE)
     .single();
 
   if (insertError) {
@@ -75,9 +81,7 @@ export async function getOrCreateShopSettings(
       const retry = await supabase
         .from("shop_settings")
         .insert({ ...insert, slug: null })
-        .select(
-          "club_id, slug, is_enabled, display_name, intro_text, pickup_info, orders_email, track_stock_default, currency"
-        )
+        .select(SHOP_SETTINGS_SELECT_CORE)
         .single();
       if (retry.error) throw retry.error;
       return retry.data as SettingsRow;
@@ -98,6 +102,15 @@ export async function updateShopSettings(
     pickupInfo?: unknown;
     ordersEmail?: unknown;
     trackStockDefault?: unknown;
+    label?: unknown;
+    title?: unknown;
+    subtitle?: unknown;
+    primaryColor?: unknown;
+    secondaryColor?: unknown;
+    accentColor?: unknown;
+    pageStyle?: unknown;
+    imagePosition?: unknown;
+    overlayIntensity?: unknown;
   },
   payment: PaymentAccountSnapshot | null
 ): Promise<{ settings?: SettingsRow; error?: string; status?: number }> {
@@ -156,26 +169,65 @@ export async function updateShopSettings(
     updates.is_enabled = wantEnabled;
   }
 
-  if (Object.keys(updates).length === 0) {
-    const { data } = await supabase
-      .from("shop_settings")
-      .select(
-        "club_id, slug, is_enabled, display_name, intro_text, pickup_info, orders_email, track_stock_default, currency"
-      )
-      .eq("club_id", clubId)
-      .maybeSingle();
-    return { settings: data as SettingsRow };
+  const appearancePatch: ShopAppearanceUpdate = {};
+  if (patch.label !== undefined) appearancePatch.label = typeof patch.label === "string" ? patch.label : null;
+  if (patch.title !== undefined) appearancePatch.title = typeof patch.title === "string" ? patch.title : null;
+  if (patch.subtitle !== undefined) {
+    appearancePatch.subtitle = typeof patch.subtitle === "string" ? patch.subtitle : null;
   }
+  if (patch.primaryColor !== undefined) {
+    appearancePatch.primaryColor = typeof patch.primaryColor === "string" ? patch.primaryColor : null;
+  }
+  if (patch.secondaryColor !== undefined) {
+    appearancePatch.secondaryColor = typeof patch.secondaryColor === "string" ? patch.secondaryColor : null;
+  }
+  if (patch.accentColor !== undefined) {
+    appearancePatch.accentColor = typeof patch.accentColor === "string" ? patch.accentColor : null;
+  }
+  if (patch.pageStyle !== undefined) {
+    appearancePatch.pageStyle = parsePageStyle(typeof patch.pageStyle === "string" ? patch.pageStyle : null);
+  }
+  if (patch.imagePosition !== undefined) {
+    appearancePatch.imagePosition = parseImagePosition(
+      typeof patch.imagePosition === "string" ? patch.imagePosition : null
+    );
+  }
+  if (patch.overlayIntensity !== undefined) {
+    appearancePatch.overlayIntensity = parseOverlayIntensity(
+      typeof patch.overlayIntensity === "string" ? patch.overlayIntensity : null
+    );
+  }
+
+  const appearanceError = validateAppearancePatch(appearancePatch);
+  if (appearanceError) return { error: appearanceError, status: 400 };
+  Object.assign(updates, brandingUpdatesFromPatch(appearancePatch));
+
+  if (Object.keys(updates).length === 0) {
+    const data = await selectShopSettingsRow(supabase, clubId);
+    return { settings: data ?? undefined };
+  }
+
+  updates.updated_at = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("shop_settings")
     .update(updates)
     .eq("club_id", clubId)
-    .select(
-      "club_id, slug, is_enabled, display_name, intro_text, pickup_info, orders_email, track_stock_default, currency"
-    )
+    .select(SHOP_SETTINGS_SELECT_BRANDING)
     .single();
 
-  if (error) return { error: error.message, status: 500 };
+  if (error) {
+    const brandingAttempt = Object.keys(updates).some((key) => key.startsWith("public_"));
+    if (brandingAttempt) {
+      return {
+        error:
+          "Les colonnes de personnalisation boutique sont absentes. Appliquez la migration 082_shop_public_page_settings.sql.",
+        status: 500,
+      };
+    }
+    return { error: error.message, status: 500 };
+  }
   return { settings: data as SettingsRow };
 }
+
+export type { SettingsRow };

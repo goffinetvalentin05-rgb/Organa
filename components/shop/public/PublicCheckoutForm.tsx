@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import PublicShopShell, { notifyCartChanged } from "@/components/shop/public/PublicShopShell";
+import PublicShopShell, { notifyCartChanged, useShopBrand } from "@/components/shop/public/PublicShopShell";
+import { cn } from "@/components/ui";
 import { clearShopCart, getShopCart } from "@/lib/shop/cart";
 import { formatChf } from "@/lib/shop/money";
+import type { PublicShopCatalog } from "@/lib/shop/types";
 
 type Line = {
   name: string;
@@ -16,10 +18,7 @@ type Line = {
 export default function PublicCheckoutForm({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [clubName, setClubName] = useState("Club");
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [primaryColor, setPrimaryColor] = useState("#1A23FF");
-  const [pickupInfo, setPickupInfo] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<PublicShopCatalog | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +27,7 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("cancelled") === "1") {
@@ -51,11 +51,8 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
         }),
       ]);
       if (catRes.ok) {
-        const cat = await catRes.json();
-        setClubName(cat.clubName);
-        setLogoUrl(cat.logoUrl);
-        setPrimaryColor(cat.primaryColor);
-        setPickupInfo(cat.pickupInfo);
+        const cat = (await catRes.json()) as PublicShopCatalog;
+        setCatalog(cat);
         if (!cat.canCheckout) {
           setError(cat.checkoutBlockedReason || "Paiement indisponible.");
         }
@@ -63,12 +60,91 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
       const quote = await quoteRes.json();
       if (!quoteRes.ok) {
         setError(quote.error || "Panier invalide");
+        setReady(true);
         return;
       }
       setLines(quote.lines || []);
       setTotal(quote.totalCents || 0);
+      setReady(true);
     })();
   }, [slug, router]);
+
+  if (!ready || !catalog) {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center bg-[#F4F7FB] text-sm text-[#64748B]">
+        Chargement du checkout…
+      </div>
+    );
+  }
+
+  return (
+    <PublicShopShell
+      slug={slug}
+      clubName={catalog.clubName}
+      logoUrl={catalog.logoUrl}
+      primaryColor={catalog.primaryColor}
+      catalog={catalog}
+    >
+      <CheckoutBody
+        slug={slug}
+        catalog={catalog}
+        lines={lines}
+        total={total}
+        error={error}
+        setError={setError}
+        submitting={submitting}
+        setSubmitting={setSubmitting}
+        firstName={firstName}
+        lastName={lastName}
+        email={email}
+        phone={phone}
+        setFirstName={setFirstName}
+        setLastName={setLastName}
+        setEmail={setEmail}
+        setPhone={setPhone}
+      />
+    </PublicShopShell>
+  );
+}
+
+function CheckoutBody({
+  slug,
+  catalog,
+  lines,
+  total,
+  error,
+  setError,
+  submitting,
+  setSubmitting,
+  firstName,
+  lastName,
+  email,
+  phone,
+  setFirstName,
+  setLastName,
+  setEmail,
+  setPhone,
+}: {
+  slug: string;
+  catalog: PublicShopCatalog;
+  lines: Line[];
+  total: number;
+  error: string | null;
+  setError: (v: string | null) => void;
+  submitting: boolean;
+  setSubmitting: (v: boolean) => void;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  setFirstName: (v: string) => void;
+  setLastName: (v: string) => void;
+  setEmail: (v: string) => void;
+  setPhone: (v: string) => void;
+}) {
+  const { cta, surfaceClass } = useShopBrand();
+  const fieldClass =
+    "h-12 w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 text-sm";
 
   const pay = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,32 +174,60 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
     }
   };
 
-  const fieldClass =
-    "w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 py-2.5 text-sm";
-
   return (
-    <PublicShopShell slug={slug} clubName={clubName} logoUrl={logoUrl} primaryColor={primaryColor}>
-      <h1 className="mb-6 text-2xl font-semibold">Commande</h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight">Commande</h1>
       {error ? (
         <p className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
         </p>
       ) : null}
-      <form onSubmit={pay} className="grid gap-6 lg:grid-cols-5">
-        <div className="space-y-4 rounded-[1.25rem] bg-white p-5 lg:col-span-3">
+      <form onSubmit={pay} className="grid gap-6 lg:grid-cols-5 lg:items-start">
+        <div className={cn("space-y-4 rounded-[1.25rem] p-5 lg:col-span-3", surfaceClass)}>
           <h2 className="font-semibold">Vos informations</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <input className={fieldClass} required placeholder="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            <input className={fieldClass} required placeholder="Nom" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <input
+              className={fieldClass}
+              required
+              placeholder="Prénom"
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <input
+              className={fieldClass}
+              required
+              placeholder="Nom"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
           </div>
-          <input className={fieldClass} required type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input className={fieldClass} type="tel" placeholder="Téléphone (facultatif)" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <input
+            className={fieldClass}
+            required
+            type="email"
+            placeholder="E-mail"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className={fieldClass}
+            type="tel"
+            placeholder="Téléphone (facultatif)"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
           <div className="rounded-2xl bg-[#F8FAFC] p-4 text-sm text-[#64748B]">
             <p className="font-semibold text-[#0F172A]">Retrait au club</p>
-            <p className="mt-1">{pickupInfo || "Les modalités de retrait vous seront confirmées par e-mail."}</p>
+            <p className="mt-1">
+              {catalog.pickupInfo || "Les modalités de retrait vous seront confirmées par e-mail."}
+            </p>
           </div>
         </div>
-        <div className="rounded-[1.25rem] bg-white p-5 lg:col-span-2">
+        <div className={cn("rounded-[1.25rem] p-5 lg:col-span-2", surfaceClass)}>
           <h2 className="font-semibold">Récapitulatif</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {lines.map((line, i) => (
@@ -143,8 +247,8 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
           <button
             type="submit"
             disabled={submitting || lines.length === 0}
-            className="mt-5 w-full rounded-full py-3 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ backgroundColor: primaryColor }}
+            className="mt-5 flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold disabled:opacity-50"
+            style={{ backgroundColor: cta.background, color: cta.color }}
           >
             {submitting ? "Redirection…" : "Payer"}
           </button>
@@ -154,6 +258,6 @@ export default function PublicCheckoutForm({ slug }: { slug: string }) {
           </p>
         </div>
       </form>
-    </PublicShopShell>
+    </div>
   );
 }
