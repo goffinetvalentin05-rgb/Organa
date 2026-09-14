@@ -5,11 +5,19 @@ import {
   OBILLZ_BRAND_PRIMARY,
 } from "@/lib/public-page/colors";
 
-export const SUPPORTERS_BACKGROUND_MODES = ["solid", "gradient", "image"] as const;
-export type SupportersBackgroundMode = (typeof SUPPORTERS_BACKGROUND_MODES)[number];
+export const SUPPORTERS_PAGE_STYLES = ["colors", "banner", "fullscreen"] as const;
+export type SupportersPageStyle = (typeof SUPPORTERS_PAGE_STYLES)[number];
+
+export const SUPPORTERS_IMAGE_POSITIONS = ["top", "center", "bottom"] as const;
+export type SupportersImagePosition = (typeof SUPPORTERS_IMAGE_POSITIONS)[number];
+
+export const SUPPORTERS_OVERLAY_INTENSITIES = ["light", "normal", "dark"] as const;
+export type SupportersOverlayIntensity = (typeof SUPPORTERS_OVERLAY_INTENSITIES)[number];
 
 export const DEFAULT_SUPPORTERS_SUBTITLE =
   "Rejoignez les supporters du club et participez directement à son développement.";
+
+export const DEFAULT_SUPPORTERS_LABEL = "Supporters";
 
 export function defaultSupportersTitle(clubName: string): string {
   return `Soutenez le ${clubName}`;
@@ -18,30 +26,33 @@ export function defaultSupportersTitle(clubName: string): string {
 export type SupportersPageSettings = {
   clubName: string;
   logoUrl: string | null;
+  label: string | null;
   title: string | null;
   subtitle: string | null;
-  message: string | null;
   primaryColor: string;
   secondaryColor: string | null;
-  backgroundMode: SupportersBackgroundMode;
+  pageStyle: SupportersPageStyle;
+  imagePosition: SupportersImagePosition;
+  overlayIntensity: SupportersOverlayIntensity;
   bannerUrl: string | null;
-  bgImageUrl: string | null;
   showStats: boolean;
   publicPath: string | null;
 };
 
 export type SupportersPageSettingsUpdate = {
+  label?: string | null;
   title?: string | null;
   subtitle?: string | null;
-  message?: string | null;
   primaryColor?: string | null;
   secondaryColor?: string | null;
-  backgroundMode?: SupportersBackgroundMode | null;
+  pageStyle?: SupportersPageStyle | null;
+  imagePosition?: SupportersImagePosition | null;
+  overlayIntensity?: SupportersOverlayIntensity | null;
   showStats?: boolean;
 };
 
 export const SUPPORTERS_SETTINGS_PROFILE_SELECT =
-  "company_name, logo_url, primary_color, public_page_primary_color, supporters_public_title, supporters_public_subtitle, supporters_public_message, supporters_public_primary_color, supporters_public_secondary_color, supporters_public_background_mode, supporters_public_banner_url, supporters_public_bg_image_url, supporters_public_show_stats";
+  "company_name, logo_url, primary_color, public_page_primary_color, supporters_public_title, supporters_public_subtitle, supporters_public_message, supporters_public_label, supporters_public_primary_color, supporters_public_secondary_color, supporters_public_background_mode, supporters_public_page_style, supporters_public_image_position, supporters_public_overlay_intensity, supporters_public_banner_url, supporters_public_show_stats";
 
 export type SupportersSettingsProfileRow = {
   company_name?: string | null;
@@ -51,13 +62,14 @@ export type SupportersSettingsProfileRow = {
   supporters_public_title?: string | null;
   supporters_public_subtitle?: string | null;
   supporters_public_message?: string | null;
+  supporters_public_label?: string | null;
   supporters_public_primary_color?: string | null;
   supporters_public_secondary_color?: string | null;
   supporters_public_background_mode?: string | null;
+  supporters_public_page_style?: string | null;
+  supporters_public_image_position?: string | null;
+  supporters_public_overlay_intensity?: string | null;
   supporters_public_banner_url?: string | null;
-  supporters_public_banner_path?: string | null;
-  supporters_public_bg_image_url?: string | null;
-  supporters_public_bg_image_path?: string | null;
   supporters_public_show_stats?: boolean | null;
 };
 
@@ -75,11 +87,23 @@ export function validateHexColor(value: string | null | undefined): string | nul
   return normalized;
 }
 
-export function parseBackgroundMode(
-  value: string | null | undefined
-): SupportersBackgroundMode {
-  if (value === "solid" || value === "gradient" || value === "image") return value;
-  return "gradient";
+export function parsePageStyle(
+  value: string | null | undefined,
+  legacyBackgroundMode?: string | null
+): SupportersPageStyle {
+  if (value === "colors" || value === "banner" || value === "fullscreen") return value;
+  if (legacyBackgroundMode === "image") return "banner";
+  return "colors";
+}
+
+export function parseImagePosition(value: string | null | undefined): SupportersImagePosition {
+  if (value === "top" || value === "center" || value === "bottom") return value;
+  return "center";
+}
+
+export function parseOverlayIntensity(value: string | null | undefined): SupportersOverlayIntensity {
+  if (value === "light" || value === "normal" || value === "dark") return value;
+  return "normal";
 }
 
 export function mapProfileToSupportersSettings(
@@ -90,9 +114,11 @@ export function mapProfileToSupportersSettings(
   return {
     clubName,
     logoUrl: trimOrNull(profile.logo_url),
+    label: trimOrNull(profile.supporters_public_label),
     title: trimOrNull(profile.supporters_public_title),
-    subtitle: trimOrNull(profile.supporters_public_subtitle),
-    message: trimOrNull(profile.supporters_public_message),
+    subtitle:
+      trimOrNull(profile.supporters_public_subtitle) ||
+      trimOrNull(profile.supporters_public_message),
     primaryColor: normalizeHexColor(
       profile.supporters_public_primary_color ||
         profile.public_page_primary_color ||
@@ -100,9 +126,13 @@ export function mapProfileToSupportersSettings(
       OBILLZ_BRAND_PRIMARY
     ),
     secondaryColor: validateHexColor(profile.supporters_public_secondary_color),
-    backgroundMode: parseBackgroundMode(profile.supporters_public_background_mode),
+    pageStyle: parsePageStyle(
+      profile.supporters_public_page_style,
+      profile.supporters_public_background_mode
+    ),
+    imagePosition: parseImagePosition(profile.supporters_public_image_position),
+    overlayIntensity: parseOverlayIntensity(profile.supporters_public_overlay_intensity),
     bannerUrl: trimOrNull(profile.supporters_public_banner_url),
-    bgImageUrl: trimOrNull(profile.supporters_public_bg_image_url),
     showStats: profile.supporters_public_show_stats !== false,
     publicPath,
   };
@@ -110,14 +140,14 @@ export function mapProfileToSupportersSettings(
 
 export function resolvedSupportersCopy(settings: {
   clubName: string;
+  label: string | null;
   title: string | null;
   subtitle: string | null;
-  message: string | null;
 }) {
   return {
+    label: settings.label?.trim() || DEFAULT_SUPPORTERS_LABEL,
     title: settings.title?.trim() || defaultSupportersTitle(settings.clubName),
     subtitle: settings.subtitle?.trim() || DEFAULT_SUPPORTERS_SUBTITLE,
-    message: settings.message?.trim() || null,
   };
 }
 
@@ -155,26 +185,39 @@ export async function updateSupportersPageSettings(
       return { error: "Couleur secondaire invalide (format #RRGGBB attendu).", status: 400 };
     }
   }
-  if (
-    input.backgroundMode !== undefined &&
-    input.backgroundMode !== null &&
-    !SUPPORTERS_BACKGROUND_MODES.includes(input.backgroundMode)
-  ) {
-    return { error: "Mode de fond invalide.", status: 400 };
+  if (input.pageStyle !== undefined && input.pageStyle !== null && !SUPPORTERS_PAGE_STYLES.includes(input.pageStyle)) {
+    return { error: "Style de page invalide.", status: 400 };
   }
+  if (
+    input.imagePosition !== undefined &&
+    input.imagePosition !== null &&
+    !SUPPORTERS_IMAGE_POSITIONS.includes(input.imagePosition)
+  ) {
+    return { error: "Position d’image invalide.", status: 400 };
+  }
+  if (
+    input.overlayIntensity !== undefined &&
+    input.overlayIntensity !== null &&
+    !SUPPORTERS_OVERLAY_INTENSITIES.includes(input.overlayIntensity)
+  ) {
+    return { error: "Intensité invalide.", status: 400 };
+  }
+
+  const pageStyle =
+    input.pageStyle !== undefined
+      ? parsePageStyle(input.pageStyle)
+      : parsePageStyle(profile.supporters_public_page_style, profile.supporters_public_background_mode);
 
   const payload: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
+    supporters_public_label:
+      input.label !== undefined ? trimOrNull(input.label) : trimOrNull(profile.supporters_public_label),
     supporters_public_title:
       input.title !== undefined ? trimOrNull(input.title) : trimOrNull(profile.supporters_public_title),
     supporters_public_subtitle:
       input.subtitle !== undefined
         ? trimOrNull(input.subtitle)
         : trimOrNull(profile.supporters_public_subtitle),
-    supporters_public_message:
-      input.message !== undefined
-        ? trimOrNull(input.message)
-        : trimOrNull(profile.supporters_public_message),
     supporters_public_primary_color:
       input.primaryColor !== undefined
         ? validateHexColor(input.primaryColor)
@@ -183,10 +226,16 @@ export async function updateSupportersPageSettings(
       input.secondaryColor !== undefined
         ? validateHexColor(input.secondaryColor)
         : validateHexColor(profile.supporters_public_secondary_color),
-    supporters_public_background_mode:
-      input.backgroundMode !== undefined
-        ? parseBackgroundMode(input.backgroundMode)
-        : parseBackgroundMode(profile.supporters_public_background_mode),
+    supporters_public_page_style: pageStyle,
+    supporters_public_background_mode: pageStyle === "colors" ? "gradient" : "image",
+    supporters_public_image_position:
+      input.imagePosition !== undefined
+        ? parseImagePosition(input.imagePosition)
+        : parseImagePosition(profile.supporters_public_image_position),
+    supporters_public_overlay_intensity:
+      input.overlayIntensity !== undefined
+        ? parseOverlayIntensity(input.overlayIntensity)
+        : parseOverlayIntensity(profile.supporters_public_overlay_intensity),
     supporters_public_show_stats:
       input.showStats !== undefined
         ? Boolean(input.showStats)

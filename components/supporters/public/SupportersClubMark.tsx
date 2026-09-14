@@ -10,19 +10,18 @@ type SupportersClubMarkProps = {
   accentColor?: string;
   className?: string;
   size?: "sm" | "md" | "lg";
-  /** glass = hero sombre ; light = fond clair. */
-  tone?: "glass" | "light";
+  onDark?: boolean;
 };
 
 const sizeClasses = {
-  sm: "h-14 w-14 sm:h-16 sm:w-16",
-  md: "h-20 w-20 sm:h-24 sm:w-24",
-  lg: "h-[5.5rem] w-[5.5rem] sm:h-28 sm:w-28",
+  sm: "h-12 w-12 sm:h-14 sm:w-14",
+  md: "h-16 w-16 sm:h-20 sm:w-20",
+  lg: "h-16 w-16 sm:h-[5.5rem] sm:w-[5.5rem] lg:h-[6.5rem] lg:w-[6.5rem]",
 };
 
 const initialText = {
   sm: "text-xl",
-  md: "text-2xl sm:text-3xl",
+  md: "text-2xl",
   lg: "text-3xl sm:text-4xl",
 };
 
@@ -32,47 +31,43 @@ export default function SupportersClubMark({
   accentColor = "#1A23FF",
   className,
   size = "lg",
-  tone = "glass",
+  onDark = true,
 }: SupportersClubMarkProps) {
   const [imgError, setImgError] = useState(false);
   const showImage = Boolean(logoUrl) && !imgError;
   const initial = (clubName.trim().charAt(0) || "C").toUpperCase();
-  const glass = tone === "glass";
 
   return (
-    <div className={cn("relative mx-auto shrink-0", sizeClasses[size], className)}>
-      <div
-        className="absolute -inset-3 rounded-full opacity-70 blur-2xl"
-        style={{ background: `${accentColor}55` }}
-        aria-hidden
-      />
-      <div
-        className={cn(
-          "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[1.6rem] shadow-[0_12px_36px_rgba(2,6,23,0.22)]",
-          glass
-            ? "border border-white/25 bg-white/12 backdrop-blur-md"
-            : "border border-white/80 bg-white/90"
-        )}
-      >
-        {showImage && logoUrl ? (
-          <Image
-            src={logoUrl}
-            alt={clubName ? `Logo ${clubName}` : "Logo du club"}
-            fill
-            className="object-contain p-2.5 sm:p-3"
-            sizes={size === "lg" ? "112px" : size === "md" ? "96px" : "64px"}
-            onError={() => setImgError(true)}
-            unoptimized={logoUrl.includes("supabase.co")}
-          />
-        ) : (
-          <span
-            className={cn("font-bold", initialText[size], glass ? "text-white" : "text-[#0F172A]")}
-            aria-hidden
-          >
-            {initial}
-          </span>
-        )}
-      </div>
+    <div
+      className={cn(
+        "relative mx-auto flex shrink-0 items-center justify-center",
+        sizeClasses[size],
+        className
+      )}
+    >
+      {showImage && logoUrl ? (
+        <Image
+          src={logoUrl}
+          alt={clubName ? `Logo ${clubName}` : "Logo du club"}
+          fill
+          className="object-contain [filter:drop-shadow(0_8px_18px_rgba(0,0,0,0.35))]"
+          sizes={size === "lg" ? "104px" : size === "md" ? "80px" : "56px"}
+          onError={() => setImgError(true)}
+          unoptimized={logoUrl.includes("supabase.co")}
+        />
+      ) : (
+        <span
+          className={cn(
+            "font-bold [filter:drop-shadow(0_6px_12px_rgba(0,0,0,0.28))]",
+            initialText[size],
+            onDark ? "text-white" : "text-[#0F172A]"
+          )}
+          style={!onDark ? { color: accentColor } : undefined}
+          aria-hidden
+        >
+          {initial}
+        </span>
+      )}
     </div>
   );
 }

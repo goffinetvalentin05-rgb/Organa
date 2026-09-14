@@ -72,10 +72,10 @@ export default function PublicSupportersSuccessClient({ slug }: { slug: string }
     primaryColor,
     secondaryColor: theme?.secondaryColor || primaryColor,
   });
-  const cta = ctaColors(primaryColor);
+  const cta = ctaColors(primaryColor, theme?.secondaryColor);
 
   return (
-    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, theme?.bgImageUrl || null)}>
+    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, false)}>
       <main className="mx-auto flex min-h-[100dvh] max-w-lg flex-col items-center justify-center px-6 py-16 text-center">
         {page ? (
           <SupportersClubMark
@@ -83,7 +83,7 @@ export default function PublicSupportersSuccessClient({ slug }: { slug: string }
             clubName={page.clubName}
             accentColor={primaryColor}
             size="md"
-            tone="light"
+            onDark={false}
           />
         ) : null}
 

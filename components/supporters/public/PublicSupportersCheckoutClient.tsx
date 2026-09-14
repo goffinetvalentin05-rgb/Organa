@@ -80,18 +80,19 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
   }
 
   const theme = page.theme || {
+    label: "Supporters",
     title: `Soutenez le ${page.clubName}`,
     subtitle: "",
-    message: null,
     primaryColor: page.primaryColor,
     secondaryColor: page.primaryColor,
-    backgroundMode: "gradient" as const,
+    pageStyle: "colors" as const,
+    imagePosition: "center" as const,
+    overlayIntensity: "normal" as const,
     bannerUrl: null,
-    bgImageUrl: null,
     showStats: true,
   };
   const palette = supportersPalette(theme);
-  const cta = ctaColors(theme.primaryColor);
+  const cta = ctaColors(theme.primaryColor, theme.secondaryColor);
   const fieldClass =
     "min-h-12 w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 text-base text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[rgba(26,35,255,0.18)] sm:text-sm";
 
@@ -114,20 +115,20 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
   }
 
   return (
-    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, theme.bgImageUrl)}>
+    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, false)}>
       <header
         className="border-b border-white/10"
         style={{ background: palette.headerGradient }}
       >
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-4 sm:px-6">
-          <SupportersClubMark
-            logoUrl={page.logoUrl}
-            clubName={page.clubName}
-            accentColor={theme.primaryColor}
-            size="sm"
-            tone="glass"
-            className="mx-0"
-          />
+            <SupportersClubMark
+              logoUrl={page.logoUrl}
+              clubName={page.clubName}
+              accentColor={theme.primaryColor}
+              size="sm"
+              onDark
+              className="mx-0"
+            />
           <div className="min-w-0 text-left text-white">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
               Supporters

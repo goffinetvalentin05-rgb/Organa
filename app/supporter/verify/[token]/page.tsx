@@ -38,7 +38,7 @@ export default async function SupporterVerifyPage({
               clubName={result.clubName}
               accentColor={result.primaryColor}
               size="sm"
-              tone="light"
+              onDark={false}
             />
           </div>
         ) : null}

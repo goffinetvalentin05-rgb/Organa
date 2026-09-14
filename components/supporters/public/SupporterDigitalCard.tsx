@@ -32,14 +32,14 @@ export default function SupporterDigitalCard({ card }: { card: CardPublicData })
       />
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
-          <SupportersClubMark
-            logoUrl={card.logoUrl}
-            clubName={card.clubName}
-            accentColor={card.primaryColor}
-            size="sm"
-            tone="glass"
-            className="mx-0"
-          />
+            <SupportersClubMark
+              logoUrl={card.logoUrl}
+              clubName={card.clubName}
+              accentColor={card.primaryColor}
+              size="sm"
+              onDark
+              className="mx-0"
+            />
           <div className="text-right">
             <p className="text-[10px] font-semibold uppercase tracking-[0.26em]" style={{ color: muted }}>
               {card.clubName}

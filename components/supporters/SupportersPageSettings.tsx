@@ -17,25 +17,73 @@ import {
 } from "@/components/ui";
 import { Loader, Trash, Upload } from "@/lib/icons";
 import {
+  DEFAULT_SUPPORTERS_LABEL,
   DEFAULT_SUPPORTERS_SUBTITLE,
   defaultSupportersTitle,
+  resolvedSecondaryColor,
   resolvedSupportersCopy,
-  type SupportersBackgroundMode,
+  type SupportersImagePosition,
+  type SupportersOverlayIntensity,
   type SupportersPageSettings,
+  type SupportersPageStyle,
 } from "@/lib/supporters/page-settings";
-import { getClubBrandPalette } from "@/lib/public-page/colors";
+import { bannerOverlay, clubColorsHeroStyle, effectivePageStyle } from "@/lib/supporters/theme";
 
-const MODES: Array<{ id: SupportersBackgroundMode; label: string }> = [
-  { id: "gradient", label: "Dégradé" },
-  { id: "solid", label: "Uni" },
-  { id: "image", label: "Image" },
+const STYLES: Array<{ id: SupportersPageStyle; label: string; hint: string }> = [
+  { id: "colors", label: "Couleurs du club", hint: "Dégradé premium" },
+  { id: "banner", label: "Bannière", hint: "Image dans le hero" },
+  { id: "fullscreen", label: "Plein écran", hint: "Image sur toute la page" },
 ];
+
+const POSITIONS: Array<{ id: SupportersImagePosition; label: string }> = [
+  { id: "top", label: "Haut" },
+  { id: "center", label: "Centre" },
+  { id: "bottom", label: "Bas" },
+];
+
+const INTENSITIES: Array<{ id: SupportersOverlayIntensity; label: string }> = [
+  { id: "light", label: "Clair" },
+  { id: "normal", label: "Normal" },
+  { id: "dark", label: "Sombre" },
+];
+
+function ChoiceChip<T extends string>({
+  options,
+  value,
+  disabled,
+  onChange,
+}: {
+  options: Array<{ id: T; label: string }>;
+  value: T;
+  disabled?: boolean;
+  onChange: (id: T) => void;
+}) {
+  return (
+    <div className="mt-1.5 flex flex-wrap gap-2">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          disabled={disabled}
+          onClick={() => onChange(option.id)}
+          className={cn(
+            "rounded-full border px-3.5 py-2 text-sm font-medium",
+            value === option.id
+              ? "border-[#1A23FF] bg-[rgba(26,35,255,0.08)] text-[#1A23FF]"
+              : "border-[rgba(15,23,42,0.1)] bg-white text-[#64748B]"
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function SupportersPageSettings({ canManage }: { canManage: boolean }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
-  const [uploadingBg, setUploadingBg] = useState(false);
   const [form, setForm] = useState<SupportersPageSettings | null>(null);
 
   const load = useCallback(async () => {
@@ -64,12 +112,14 @@ export default function SupportersPageSettings({ canManage }: { canManage: boole
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          label: form.label,
           title: form.title,
           subtitle: form.subtitle,
-          message: form.message,
           primaryColor: form.primaryColor,
           secondaryColor: form.secondaryColor,
-          backgroundMode: form.backgroundMode,
+          pageStyle: form.pageStyle,
+          imagePosition: form.imagePosition,
+          overlayIntensity: form.overlayIntensity,
           showStats: form.showStats,
         }),
       });
@@ -84,30 +134,26 @@ export default function SupportersPageSettings({ canManage }: { canManage: boole
     }
   };
 
-  const uploadMedia = async (
-    kind: "banner" | "background",
-    file: File,
-    setBusy: (v: boolean) => void
-  ) => {
-    setBusy(true);
+  const uploadBanner = async (file: File) => {
+    setUploadingBanner(true);
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch(`/api/supporters/media?kind=${kind}`, { method: "POST", body });
+      const res = await fetch("/api/supporters/media?kind=banner", { method: "POST", body });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload impossible");
       await load();
-      toast.success(kind === "banner" ? "Bannière mise à jour" : "Image de fond mise à jour");
+      toast.success("Image mise à jour");
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Upload impossible");
     } finally {
-      setBusy(false);
+      setUploadingBanner(false);
     }
   };
 
-  const deleteMedia = async (kind: "banner" | "background") => {
+  const deleteBanner = async () => {
     try {
-      const res = await fetch(`/api/supporters/media?kind=${kind}`, { method: "DELETE" });
+      const res = await fetch("/api/supporters/media?kind=banner", { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Suppression impossible");
       await load();
@@ -126,87 +172,104 @@ export default function SupportersPageSettings({ canManage }: { canManage: boole
   }
 
   const copy = resolvedSupportersCopy(form);
-  const palette = getClubBrandPalette(form.primaryColor, form.secondaryColor);
-  const previewBg = form.bannerUrl
-    ? undefined
-    : form.backgroundMode === "solid"
-      ? form.primaryColor
-      : palette.headerGradient;
+  const secondary = resolvedSecondaryColor(form.primaryColor, form.secondaryColor);
+  const previewStyle = effectivePageStyle(form.pageStyle, form.bannerUrl);
+  const needsImage = form.pageStyle === "banner" || form.pageStyle === "fullscreen";
 
   return (
     <GlassCard className="p-5 sm:p-6">
-      <h2 className="text-base font-semibold">Personnalisation de la page publique</h2>
-      <p className="mt-1 text-sm text-[#64748B]">
-        Adaptez le hero, les couleurs et les visuels pour que la page ressemble à votre club.
-      </p>
-      {form.publicPath ? (
-        <a
-          href={form.publicPath}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex text-sm font-semibold text-[#1A23FF]"
-        >
-          Voir la page publique
-        </a>
-      ) : null}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold">Apparence de la page publique</h2>
+          <p className="mt-1 text-sm text-[#64748B]">
+            Style, couleurs et visuel du club. Le supporter doit reconnaître votre identité.
+          </p>
+        </div>
+        {form.publicPath ? (
+          <a
+            href={form.publicPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(dashboardSecondaryButtonClass, "rounded-full px-4 py-2 text-sm")}
+          >
+            Aperçu
+          </a>
+        ) : null}
+      </div>
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.08)]">
-        <div className="relative min-h-[9.5rem] px-5 py-6 text-center text-white">
-          {form.bannerUrl ? (
+        <div className="relative min-h-[8.5rem] px-5 py-5 text-center text-white">
+          {previewStyle === "banner" && form.bannerUrl ? (
             <>
-              <Image src={form.bannerUrl} alt="" fill className="object-cover" unoptimized sizes="640px" />
+              <Image
+                src={form.bannerUrl}
+                alt=""
+                fill
+                className="object-cover"
+                style={{
+                  objectPosition:
+                    form.imagePosition === "top"
+                      ? "center top"
+                      : form.imagePosition === "bottom"
+                        ? "center bottom"
+                        : "center",
+                }}
+                unoptimized
+                sizes="640px"
+              />
               <div
                 className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(180deg, ${form.primaryColor}99 0%, #0b1220e6 100%)`,
-                }}
+                style={{ background: bannerOverlay(form.primaryColor, secondary, form.overlayIntensity) }}
               />
             </>
           ) : (
-            <div className="absolute inset-0" style={{ background: previewBg }} />
+            <div className="absolute inset-0" style={clubColorsHeroStyle(form.primaryColor, secondary)} />
           )}
-          <div className="relative">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70">Aperçu</p>
-            <p className="mt-2 text-lg font-semibold">{copy.title}</p>
-            <p className="mt-1 text-xs text-white/80">{copy.subtitle}</p>
+          <div className="relative mx-auto max-w-md">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70">{copy.label}</p>
+            <p className="mt-1.5 text-lg font-semibold">{copy.title}</p>
+            <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-white/80">{copy.subtitle}</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 space-y-4">
-        <label className="block">
-          <span className={dashboardLabelClass}>Titre public</span>
-          <input
-            className={dashboardInputClass}
-            value={form.title || ""}
-            disabled={!canManage}
-            onChange={(e) => setForm({ ...form, title: e.target.value || null })}
-            placeholder={defaultSupportersTitle(form.clubName)}
-          />
-        </label>
-        <label className="block">
-          <span className={dashboardLabelClass}>Sous-titre</span>
-          <input
-            className={dashboardInputClass}
-            value={form.subtitle || ""}
-            disabled={!canManage}
-            onChange={(e) => setForm({ ...form, subtitle: e.target.value || null })}
-            placeholder={DEFAULT_SUPPORTERS_SUBTITLE}
-          />
-        </label>
-        <label className="block">
-          <span className={dashboardLabelClass}>Message complémentaire (optionnel)</span>
-          <textarea
-            className={cn(dashboardInputClass, "min-h-[72px] resize-y")}
-            value={form.message || ""}
-            disabled={!canManage}
-            onChange={(e) => setForm({ ...form, message: e.target.value || null })}
-            placeholder="Chaque soutien compte pour faire grandir notre club, nos équipes et nos projets."
-            rows={3}
-          />
-        </label>
+      <div className="mt-6 space-y-6">
+        <section>
+          <p className={dashboardLabelClass}>Style de page</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+            {STYLES.map((style) => (
+              <button
+                key={style.id}
+                type="button"
+                disabled={!canManage}
+                onClick={() => setForm({ ...form, pageStyle: style.id })}
+                className={cn(
+                  "rounded-2xl border p-3 text-left transition",
+                  form.pageStyle === style.id
+                    ? "border-[#1A23FF] bg-[rgba(26,35,255,0.06)]"
+                    : "border-[rgba(15,23,42,0.1)] bg-white hover:border-[rgba(26,35,255,0.25)]"
+                )}
+              >
+                <span
+                  className="mb-2 block h-10 overflow-hidden rounded-xl"
+                  style={
+                    style.id === "colors" || !form.bannerUrl
+                      ? clubColorsHeroStyle(form.primaryColor, secondary)
+                      : {
+                          backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.25), rgba(15,23,42,0.55)), url(${form.bannerUrl})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }
+                  }
+                />
+                <p className="text-sm font-semibold">{style.label}</p>
+                <p className="mt-0.5 text-xs text-[#64748B]">{style.hint}</p>
+              </button>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <section className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className={dashboardLabelClass}>Couleur principale</span>
             <div className="mt-1.5 flex items-center gap-3">
@@ -244,109 +307,112 @@ export default function SupportersPageSettings({ canManage }: { canManage: boole
               />
             </div>
           </label>
-        </div>
+        </section>
 
-        <div>
-          <p className={dashboardLabelClass}>Type de fond</p>
-          <div className="mt-1.5 flex flex-wrap gap-2">
-            {MODES.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                disabled={!canManage}
-                onClick={() => setForm({ ...form, backgroundMode: mode.id })}
-                className={cn(
-                  "rounded-full border px-3.5 py-2 text-sm font-medium",
-                  form.backgroundMode === mode.id
-                    ? "border-[#1A23FF] bg-[rgba(26,35,255,0.08)] text-[#1A23FF]"
-                    : "border-[rgba(15,23,42,0.1)] bg-white text-[#64748B]"
-                )}
-              >
-                {mode.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={`${dashboardInnerPanelClass} p-4`}>
-          <p className="text-sm font-medium">Image de bannière / couverture</p>
-          <p className={cn(dashboardHintClass, "mt-1")}>
-            Photo d’équipe, stade ou ambiance. Utilisée dans le hero.
-          </p>
-          {form.bannerUrl ? (
-            <div className="relative mt-3 aspect-[16/6] overflow-hidden rounded-xl bg-white">
-              <Image src={form.bannerUrl} alt="" fill className="object-cover" unoptimized sizes="640px" />
-            </div>
-          ) : null}
-          {canManage ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <label className={cn(dashboardSecondaryButtonClass, "cursor-pointer rounded-full px-4 py-2 text-sm")}>
-                {uploadingBanner ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {form.bannerUrl ? "Remplacer" : "Ajouter"}
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg"
-                  className="hidden"
-                  disabled={uploadingBanner}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void uploadMedia("banner", file, setUploadingBanner);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
+        {needsImage ? (
+          <section className={`${dashboardInnerPanelClass} space-y-4 p-4`}>
+            <div>
+              <p className="text-sm font-medium">Image</p>
+              <p className={cn(dashboardHintClass, "mt-1")}>
+                Photo d’équipe, stade ou ambiance. JPG ou PNG, max. 5 Mo.
+              </p>
               {form.bannerUrl ? (
-                <ActionButton variant="dangerSoft" type="button" onClick={() => void deleteMedia("banner")}>
-                  <Trash className="h-4 w-4" /> Retirer
-                </ActionButton>
+                <div className="relative mt-3 aspect-[16/6] overflow-hidden rounded-xl bg-[#0B1220]">
+                  <Image src={form.bannerUrl} alt="" fill className="object-cover" unoptimized sizes="640px" />
+                </div>
+              ) : (
+                <p className="mt-3 rounded-xl border border-dashed border-[rgba(15,23,42,0.12)] bg-white px-4 py-6 text-center text-sm text-[#64748B]">
+                  Sans image, le style « Couleurs du club » est utilisé automatiquement.
+                </p>
+              )}
+              {canManage ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <label className={cn(dashboardSecondaryButtonClass, "cursor-pointer rounded-full px-4 py-2 text-sm")}>
+                    {uploadingBanner ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    {form.bannerUrl ? "Remplacer" : "Ajouter"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg"
+                      className="hidden"
+                      disabled={uploadingBanner}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void uploadBanner(file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  {form.bannerUrl ? (
+                    <ActionButton variant="dangerSoft" type="button" onClick={() => void deleteBanner()}>
+                      <Trash className="h-4 w-4" /> Retirer
+                    </ActionButton>
+                  ) : null}
+                </div>
               ) : null}
             </div>
-          ) : null}
-        </div>
+            <div>
+              <p className={dashboardLabelClass}>Position de l’image</p>
+              <ChoiceChip
+                options={POSITIONS}
+                value={form.imagePosition}
+                disabled={!canManage}
+                onChange={(imagePosition) => setForm({ ...form, imagePosition })}
+              />
+            </div>
+            <div>
+              <p className={dashboardLabelClass}>Intensité</p>
+              <ChoiceChip
+                options={INTENSITIES}
+                value={form.overlayIntensity}
+                disabled={!canManage}
+                onChange={(overlayIntensity) => setForm({ ...form, overlayIntensity })}
+              />
+            </div>
+          </section>
+        ) : null}
 
-        <div className={`${dashboardInnerPanelClass} p-4`}>
-          <p className="text-sm font-medium">Image d’ambiance (optionnelle)</p>
-          <p className={cn(dashboardHintClass, "mt-1")}>
-            Texture discrète derrière le contenu, sous le hero.
-          </p>
-          {form.bgImageUrl ? (
-            <div className="relative mt-3 aspect-[16/6] overflow-hidden rounded-xl bg-white">
-              <Image src={form.bgImageUrl} alt="" fill className="object-cover" unoptimized sizes="640px" />
-            </div>
-          ) : null}
-          {canManage ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <label className={cn(dashboardSecondaryButtonClass, "cursor-pointer rounded-full px-4 py-2 text-sm")}>
-                {uploadingBg ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {form.bgImageUrl ? "Remplacer" : "Ajouter"}
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg"
-                  className="hidden"
-                  disabled={uploadingBg}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void uploadMedia("background", file, setUploadingBg);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-              {form.bgImageUrl ? (
-                <ActionButton variant="dangerSoft" type="button" onClick={() => void deleteMedia("background")}>
-                  <Trash className="h-4 w-4" /> Retirer
-                </ActionButton>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        <section className="space-y-4">
+          <p className="text-sm font-semibold">Contenu</p>
+          <label className="block">
+            <span className={dashboardLabelClass}>Petit label</span>
+            <input
+              className={dashboardInputClass}
+              value={form.label || ""}
+              disabled={!canManage}
+              onChange={(e) => setForm({ ...form, label: e.target.value || null })}
+              placeholder={DEFAULT_SUPPORTERS_LABEL}
+            />
+          </label>
+          <label className="block">
+            <span className={dashboardLabelClass}>Titre</span>
+            <input
+              className={dashboardInputClass}
+              value={form.title || ""}
+              disabled={!canManage}
+              onChange={(e) => setForm({ ...form, title: e.target.value || null })}
+              placeholder={defaultSupportersTitle(form.clubName)}
+            />
+          </label>
+          <label className="block">
+            <span className={dashboardLabelClass}>Description</span>
+            <textarea
+              className={cn(dashboardInputClass, "min-h-[72px] resize-y")}
+              value={form.subtitle || ""}
+              disabled={!canManage}
+              onChange={(e) => setForm({ ...form, subtitle: e.target.value || null })}
+              placeholder={DEFAULT_SUPPORTERS_SUBTITLE}
+              rows={3}
+            />
+          </label>
+        </section>
 
         <div className="flex items-center justify-between gap-3 rounded-xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-2.5">
-          <span className="text-sm font-medium">Afficher les statistiques sur la page publique</span>
+          <span className="text-sm font-medium">Afficher le prix minimum dans le hero</span>
           <PremiumSwitch
             checked={form.showStats}
             onChange={(v) => canManage && setForm({ ...form, showStats: v })}
             disabled={!canManage}
-            aria-label="Afficher les statistiques"
+            aria-label="Afficher le prix minimum"
           />
         </div>
       </div>

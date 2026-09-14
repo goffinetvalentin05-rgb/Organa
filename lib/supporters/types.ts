@@ -83,17 +83,20 @@ export type PublicSupporterOffer = {
   benefits: Array<{ label: string }>;
 };
 
-export type SupportersBackgroundMode = "solid" | "gradient" | "image";
+export type SupportersPageStyle = "colors" | "banner" | "fullscreen";
+export type SupportersImagePosition = "top" | "center" | "bottom";
+export type SupportersOverlayIntensity = "light" | "normal" | "dark";
 
 export type PublicSupportersTheme = {
+  label: string;
   title: string;
   subtitle: string;
-  message: string | null;
   primaryColor: string;
   secondaryColor: string;
-  backgroundMode: SupportersBackgroundMode;
+  pageStyle: SupportersPageStyle;
+  imagePosition: SupportersImagePosition;
+  overlayIntensity: SupportersOverlayIntensity;
   bannerUrl: string | null;
-  bgImageUrl: string | null;
   showStats: boolean;
 };
 

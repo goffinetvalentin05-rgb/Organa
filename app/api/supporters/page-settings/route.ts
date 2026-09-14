@@ -5,7 +5,6 @@ import {
   mapProfileToSupportersSettings,
   SUPPORTERS_SETTINGS_PROFILE_SELECT,
   updateSupportersPageSettings,
-  type SupportersBackgroundMode,
 } from "@/lib/supporters/page-settings";
 
 export const runtime = "nodejs";
@@ -71,12 +70,14 @@ export async function PUT(request: NextRequest) {
 
     const admin = createAdminClient();
     const result = await updateSupportersPageSettings(admin, guard.clubId, {
+      label: body.label,
       title: body.title,
       subtitle: body.subtitle,
-      message: body.message,
       primaryColor: body.primaryColor,
       secondaryColor: body.secondaryColor,
-      backgroundMode: body.backgroundMode as SupportersBackgroundMode | undefined,
+      pageStyle: body.pageStyle,
+      imagePosition: body.imagePosition,
+      overlayIntensity: body.overlayIntensity,
       showStats: body.showStats,
     });
 

@@ -26,10 +26,10 @@ import {
 } from "./format";
 import { isSupporterActive, offerAllowsCheckout, supporterDisplayStatus } from "./status";
 import {
+  DEFAULT_SUPPORTERS_LABEL,
   DEFAULT_SUPPORTERS_SUBTITLE,
   defaultSupportersTitle,
   mapProfileToSupportersSettings,
-  parseBackgroundMode,
   resolvedSecondaryColor,
   SUPPORTERS_SETTINGS_PROFILE_SELECT,
   type SupportersSettingsProfileRow,
@@ -52,14 +52,15 @@ function brandingFromProfile(profile: SupportersSettingsProfileRow | null): Club
     clubName: mapped.clubName,
     logoUrl: mapped.logoUrl,
     theme: {
+      label: mapped.label || DEFAULT_SUPPORTERS_LABEL,
       title: mapped.title || defaultSupportersTitle(mapped.clubName),
       subtitle: mapped.subtitle || DEFAULT_SUPPORTERS_SUBTITLE,
-      message: mapped.message,
       primaryColor,
       secondaryColor: resolvedSecondaryColor(primaryColor, mapped.secondaryColor),
-      backgroundMode: parseBackgroundMode(mapped.backgroundMode),
+      pageStyle: mapped.pageStyle,
+      imagePosition: mapped.imagePosition,
+      overlayIntensity: mapped.overlayIntensity,
       bannerUrl: mapped.bannerUrl,
-      bgImageUrl: mapped.bgImageUrl,
       showStats: mapped.showStats,
     },
   };
@@ -92,14 +93,15 @@ export async function loadClubBranding(clubId: string): Promise<ClubSupporterBra
     clubName,
     logoUrl: typeof fallback?.logo_url === "string" ? fallback.logo_url : null,
     theme: {
+      label: DEFAULT_SUPPORTERS_LABEL,
       title: defaultSupportersTitle(clubName),
       subtitle: DEFAULT_SUPPORTERS_SUBTITLE,
-      message: null,
       primaryColor,
       secondaryColor: resolvedSecondaryColor(primaryColor, null),
-      backgroundMode: "gradient",
+      pageStyle: "colors",
+      imagePosition: "center",
+      overlayIntensity: "normal",
       bannerUrl: null,
-      bgImageUrl: null,
       showStats: true,
     },
   };
