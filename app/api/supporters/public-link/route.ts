@@ -12,7 +12,7 @@ export async function GET() {
     const guard = await requirePermission(PERMISSIONS.VIEW_SUPPORTERS);
     if ("error" in guard) return guard.error;
     const supabase = await createClient();
-    const slug = await resolveClubPublicSlug(supabase, guard.clubId);
+    const slug = await resolveClubPublicSlug(guard.clubId);
     const account = await getClubStripeAccount(supabase, guard.clubId);
     const ready = isPaymentReady(account);
     return NextResponse.json({

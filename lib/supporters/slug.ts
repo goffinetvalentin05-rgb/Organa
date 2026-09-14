@@ -1,11 +1,15 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+/**
+ * Slug public du club (page club, boutique, buvette).
+ * Lecture via service_role après un garde permission côté appelant :
+ * JWT n’a pas GRANT sur public_page_slug / buvette_slug (migration 075).
+ */
 export async function resolveClubPublicSlug(
-  supabase: SupabaseClient,
   clubId: string
 ): Promise<string | null> {
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select("public_page_slug, buvette_slug")
     .eq("user_id", clubId)
@@ -17,7 +21,7 @@ export async function resolveClubPublicSlug(
       : "";
   if (publicSlug) return publicSlug;
 
-  const { data: shop } = await supabase
+  const { data: shop } = await admin
     .from("shop_settings")
     .select("slug")
     .eq("club_id", clubId)
@@ -38,9 +42,9 @@ export async function resolveClubIdByPublicSlug(
 ): Promise<string | null> {
   const normalized = slug.trim().toLowerCase();
   if (!normalized) return null;
-  const supabase = createAdminClient();
+  const admin = createAdminClient();
 
-  const { data: byPublic } = await supabase
+  const { data: byPublic } = await admin
     .from("profiles")
     .select("user_id")
     .eq("public_page_slug", normalized)
@@ -48,14 +52,14 @@ export async function resolveClubIdByPublicSlug(
     .maybeSingle();
   if (byPublic?.user_id) return byPublic.user_id as string;
 
-  const { data: byShop } = await supabase
+  const { data: byShop } = await admin
     .from("shop_settings")
     .select("club_id")
     .eq("slug", normalized)
     .maybeSingle();
   if (byShop?.club_id) return byShop.club_id as string;
 
-  const { data: byBuvette } = await supabase
+  const { data: byBuvette } = await admin
     .from("profiles")
     .select("user_id")
     .eq("buvette_slug", normalized)

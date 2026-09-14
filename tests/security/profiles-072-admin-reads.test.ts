@@ -48,6 +48,8 @@ const PRIVATE_ROUTES = [
   "app/api/export/accounting/route.tsx",
   "app/api/associations/logo/route.ts",
   "app/api/associations/settings/route.ts",
+  "app/api/supporters/page-settings/route.ts",
+  "app/api/supporters/media/route.ts",
 ] as const;
 
 describe("072 prep — lectures privées profiles via admin", () => {
@@ -206,6 +208,20 @@ describe("072 prep — lectures privées profiles via admin", () => {
       expect(src, rel).toContain('.from("profiles")');
       expect(hasJwtProfilesRead(src), rel).toBe(false);
     }
+  });
+
+  it("supporters public-link : slug via admin après VIEW_SUPPORTERS, pas de JWT profiles", () => {
+    const src = read("app/api/supporters/public-link/route.ts");
+    expect(src).toContain("PERMISSIONS.VIEW_SUPPORTERS");
+    expect(src).toContain("resolveClubPublicSlug(guard.clubId)");
+    expect(src).not.toMatch(/from\("profiles"\)/);
+    expect(hasJwtProfilesRead(src)).toBe(false);
+
+    const slug = read("lib/supporters/slug.ts");
+    expect(slug).toContain("createAdminClient");
+    expect(slug).toMatch(/await admin\s*\n\s*\.from\("profiles"\)/);
+    expect(slug).not.toMatch(/export async function resolveClubPublicSlug\(\s*supabase/);
+    expect(hasJwtProfilesRead(slug)).toBe(false);
   });
 
   it("page publique et helpers buvette/public-page reçoivent l’admin côté API", () => {
