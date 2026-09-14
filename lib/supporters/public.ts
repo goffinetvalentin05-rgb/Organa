@@ -8,6 +8,7 @@ import type {
   CardPublicData,
   OfferRow,
   PublicSupportersPage,
+  PublicSupportersTheme,
   SupporterRow,
   VerifyPublicData,
 } from "./types";
@@ -24,28 +25,83 @@ import {
   seasonLabel,
 } from "./format";
 import { isSupporterActive, offerAllowsCheckout, supporterDisplayStatus } from "./status";
+import {
+  DEFAULT_SUPPORTERS_SUBTITLE,
+  defaultSupportersTitle,
+  mapProfileToSupportersSettings,
+  parseBackgroundMode,
+  resolvedSecondaryColor,
+  SUPPORTERS_SETTINGS_PROFILE_SELECT,
+  type SupportersSettingsProfileRow,
+} from "./page-settings";
 
 const WALL_LIMIT = 30;
 
-export async function loadClubBranding(clubId: string): Promise<{
+export type ClubSupporterBranding = {
   clubName: string;
   logoUrl: string | null;
-  primaryColor: string;
-}> {
+  theme: PublicSupportersTheme;
+};
+
+const LEGACY_BRANDING_SELECT = "company_name, logo_url, primary_color, public_page_primary_color";
+
+function brandingFromProfile(profile: SupportersSettingsProfileRow | null): ClubSupporterBranding {
+  const mapped = mapProfileToSupportersSettings(profile || {});
+  const primaryColor = mapped.primaryColor;
+  return {
+    clubName: mapped.clubName,
+    logoUrl: mapped.logoUrl,
+    theme: {
+      title: mapped.title || defaultSupportersTitle(mapped.clubName),
+      subtitle: mapped.subtitle || DEFAULT_SUPPORTERS_SUBTITLE,
+      message: mapped.message,
+      primaryColor,
+      secondaryColor: resolvedSecondaryColor(primaryColor, mapped.secondaryColor),
+      backgroundMode: parseBackgroundMode(mapped.backgroundMode),
+      bannerUrl: mapped.bannerUrl,
+      bgImageUrl: mapped.bgImageUrl,
+      showStats: mapped.showStats,
+    },
+  };
+}
+
+export async function loadClubBranding(clubId: string): Promise<ClubSupporterBranding> {
   const supabase = createAdminClient();
-  const { data: profile } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
-    .select("company_name, logo_url, primary_color, public_page_primary_color")
+    .select(SUPPORTERS_SETTINGS_PROFILE_SELECT)
     .eq("user_id", clubId)
     .maybeSingle();
 
+  if (!error) {
+    return brandingFromProfile((data || null) as SupportersSettingsProfileRow | null);
+  }
+
+  const { data: fallback } = await supabase
+    .from("profiles")
+    .select(LEGACY_BRANDING_SELECT)
+    .eq("user_id", clubId)
+    .maybeSingle();
+
+  const clubName = fallback?.company_name?.trim() || "Club";
+  const primaryColor = normalizeHexColor(
+    fallback?.public_page_primary_color || fallback?.primary_color,
+    OBILLZ_BRAND_PRIMARY
+  );
   return {
-    clubName: profile?.company_name?.trim() || "Club",
-    logoUrl: typeof profile?.logo_url === "string" ? profile.logo_url : null,
-    primaryColor: normalizeHexColor(
-      profile?.public_page_primary_color || profile?.primary_color,
-      OBILLZ_BRAND_PRIMARY
-    ),
+    clubName,
+    logoUrl: typeof fallback?.logo_url === "string" ? fallback.logo_url : null,
+    theme: {
+      title: defaultSupportersTitle(clubName),
+      subtitle: DEFAULT_SUPPORTERS_SUBTITLE,
+      message: null,
+      primaryColor,
+      secondaryColor: resolvedSecondaryColor(primaryColor, null),
+      backgroundMode: "gradient",
+      bannerUrl: null,
+      bgImageUrl: null,
+      showStats: true,
+    },
   };
 }
 
@@ -163,7 +219,8 @@ export async function getPublicSupportersPage(
     slug,
     clubName: branding.clubName,
     logoUrl: branding.logoUrl,
-    primaryColor: branding.primaryColor,
+    primaryColor: branding.theme.primaryColor,
+    theme: branding.theme,
     canCheckout,
     checkoutBlockedReason: !paymentsReady
       ? "Les paiements ne sont pas encore configurés."
@@ -254,7 +311,8 @@ export async function getCardByToken(cardToken: string): Promise<CardPublicData 
   return {
     clubName: branding.clubName,
     logoUrl: branding.logoUrl,
-    primaryColor: branding.primaryColor,
+    primaryColor: branding.theme.primaryColor,
+    secondaryColor: branding.theme.secondaryColor,
     offerName: offer?.name || "Supporter",
     firstName: row.first_name,
     lastName: row.last_name,
@@ -284,6 +342,8 @@ export async function getVerifyByToken(qrToken: string): Promise<VerifyPublicDat
     return {
       outcome: "invalid",
       clubName: null,
+      logoUrl: null,
+      primaryColor: OBILLZ_BRAND_PRIMARY,
       offerName: null,
       firstName: null,
       lastName: null,
@@ -305,6 +365,8 @@ export async function getVerifyByToken(qrToken: string): Promise<VerifyPublicDat
     return {
       outcome: "invalid",
       clubName: null,
+      logoUrl: null,
+      primaryColor: OBILLZ_BRAND_PRIMARY,
       offerName: null,
       firstName: null,
       lastName: null,
@@ -332,6 +394,8 @@ export async function getVerifyByToken(qrToken: string): Promise<VerifyPublicDat
   return {
     outcome,
     clubName: branding.clubName,
+    logoUrl: branding.logoUrl,
+    primaryColor: branding.theme.primaryColor,
     offerName: offer?.name || "Supporter",
     firstName: row.first_name,
     lastName: row.last_name,

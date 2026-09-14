@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import PublicClubLogo from "@/components/public/PublicClubLogo";
-import { getClubBrandPalette } from "@/lib/public-page/colors";
+import { Shield } from "@/lib/icons";
 import { formatChf } from "@/lib/shop/money";
 import { durationLabel } from "@/lib/supporters/format";
 import type { PublicSupportersPage } from "@/lib/supporters/types";
+import { ctaColors, pageSurfaceStyle, supportersPalette } from "@/lib/supporters/theme";
+import SupportersClubMark from "./SupportersClubMark";
 
 export default function PublicSupportersCheckoutClient({ slug }: { slug: string }) {
   const router = useRouter();
@@ -77,9 +79,21 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
     );
   }
 
-  const palette = getClubBrandPalette(page.primaryColor);
+  const theme = page.theme || {
+    title: `Soutenez le ${page.clubName}`,
+    subtitle: "",
+    message: null,
+    primaryColor: page.primaryColor,
+    secondaryColor: page.primaryColor,
+    backgroundMode: "gradient" as const,
+    bannerUrl: null,
+    bgImageUrl: null,
+    showStats: true,
+  };
+  const palette = supportersPalette(theme);
+  const cta = ctaColors(theme.primaryColor);
   const fieldClass =
-    "w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 py-3 text-sm";
+    "min-h-12 w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-white px-4 text-base text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[rgba(26,35,255,0.18)] sm:text-sm";
 
   if (!offer) {
     return (
@@ -100,30 +114,57 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
   }
 
   return (
-    <div className="min-h-[100dvh]" style={{ background: palette.pageBackground }}>
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-        <div className="mb-8 text-center">
-          <PublicClubLogo
+    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, theme.bgImageUrl)}>
+      <header
+        className="border-b border-white/10"
+        style={{ background: palette.headerGradient }}
+      >
+        <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-4 sm:px-6">
+          <SupportersClubMark
             logoUrl={page.logoUrl}
             clubName={page.clubName}
-            accentColor={page.primaryColor}
-            size="md"
+            accentColor={theme.primaryColor}
+            size="sm"
+            tone="glass"
+            className="mx-0"
           />
-          <h1 className="mt-4 text-2xl font-semibold">Devenir supporter</h1>
+          <div className="min-w-0 text-left text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+              Supporters
+            </p>
+            <p className="truncate text-sm font-semibold">{page.clubName}</p>
+          </div>
         </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+        <Link
+          href={`/club/${slug}/supporters`}
+          className="text-sm font-medium text-[#64748B] hover:text-[#0F172A]"
+        >
+          ← Retour aux offres
+        </Link>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">Devenir supporter</h1>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#64748B]">
+          Vos informations restent privées. Seul un prénom public peut apparaître sur le mur, si vous
+          l’acceptez.
+        </p>
+
         {error ? (
-          <p className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <p className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {error}
           </p>
         ) : null}
-        <form onSubmit={pay} className="grid gap-6 lg:grid-cols-5">
-          <div className="space-y-4 rounded-[1.25rem] bg-white p-5 shadow-sm lg:col-span-3">
-            <h2 className="font-semibold">Vos informations</h2>
+
+        <form onSubmit={pay} className="mt-7 grid items-start gap-5 lg:grid-cols-5">
+          <div className="space-y-4 rounded-[1.5rem] border border-[rgba(15,23,42,0.06)] bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.06)] sm:p-6 lg:col-span-3">
+            <h2 className="text-lg font-semibold">Vos informations</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <input
                 className={fieldClass}
                 required
                 placeholder="Prénom"
+                autoComplete="given-name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
@@ -131,6 +172,7 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
                 className={fieldClass}
                 required
                 placeholder="Nom"
+                autoComplete="family-name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
@@ -139,6 +181,7 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
               className={fieldClass}
               required
               type="email"
+              autoComplete="email"
               placeholder="E-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -146,14 +189,15 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
             <input
               className={fieldClass}
               type="tel"
+              autoComplete="tel"
               placeholder="Téléphone (facultatif)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
-            <label className="flex items-start gap-3 text-sm">
+            <label className="flex items-start gap-3 rounded-xl bg-[#F8FAFC] p-3 text-sm leading-relaxed">
               <input
                 type="checkbox"
-                className="mt-1 h-5 w-5 accent-[#1A23FF]"
+                className="mt-0.5 h-5 w-5 accent-[#1A23FF]"
                 checked={publicNameEnabled}
                 onChange={(e) => setPublicNameEnabled(e.target.checked)}
               />
@@ -162,31 +206,47 @@ export default function PublicSupportersCheckoutClient({ slug }: { slug: string 
               </span>
             </label>
             <p className="text-xs leading-relaxed text-[#64748B]">
-              Vous pourrez apparaître parmi les supporters du club. Votre e-mail et vos
-              informations personnelles ne seront jamais affichés publiquement.
+              Votre e-mail et vos informations personnelles ne seront jamais affichés publiquement.
             </p>
           </div>
-          <div className="rounded-[1.25rem] bg-white p-5 shadow-sm lg:col-span-2">
-            <h2 className="font-semibold">Récapitulatif</h2>
-            <p className="mt-4 text-sm text-[#64748B]">{page.clubName}</p>
-            <p className="mt-1 text-lg font-semibold">{offer.name}</p>
-            <p className="text-sm text-[#64748B]">
+
+          <aside className="rounded-[1.5rem] border border-[rgba(15,23,42,0.06)] bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.06)] sm:p-6 lg:sticky lg:top-6 lg:col-span-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+              Récapitulatif
+            </p>
+            <p className="mt-3 text-sm text-[#64748B]">{page.clubName}</p>
+            <p className="mt-1 text-xl font-semibold tracking-tight">{offer.name}</p>
+            <p className="mt-1 text-sm text-[#64748B]">
               {durationLabel({
                 durationType: offer.durationType,
                 startDate: offer.startDate,
                 endDate: offer.endDate,
               })}
             </p>
-            <p className="mt-4 text-2xl font-semibold">{formatChf(offer.priceCents)}</p>
+            {offer.benefits.length > 0 ? (
+              <ul className="mt-4 space-y-1.5 text-sm text-[#334155]">
+                {offer.benefits.slice(0, 4).map((b, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span style={{ color: theme.primaryColor }}>✓</span>
+                    <span>{b.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <p className="mt-5 text-3xl font-semibold tracking-tight">{formatChf(offer.priceCents)}</p>
             <button
               type="submit"
               disabled={submitting || !page.canCheckout || offer.soldOut}
-              className="mt-6 w-full rounded-full py-3.5 text-sm font-semibold text-white disabled:opacity-50"
-              style={{ backgroundColor: page.primaryColor }}
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full text-sm font-semibold disabled:opacity-50"
+              style={{ backgroundColor: cta.background, color: cta.color }}
             >
               {submitting ? "Redirection…" : `Payer ${formatChf(offer.priceCents)}`}
             </button>
-          </div>
+            <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-[#64748B]">
+              <Shield className="mt-0.5 h-4 w-4 shrink-0" />
+              Paiement sécurisé. Le montant est versé directement au club.
+            </p>
+          </aside>
         </form>
       </main>
     </div>

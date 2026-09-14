@@ -83,11 +83,26 @@ export type PublicSupporterOffer = {
   benefits: Array<{ label: string }>;
 };
 
+export type SupportersBackgroundMode = "solid" | "gradient" | "image";
+
+export type PublicSupportersTheme = {
+  title: string;
+  subtitle: string;
+  message: string | null;
+  primaryColor: string;
+  secondaryColor: string;
+  backgroundMode: SupportersBackgroundMode;
+  bannerUrl: string | null;
+  bgImageUrl: string | null;
+  showStats: boolean;
+};
+
 export type PublicSupportersPage = {
   slug: string;
   clubName: string;
   logoUrl: string | null;
   primaryColor: string;
+  theme: PublicSupportersTheme;
   canCheckout: boolean;
   checkoutBlockedReason: string | null;
   offers: PublicSupporterOffer[];
@@ -102,6 +117,7 @@ export type CardPublicData = {
   clubName: string;
   logoUrl: string | null;
   primaryColor: string;
+  secondaryColor: string;
   offerName: string;
   firstName: string;
   lastName: string;
@@ -118,6 +134,8 @@ export type CardPublicData = {
 export type VerifyPublicData = {
   outcome: "valid" | "expired" | "disabled" | "invalid";
   clubName: string | null;
+  logoUrl: string | null;
+  primaryColor: string;
   offerName: string | null;
   firstName: string | null;
   lastName: string | null;

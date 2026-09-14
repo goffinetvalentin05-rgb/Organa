@@ -29,27 +29,38 @@ export default async function SupporterCardPage({
     );
   }
 
-  const palette = getClubBrandPalette(card.primaryColor);
+  const palette = getClubBrandPalette(card.primaryColor, card.secondaryColor);
 
   return (
-    <div className="min-h-[100dvh] px-4 py-8 sm:py-12" style={{ background: palette.pageBackground }}>
+    <div
+      className="min-h-[100dvh] px-4 py-8 sm:py-12"
+      style={{ background: palette.pageBackground }}
+    >
       <div className="mx-auto max-w-md">
+        <p className="mb-5 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-[#94A3B8]">
+          Carte digitale
+        </p>
         <SupporterDigitalCard card={card} />
         <div className="mt-8 text-center">
-          <p className="text-sm font-semibold text-[#0F172A]">{card.clubName}</p>
+          <p className="text-base font-semibold text-[#0F172A]">{card.clubName}</p>
           <p className="mt-1 text-sm text-[#64748B]">{card.offerName}</p>
-          <p className="mt-1 text-sm font-medium text-[#0F172A]">{card.statusLabel}</p>
+          <p className="mt-2 text-sm font-medium text-[#0F172A]">{card.statusLabel}</p>
           {card.endDateLabel ? (
             <p className="mt-1 text-sm text-[#64748B]">Valable jusqu’au {card.endDateLabel}</p>
           ) : null}
         </div>
         {card.benefits.length > 0 ? (
-          <div className="mt-8 rounded-[1.25rem] bg-white p-5 shadow-sm">
+          <div className="mt-8 rounded-[1.5rem] border border-[rgba(15,23,42,0.06)] bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
             <h2 className="text-sm font-semibold">Vos avantages</h2>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2.5 text-sm">
               {card.benefits.map((b, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-emerald-600">✓</span>
+                <li key={i} className="flex items-start gap-2.5">
+                  <span
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
+                    style={{ backgroundColor: card.primaryColor }}
+                  >
+                    ✓
+                  </span>
                   <span>{b.label}</span>
                 </li>
               ))}

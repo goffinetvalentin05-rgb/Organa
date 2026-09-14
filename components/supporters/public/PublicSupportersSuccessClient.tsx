@@ -3,19 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import PublicClubLogo from "@/components/public/PublicClubLogo";
-import { getClubBrandPalette } from "@/lib/public-page/colors";
-
-type Catalog = {
-  clubName: string;
-  logoUrl: string | null;
-  primaryColor: string;
-};
+import { CheckCircle } from "@/lib/icons";
+import type { PublicSupportersPage } from "@/lib/supporters/types";
+import { ctaColors, pageSurfaceStyle, supportersPalette } from "@/lib/supporters/theme";
+import SupportersClubMark from "./SupportersClubMark";
 
 export default function PublicSupportersSuccessClient({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
   const supporterId = searchParams.get("s") || "";
-  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [page, setPage] = useState<PublicSupportersPage | null>(null);
   const [active, setActive] = useState(false);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
   const [checking, setChecking] = useState(Boolean(supporterId));
@@ -24,12 +20,7 @@ export default function PublicSupportersSuccessClient({ slug }: { slug: string }
     fetch(`/api/public/supporters/${slug}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (!data) return;
-        setCatalog({
-          clubName: data.clubName,
-          logoUrl: data.logoUrl,
-          primaryColor: data.primaryColor,
-        });
+        if (data) setPage(data);
       })
       .catch(() => undefined);
   }, [slug]);
@@ -74,47 +65,74 @@ export default function PublicSupportersSuccessClient({ slug }: { slug: string }
     };
   }, [supporterId]);
 
-  const clubName = catalog?.clubName || "club";
-  const primaryColor = catalog?.primaryColor || "#1A23FF";
-  const palette = getClubBrandPalette(primaryColor);
+  const clubName = page?.clubName || "club";
+  const theme = page?.theme;
+  const primaryColor = theme?.primaryColor || page?.primaryColor || "#1A23FF";
+  const palette = supportersPalette({
+    primaryColor,
+    secondaryColor: theme?.secondaryColor || primaryColor,
+  });
+  const cta = ctaColors(primaryColor);
 
   return (
-    <div className="min-h-[100dvh]" style={{ background: palette.pageBackground }}>
+    <div className="min-h-[100dvh]" style={pageSurfaceStyle(palette, theme?.bgImageUrl || null)}>
       <main className="mx-auto flex min-h-[100dvh] max-w-lg flex-col items-center justify-center px-6 py-16 text-center">
-        {catalog ? (
-          <PublicClubLogo
-            logoUrl={catalog.logoUrl}
-            clubName={catalog.clubName}
+        {page ? (
+          <SupportersClubMark
+            logoUrl={page.logoUrl}
+            clubName={page.clubName}
             accentColor={primaryColor}
             size="md"
+            tone="light"
           />
         ) : null}
+
         {active ? (
           <>
-            <h1 className="mt-6 text-2xl font-semibold">
+            <div
+              className="mt-7 flex h-14 w-14 items-center justify-center rounded-full text-white"
+              style={{ backgroundColor: primaryColor }}
+            >
+              <CheckCircle className="h-7 w-7" />
+            </div>
+            <h1 className="mt-5 text-3xl font-semibold tracking-tight">Merci pour votre soutien</h1>
+            <p className="mt-3 text-[15px] leading-relaxed text-[#64748B]">
               Vous faites désormais partie des supporters du {clubName}.
-            </h1>
-            <p className="mt-3 text-sm text-[#64748B]">
-              Merci pour votre soutien. Votre carte digitale est prête.
             </p>
-            {cardUrl ? (
+            <div className="mt-8 flex w-full max-w-sm flex-col gap-3">
+              {cardUrl ? (
+                <Link
+                  href={cardUrl}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-semibold"
+                  style={{ backgroundColor: cta.background, color: cta.color }}
+                >
+                  Voir ma carte supporter
+                </Link>
+              ) : null}
               <Link
-                href={cardUrl}
-                className="mt-8 inline-flex rounded-full px-6 py-3 text-sm font-semibold text-white"
-                style={{ backgroundColor: primaryColor }}
+                href={`/club/${slug}/supporters`}
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-[rgba(15,23,42,0.12)] bg-white px-6 text-sm font-semibold text-[#334155]"
               >
-                Voir ma carte supporter
+                Retour à la page supporters
               </Link>
-            ) : null}
+            </div>
           </>
         ) : (
           <>
-            <h1 className="mt-6 text-2xl font-semibold">Paiement reçu</h1>
-            <p className="mt-3 text-sm leading-relaxed text-[#64748B]">
+            <div className="mt-8 h-12 w-12 animate-spin rounded-full border-2 border-[#E2E8F0]" style={{ borderTopColor: primaryColor }} />
+            <h1 className="mt-6 text-2xl font-semibold tracking-tight">Paiement reçu</h1>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#64748B]">
               {checking
-                ? "Votre adhésion est en cours de confirmation…"
+                ? "Votre adhésion est en cours de confirmation. Cela ne prend généralement que quelques secondes."
                 : "Votre adhésion est en cours de confirmation. Vous recevrez votre carte supporter par e-mail dès validation du paiement."}
             </p>
+            <Link
+              href={`/club/${slug}/supporters`}
+              className="mt-8 text-sm font-semibold"
+              style={{ color: primaryColor }}
+            >
+              Retour à la page supporters
+            </Link>
           </>
         )}
       </main>

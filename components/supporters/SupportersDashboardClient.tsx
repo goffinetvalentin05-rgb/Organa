@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import ClubPaymentsPanel from "@/components/payments/connect/ClubPaymentsPanel";
+import SupportersPageSettings from "@/components/supporters/SupportersPageSettings";
 import {
   ActionButton,
   CheckboxRow,
@@ -542,7 +543,9 @@ export default function SupportersDashboardClient() {
       ) : null}
 
       {!loading && tab === "parametres" ? (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
+          <SupportersPageSettings canManage={canManage} />
+          <div className="grid gap-6 lg:grid-cols-2">
           <GlassCard className="p-5">
             <h2 className="text-base font-semibold">Lien public</h2>
             <p className={cn("mt-1 text-sm", dashboardTextSecondaryClass)}>
@@ -583,6 +586,7 @@ export default function SupportersDashboardClient() {
               </div>
             )}
             <ClubPaymentsPanel variant="shop" />
+          </div>
           </div>
         </div>
       ) : null}
