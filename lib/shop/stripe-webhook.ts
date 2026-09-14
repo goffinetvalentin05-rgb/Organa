@@ -17,6 +17,13 @@ import {
   isMembershipStripeEvent,
 } from "@/lib/quotes/stripe-membership";
 import { MEMBERSHIP_STRIPE_PURPOSE } from "@/lib/quotes/payment-method";
+import {
+  handleSupporterCheckoutSession,
+  handleSupporterCheckoutTerminal,
+  isSupportersCheckoutSession,
+  isSupportersStripeEvent,
+} from "@/lib/supporters/stripe-webhook";
+import { SUPPORTERS_STRIPE_PURPOSE } from "@/lib/supporters/types";
 
 const SHOP_PURPOSE = "club_shop";
 
@@ -41,7 +48,11 @@ export function isShopStripeEvent(event: Stripe.Event): boolean {
     metadata?: Record<string, string> | null;
   };
   const purpose = obj?.metadata?.obillz_purpose || obj?.metadata?.type;
-  return purpose === SHOP_PURPOSE || purpose === MEMBERSHIP_STRIPE_PURPOSE;
+  return (
+    purpose === SHOP_PURPOSE ||
+    purpose === MEMBERSHIP_STRIPE_PURPOSE ||
+    purpose === SUPPORTERS_STRIPE_PURPOSE
+  );
 }
 
 async function claimEvent(
@@ -295,6 +306,18 @@ export async function handleShopStripeEvent(
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded": {
       let session = event.data.object as Stripe.Checkout.Session;
+      const looksLikeSupporters =
+        isSupportersStripeEvent(event) || isSupportersCheckoutSession(session);
+      if (looksLikeSupporters) {
+        await handleSupporterCheckoutSession(
+          stripe,
+          event,
+          session,
+          connectedAccount
+        );
+        break;
+      }
+
       const looksLikeMembership =
         isMembershipStripeEvent(event) || isMembershipCheckoutSession(session);
       if (looksLikeMembership || !session.metadata?.obillz_purpose) {
@@ -308,7 +331,8 @@ export async function handleShopStripeEvent(
       const membershipDoc =
         looksLikeMembership || isMembershipCheckoutSession(session)
           ? true
-          : session.metadata?.obillz_purpose === SHOP_PURPOSE
+          : session.metadata?.obillz_purpose === SHOP_PURPOSE ||
+              session.metadata?.obillz_purpose === SUPPORTERS_STRIPE_PURPOSE
             ? false
             : Boolean(await findMembershipDocument({ sessionId: session.id }));
 
@@ -359,6 +383,10 @@ export async function handleShopStripeEvent(
 
     case "checkout.session.async_payment_failed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (isSupportersCheckoutSession(session)) {
+        await handleSupporterCheckoutTerminal(session, "cancelled");
+        break;
+      }
       if (session.metadata?.obillz_purpose !== SHOP_PURPOSE) return;
       await markOrderTerminal({
         sessionId: session.id,
@@ -371,6 +399,10 @@ export async function handleShopStripeEvent(
 
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (isSupportersCheckoutSession(session)) {
+        await handleSupporterCheckoutTerminal(session, "expired");
+        break;
+      }
       if (session.metadata?.obillz_purpose !== SHOP_PURPOSE) return;
       await markOrderTerminal({
         sessionId: session.id,

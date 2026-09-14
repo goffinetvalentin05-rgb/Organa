@@ -16,6 +16,9 @@ export const PERMISSIONS = {
   VIEW_SHOP: "view_shop",
   MANAGE_SHOP: "manage_shop",
 
+  VIEW_SUPPORTERS: "view_supporters",
+  MANAGE_SUPPORTERS: "manage_supporters",
+
   VIEW_VISUALS: "view_visuals",
   MANAGE_VISUALS: "manage_visuals",
 
@@ -64,6 +67,8 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   manage_meeting_minutes: "Créer / modifier les PV de séances",
   view_shop: "Voir la boutique",
   manage_shop: "Gérer la boutique",
+  view_supporters: "Voir les supporters",
+  manage_supporters: "Gérer les supporters",
   view_visuals: "Voir les visuels",
   manage_visuals: "Gérer les visuels",
   access_settings: "Accéder aux paramètres",
@@ -122,6 +127,10 @@ export const PERMISSION_GROUPS: Array<{
     permissions: [PERMISSIONS.VIEW_SHOP, PERMISSIONS.MANAGE_SHOP],
   },
   {
+    title: "Supporters",
+    permissions: [PERMISSIONS.VIEW_SUPPORTERS, PERMISSIONS.MANAGE_SUPPORTERS],
+  },
+  {
     title: "Visuels",
     permissions: [PERMISSIONS.VIEW_VISUALS, PERMISSIONS.MANAGE_VISUALS],
   },
@@ -160,6 +169,7 @@ export function suggestedDefaultPermissions(): Record<Permission, boolean> {
   map.view_plannings = true;
   map.view_meeting_minutes = true;
   map.view_shop = true;
+  map.view_supporters = true;
   map.view_visuals = true;
   return map;
 }
