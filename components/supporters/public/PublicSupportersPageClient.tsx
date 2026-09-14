@@ -1,23 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heart, Shield } from "@/lib/icons";
+import PublicBrandingHero from "@/components/public-branding/PublicBrandingHero";
+import PublicPageCanvas from "@/components/public-branding/PublicPageCanvas";
 import { formatChf } from "@/lib/shop/money";
 import type { PublicSupporterOffer, PublicSupportersPage } from "@/lib/supporters/types";
-import {
-  bannerOverlay,
-  clubColorsHeroStyle,
-  ctaColors,
-  effectivePageStyle,
-  fullscreenOverlay,
-  heroTextColors,
-  imageObjectPosition,
-  pageSurfaceStyle,
-  supportersPalette,
-} from "@/lib/supporters/theme";
-import SupportersClubMark from "./SupportersClubMark";
+import { ctaColors } from "@/lib/supporters/theme";
+import { resolvePublicLayout } from "@/lib/public-branding/theme";
 
 function fallbackTheme(page: PublicSupportersPage) {
   return (
@@ -107,11 +98,17 @@ function SupportersCatalog({
   setShowAllWall: (v: boolean) => void;
 }) {
   const theme = fallbackTheme(page);
-  const style = effectivePageStyle(theme.pageStyle, theme.bannerUrl);
-  const immersive = style === "fullscreen";
-  const palette = supportersPalette(theme);
-  const heroText = heroTextColors(theme.primaryColor, style);
-  const cta = ctaColors(theme.primaryColor, theme.secondaryColor);
+  const layout = resolvePublicLayout({
+    ...theme,
+    accentColor: theme.primaryColor,
+    introText: null,
+  });
+  const visualTheme = {
+    ...theme,
+    accentColor: theme.primaryColor,
+    introText: null as string | null,
+  };
+  const { immersive, heroText, cta, surfaceClass } = layout;
   const featured = page.offers.find((o) => o.isFeatured && !o.soldOut) || page.offers.find((o) => !o.soldOut);
   const wallNames = showAllWall ? page.wall.names : page.wall.names.slice(0, 36);
   const fromPrice = page.offers.length
@@ -119,132 +116,36 @@ function SupportersCatalog({
         ...page.offers.filter((o) => !o.soldOut).map((o) => o.priceCents).concat(page.offers.map((o) => o.priceCents))
       )
     : null;
-  const objectPosition = imageObjectPosition(theme.imagePosition);
   const primaryHref =
     featured && page.canCheckout
       ? `/club/${slug}/supporters/checkout?offer=${featured.id}`
       : "#offres";
 
-  const surfaceClass = immersive
-    ? "bg-white/92 shadow-[0_8px_30px_rgba(15,23,42,0.12)] backdrop-blur-[6px]"
-    : "bg-white shadow-[0_8px_30px_rgba(15,23,42,0.07)]";
-
   return (
-    <div className="relative min-h-[100dvh] text-[#0F172A]" style={pageSurfaceStyle(palette, immersive)}>
-      {immersive && theme.bannerUrl ? (
-        <div className="pointer-events-none fixed inset-0 -z-10">
-          <Image
-            src={theme.bannerUrl}
-            alt=""
-            fill
-            priority
-            className="object-cover"
-            style={{ objectPosition }}
-            sizes="100vw"
-            unoptimized={theme.bannerUrl.includes("supabase.co")}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: fullscreenOverlay(theme.primaryColor, theme.overlayIntensity) }}
-          />
+    <PublicPageCanvas theme={visualTheme} priority>
+      <PublicBrandingHero clubName={page.clubName} logoUrl={page.logoUrl} theme={visualTheme}>
+        <div className="mt-6 flex w-full max-w-sm flex-col items-center gap-3 sm:max-w-md">
+          <Link
+            href={primaryHref}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold shadow-[0_10px_28px_rgba(2,6,23,0.22)] transition hover:opacity-95 sm:w-auto sm:min-w-[220px]"
+            style={{ backgroundColor: cta.background, color: cta.color }}
+          >
+            {featured && page.canCheckout ? "Devenir supporter" : "Voir les offres"}
+          </Link>
         </div>
-      ) : null}
-
-      <div className="overflow-x-hidden">
-
-        <header className="relative isolate min-h-[20rem] overflow-hidden sm:min-h-[22rem]">
-        {style === "banner" && theme.bannerUrl ? (
-          <>
-            <Image
-              src={theme.bannerUrl}
-              alt=""
-              fill
-              priority
-              className="object-cover"
-              style={{ objectPosition }}
-              sizes="100vw"
-              unoptimized={theme.bannerUrl.includes("supabase.co")}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: bannerOverlay(theme.primaryColor, theme.secondaryColor, theme.overlayIntensity),
-              }}
-            />
-          </>
+        {theme.showStats && fromPrice != null ? (
+          <p className="mt-4 text-sm font-semibold" style={{ color: heroText.text }}>
+            Dès {formatChf(fromPrice)}
+          </p>
         ) : null}
-
-        {style === "colors" ? (
-          <>
-            <div
-              className="absolute inset-0"
-              style={clubColorsHeroStyle(theme.primaryColor, theme.secondaryColor)}
-            />
-            <div
-              className="pointer-events-none absolute -left-16 top-[-20%] h-64 w-64 rounded-full opacity-30 blur-3xl"
-              style={{ background: "#fff" }}
-            />
-            <div
-              className="pointer-events-none absolute -right-10 bottom-[-30%] h-72 w-72 rounded-full opacity-25 blur-3xl"
-              style={{ background: theme.secondaryColor }}
-            />
-          </>
-        ) : null}
-
-        <div className="relative mx-auto flex w-[calc(100%-32px)] max-w-[760px] flex-col items-center px-0 pb-16 pt-10 text-center sm:pb-20 sm:pt-12">
-          <p
-            className="text-[11px] font-semibold uppercase tracking-[0.32em]"
-            style={{ color: heroText.faint }}
-          >
-            {theme.label}
-          </p>
-          <div className="mt-4">
-            <SupportersClubMark
-              logoUrl={page.logoUrl}
-              clubName={page.clubName}
-              accentColor={theme.primaryColor}
-              size="lg"
-              onDark={heroText.onDark}
-            />
-          </div>
-          <h1
-            className="mt-4 w-full max-w-[680px] text-[1.85rem] font-semibold leading-tight tracking-tight [overflow-wrap:break-word] sm:text-4xl lg:text-[2.75rem]"
-            style={{ color: heroText.text }}
-          >
-            {theme.title}
-          </h1>
-          <p
-            className="mt-3 w-full max-w-[680px] text-[15px] leading-relaxed [overflow-wrap:break-word] sm:text-base"
-            style={{ color: heroText.muted }}
-          >
-            {theme.subtitle}
-          </p>
-
-          <div className="mt-6 flex w-full max-w-sm flex-col items-center gap-3 sm:max-w-md">
-            <Link
-              href={primaryHref}
-              className="inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold shadow-[0_10px_28px_rgba(2,6,23,0.22)] transition hover:opacity-95 sm:w-auto sm:min-w-[220px]"
-              style={{ backgroundColor: cta.background, color: cta.color }}
-            >
-              {featured && page.canCheckout ? "Devenir supporter" : "Voir les offres"}
-            </Link>
-          </div>
-
-          {theme.showStats && fromPrice != null ? (
-            <p className="mt-4 text-sm font-semibold" style={{ color: heroText.text }}>
-              Dès {formatChf(fromPrice)}
-            </p>
-          ) : null}
-
-          <p
-            className="mt-3 flex items-center justify-center gap-2 text-xs font-medium"
-            style={{ color: heroText.faint }}
-          >
-            <Shield className="h-4 w-4" />
-            Paiement sécurisé · soutien direct au club
-          </p>
-        </div>
-      </header>
+        <p
+          className="mt-3 flex items-center justify-center gap-2 text-xs font-medium"
+          style={{ color: heroText.faint }}
+        >
+          <Shield className="h-4 w-4" />
+          Paiement sécurisé · soutien direct au club
+        </p>
+      </PublicBrandingHero>
 
       <main className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
         <div className="-mt-8 sm:-mt-10">
@@ -350,8 +251,7 @@ function SupportersCatalog({
       >
         {page.clubName} · propulsé par Obillz
       </footer>
-      </div>
-    </div>
+    </PublicPageCanvas>
   );
 }
 

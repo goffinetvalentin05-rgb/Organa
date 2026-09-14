@@ -3,10 +3,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
   mapProfileToBuvetteSettings,
+  selectBuvetteProfile,
   updateBuvettePublicSettings,
-  BUVETTE_SETTINGS_PROFILE_SELECT,
 } from "@/lib/buvette/settings";
-import { getBuvettePublicUrlPath, suggestBuvetteSlug } from "@/lib/buvette/slug";
+import { suggestBuvetteSlug } from "@/lib/buvette/slug";
 
 export const runtime = "nodejs";
 
@@ -19,16 +19,7 @@ export async function GET() {
     if ("error" in guard) return guard.error;
 
     const admin = createAdminClient();
-    const { data: profile, error } = await admin
-      .from("profiles")
-      .select(BUVETTE_SETTINGS_PROFILE_SELECT)
-      .eq("user_id", guard.clubId)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
+    const profile = await selectBuvetteProfile(admin, "user_id", guard.clubId);
     const settings = mapProfileToBuvetteSettings(profile || {}, guard.clubId);
 
     if (!settings.slug) {
@@ -59,10 +50,15 @@ export async function PUT(request: NextRequest) {
     const admin = createAdminClient();
     const result = await updateBuvettePublicSettings(admin, guard.clubId, {
       slug: body.slug,
+      label: body.label,
       title: body.title,
-      description: body.description,
+      description: body.description ?? body.subtitle,
       primaryColor: body.primaryColor,
+      secondaryColor: body.secondaryColor,
       accentColor: body.accentColor,
+      pageStyle: body.pageStyle,
+      imagePosition: body.imagePosition,
+      overlayIntensity: body.overlayIntensity,
     });
 
     if (result.error) {

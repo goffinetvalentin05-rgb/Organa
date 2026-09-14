@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import {
   mapProfileToBuvetteSettings,
-  BUVETTE_SETTINGS_PROFILE_SELECT,
+  selectBuvetteProfile,
 } from "@/lib/buvette/settings";
 import { getBuvettePublicUrlPath, suggestBuvetteSlug } from "@/lib/buvette/slug";
 
@@ -17,11 +17,7 @@ export async function GET() {
 
     const admin = createAdminClient();
 
-    const { data: profile } = await admin
-      .from("profiles")
-      .select(BUVETTE_SETTINGS_PROFILE_SELECT)
-      .eq("user_id", guard.clubId)
-      .maybeSingle();
+    const profile = await selectBuvetteProfile(admin, "user_id", guard.clubId);
 
     const companyName = profile?.company_name?.trim() || "Club";
     let slug = profile?.buvette_slug?.trim() || null;

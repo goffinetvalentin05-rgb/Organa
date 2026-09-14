@@ -28,5 +28,8 @@ export {
   pageSurfaceStyle,
   productCardClass,
   productGridClass,
+  publicSurfaceClass,
+  resolvePublicLayout,
+  resolvedBrandColors,
   shopSurfaceClass,
 } from "./theme";

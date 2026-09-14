@@ -104,8 +104,41 @@ export function productCardClass(count: number): string {
   return "w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.875rem)] lg:w-[calc(25%-1.125rem)]";
 }
 
-export function shopSurfaceClass(immersive: boolean): string {
+export function publicSurfaceClass(immersive: boolean): string {
   return immersive
     ? "border border-white/25 bg-white/92 shadow-[0_8px_30px_rgba(15,23,42,0.16)] backdrop-blur-[8px]"
     : "border border-[rgba(15,23,42,0.08)] bg-white shadow-[0_8px_30px_rgba(15,23,42,0.07)]";
+}
+
+export const shopSurfaceClass = publicSurfaceClass;
+
+export function resolvedBrandColors(
+  primaryColor: string,
+  secondaryColor?: string | null,
+  accentColor?: string | null
+) {
+  const primary = primaryColor;
+  const secondary = validateHex(secondaryColor) || darkenHex(primary, 0.32);
+  const accent = validateHex(accentColor) || primary;
+  return { primary, secondary, accent };
+}
+
+function validateHex(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return /^#[0-9A-Fa-f]{6}$/.test(value) ? value : null;
+}
+
+export function resolvePublicLayout(theme: PublicVisualTheme) {
+  const style = effectivePageStyle(theme.pageStyle, theme.bannerUrl);
+  const immersive = style === "fullscreen";
+  const palette = brandPalette(theme);
+  return {
+    style,
+    immersive,
+    palette,
+    heroText: heroTextColors(theme.primaryColor, style),
+    cta: ctaColors(theme.primaryColor, theme.secondaryColor, theme.accentColor),
+    objectPosition: imageObjectPosition(theme.imagePosition),
+    surfaceClass: publicSurfaceClass(immersive),
+  };
 }

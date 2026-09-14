@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { BUVETTE_PUBLIC_DEFAULT_TITLE } from "@/lib/buvette/settings";
-import { normalizeHexColor, OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
+import {
+  buildBuvettePublicTheme,
+  mapProfileToBuvetteSettings,
+  selectBuvetteProfile,
+} from "@/lib/buvette/settings";
 
 export const runtime = "nodejs";
 const getErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Erreur serveur");
@@ -13,36 +16,25 @@ export async function GET(
   try {
     const { slug } = await params;
     const supabase = createAdminClient();
+    const profile = await selectBuvetteProfile(supabase, "buvette_slug", slug);
 
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select(
-        "user_id, company_name, logo_url, primary_color, buvette_public_title, buvette_public_description, buvette_public_primary_color, buvette_public_accent_color, buvette_public_banner_url"
-      )
-      .eq("buvette_slug", slug)
-      .maybeSingle();
-
-    if (error || !profile) {
+    if (!profile) {
       return NextResponse.json({ error: "Club introuvable" }, { status: 404 });
     }
 
-    const primaryColor = normalizeHexColor(
-      profile.buvette_public_primary_color || profile.primary_color,
-      OBILLZ_BRAND_PRIMARY
-    );
-    const accentColor = profile.buvette_public_accent_color
-      ? normalizeHexColor(profile.buvette_public_accent_color)
-      : null;
+    const settings = mapProfileToBuvetteSettings(profile, "");
+    const theme = buildBuvettePublicTheme(settings);
 
     return NextResponse.json(
       {
-        clubName: profile.company_name || "Club",
-        logoUrl: profile.logo_url || null,
-        title: profile.buvette_public_title?.trim() || BUVETTE_PUBLIC_DEFAULT_TITLE,
-        description: profile.buvette_public_description?.trim() || null,
-        primaryColor,
-        accentColor,
-        bannerUrl: profile.buvette_public_banner_url?.trim() || null,
+        clubName: settings.companyName,
+        logoUrl: settings.logoUrl,
+        title: theme.title,
+        description: theme.subtitle,
+        primaryColor: theme.primaryColor,
+        accentColor: theme.accentColor,
+        bannerUrl: settings.bannerUrl,
+        theme,
       },
       { status: 200 }
     );
