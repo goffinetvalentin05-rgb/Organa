@@ -5,10 +5,8 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import ClubPaymentsPanel from "@/components/payments/connect/ClubPaymentsPanel";
-import PremiumSwitch from "@/components/public-page/PremiumSwitch";
 import {
   ActionButton,
-  BodyPortal,
   CheckboxRow,
   DashboardBadge,
   EmptyState,
@@ -20,8 +18,6 @@ import {
   cn,
   dashboardDataTableClass,
   dashboardInputClass,
-  dashboardLabelClass,
-  dashboardModalClass,
   dashboardSelectClass,
   dashboardTabActiveClass,
   dashboardTabInactiveClass,
@@ -35,7 +31,6 @@ import {
   Download,
   Edit,
   Heart,
-  Plus,
   Trash,
   Users,
   Wallet,
@@ -47,11 +42,15 @@ import { durationLabel, formatSupporterNumberLabel, formatSwissDate } from "@/li
 import { supporterDisplayStatus } from "@/lib/supporters/status";
 import type {
   Supporter,
-  SupporterDurationType,
   SupporterOffer,
   SupporterStats,
   SupporterStatus,
 } from "@/lib/supporters/types";
+import SupporterOfferDialog, {
+  defaultSeasonDates,
+  emptyOfferForm,
+  type OfferFormState,
+} from "@/components/supporters/SupporterOfferDialog";
 
 type TabId = "offres" | "supporters" | "parametres";
 
@@ -61,48 +60,7 @@ const TABS: Array<{ id: TabId; label: string }> = [
   { id: "parametres", label: "Paramètres" },
 ];
 
-type OfferForm = {
-  name: string;
-  description: string;
-  price: string;
-  durationType: SupporterDurationType;
-  startDate: string;
-  endDate: string;
-  maxSupporters: string;
-  isActive: boolean;
-  isFeatured: boolean;
-  showSupporterCount: boolean;
-  benefits: string[];
-};
-
-function defaultSeasonDates() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  if (month >= 6) {
-    return { start: `${year}-07-01`, end: `${year + 1}-06-30` };
-  }
-  return { start: `${year - 1}-07-01`, end: `${year}-06-30` };
-}
-
-function emptyOfferForm(): OfferForm {
-  const season = defaultSeasonDates();
-  return {
-    name: "",
-    description: "",
-    price: "",
-    durationType: "season",
-    startDate: season.start,
-    endDate: season.end,
-    maxSupporters: "",
-    isActive: true,
-    isFeatured: false,
-    showSupporterCount: true,
-    benefits: [""],
-  };
-}
-
-function formFromOffer(offer: SupporterOffer): OfferForm {
+function formFromOffer(offer: SupporterOffer): OfferFormState {
   return {
     name: offer.name,
     description: offer.description || "",
@@ -145,9 +103,9 @@ export default function SupportersDashboardClient() {
   const [offerFilter, setOfferFilter] = useState("all");
   const [query, setQuery] = useState("");
 
-  const [formOpen, setFormOpen] = useState(false);
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [editing, setEditing] = useState<SupporterOffer | null>(null);
-  const [form, setForm] = useState<OfferForm>(emptyOfferForm());
+  const [form, setForm] = useState<OfferFormState>(emptyOfferForm());
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<Supporter | null>(null);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
@@ -216,18 +174,24 @@ export default function SupportersDashboardClient() {
     });
   }, [supporters, statusFilter, offerFilter, query]);
 
-  const openCreate = () => {
+  const openCreateOffer = () => {
     setEditing(null);
     setForm(emptyOfferForm());
-    setFormOpen(true);
     setPublishedNotice(false);
+    setTab("offres");
+    setIsOfferModalOpen(true);
   };
 
-  const openEdit = (offer: SupporterOffer) => {
+  const openEditOffer = (offer: SupporterOffer) => {
     setEditing(offer);
     setForm(formFromOffer(offer));
-    setFormOpen(true);
     setPublishedNotice(false);
+    setIsOfferModalOpen(true);
+  };
+
+  const closeOfferModal = () => {
+    if (saving) return;
+    setIsOfferModalOpen(false);
   };
 
   const saveOffer = async () => {
@@ -256,12 +220,14 @@ export default function SupportersDashboardClient() {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Enregistrement impossible");
-      toast.success(editing ? "Offre modifiée" : "Offre créée");
-      setFormOpen(false);
+      toast.success(editing ? "Offre modifiée" : "Offre créée avec succès");
+      setIsOfferModalOpen(false);
       setPublishedNotice(!editing);
+      setTab("offres");
       await loadAll();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      console.error("[SUPPORTERS][offer save]", e);
+      toast.error(e instanceof Error ? e.message : "Impossible d’enregistrer l’offre");
     } finally {
       setSaving(false);
     }
@@ -337,8 +303,6 @@ export default function SupportersDashboardClient() {
     await loadAll();
   };
 
-  const needsDates = form.durationType !== "year";
-
   return (
     <PageLayout>
       <PageHeader
@@ -346,7 +310,9 @@ export default function SupportersDashboardClient() {
         subtitle="Créez une communauté autour de votre club et développez une nouvelle source de revenus."
         actions={
           canManage ? (
-            <DashboardPrimaryButton onClick={openCreate}>Nouvelle offre</DashboardPrimaryButton>
+            <DashboardPrimaryButton type="button" onClick={openCreateOffer}>
+              Nouvelle offre
+            </DashboardPrimaryButton>
           ) : null
         }
       />
@@ -389,10 +355,10 @@ export default function SupportersDashboardClient() {
               <QRCodeSVG id="supporters-notice-qr" value={publicUrl} size={112} includeMargin />
             </div>
             <div className="flex flex-wrap gap-2">
-              <ActionButton variant="surface" onClick={copyLink}>
+              <ActionButton variant="surface" type="button" onClick={copyLink}>
                 <Copy className="h-4 w-4" /> Copier le lien
               </ActionButton>
-              <ActionButton variant="surface" onClick={downloadQr}>
+              <ActionButton variant="surface" type="button" onClick={downloadQr}>
                 <Download className="h-4 w-4" /> Télécharger le QR
               </ActionButton>
             </div>
@@ -424,11 +390,13 @@ export default function SupportersDashboardClient() {
         offers.length === 0 ? (
           <EmptyState
             icon={Heart}
-            title="Créez votre première offre Supporter"
-            description="Transformez votre communauté en véritable soutien pour le club. Une offre se crée en moins de deux minutes."
+            title="Aucune offre pour le moment"
+            description="Créez votre première offre Supporter et partagez-la avec votre communauté."
             action={
               canManage ? (
-                <DashboardPrimaryButton onClick={openCreate}>Créer une offre</DashboardPrimaryButton>
+                <DashboardPrimaryButton type="button" onClick={openCreateOffer}>
+                  Créer une offre
+                </DashboardPrimaryButton>
               ) : null
             }
           />
@@ -470,10 +438,10 @@ export default function SupportersDashboardClient() {
                 </ul>
                 {canManage ? (
                   <div className="mt-5 flex flex-wrap gap-2">
-                    <ActionButton variant="surface" onClick={() => openEdit(offer)}>
+                    <ActionButton variant="surface" type="button" onClick={() => openEditOffer(offer)}>
                       <Edit className="h-4 w-4" /> Modifier
                     </ActionButton>
-                    <ActionButton variant="ghost" onClick={() => deleteOffer(offer)}>
+                    <ActionButton variant="ghost" type="button" onClick={() => deleteOffer(offer)}>
                       <Trash className="h-4 w-4" /> Retirer
                     </ActionButton>
                   </div>
@@ -492,7 +460,9 @@ export default function SupportersDashboardClient() {
             description="Créez votre première offre et partagez-la avec votre communauté."
             action={
               canManage ? (
-                <DashboardPrimaryButton onClick={openCreate}>Créer une offre</DashboardPrimaryButton>
+                <DashboardPrimaryButton type="button" onClick={openCreateOffer}>
+                  Créer une offre
+                </DashboardPrimaryButton>
               ) : null
             }
           />
@@ -582,10 +552,10 @@ export default function SupportersDashboardClient() {
               <>
                 <p className="mt-4 break-all rounded-xl bg-[#F8FAFC] px-4 py-3 text-sm">{publicUrl}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <ActionButton variant="surface" onClick={copyLink}>
+                  <ActionButton variant="surface" type="button" onClick={copyLink}>
                     <Copy className="h-4 w-4" /> Copier le lien
                   </ActionButton>
-                  <ActionButton variant="surface" onClick={downloadQr}>
+                  <ActionButton variant="surface" type="button" onClick={downloadQr}>
                     <Download className="h-4 w-4" /> Télécharger le QR
                   </ActionButton>
                 </div>
@@ -617,296 +587,112 @@ export default function SupportersDashboardClient() {
         </div>
       ) : null}
 
-      <BodyPortal open={formOpen}>
-        <div className="pointer-events-auto flex h-full min-h-full items-end justify-center bg-[#071634]/50 p-4 sm:items-center">
-          <div className={cn(dashboardModalClass, "max-h-[90vh] w-full max-w-2xl overflow-y-auto p-6")}>
+      <SupporterOfferDialog
+        open={isOfferModalOpen}
+        mode={editing ? "edit" : "create"}
+        form={form}
+        saving={saving}
+        onChange={setForm}
+        onClose={closeOfferModal}
+        onSubmit={() => void saveOffer()}
+      />
+
+      {selected ? (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-[#071634]/40"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                {editing ? "Modifier l’offre" : "Nouvelle offre"}
+                {selected.firstName} {selected.lastName}
               </h2>
-              <button type="button" onClick={() => setFormOpen(false)} aria-label="Fermer">
+              <button type="button" onClick={() => setSelected(null)} aria-label="Fermer">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="space-y-4">
+            <dl className="space-y-3 text-sm">
               <div>
-                <label className={dashboardLabelClass}>Nom de l’offre</label>
-                <input
-                  className={dashboardInputClass}
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Supporter+"
-                />
+                <dt className="text-[#94A3B8]">E-mail</dt>
+                <dd>{selected.email}</dd>
               </div>
               <div>
-                <label className={dashboardLabelClass}>Courte description</label>
-                <textarea
-                  className={cn(dashboardInputClass, "min-h-[72px]")}
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Soutenez le club tout au long de la saison."
-                />
+                <dt className="text-[#94A3B8]">Téléphone</dt>
+                <dd>{selected.phone || "—"}</dd>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={dashboardLabelClass}>Prix (CHF)</label>
-                  <input
-                    className={dashboardInputClass}
-                    value={form.price}
-                    onChange={(e) => setForm({ ...form, price: e.target.value })}
-                    placeholder="50"
-                  />
-                </div>
-                <div>
-                  <label className={dashboardLabelClass}>Durée</label>
-                  <select
-                    className={dashboardSelectClass}
-                    value={form.durationType}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        durationType: e.target.value as SupporterDurationType,
-                      })
+              <div>
+                <dt className="text-[#94A3B8]">Offre</dt>
+                <dd>
+                  {selected.offerName}{" "}
+                  {selected.amountPaidCents != null ? `· ${formatChf(selected.amountPaidCents)}` : ""}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[#94A3B8]">Statut</dt>
+                <dd>{statusBadge(supporterDisplayStatus(selected))}</dd>
+              </div>
+              <div>
+                <dt className="text-[#94A3B8]">Numéro</dt>
+                <dd>{formatSupporterNumberLabel(selected.supporterNumber) || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-[#94A3B8]">Début</dt>
+                <dd>{formatSwissDate(selected.startDate) || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-[#94A3B8]">Expiration</dt>
+                <dd>{formatSwissDate(selected.endDate) || "—"}</dd>
+              </div>
+            </dl>
+            {canManage ? (
+              <div className="mt-6 space-y-3">
+                {cardUrl ? (
+                  <ActionButton variant="premiumInline" href={cardUrl} className="w-full">
+                    Voir la carte
+                  </ActionButton>
+                ) : null}
+                <CheckboxRow
+                  checked={selected.publicNameEnabled}
+                  onChange={(next) =>
+                    void patchSupporter(
+                      selected.id,
+                      { publicNameEnabled: next },
+                      next ? "Visibilité publique activée" : "Visibilité publique désactivée"
+                    )
+                  }
+                  label="Apparaître sur le mur des supporters"
+                />
+                {supporterDisplayStatus(selected) === "active" ? (
+                  <ActionButton
+                    variant="dangerSoft"
+                    className="w-full"
+                    type="button"
+                    onClick={() =>
+                      void patchSupporter(selected.id, { action: "disable" }, "Carte désactivée")
                     }
                   >
-                    <option value="season">Saison</option>
-                    <option value="year">1 année</option>
-                    <option value="custom">Période personnalisée</option>
-                  </select>
-                </div>
+                    Désactiver la carte
+                  </ActionButton>
+                ) : selected.status === "cancelled" ? (
+                  <ActionButton
+                    variant="surface"
+                    className="w-full"
+                    type="button"
+                    onClick={() =>
+                      void patchSupporter(selected.id, { action: "enable" }, "Carte réactivée")
+                    }
+                  >
+                    Réactiver la carte
+                  </ActionButton>
+                ) : null}
               </div>
-              {needsDates ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className={dashboardLabelClass}>Date de début</label>
-                    <input
-                      type="date"
-                      className={dashboardInputClass}
-                      value={form.startDate}
-                      onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className={dashboardLabelClass}>Date de fin</label>
-                    <input
-                      type="date"
-                      className={dashboardInputClass}
-                      value={form.endDate}
-                      onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                    />
-                  </div>
-                </div>
-              ) : null}
-              <div>
-                <label className={dashboardLabelClass}>Nombre maximum de supporters (optionnel)</label>
-                <input
-                  className={dashboardInputClass}
-                  value={form.maxSupporters}
-                  onChange={(e) => setForm({ ...form, maxSupporters: e.target.value })}
-                  placeholder="Illimité"
-                />
-              </div>
-              <div className="space-y-1">
-                <p className={dashboardLabelClass}>Avantages</p>
-                {form.benefits.map((label, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      className={dashboardInputClass}
-                      value={label}
-                      onChange={(e) => {
-                        const next = [...form.benefits];
-                        next[index] = e.target.value;
-                        setForm({ ...form, benefits: next });
-                      }}
-                      placeholder="Nom sur le mur des supporters"
-                    />
-                    <button
-                      type="button"
-                      className="rounded-xl px-2 text-[#94A3B8] hover:text-[#0F172A]"
-                      onClick={() => {
-                        if (index === 0) return;
-                        const next = [...form.benefits];
-                        [next[index - 1], next[index]] = [next[index], next[index - 1]];
-                        setForm({ ...form, benefits: next });
-                      }}
-                      aria-label="Monter"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-xl px-2 text-[#94A3B8] hover:text-[#0F172A]"
-                      onClick={() => {
-                        if (index >= form.benefits.length - 1) return;
-                        const next = [...form.benefits];
-                        [next[index + 1], next[index]] = [next[index], next[index + 1]];
-                        setForm({ ...form, benefits: next });
-                      }}
-                      aria-label="Descendre"
-                    >
-                      ↓
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-xl px-2 text-[#94A3B8] hover:text-rose-600"
-                      onClick={() =>
-                        setForm({
-                          ...form,
-                          benefits: form.benefits.filter((_, i) => i !== index),
-                        })
-                      }
-                      aria-label="Supprimer"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-                <ActionButton
-                  variant="ghost"
-                  onClick={() => setForm({ ...form, benefits: [...form.benefits, ""] })}
-                >
-                  <Plus className="h-4 w-4" /> Ajouter un avantage
-                </ActionButton>
-              </div>
-              <div className="space-y-2 rounded-2xl bg-[#F8FAFC] p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">Offre active</span>
-                  <PremiumSwitch
-                    checked={form.isActive}
-                    onChange={(v) => setForm({ ...form, isActive: v })}
-                    aria-label="Offre active"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">Mettre l’offre en avant</span>
-                  <PremiumSwitch
-                    checked={form.isFeatured}
-                    onChange={(v) => setForm({ ...form, isFeatured: v })}
-                    aria-label="Mettre en avant"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">Afficher le nombre de supporters</span>
-                  <PremiumSwitch
-                    checked={form.showSupporterCount}
-                    onChange={(v) => setForm({ ...form, showSupporterCount: v })}
-                    aria-label="Afficher le nombre"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <ActionButton variant="ghost" onClick={() => setFormOpen(false)}>
-                  Annuler
-                </ActionButton>
-                <DashboardPrimaryButton
-                  icon="none"
-                  loading={saving}
-                  onClick={() => void saveOffer()}
-                >
-                  {editing ? "Enregistrer" : "Publier"}
-                </DashboardPrimaryButton>
-              </div>
-            </div>
+            ) : null}
           </div>
         </div>
-      </BodyPortal>
-
-      <BodyPortal open={Boolean(selected)}>
-        <div
-          className="pointer-events-auto flex h-full min-h-full justify-end bg-[#071634]/40"
-          onClick={() => setSelected(null)}
-        >
-          {selected ? (
-            <div
-              className="h-full w-full max-w-md overflow-y-auto bg-white p-6 shadow-xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">
-                  {selected.firstName} {selected.lastName}
-                </h2>
-                <button type="button" onClick={() => setSelected(null)} aria-label="Fermer">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="text-[#94A3B8]">E-mail</dt>
-                  <dd>{selected.email}</dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Téléphone</dt>
-                  <dd>{selected.phone || "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Offre</dt>
-                  <dd>
-                    {selected.offerName}{" "}
-                    {selected.amountPaidCents != null ? `· ${formatChf(selected.amountPaidCents)}` : ""}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Statut</dt>
-                  <dd>{statusBadge(supporterDisplayStatus(selected))}</dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Numéro</dt>
-                  <dd>{formatSupporterNumberLabel(selected.supporterNumber) || "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Début</dt>
-                  <dd>{formatSwissDate(selected.startDate) || "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-[#94A3B8]">Expiration</dt>
-                  <dd>{formatSwissDate(selected.endDate) || "—"}</dd>
-                </div>
-              </dl>
-              {canManage ? (
-                <div className="mt-6 space-y-3">
-                  {cardUrl ? (
-                    <ActionButton variant="premiumInline" href={cardUrl} className="w-full">
-                      Voir la carte
-                    </ActionButton>
-                  ) : null}
-                  <CheckboxRow
-                    checked={selected.publicNameEnabled}
-                    onChange={(next) =>
-                      void patchSupporter(
-                        selected.id,
-                        { publicNameEnabled: next },
-                        next ? "Visibilité publique activée" : "Visibilité publique désactivée"
-                      )
-                    }
-                    label="Apparaître sur le mur des supporters"
-                  />
-                  {supporterDisplayStatus(selected) === "active" ? (
-                    <ActionButton
-                      variant="dangerSoft"
-                      className="w-full"
-                      onClick={() =>
-                        void patchSupporter(selected.id, { action: "disable" }, "Carte désactivée")
-                      }
-                    >
-                      Désactiver la carte
-                    </ActionButton>
-                  ) : selected.status === "cancelled" ? (
-                    <ActionButton
-                      variant="surface"
-                      className="w-full"
-                      onClick={() =>
-                        void patchSupporter(selected.id, { action: "enable" }, "Carte réactivée")
-                      }
-                    >
-                      Réactiver la carte
-                    </ActionButton>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      </BodyPortal>
+      ) : null}
     </PageLayout>
   );
 }
