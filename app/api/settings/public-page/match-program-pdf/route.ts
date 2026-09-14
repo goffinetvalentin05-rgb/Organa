@@ -6,13 +6,10 @@ import {
   MATCH_PROGRAM_BUCKET,
   buildMatchProgramStoragePath,
 } from "@/lib/public-page/match-program";
-import { mapProfileToSettings } from "@/lib/public-page/db";
+import { mapProfileToSettings, selectPublicPageProfile } from "@/lib/public-page/db";
 import { getMatchProgramPdfPublicUrl } from "@/lib/public-page/match-program";
 
 export const runtime = "nodejs";
-
-const SETTINGS_SELECT =
-  "user_id, company_name, logo_url, primary_color, buvette_slug, public_page_enabled, public_page_slug, public_page_title, public_page_description, public_page_primary_color, public_page_instagram_url, public_page_facebook_url, public_page_website_url, public_page_show_buvette, public_page_show_match_program, public_page_match_program_type, public_page_match_program_url, public_page_match_program_pdf_path, public_page_match_program_pdf_name, public_page_show_public_links";
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     const displayName = file.name?.trim() || "programme-matchs.pdf";
 
-    const { data: updated, error: updateError } = await admin
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         public_page_match_program_type: "pdf",
@@ -82,9 +79,7 @@ export async function POST(request: NextRequest) {
         public_page_match_program_url: null,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", guard.clubId)
-      .select(SETTINGS_SELECT)
-      .single();
+      .eq("user_id", guard.clubId);
 
     if (updateError) {
       await supabase.storage.from(MATCH_PROGRAM_BUCKET).remove([storagePath]);
@@ -99,9 +94,10 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL || "",
       storagePath
     );
+    const updated = await selectPublicPageProfile(admin, guard.clubId);
 
     return NextResponse.json({
-      settings: mapProfileToSettings(updated as Record<string, unknown>, pdfUrl),
+      settings: mapProfileToSettings(updated || {}, pdfUrl),
       pdfUrl,
       pdfName: displayName,
     });
@@ -136,7 +132,7 @@ export async function DELETE() {
 
     await supabase.storage.from(MATCH_PROGRAM_BUCKET).remove([pdfPath]).catch(() => undefined);
 
-    const { data: updated, error: updateError } = await admin
+    const { error: updateError } = await admin
       .from("profiles")
       .update({
         public_page_match_program_pdf_path: null,
@@ -144,16 +140,16 @@ export async function DELETE() {
         public_page_match_program_type: null,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", guard.clubId)
-      .select(SETTINGS_SELECT)
-      .single();
+      .eq("user_id", guard.clubId);
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    const updated = await selectPublicPageProfile(admin, guard.clubId);
+
     return NextResponse.json({
-      settings: mapProfileToSettings(updated as Record<string, unknown>, null),
+      settings: mapProfileToSettings(updated || {}, null),
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Erreur serveur";

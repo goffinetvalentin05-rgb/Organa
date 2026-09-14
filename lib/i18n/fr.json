@@ -1022,6 +1022,8 @@
         "slugHint": "Lettres minuscules, chiffres et tirets uniquement (ex. fc-mon-club).",
         "contentTitle": "Contenu affiché",
         "contentDescription": "Titre, description et couleur visibles par vos visiteurs.",
+        "appearanceTitle": "Apparence",
+        "appearanceDescription": "Même logique que Supporters, Boutique et Buvette : style, couleurs et visuel du club.",
         "logoHint": "Le logo est repris depuis l'identité visuelle du club.",
         "titleLabel": "Titre affiché",
         "descriptionLabel": "Courte description",

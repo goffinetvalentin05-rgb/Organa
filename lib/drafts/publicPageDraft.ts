@@ -4,6 +4,16 @@ import type {
   PublicPageLinkType,
   PublicPageSettings,
 } from "@/lib/public-page/types";
+import {
+  parseImagePosition,
+  parseOverlayIntensity,
+  parsePageStyle,
+} from "@/lib/public-branding/parse";
+import type {
+  PublicImagePosition,
+  PublicOverlayIntensity,
+  PublicPageStyle,
+} from "@/lib/public-branding/types";
 import { createLocalDraftStore } from "@/lib/drafts/createLocalDraftStore";
 
 export const PUBLIC_PAGE_DRAFT_VERSION = 1 as const;
@@ -31,6 +41,14 @@ export type PublicPageDraftData = {
     showPublicLinks: boolean;
     publicUrlPath: string | null;
     buvetteSlug: string | null;
+    companyName?: string;
+    label?: string | null;
+    secondaryColor?: string | null;
+    accentColor?: string | null;
+    pageStyle?: PublicPageStyle;
+    imagePosition?: PublicImagePosition;
+    overlayIntensity?: PublicOverlayIntensity;
+    bannerUrl?: string | null;
   };
   links: PublicPageLinkInput[];
 };
@@ -64,6 +82,14 @@ export function emptyPublicPageDraftData(): PublicPageDraftData {
       showPublicLinks: false,
       publicUrlPath: null,
       buvetteSlug: null,
+      companyName: "Club",
+      label: null,
+      secondaryColor: null,
+      accentColor: null,
+      pageStyle: "colors",
+      imagePosition: "center",
+      overlayIntensity: "normal",
+      bannerUrl: null,
     },
     links: [],
   };
@@ -133,6 +159,24 @@ export function normalizePublicPageDraftData(
       publicUrlPath:
         typeof f.publicUrlPath === "string" ? f.publicUrlPath : null,
       buvetteSlug: typeof f.buvetteSlug === "string" ? f.buvetteSlug : null,
+      ...(typeof f.companyName === "string" ? { companyName: f.companyName } : {}),
+      ...(typeof f.label === "string" || f.label === null ? { label: f.label } : {}),
+      ...(typeof f.secondaryColor === "string" || f.secondaryColor === null
+        ? { secondaryColor: f.secondaryColor }
+        : {}),
+      ...(typeof f.accentColor === "string" || f.accentColor === null
+        ? { accentColor: f.accentColor }
+        : {}),
+      ...(typeof f.pageStyle === "string" ? { pageStyle: parsePageStyle(f.pageStyle) } : {}),
+      ...(typeof f.imagePosition === "string"
+        ? { imagePosition: parseImagePosition(f.imagePosition) }
+        : {}),
+      ...(typeof f.overlayIntensity === "string"
+        ? { overlayIntensity: parseOverlayIntensity(f.overlayIntensity) }
+        : {}),
+      ...(typeof f.bannerUrl === "string" || f.bannerUrl === null
+        ? { bannerUrl: f.bannerUrl }
+        : {}),
     },
     links,
   };
@@ -151,12 +195,16 @@ export function isMeaningfulPublicPageDraft(data: PublicPageDraftData): boolean 
   if (f.showBuvette || f.showMatchProgram || f.showPublicLinks) return true;
   if (f.matchProgramUrl?.trim()) return true;
   if (f.matchProgramType) return true;
+  if (f.label?.trim()) return true;
+  if (f.secondaryColor?.trim()) return true;
+  if (f.accentColor?.trim()) return true;
+  if (f.pageStyle && f.pageStyle !== "colors") return true;
   if (data.links.length > 0) return true;
   return false;
 }
 
 export function toPublicPageDraftPayload(
-  form: PublicPageSettings,
+  form: PublicPageSettings | PublicPageDraftData["form"],
   links: PublicPageLinkInput[]
 ): PublicPageDraftData {
   return {
@@ -180,6 +228,14 @@ export function toPublicPageDraftPayload(
       showPublicLinks: form.showPublicLinks,
       publicUrlPath: form.publicUrlPath,
       buvetteSlug: form.buvetteSlug,
+      companyName: form.companyName,
+      label: form.label,
+      secondaryColor: form.secondaryColor,
+      accentColor: form.accentColor,
+      pageStyle: form.pageStyle,
+      imagePosition: form.imagePosition,
+      overlayIntensity: form.overlayIntensity,
+      bannerUrl: form.bannerUrl,
     },
     links: links.map((l, i) => ({
       id: l.id,

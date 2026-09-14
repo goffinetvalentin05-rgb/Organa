@@ -1084,6 +1084,8 @@
         "slugHint": "Nur Kleinbuchstaben, Ziffern und Bindestriche (z. B. fc-mein-verein).",
         "contentTitle": "Angezeigter Inhalt",
         "contentDescription": "Titel, Beschreibung und Farbe für Besucher.",
+        "appearanceTitle": "Erscheinungsbild",
+        "appearanceDescription": "Dieselbe Logik wie Supporters, Shop und Buvette: Stil, Farben und Vereinsvisual.",
         "logoHint": "Logo wird aus der Vereinsidentität übernommen.",
         "titleLabel": "Angezeigter Titel",
         "descriptionLabel": "Kurze Beschreibung",

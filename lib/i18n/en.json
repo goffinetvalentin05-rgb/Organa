@@ -1144,6 +1144,8 @@
         "slugHint": "Lowercase letters, numbers and hyphens only (e.g. fc-my-club).",
         "contentTitle": "Displayed content",
         "contentDescription": "Title, description and color visible to visitors.",
+        "appearanceTitle": "Appearance",
+        "appearanceDescription": "Same logic as Supporters, Shop and Bar: style, colors and club visual.",
         "logoHint": "Logo is taken from your club visual identity.",
         "titleLabel": "Displayed title",
         "descriptionLabel": "Short description",

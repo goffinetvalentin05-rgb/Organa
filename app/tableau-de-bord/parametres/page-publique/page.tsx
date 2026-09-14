@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
-import { OBILLZ_BRAND_PRIMARY } from "@/lib/public-page/colors";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
@@ -11,13 +9,13 @@ import {
   ExternalLink,
   Loader,
   Globe,
-  FileText,
   ShoppingBag,
   Calendar2,
   QrCode,
   Instagram,
   CheckCircle,
   Eye,
+  Sparkles,
 } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
@@ -25,6 +23,12 @@ import DraftAutosaveHint from "@/components/DraftAutosaveHint";
 import MatchProgramSettings from "@/components/public-page/MatchProgramSettings";
 import PublicLinksSettings, { linksToInputs } from "@/components/public-page/PublicLinksSettings";
 import PremiumSwitch from "@/components/public-page/PremiumSwitch";
+import PublicAppearanceEditor from "@/components/public-branding/PublicAppearanceEditor";
+import PublicClubMark from "@/components/public/PublicClubMark";
+import {
+  DEFAULT_PUBLIC_PAGE_LABEL,
+  DEFAULT_PUBLIC_PAGE_SUBTITLE,
+} from "@/lib/public-page/branding";
 import {
   ppHintClass,
   ppInputClass,
@@ -87,27 +91,16 @@ function LogoPreview({
   title: string;
   primaryColor: string;
 }) {
-  const [imgError, setImgError] = useState(false);
-  const showImage = Boolean(logoUrl) && !imgError;
-  const initial = (title.trim().charAt(0) || "C").toUpperCase();
-  const accent = primaryColor || OBILLZ_BRAND_PRIMARY;
-
   return (
-    <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.08)] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-      {showImage && logoUrl ? (
-        <Image
-          src={logoUrl}
-          alt=""
-          fill
-          className="object-contain p-2"
-          sizes="80px"
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <span className="text-2xl font-bold" style={{ color: accent }}>
-          {initial}
-        </span>
-      )}
+    <div className="flex h-20 w-20 shrink-0 items-center justify-center">
+      <PublicClubMark
+        logoUrl={logoUrl}
+        clubName={title}
+        accentColor={primaryColor}
+        size="md"
+        onDark={false}
+        className="mx-0"
+      />
     </div>
   );
 }
@@ -124,6 +117,7 @@ export default function PublicPageSettingsPage() {
     { id: string; name: string; code: string; registrationPath: string }[]
   >([]);
   const [origin, setOrigin] = useState("");
+  const [uploadingBanner, setUploadingBanner] = useState(false);
 
   const draftData = useMemo(
     () =>
@@ -150,6 +144,14 @@ export default function PublicPageSettingsPage() {
               showPublicLinks: false,
               publicUrlPath: null,
               buvetteSlug: null,
+              companyName: "Club",
+              label: null,
+              secondaryColor: null,
+              accentColor: null,
+              pageStyle: "colors",
+              imagePosition: "center",
+              overlayIntensity: "normal",
+              bannerUrl: null,
             },
             []
           ),
@@ -220,6 +222,12 @@ export default function PublicPageSettingsPage() {
           matchProgramUrl: form.matchProgramUrl,
           showPublicLinks: form.showPublicLinks,
           links: links.map((l, i) => ({ ...l, sortOrder: i })),
+          label: form.label,
+          secondaryColor: form.secondaryColor,
+          accentColor: form.accentColor,
+          pageStyle: form.pageStyle,
+          imagePosition: form.imagePosition,
+          overlayIntensity: form.overlayIntensity,
         }),
       });
       const data = await res.json();
@@ -246,6 +254,38 @@ export default function PublicPageSettingsPage() {
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error(t("dashboard.settings.publicPage.linkCopyError"));
+    }
+  };
+
+  const uploadBanner = async (file: File) => {
+    setUploadingBanner(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/settings/public-page/banner", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Upload impossible");
+      setForm((prev) => (prev ? { ...prev, bannerUrl: data.bannerUrl || null } : prev));
+      toast.success("Image enregistrée");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
+  const deleteBanner = async () => {
+    setUploadingBanner(true);
+    try {
+      const res = await fetch("/api/settings/public-page/banner", { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Suppression impossible");
+      setForm((prev) => (prev ? { ...prev, bannerUrl: null } : prev));
+      toast.success("Image retirée");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setUploadingBanner(false);
     }
   };
 
@@ -393,60 +433,58 @@ export default function PublicPageSettingsPage() {
       </SettingsSection>
 
       <SettingsSection
-        icon={FileText}
-        title={t("dashboard.settings.publicPage.contentTitle")}
-        description={t("dashboard.settings.publicPage.contentDescription")}
+        icon={Sparkles}
+        title={t("dashboard.settings.publicPage.appearanceTitle")}
+        description={t("dashboard.settings.publicPage.appearanceDescription")}
       >
-        <div className="space-y-5 sm:space-y-6">
+        <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <LogoPreview logoUrl={form.logoUrl} title={form.title} primaryColor={form.primaryColor} />
+            <LogoPreview
+              logoUrl={form.logoUrl}
+              title={form.title || form.companyName}
+              primaryColor={form.primaryColor}
+            />
             <p className="text-sm leading-relaxed text-[#64748B]">
               {t("dashboard.settings.publicPage.logoHint")}
             </p>
           </div>
 
-          <div>
-            <label className={ppLabelClass}>
-              {t("dashboard.settings.publicPage.titleLabel")}
-            </label>
-            <input
-              className={ppInputClass}
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className={ppLabelClass}>
-              {t("dashboard.settings.publicPage.descriptionLabel")}
-            </label>
-            <textarea
-              className={cn(ppInputClass, "min-h-[104px] resize-y")}
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              rows={4}
-            />
-          </div>
-
-          <div>
-            <label className={ppLabelClass}>
-              {t("dashboard.settings.publicPage.colorLabel")}
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={form.primaryColor}
-                onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                className="h-10 w-12 cursor-pointer rounded-xl border border-[#E5E7EB] bg-white"
-              />
-              <input
-                className={cn(ppInputClass, "flex-1 font-mono")}
-                value={form.primaryColor}
-                onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-              />
-            </div>
-            <p className={ppHintClass}>{t("dashboard.settings.publicPage.colorHint")}</p>
-          </div>
+          <PublicAppearanceEditor
+            form={{
+              clubName: form.companyName || form.title || "Club",
+              label: form.label,
+              title: form.title,
+              subtitle: form.description,
+              primaryColor: form.primaryColor,
+              secondaryColor: form.secondaryColor,
+              accentColor: form.accentColor,
+              pageStyle: form.pageStyle || "colors",
+              imagePosition: form.imagePosition || "center",
+              overlayIntensity: form.overlayIntensity || "normal",
+              bannerUrl: form.bannerUrl,
+              publicPath: form.publicUrlPath,
+            }}
+            onChange={(patch) => {
+              const { subtitle, title, clubName: _clubName, publicPath: _publicPath, introText: _intro, ...rest } =
+                patch;
+              setForm({
+                ...form,
+                ...rest,
+                title: title !== undefined ? title || "" : form.title,
+                description: subtitle !== undefined ? subtitle || "" : form.description,
+              });
+            }}
+            canManage
+            uploadingBanner={uploadingBanner}
+            onUploadBanner={(file) => void uploadBanner(file)}
+            onDeleteBanner={() => void deleteBanner()}
+            placeholders={{
+              label: DEFAULT_PUBLIC_PAGE_LABEL,
+              title: form.companyName || "Votre club",
+              subtitle: DEFAULT_PUBLIC_PAGE_SUBTITLE,
+            }}
+            showAccent
+          />
         </div>
       </SettingsSection>
 

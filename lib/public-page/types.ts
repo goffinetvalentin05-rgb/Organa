@@ -1,3 +1,10 @@
+import type {
+  PublicImagePosition,
+  PublicOverlayIntensity,
+  PublicPageStyle,
+  PublicVisualTheme,
+} from "@/lib/public-branding/types";
+
 export type MatchProgramType = "external_url" | "pdf";
 export type PublicPageLinkType = "qr_code" | "event" | "buvette" | "custom";
 
@@ -21,6 +28,14 @@ export interface PublicPageSettings {
   showPublicLinks: boolean;
   publicUrlPath: string | null;
   buvetteSlug: string | null;
+  companyName: string;
+  label: string | null;
+  secondaryColor: string | null;
+  accentColor: string | null;
+  pageStyle: PublicPageStyle;
+  imagePosition: PublicImagePosition;
+  overlayIntensity: PublicOverlayIntensity;
+  bannerUrl: string | null;
 }
 
 export interface PublicPageLink {
@@ -46,6 +61,7 @@ export interface PublicPageLinkInput {
 }
 
 export interface PublicClubPageData {
+  clubName: string;
   title: string;
   description: string;
   logoUrl: string | null;
@@ -55,6 +71,7 @@ export interface PublicClubPageData {
   websiteUrl: string | null;
   showBuvette: boolean;
   buvetteSlug: string | null;
+  theme: PublicVisualTheme;
   matchProgram: {
     label: string;
     href: string;

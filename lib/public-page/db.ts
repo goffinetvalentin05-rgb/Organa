@@ -8,6 +8,19 @@ import {
 } from "./links-db";
 import { getMatchProgramPdfPublicUrl } from "./match-program";
 import { normalizeAndValidatePublicUrl } from "./urls";
+import {
+  parseImagePosition,
+  parseOverlayIntensity,
+  parsePageStyle,
+  trimOrNull as trimUnknown,
+  validateHexColor,
+} from "@/lib/public-branding/parse";
+import type {
+  PublicImagePosition,
+  PublicOverlayIntensity,
+  PublicPageStyle,
+} from "@/lib/public-branding/types";
+import { PUBLIC_PAGE_BRANDING_MIGRATION_HINT } from "./branding";
 import type {
   MatchProgramType,
   PublicPageLinkInput,
@@ -15,12 +28,57 @@ import type {
   PublicPageSettingsResponse,
 } from "./types";
 
-const SETTINGS_SELECT =
+export const SETTINGS_SELECT_CORE =
   "user_id, company_name, logo_url, primary_color, buvette_slug, public_page_enabled, public_page_slug, public_page_title, public_page_description, public_page_primary_color, public_page_instagram_url, public_page_facebook_url, public_page_website_url, public_page_show_buvette, public_page_show_match_program, public_page_match_program_type, public_page_match_program_url, public_page_match_program_pdf_path, public_page_match_program_pdf_name, public_page_show_public_links";
+
+export const SETTINGS_SELECT_BRANDING = `${SETTINGS_SELECT_CORE}, public_page_label, public_page_secondary_color, public_page_accent_color, public_page_page_style, public_page_banner_url, public_page_banner_path, public_page_image_position, public_page_overlay_intensity`;
 
 function parseMatchProgramType(value: unknown): MatchProgramType | null {
   if (value === "external_url" || value === "pdf") return value;
   return null;
+}
+
+export async function selectPublicPageProfile(
+  supabase: SupabaseClient,
+  clubId: string
+): Promise<Record<string, unknown> | null> {
+  const full = await supabase
+    .from("profiles")
+    .select(SETTINGS_SELECT_BRANDING)
+    .eq("user_id", clubId)
+    .maybeSingle();
+
+  if (!full.error) return (full.data as Record<string, unknown> | null) ?? null;
+
+  const core = await supabase
+    .from("profiles")
+    .select(SETTINGS_SELECT_CORE)
+    .eq("user_id", clubId)
+    .maybeSingle();
+
+  if (core.error) throw core.error;
+  return (core.data as Record<string, unknown> | null) ?? null;
+}
+
+export async function selectEnabledPublicClubProfileBySlug(
+  supabase: SupabaseClient,
+  slug: string
+): Promise<Record<string, unknown> | null> {
+  const filters = (select: string) =>
+    supabase
+      .from("profiles")
+      .select(select)
+      .eq("public_page_slug", slug)
+      .eq("public_page_enabled", true)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+  const full = await filters(SETTINGS_SELECT_BRANDING);
+  if (!full.error) return (full.data as Record<string, unknown> | null) ?? null;
+
+  const core = await filters(SETTINGS_SELECT_CORE);
+  if (core.error) throw core.error;
+  return (core.data as Record<string, unknown> | null) ?? null;
 }
 
 export function mapProfileToSettings(
@@ -32,6 +90,9 @@ export function mapProfileToSettings(
       ? profile.public_page_slug.trim()
       : null;
 
+  const companyName =
+    (typeof profile.company_name === "string" && profile.company_name.trim()) || "Club";
+
   const primaryColor = normalizeHexColor(
     (typeof profile.public_page_primary_color === "string" &&
       profile.public_page_primary_color) ||
@@ -41,8 +102,7 @@ export function mapProfileToSettings(
 
   const title =
     (typeof profile.public_page_title === "string" && profile.public_page_title) ||
-    (typeof profile.company_name === "string" ? profile.company_name : "") ||
-    "";
+    companyName;
 
   const pdfPath =
     typeof profile.public_page_match_program_pdf_path === "string"
@@ -75,17 +135,40 @@ export function mapProfileToSettings(
       typeof profile.public_page_match_program_pdf_name === "string"
         ? profile.public_page_match_program_pdf_name
         : null,
-    matchProgramPdfUrl: pdfPath ? pdfPublicUrl || getMatchProgramPdfPublicUrl(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      pdfPath
-    ) : null,
+    matchProgramPdfUrl: pdfPath
+      ? pdfPublicUrl ||
+        getMatchProgramPdfPublicUrl(process.env.NEXT_PUBLIC_SUPABASE_URL || "", pdfPath)
+      : null,
     showPublicLinks: profile.public_page_show_public_links === true,
-    publicUrlPath:
-      profile.public_page_enabled === true && slug ? `/p/${slug}` : null,
+    publicUrlPath: profile.public_page_enabled === true && slug ? `/p/${slug}` : null,
     buvetteSlug:
       typeof profile.buvette_slug === "string" && profile.buvette_slug.trim()
         ? profile.buvette_slug.trim()
         : null,
+    companyName,
+    label: trimUnknown(profile.public_page_label),
+    secondaryColor: validateHexColor(
+      typeof profile.public_page_secondary_color === "string"
+        ? profile.public_page_secondary_color
+        : null
+    ),
+    accentColor: validateHexColor(
+      typeof profile.public_page_accent_color === "string" ? profile.public_page_accent_color : null
+    ),
+    pageStyle: parsePageStyle(
+      typeof profile.public_page_page_style === "string" ? profile.public_page_page_style : null
+    ),
+    imagePosition: parseImagePosition(
+      typeof profile.public_page_image_position === "string"
+        ? profile.public_page_image_position
+        : null
+    ),
+    overlayIntensity: parseOverlayIntensity(
+      typeof profile.public_page_overlay_intensity === "string"
+        ? profile.public_page_overlay_intensity
+        : null
+    ),
+    bannerUrl: trimUnknown(profile.public_page_banner_url),
   };
 }
 
@@ -93,15 +176,15 @@ export async function fetchPublicPageSettingsBundle(
   supabase: SupabaseClient,
   clubId: string
 ): Promise<PublicPageSettingsResponse | null> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(SETTINGS_SELECT)
-    .eq("user_id", clubId)
-    .maybeSingle();
+  let profile: Record<string, unknown> | null;
+  try {
+    profile = await selectPublicPageProfile(supabase, clubId);
+  } catch {
+    return null;
+  }
 
-  if (error || !data) return null;
+  if (!profile) return null;
 
-  const profile = data as Record<string, unknown>;
   const pdfPath =
     typeof profile.public_page_match_program_pdf_path === "string"
       ? profile.public_page_match_program_pdf_path
@@ -145,6 +228,12 @@ export interface PublicPageUpdateInput {
   matchProgramUrl?: string | null;
   showPublicLinks?: boolean;
   links?: PublicPageLinkInput[];
+  label?: string | null;
+  secondaryColor?: string | null;
+  accentColor?: string | null;
+  pageStyle?: PublicPageStyle | null;
+  imagePosition?: PublicImagePosition | null;
+  overlayIntensity?: PublicOverlayIntensity | null;
 }
 
 function trimOrNull(value: string | undefined | null): string | null {
@@ -163,17 +252,18 @@ export async function updatePublicPageSettings(
   error?: string;
   status?: number;
 }> {
-  const { data: existing, error: fetchError } = await supabase
-    .from("profiles")
-    .select(SETTINGS_SELECT)
-    .eq("user_id", clubId)
-    .maybeSingle();
-
-  if (fetchError) {
-    return { error: fetchError.message, status: 500 };
+  let existing: Record<string, unknown> | null;
+  try {
+    existing = await selectPublicPageProfile(supabase, clubId);
+  } catch (error: unknown) {
+    return { error: error instanceof Error ? error.message : "Erreur serveur", status: 500 };
   }
 
-  const profile = (existing || {}) as Record<string, unknown>;
+  if (!existing) {
+    return { error: "Profil club introuvable", status: 404 };
+  }
+
+  const profile = existing;
   const companyName = typeof profile.company_name === "string" ? profile.company_name : "Club";
 
   let slug =
@@ -209,11 +299,25 @@ export async function updatePublicPageSettings(
     }
   }
 
-  if (input.primaryColor !== undefined && input.primaryColor !== null) {
-    const hex = String(input.primaryColor).trim();
-    if (hex && !/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-      return { error: "Couleur invalide (format #RRGGBB attendu).", status: 400 };
+  for (const [key, label] of [
+    ["primaryColor", "Couleur principale"],
+    ["secondaryColor", "Couleur secondaire"],
+    ["accentColor", "Couleur d’accent"],
+  ] as const) {
+    const value = input[key];
+    if (value !== undefined && value !== null && String(value).trim() && !validateHexColor(value)) {
+      return { error: `${label} invalide (format #RRGGBB attendu).`, status: 400 };
     }
+  }
+
+  if (
+    input.pageStyle !== undefined &&
+    input.pageStyle !== null &&
+    input.pageStyle !== "colors" &&
+    input.pageStyle !== "banner" &&
+    input.pageStyle !== "fullscreen"
+  ) {
+    return { error: "Style de page invalide.", status: 400 };
   }
 
   const showMatchProgram =
@@ -268,7 +372,7 @@ export async function updatePublicPageSettings(
         : profile.public_page_description ?? null,
     public_page_primary_color:
       input.primaryColor !== undefined
-        ? input.primaryColor?.trim() || null
+        ? validateHexColor(input.primaryColor) || trimOrNull(input.primaryColor)
         : profile.public_page_primary_color ?? null,
     public_page_instagram_url:
       input.instagramUrl !== undefined
@@ -293,16 +397,46 @@ export async function updatePublicPageSettings(
         : profile.public_page_show_public_links === true,
   };
 
-  const { data: updated, error: updateError } = await supabase
+  if (input.label !== undefined) {
+    payload.public_page_label = trimOrNull(input.label)?.slice(0, 40) ?? null;
+  }
+  if (input.secondaryColor !== undefined) {
+    payload.public_page_secondary_color = validateHexColor(input.secondaryColor);
+  }
+  if (input.accentColor !== undefined) {
+    payload.public_page_accent_color = validateHexColor(input.accentColor);
+  }
+  if (input.pageStyle !== undefined) {
+    payload.public_page_page_style = parsePageStyle(input.pageStyle);
+  }
+  if (input.imagePosition !== undefined) {
+    payload.public_page_image_position = parseImagePosition(input.imagePosition);
+  }
+  if (input.overlayIntensity !== undefined) {
+    payload.public_page_overlay_intensity = parseOverlayIntensity(input.overlayIntensity);
+  }
+
+  const { error: updateError } = await supabase
     .from("profiles")
     .update(payload)
-    .eq("user_id", clubId)
-    .select(SETTINGS_SELECT)
-    .single();
+    .eq("user_id", clubId);
 
   if (updateError) {
     if (updateError.code === "23505") {
       return { error: "Ce slug est déjà utilisé.", status: 409 };
+    }
+    if (
+      Object.keys(payload).some(
+        (key) =>
+          key.includes("page_style") ||
+          key.includes("label") ||
+          key.includes("secondary") ||
+          key.includes("accent") ||
+          key.includes("image_position") ||
+          key.includes("overlay")
+      )
+    ) {
+      return { error: PUBLIC_PAGE_BRANDING_MIGRATION_HINT, status: 500 };
     }
     return { error: updateError.message, status: 500 };
   }
@@ -316,7 +450,7 @@ export async function updatePublicPageSettings(
     linksResult = sync.links;
   }
 
-  const updatedProfile = updated as Record<string, unknown>;
+  const updatedProfile = (await selectPublicPageProfile(supabase, clubId)) || profile;
   const pdfPath =
     typeof updatedProfile.public_page_match_program_pdf_path === "string"
       ? updatedProfile.public_page_match_program_pdf_path
@@ -330,3 +464,4 @@ export async function updatePublicPageSettings(
     links: linksResult,
   };
 }
+

@@ -1,20 +1,17 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { OBILLZ_BRAND_PRIMARY, normalizeHexColor } from "./colors";
 import { fetchActivePublicPageLinksForClub } from "./links-db";
 import {
   getMatchProgramPdfPublicUrl,
   isMatchProgramConfigured,
 } from "./match-program";
 import type { PublicClubPageData } from "./types";
-import { mapProfileToSettings } from "./db";
+import { mapProfileToSettings, selectEnabledPublicClubProfileBySlug } from "./db";
+import { buildPublicClubTheme } from "./branding";
 
 export type PublicSlugResolution =
   | { type: "club"; data: PublicClubPageData }
   | { type: "planning" }
   | { type: "not_found" };
-
-const PUBLIC_PROFILE_SELECT =
-  "user_id, company_name, logo_url, primary_color, buvette_slug, public_page_enabled, public_page_slug, public_page_title, public_page_description, public_page_primary_color, public_page_instagram_url, public_page_facebook_url, public_page_website_url, public_page_show_buvette, public_page_show_match_program, public_page_match_program_type, public_page_match_program_url, public_page_match_program_pdf_path, public_page_match_program_pdf_name, public_page_show_public_links";
 
 function trimSocialUrl(value: unknown): string | null {
   if (typeof value !== "string" || !value.trim()) return null;
@@ -73,26 +70,17 @@ async function mapProfileToPublicClubData(
     external: isExternalHref(link.url),
   }));
 
-  const primaryColor = normalizeHexColor(
-    (typeof profile.public_page_primary_color === "string" &&
-      profile.public_page_primary_color) ||
-      (typeof profile.primary_color === "string" && profile.primary_color) ||
-      OBILLZ_BRAND_PRIMARY
-  );
-
-  const title =
-    (typeof profile.public_page_title === "string" && profile.public_page_title.trim()) ||
-    (typeof profile.company_name === "string" && profile.company_name.trim()) ||
-    "Club";
+  const theme = buildPublicClubTheme({
+    ...settings,
+    clubName: settings.companyName,
+  });
 
   return {
-    title,
-    description:
-      typeof profile.public_page_description === "string"
-        ? profile.public_page_description.trim()
-        : "",
-    logoUrl: typeof profile.logo_url === "string" ? profile.logo_url : null,
-    primaryColor,
+    clubName: settings.companyName,
+    title: theme.title,
+    description: theme.subtitle,
+    logoUrl: settings.logoUrl,
+    primaryColor: theme.primaryColor,
     instagramUrl: trimSocialUrl(profile.public_page_instagram_url),
     facebookUrl: trimSocialUrl(profile.public_page_facebook_url),
     websiteUrl: trimSocialUrl(profile.public_page_website_url),
@@ -101,6 +89,7 @@ async function mapProfileToPublicClubData(
       typeof profile.buvette_slug === "string" && profile.buvette_slug.trim()
         ? profile.buvette_slug.trim()
         : null,
+    theme,
     matchProgram,
     publicLinks,
   };
@@ -112,20 +101,16 @@ export async function resolvePublicSlug(slug: string): Promise<PublicSlugResolut
 
   const supabase = createAdminClient();
 
-  const { data: clubProfile } = await supabase
-    .from("profiles")
-    .select(PUBLIC_PROFILE_SELECT)
-    .eq("public_page_slug", normalized)
-    .eq("public_page_enabled", true)
-    .is("deleted_at", null)
-    .maybeSingle();
+  let clubProfile: Record<string, unknown> | null = null;
+  try {
+    clubProfile = await selectEnabledPublicClubProfileBySlug(supabase, normalized);
+  } catch {
+    clubProfile = null;
+  }
 
   if (clubProfile) {
     const clubId = String(clubProfile.user_id);
-    const data = await mapProfileToPublicClubData(
-      clubProfile as Record<string, unknown>,
-      clubId
-    );
+    const data = await mapProfileToPublicClubData(clubProfile, clubId);
     return { type: "club", data };
   }
 

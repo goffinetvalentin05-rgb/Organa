@@ -1,8 +1,6 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import {
   Calendar,
   ExternalLink,
@@ -12,111 +10,105 @@ import {
   FileText,
   QrCode,
 } from "@/lib/icons";
-import { getClubBrandPalette } from "@/lib/public-page/colors";
+import { cn } from "@/components/ui";
+import PublicBrandingHero from "@/components/public-branding/PublicBrandingHero";
+import PublicPageCanvas from "@/components/public-branding/PublicPageCanvas";
+import { ctaColors, resolvePublicLayout } from "@/lib/public-branding/theme";
+import { buildPublicClubTheme } from "@/lib/public-page/branding";
 import type { PublicClubPageData } from "@/lib/public-page/types";
 
 interface ClubPublicPageProps {
   initialData: PublicClubPageData;
 }
 
-function ClubLogo({
-  logoUrl,
-  title,
-  accent,
-  accentText,
-}: {
-  logoUrl: string | null;
-  title: string;
-  accent: string;
-  accentText: string;
-}) {
-  const [imgError, setImgError] = useState(false);
-  const showImage = Boolean(logoUrl) && !imgError;
-  const initial = (title.trim().charAt(0) || "C").toUpperCase();
-
-  if (showImage && logoUrl) {
-    return (
-      <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-white/40 bg-white shadow-lg ring-2 ring-black/5">
-        <Image
-          src={logoUrl}
-          alt={title}
-          fill
-          className="object-contain p-2"
-          sizes="80px"
-          onError={() => setImgError(true)}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-white/35 text-2xl font-bold shadow-lg ring-2 ring-black/5"
-      style={{ backgroundColor: accent, color: accentText }}
-      aria-hidden={!title}
-    >
-      {initial}
-    </div>
-  );
-}
-
 function ActionCard({
   href,
   label,
   description,
-  accent,
-  accentText,
+  iconBackground,
+  iconColor,
   external,
   icon: Icon,
+  surfaceClass,
 }: {
   href: string;
   label: string;
   description: string;
-  accent: string;
-  accentText: string;
+  iconBackground: string;
+  iconColor: string;
   external?: boolean;
   icon?: React.ComponentType<{ className?: string }>;
+  surfaceClass: string;
 }) {
-  const className =
-    "group flex w-full items-center gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 text-left shadow-sm transition hover:border-slate-300 hover:shadow-md active:scale-[0.99]";
+  const className = cn(
+    "group flex w-full min-h-[4.75rem] items-center gap-4 rounded-[1.35rem] p-4 text-left transition duration-200 sm:p-5",
+    "hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(15,23,42,0.12)] active:scale-[0.99]",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    surfaceClass
+  );
 
   const IconComponent = Icon || Calendar;
 
   const content = (
     <>
       <div
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm"
-        style={{ backgroundColor: accent, color: accentText }}
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-[0_6px_16px_rgba(15,23,42,0.16)] sm:h-[3.25rem] sm:w-[3.25rem]"
+        style={{ backgroundColor: iconBackground, color: iconColor }}
       >
         <IconComponent className="h-6 w-6" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-slate-900">{label}</p>
+        <p className="text-[15px] font-semibold leading-snug tracking-tight text-[#0F172A] sm:text-base">
+          {label}
+        </p>
         {description ? (
-          <p className="mt-0.5 text-sm leading-snug text-slate-600">{description}</p>
+          <p className="mt-1 text-sm leading-snug text-[#64748B]">{description}</p>
         ) : null}
       </div>
-      <ExternalLink className="h-5 w-5 shrink-0 text-slate-400 transition group-hover:text-slate-600" />
+      <ExternalLink className="h-5 w-5 shrink-0 text-[#94A3B8] transition group-hover:translate-x-0.5 group-hover:text-[#64748B]" />
     </>
   );
 
   if (external || href.startsWith("http") || href.startsWith("mailto:")) {
     return (
-      <a href={href} className={className} target="_blank" rel="noopener noreferrer">
+      <a
+        href={href}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ ["--tw-ring-color" as string]: iconBackground }}
+      >
         {content}
       </a>
     );
   }
 
   return (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} style={{ ["--tw-ring-color" as string]: iconBackground }}>
       {content}
     </Link>
   );
 }
 
 export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
-  const brand = getClubBrandPalette(initialData.primaryColor);
+  const theme =
+    initialData.theme ||
+    buildPublicClubTheme({
+      title: initialData.title,
+      description: initialData.description,
+      primaryColor: initialData.primaryColor,
+      label: null,
+      secondaryColor: null,
+      accentColor: null,
+      pageStyle: "colors",
+      imagePosition: "center",
+      overlayIntensity: "normal",
+      bannerUrl: null,
+      clubName: initialData.clubName || initialData.title,
+    });
+  const layout = resolvePublicLayout(theme);
+  const cta = ctaColors(theme.primaryColor, theme.secondaryColor, theme.accentColor);
+  const clubName = initialData.clubName || theme.title;
   const buvetteHref = initialData.buvetteSlug
     ? `/club/${initialData.buvetteSlug}/buvette`
     : null;
@@ -136,6 +128,7 @@ export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
       href: buvetteHref,
       label: "Réserver la buvette",
       description: "Choisissez une date et envoyez votre demande en ligne.",
+      icon: Calendar,
     });
   }
 
@@ -168,62 +161,49 @@ export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
   ].filter((s) => s.url);
 
   const hasContent = actions.length > 0 || socials.length > 0;
+  const footerColor = layout.immersive ? "rgba(255,255,255,0.65)" : "#94A3B8";
+  const footerLinkColor = layout.immersive ? "rgba(255,255,255,0.82)" : "#64748B";
 
   return (
-    <div className="min-h-screen" style={{ background: brand.pageBackground }}>
-      <header className="px-4 pb-16 pt-10 sm:px-6" style={{ background: brand.headerGradient }}>
-        <div className="mx-auto flex max-w-lg flex-col items-center text-center">
-          <ClubLogo
-            logoUrl={initialData.logoUrl}
-            title={initialData.title}
-            accent={brand.accent}
-            accentText={brand.accentText}
-          />
-          <h1
-            className="mt-5 text-2xl font-bold tracking-tight sm:text-3xl"
-            style={{ color: brand.headerText }}
-          >
-            {initialData.title}
-          </h1>
-          {initialData.description ? (
-            <p
-              className="mt-3 max-w-md text-sm leading-relaxed sm:text-base"
-              style={{ color: brand.headerTextMuted }}
+    <PublicPageCanvas theme={theme} priority>
+      <PublicBrandingHero clubName={clubName} logoUrl={initialData.logoUrl} theme={theme} />
+
+      <main className="relative z-10 mx-auto w-full max-w-lg px-4 pb-16 sm:px-6 sm:pb-20">
+        <div className="-mt-8 space-y-3 sm:-mt-10">
+          {actions.length > 0
+            ? actions.map((action) => (
+                <ActionCard
+                  key={action.key}
+                  href={action.href}
+                  label={action.label}
+                  description={action.description}
+                  iconBackground={cta.background}
+                  iconColor={cta.color}
+                  external={action.external}
+                  icon={action.icon}
+                  surfaceClass={layout.surfaceClass}
+                />
+              ))
+            : null}
+
+          {!hasContent ? (
+            <div
+              className={cn(
+                "rounded-[1.35rem] px-6 py-8 text-center text-sm text-[#64748B]",
+                layout.surfaceClass
+              )}
             >
-              {initialData.description}
-            </p>
+              Aucun lien actif pour le moment. Revenez bientôt.
+            </div>
           ) : null}
         </div>
-      </header>
-
-      <main className="relative mx-auto -mt-10 max-w-lg px-4 pb-12 sm:px-6">
-        {actions.length > 0 ? (
-          <div className="space-y-3">
-            {actions.map((action) => (
-              <ActionCard
-                key={action.key}
-                href={action.href}
-                label={action.label}
-                description={action.description}
-                accent={brand.accent}
-                accentText={brand.accentText}
-                external={action.external}
-                icon={action.icon}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        {!hasContent ? (
-          <div className="rounded-2xl border border-slate-200 bg-white px-6 py-8 text-center text-sm text-slate-600 shadow-sm">
-            Aucun lien actif pour le moment. Revenez bientôt.
-          </div>
-        ) : null}
 
         {socials.length > 0 ? (
           <div
-            className={`flex items-center justify-center gap-4 ${actions.length > 0 ? "mt-10" : ""}`}
-            style={{ ["--club-accent" as string]: brand.accent }}
+            className={cn(
+              "mx-auto mt-8 flex w-fit items-center justify-center gap-1.5 rounded-full px-2 py-2 sm:mt-10",
+              layout.surfaceClass
+            )}
           >
             {socials.map(({ url, label, Icon }) => (
               <a
@@ -232,7 +212,8 @@ export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-[var(--club-accent)] hover:text-[var(--club-accent)] hover:shadow-md"
+                className="flex h-12 w-12 items-center justify-center rounded-full text-[#334155] transition hover:bg-[rgba(15,23,42,0.05)] hover:text-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{ ["--tw-ring-color" as string]: cta.background }}
               >
                 <Icon className="h-5 w-5" />
               </a>
@@ -240,11 +221,12 @@ export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
           </div>
         ) : null}
 
-        <p className="mt-10 text-center text-xs text-slate-400">
+        <p className="mt-10 text-center text-xs" style={{ color: footerColor }}>
           Propulsé par{" "}
           <a
             href="https://obillz.com"
-            className="font-medium text-slate-500 hover:text-slate-700"
+            className="font-medium transition hover:opacity-80"
+            style={{ color: footerLinkColor }}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -252,6 +234,6 @@ export default function ClubPublicPage({ initialData }: ClubPublicPageProps) {
           </a>
         </p>
       </main>
-    </div>
+    </PublicPageCanvas>
   );
 }

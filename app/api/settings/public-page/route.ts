@@ -61,6 +61,12 @@ export async function PUT(request: NextRequest) {
       matchProgramUrl: body.matchProgramUrl,
       showPublicLinks: body.showPublicLinks,
       links: body.links,
+      label: body.label,
+      secondaryColor: body.secondaryColor,
+      accentColor: body.accentColor,
+      pageStyle: body.pageStyle,
+      imagePosition: body.imagePosition,
+      overlayIntensity: body.overlayIntensity,
     });
 
     if (result.error) {
