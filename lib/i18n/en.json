@@ -539,6 +539,7 @@
       "buvette": "Club Bar",
       "shop": "Shop",
       "supporters": "Supporters",
+      "supportSales": "Support sales",
       "paymentAccount": "Payment account",
       "plannings": "Plannings",
       "meetingMinutes": "Meeting minutes",
@@ -570,6 +571,7 @@
       "buvette": "Club Bar",
       "shop": "Shop",
       "supporters": "Supporters",
+      "supportSales": "Support sales",
       "paymentAccount": "Payment account",
       "plannings": "Plannings",
       "meetingMinutes": "Meeting minutes",
@@ -595,6 +597,13 @@
         "settings": "Shop settings",
         "payments": "Payments"
       }
+    },
+    "supportSales": {
+      "title": "Support sales",
+      "subtitle": "Organize your sales and automatically track each member’s orders.",
+      "create": "Create a sale",
+      "emptyTitle": "No support sale yet",
+      "emptyDescription": "Launch a temporary sale (fondue, wine, chocolate…) and track what each member sells to their circle."
     },
     "visuals": {
       "title": "Visuals",

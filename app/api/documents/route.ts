@@ -22,11 +22,8 @@ import {
   type RecipientType,
 } from "@/lib/documents/recipient";
 import { withIdempotency } from "@/lib/api/idempotency";
-import {
-  createMembershipPaymentToken,
-  resolveQuotePaymentMethodForInsert,
-} from "@/lib/quotes/membership-settings";
 import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
+import { createDocumentRecord } from "@/lib/obillz-tools/finance/createDocumentRecord";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -246,113 +243,6 @@ export async function POST(request: NextRequest) {
       eventId,
       paymentMethod,
     } = body;
-
-    // Log du payload reçu pour debugging
-    console.log("[API][documents][POST] Payload reçu:", {
-      type,
-      recipientType: recipientType || (clientId ? "member" : "non fourni"),
-      clientId: clientId || null,
-      sponsorContractId: sponsorContractId || null,
-      recipientData:
-        recipientType === "external" && recipientData
-          ? {
-              name: (recipientData as { name?: string })?.name,
-              hasAddress: Boolean((recipientData as { address?: string })?.address),
-              postalCode: (recipientData as { postalCode?: string })?.postalCode,
-              city: (recipientData as { city?: string })?.city,
-              email: (recipientData as { email?: string })?.email || null,
-            }
-          : null,
-      lignes_count: lignes?.length || 0,
-      statut,
-      dateCreation,
-    });
-
-    if (!type || (type !== "invoice" && type !== "quote")) {
-      return NextResponse.json(
-        { error: "Paramètre 'type' requis et doit être 'invoice' ou 'quote'" },
-        { status: 400 }
-      );
-    }
-
-    if (type === "quote") {
-      if (!clientId) {
-        return NextResponse.json(
-          { error: "clientId requis" },
-          { status: 400 }
-        );
-      }
-    }
-
-    if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
-      return NextResponse.json(
-        { error: "Au moins une ligne est requise" },
-        { status: 400 }
-      );
-    }
-
-    let resolvedRecipientType: RecipientType = "member";
-    if (type === "invoice") {
-      const recipientCheck = validateInvoiceRecipientInput({
-        recipientType: recipientType || (clientId ? "member" : undefined),
-        clientId,
-        sponsorContractId,
-        recipientData,
-      });
-      if (!recipientCheck.ok) {
-        return NextResponse.json({ error: recipientCheck.error }, { status: 400 });
-      }
-      resolvedRecipientType = recipientCheck.type;
-    }
-
-    let resolvedClientId: string | null = null;
-    let resolvedSponsorId: string | null = null;
-    let resolvedRecipientData: ExternalRecipientData | null = null;
-
-    if (type === "quote" || resolvedRecipientType === "member") {
-      const memberId = clientId as string;
-      const { data: client, error: clientError } = await admin
-        .from("clients")
-        .select("id")
-        .eq("id", memberId)
-        .eq("user_id", guard.clubId)
-        .is("deleted_at", null)
-        .single();
-
-      if (clientError || !client) {
-        console.error("[API][documents][POST] Client introuvable ou non autorisé:", clientError);
-        return NextResponse.json(
-          { error: "Client introuvable ou non autorisé" },
-          { status: 404 }
-        );
-      }
-      resolvedClientId = memberId;
-    } else if (resolvedRecipientType === "sponsor") {
-      const sponsorId = sponsorContractId as string;
-      const { data: sponsor, error: sponsorError } = await supabase
-        .from("sponsor_contracts")
-        .select("id")
-        .eq("id", sponsorId)
-        .eq("club_id", guard.clubId)
-        .single();
-
-      if (sponsorError || !sponsor) {
-        console.error("[API][documents][POST] Sponsor introuvable ou non autorisé:", sponsorError);
-        return NextResponse.json(
-          { error: "Contrat sponsor introuvable ou non autorisé" },
-          { status: 404 }
-        );
-      }
-      resolvedSponsorId = sponsorId;
-    } else {
-      resolvedRecipientData = parseExternalRecipientData(recipientData);
-      if (!resolvedRecipientData) {
-        return NextResponse.json(
-          { error: "Informations du destinataire externe invalides" },
-          { status: 400 }
-        );
-      }
-    }
 
     const idempotencyKey = request.headers.get("Idempotency-Key");
     const idempotencyResourceType = type === "invoice" ? "invoice" : "quote";

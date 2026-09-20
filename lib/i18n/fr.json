@@ -538,6 +538,7 @@
       "buvette": "Buvette",
       "shop": "Boutique",
       "supporters": "Supporters",
+      "supportSales": "Ventes de soutien",
       "paymentAccount": "Compte de paiement",
       "plannings": "Plannings",
       "meetingMinutes": "PV de séances",
@@ -566,6 +567,7 @@
       "buvette": "Buvette",
       "shop": "Boutique",
       "supporters": "Supporters",
+      "supportSales": "Ventes de soutien",
       "paymentAccount": "Compte de paiement",
       "plannings": "Plannings",
       "meetingMinutes": "PV de séances",
@@ -588,6 +590,13 @@
         "settings": "Paramètres boutique",
         "payments": "Paiements"
       }
+    },
+    "supportSales": {
+      "title": "Ventes de soutien",
+      "subtitle": "Organisez vos ventes et suivez automatiquement les commandes de chaque membre.",
+      "create": "Créer une vente",
+      "emptyTitle": "Aucune vente de soutien",
+      "emptyDescription": "Lancez une vente temporaire (fondue, vin, chocolat…) et suivez ce que chaque membre vend à son entourage."
     },
     "visuals": {
       "title": "Visuels",

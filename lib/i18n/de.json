@@ -538,6 +538,7 @@
       "buvette": "Vereinsbar",
       "shop": "Shop",
       "supporters": "Supporters",
+      "supportSales": "Unterstützungsverkäufe",
       "paymentAccount": "Zahlungskonto",
       "plannings": "Planungen",
       "meetingMinutes": "Sitzungsprotokolle",
@@ -568,6 +569,7 @@
       "buvette": "Vereinsbar",
       "shop": "Shop",
       "supporters": "Supporters",
+      "supportSales": "Unterstützungsverkäufe",
       "paymentAccount": "Zahlungskonto",
       "plannings": "Planungen",
       "meetingMinutes": "Sitzungsprotokolle",
@@ -593,6 +595,13 @@
         "settings": "Shop-Einstellungen",
         "payments": "Zahlungen"
       }
+    },
+    "supportSales": {
+      "title": "Unterstützungsverkäufe",
+      "subtitle": "Organisieren Sie Ihre Verkäufe und verfolgen Sie automatisch die Bestellungen jedes Mitglieds.",
+      "create": "Verkauf erstellen",
+      "emptyTitle": "Noch kein Verkauf vorhanden",
+      "emptyDescription": "Starten Sie einen temporären Verkauf (Fondue, Wein, Schokolade…) und sehen Sie, was jedes Mitglied im Umfeld verkauft."
     },
     "visuals": {
       "title": "Visuals",

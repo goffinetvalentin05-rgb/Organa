@@ -1,0 +1,16 @@
+import { PERMISSIONS } from "@/lib/auth/permissions-shared";
+
+export const FINANCE_VIEW = [
+  PERMISSIONS.VIEW_DOCUMENTS,
+  PERMISSIONS.VIEW_INVOICES,
+] as const;
+
+export const FINANCE_MANAGE = [
+  PERMISSIONS.MANAGE_DOCUMENTS,
+  PERMISSIONS.MANAGE_INVOICES,
+] as const;
+
+export const FINANCE_DELETE = [
+  PERMISSIONS.DELETE_DOCUMENTS,
+  PERMISSIONS.DELETE_INVOICES,
+] as const;

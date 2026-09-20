@@ -274,6 +274,18 @@ export const ShoppingBag = ({ className = "w-5 h-5" }: { className?: string }) =
   </svg>
 );
 
+/** Ventes de soutien — opérations temporaires (fondue, vin, calendriers…) */
+export const Gift = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M20 12v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8m16 0H4m16 0V9a1 1 0 00-1-1H5a1 1 0 00-1 1v3m8-3v12M8.5 8A2.5 2.5 0 1112 6.5 2.5 2.5 0 0115.5 8"
+    />
+  </svg>
+);
+
 export const Globe = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
