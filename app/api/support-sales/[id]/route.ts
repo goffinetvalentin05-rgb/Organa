@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { requireWriteAccess } from "@/lib/billing/checkAccess";
+import { completeSupportSale } from "@/lib/support-sales/complete";
 import { isUuid, parseSupportSaleInput } from "@/lib/support-sales/input";
+import { isMissingSaleColumn, normalizeSaleRow } from "@/lib/support-sales/map";
 import { assertMembersBelongToClub } from "@/lib/support-sales/members";
 import {
   loadSaleRelations,
@@ -10,7 +12,7 @@ import {
   replaceSaleAudience,
   SUPPORT_SALE_SELECT,
 } from "@/lib/support-sales/service";
-import { SUPPORT_SALE_STATUSES, type SupportSaleRow, type SupportSaleStatus } from "@/lib/support-sales/types";
+import { SUPPORT_SALE_SELECT_CORE, SUPPORT_SALE_STATUSES, type SupportSaleRow, type SupportSaleStatus } from "@/lib/support-sales/types";
 
 export const runtime = "nodejs";
 
@@ -18,14 +20,25 @@ const err = (e: unknown) => (e instanceof Error ? e.message : "Erreur serveur");
 
 async function loadOwnedSale(clubId: string, id: string) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("support_sales")
     .select(SUPPORT_SALE_SELECT)
     .eq("id", id)
     .eq("club_id", clubId)
     .is("deleted_at", null)
     .maybeSingle();
-  return { supabase, sale: (data || null) as SupportSaleRow | null, error };
+  if (error && isMissingSaleColumn(error)) {
+    const fallback = await supabase
+      .from("support_sales")
+      .select(SUPPORT_SALE_SELECT_CORE)
+      .eq("id", id)
+      .eq("club_id", clubId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    data = fallback.data as typeof data;
+    error = fallback.error;
+  }
+  return { supabase, sale: data ? normalizeSaleRow(data as SupportSaleRow) : null, error };
 }
 
 export async function GET(
@@ -75,29 +88,44 @@ export async function PUT(
     if (!sale) return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
 
     const nextStatus = parsed.data.status || sale.status;
-    const { data: updated, error } = await supabase
+    const payload = {
+      name: parsed.data.name,
+      product_name: parsed.data.productName,
+      description: parsed.data.description,
+      price_cents: parsed.data.priceCents,
+      available_quantity: parsed.data.availableQuantity,
+      start_date: parsed.data.startDate,
+      reservation_deadline: parsed.data.reservationDeadline,
+      distribution_info: parsed.data.distributionInfo,
+      member_scope: parsed.data.memberScope,
+      goal_per_member: parsed.data.goalPerMember,
+      sponsor_name: parsed.data.sponsorName,
+      sponsor_text: parsed.data.sponsorText,
+      sponsor_url: parsed.data.sponsorUrl,
+      status: nextStatus,
+      updated_by: guard.userId,
+    };
+    let { data: updated, error } = await supabase
       .from("support_sales")
-      .update({
-        name: parsed.data.name,
-        product_name: parsed.data.productName,
-        description: parsed.data.description,
-        price_cents: parsed.data.priceCents,
-        available_quantity: parsed.data.availableQuantity,
-        start_date: parsed.data.startDate,
-        reservation_deadline: parsed.data.reservationDeadline,
-        distribution_info: parsed.data.distributionInfo,
-        member_scope: parsed.data.memberScope,
-        goal_per_member: parsed.data.goalPerMember,
-        sponsor_name: parsed.data.sponsorName,
-        sponsor_text: parsed.data.sponsorText,
-        status: nextStatus,
-        updated_by: guard.userId,
-      })
+      .update(payload)
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .is("deleted_at", null)
       .select(SUPPORT_SALE_SELECT)
       .single();
+    if (error && isMissingSaleColumn(error)) {
+      const { sponsor_url: _sponsorUrl, ...corePayload } = payload;
+      const fallback = await supabase
+        .from("support_sales")
+        .update(corePayload)
+        .eq("id", id)
+        .eq("club_id", guard.clubId)
+        .is("deleted_at", null)
+        .select(SUPPORT_SALE_SELECT_CORE)
+        .single();
+      updated = fallback.data as typeof updated;
+      error = fallback.error;
+    }
 
     if (error || !updated) {
       return NextResponse.json({ error: error?.message || "Mise à jour impossible" }, { status: 500 });
@@ -112,7 +140,7 @@ export async function PUT(
     );
     const relations = await loadSaleRelations(supabase, guard.clubId, [id]);
     return NextResponse.json({
-      sale: mapSalesWithRelations([updated as SupportSaleRow], relations)[0],
+      sale: mapSalesWithRelations([normalizeSaleRow(updated as SupportSaleRow)], relations)[0],
     });
   } catch (error: unknown) {
     return NextResponse.json({ error: err(error) }, { status: 500 });
@@ -135,6 +163,18 @@ export async function PATCH(
     const status = body && typeof body === "object" ? (body as { status?: string }).status : null;
     if (!status || !SUPPORT_SALE_STATUSES.includes(status as SupportSaleStatus)) {
       return NextResponse.json({ error: "Statut invalide." }, { status: 400 });
+    }
+
+    if (status === "ended") {
+      const completed = await completeSupportSale({
+        clubId: guard.clubId,
+        userId: guard.userId,
+        saleId: id,
+      });
+      if (!completed.ok) {
+        return NextResponse.json({ error: completed.error }, { status: completed.status });
+      }
+      return NextResponse.json({ sale: completed.sale, revenueId: completed.revenueId });
     }
 
     const { supabase, sale } = await loadOwnedSale(guard.clubId, id);

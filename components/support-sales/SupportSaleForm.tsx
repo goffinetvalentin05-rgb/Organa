@@ -18,6 +18,8 @@ import {
 } from "@/components/ui";
 import { useI18n } from "@/components/I18nProvider";
 import { formatCategoryLabel, buildCategoryFilterOptions } from "@/lib/members/taxonomy";
+import { usePermissions } from "@/lib/auth/permissions-client";
+import SupportSaleAppearanceSettings from "@/components/support-sales/SupportSaleAppearanceSettings";
 import type { SupportSale, SupportSaleMemberOption, SupportSaleMemberScope } from "@/lib/support-sales/types";
 
 type FormState = {
@@ -35,6 +37,7 @@ type FormState = {
   memberIds: string[];
   sponsorName: string;
   sponsorText: string;
+  sponsorUrl: string;
 };
 
 function saleToForm(sale?: SupportSale | null): FormState {
@@ -53,6 +56,7 @@ function saleToForm(sale?: SupportSale | null): FormState {
     memberIds: sale?.memberIds || [],
     sponsorName: sale?.sponsorName || "",
     sponsorText: sale?.sponsorText || "",
+    sponsorUrl: sale?.sponsorUrl || "",
   };
 }
 
@@ -64,6 +68,8 @@ export default function SupportSaleForm({
   sale?: SupportSale | null;
 }) {
   const { t } = useI18n();
+  const { has } = usePermissions();
+  const canManage = has("manage_support_sales");
   const router = useRouter();
   const [form, setForm] = useState<FormState>(saleToForm(sale));
   const [members, setMembers] = useState<SupportSaleMemberOption[]>([]);
@@ -160,6 +166,7 @@ export default function SupportSaleForm({
         memberIds: form.memberIds,
         sponsorName: form.sponsorName,
         sponsorText: form.sponsorText,
+        sponsorUrl: form.sponsorUrl,
         status: publish ? "active" : sale?.status || "draft",
       };
       const res = await fetch(
@@ -411,16 +418,25 @@ export default function SupportSaleForm({
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className={`${dashboardLabelClass} mb-2 block`}>Texte</span>
+              <span className={`${dashboardLabelClass} mb-2 block`}>Texte (facultatif)</span>
               <input
                 className={dashboardInputClass}
                 value={form.sponsorText}
                 onChange={(e) => update("sponsorText", e.target.value)}
-                placeholder="Cette vente est soutenue par Garage Müller"
+                placeholder="Garage Müller accompagne le club dans cette vente de soutien."
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className={`${dashboardLabelClass} mb-2 block`}>Logo du sponsor</span>
+              <span className={`${dashboardLabelClass} mb-2 block`}>Lien du site (facultatif)</span>
+              <input
+                className={dashboardInputClass}
+                value={form.sponsorUrl}
+                onChange={(e) => update("sponsorUrl", e.target.value)}
+                placeholder="https://garage-muller.ch"
+              />
+            </label>
+            <label className="block sm:col-span-2">
+              <span className={`${dashboardLabelClass} mb-2 block`}>Logo ou image du sponsor</span>
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
@@ -433,11 +449,15 @@ export default function SupportSaleForm({
               />
               {sponsorPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={sponsorPreview} alt="" className="mt-3 h-16 w-auto rounded-xl object-contain" />
+                <img src={sponsorPreview} alt="" className="mt-3 h-28 w-full max-w-md rounded-2xl object-contain bg-[#F8FAFC]" />
               ) : null}
             </label>
           </div>
         </FormSection>
+
+        {mode === "edit" && sale ? (
+          <SupportSaleAppearanceSettings saleId={sale.id} saleName={form.name || sale.name} canManage={canManage} />
+        ) : null}
 
         <GlassCard className="flex flex-wrap items-center justify-end gap-3">
           <ActionButton

@@ -10,8 +10,31 @@ const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
 const BUCKET = "support-sales";
 
-function kindFromRequest(request: NextRequest): "image" | "sponsor" {
-  return request.nextUrl.searchParams.get("kind") === "sponsor" ? "sponsor" : "image";
+type MediaKind = "image" | "sponsor" | "banner";
+
+function kindFromRequest(request: NextRequest): MediaKind {
+  const kind = request.nextUrl.searchParams.get("kind");
+  if (kind === "sponsor" || kind === "banner") return kind;
+  return "image";
+}
+
+function previousPath(
+  kind: MediaKind,
+  sale: { image_path: string | null; sponsor_logo_path: string | null; public_banner_path: string | null }
+) {
+  if (kind === "sponsor") return sale.sponsor_logo_path;
+  if (kind === "banner") return sale.public_banner_path;
+  return sale.image_path;
+}
+
+function mediaPatch(kind: MediaKind, path: string | null, url: string | null, userId: string) {
+  if (kind === "sponsor") {
+    return { sponsor_logo_path: path, sponsor_logo_url: url, updated_by: userId };
+  }
+  if (kind === "banner") {
+    return { public_banner_path: path, public_banner_url: url, updated_by: userId };
+  }
+  return { image_path: path, image_url: url, updated_by: userId };
 }
 
 export async function POST(
@@ -29,7 +52,7 @@ export async function POST(
     const supabase = await createClient();
     const { data: sale } = await supabase
       .from("support_sales")
-      .select("id, image_path, sponsor_logo_path")
+      .select("id, image_path, sponsor_logo_path, public_banner_path")
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .is("deleted_at", null)
@@ -59,16 +82,11 @@ export async function POST(
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const previous = kind === "sponsor" ? sale.sponsor_logo_path : sale.image_path;
+    const previous = previousPath(kind, sale);
     const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    const patch =
-      kind === "sponsor"
-        ? { sponsor_logo_path: path, sponsor_logo_url: pub.publicUrl, updated_by: guard.userId }
-        : { image_path: path, image_url: pub.publicUrl, updated_by: guard.userId };
-
     const { error: updateError } = await supabase
       .from("support_sales")
-      .update(patch)
+      .update(mediaPatch(kind, path, pub.publicUrl, guard.userId))
       .eq("id", id)
       .eq("club_id", guard.clubId);
     if (updateError) {
@@ -104,7 +122,7 @@ export async function DELETE(
     const supabase = await createClient();
     const { data: sale } = await supabase
       .from("support_sales")
-      .select("id, image_path, sponsor_logo_path")
+      .select("id, image_path, sponsor_logo_path, public_banner_path")
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .is("deleted_at", null)
@@ -112,13 +130,12 @@ export async function DELETE(
     if (!sale) return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
 
     const kind = kindFromRequest(request);
-    const previous = kind === "sponsor" ? sale.sponsor_logo_path : sale.image_path;
-    const patch =
-      kind === "sponsor"
-        ? { sponsor_logo_path: null, sponsor_logo_url: null, updated_by: guard.userId }
-        : { image_path: null, image_url: null, updated_by: guard.userId };
-
-    await supabase.from("support_sales").update(patch).eq("id", id).eq("club_id", guard.clubId);
+    const previous = previousPath(kind, sale);
+    await supabase
+      .from("support_sales")
+      .update(mediaPatch(kind, null, null, guard.userId))
+      .eq("id", id)
+      .eq("club_id", guard.clubId);
     if (previous) await supabase.storage.from(BUCKET).remove([previous]);
     return NextResponse.json({ ok: true });
   } catch (error: unknown) {

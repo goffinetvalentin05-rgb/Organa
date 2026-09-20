@@ -21,7 +21,7 @@ import { useI18n } from "@/components/I18nProvider";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { formatCategoryLabel } from "@/lib/members/taxonomy";
 import { formatChf } from "@/lib/shop/money";
-import { CheckCircle, Copy, Gift, Users } from "@/lib/icons";
+import { CheckCircle, Copy, Download, Gift, Users } from "@/lib/icons";
 import { statusBadgeVariant, statusLabel } from "@/lib/support-sales/status";
 import type { SupportSaleDashboard, SupportSaleMemberRow } from "@/lib/support-sales/types";
 
@@ -37,6 +37,8 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
   const [data, setData] = useState<SupportSaleDashboard | null>(null);
   const [tab, setTab] = useState<TabId>("members");
   const [selected, setSelected] = useState<SupportSaleMemberRow | null>(null);
+  const [confirmEnd, setConfirmEnd] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,7 +68,7 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
     toast.success(label);
   };
 
-  const setStatus = async (status: "draft" | "active" | "ended") => {
+  const setStatus = async (status: "draft" | "active") => {
     const res = await fetch(`/api/support-sales/${saleId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -79,6 +81,22 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
     }
     toast.success("Statut mis à jour");
     void load();
+  };
+
+  const completeSale = async () => {
+    setCompleting(true);
+    try {
+      const res = await fetch(`/api/support-sales/${saleId}/complete`, { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Impossible de terminer la vente");
+      setConfirmEnd(false);
+      toast.success("Vente terminée");
+      void load();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Impossible de terminer la vente");
+    } finally {
+      setCompleting(false);
+    }
   };
 
   const removeSale = async () => {
@@ -142,22 +160,34 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
             : "Sans date limite"
         }
         actions={
-          canManage ? (
-            <div className="flex flex-wrap gap-2">
-              {sale.status !== "active" ? (
-                <DashboardPrimaryButton type="button" size="sm" icon="none" onClick={() => void setStatus("active")}>
-                  Publier
-                </DashboardPrimaryButton>
-              ) : (
-                <ActionButton variant="surface" onClick={() => void setStatus("ended")}>
-                  Terminer
-                </ActionButton>
-              )}
+          <div className="flex flex-wrap gap-2">
+            {sale.status === "ended" ? (
+              <ActionButton
+                variant="surface"
+                onClick={() => {
+                  window.location.href = `/api/pdf/vente-soutien/download?id=${sale.id}`;
+                }}
+              >
+                <Download className="h-4 w-4" />
+                Exporter le récapitulatif PDF
+              </ActionButton>
+            ) : null}
+            {canManage && sale.status === "draft" ? (
+              <DashboardPrimaryButton type="button" size="sm" icon="none" onClick={() => void setStatus("active")}>
+                Publier
+              </DashboardPrimaryButton>
+            ) : null}
+            {canManage && sale.status === "active" ? (
+              <ActionButton variant="surface" onClick={() => setConfirmEnd(true)}>
+                Terminer
+              </ActionButton>
+            ) : null}
+            {canManage ? (
               <ActionButton variant="ghost" onClick={() => router.push(`/tableau-de-bord/ventes-soutien/${sale.id}/modifier`)}>
                 Modifier
               </ActionButton>
-            </div>
-          ) : null
+            ) : null}
+          </div>
         }
       />
 
@@ -357,6 +387,45 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
               Supprimer la vente
             </ActionButton>
           ) : null}
+        </div>
+      ) : null}
+
+      {confirmEnd ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-[#071634]/50 p-4 sm:items-center"
+          onClick={() => !completing && setConfirmEnd(false)}
+        >
+          <div
+            className={cn(dashboardModalClass, "w-full max-w-lg p-6")}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold text-[#0F172A]">Terminer cette vente ?</h2>
+            <p className="mt-3 text-sm leading-relaxed text-[#475569]">
+              {sale.stats.quantitySold} produits ont été vendus pour un total de{" "}
+              <strong>{money(sale.stats.revenueCents)}</strong>.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-[#475569]">
+              <li>Les nouvelles réservations seront désactivées</li>
+              <li>Le récapitulatif PDF sera disponible</li>
+              <li>
+                <strong>{money(sale.stats.revenueCents)}</strong> seront ajoutés aux encaissements du club
+              </li>
+            </ul>
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <ActionButton variant="ghost" disabled={completing} onClick={() => setConfirmEnd(false)}>
+                Annuler
+              </ActionButton>
+              <DashboardPrimaryButton
+                type="button"
+                size="sm"
+                icon="none"
+                loading={completing}
+                onClick={() => void completeSale()}
+              >
+                Terminer la vente
+              </DashboardPrimaryButton>
+            </div>
+          </div>
         </div>
       ) : null}
 

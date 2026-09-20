@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { isUuid } from "@/lib/support-sales/input";
-import { mapReservation } from "@/lib/support-sales/map";
+import { isMissingSaleColumn, mapReservation, normalizeSaleRow } from "@/lib/support-sales/map";
 import { loadEligibleMembers } from "@/lib/support-sales/members";
 import {
   buildDashboard,
@@ -10,7 +10,7 @@ import {
   mapSalesWithRelations,
   SUPPORT_SALE_SELECT,
 } from "@/lib/support-sales/service";
-import type { SupportSaleRow } from "@/lib/support-sales/types";
+import { SUPPORT_SALE_SELECT_CORE, type SupportSaleRow } from "@/lib/support-sales/types";
 
 export const runtime = "nodejs";
 
@@ -25,13 +25,23 @@ export async function GET(
     if (!isUuid(id)) return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
 
     const supabase = await createClient();
-    const { data: saleRow } = await supabase
+    let { data: saleRow, error: saleError } = await supabase
       .from("support_sales")
       .select(SUPPORT_SALE_SELECT)
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .is("deleted_at", null)
       .maybeSingle();
+    if (saleError && isMissingSaleColumn(saleError)) {
+      const fallback = await supabase
+        .from("support_sales")
+        .select(SUPPORT_SALE_SELECT_CORE)
+        .eq("id", id)
+        .eq("club_id", guard.clubId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      saleRow = fallback.data as typeof saleRow;
+    }
     if (!saleRow) return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
 
     const [{ data: reservationRows }, relations] = await Promise.all([
@@ -46,7 +56,7 @@ export async function GET(
       loadSaleRelations(supabase, guard.clubId, [id]),
     ]);
 
-    const sale = mapSalesWithRelations([saleRow as SupportSaleRow], relations)[0];
+    const sale = mapSalesWithRelations([normalizeSaleRow(saleRow as SupportSaleRow)], relations)[0];
     const reservations = (reservationRows || []).map(mapReservation);
     const eligible = await loadEligibleMembers({
       clubId: guard.clubId,

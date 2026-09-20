@@ -2,31 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import PublicClubMark from "@/components/public/PublicClubMark";
 import PublicPageCanvas from "@/components/public-branding/PublicPageCanvas";
+import PublicBrandingHero from "@/components/public-branding/PublicBrandingHero";
 import { cn } from "@/components/ui";
 import { ctaColors, resolvePublicLayout } from "@/lib/public-branding/theme";
-import type { PublicVisualTheme } from "@/lib/public-branding/types";
 import { useI18n } from "@/components/I18nProvider";
 import { formatCategoryLabel } from "@/lib/members/taxonomy";
 import { formatChf, lineTotalCents } from "@/lib/shop/money";
 import type { PublicReservationResult, PublicSupportSale } from "@/lib/support-sales/types";
-
-function themeFromSale(sale: PublicSupportSale): PublicVisualTheme {
-  return {
-    label: "Vente de soutien",
-    title: sale.name,
-    subtitle: sale.productName,
-    introText: sale.description,
-    primaryColor: sale.primaryColor,
-    secondaryColor: sale.secondaryColor,
-    accentColor: sale.primaryColor,
-    pageStyle: "colors",
-    imagePosition: "center",
-    overlayIntensity: "normal",
-    bannerUrl: null,
-  };
-}
 
 export default function PublicSupportSaleClient({ slug }: { slug: string }) {
   const { t } = useI18n();
@@ -85,10 +68,23 @@ export default function PublicSupportSaleClient({ slug }: { slug: string }) {
     );
   }
 
-  const theme = themeFromSale(sale);
+  const theme = sale.theme || {
+    label: "Vente de soutien",
+    title: sale.name,
+    subtitle: sale.productName,
+    introText: sale.description,
+    primaryColor: sale.primaryColor,
+    secondaryColor: sale.secondaryColor,
+    accentColor: sale.primaryColor,
+    pageStyle: "colors" as const,
+    imagePosition: "center" as const,
+    overlayIntensity: "normal" as const,
+    bannerUrl: null,
+  };
   const layout = resolvePublicLayout(theme);
-  const cta = ctaColors(sale.primaryColor, sale.secondaryColor);
+  const cta = ctaColors(theme.primaryColor, theme.secondaryColor);
   const totalCents = lineTotalCents(sale.priceCents, quantity);
+  const hasSponsor = Boolean(sale.sponsorName || sale.sponsorText || sale.sponsorLogoUrl);
 
   const submit = async () => {
     setFormError(null);
@@ -123,26 +119,9 @@ export default function PublicSupportSaleClient({ slug }: { slug: string }) {
 
   return (
     <PublicPageCanvas theme={theme}>
-      <header className="border-b border-[rgba(15,23,42,0.06)] bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
-          <PublicClubMark
-            logoUrl={sale.logoUrl}
-            clubName={sale.clubName}
-            accentColor={sale.primaryColor}
-            size="sm"
-            onDark={false}
-            className="mx-0"
-          />
-          <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-[#0F172A]">{sale.clubName}</p>
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#94A3B8]">
-              Vente de soutien
-            </p>
-          </div>
-        </div>
-      </header>
+      <PublicBrandingHero clubName={sale.clubName} logoUrl={sale.logoUrl} theme={theme} />
 
-      <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+      <main className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:-mt-8 sm:pb-20">
         <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
           <div className={cn("overflow-hidden rounded-[1.5rem]", layout.surfaceClass)}>
             {sale.imageUrl ? (
@@ -158,7 +137,7 @@ export default function PublicSupportSaleClient({ slug }: { slug: string }) {
           <div className={cn("rounded-[1.5rem] p-5 sm:p-6", layout.surfaceClass)}>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{sale.name}</h1>
             <p className="mt-1 text-sm text-[#64748B]">{sale.productName}</p>
-            <p className="mt-3 text-2xl font-semibold" style={{ color: sale.primaryColor }}>
+            <p className="mt-3 text-2xl font-semibold" style={{ color: theme.primaryColor }}>
               {formatChf(sale.priceCents)}
             </p>
             {sale.reservationDeadline ? (
@@ -171,18 +150,6 @@ export default function PublicSupportSaleClient({ slug }: { slug: string }) {
               <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[#64748B]">
                 {sale.description}
               </p>
-            ) : null}
-
-            {sale.sponsorName || sale.sponsorText || sale.sponsorLogoUrl ? (
-              <div className="mt-5 flex items-center gap-3 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] px-4 py-3">
-                {sale.sponsorLogoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={sale.sponsorLogoUrl} alt="" className="h-10 w-10 rounded-xl object-contain" />
-                ) : null}
-                <p className="text-sm text-[#475569]">
-                  {sale.sponsorText || `Cette vente est soutenue par ${sale.sponsorName}`}
-                </p>
-              </div>
             ) : null}
 
             {sale.acceptsReservations ? (
@@ -283,6 +250,67 @@ export default function PublicSupportSaleClient({ slug }: { slug: string }) {
             )}
           </div>
         </div>
+
+        {hasSponsor ? (
+          <section className={cn("mt-10 overflow-hidden rounded-[1.75rem] sm:mt-12", layout.surfaceClass)}>
+            <div className="px-5 pt-6 sm:px-8 sm:pt-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#94A3B8]">
+                Cette vente est soutenue par
+              </p>
+              {sale.sponsorName ? (
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
+                  {sale.sponsorName}
+                </h2>
+              ) : null}
+            </div>
+            {sale.sponsorLogoUrl ? (
+              sale.sponsorUrl ? (
+                <a
+                  href={sale.sponsorUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 block px-5 sm:px-8"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={sale.sponsorLogoUrl}
+                    alt={sale.sponsorName || "Sponsor"}
+                    className="mx-auto max-h-56 w-full rounded-2xl object-contain sm:max-h-72"
+                  />
+                </a>
+              ) : (
+                <div className="mt-5 px-5 sm:px-8">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={sale.sponsorLogoUrl}
+                    alt={sale.sponsorName || "Sponsor"}
+                    className="mx-auto max-h-56 w-full rounded-2xl object-contain sm:max-h-72"
+                  />
+                </div>
+              )
+            ) : null}
+            <div className="px-5 py-6 sm:px-8 sm:py-8">
+              {sale.sponsorText ? (
+                <p className="text-base leading-relaxed text-[#475569] sm:text-lg">{sale.sponsorText}</p>
+              ) : sale.sponsorName ? (
+                <p className="text-base leading-relaxed text-[#475569] sm:text-lg">
+                  {sale.sponsorName} accompagne {sale.clubName} dans cette vente de soutien.
+                </p>
+              ) : null}
+              {sale.sponsorUrl ? (
+                <a
+                  href={sale.sponsorUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex text-sm font-semibold"
+                  style={{ color: theme.primaryColor }}
+                >
+                  Découvrir le sponsor
+                </a>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
       </main>
     </PublicPageCanvas>
   );

@@ -2005,7 +2005,8 @@
       },
       "types": {
         "membership": "Mitgliedsbeitrag",
-        "invoice": "Rechnung"
+        "invoice": "Rechnung",
+        "supportSale": "Unterstützungsverkauf"
       },
       "status": {
         "paid": "Bezahlt",

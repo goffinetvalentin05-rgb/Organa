@@ -1986,7 +1986,8 @@
       },
       "types": {
         "membership": "Cotisation",
-        "invoice": "Facture"
+        "invoice": "Facture",
+        "supportSale": "Vente de soutien"
       },
       "status": {
         "paid": "Payé",

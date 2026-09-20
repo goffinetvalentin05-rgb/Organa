@@ -46,8 +46,22 @@ export type ParsedSupportSaleInput = {
   memberIds: string[];
   sponsorName: string | null;
   sponsorText: string | null;
+  sponsorUrl: string | null;
   status?: SupportSaleStatus;
 };
+
+export function parseOptionalHttpUrl(value: unknown): string | null {
+  const raw = trimOrNull(value, 400);
+  if (!raw) return null;
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const url = new URL(withProtocol);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    return url.href.slice(0, 400);
+  } catch {
+    return null;
+  }
+}
 
 export function parseSupportSaleInput(
   body: unknown
@@ -98,6 +112,12 @@ export function parseSupportSaleInput(
     status = input.status as SupportSaleStatus;
   }
 
+  const sponsorUrlRaw = typeof input.sponsorUrl === "string" ? input.sponsorUrl.trim() : "";
+  const sponsorUrl = parseOptionalHttpUrl(input.sponsorUrl);
+  if (sponsorUrlRaw && !sponsorUrl) {
+    return { error: "Le lien du sponsor n’est pas valide." };
+  }
+
   return {
     data: {
       name,
@@ -114,6 +134,7 @@ export function parseSupportSaleInput(
       memberIds: memberScope === "members" ? memberIds : [],
       sponsorName: trimOrNull(input.sponsorName, 120),
       sponsorText: trimOrNull(input.sponsorText, 400),
+      sponsorUrl,
       status,
     },
   };

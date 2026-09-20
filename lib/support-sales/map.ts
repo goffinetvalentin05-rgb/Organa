@@ -9,6 +9,32 @@ import type {
   SupportSaleSummaryStats,
 } from "./types";
 
+export function normalizeSaleRow(row: SupportSaleRow | Record<string, unknown>): SupportSaleRow {
+  const value = row as SupportSaleRow;
+  return {
+    ...value,
+    sponsor_url: value.sponsor_url ?? null,
+    public_label: value.public_label ?? null,
+    public_title: value.public_title ?? null,
+    public_subtitle: value.public_subtitle ?? null,
+    public_primary_color: value.public_primary_color ?? null,
+    public_secondary_color: value.public_secondary_color ?? null,
+    public_page_style: value.public_page_style ?? null,
+    public_banner_url: value.public_banner_url ?? null,
+    public_banner_path: value.public_banner_path ?? null,
+    public_image_position: value.public_image_position ?? null,
+    public_overlay_intensity: value.public_overlay_intensity ?? null,
+    club_revenue_id: value.club_revenue_id ?? null,
+  };
+}
+
+export function isMissingSaleColumn(error: { message?: string } | null | undefined): boolean {
+  return Boolean(
+    error?.message &&
+      /sponsor_url|public_label|public_title|public_banner|club_revenue_id/.test(error.message)
+  );
+}
+
 export function emptyStats(): SupportSaleSummaryStats {
   return {
     reservationsCount: 0,
@@ -47,6 +73,7 @@ export function mapSale(
     sponsorName: row.sponsor_name,
     sponsorLogoUrl: row.sponsor_logo_url,
     sponsorText: row.sponsor_text,
+    sponsorUrl: row.sponsor_url ?? null,
     collectionMode: row.collection_mode === "online" ? "online" : "reservation",
     status: row.status as SupportSaleStatus,
     publicPath: getSupportSalePublicPath(row.slug),

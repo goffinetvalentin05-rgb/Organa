@@ -2135,7 +2135,8 @@
       },
       "types": {
         "membership": "Membership",
-        "invoice": "Invoice"
+        "invoice": "Invoice",
+        "supportSale": "Support sale"
       },
       "status": {
         "paid": "Paid",

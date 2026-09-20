@@ -10,8 +10,10 @@ export type SupportSaleCollectionMode = (typeof SUPPORT_SALE_COLLECTION_MODES)[n
 export const SUPPORT_SALE_RESERVATION_STATUSES = ["confirmed", "cancelled"] as const;
 export type SupportSaleReservationStatus = (typeof SUPPORT_SALE_RESERVATION_STATUSES)[number];
 
-export const SUPPORT_SALE_SELECT =
+export const SUPPORT_SALE_SELECT_CORE =
   "id, club_id, name, product_name, slug, description, image_path, image_url, price_cents, currency, available_quantity, start_date, reservation_deadline, distribution_info, member_scope, goal_per_member, sponsor_name, sponsor_logo_path, sponsor_logo_url, sponsor_text, collection_mode, status, created_at, updated_at";
+
+export const SUPPORT_SALE_SELECT = `${SUPPORT_SALE_SELECT_CORE}, sponsor_url, public_label, public_title, public_subtitle, public_primary_color, public_secondary_color, public_page_style, public_banner_url, public_banner_path, public_image_position, public_overlay_intensity, club_revenue_id`;
 
 export type SupportSaleRow = {
   id: string;
@@ -34,8 +36,20 @@ export type SupportSaleRow = {
   sponsor_logo_path: string | null;
   sponsor_logo_url: string | null;
   sponsor_text: string | null;
+  sponsor_url: string | null;
   collection_mode: SupportSaleCollectionMode;
   status: SupportSaleStatus;
+  public_label: string | null;
+  public_title: string | null;
+  public_subtitle: string | null;
+  public_primary_color: string | null;
+  public_secondary_color: string | null;
+  public_page_style: string | null;
+  public_banner_url: string | null;
+  public_banner_path: string | null;
+  public_image_position: string | null;
+  public_overlay_intensity: string | null;
+  club_revenue_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -68,6 +82,7 @@ export type SupportSale = {
   sponsorName: string | null;
   sponsorLogoUrl: string | null;
   sponsorText: string | null;
+  sponsorUrl: string | null;
   collectionMode: SupportSaleCollectionMode;
   status: SupportSaleStatus;
   publicPath: string;
@@ -127,6 +142,7 @@ export type PublicSupportSale = {
   sponsorName: string | null;
   sponsorLogoUrl: string | null;
   sponsorText: string | null;
+  sponsorUrl: string | null;
   status: SupportSaleStatus;
   acceptsReservations: boolean;
   remainingQuantity: number | null;
@@ -134,6 +150,7 @@ export type PublicSupportSale = {
   logoUrl: string | null;
   primaryColor: string;
   secondaryColor: string;
+  theme: import("@/lib/public-branding/types").PublicVisualTheme;
   members: SupportSaleMemberOption[];
 };
 

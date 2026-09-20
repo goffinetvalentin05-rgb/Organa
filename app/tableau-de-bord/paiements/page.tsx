@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
 import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
-import { CreditCard, FileText, Receipt, CheckCircle } from "@/lib/icons";
+import { CreditCard, FileText, Gift, Receipt, CheckCircle } from "@/lib/icons";
 import { PageLayout, PageHeader, EmptyState, DataCard, EntityCard, EntityCardList, EntityMetaRow } from "@/components/ui";
 
 interface DocumentClient {
@@ -28,7 +28,7 @@ interface PaymentItem {
   id: string;
   date: string;
   member: string;
-  type: "membership" | "invoice";
+  type: "membership" | "invoice" | "support_sale";
   documentNumber: string;
   amount: number;
   documentId: string;
@@ -69,6 +69,26 @@ export default function PaiementsPage() {
           documentId: doc.id,
           documentType: doc.type === "quote" ? "devis" : "factures",
         }));
+
+        const revenuesRes = await fetch("/api/club-revenues", { cache: "no-store" });
+        if (revenuesRes.ok) {
+          const revenuesData = await revenuesRes.json();
+          const supportRevenues = (revenuesData.revenues || []).filter(
+            (row: { source_type?: string | null }) => row.source_type === "support_sale"
+          );
+          for (const row of supportRevenues) {
+            paymentsList.push({
+              id: row.id,
+              date: row.revenue_date,
+              member: row.name,
+              type: "support_sale",
+              documentNumber: row.description || "Vente de soutien",
+              amount: Number(row.amount) || 0,
+              documentId: row.source_id || row.id,
+              documentType: row.source_id ? `ventes-soutien` : "produits",
+            });
+          }
+        }
 
         // Trier par date décroissante
         paymentsList.sort((a, b) => b.date.localeCompare(a.date));
@@ -161,11 +181,17 @@ export default function PaiementsPage() {
               leading={
                 <div
                   className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-                    payment.type === "membership" ? "bg-blue-100" : "bg-purple-100"
+                    payment.type === "membership"
+                      ? "bg-blue-100"
+                      : payment.type === "support_sale"
+                        ? "bg-emerald-100"
+                        : "bg-purple-100"
                   }`}
                 >
                   {payment.type === "membership" ? (
                     <FileText className="h-5 w-5 text-blue-600" />
+                  ) : payment.type === "support_sale" ? (
+                    <Gift className="h-5 w-5 text-emerald-600" />
                   ) : (
                     <Receipt className="h-5 w-5 text-purple-600" />
                   )}
@@ -176,7 +202,9 @@ export default function PaiementsPage() {
                 <>
                   {payment.type === "membership"
                     ? t("dashboard.payments.types.membership")
-                    : t("dashboard.payments.types.invoice")}{" "}
+                    : payment.type === "support_sale"
+                      ? t("dashboard.payments.types.supportSale")
+                      : t("dashboard.payments.types.invoice")}{" "}
                   • {payment.documentNumber}
                 </>
               }

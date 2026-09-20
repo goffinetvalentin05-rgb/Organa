@@ -38,10 +38,19 @@ export async function GET() {
 
     const supabase = await createClient();
 
-    const { data: rows, error } = await supabase
-      .from("club_revenues")
-      .select(
-        `
+    const selectWithSource = `
+        id,
+        name,
+        amount,
+        revenue_date,
+        description,
+        event_id,
+        source_type,
+        source_id,
+        created_at,
+        updated_at
+      `;
+    const selectLegacy = `
         id,
         name,
         amount,
@@ -50,10 +59,25 @@ export async function GET() {
         event_id,
         created_at,
         updated_at
-      `
-      )
+      `;
+
+    let rows: ClubRevenueDbRow[] | null = null;
+    let { data, error } = await supabase
+      .from("club_revenues")
+      .select(selectWithSource)
       .eq("user_id", guard.clubId)
       .order("revenue_date", { ascending: false });
+    rows = (data || null) as ClubRevenueDbRow[] | null;
+
+    if (error && /source_type|source_id/.test(error.message || "")) {
+      const fallback = await supabase
+        .from("club_revenues")
+        .select(selectLegacy)
+        .eq("user_id", guard.clubId)
+        .order("revenue_date", { ascending: false });
+      rows = (fallback.data || null) as ClubRevenueDbRow[] | null;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error("[API][club-revenues][GET]", error.message, error.code, error.details);
