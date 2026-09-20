@@ -284,6 +284,18 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
       ) : null}
 
       {tab === "distribution" ? (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <ActionButton
+              variant="surface"
+              onClick={() => {
+                window.location.href = `/api/pdf/vente-soutien/distribution/download?id=${sale.id}`;
+              }}
+            >
+              <Download className="h-4 w-4" />
+              Exporter la feuille de distribution
+            </ActionButton>
+          </div>
         <div className="grid gap-4 md:grid-cols-2">
           {members
             .filter((row) => row.quantitySold > 0)
@@ -315,6 +327,7 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
               description="Les réservations apparaîtront ici avec la quantité à remettre à chaque membre."
             />
           ) : null}
+        </div>
         </div>
       ) : null}
 

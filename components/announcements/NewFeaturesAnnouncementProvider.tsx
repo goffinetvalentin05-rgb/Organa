@@ -51,6 +51,7 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
   const { t } = useI18n();
   const pathname = usePathname();
   const [seenByKey, setSeenByKey] = useState<Record<string, boolean>>(defaultSeenMap);
+  const [saleNotifications, setSaleNotifications] = useState<DashboardNotification[]>([]);
   const [checked, setChecked] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
@@ -75,7 +76,7 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
 
   const markKeysSeen = useCallback(
     (keys: string[]) => {
-      const unique = keys.filter((key) => seenRef.current[key] === false);
+      const unique = keys.filter((key) => seenRef.current[key] !== true);
       if (unique.length === 0) return;
       const next = { ...seenRef.current };
       for (const key of unique) next[key] = true;
@@ -118,7 +119,21 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
       }
     };
 
+    const loadSaleNotifications = async () => {
+      try {
+        const res = await fetch("/api/support-sales/launch-notifications", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data.notifications)) {
+          setSaleNotifications(data.notifications);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+
     void check();
+    void loadSaleNotifications();
     return () => {
       cancelled = true;
     };
@@ -158,13 +173,18 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
   const handleNotificationClick = useCallback(
     (id: string) => {
       markKeysSeen([id]);
+      setSaleNotifications((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, read: true } : item))
+      );
     },
     [markKeysSeen]
   );
 
   const markAllRead = useCallback(() => {
-    markKeysSeen(BELL_NOTIFICATION_DEFS.map((def) => def.id));
-  }, [markKeysSeen]);
+    const saleIds = saleNotifications.map((item) => item.id);
+    markKeysSeen([...BELL_NOTIFICATION_DEFS.map((def) => def.id), ...saleIds]);
+    setSaleNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+  }, [markKeysSeen, saleNotifications]);
 
   const requestOpenPanel = useCallback(() => {
     setToastOpen(false);
@@ -176,8 +196,9 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
   }, []);
 
   const notifications = useMemo(
-    (): DashboardNotification[] =>
-      BELL_NOTIFICATION_DEFS.map((def) => ({
+    (): DashboardNotification[] => [
+      ...saleNotifications,
+      ...BELL_NOTIFICATION_DEFS.map((def) => ({
         id: def.id,
         title: t(def.titleKey),
         message: t(def.messageKey),
@@ -187,7 +208,8 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
         icon: def.icon,
         read: seenByKey[def.id] !== false,
       })),
-    [seenByKey, t]
+    ],
+    [saleNotifications, seenByKey, t]
   );
 
   const value = useMemo(

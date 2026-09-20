@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { createClient } from "@/lib/supabase/server";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
-import { SupportSaleRecapPdf } from "@/lib/pdf/SupportSaleRecapPdf";
-import { centsToChf } from "@/lib/shop/money";
+import { SupportSaleDistributionPdf } from "@/lib/pdf/SupportSaleDistributionPdf";
+import { groupMembersForDistribution } from "@/lib/support-sales/distribution";
 import { isUuid } from "@/lib/support-sales/input";
-import { formatSalePdfDate, loadSupportSalePdfContext } from "@/lib/support-sales/pdf-data";
+import { loadSupportSalePdfContext } from "@/lib/support-sales/pdf-data";
 import { getClubCompanyPdfData } from "@/lib/utils/pdf-data";
 
 export const runtime = "nodejs";
@@ -27,32 +27,17 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
     }
 
-    const { sale } = context;
-    if (sale.status !== "ended") {
-      return NextResponse.json(
-        { error: "Le récapitulatif PDF est disponible une fois la vente terminée." },
-        { status: 400 }
-      );
-    }
-
+    const { sale, dashboard } = context;
+    const groups = groupMembersForDistribution(dashboard.members);
+    const totalQuantity = groups.reduce((sum, group) => sum + group.totalQuantity, 0);
     const { company, primaryColor } = await getClubCompanyPdfData(supabase, guard.clubId);
+
     const pdfBuffer = await renderToBuffer(
-      <SupportSaleRecapPdf
+      <SupportSaleDistributionPdf
         company={{ name: company.name || "Club", logoUrl: company.logoUrl }}
-        sale={{
-          name: sale.name,
-          productName: sale.productName,
-          startDateLabel: formatSalePdfDate(sale.startDate),
-          endDateLabel: formatSalePdfDate(sale.reservationDeadline),
-          unitPriceChf: centsToChf(sale.priceCents),
-          sponsorName: sale.sponsorName,
-        }}
-        summary={{
-          reservationsCount: sale.stats.reservationsCount,
-          quantitySold: sale.stats.quantitySold,
-          membersSoldCount: sale.stats.membersSoldCount,
-          amountChf: centsToChf(sale.stats.revenueCents),
-        }}
+        sale={{ name: sale.name, productName: sale.productName }}
+        totalQuantity={totalQuantity}
+        groups={groups}
         primaryColor={primaryColor}
       />
     );
@@ -61,7 +46,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="recapitulatif-${sale.slug}.pdf"`,
+        "Content-Disposition": `attachment; filename="distribution-${sale.slug}.pdf"`,
       },
     });
   } catch (error: unknown) {

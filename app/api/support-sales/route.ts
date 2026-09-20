@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
       sponsor_url: parsed.data.sponsorUrl,
       collection_mode: "reservation",
       status: parsed.data.status === "active" ? "active" : "draft",
+      published_at: parsed.data.status === "active" ? new Date().toISOString() : null,
       created_by: guard.userId,
       updated_by: guard.userId,
     };
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
       .select(SUPPORT_SALE_SELECT)
       .single();
     if (error && isMissingSaleColumn(error)) {
-      const { sponsor_url: _sponsorUrl, ...corePayload } = payload;
+      const { sponsor_url: _sponsorUrl, published_at: _publishedAt, ...corePayload } = payload;
       const fallback = await supabase
         .from("support_sales")
         .insert(corePayload)

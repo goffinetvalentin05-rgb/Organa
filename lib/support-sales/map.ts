@@ -25,13 +25,14 @@ export function normalizeSaleRow(row: SupportSaleRow | Record<string, unknown>):
     public_image_position: value.public_image_position ?? null,
     public_overlay_intensity: value.public_overlay_intensity ?? null,
     club_revenue_id: value.club_revenue_id ?? null,
+    published_at: value.published_at ?? null,
   };
 }
 
 export function isMissingSaleColumn(error: { message?: string } | null | undefined): boolean {
   return Boolean(
     error?.message &&
-      /sponsor_url|public_label|public_title|public_banner|club_revenue_id/.test(error.message)
+      /sponsor_url|public_label|public_title|public_banner|club_revenue_id|published_at/.test(error.message)
   );
 }
 
@@ -77,6 +78,7 @@ export function mapSale(
     collectionMode: row.collection_mode === "online" ? "online" : "reservation",
     status: row.status as SupportSaleStatus,
     publicPath: getSupportSalePublicPath(row.slug),
+    publishedAt: row.published_at ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     stats: extras.stats || emptyStats(),

@@ -15,7 +15,8 @@ export type ProductNotificationIcon =
   | "credit-card"
   | "shopping-bag"
   | "sparkles"
-  | "users";
+  | "users"
+  | "gift";
 
 export type ProductNotificationDef = {
   id: string;

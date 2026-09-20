@@ -104,6 +104,9 @@ export async function PUT(
       sponsor_url: parsed.data.sponsorUrl,
       status: nextStatus,
       updated_by: guard.userId,
+      ...(nextStatus === "active" && !sale.published_at
+        ? { published_at: new Date().toISOString() }
+        : {}),
     };
     let { data: updated, error } = await supabase
       .from("support_sales")
@@ -114,7 +117,7 @@ export async function PUT(
       .select(SUPPORT_SALE_SELECT)
       .single();
     if (error && isMissingSaleColumn(error)) {
-      const { sponsor_url: _sponsorUrl, ...corePayload } = payload;
+      const { sponsor_url: _sponsorUrl, published_at: _publishedAt, ...corePayload } = payload;
       const fallback = await supabase
         .from("support_sales")
         .update(corePayload)
@@ -180,14 +183,32 @@ export async function PATCH(
     const { supabase, sale } = await loadOwnedSale(guard.clubId, id);
     if (!sale) return NextResponse.json({ error: "Vente introuvable" }, { status: 404 });
 
-    const { data: updated, error } = await supabase
+    let { data: updated, error } = await supabase
       .from("support_sales")
-      .update({ status, updated_by: guard.userId })
+      .update({
+        status,
+        updated_by: guard.userId,
+        ...(status === "active" && !sale.published_at
+          ? { published_at: new Date().toISOString() }
+          : {}),
+      })
       .eq("id", id)
       .eq("club_id", guard.clubId)
       .is("deleted_at", null)
       .select(SUPPORT_SALE_SELECT)
       .single();
+    if (error && isMissingSaleColumn(error)) {
+      const fallback = await supabase
+        .from("support_sales")
+        .update({ status, updated_by: guard.userId })
+        .eq("id", id)
+        .eq("club_id", guard.clubId)
+        .is("deleted_at", null)
+        .select(SUPPORT_SALE_SELECT_CORE)
+        .single();
+      updated = fallback.data as typeof updated;
+      error = fallback.error;
+    }
 
     if (error || !updated) {
       return NextResponse.json({ error: error?.message || "Mise à jour impossible" }, { status: 500 });
@@ -195,7 +216,7 @@ export async function PATCH(
 
     const relations = await loadSaleRelations(supabase, guard.clubId, [id]);
     return NextResponse.json({
-      sale: mapSalesWithRelations([updated as SupportSaleRow], relations)[0],
+      sale: mapSalesWithRelations([normalizeSaleRow(updated as SupportSaleRow)], relations)[0],
     });
   } catch (error: unknown) {
     return NextResponse.json({ error: err(error) }, { status: 500 });

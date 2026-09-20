@@ -8,7 +8,7 @@ import BodyPortal from "@/components/ui/BodyPortal";
 import { useI18n } from "@/components/I18nProvider";
 import { useDismissibleMenu } from "@/lib/ui/useDismissibleMenu";
 import { placeNotificationPanel } from "@/lib/announcements/panelPosition";
-import { CreditCard, FilePlus, ShoppingBag, Sparkles, Users } from "@/lib/icons";
+import { CreditCard, FilePlus, Gift, ShoppingBag, Sparkles, Users } from "@/lib/icons";
 import type { ProductNotificationIcon } from "@/lib/announcements/constants";
 
 export type DashboardNotification = {
@@ -38,6 +38,7 @@ function NotificationGlyph({ icon }: { icon?: ProductNotificationIcon }) {
   if (icon === "shopping-bag") return <ShoppingBag className={className} />;
   if (icon === "sparkles") return <Sparkles className={className} />;
   if (icon === "users") return <Users className={className} />;
+  if (icon === "gift") return <Gift className={className} />;
   return <FilePlus className={className} />;
 }
 

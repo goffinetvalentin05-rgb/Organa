@@ -13,7 +13,7 @@ export type SupportSaleReservationStatus = (typeof SUPPORT_SALE_RESERVATION_STAT
 export const SUPPORT_SALE_SELECT_CORE =
   "id, club_id, name, product_name, slug, description, image_path, image_url, price_cents, currency, available_quantity, start_date, reservation_deadline, distribution_info, member_scope, goal_per_member, sponsor_name, sponsor_logo_path, sponsor_logo_url, sponsor_text, collection_mode, status, created_at, updated_at";
 
-export const SUPPORT_SALE_SELECT = `${SUPPORT_SALE_SELECT_CORE}, sponsor_url, public_label, public_title, public_subtitle, public_primary_color, public_secondary_color, public_page_style, public_banner_url, public_banner_path, public_image_position, public_overlay_intensity, club_revenue_id`;
+export const SUPPORT_SALE_SELECT = `${SUPPORT_SALE_SELECT_CORE}, sponsor_url, public_label, public_title, public_subtitle, public_primary_color, public_secondary_color, public_page_style, public_banner_url, public_banner_path, public_image_position, public_overlay_intensity, club_revenue_id, published_at`;
 
 export type SupportSaleRow = {
   id: string;
@@ -50,6 +50,7 @@ export type SupportSaleRow = {
   public_image_position: string | null;
   public_overlay_intensity: string | null;
   club_revenue_id: string | null;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -86,6 +87,7 @@ export type SupportSale = {
   collectionMode: SupportSaleCollectionMode;
   status: SupportSaleStatus;
   publicPath: string;
+  publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
   stats: SupportSaleSummaryStats;
