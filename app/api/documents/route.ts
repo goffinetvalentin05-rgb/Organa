@@ -23,7 +23,10 @@ import {
 } from "@/lib/documents/recipient";
 import { withIdempotency } from "@/lib/api/idempotency";
 import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
-import { createDocumentRecord } from "@/lib/obillz-tools/finance/createDocumentRecord";
+import {
+  createMembershipPaymentToken,
+  resolveQuotePaymentMethodForInsert,
+} from "@/lib/quotes/membership-settings";
 
 // Forcer le runtime Node.js (pas Edge)
 export const runtime = "nodejs";
@@ -253,6 +256,88 @@ export async function POST(request: NextRequest) {
       idempotencyKey,
       resourceType: idempotencyResourceType,
       operation: async () => {
+        if (!type || (type !== "invoice" && type !== "quote")) {
+          return {
+            status: 400,
+            body: { error: "Paramètre 'type' requis et doit être 'invoice' ou 'quote'" },
+            resourceId: null,
+          };
+        }
+        if (type === "quote" && !clientId) {
+          return { status: 400, body: { error: "clientId requis" }, resourceId: null };
+        }
+        if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
+          return {
+            status: 400,
+            body: { error: "Au moins une ligne est requise" },
+            resourceId: null,
+          };
+        }
+
+        let resolvedRecipientType: RecipientType = "member";
+        if (type === "invoice") {
+          const recipientCheck = validateInvoiceRecipientInput({
+            recipientType: recipientType || (clientId ? "member" : undefined),
+            clientId: clientId ?? undefined,
+            sponsorContractId: sponsorContractId ?? undefined,
+            recipientData,
+          });
+          if (!recipientCheck.ok) {
+            return { status: 400, body: { error: recipientCheck.error }, resourceId: null };
+          }
+          resolvedRecipientType = recipientCheck.type;
+        }
+
+        let resolvedClientId: string | null = null;
+        let resolvedSponsorId: string | null = null;
+        let resolvedRecipientData: ExternalRecipientData | null = null;
+
+        if (type === "quote" || resolvedRecipientType === "member") {
+          const memberId = clientId as string;
+          const { data: client, error: clientError } = await admin
+            .from("clients")
+            .select("id")
+            .eq("id", memberId)
+            .eq("user_id", guard.clubId)
+            .is("deleted_at", null)
+            .single();
+
+          if (clientError || !client) {
+            return {
+              status: 404,
+              body: { error: "Client introuvable ou non autorisé" },
+              resourceId: null,
+            };
+          }
+          resolvedClientId = memberId;
+        } else if (resolvedRecipientType === "sponsor") {
+          const sponsorId = sponsorContractId as string;
+          const { data: sponsor, error: sponsorError } = await supabase
+            .from("sponsor_contracts")
+            .select("id")
+            .eq("id", sponsorId)
+            .eq("club_id", guard.clubId)
+            .single();
+
+          if (sponsorError || !sponsor) {
+            return {
+              status: 404,
+              body: { error: "Contrat sponsor introuvable ou non autorisé" },
+              resourceId: null,
+            };
+          }
+          resolvedSponsorId = sponsorId;
+        } else {
+          resolvedRecipientData = parseExternalRecipientData(recipientData);
+          if (!resolvedRecipientData) {
+            return {
+              status: 400,
+              body: { error: "Informations du destinataire externe invalides" },
+              resourceId: null,
+            };
+          }
+        }
+
         // Calculer les totaux
         const totalHT = calculerTotalHT(lignes);
         const totalTVA = calculerTVA(lignes);
@@ -370,14 +455,15 @@ export async function POST(request: NextRequest) {
           })
         : { client_id: resolvedClientId };
 
+    const recipientFields = recipientDbFields as Record<string, unknown>;
     console.log("[API][documents][POST][recipient-resolved]", {
       step: "before-insert",
       documentType: type,
       recipientType: type === "invoice" ? resolvedRecipientType : "member",
-      clientId: recipientDbFields.client_id ?? null,
-      sponsorContractId: recipientDbFields.sponsor_contract_id ?? null,
+      clientId: recipientFields.client_id ?? null,
+      sponsorContractId: recipientFields.sponsor_contract_id ?? null,
       externalName:
-        (recipientDbFields.external_recipient_name as string | null | undefined) ??
+        (recipientFields.external_recipient_name as string | null | undefined) ??
         null,
     });
 

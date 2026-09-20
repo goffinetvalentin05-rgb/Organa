@@ -45,7 +45,7 @@ function upsertPath(args: {
     args.existing.clubId === args.clubId &&
     args.existing.key === args.key;
 
-  if (!conflict) {
+  if (!conflict || !args.existing) {
     return canInsertSeen(args.actorId, args.rowUserId) ? "insert" : "deny";
   }
   return canUpdateSeen(args.actorId, args.existing.userId) ? "update" : "deny";

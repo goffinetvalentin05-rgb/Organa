@@ -220,7 +220,8 @@ describe("anti double-traitement (appelant)", () => {
     expect(second).toBeNull();
     expect(createCalls).toBe(1);
 
-    resolveCreate?.({ documentId: "doc-1" });
+    const complete = resolveCreate as ((value: { documentId: string }) => void) | null;
+    complete?.({ documentId: "doc-1" });
     const first = await firstPromise;
     expect(first?.document.documentId).toBe("doc-1");
   });

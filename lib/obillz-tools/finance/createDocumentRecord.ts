@@ -165,8 +165,8 @@ export async function createDocumentRecord(params: {
   if (type === "invoice") {
     const recipientCheck = validateInvoiceRecipientInput({
       recipientType: recipientType || (clientId ? "member" : undefined),
-      clientId,
-      sponsorContractId,
+      clientId: clientId ?? undefined,
+      sponsorContractId: sponsorContractId ?? undefined,
       recipientData,
     });
     if (!recipientCheck.ok) {
