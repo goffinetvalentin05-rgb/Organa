@@ -87,7 +87,7 @@ export default function FactureDetailPage() {
     isSubmitting: envoiEmail,
     showOverlay: showEmailOverlay,
     run: runEmailSend,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
 
@@ -379,7 +379,7 @@ export default function FactureDetailPage() {
 
   return (
     <>
-      <SubmittingOverlay visible={showEmailOverlay} message="Envoi en cours…" />
+      <SubmittingOverlay visible={showEmailOverlay} title="Envoi de la facture…" />
       <PageLayout maxWidth="7xl">
       <DetailPageHeader
         backHref="/tableau-de-bord/factures"

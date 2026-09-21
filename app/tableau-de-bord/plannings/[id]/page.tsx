@@ -37,6 +37,8 @@ import {
   sectionListRowClass,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { usePermissions } from "@/lib/auth/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions-shared";
 import { isValidIsoDateOnly } from "@/lib/planning/isoCalendarDate";
@@ -147,7 +149,11 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
     notes: "",
   });
   const [savingSlot, setSavingSlot] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const {
+    isSubmitting: downloading,
+    showOverlay: showPdfOverlay,
+    run: runPdfDownload,
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [publicLink, setPublicLink] = useState<PublicPlanningLink | null>(null);
   const [sharing, setSharing] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -611,31 +617,32 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
   }, [members, linkTargetSlot, linkSearchTerm]);
 
   const handleDownloadPdf = async () => {
-    setDownloading(true);
-    try {
-      const response = await fetch(`/api/pdf/planning/download?id=${id}`);
-      
-      if (!response.ok) {
-        throw new Error("Erreur lors de la génération du PDF");
-      }
+    await runPdfDownload(async () => {
+      try {
+        const response = await fetch(`/api/pdf/planning/download?id=${id}`);
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `planning-${planning?.name || id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success("PDF téléchargé !");
-    } catch (error: any) {
-      console.error("[PlanningDetail] Erreur téléchargement PDF:", error);
-      toast.error(error.message || "Erreur lors du téléchargement");
-    } finally {
-      setDownloading(false);
-    }
+        if (!response.ok) {
+          throw new Error("Erreur lors de la génération du PDF");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `planning-${planning?.name || id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast.success("PDF téléchargé !");
+      } catch (error: unknown) {
+        console.error("[PlanningDetail] Erreur téléchargement PDF:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Erreur lors du téléchargement"
+        );
+      }
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -688,6 +695,7 @@ export default function PlanningDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <PageLayout maxWidth="7xl">
+      <SubmittingOverlay visible={showPdfOverlay} title="Génération du PDF…" />
       <DetailPageHeader
         backHref="/tableau-de-bord/plannings"
         backLabel="Retour aux plannings"

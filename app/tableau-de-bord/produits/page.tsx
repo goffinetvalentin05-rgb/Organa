@@ -46,7 +46,7 @@ function ProduitsPageInner() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ClubRevenue | null>(null);
-  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -222,7 +222,7 @@ function ProduitsPageInner() {
 
   return (
     <>
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création du revenu…" />
       <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.productRevenues.title")}

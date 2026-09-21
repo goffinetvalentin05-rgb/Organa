@@ -88,12 +88,12 @@ export default function MarketingCampaignsPage() {
     isSubmitting: sending,
     showOverlay: showCampaignOverlay,
     run: runCampaignSend,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const {
     isSubmitting: savingContact,
     showOverlay: showContactOverlay,
     run: runContactSave,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
   const [contentHtml, setContentHtml] = useState("<p>Bonjour,</p><p>Votre message ici.</p>");
@@ -422,7 +422,7 @@ export default function MarketingCampaignsPage() {
     <>
       <SubmittingOverlay
         visible={showCampaignOverlay || showContactOverlay}
-        message={showCampaignOverlay ? "Envoi de la campagne…" : "Enregistrement…"}
+        title={showCampaignOverlay ? "Envoi de la campagne…" : "Enregistrement…"}
       />
       <PageLayout maxWidth="7xl">
       <PageHeader

@@ -1,56 +1,98 @@
 "use client";
 
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { cn } from "@/components/ui/cn";
 
-export default function SubmittingOverlay({
+function ObillzMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      aria-hidden
+      className={className}
+      fill="none"
+    >
+      <rect width="32" height="32" rx="9" className="fill-[#EEF2FF]" />
+      <circle
+        cx="16"
+        cy="16"
+        r="7.25"
+        className="stroke-[#1A23FF]"
+        strokeWidth="2.25"
+      />
+    </svg>
+  );
+}
+
+export type ProcessingOverlayProps = {
+  visible?: boolean;
+  open?: boolean;
+  title?: string;
+  /** Alias de `title` — conservé pour les usages existants. */
+  message?: string;
+  description?: string;
+};
+
+export function ProcessingOverlay({
   visible,
+  open,
+  title,
   message,
-}: {
-  visible: boolean;
-  message: string;
-}) {
+  description,
+}: ProcessingOverlayProps) {
+  const shown = open ?? visible ?? false;
+  const label = (title || message || "").trim();
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!shown) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [shown]);
+
   return (
     <AnimatePresence>
-      {visible ? (
+      {shown ? (
         <motion.div
-          key="submitting-overlay"
-          initial={{ opacity: 0 }}
+          key="processing-overlay"
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, pointerEvents: "none" }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-[4px]"
-          style={{ pointerEvents: "auto" }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0.08 : 0.18 }}
+          className="fixed inset-0 z-[9999] flex cursor-wait items-center justify-center bg-[#0F172A]/25 p-4 backdrop-blur-[6px]"
           role="status"
           aria-live="polite"
+          aria-busy="true"
+          aria-label={label || "Traitement en cours"}
         >
           <motion.div
-            initial={{ scale: 0.98, opacity: 0.9, y: 6 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.98, opacity: 0.9, y: 6 }}
-            transition={{ duration: 0.25 }}
-            className="flex w-[min(92vw,420px)] flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.04] px-6 py-7 text-center"
+            initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: 4 }}
+            transition={{ duration: reduceMotion ? 0.08 : 0.2 }}
+            className="flex w-[min(92vw,20.5rem)] flex-col items-center rounded-[1.5rem] border border-[#E5E7EB] bg-white px-7 py-8 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_40px_rgba(15,23,42,0.1)]"
+            onClick={(event) => event.stopPropagation()}
           >
-            <motion.div
-              animate={{ rotate: [0, 8, 0] }}
-              transition={{ duration: 0.7, ease: "easeInOut" }}
-              className="drop-shadow-[0_0_18px_rgba(26,35,255,0.65)]"
-            >
-              <Image
-                src="/obillz-logo.png"
-                alt="Obillz"
-                width={140}
-                height={40}
-                className="h-auto w-[140px] select-none"
-                priority
-              />
-            </motion.div>
-            <p className="text-sm font-semibold text-white/90">{message}</p>
-            <motion.div
+            <ObillzMark className="h-10 w-10" />
+            {label ? (
+              <p className="mt-4 text-[0.95rem] font-semibold tracking-tight text-[#0F172A]">
+                {label}
+              </p>
+            ) : null}
+            {description ? (
+              <p className="mt-1.5 text-sm leading-relaxed text-[#64748B]">
+                {description}
+              </p>
+            ) : null}
+            <span
               aria-hidden
-              className="h-10 w-10 rounded-full border border-white/15 border-t-white/60"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 0.9, ease: "linear", repeat: Infinity }}
+              className={cn(
+                "mt-5 h-[22px] w-[22px] rounded-full border-[1.5px] border-[#E5E7EB] border-t-[#1A23FF] motion-reduce:animate-none",
+                !reduceMotion && "animate-spin"
+              )}
             />
           </motion.div>
         </motion.div>
@@ -59,3 +101,7 @@ export default function SubmittingOverlay({
   );
 }
 
+/** Nom historique — même composant. */
+export default function SubmittingOverlay(props: ProcessingOverlayProps) {
+  return <ProcessingOverlay {...props} />;
+}

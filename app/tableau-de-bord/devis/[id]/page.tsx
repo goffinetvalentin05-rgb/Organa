@@ -68,7 +68,7 @@ export default function DevisDetailPage() {
     isSubmitting: envoiEmail,
     showOverlay: showEmailOverlay,
     run: runEmailSend,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
@@ -241,7 +241,7 @@ export default function DevisDetailPage() {
 
   return (
     <>
-      <SubmittingOverlay visible={showEmailOverlay} message="Envoi en cours…" />
+      <SubmittingOverlay visible={showEmailOverlay} title="Envoi de la cotisation…" />
       <PageLayout maxWidth="7xl">
       <DetailPageHeader
         backHref="/tableau-de-bord/devis"

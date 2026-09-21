@@ -141,7 +141,7 @@ export default function ParametresPage() {
     isSubmitting: isSubmittingSettings,
     showOverlay: showSettingsOverlay,
     run: runSettingsSave,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [saveSuccessPulse, setSaveSuccessPulse] = useState(false);
   const initialFormSignatureRef = useRef<string | null>(null);
 
@@ -693,7 +693,7 @@ export default function ParametresPage() {
     <>
       <SubmittingOverlay
         visible={showSettingsOverlay}
-        message="Enregistrement en cours…"
+        title="Enregistrement…"
       />
       <Suspense fallback={null}>
         <CheckoutHandler onSuccess={fetchUserPlan} />

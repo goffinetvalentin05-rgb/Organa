@@ -3,8 +3,8 @@
 import { useCallback, useRef, useState } from "react";
 
 type UseSafeSubmitOptions = {
-  // Show a lightweight Obillz overlay only if the request takes longer
-  // than this threshold (to avoid “flash” on fast actions).
+  // Show overlay only if the request takes longer than this threshold
+  // (avoids a flash on fast actions).
   overlayDelayMs?: number;
 };
 
@@ -18,7 +18,7 @@ function makeIdempotencyKey() {
 }
 
 export function useSafeSubmit(options: UseSafeSubmitOptions = {}) {
-  const overlayDelayMs = options.overlayDelayMs ?? 450;
+  const overlayDelayMs = options.overlayDelayMs ?? 280;
 
   const submittingRef = useRef(false);
   const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

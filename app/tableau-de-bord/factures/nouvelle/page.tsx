@@ -93,7 +93,7 @@ function NouvelleFacturePageContent() {
   const [notes, setNotes] = useState("");
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savingForPdf, setSavingForPdf] = useState(false);
-  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const [createSuccess, setCreateSuccess] = useState(false);
   const [activeMode, setActiveMode] = useState<SubmissionMode | null>(null);
   const [loadingPhase, setLoadingPhase] = useState<DocumentFlowPhase | null>(null);
@@ -594,7 +594,7 @@ function NouvelleFacturePageContent() {
 
   return (
     <>
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création de la facture…" />
       <PageLayout maxWidth="4xl">
       <PageHeader
         title={t("dashboard.invoices.form.title")}

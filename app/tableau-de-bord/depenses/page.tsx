@@ -117,7 +117,7 @@ export default function DepensesPage() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const [createSuccess, setCreateSuccess] = useState(false);
   const [formData, setFormData] = useState({
     label: "",
@@ -723,7 +723,7 @@ export default function DepensesPage() {
 
   return (
     <>
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création de la charge…" />
       <PageLayout maxWidth="7xl">
       <PageHeader
         title={t("dashboard.expenses.title")}

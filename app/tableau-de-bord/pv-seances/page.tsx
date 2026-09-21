@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, Edit, Trash, Download, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
@@ -17,6 +17,8 @@ import {
   DashboardBadge,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { downloadPvSeancePdf } from "./downloadPvPdf";
 import type { MeetingStatus, MeetingType } from "@/lib/meeting-minutes";
 
@@ -35,7 +37,9 @@ export default function PvSeancesPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const downloadingRef = useRef(false);
+  const { showOverlay: showPdfOverlay, run: runPdfDownload } = useSafeSubmit({
+    overlayDelayMs: 280,
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -107,24 +111,25 @@ export default function PvSeancesPage() {
   };
 
   const downloadPdf = async (id: string) => {
-    if (!id || downloadingRef.current) return;
-    downloadingRef.current = true;
-    setDownloadingId(id);
-    try {
-      await downloadPvSeancePdf(id, locale);
-      toast.success(t("dashboard.meetingMinutes.downloadPdfSuccess"));
-    } catch (error: unknown) {
-      toast.error(
-        error instanceof Error ? error.message : t("dashboard.meetingMinutes.downloadPdfError")
-      );
-    } finally {
-      downloadingRef.current = false;
-      setDownloadingId(null);
-    }
+    if (!id) return;
+    await runPdfDownload(async () => {
+      setDownloadingId(id);
+      try {
+        await downloadPvSeancePdf(id, locale);
+        toast.success(t("dashboard.meetingMinutes.downloadPdfSuccess"));
+      } catch (error: unknown) {
+        toast.error(
+          error instanceof Error ? error.message : t("dashboard.meetingMinutes.downloadPdfError")
+        );
+      } finally {
+        setDownloadingId(null);
+      }
+    });
   };
 
   return (
     <PageLayout maxWidth="7xl">
+      <SubmittingOverlay visible={showPdfOverlay} title="Génération du PDF…" />
       <PageHeader
         title={t("dashboard.meetingMinutes.title")}
         subtitle={t("dashboard.meetingMinutes.subtitle")}

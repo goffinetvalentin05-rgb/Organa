@@ -44,7 +44,7 @@ export default function NouveauClientPage() {
     isSubmitting,
     showOverlay,
     run: runCreateClient,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [error, setError] = useState<{
     type: "LIMIT_REACHED" | "OTHER";
     message: string;
@@ -161,7 +161,7 @@ export default function NouveauClientPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création du membre…" />
       <DraftAutosaveHint show={showDraftStatus} label={draftStatusLabel} />
       <div className="flex items-center gap-2 text-sm">
         <Link href="/tableau-de-bord/clients" className="text-white/70 hover:text-white transition-colors">

@@ -52,7 +52,7 @@ export default function NouveauPlanningPage() {
   const { t } = useI18n();
   const router = useRouter();
   const { clubId, loading: clubLoading } = usePermissions();
-  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const [createSuccess, setCreateSuccess] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -242,7 +242,7 @@ export default function NouveauPlanningPage() {
 
   return (
     <>
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création du planning…" />
       <PageLayout maxWidth="5xl">
         <div>
         <Link

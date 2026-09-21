@@ -85,7 +85,7 @@ export default function ImportMembersModal({
   const { t } = useI18n();
   const vis = useMemberFieldSettings();
   const { clubId, loading: clubLoading } = usePermissions();
-  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const importToastId = "clients-import";
   const [step, setStep] = useState<Step>("upload");
   const [fileError, setFileError] = useState<string | null>(null);
@@ -338,7 +338,7 @@ export default function ImportMembersModal({
 
         <SubmittingOverlay
           visible={showOverlay}
-          message={t("dashboard.clients.import.importingOverlay") ?? "Import en cours…"}
+          title={t("dashboard.clients.import.importingOverlay") ?? "Importation en cours…"}
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">

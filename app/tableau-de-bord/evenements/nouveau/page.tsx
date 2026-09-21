@@ -41,7 +41,7 @@ export default function NouvelEvenementPage() {
   const router = useRouter();
   const { clubId, loading: clubLoading } = usePermissions();
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
-  const { isSubmitting, showOverlay, run: runCreateEvent } = useSafeSubmit({ overlayDelayMs: 450 });
+  const { isSubmitting, showOverlay, run: runCreateEvent } = useSafeSubmit({ overlayDelayMs: 280 });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
   const [showNewTypeForm, setShowNewTypeForm] = useState(false);
@@ -150,7 +150,7 @@ export default function NouvelEvenementPage() {
 
   return (
     <PageLayout maxWidth="4xl">
-      <SubmittingOverlay visible={showOverlay} message="Création en cours…" />
+      <SubmittingOverlay visible={showOverlay} title="Création de l’événement…" />
       <div>
         <Link
           href="/tableau-de-bord/evenements"

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import SubmittingOverlay from "@/components/SubmittingOverlay";
+import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import {
   ActionButton,
   FormSection,
@@ -74,7 +76,8 @@ export default function SupportSaleForm({
   const [form, setForm] = useState<FormState>(saleToForm(sale));
   const [members, setMembers] = useState<SupportSaleMemberOption[]>([]);
   const [memberQuery, setMemberQuery] = useState("");
-  const [saving, setSaving] = useState(false);
+  const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
+  const [overlayTitle, setOverlayTitle] = useState("Création de la vente…");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [sponsorFile, setSponsorFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(sale?.imageUrl || null);
@@ -149,8 +152,14 @@ export default function SupportSaleForm({
   };
 
   const submit = async (publish: boolean) => {
-    setSaving(true);
-    try {
+    setOverlayTitle(
+      publish
+        ? "Publication de la vente…"
+        : mode === "edit"
+          ? "Enregistrement de la vente…"
+          : "Création de la vente…"
+    );
+    await run(async () => {
       const payload = {
         name: form.name,
         productName: form.productName,
@@ -183,15 +192,14 @@ export default function SupportSaleForm({
       toast.success(mode === "edit" ? "Vente mise à jour" : "Vente créée");
       router.push(`/tableau-de-bord/ventes-soutien/${data.sale.id}`);
       router.refresh();
-    } catch (error: unknown) {
+    }).catch((error: unknown) => {
       toast.error(error instanceof Error ? error.message : "Erreur");
-    } finally {
-      setSaving(false);
-    }
+    });
   };
 
   return (
     <PageLayout>
+      <SubmittingOverlay visible={showOverlay} title={overlayTitle} />
       <PageHeader
         title={mode === "edit" ? "Modifier la vente" : "Créer une vente"}
         subtitle="Une opération simple : le club lance la vente, les membres vendent à leur entourage."
@@ -467,13 +475,14 @@ export default function SupportSaleForm({
           >
             Annuler
           </ActionButton>
-          <ActionButton type="submit" variant="surface" disabled={saving}>
+          <ActionButton type="submit" variant="surface" disabled={isSubmitting}>
             {mode === "edit" ? "Enregistrer" : "Enregistrer en brouillon"}
           </ActionButton>
           <DashboardPrimaryButton
             type="button"
             icon="none"
-            loading={saving}
+            loading={isSubmitting}
+            disabled={isSubmitting}
             onClick={() => void submit(true)}
           >
             Publier la vente

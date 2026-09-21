@@ -89,7 +89,7 @@ export default function NouveauDevisPage() {
     isSubmitting,
     showOverlay,
     run: runQuoteSubmit,
-  } = useSafeSubmit({ overlayDelayMs: 450 });
+  } = useSafeSubmit({ overlayDelayMs: 280 });
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   // Verrou synchrone : `setState` est asynchrone, un double clic rapide
   // passerait avant le re-render qui désactive le bouton.
@@ -1038,7 +1038,16 @@ export default function NouveauDevisPage() {
   }
 
   return (
-    <PageLayout maxWidth="4xl">
+    <>
+      <SubmittingOverlay
+        visible={showOverlay}
+        title={
+          recipientType === "individual"
+            ? "Création de la cotisation…"
+            : "Création des cotisations…"
+        }
+      />
+      <PageLayout maxWidth="4xl">
       <PageHeader
         title={t("dashboard.quotes.newTitle")}
         subtitle={t("dashboard.quotes.newSubtitle")}
@@ -1605,5 +1614,6 @@ export default function NouveauDevisPage() {
         </div>
       </form>
     </PageLayout>
+    </>
   );
 }
