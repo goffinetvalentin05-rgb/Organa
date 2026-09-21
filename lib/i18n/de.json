@@ -1661,6 +1661,9 @@
       "backToList": "Zurück zur Liste",
       "backToDetail": "Zurück zum Protokoll",
       "downloadPdf": "PDF herunterladen",
+      "generatingPdf": "PDF wird erzeugt…",
+      "downloadPdfSuccess": "PDF heruntergeladen",
+      "downloadPdfError": "PDF konnte nicht heruntergeladen werden. Bitte erneut versuchen.",
       "columns": {
         "title": "Titel",
         "date": "Sitzungsdatum",

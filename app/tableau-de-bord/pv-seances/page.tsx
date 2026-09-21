@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { Eye, Edit, Trash, Download, ClipboardList } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import { localeToIntl } from "@/lib/i18n";
@@ -16,6 +17,7 @@ import {
   DashboardBadge,
 } from "@/components/ui";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
+import { downloadPvSeancePdf } from "./downloadPvPdf";
 import type { MeetingStatus, MeetingType } from "@/lib/meeting-minutes";
 
 type MinuteRow = {
@@ -32,6 +34,8 @@ export default function PvSeancesPage() {
   const [minutes, setMinutes] = useState<MinuteRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const downloadingRef = useRef(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -102,8 +106,21 @@ export default function PvSeancesPage() {
     }
   };
 
-  const downloadPdf = (id: string) => {
-    window.open(`/api/pdf/pv-seance/download?id=${id}&locale=${locale}`, "_blank");
+  const downloadPdf = async (id: string) => {
+    if (!id || downloadingRef.current) return;
+    downloadingRef.current = true;
+    setDownloadingId(id);
+    try {
+      await downloadPvSeancePdf(id, locale);
+      toast.success(t("dashboard.meetingMinutes.downloadPdfSuccess"));
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : t("dashboard.meetingMinutes.downloadPdfError")
+      );
+    } finally {
+      downloadingRef.current = false;
+      setDownloadingId(null);
+    }
   };
 
   return (
@@ -223,7 +240,9 @@ export default function PvSeancesPage() {
                     type="button"
                     className="inline-flex items-center gap-1.5"
                     title={t("dashboard.meetingMinutes.downloadPdf")}
-                    onClick={() => downloadPdf(m.id)}
+                    loading={downloadingId === m.id}
+                    loadingLabel={t("dashboard.meetingMinutes.generatingPdf")}
+                    onClick={() => void downloadPdf(m.id)}
                   >
                     <Download className="h-4 w-4" />
                     PDF

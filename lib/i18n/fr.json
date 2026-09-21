@@ -1676,6 +1676,9 @@
       "backToList": "Retour à la liste",
       "backToDetail": "Retour au PV",
       "downloadPdf": "Télécharger PDF",
+      "generatingPdf": "Génération du PDF…",
+      "downloadPdfSuccess": "PDF téléchargé",
+      "downloadPdfError": "Impossible de télécharger le PDF. Réessayez.",
       "columns": {
         "title": "Titre",
         "date": "Date de séance",

@@ -235,6 +235,14 @@ export function EntityCardList({
   return <div className={cn("flex flex-col gap-2.5 sm:gap-3", className)}>{children}</div>;
 }
 
+function initialsFromLabel(label: string): string {
+  const parts = (label || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+  }
+  return (parts[0] || "?").charAt(0).toUpperCase();
+}
+
 /** Avatar initiales premium pour les cartes membres / contacts. */
 export function EntityAvatar({
   label,
@@ -245,14 +253,18 @@ export function EntityAvatar({
   className?: string;
   size?: "sm" | "md";
 }) {
-  const initial = (label || "?").charAt(0).toUpperCase();
+  const initials = initialsFromLabel(label);
+  const compact = initials.length > 1;
   return (
     <div
       className={cn(
         "flex items-center justify-center rounded-2xl font-bold text-white shadow-[0_8px_18px_rgba(26,35,255,0.22)]",
         size === "sm"
-          ? "h-11 w-11 rounded-xl text-base"
-          : "h-14 w-14 text-lg sm:h-16 sm:w-16 sm:text-xl",
+          ? cn("h-11 w-11 rounded-xl", compact ? "text-[13px] tracking-wide" : "text-base")
+          : cn(
+              "h-14 w-14 sm:h-16 sm:w-16",
+              compact ? "text-base tracking-wide sm:text-lg" : "text-lg sm:text-xl",
+            ),
         className,
       )}
       style={{
@@ -260,7 +272,7 @@ export function EntityAvatar({
       }}
       aria-hidden
     >
-      {initial}
+      {initials}
     </div>
   );
 }

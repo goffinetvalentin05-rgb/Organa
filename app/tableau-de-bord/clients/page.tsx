@@ -50,16 +50,25 @@ const headerButtonClass =
   "inline-flex items-center justify-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] hover:text-[#1A23FF]";
 
 const roleColors: Record<string, string> = {
-  player: "bg-blue-50 text-blue-700",
-  coach: "bg-emerald-50 text-emerald-700",
-  volunteer: "bg-violet-50 text-violet-700",
-  staff: "bg-orange-50 text-orange-700",
-  committee: "bg-[#EEF2FF] text-[#1A23FF]",
-  president: "bg-[#EEF2FF] text-[#1A23FF]",
-  vice_president: "bg-[#EEF2FF] text-[#1A23FF]",
-  treasurer: "bg-[#EEF2FF] text-[#1A23FF]",
-  secretary: "bg-[#EEF2FF] text-[#1A23FF]",
+  player: "border-blue-200 bg-blue-50 text-blue-700",
+  coach: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  volunteer: "border-violet-200 bg-violet-50 text-violet-700",
+  parent: "border-violet-200 bg-violet-50 text-violet-700",
+  staff: "border-orange-200 bg-orange-50 text-orange-700",
+  committee: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  president: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  vice_president: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  treasurer: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  secretary: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  bar_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  sponsoring_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  equipment_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  events_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
+  sponsor: "border-amber-200 bg-amber-50 text-amber-700",
 };
+
+const memberBadgeClass =
+  "inline-flex items-center rounded-full border px-2.5 py-[3px] text-[11px] font-semibold tracking-wide";
 
 export default function ClientsPage() {
   const { t } = useI18n();
@@ -336,47 +345,67 @@ export default function ClientsPage() {
             const displayName = `${client.prenom ? `${client.prenom} ` : ""}${
               client.nom || t("dashboard.clients.noName")
             }`;
+            const roleLabel = vis.role.enabled ? formatRoleLabel(client.role, t) : null;
+            const categoryLabel =
+              vis.category.enabled && client.category
+                ? formatCategoryLabel(client.category, t)
+                : null;
+            const hasBadges = Boolean(roleLabel || categoryLabel);
+
             return (
               <article
                 key={client.id}
-                className="group flex h-full flex-col rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:p-6"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
               >
                 <Link
                   href={`/tableau-de-bord/clients/${client.id}`}
-                  className="flex min-w-0 flex-1 flex-col"
+                  className="flex min-w-0 flex-1 flex-col px-5 py-5 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
                 >
-                  <EntityAvatar label={displayName} />
-                  <h3 className="mt-4 truncate text-base font-semibold tracking-tight text-[#0F172A] transition-colors group-hover:text-[#1A23FF]">
-                    {displayName}
-                  </h3>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {vis.role.enabled ? (
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                          roleColors[client.role] || "bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {formatRoleLabel(client.role, t)}
-                      </span>
-                    ) : null}
-                    {vis.category.enabled && client.category ? (
-                      <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-semibold text-[#475569]">
-                        {formatCategoryLabel(client.category, t)}
-                      </span>
-                    ) : null}
+                  <div className="flex items-start gap-3.5">
+                    <EntityAvatar label={displayName} size="sm" className="shrink-0" />
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <h3 className="truncate text-base font-semibold tracking-tight text-[#0F172A] transition-colors group-hover:text-[#1A23FF]">
+                        {displayName}
+                      </h3>
+                      {hasBadges ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {roleLabel ? (
+                            <span
+                              className={cn(
+                                memberBadgeClass,
+                                roleColors[client.role] ||
+                                  "border-[rgba(15,23,42,0.08)] bg-[#F1F5F9] text-[#475569]"
+                              )}
+                            >
+                              {roleLabel}
+                            </span>
+                          ) : null}
+                          {categoryLabel ? (
+                            <span
+                              className={cn(
+                                memberBadgeClass,
+                                "border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] text-[#475569]"
+                              )}
+                            >
+                              {categoryLabel}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </Link>
-                <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[rgba(15,23,42,0.06)] pt-4">
+                <div className="mt-auto flex items-center gap-2 border-t border-[rgba(15,23,42,0.06)] bg-[#FAFBFD] px-4 py-3">
                   <ActionButton
                     href={`/tableau-de-bord/clients/${client.id}/edit`}
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs"
                   >
                     <Edit className="h-3.5 w-3.5" />
                     {t("dashboard.clients.editAction")}
                   </ActionButton>
                   <DeleteClientButton
                     clientId={client.id}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-white px-3 py-2 text-xs font-medium text-rose-700 shadow-sm transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
                     onDeleted={(removedId) =>
                       setClients((prev) => prev.filter((c) => c.id !== removedId))
                     }
