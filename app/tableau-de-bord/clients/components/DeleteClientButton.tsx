@@ -9,12 +9,15 @@ interface DeleteClientButtonProps {
   /** Appelé après suppression réussie pour mettre à jour la liste (page client-side). */
   onDeleted?: (clientId: string) => void;
   className?: string;
+  /** Icône seule — action secondaire, plus discrète. */
+  iconOnly?: boolean;
 }
 
 export default function DeleteClientButton({
   clientId,
   onDeleted,
   className,
+  iconOnly = false,
 }: DeleteClientButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { t } = useI18n();
@@ -53,22 +56,26 @@ export default function DeleteClientButton({
     }
   };
 
+  const label = t("dashboard.clients.deleteAction");
+
   return (
     <button
       type="button"
       onClick={handleDelete}
       disabled={isDeleting}
+      title={label}
+      aria-label={label}
       className={
         className ??
         "px-4 py-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-red-200 shadow-sm"
       }
     >
       {isDeleting ? (
-        <Loader className="w-4 h-4 animate-spin" />
+        <Loader className={iconOnly ? "h-3.5 w-3.5 animate-spin" : "h-4 w-4 animate-spin"} />
       ) : (
-        <Trash className="w-4 h-4" />
+        <Trash className={iconOnly ? "h-3.5 w-3.5" : "h-4 w-4"} />
       )}
-      {t("dashboard.clients.deleteAction")}
+      {iconOnly ? null : label}
     </button>
   );
 }

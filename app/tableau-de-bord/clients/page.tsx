@@ -18,8 +18,8 @@ import {
   GlassCard,
   EmptyState,
   ActionButton,
-  EntityAvatar,
   EntityCardGrid,
+  DashboardBadge,
   dashboardSelectClass,
   cn,
 } from "@/components/ui";
@@ -49,26 +49,35 @@ const COMMITTEE_ROLES = new Set([
 const headerButtonClass =
   "inline-flex items-center justify-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-medium text-[#334155] shadow-sm transition hover:border-[rgba(26,35,255,0.22)] hover:text-[#1A23FF]";
 
-const roleColors: Record<string, string> = {
-  player: "border-blue-200 bg-blue-50 text-blue-700",
-  coach: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  volunteer: "border-violet-200 bg-violet-50 text-violet-700",
-  parent: "border-violet-200 bg-violet-50 text-violet-700",
-  staff: "border-orange-200 bg-orange-50 text-orange-700",
-  committee: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  president: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  vice_president: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  treasurer: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  secretary: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  bar_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  sponsoring_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  equipment_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  events_manager: "border-[rgba(26,35,255,0.18)] bg-[#EEF2FF] text-[#1A23FF]",
-  sponsor: "border-amber-200 bg-amber-50 text-amber-700",
-};
+function memberInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+  }
+  return (parts[0] || "?").slice(0, 2).toUpperCase();
+}
 
-const memberBadgeClass =
-  "inline-flex items-center rounded-full border px-2.5 py-[3px] text-[11px] font-semibold tracking-wide";
+function memberRoleBadgeVariant(
+  role: string
+): "info" | "success" | "warning" | "neutral" | "default" {
+  if (role === "coach") return "success";
+  if (role === "staff" || role === "sponsor") return "warning";
+  if (
+    role === "player" ||
+    role === "committee" ||
+    role === "president" ||
+    role === "vice_president" ||
+    role === "treasurer" ||
+    role === "secretary" ||
+    role === "bar_manager" ||
+    role === "sponsoring_manager" ||
+    role === "equipment_manager" ||
+    role === "events_manager"
+  ) {
+    return "info";
+  }
+  return "neutral";
+}
 
 export default function ClientsPage() {
   const { t } = useI18n();
@@ -355,57 +364,51 @@ export default function ClientsPage() {
             return (
               <article
                 key={client.id}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
+                className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7EB] bg-gradient-to-br from-[#F8FAFF] via-[#F4F7FF] to-[#EEF2FF] p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-200 hover:border-[rgba(26,35,255,0.16)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)]"
               >
+                <span className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#1A23FF]/[0.06]" />
+                <span className="pointer-events-none absolute -bottom-12 right-4 h-32 w-32 rounded-full bg-[#3B82F6]/[0.05]" />
+
                 <Link
                   href={`/tableau-de-bord/clients/${client.id}`}
-                  className="flex min-w-0 flex-1 flex-col px-5 py-5 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
+                  className="relative flex min-w-0 flex-1 flex-col outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
                 >
-                  <div className="flex items-start gap-3.5">
-                    <EntityAvatar label={displayName} size="sm" className="shrink-0" />
-                    <div className="min-w-0 flex-1 pt-0.5">
-                      <h3 className="truncate text-base font-semibold tracking-tight text-[#0F172A] transition-colors group-hover:text-[#1A23FF]">
-                        {displayName}
-                      </h3>
-                      {hasBadges ? (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {roleLabel ? (
-                            <span
-                              className={cn(
-                                memberBadgeClass,
-                                roleColors[client.role] ||
-                                  "border-[rgba(15,23,42,0.08)] bg-[#F1F5F9] text-[#475569]"
-                              )}
-                            >
-                              {roleLabel}
-                            </span>
-                          ) : null}
-                          {categoryLabel ? (
-                            <span
-                              className={cn(
-                                memberBadgeClass,
-                                "border-[rgba(15,23,42,0.08)] bg-[#F8FAFC] text-[#475569]"
-                              )}
-                            >
-                              {categoryLabel}
-                            </span>
-                          ) : null}
-                        </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-[#E5E7EB]">
+                    <span className="text-[13px] font-semibold tracking-[0.06em] text-[#1A23FF]">
+                      {memberInitials(displayName)}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3.5 truncate text-[1.05rem] font-semibold tracking-tight text-[#0F172A] transition-colors group-hover:text-[#1A23FF]">
+                    {displayName}
+                  </h3>
+
+                  {hasBadges ? (
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {roleLabel ? (
+                        <DashboardBadge variant={memberRoleBadgeVariant(client.role)}>
+                          {roleLabel}
+                        </DashboardBadge>
+                      ) : null}
+                      {categoryLabel ? (
+                        <DashboardBadge variant="neutral">{categoryLabel}</DashboardBadge>
                       ) : null}
                     </div>
-                  </div>
+                  ) : null}
                 </Link>
-                <div className="mt-auto flex items-center gap-2 border-t border-[rgba(15,23,42,0.06)] bg-[#FAFBFD] px-4 py-3">
+
+                <div className="relative mt-5 flex items-center gap-2">
                   <ActionButton
                     href={`/tableau-de-bord/clients/${client.id}/edit`}
-                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs"
                   >
                     <Edit className="h-3.5 w-3.5" />
                     {t("dashboard.clients.editAction")}
                   </ActionButton>
                   <DeleteClientButton
+                    iconOnly
                     clientId={client.id}
-                    className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-white px-3 py-2 text-xs font-medium text-rose-700 shadow-sm transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#94A3B8] transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
                     onDeleted={(removedId) =>
                       setClients((prev) => prev.filter((c) => c.id !== removedId))
                     }
