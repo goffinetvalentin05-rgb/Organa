@@ -529,7 +529,7 @@
     "nav": {
       "dashboard": "Vereins-Dashboard",
       "clients": "Mitglieder",
-      "todos": "Aufgaben",
+      "todos": "To Do List",
       "finances": "Finanzen",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
@@ -559,7 +559,7 @@
       "editClient": "Mitglied bearbeiten",
       "memberDetail": "Mitgliedakte",
       "clients": "Mitglieder",
-      "todos": "Aufgaben",
+      "todos": "To Do List",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "sponsoring": "Sponsoring",
@@ -1752,11 +1752,14 @@
       }
     },
     "todos": {
-      "title": "Aufgaben",
-      "subtitle": "Verfolgen Sie die aktiven Aufgaben aus validierten Protokollen.",
+      "title": "To Do List",
+      "subtitle": "Behalten Sie den Überblick über die in Ihren Sitzungen beschlossenen Aktionen.",
       "loadError": "Aufgaben konnten nicht geladen werden",
-      "empty": "Keine offenen Aufgaben.",
+      "empty": "Sie haben keine offenen Aufgaben.",
+      "emptyTitle": "Alles erledigt",
       "emptyDone": "Keine erledigten Aufgaben.",
+      "emptyDoneTitle": "Noch nichts hier",
+      "emptyDoneDescription": "Erledigte Aufgaben erscheinen hier.",
       "complete": "Erledigen",
       "completeSuccess": "Aufgabe erledigt",
       "completeError": "Aufgabe konnte nicht abgeschlossen werden",
@@ -1765,6 +1768,24 @@
       "noResponsible": "Ohne Verantwortliche",
       "completed": "Erledigt",
       "completedOn": "Erledigt am {date}",
+      "point": "Punkt",
+      "hero": {
+        "label": "Ihre Prioritäten",
+        "allClear": "Alles erledigt",
+        "attentionOne": "1 Aufgabe braucht Ihre Aufmerksamkeit",
+        "attentionMany": "{count} Aufgaben brauchen Ihre Aufmerksamkeit",
+        "pillOverdue": "{count} überfällig",
+        "pillToday": "{count} heute",
+        "pillUpcoming": "{count} bevorstehend"
+      },
+      "origin": {
+        "committee": "Komitee-Protokoll",
+        "general_assembly": "GV-Protokoll",
+        "coaches": "Trainer-Protokoll",
+        "sponsoring": "Sponsoring-Protokoll",
+        "finance": "Finanz-Protokoll",
+        "other": "Sitzungsprotokoll"
+      },
       "filters": {
         "active": "Alle",
         "overdue": "Überfällig",
@@ -1858,7 +1879,7 @@
         "complete": "Ergänzen"
       },
       "todos": {
-        "title": "Aufgaben",
+        "title": "To Do List",
         "subtitle": "{count} Aufgabe(n) offen",
         "viewAll": "Alle Aufgaben ansehen"
       },

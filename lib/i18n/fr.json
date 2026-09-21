@@ -528,7 +528,7 @@
     "nav": {
       "dashboard": "Dashboard du club",
       "clients": "Membres",
-      "todos": "À faire",
+      "todos": "To Do List",
       "finances": "Finances",
       "quotes": "Cotisations",
       "invoices": "Factures",
@@ -556,7 +556,7 @@
       "editClient": "Modifier membre",
       "memberDetail": "Fiche membre",
       "clients": "Membres",
-      "todos": "À faire",
+      "todos": "To Do List",
       "quotes": "Cotisations",
       "invoices": "Factures",
       "sponsoring": "Sponsoring",
@@ -1767,11 +1767,14 @@
       }
     },
     "todos": {
-      "title": "À faire",
-      "subtitle": "Suivez les tâches actives issues des PV validés.",
+      "title": "To Do List",
+      "subtitle": "Gardez une vue claire sur les actions décidées lors de vos séances.",
       "loadError": "Impossible de charger les tâches",
-      "empty": "Aucune tâche à faire pour le moment.",
+      "empty": "Vous n’avez aucune tâche en attente.",
+      "emptyTitle": "Tout est à jour",
       "emptyDone": "Aucune tâche terminée.",
+      "emptyDoneTitle": "Rien pour l’instant",
+      "emptyDoneDescription": "Les tâches réalisées apparaîtront ici.",
       "complete": "Terminer",
       "completeSuccess": "Tâche terminée",
       "completeError": "Impossible de terminer la tâche",
@@ -1780,6 +1783,24 @@
       "noResponsible": "Sans responsable",
       "completed": "Terminée",
       "completedOn": "Réalisée le {date}",
+      "point": "Point",
+      "hero": {
+        "label": "Vos priorités",
+        "allClear": "Tout est à jour",
+        "attentionOne": "1 tâche nécessite votre attention",
+        "attentionMany": "{count} tâches nécessitent votre attention",
+        "pillOverdue": "{count} en retard",
+        "pillToday": "{count} aujourd’hui",
+        "pillUpcoming": "{count} à venir"
+      },
+      "origin": {
+        "committee": "PV du comité",
+        "general_assembly": "PV de l’assemblée générale",
+        "coaches": "PV des entraîneurs",
+        "sponsoring": "PV sponsoring",
+        "finance": "PV finances",
+        "other": "PV de séance"
+      },
       "filters": {
         "active": "Toutes",
         "overdue": "En retard",
@@ -1872,8 +1893,8 @@
         "complete": "Compléter"
       },
       "todos": {
-        "title": "À faire",
-        "subtitle": "{count} tâche(s) à faire",
+        "title": "To Do List",
+        "subtitle": "{count} tâche(s) à suivre",
         "viewAll": "Voir toutes les tâches"
       },
       "activity": {

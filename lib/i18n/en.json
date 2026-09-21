@@ -529,7 +529,7 @@
     "nav": {
       "dashboard": "Club Dashboard",
       "clients": "Members",
-      "todos": "To do",
+      "todos": "To Do List",
       "finances": "Finances",
       "quotes": "Memberships",
       "invoices": "Invoices",
@@ -560,7 +560,7 @@
       "editClient": "Edit member",
       "memberDetail": "Member profile",
       "clients": "Members",
-      "todos": "To do",
+      "todos": "To Do List",
       "quotes": "Memberships",
       "invoices": "Invoices",
       "sponsoring": "Sponsoring",
@@ -1882,11 +1882,14 @@
       }
     },
     "todos": {
-      "title": "To do",
-      "subtitle": "Track active tasks from validated meeting minutes.",
+      "title": "To Do List",
+      "subtitle": "Keep a clear view of the actions decided in your meetings.",
       "loadError": "Could not load tasks",
-      "empty": "No active tasks right now.",
+      "empty": "You have no pending tasks.",
+      "emptyTitle": "You’re all caught up",
       "emptyDone": "No completed tasks yet.",
+      "emptyDoneTitle": "Nothing here yet",
+      "emptyDoneDescription": "Completed tasks will appear here.",
       "complete": "Complete",
       "completeSuccess": "Task completed",
       "completeError": "Could not complete the task",
@@ -1895,6 +1898,24 @@
       "noResponsible": "Unassigned",
       "completed": "Completed",
       "completedOn": "Done on {date}",
+      "point": "Item",
+      "hero": {
+        "label": "Your priorities",
+        "allClear": "You’re all caught up",
+        "attentionOne": "1 task needs your attention",
+        "attentionMany": "{count} tasks need your attention",
+        "pillOverdue": "{count} overdue",
+        "pillToday": "{count} today",
+        "pillUpcoming": "{count} upcoming"
+      },
+      "origin": {
+        "committee": "Committee minutes",
+        "general_assembly": "General assembly minutes",
+        "coaches": "Coaches meeting minutes",
+        "sponsoring": "Sponsoring minutes",
+        "finance": "Finance minutes",
+        "other": "Meeting minutes"
+      },
       "filters": {
         "active": "All",
         "overdue": "Overdue",
@@ -1988,8 +2009,8 @@
         "complete": "Complete"
       },
       "todos": {
-        "title": "To do",
-        "subtitle": "{count} task(s) to do",
+        "title": "To Do List",
+        "subtitle": "{count} task(s) to follow",
         "viewAll": "See all tasks"
       },
       "activity": {

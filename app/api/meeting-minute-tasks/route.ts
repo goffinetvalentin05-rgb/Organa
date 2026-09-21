@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       if (error.code === "42P01" || /meeting_minute_tasks/i.test(error.message)) {
         return NextResponse.json({
           tasks: [],
-          summary: { overdue: 0, today: 0, upcoming: 0, total: 0 },
+          summary: { overdue: 0, today: 0, upcoming: 0, total: 0, done: 0 },
         });
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -81,6 +81,7 @@ export async function GET(request: Request) {
         (task) => task.urgency === "soon" || task.urgency === "normal" || task.urgency === "none"
       ).length,
       total: active.length,
+      done: allTasks.filter((task) => task.status === "done").length,
     };
 
     let tasks: MeetingMinuteTaskDto[];
