@@ -529,6 +529,7 @@
     "nav": {
       "dashboard": "Club Dashboard",
       "clients": "Members",
+      "todos": "To do",
       "finances": "Finances",
       "quotes": "Memberships",
       "invoices": "Invoices",
@@ -559,6 +560,7 @@
       "editClient": "Edit member",
       "memberDetail": "Member profile",
       "clients": "Members",
+      "todos": "To do",
       "quotes": "Memberships",
       "invoices": "Invoices",
       "sponsoring": "Sponsoring",
@@ -1794,6 +1796,7 @@
       "generatingPdf": "Generating PDF…",
       "downloadPdfSuccess": "PDF downloaded",
       "downloadPdfError": "Could not download the PDF. Please try again.",
+      "completedOn": "Completed on {date}",
       "columns": {
         "title": "Title",
         "date": "Meeting date",
@@ -1878,6 +1881,41 @@
         "subtitle": "Meeting minutes details"
       }
     },
+    "todos": {
+      "title": "To do",
+      "subtitle": "Track active tasks from validated meeting minutes.",
+      "loadError": "Could not load tasks",
+      "empty": "No active tasks right now.",
+      "emptyDone": "No completed tasks yet.",
+      "complete": "Complete",
+      "completeSuccess": "Task completed",
+      "completeError": "Could not complete the task",
+      "viewPv": "View minutes",
+      "due": "Due",
+      "noResponsible": "Unassigned",
+      "completed": "Completed",
+      "completedOn": "Done on {date}",
+      "filters": {
+        "active": "All",
+        "overdue": "Overdue",
+        "upcoming": "Upcoming",
+        "done": "Completed"
+      },
+      "relative": {
+        "tomorrow": "Tomorrow",
+        "inDays": "In {count} days",
+        "overdueOne": "1 day overdue",
+        "overdueMany": "{count} days overdue"
+      },
+      "urgency": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "soon": "Soon",
+        "upcoming": "Upcoming",
+        "normal": "Scheduled",
+        "none": "No due date"
+      }
+    },
     "status": {
       "quote": {
         "draft": "Draft",
@@ -1948,6 +1986,11 @@
         "relance": "Follow up",
         "view": "View",
         "complete": "Complete"
+      },
+      "todos": {
+        "title": "To do",
+        "subtitle": "{count} task(s) to do",
+        "viewAll": "See all tasks"
       },
       "activity": {
         "clubRevenue": "Club revenue"

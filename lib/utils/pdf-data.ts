@@ -11,6 +11,7 @@ import { getCompanySettings } from "@/lib/utils/company-settings";
 import { getCurrencySymbol } from "@/lib/utils/currency";
 import { deriveContractStatus, sponsorContractStatusLabel } from "@/lib/sponsor-contracts";
 import { mapMeetingMinutesRow } from "@/lib/meeting-minutes";
+import { attachTasksToMinute } from "@/lib/meeting-minute-tasks";
 import { formatPdfCurrency } from "@/lib/pdf/clubPdfLayout";
 import {
   formatRecipientAddress,
@@ -514,9 +515,15 @@ export async function getMeetingMinutesPdfData(
     throw new Error("PV introuvable");
   }
 
-  const minute = mapMeetingMinutesRow(row as Record<string, unknown>);
-  if (!minute) {
+  const mapped = mapMeetingMinutesRow(row as Record<string, unknown>);
+  if (!mapped) {
     throw new Error("PV introuvable");
+  }
+  let minute = mapped;
+  try {
+    minute = await attachTasksToMinute(supabase, scopeUserId, mapped);
+  } catch {
+    minute = mapped;
   }
 
   const generatedAt = new Date().toISOString().slice(0, 10);

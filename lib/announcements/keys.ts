@@ -1,5 +1,5 @@
 const KEY_MAX_LENGTH = 80;
-const KEYS_MAX_COUNT = 20;
+const KEYS_MAX_COUNT = 60;
 
 export function parseAnnouncementKeysParam(raw: string | null | undefined): string[] {
   if (!raw) return [];

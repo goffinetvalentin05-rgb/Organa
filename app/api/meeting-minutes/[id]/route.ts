@@ -10,6 +10,7 @@ import {
   normalizeMeetingType,
   parseMeetingMinutesBody,
 } from "@/lib/meeting-minutes";
+import { attachTasksToMinute, syncMeetingMinuteTasks } from "@/lib/meeting-minute-tasks";
 
 export const runtime = "nodejs";
 
@@ -58,8 +59,18 @@ export async function GET(
     const clubName =
       (profile?.company_name as string | undefined)?.trim() || "Votre club";
 
+    const mapped = mapMeetingMinutesRow(data as Record<string, unknown>);
+    let minute = mapped;
+    if (mapped) {
+      try {
+        minute = await attachTasksToMinute(supabase, guard.clubId, mapped);
+      } catch {
+        minute = mapped;
+      }
+    }
+
     return NextResponse.json(
-      { minute: mapMeetingMinutesRow(data as Record<string, unknown>), clubName },
+      { minute, clubName },
       { status: 200 }
     );
   } catch (e: unknown) {
@@ -153,11 +164,35 @@ export async function PATCH(
       return NextResponse.json({ error: "PV introuvable" }, { status: 404 });
     }
 
+    const mapped = mapMeetingMinutesRow(data as Record<string, unknown>);
+    if (mapped) {
+      try {
+        const syncedPoints = await syncMeetingMinuteTasks({
+          supabase,
+          clubId: guard.clubId,
+          userId: guard.userId,
+          meetingMinutesId: mapped.id,
+          pvStatus: mapped.status,
+          points: mapped.points,
+        });
+        await supabase
+          .from("meeting_minutes")
+          .update({ points: syncedPoints })
+          .eq("id", mapped.id)
+          .eq("club_id", guard.clubId);
+        mapped.points = syncedPoints;
+      } catch (syncError) {
+        console.error("[API][meeting-minutes/[id]][PATCH][tasks]", syncError);
+      }
+    }
+
     revalidatePath("/tableau-de-bord/pv-seances");
     revalidatePath(`/tableau-de-bord/pv-seances/${id}`);
+    revalidatePath("/tableau-de-bord/a-faire");
+    revalidatePath("/tableau-de-bord");
 
     return NextResponse.json(
-      { minute: mapMeetingMinutesRow(data as Record<string, unknown>) },
+      { minute: mapped },
       { status: 200 }
     );
   } catch (e: unknown) {
@@ -189,6 +224,8 @@ export async function DELETE(
     }
 
     revalidatePath("/tableau-de-bord/pv-seances");
+    revalidatePath("/tableau-de-bord/a-faire");
+    revalidatePath("/tableau-de-bord");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (e: unknown) {

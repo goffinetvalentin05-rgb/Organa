@@ -630,7 +630,7 @@ export default function MeetingMinutesForm({
                       updatePoint(pointIndex, {
                         tasks: [
                           ...point.tasks,
-                          { description: "", responsible: "", deadline: "", status: "todo" },
+                          { description: "", responsible: "", responsibleClientId: null, deadline: "", status: "todo" },
                         ],
                       })
                     }
@@ -645,7 +645,7 @@ export default function MeetingMinutesForm({
                   <div className="space-y-3">
                     {point.tasks.map((task, taskIndex) => (
                       <div
-                        key={`task-${taskIndex}`}
+                        key={task.id || `task-${taskIndex}`}
                         className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2"
                       >
                         <label className="block sm:col-span-2">
@@ -666,12 +666,44 @@ export default function MeetingMinutesForm({
                           <span className={dashboardLabelClass}>
                             {t("dashboard.meetingMinutes.form.taskResponsible")}
                           </span>
+                          <select
+                            className={`${dashboardSelectClass} mb-2`}
+                            value={task.responsibleClientId || ""}
+                            onChange={(e) => {
+                              const member = members.find((m) => m.id === e.target.value);
+                              const next = [...point.tasks];
+                              next[taskIndex] = {
+                                ...task,
+                                responsibleClientId: member?.id ?? null,
+                                responsible: member ? member.nom : "",
+                              };
+                              updatePoint(pointIndex, { tasks: next });
+                            }}
+                          >
+                            <option value="">
+                              {t("dashboard.meetingMinutes.form.selectMember")}
+                            </option>
+                            {members.map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.nom}
+                              </option>
+                            ))}
+                          </select>
                           <input
                             className={dashboardInputClass}
                             value={task.responsible}
+                            placeholder={t("dashboard.meetingMinutes.form.freeTextPlaceholder")}
                             onChange={(e) => {
+                              const name = e.target.value;
+                              const stillMatches = members.some(
+                                (m) => m.id === task.responsibleClientId && m.nom === name
+                              );
                               const next = [...point.tasks];
-                              next[taskIndex] = { ...task, responsible: e.target.value };
+                              next[taskIndex] = {
+                                ...task,
+                                responsible: name,
+                                responsibleClientId: stillMatches ? task.responsibleClientId : null,
+                              };
                               updatePoint(pointIndex, { tasks: next });
                             }}
                           />

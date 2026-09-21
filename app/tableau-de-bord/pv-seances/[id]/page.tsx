@@ -268,7 +268,8 @@ export default function PvSeanceDetailPage() {
               return (
                 <div
                   key={pointIndex}
-                  className="space-y-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:p-5"
+                  id={`point-${pointIndex}`}
+                  className="scroll-mt-24 space-y-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:p-5"
                 >
                   <h3 className="text-base font-bold text-white">
                     {t("dashboard.meetingMinutes.form.pointLabel", { n: pointIndex + 1 })}
@@ -316,8 +317,13 @@ export default function PvSeanceDetailPage() {
                               {t("dashboard.meetingMinutes.form.taskDeadline")} :{" "}
                               {task.deadline ? formatDate(task.deadline) : "—"}
                               {" · "}
-                              {t("dashboard.meetingMinutes.form.taskStatus")} :{" "}
-                              {t(`dashboard.meetingMinutes.taskStatus.${task.status}`)}
+                              {task.status === "done" && task.completedAt
+                                ? t("dashboard.meetingMinutes.completedOn", {
+                                    date: formatDateTime(task.completedAt),
+                                  })
+                                : `${t("dashboard.meetingMinutes.form.taskStatus")} : ${t(
+                                    `dashboard.meetingMinutes.taskStatus.${task.status}`
+                                  )}`}
                             </p>
                           </div>
                         ))}

@@ -77,8 +77,12 @@ function normalizeTask(raw: unknown): TaskEntry | null {
   return {
     description: typeof t.description === "string" ? t.description : "",
     responsible: typeof t.responsible === "string" ? t.responsible : "",
+    responsibleClientId:
+      typeof t.responsibleClientId === "string" ? t.responsibleClientId : null,
     deadline: typeof t.deadline === "string" ? t.deadline : "",
     status,
+    id: typeof t.id === "string" ? t.id : undefined,
+    completedAt: typeof t.completedAt === "string" ? t.completedAt : null,
   };
 }
 

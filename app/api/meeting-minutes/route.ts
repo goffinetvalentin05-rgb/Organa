@@ -8,6 +8,7 @@ import {
   meetingMinutesToDbPayload,
   parseMeetingMinutesBody,
 } from "@/lib/meeting-minutes";
+import { syncMeetingMinuteTasks } from "@/lib/meeting-minute-tasks";
 
 export const runtime = "nodejs";
 
@@ -90,10 +91,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const mapped = mapMeetingMinutesRow(data as Record<string, unknown>);
+    if (mapped) {
+      try {
+        const syncedPoints = await syncMeetingMinuteTasks({
+          supabase,
+          clubId: guard.clubId,
+          userId: guard.userId,
+          meetingMinutesId: mapped.id,
+          pvStatus: mapped.status,
+          points: mapped.points,
+        });
+        await supabase
+          .from("meeting_minutes")
+          .update({ points: syncedPoints })
+          .eq("id", mapped.id)
+          .eq("club_id", guard.clubId);
+        mapped.points = syncedPoints;
+      } catch (syncError) {
+        console.error("[API][meeting-minutes][POST][tasks]", syncError);
+      }
+    }
+
     revalidatePath("/tableau-de-bord/pv-seances");
+    revalidatePath("/tableau-de-bord/a-faire");
+    revalidatePath("/tableau-de-bord");
 
     return NextResponse.json(
-      { minute: mapMeetingMinutesRow(data as Record<string, unknown>) },
+      { minute: mapped },
       { status: 201 }
     );
   } catch (e: unknown) {

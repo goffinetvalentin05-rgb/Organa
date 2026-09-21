@@ -52,6 +52,7 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
   const pathname = usePathname();
   const [seenByKey, setSeenByKey] = useState<Record<string, boolean>>(defaultSeenMap);
   const [saleNotifications, setSaleNotifications] = useState<DashboardNotification[]>([]);
+  const [taskNotifications, setTaskNotifications] = useState<DashboardNotification[]>([]);
   const [checked, setChecked] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
@@ -132,8 +133,22 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
       }
     };
 
+    const loadTaskNotifications = async () => {
+      try {
+        const res = await fetch("/api/meeting-minute-tasks/notifications", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data.notifications)) {
+          setTaskNotifications(data.notifications);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+
     void check();
     void loadSaleNotifications();
+    void loadTaskNotifications();
     return () => {
       cancelled = true;
     };
@@ -176,15 +191,20 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
       setSaleNotifications((prev) =>
         prev.map((item) => (item.id === id ? { ...item, read: true } : item))
       );
+      setTaskNotifications((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, read: true } : item))
+      );
     },
     [markKeysSeen]
   );
 
   const markAllRead = useCallback(() => {
     const saleIds = saleNotifications.map((item) => item.id);
-    markKeysSeen([...BELL_NOTIFICATION_DEFS.map((def) => def.id), ...saleIds]);
+    const taskIds = taskNotifications.map((item) => item.id);
+    markKeysSeen([...BELL_NOTIFICATION_DEFS.map((def) => def.id), ...saleIds, ...taskIds]);
     setSaleNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
-  }, [markKeysSeen, saleNotifications]);
+    setTaskNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+  }, [markKeysSeen, saleNotifications, taskNotifications]);
 
   const requestOpenPanel = useCallback(() => {
     setToastOpen(false);
@@ -198,6 +218,7 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
   const notifications = useMemo(
     (): DashboardNotification[] => [
       ...saleNotifications,
+      ...taskNotifications,
       ...BELL_NOTIFICATION_DEFS.map((def) => ({
         id: def.id,
         title: t(def.titleKey),
@@ -209,7 +230,7 @@ export function NewFeaturesAnnouncementProvider({ children }: { children: ReactN
         read: seenByKey[def.id] !== false,
       })),
     ],
-    [saleNotifications, seenByKey, t]
+    [saleNotifications, taskNotifications, seenByKey, t]
   );
 
   const value = useMemo(

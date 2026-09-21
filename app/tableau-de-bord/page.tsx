@@ -12,6 +12,7 @@ import {
   Wallet,
   Calendar2,
   ArrowRight,
+  CheckCircle,
 } from "@/lib/icons";
 import Link from "next/link";
 import { useI18n } from "@/components/I18nProvider";
@@ -24,6 +25,8 @@ import {
   EntityCardList,
   DashboardBadge,
 } from "@/components/ui";
+import type { MeetingMinuteTaskDto } from "@/lib/meeting-minute-tasks";
+import { relativeDeadline } from "@/lib/meeting-minute-tasks";
 
 interface Client {
   id: string;
@@ -96,6 +99,22 @@ function CheckoutHandler() {
   return null;
 }
 
+function relativeTaskLabel(
+  deadline: string | null,
+  t: (key: string, vars?: Record<string, string | number>) => string
+) {
+  const rel = relativeDeadline(deadline);
+  if (rel.kind === "today") return t("dashboard.todos.urgency.today");
+  if (rel.kind === "tomorrow") return t("dashboard.todos.relative.tomorrow");
+  if (rel.kind === "inDays") return t("dashboard.todos.relative.inDays", { count: rel.count });
+  if (rel.kind === "overdue") {
+    return rel.count === 1
+      ? t("dashboard.todos.relative.overdueOne")
+      : t("dashboard.todos.relative.overdueMany", { count: rel.count });
+  }
+  return null;
+}
+
 export default function TableauDeBordPage() {
   const { t, locale } = useI18n();
 
@@ -115,6 +134,8 @@ export default function TableauDeBordPage() {
   const [dueExpenses, setDueExpenses] = useState<Depense[]>([]);
   const [planningGaps, setPlanningGaps] = useState<PlanningGap[]>([]);
   const [sponsorAlerts, setSponsorAlerts] = useState({ expired: 0, expiringSoon: 0 });
+  const [todoSummary, setTodoSummary] = useState({ overdue: 0, today: 0, upcoming: 0, total: 0 });
+  const [todoPreview, setTodoPreview] = useState<MeetingMinuteTaskDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   const parseDate = (value?: string) => {
@@ -157,6 +178,7 @@ export default function TableauDeBordPage() {
           eventsRes,
           sponsorsRes,
           planningsRes,
+          todosRes,
         ] = await Promise.all([
           fetch("/api/clients", { cache: "no-store" }),
           fetch("/api/documents", { cache: "no-store" }),
@@ -165,6 +187,7 @@ export default function TableauDeBordPage() {
           fetch("/api/events", { cache: "no-store" }),
           fetch("/api/sponsor-contracts", { cache: "no-store" }),
           fetch("/api/plannings", { cache: "no-store" }),
+          fetch("/api/meeting-minute-tasks?filter=active", { cache: "no-store" }),
         ]);
 
         const clientsData = clientsRes.ok ? await clientsRes.json() : { clients: [] };
@@ -176,6 +199,7 @@ export default function TableauDeBordPage() {
         const eventsData = eventsRes.ok ? await eventsRes.json() : { events: [] };
         const sponsorsData = sponsorsRes.ok ? await sponsorsRes.json() : { contracts: [] };
         const planningsData = planningsRes.ok ? await planningsRes.json() : { plannings: [] };
+        const todosData = todosRes.ok ? await todosRes.json() : { tasks: [], summary: {} };
 
         const clients: Client[] = clientsData.clients || [];
         const documents: DocumentItem[] = documentsData.documents || [];
@@ -274,6 +298,13 @@ export default function TableauDeBordPage() {
           expired: Number(renewalsData.expiredCount) || 0,
           expiringSoon: Number(renewalsData.expiringSoonCount) || 0,
         });
+        setTodoSummary({
+          overdue: Number(todosData.summary?.overdue) || 0,
+          today: Number(todosData.summary?.today) || 0,
+          upcoming: Number(todosData.summary?.upcoming) || 0,
+          total: Number(todosData.summary?.total) || 0,
+        });
+        setTodoPreview(((todosData.tasks || []) as MeetingMinuteTaskDto[]).slice(0, 3));
       } catch (error) {
         console.error("[TableauDeBord] Erreur chargement:", error);
       } finally {
@@ -470,6 +501,85 @@ export default function TableauDeBordPage() {
           })}
         </div>
       </div>
+
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-[#0F172A]">
+              {t("dashboard.overview.todos.title")}
+            </h2>
+            <p className="mt-1 text-sm text-[#64748B]">
+              {t("dashboard.overview.todos.subtitle", { count: todoSummary.total })}
+            </p>
+          </div>
+          <Link
+            href="/tableau-de-bord/a-faire"
+            className="text-sm font-medium text-[#1A23FF] hover:underline"
+          >
+            {t("dashboard.overview.todos.viewAll")}
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: t("dashboard.todos.urgency.overdue"), value: todoSummary.overdue },
+            { label: t("dashboard.todos.urgency.today"), value: todoSummary.today },
+            { label: t("dashboard.todos.urgency.upcoming"), value: todoSummary.upcoming },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">
+                {item.label}
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-[#0F172A]">{item.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {!loading && todoPreview.length > 0 ? (
+          <EntityCardList>
+            {todoPreview.map((task) => {
+              const relative = relativeTaskLabel(task.deadline, t);
+              return (
+              <EntityCard
+                key={task.id}
+                layout="row"
+                href={`/tableau-de-bord/a-faire?highlight=${task.id}`}
+                leading={
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2FF] text-[#1A23FF]">
+                    <CheckCircle className="h-5 w-5" />
+                  </span>
+                }
+                title={task.description}
+                subtitle={[
+                  task.responsibleName || t("dashboard.todos.noResponsible"),
+                  relative,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+                status={
+                  <DashboardBadge
+                    variant={
+                      task.urgency === "overdue"
+                        ? "danger"
+                        : task.urgency === "today"
+                          ? "warning"
+                          : "info"
+                    }
+                  >
+                    {t(`dashboard.todos.urgency.${task.urgency === "none" ? "normal" : task.urgency}`)}
+                  </DashboardBadge>
+                }
+              />
+              );
+            })}
+          </EntityCardList>
+        ) : !loading ? (
+          <p className="text-sm text-[#64748B]">{t("dashboard.todos.empty")}</p>
+        ) : null}
+      </section>
 
       <section className="space-y-4">
         <div>

@@ -19,6 +19,7 @@ import { NewFeaturesAnnouncementProvider } from "@/components/announcements/NewF
 import DashboardNotificationBellConnected from "@/components/announcements/DashboardNotificationBellConnected";
 import {
   LayoutDashboard,
+  CheckCircle,
   Users,
   Settings,
   Home,
@@ -125,6 +126,7 @@ export default function DashboardShell({
   const navigationPrimary = [
     { name: t("dashboard.nav.dashboard"), href: "/tableau-de-bord", icon: LayoutDashboard },
     { name: t("dashboard.nav.clients"), href: "/tableau-de-bord/clients", icon: Users },
+    { name: t("dashboard.nav.todos"), href: "/tableau-de-bord/a-faire", icon: CheckCircle },
   ];
 
   const navigationSecondary = [

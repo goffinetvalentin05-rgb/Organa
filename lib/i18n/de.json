@@ -529,6 +529,7 @@
     "nav": {
       "dashboard": "Vereins-Dashboard",
       "clients": "Mitglieder",
+      "todos": "Aufgaben",
       "finances": "Finanzen",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
@@ -558,6 +559,7 @@
       "editClient": "Mitglied bearbeiten",
       "memberDetail": "Mitgliedakte",
       "clients": "Mitglieder",
+      "todos": "Aufgaben",
       "quotes": "Mitgliedsbeiträge",
       "invoices": "Rechnungen",
       "sponsoring": "Sponsoring",
@@ -1664,6 +1666,7 @@
       "generatingPdf": "PDF wird erzeugt…",
       "downloadPdfSuccess": "PDF heruntergeladen",
       "downloadPdfError": "PDF konnte nicht heruntergeladen werden. Bitte erneut versuchen.",
+      "completedOn": "Erledigt am {date}",
       "columns": {
         "title": "Titel",
         "date": "Sitzungsdatum",
@@ -1748,6 +1751,41 @@
         "subtitle": "Protokolldetails"
       }
     },
+    "todos": {
+      "title": "Aufgaben",
+      "subtitle": "Verfolgen Sie die aktiven Aufgaben aus validierten Protokollen.",
+      "loadError": "Aufgaben konnten nicht geladen werden",
+      "empty": "Keine offenen Aufgaben.",
+      "emptyDone": "Keine erledigten Aufgaben.",
+      "complete": "Erledigen",
+      "completeSuccess": "Aufgabe erledigt",
+      "completeError": "Aufgabe konnte nicht abgeschlossen werden",
+      "viewPv": "Protokoll ansehen",
+      "due": "Frist",
+      "noResponsible": "Ohne Verantwortliche",
+      "completed": "Erledigt",
+      "completedOn": "Erledigt am {date}",
+      "filters": {
+        "active": "Alle",
+        "overdue": "Überfällig",
+        "upcoming": "Bevorstehend",
+        "done": "Erledigt"
+      },
+      "relative": {
+        "tomorrow": "Morgen",
+        "inDays": "In {count} Tagen",
+        "overdueOne": "1 Tag überfällig",
+        "overdueMany": "{count} Tage überfällig"
+      },
+      "urgency": {
+        "overdue": "Überfällig",
+        "today": "Heute",
+        "soon": "Bald",
+        "upcoming": "Bevorstehend",
+        "normal": "Geplant",
+        "none": "Ohne Frist"
+      }
+    },
     "status": {
       "quote": {
         "draft": "Entwurf",
@@ -1818,6 +1856,11 @@
         "relance": "Nachfassen",
         "view": "Ansehen",
         "complete": "Ergänzen"
+      },
+      "todos": {
+        "title": "Aufgaben",
+        "subtitle": "{count} Aufgabe(n) offen",
+        "viewAll": "Alle Aufgaben ansehen"
       },
       "activity": {
         "clubRevenue": "Vereinseinnahme"

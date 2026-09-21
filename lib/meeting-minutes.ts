@@ -23,10 +23,13 @@ export type ParticipantEntry = {
 };
 
 export type TaskEntry = {
+  id?: string;
   description: string;
   responsible: string;
+  responsibleClientId?: string | null;
   deadline: string;
   status: TaskStatus;
+  completedAt?: string | null;
 };
 
 export type MeetingPoint = {
@@ -85,6 +88,12 @@ function normalizeTaskStatus(raw: unknown): TaskStatus {
   return "todo";
 }
 
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  );
+}
+
 function normalizeTasks(input: unknown): TaskEntry[] {
   if (!Array.isArray(input)) return [];
   return input
@@ -99,13 +108,30 @@ function normalizeTasks(input: unknown): TaskEntry[] {
           : typeof raw.dueDate === "string"
             ? raw.dueDate
             : "";
-      return {
+      const idRaw = typeof raw.id === "string" ? raw.id.trim() : "";
+      const clientIdRaw =
+        typeof raw.responsibleClientId === "string"
+          ? raw.responsibleClientId.trim()
+          : typeof raw.responsible_client_id === "string"
+            ? raw.responsible_client_id.trim()
+            : "";
+      const completedAtRaw =
+        typeof raw.completedAt === "string"
+          ? raw.completedAt.trim()
+          : typeof raw.completed_at === "string"
+            ? raw.completed_at.trim()
+            : "";
+      const task: TaskEntry = {
         description,
         responsible:
           typeof raw.responsible === "string" ? raw.responsible.trim() : "",
+        responsibleClientId: clientIdRaw && isUuid(clientIdRaw) ? clientIdRaw : null,
         deadline: deadlineRaw.trim(),
         status: normalizeTaskStatus(raw.status),
+        completedAt: completedAtRaw || null,
       };
+      if (idRaw && isUuid(idRaw)) task.id = idRaw;
+      return task;
     })
     .filter((item): item is TaskEntry => item != null);
 }
