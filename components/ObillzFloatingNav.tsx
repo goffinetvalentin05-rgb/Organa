@@ -23,6 +23,7 @@ type ObillzFloatingNavProps = {
   homeHref: string;
   links: ObillzFloatingNavLink[];
   cta: ObillzFloatingNavCta;
+  showProductSwitcher?: boolean;
 };
 
 function isAnchor(href: string) {
@@ -84,6 +85,7 @@ export default function ObillzFloatingNav({
   homeHref,
   links,
   cta,
+  showProductSwitcher = true,
 }: ObillzFloatingNavProps) {
   const [open, setOpen] = useState(false);
 
@@ -127,10 +129,14 @@ export default function ObillzFloatingNav({
               className="landing-nav-logo--on-light h-8 w-auto max-w-[140px] object-contain object-left sm:h-9 sm:max-w-none"
             />
           </Link>
-          <div className="hidden h-6 w-px bg-[#17211d]/10 md:block" />
-          <div className="hidden md:block">
-            <ProductSwitcher current={product} theme="light" />
-          </div>
+          {showProductSwitcher ? (
+            <>
+              <div className="hidden h-6 w-px bg-[#17211d]/10 md:block" />
+              <div className="hidden md:block">
+                <ProductSwitcher current={product} theme="light" />
+              </div>
+            </>
+          ) : null}
         </div>
 
         <div className="hidden items-center gap-7 lg:flex">
@@ -167,9 +173,11 @@ export default function ObillzFloatingNav({
               isSport ? "bg-white/95" : "bg-[#fbfaf6]/95"
             }`}
           >
-            <div className="mb-2 md:hidden">
-              <ProductSwitcher current={product} theme="light" />
-            </div>
+            {showProductSwitcher ? (
+              <div className="mb-2 md:hidden">
+                <ProductSwitcher current={product} theme="light" />
+              </div>
+            ) : null}
             {links.map((link) => (
               <NavTextLink
                 key={link.href}

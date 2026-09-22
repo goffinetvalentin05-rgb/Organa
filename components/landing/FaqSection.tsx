@@ -25,7 +25,7 @@ export default function FaqSection() {
         >
           <p className="lp-eyebrow">{t("marketing.faq.badge")}</p>
           <h2 className="lp-title">
-            {t("marketing.faq.titleLine1")} {t("marketing.faq.titleLine2")}
+            {t("marketing.faq.titleLine1")} <span>{t("marketing.faq.titleLine2")}</span>
           </h2>
           <p className="lp-lead mx-auto">{t("marketing.faq.subtitle")}</p>
         </motion.div>

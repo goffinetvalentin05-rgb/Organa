@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { Check } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
 import { scrollReveal, viewportOnce } from "@/components/landing/landing-motion";
@@ -12,7 +12,7 @@ import {
   type SportFeatureId,
 } from "@/lib/sport-features";
 
-type EcoVisual = "none" | "members" | "progress" | "calendar" | "checks" | "bubbles" | "bars" | "spark";
+type EcoVisual = "none" | "members" | "progress" | "calendar" | "checks" | "bubbles" | "bars" | "spark" | "invoice";
 
 type EcoNodeConfig = {
   id: SportFeatureId;
@@ -32,7 +32,7 @@ const ECO_NODES: EcoNodeConfig[] = [
   { id: "membres", x: 47, y: 7, size: "lg", visual: "members" },
   { id: "cotisations", x: 78, y: 13, size: "lg", visual: "progress" },
   { id: "pagePublique", x: 10, y: 34, size: "sm", visual: "none" },
-  { id: "factures", x: 91, y: 34, size: "sm", visual: "none" },
+  { id: "factures", x: 91, y: 34, size: "sm", visual: "invoice" },
   { id: "statistiques", x: 13, y: 59, size: "lg", visual: "spark" },
   { id: "revenus", x: 89, y: 59, size: "lg", visual: "bars" },
   { id: "qrcodes", x: 14, y: 82, size: "sm", visual: "none" },
@@ -101,6 +101,13 @@ function NodeVisual({ visual }: { visual: EcoVisual }) {
             </span>
             <span className="lp-eco__row-line lp-eco__row-line--short" />
           </span>
+        </span>
+      );
+    case "invoice":
+      return (
+        <span className="lp-eco__visual lp-eco__invoice">
+          <span />
+          <span />
         </span>
       );
     case "bubbles":
@@ -185,10 +192,14 @@ export default function ClubEcosystemSection() {
   const compact = useIsCompact();
   const stageRef = useRef<HTMLDivElement>(null);
 
+  const inView = useInView(stageRef, { amount: 0.28, once: true });
+
   const { scrollYProgress } = useScroll({
     target: stageRef,
     offset: ["start end", "center center"],
   });
+
+  const titleLines = t("marketing.ecosystem.title").split("\n");
 
   const labels = useMemo(() => {
     const raw = getTranslationValue(locale, "marketing.modules.orbitFeatures");
@@ -206,7 +217,7 @@ export default function ClubEcosystemSection() {
       <div className="lp-eco__wrap">
         <div
           ref={stageRef}
-          className="lp-eco__stage"
+          className={`lp-eco__stage${inView ? " is-live" : ""}`}
           role="group"
           aria-label={t("marketing.ecosystem.stageAriaLabel")}
         >
@@ -235,8 +246,11 @@ export default function ClubEcosystemSection() {
               whileInView="visible"
               viewport={viewportOnce}
             >
-              <p className="lp-eyebrow">{t("marketing.ecosystem.badge")}</p>
-              <h2 className="lp-eco__title">{t("marketing.ecosystem.title")}</h2>
+              <h2 className="lp-eco__title">
+                {titleLines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </h2>
               <p className="lp-eco__lead">{t("marketing.ecosystem.subtitle")}</p>
             </motion.header>
           </div>

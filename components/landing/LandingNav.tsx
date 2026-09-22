@@ -16,6 +16,7 @@ export default function LandingNav() {
         { href: "/tarifs", label: t("marketing.nav.pricing") },
         { href: "/#faq", label: t("marketing.nav.faq") },
       ]}
+      showProductSwitcher={false}
       cta={{
         href: "/inscription",
         label: t("marketing.nav.cta"),
