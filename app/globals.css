@@ -12412,180 +12412,20 @@ body.app-bg:has(.obillz-landing-home) {
 
 .lp-gate__stage {
   position: relative;
-  height: clamp(13.5rem, 24vw, 17.5rem);
+  aspect-ratio: 16 / 9;
   margin: 0.85rem 0.85rem 0;
   overflow: hidden;
   border-radius: 1.2rem;
-  background: #ffffff;
+  background: #071433;
 }
 
-.lp-gate__stage--revenue {
-  background: #f7f8fd;
-}
-
-.lp-gate__clock {
-  position: absolute;
-  left: 8%;
-  top: 50%;
-  width: min(11.5rem, 46%);
-  translate: 0 -50%;
-}
-
-.lp-gate__arc,
-.lp-gate__hand {
-  transform-box: view-box;
-  transform-origin: 70px 70px;
+.lp-gate__visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-gate__arc {
-  transform: rotate(-80deg);
-}
-
-.lp-gate__hand {
-  stroke: #0b1220;
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-
-.lp-gate__task {
-  position: absolute;
-  display: grid;
-  gap: 0.35rem;
-  width: 7.2rem;
-  padding: 0.7rem 0.75rem;
-  border: 1px solid rgba(15, 23, 42, 0.07);
-  border-radius: 0.85rem;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-  transition: translate 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-gate__task i {
-  display: block;
-  height: 0.32rem;
-  border-radius: 999px;
-  background: #e7ebf4;
-}
-
-.lp-gate__task i:first-child {
-  width: 72%;
-  background: rgba(26, 35, 255, 0.22);
-}
-
-.lp-gate__task--a {
-  right: 12%;
-  top: 14%;
-  rotate: -6deg;
-}
-
-.lp-gate__task--b {
-  right: 7%;
-  top: 40%;
-  rotate: 4deg;
-}
-
-.lp-gate__task--c {
-  right: 16%;
-  top: 66%;
-  rotate: -2deg;
-}
-
-.lp-gate__pass {
-  position: absolute;
-  left: 8%;
-  top: 50%;
-  display: grid;
-  gap: 0.7rem;
-  width: min(11rem, 46%);
-  padding: 0.9rem;
-  border-radius: 1rem;
-  background: #1a23ff;
-  translate: 0 -54%;
-  rotate: -6deg;
-  transition: rotate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-gate__crest {
-  width: 1.35rem;
-  height: 1.35rem;
-  border-radius: 0.35rem;
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.lp-gate__pass-lines {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.lp-gate__pass-lines i {
-  display: block;
-  height: 0.32rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.lp-gate__pass-lines i:last-child {
-  width: 62%;
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.lp-gate__qr {
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-.lp-gate__bars {
-  position: absolute;
-  right: 10%;
-  top: 18%;
-  display: flex;
-  align-items: flex-end;
-  gap: 0.4rem;
-  height: 5.5rem;
-}
-
-.lp-gate__bars i {
-  display: block;
-  width: 0.7rem;
-  border-radius: 0.25rem 0.25rem 0.1rem 0.1rem;
-  background: rgba(26, 35, 255, 0.18);
-  transform-origin: bottom;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-gate__bars i:nth-child(1) { height: 32%; }
-.lp-gate__bars i:nth-child(2) { height: 46%; }
-.lp-gate__bars i:nth-child(3) { height: 40%; }
-.lp-gate__bars i:nth-child(4) { height: 68%; }
-.lp-gate__bars i:nth-child(5) {
-  height: 88%;
-  background: #1a23ff;
-}
-
-.lp-gate__slip {
-  position: absolute;
-  right: 12%;
-  bottom: 14%;
-  display: grid;
-  gap: 0.32rem;
-  width: 6.4rem;
-  padding: 0.65rem 0.7rem;
-  border: 1px solid rgba(15, 23, 42, 0.07);
-  border-radius: 0.75rem;
-  background: #ffffff;
-}
-
-.lp-gate__slip i {
-  display: block;
-  height: 0.28rem;
-  border-radius: 999px;
-  background: #e7ebf4;
-}
-
-.lp-gate__slip i:first-child {
-  width: 46%;
-  background: rgba(26, 35, 255, 0.28);
 }
 
 .lp-gate__copy {
@@ -12646,30 +12486,8 @@ body.app-bg:has(.obillz-landing-home) {
     translate: 4px 0;
   }
 
-  .lp-gate__card:hover .lp-gate__arc {
-    transform: rotate(-40deg);
-  }
-
-  .lp-gate__card:hover .lp-gate__hand--h {
-    transform: rotate(-18deg);
-  }
-
-  .lp-gate__card:hover .lp-gate__task--a,
-  .lp-gate__card:hover .lp-gate__task--b,
-  .lp-gate__card:hover .lp-gate__task--c {
-    rotate: 0deg;
-  }
-
-  .lp-gate__card:hover .lp-gate__task--a { translate: 0 0.4rem; }
-  .lp-gate__card:hover .lp-gate__task--b { translate: -0.4rem 0; }
-  .lp-gate__card:hover .lp-gate__task--c { translate: 0.2rem -0.35rem; }
-
-  .lp-gate__card:hover .lp-gate__pass {
-    rotate: -2deg;
-  }
-
-  .lp-gate__card:hover .lp-gate__bars i {
-    transform: scaleY(1.06);
+  .lp-gate__card:hover .lp-gate__visual {
+    transform: scale(1.035);
   }
 }
 
@@ -12688,11 +12506,7 @@ body.app-bg:has(.obillz-landing-home) {
 @media (prefers-reduced-motion: reduce) {
   .lp-gate__card,
   .lp-gate__cta svg,
-  .lp-gate__arc,
-  .lp-gate__hand,
-  .lp-gate__task,
-  .lp-gate__pass,
-  .lp-gate__bars i {
+  .lp-gate__visual {
     transition: none !important;
   }
 }
