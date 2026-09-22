@@ -1,198 +1,210 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import ScrollReveal from "@/components/landing/ScrollReveal";
 import { easePremium } from "@/components/landing/landing-motion";
 
-const QR_ROWS = ["1110111", "1000101", "1011101", "1000001", "1110111", "0001010", "1101111"];
+type GrowCard = "shop" | "pass" | "sale";
+type SpotlightRole = "idle" | "active" | "dimmed";
 
-function Jersey({ soft = false }: { soft?: boolean }) {
-  return (
-    <svg className="lp-grow__jersey" viewBox="0 0 84 92" aria-hidden>
-      <path
-        fill={soft ? "#c9d0ff" : "#1A23FF"}
-        d="M30 10 42 20 54 10l18 12-8 14v44H20V36L12 22z"
-      />
-      <path fill="#ffffff" d="M34 10h16L42 22z" />
-      <path
-        fill={soft ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)"}
-        d="M42 28v40"
-        stroke={soft ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)"}
-        strokeWidth="3"
-      />
-    </svg>
-  );
-}
-
-function QrMark() {
-  return (
-    <span className="lp-grow__qr">
-      {QR_ROWS.map((row, y) => (
-        <span key={y} className="lp-grow__qr-row">
-          {row.split("").map((cell, x) => (
-            <span key={x} className={cell === "1" ? "is-on" : ""} />
-          ))}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-function ShopCard({ play, still }: { play: boolean; still: boolean }) {
-  const [cart, setCart] = useState(still ? 1 : 0);
+function useFineHover() {
+  const [fine, setFine] = useState(false);
 
   useEffect(() => {
-    if (still) {
-      setCart(1);
-      return;
-    }
-    if (!play) return;
-    const timer = window.setTimeout(() => setCart(1), 980);
-    return () => window.clearTimeout(timer);
-  }, [play, still]);
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setFine(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
+  return fine;
+}
+
+function cardMotion(delay: number, play: boolean, still: boolean, role: SpotlightRole, id: GrowCard) {
+  const spotlight = role !== "idle";
+  const wide = id === "sale";
+  return {
+    initial: still ? false : { opacity: 0, y: 22, scale: 1, x: 0 },
+    animate:
+      play || still
+        ? {
+            opacity: role === "dimmed" ? 0.74 : 1,
+            x: role === "active" ? (id === "shop" ? 18 : id === "pass" ? -18 : 0) : 0,
+            y: role === "active" ? (wide ? -18 : -22) : role === "dimmed" ? 10 : 0,
+            scale: role === "active" ? (wide ? 1.08 : 1.11) : role === "dimmed" ? 0.96 : 1,
+            transition: {
+              duration: spotlight ? 0.58 : 0.68,
+              delay: spotlight || still ? 0 : delay,
+              ease: easePremium,
+            },
+          }
+        : undefined,
+    transition: { duration: 0.58, ease: easePremium },
+  };
+}
+
+function spotlightClass(role: SpotlightRole) {
+  if (role === "active") return " is-active";
+  if (role === "dimmed") return " is-dimmed";
+  return "";
+}
+
+function ShopCard({
+  play,
+  still,
+  role,
+  onActivate,
+  onDeactivate,
+}: {
+  play: boolean;
+  still: boolean;
+  role: SpotlightRole;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}) {
   return (
-    <article className="lp-grow__card lp-grow__card--shop">
+    <motion.article
+      className={`lp-grow__card lp-grow__card--shop${spotlightClass(role)}`}
+      {...cardMotion(0, play, still, role, "shop")}
+      onHoverStart={onActivate}
+      onHoverEnd={onDeactivate}
+    >
       <div className="lp-grow__mock" aria-hidden>
-        <div className="lp-grow__shop">
-          <div className="lp-grow__shop-bar">
-            <span>FC Les Étoiles</span>
-            <span className={`lp-grow__cart${cart > 0 ? " is-on" : ""}`}>{cart}</span>
-          </div>
-          <motion.div
-            className="lp-grow__hero-product"
-            initial={still ? false : { opacity: 0, y: 16 }}
-            animate={play || still ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.75, ease: easePremium }}
-          >
-            <span className="lp-grow__photo">
-              <Jersey />
-            </span>
-            <span className="lp-grow__meta">
-              <span>Maillot domicile</span>
-              <strong>CHF 45</strong>
-            </span>
-          </motion.div>
-          <div className="lp-grow__side-product">
-            <span className="lp-grow__photo lp-grow__photo--sm">
-              <Jersey soft />
-            </span>
-            <span className="lp-grow__meta">
-              <span>Training</span>
-              <strong>CHF 32</strong>
-            </span>
-          </div>
+        <div className="lp-grow__visual lp-grow__visual--shop">
+          <Image
+            src="/images/landing/club-growth-shop.png"
+            alt=""
+            width={923}
+            height={520}
+            sizes="(max-width: 980px) 92vw, 46vw"
+            className="lp-grow__visual-img"
+          />
         </div>
       </div>
       <div className="lp-grow__card-copy">
         <h3>Boutique en ligne</h3>
         <p>Vendez directement à votre communauté.</p>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
-function PassCard({ play, still }: { play: boolean; still: boolean }) {
+function PassCard({
+  play,
+  still,
+  role,
+  onActivate,
+  onDeactivate,
+}: {
+  play: boolean;
+  still: boolean;
+  role: SpotlightRole;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}) {
   return (
-    <article className="lp-grow__card lp-grow__card--pass">
+    <motion.article
+      className={`lp-grow__card lp-grow__card--pass${spotlightClass(role)}`}
+      {...cardMotion(0.1, play, still, role, "pass")}
+      onHoverStart={onActivate}
+      onHoverEnd={onDeactivate}
+    >
       <div className="lp-grow__mock" aria-hidden>
-        <motion.div
-          className="lp-grow__pass"
-          initial={still ? false : { opacity: 0, y: 18, rotate: -6 }}
-          animate={play || still ? { opacity: 1, y: 0, rotate: -2.5 } : undefined}
-          transition={{ duration: 0.9, ease: easePremium }}
-        >
-          <div className="lp-grow__pass-top">
-            <span className="lp-grow__crest" />
-            <span>FC Les Étoiles</span>
-          </div>
-          <p className="lp-grow__pass-kicker">Supporter</p>
-          <p className="lp-grow__pass-name">Camille Rossi</p>
-          <p className="lp-grow__pass-num">N° 128</p>
-          <motion.div
-            initial={still ? false : { opacity: 0, y: 8 }}
-            animate={play || still ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.5, delay: still ? 0 : 0.55, ease: easePremium }}
-          >
-            <QrMark />
-          </motion.div>
-          <span className={`lp-grow__status${play || still ? " is-on" : ""}`}>Valide</span>
-        </motion.div>
+        <div className="lp-grow__visual lp-grow__visual--pass">
+          <Image
+            src="/images/landing/club-growth-supporter.jpg"
+            alt=""
+            fill
+            sizes="(max-width: 980px) 72vw, 22rem"
+            className="lp-grow__visual-img"
+          />
+        </div>
       </div>
       <div className="lp-grow__card-copy">
         <h3>Cartes supporters</h3>
         <p>Transformez le soutien autour du club en revenus.</p>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
-function SaleCard({ play, still }: { play: boolean; still: boolean }) {
-  const [step, setStep] = useState(still ? 2 : 0);
-
-  useEffect(() => {
-    if (still) {
-      setStep(2);
-      return;
-    }
-    if (!play) return;
-    const mid = window.setTimeout(() => setStep(1), 520);
-    const done = window.setTimeout(() => setStep(2), 1280);
-    return () => {
-      window.clearTimeout(mid);
-      window.clearTimeout(done);
-    };
-  }, [play, still]);
-
-  const sales = step === 0 ? 0 : step === 1 ? 74 : 86;
-  const width = step === 0 ? "0%" : step === 1 ? "62%" : "78%";
-
+function SaleCard({
+  play,
+  still,
+  role,
+  onActivate,
+  onDeactivate,
+}: {
+  play: boolean;
+  still: boolean;
+  role: SpotlightRole;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}) {
   return (
-    <article className="lp-grow__card lp-grow__card--sale">
+    <motion.article
+      className={`lp-grow__card lp-grow__card--sale${spotlightClass(role)}`}
+      {...cardMotion(0.2, play, still, role, "sale")}
+      onHoverStart={onActivate}
+      onHoverEnd={onDeactivate}
+    >
       <div className="lp-grow__mock" aria-hidden>
-        <div className="lp-grow__sale">
-          <div className="lp-grow__sale-head">
-            <span>Fondue 2026</span>
-            <strong>{sales}</strong>
-          </div>
-          <p className="lp-grow__sale-goal">Objectif 120</p>
-          <span className="lp-grow__track">
-            <span className="lp-grow__bar" style={{ width }} />
-          </span>
-          <ul>
-            <li>
-              <span>Léa M.</span>
-              <span>U15</span>
-              <span>14</span>
-            </li>
-            <li>
-              <span>Noah P.</span>
-              <span>Seniors</span>
-              <span>9</span>
-            </li>
-            <li className={step >= 2 ? "is-on" : ""}>
-              <span>Commande</span>
-              <span />
-              <span>+1</span>
-            </li>
-          </ul>
+        <div className="lp-grow__visual lp-grow__visual--sale">
+          <Image
+            src="/images/landing/club-growth-sale.png"
+            alt=""
+            width={984}
+            height={373}
+            sizes="(max-width: 980px) 92vw, 80vw"
+            className="lp-grow__visual-img"
+          />
         </div>
       </div>
       <div className="lp-grow__card-copy">
         <h3>Ventes de soutien</h3>
-        <p>Lancez et suivez vos campagnes depuis OBILLZ.</p>
+        <p>Suivez vos campagnes depuis OBILLZ.</p>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
 export default function ClubGrowthSection() {
   const reduceMotion = useReducedMotion();
   const still = reduceMotion === true;
+  const fineHover = useFineHover();
   const stageRef = useRef<HTMLDivElement>(null);
+  const clearRef = useRef<number | null>(null);
+  const [active, setActive] = useState<GrowCard | null>(null);
   const inView = useInView(stageRef, { amount: 0.28, once: true });
   const play = inView && !still;
+  const spotlight = !still && fineHover;
+
+  useEffect(() => {
+    return () => {
+      if (clearRef.current) window.clearTimeout(clearRef.current);
+    };
+  }, []);
+
+  const activate = (id: GrowCard) => {
+    if (!spotlight) return;
+    if (clearRef.current) window.clearTimeout(clearRef.current);
+    setActive(id);
+  };
+
+  const deactivate = (id: GrowCard) => {
+    if (!spotlight) return;
+    clearRef.current = window.setTimeout(() => {
+      setActive((current) => (current === id ? null : current));
+    }, 40);
+  };
+
+  const role = (id: GrowCard): SpotlightRole => {
+    if (!active) return "idle";
+    return active === id ? "active" : "dimmed";
+  };
 
   return (
     <section className="lp-grow" aria-labelledby="lp-grow-title">
@@ -212,10 +224,28 @@ export default function ClubGrowthSection() {
           </header>
         </ScrollReveal>
 
-        <div ref={stageRef} className="lp-grow__stage">
-          <ShopCard play={play} still={still} />
-          <PassCard play={play} still={still} />
-          <SaleCard play={play} still={still} />
+        <div ref={stageRef} className={`lp-grow__stage${active ? " is-spotlight" : ""}`}>
+          <ShopCard
+            play={play}
+            still={still}
+            role={role("shop")}
+            onActivate={() => activate("shop")}
+            onDeactivate={() => deactivate("shop")}
+          />
+          <PassCard
+            play={play}
+            still={still}
+            role={role("pass")}
+            onActivate={() => activate("pass")}
+            onDeactivate={() => deactivate("pass")}
+          />
+          <SaleCard
+            play={play}
+            still={still}
+            role={role("sale")}
+            onActivate={() => activate("sale")}
+            onDeactivate={() => deactivate("sale")}
+          />
         </div>
       </div>
     </section>

@@ -9,7 +9,6 @@ import SimpleStartSection from "@/components/landing/SimpleStartSection";
 import CommitteePlatformSection from "@/components/landing/CommitteePlatformSection";
 import ClubGrowthSection from "@/components/landing/ClubGrowthSection";
 import ClubEcosystemSection from "@/components/landing/ClubEcosystemSection";
-import ClubEstimateSection from "@/components/landing/ClubEstimateSection";
 import DemoInviteSection from "@/components/landing/DemoInviteSection";
 import FaqSection from "@/components/landing/FaqSection";
 import { obillzLandingHomeClass } from "@/components/ui/styles";
@@ -25,7 +24,6 @@ export default function LandingPage() {
         <CommitteePlatformSection />
         <ClubGrowthSection />
         <ClubEcosystemSection />
-        <ClubEstimateSection />
         <SimpleStartSection />
         <FaqSection />
         <DemoInviteSection />

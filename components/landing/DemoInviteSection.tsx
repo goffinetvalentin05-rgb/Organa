@@ -2,117 +2,111 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 import { easePremium, viewportOnce } from "@/components/landing/landing-motion";
+import { useI18n } from "@/components/I18nProvider";
 
-/**
- * URL d’embed du calendrier (Calendly, Cal.com, etc.).
- * Renseigner NEXT_PUBLIC_DEMO_CALENDAR_URL. Aucune URL n’est inventée.
- */
-const DEMO_CALENDAR_URL = process.env.NEXT_PUBLIC_DEMO_CALENDAR_URL?.trim() ?? "";
+const FOUNDER_PHOTO_SRC = "/images/landing/valentin-goffinet.jpg";
+const WHATSAPP_MESSAGE =
+  "Bonjour Valentin, je voudrais en savoir plus sur OBILLZ pour mon club.";
 
-/** Laisser vide tant que la photo n’est pas ajoutée, par exemple "/images/landing/valentin-goffinet.jpg". */
-const FOUNDER_PHOTO_SRC = "";
+const SHOTS = [
+  {
+    src: "/images/landing/club-growth-shop.png",
+    width: 923,
+    height: 520,
+    className: "lp-meet__shot lp-meet__shot--shop",
+    delay: 0.12,
+    rotate: -1.5,
+  },
+  {
+    src: "/images/landing/club-growth-supporter.jpg",
+    width: 768,
+    height: 1024,
+    className: "lp-meet__shot lp-meet__shot--pass",
+    delay: 0.2,
+    rotate: -7,
+  },
+  {
+    src: "/images/landing/club-growth-sale.png",
+    width: 984,
+    height: 373,
+    className: "lp-meet__shot lp-meet__shot--sale",
+    delay: 0.28,
+    rotate: 4,
+  },
+] as const;
 
-function calendarEmbedSrc(raw: string): string | null {
-  if (!raw) return null;
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    return null;
-  }
-  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
-
-  const host = url.hostname.replace(/^www\./, "");
-  if (host === "calendly.com" || host.endsWith(".calendly.com")) {
-    url.searchParams.set("hide_gdpr_banner", "1");
-    url.searchParams.set("hide_event_type_details", "1");
-    url.searchParams.set("background_color", "ffffff");
-    url.searchParams.set("primary_color", "1a23ff");
-    url.searchParams.set("text_color", "0b1220");
-  }
-  if (host === "cal.com" || host.endsWith(".cal.com")) {
-    url.searchParams.set("embed", "true");
-    url.searchParams.set("theme", "light");
-  }
-  return url.toString();
+function buildWhatsAppUrl(phone: string, message: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
 export default function DemoInviteSection() {
+  const { t } = useI18n();
   const reduceMotion = useReducedMotion();
-  const embedSrc = calendarEmbedSrc(DEMO_CALENDAR_URL);
+  const whatsappUrl = buildWhatsAppUrl(
+    t("marketing.askChatGpt.whatsappPhone"),
+    WHATSAPP_MESSAGE
+  );
 
   return (
     <section className="lp-meet" id="demo" aria-labelledby="lp-meet-title">
-      <div className="lp-meet__wrap">
-        <motion.div
-          className="lp-meet__card"
-          initial={reduceMotion ? false : { opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewportOnce}
-          transition={{ duration: 0.7, ease: easePremium }}
-        >
-          <div className="lp-meet__copy">
-            <Image src="/logo-symbole.png" alt="" width={40} height={40} className="lp-meet__mark" />
-            <Image src="/logo-symbole.png" alt="" width={180} height={180} className="lp-meet__watermark" aria-hidden />
-            <h2 id="lp-meet-title">Parlons de votre club.</h2>
-            <p>
-              30 minutes pour comprendre votre fonctionnement, vos besoins et voir concrètement ce qu’OBILLZ peut vous apporter.
-            </p>
-            <div className="lp-meet__profile">
-              <span className="lp-meet__avatar">
-                {FOUNDER_PHOTO_SRC ? (
-                  <Image src={FOUNDER_PHOTO_SRC} alt="" width={72} height={72} />
-                ) : (
-                  <span aria-hidden>VG</span>
-                )}
-              </span>
-              <span className="lp-meet__identity">
-                <strong>Valentin Goffinet</strong>
-                <span>Fondateur d’OBILLZ</span>
-              </span>
-            </div>
+      <div className="lp-meet__stage">
+        <div className="lp-meet__panel">
+          <div className="lp-meet__shots" aria-hidden>
+            {SHOTS.map((shot) => (
+              <motion.div
+                key={shot.src}
+                className={shot.className}
+                initial={reduceMotion ? false : { opacity: 0, y: 28, rotate: shot.rotate }}
+                whileInView={{ opacity: 1, y: 0, rotate: shot.rotate }}
+                viewport={viewportOnce}
+                transition={{ duration: 0.8, delay: shot.delay, ease: easePremium }}
+              >
+                <Image src={shot.src} alt="" width={shot.width} height={shot.height} />
+              </motion.div>
+            ))}
           </div>
 
-          <div className="lp-meet__cal">
-            {embedSrc ? (
-              <iframe
-                className="lp-meet__frame"
-                src={embedSrc}
-                title="Réserver un échange de 30 minutes"
-                loading="lazy"
-              />
-            ) : (
-              <div className="lp-meet__slot" role="region" aria-label="Calendrier de réservation">
-                <div className="lp-meet__preview" aria-hidden>
-                  <div className="lp-meet__preview-month">
-                    <div className="lp-meet__preview-head">
-                      <span />
-                      <i />
-                      <span />
-                    </div>
-                    <div className="lp-meet__preview-week">
-                      {Array.from({ length: 7 }, (_, index) => (
-                        <i key={index} />
-                      ))}
-                    </div>
-                    <div className="lp-meet__preview-grid">
-                      {Array.from({ length: 35 }, (_, index) => (
-                        <i key={index} className={index === 16 ? "is-on" : undefined} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="lp-meet__preview-slots">
-                    <i />
-                    <i className="is-on" />
-                    <i />
-                    <i />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.div>
+          <motion.div
+            className="lp-meet__copy"
+            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.7, ease: easePremium }}
+          >
+            <h2 id="lp-meet-title">
+              <span>Vous avez vu ce qu’OBILLZ peut changer.</span>
+              Parlons de votre club.
+            </h2>
+            <p>
+              Un échange direct avec{" "}
+              <span className="lp-meet__who">
+                <Image
+                  src={FOUNDER_PHOTO_SRC}
+                  alt=""
+                  width={28}
+                  height={28}
+                />
+                Valentin
+              </span>
+              , fondateur d’OBILLZ, pour voir comment la plateforme peut s’adapter à votre club.
+            </p>
+            <motion.a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="lp-meet__cta"
+              whileHover={reduceMotion ? undefined : { y: -2 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              transition={{ duration: 0.22, ease: easePremium }}
+            >
+              Parler au fondateur
+              <ArrowUpRight strokeWidth={2.25} aria-hidden />
+            </motion.a>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
