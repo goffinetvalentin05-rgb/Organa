@@ -11876,130 +11876,78 @@ body.app-bg:has(.obillz-landing-home) {
   font-weight: 650;
 }
 
-.lp-grow__showcase {
+.lp-grow__marquee {
+  --lp-grow-gap: 0.9rem;
   position: relative;
-  margin-top: clamp(2.75rem, 5.5vw, 4.25rem);
-}
-
-.lp-grow__viewport {
-  --slide: 84%;
+  z-index: 1;
+  width: 100vw;
+  max-width: 100vw;
+  margin-top: clamp(2.5rem, 5vw, 3.75rem);
+  margin-left: calc(50% - 50vw);
+  padding-block: 1.15rem 1.4rem;
   overflow: hidden;
   touch-action: pan-y;
   user-select: none;
+  mask-image: linear-gradient(90deg, transparent, #000 3.5%, #000 96.5%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3.5%, #000 96.5%, transparent);
 }
 
-.lp-grow__rail {
+.lp-grow__ribbon {
+  display: flex;
+  width: max-content;
+  animation: lp-grow-marquee 36s linear infinite;
+}
+
+.lp-grow__ribbon.is-paused {
+  animation-play-state: paused;
+}
+
+.lp-grow__group {
   display: flex;
   align-items: stretch;
-  width: 100%;
-  transform: translateX(calc((100% - var(--slide)) / 2 - var(--index) * var(--slide) + var(--drag, 0px)));
-  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-grow__rail.is-instant,
-.lp-grow__rail.is-dragging {
-  transition: none;
+  gap: var(--lp-grow-gap);
+  padding-right: var(--lp-grow-gap);
 }
 
 .lp-grow__slide {
-  flex: 0 0 var(--slide);
-  width: var(--slide);
+  flex: 0 0 auto;
+  width: min(82vw, 23rem);
   min-width: 0;
-  padding-inline: clamp(0.4rem, 1vw, 0.75rem);
-  box-sizing: border-box;
-  opacity: 0.66;
-  transform: scale(0.92) translateY(10px);
-  transform-origin: center center;
-  transition:
-    transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 720ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.lp-grow__slide:not(.is-current) {
-  cursor: pointer;
-}
-
-.lp-grow__slide.is-current {
-  opacity: 1;
-  transform: none;
-  z-index: 2;
-}
-
-.lp-grow__controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.85rem;
-  margin-top: 1.15rem;
-}
-
-.lp-grow__arrow {
-  display: grid;
-  place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
-  padding: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #334155;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
-  cursor: pointer;
-}
-
-.lp-grow__arrow svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.lp-grow__arrow:hover {
-  color: #0b1220;
-  border-color: rgba(26, 35, 255, 0.22);
-}
-
-.lp-grow__arrow:focus-visible,
-.lp-grow__dot:focus-visible {
-  outline: 2px solid #1a23ff;
-  outline-offset: 3px;
-}
-
-.lp-grow__dots {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.lp-grow__dot {
-  width: 0.42rem;
-  height: 0.42rem;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.18);
-  cursor: pointer;
-}
-
-.lp-grow__dot.is-on {
-  background: #1a23ff;
+@keyframes lp-grow-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (min-width: 900px) {
-  .lp-grow__viewport {
-    --slide: 62%;
+  .lp-grow__marquee {
+    --lp-grow-gap: 1.35rem;
   }
 
-  .lp-grow__arrow {
-    position: absolute;
-    top: 38%;
-    z-index: 3;
+  .lp-grow__ribbon {
+    animation-duration: 28s;
   }
 
-  .lp-grow__controls .lp-grow__arrow:first-child {
-    left: 0.15rem;
+  .lp-grow__slide {
+    width: clamp(22rem, 24vw, 26rem);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-grow__slide:hover {
+    z-index: 2;
   }
 
-  .lp-grow__controls .lp-grow__arrow:last-child {
-    right: 0.15rem;
+  .lp-grow__slide:hover .lp-grow__card {
+    transform: scale(1.03);
+    border-color: rgba(26, 35, 255, 0.22);
+    background: #ffffff;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
   }
 }
 
@@ -12014,19 +11962,13 @@ body.app-bg:has(.obillz-landing-home) {
   border-radius: 1.85rem;
   background:
     radial-gradient(ellipse 80% 55% at 100% 0%, rgba(26, 35, 255, 0.05), transparent 58%),
-    #f6f7fb;
+    #ffffff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   transition:
-    border-color 720ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 720ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lp-grow__slide.is-current .lp-grow__card {
-  border-color: rgba(26, 35, 255, 0.22);
-  background: #ffffff;
-  box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.07),
-    0 2px 8px rgba(26, 35, 255, 0.05);
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 420ms ease;
 }
 
 .lp-grow__mock {
@@ -12043,7 +11985,7 @@ body.app-bg:has(.obillz-landing-home) {
   justify-content: center;
   overflow: hidden;
   width: 100%;
-  height: clamp(15.5rem, 28vw, 20.5rem);
+  height: clamp(11.5rem, 16vw, 14.75rem);
   border-radius: 1.2rem;
 }
 
@@ -12064,31 +12006,24 @@ body.app-bg:has(.obillz-landing-home) {
 .lp-grow__visual--pass .lp-grow__visual-img {
   position: static;
   display: block;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 12px 22px rgba(15, 23, 42, 0.1));
+  object-position: center;
+  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.08));
 }
 
 .lp-grow__visual--shop .lp-grow__visual-img {
-  max-width: min(100%, 32rem);
-}
-
-.lp-grow__visual--sale .lp-grow__visual-img {
-  max-width: min(100%, 36rem);
-}
-
-.lp-grow__slide.is-current .lp-grow__visual--shop .lp-grow__visual-img {
   animation: lp-grow-float 8.5s ease-in-out infinite;
 }
 
-.lp-grow__slide.is-current .lp-grow__visual--pass .lp-grow__visual-img {
+.lp-grow__visual--pass .lp-grow__visual-img {
   animation: lp-grow-phone 9s ease-in-out infinite;
 }
 
-.lp-grow__slide.is-current .lp-grow__visual--sale .lp-grow__visual-img {
+.lp-grow__visual--sale .lp-grow__visual-img {
   animation: lp-grow-float-soft 9.5s ease-in-out infinite;
 }
 
@@ -12492,17 +12427,28 @@ body.app-bg:has(.obillz-landing-home) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-grow__rail,
-  .lp-grow__slide,
+  .lp-grow__ribbon,
   .lp-grow__card,
-  .lp-grow__dot {
-    transition: none !important;
-  }
-
   .lp-grow__visual--shop .lp-grow__visual-img,
   .lp-grow__visual--pass .lp-grow__visual-img,
   .lp-grow__visual--sale .lp-grow__visual-img {
     animation: none !important;
+  }
+
+  .lp-grow__marquee {
+    overflow-x: auto;
+    touch-action: pan-x;
+    mask-image: none;
+    -webkit-mask-image: none;
+    scrollbar-width: thin;
+  }
+
+  .lp-grow__group[aria-hidden="true"] {
+    display: none;
+  }
+
+  .lp-grow__slide:hover .lp-grow__card {
+    transform: none;
   }
 }
 
