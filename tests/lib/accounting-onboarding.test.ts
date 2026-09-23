@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { RECOMMENDED_CHART } from "@/lib/accounting/chart";
 import { buildOpeningLines, linesAreBalanced } from "@/lib/accounting/engine";
 import { isBankSystemCode, isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import {
@@ -6,6 +7,7 @@ import {
   coverageType,
   nextAccountingPeriod,
   normalizeOnboardingInput,
+  PATRIMONY_ITEMS,
   resolveCoverageType,
   allocateExtraBankNumbers,
   suggestBankNumber,
@@ -132,5 +134,27 @@ describe("situation de départ", () => {
     });
     expect(linesAreBalanced(opening.lines)).toBe(true);
     expect(opening.equityAmount).toBe(27700);
+  });
+
+  it("n’ouvre pas les comptes de régularisation comme fourre-tout", () => {
+    expect(PATRIMONY_ITEMS.map((item) => item.number)).toEqual(["1100", "2000", "1500", "1200"]);
+    const input = normalizeOnboardingInput({
+      periodStart: "2026-01-01",
+      periodEnd: "2026-12-31",
+      accountingStartDate: "2026-09-23",
+      banks: [{ name: "Courant", amount: 0 }],
+      others: [
+        { accountCode: "debtors", amount: 100, side: "liability" },
+        { accountCode: "prepaid", amount: 50 },
+        { accountCode: "accrued", amount: 40 },
+      ],
+    });
+    expect(input.others).toEqual([{ accountCode: "debtors", amount: 100, side: "asset", note: undefined }]);
+    expect(RECOMMENDED_CHART.find((account) => account.number === "1300")?.name).toBe(
+      "Actifs de régularisation / actifs transitoires"
+    );
+    expect(RECOMMENDED_CHART.find((account) => account.number === "2300")?.name).toBe(
+      "Passifs de régularisation / passifs transitoires"
+    );
   });
 });

@@ -367,7 +367,7 @@ export default function AccountingOnboarding({
           <section className="mt-8">
             <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Autres éléments du patrimoine</h3>
             <p className="mt-2 max-w-xl text-sm text-[#475569]">
-              Ajoutez, si nécessaire, les créances, dettes, immobilisations, stocks ou autres éléments qui figurent dans la situation actuelle de votre club.
+              Ajoutez, si nécessaire, les créances, dettes, immobilisations ou stocks qui figurent dans la situation actuelle de votre club.
             </p>
             <div className="mt-4 space-y-4">
               {patrimony.map((row) => {
@@ -419,6 +419,10 @@ export default function AccountingOnboarding({
             >
               + Ajouter un élément
             </button>
+            <p className="mt-4 max-w-xl text-sm text-[#475569]">
+              <span className="font-medium text-[#334155]">Situation particulière.</span>{" "}
+              Un élément qui ne correspond à aucune de ces catégories peut être ajouté ensuite, avec un compte spécifique, depuis le plan comptable.
+            </p>
           </section>
 
           <div className="mt-8 flex flex-wrap gap-3">

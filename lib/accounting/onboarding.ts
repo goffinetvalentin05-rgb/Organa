@@ -190,18 +190,19 @@ export function normalizeOnboardingInput(body: Record<string, unknown>): Normali
   if (Number.isNaN(stripeAmount)) throw new Error("Solde Stripe invalide");
 
   const others: OpeningOther[] = (Array.isArray(body.others) ? body.others : [])
-    .map((row) => {
+    .flatMap((row) => {
       const item = row as Record<string, unknown>;
+      const preset = PATRIMONY_ITEMS.find((entry) => entry.accountCode === String(item.accountCode || "").trim());
       const amount = parseChfInput(item.amount);
+      if (!preset || !(amount > 0)) return [];
       const note = String(item.note || "").trim();
-      return {
-        accountCode: String(item.accountCode || "").trim(),
+      return [{
+        accountCode: preset.accountCode,
         amount,
-        side: item.side === "liability" ? "liability" as const : "asset" as const,
+        side: preset.side,
         note: note || undefined,
-      };
-    })
-    .filter((row) => row.accountCode && row.amount > 0);
+      }];
+    });
 
   return {
     periodStart,
@@ -248,20 +249,6 @@ export const PATRIMONY_ITEMS = [
     label: "Stocks",
     description: "Par exemple les articles encore disponibles dans la boutique du club.",
     side: "asset" as const,
-  },
-  {
-    accountCode: "prepaid",
-    number: "1300",
-    label: "Autres actifs",
-    description: "Autre élément d’actif à reprendre dans la situation de départ.",
-    side: "asset" as const,
-  },
-  {
-    accountCode: "accrued",
-    number: "2300",
-    label: "Autres passifs",
-    description: "Autre élément de passif à reprendre dans la situation de départ.",
-    side: "liability" as const,
   },
 ] as const;
 
