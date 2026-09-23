@@ -10,6 +10,7 @@ import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 import { CLIENTS_SAFE_COLUMNS } from "@/lib/clients/safeSelect";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
 import type { LigneDocument } from "@/lib/utils/calculations";
+import { getErrorMessage } from "@/lib/utils/error-message";
 import { safeProcessAccounting } from "@/lib/accounting/hooks";
 import {
   buildInvoiceRecipientDbFields,
