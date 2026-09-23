@@ -6,7 +6,7 @@ import { ACCOUNT_CLASS_LABELS, DEFAULT_MAPPINGS, RECOMMENDED_CHART } from "@/lib
 import { formatChfAmount, formatSwissDate, zurichToday } from "@/lib/accounting/format";
 import {
   HISTORY_IMPORT_FORMATS,
-  OTHER_OPENING_PRESETS,
+  PATRIMONY_ITEMS,
   dateInPeriod,
   nextAccountingPeriod,
   parseChfInput,
@@ -50,7 +50,8 @@ const MAPPING_LABELS: Record<string, string> = {
   other_expense: "Autres charges",
 };
 
-type BankDraft = { name: string; number: string; amount: string };
+type BankDraft = { name: string; amount: string };
+type PatrimonyDraft = { key: number; accountCode: string; note: string; amount: string };
 
 const fieldClass = "mt-1 w-full rounded-xl border border-[rgba(15,23,42,0.1)] px-3 py-2 text-sm";
 
@@ -68,14 +69,13 @@ export default function AccountingOnboarding({
   const [periodEnd, setPeriodEnd] = useState(`${year}-12-31`);
   const [mode, setMode] = useState<StartMode | null>(null);
   const [banks, setBanks] = useState<BankDraft[]>([
-    { name: "Compte courant", number: suggestBankNumber(0), amount: "" },
+    { name: "Compte courant", amount: "" },
   ]);
   const [useCash, setUseCash] = useState(false);
   const [cashName, setCashName] = useState("Caisse");
   const [cashAmount, setCashAmount] = useState("");
   const [stripeAmount, setStripeAmount] = useState("");
-  const [showOthers, setShowOthers] = useState(false);
-  const [others, setOthers] = useState<Record<string, string>>({});
+  const [patrimony, setPatrimony] = useState<PatrimonyDraft[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [modeMissing, setModeMissing] = useState(false);
   const modeButtons = useRef<Array<HTMLButtonElement | null>>([]);
@@ -160,7 +160,6 @@ export default function AccountingOnboarding({
         historyImportStatus: mode === "resume_current" ? "planned" : "not_requested",
         banks: banks.map((bank) => ({
           name: bank.name.trim(),
-          number: bank.number.trim(),
           amount: parseChfInput(bank.amount) || 0,
         })),
         useCash,
@@ -168,13 +167,12 @@ export default function AccountingOnboarding({
         cashAmount: useCash ? parseChfInput(cashAmount) || 0 : 0,
         useStripe: usesStripe,
         stripeAmount: usesStripe ? parseChfInput(stripeAmount) || 0 : 0,
-        others: showOthers
-          ? OTHER_OPENING_PRESETS.flatMap((preset) => {
-              const amount = parseChfInput(others[preset.accountCode] || "");
-              if (!amount) return [];
-              return [{ accountCode: preset.accountCode, amount, side: preset.side }];
-            })
-          : [],
+        others: patrimony.flatMap((row) => {
+          const item = PATRIMONY_ITEMS.find((preset) => preset.accountCode === row.accountCode);
+          const amount = parseChfInput(row.amount) || 0;
+          if (!item || !amount) return [];
+          return [{ accountCode: item.accountCode, amount, side: item.side, note: row.note.trim() || undefined }];
+        }),
         includeExisting: false,
       });
     } finally {
@@ -305,16 +303,14 @@ export default function AccountingOnboarding({
 
           <section className="mt-8">
             <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Comptes bancaires</h3>
-            <div className="mt-3 space-y-3">
+            <div className="mt-3 space-y-4">
               {banks.map((bank, index) => (
-                <div key={index} className="grid gap-3 sm:grid-cols-[1fr_7rem_9rem_auto] sm:items-end">
+                <div key={index} className="grid gap-3 sm:grid-cols-[1fr_11rem_auto] sm:items-end">
                   <label className="text-sm text-[#334155]">Nom du compte
                     <input className={fieldClass} value={bank.name} placeholder="Compte courant Raiffeisen" onChange={(event) => updateBank(index, { name: event.target.value })} />
+                    <span className="mt-1 block text-xs text-[#64748B]">Compte comptable {suggestBankNumber(index)}</span>
                   </label>
-                  <label className="text-sm text-[#334155]">N°
-                    <input className={fieldClass} value={bank.number} onChange={(event) => updateBank(index, { number: event.target.value })} />
-                  </label>
-                  <label className="text-sm text-[#334155]">Solde d’ouverture
+                  <label className="text-sm text-[#334155]">Solde
                     <input className={fieldClass} inputMode="decimal" placeholder="CHF" value={bank.amount} onChange={(event) => updateBank(index, { amount: event.target.value })} />
                   </label>
                   {banks.length > 1 ? (
@@ -328,7 +324,7 @@ export default function AccountingOnboarding({
             <button
               type="button"
               className="mt-3 text-sm font-semibold text-[#1A23FF]"
-              onClick={() => setBanks([...banks, { name: "", number: suggestBankNumber(banks.length), amount: "" }])}
+              onClick={() => setBanks([...banks, { name: "", amount: "" }])}
             >
               + Ajouter un compte bancaire
             </button>
@@ -336,7 +332,7 @@ export default function AccountingOnboarding({
 
           <section className="mt-8">
             <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Caisse</h3>
-            <p className="mt-2 text-sm text-[#334155]">Votre club utilise-t-il une caisse en espèces ?</p>
+            <p className="mt-2 text-sm text-[#334155]">Utilisez-vous une caisse ?</p>
             <div className="mt-3 flex gap-2">
               <button type="button" className={pill(useCash)} onClick={() => setUseCash(true)}>Oui</button>
               <button type="button" className={pill(!useCash)} onClick={() => setUseCash(false)}>Non</button>
@@ -345,6 +341,7 @@ export default function AccountingOnboarding({
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <label className="text-sm text-[#334155]">Nom
                   <input className={fieldClass} value={cashName} onChange={(event) => setCashName(event.target.value)} />
+                  <span className="mt-1 block text-xs text-[#64748B]">Compte comptable 1000</span>
                 </label>
                 <label className="text-sm text-[#334155]">Solde
                   <input className={fieldClass} inputMode="decimal" placeholder="CHF" value={cashAmount} onChange={(event) => setCashAmount(event.target.value)} />
@@ -357,59 +354,76 @@ export default function AccountingOnboarding({
             <section className="mt-8">
               <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Stripe</h3>
               <p className="mt-2 text-sm font-medium text-[#0F172A]">Compte Stripe</p>
+              <p className="mt-1 text-xs text-[#64748B]">Compte comptable 1025</p>
               <p className="mt-1 max-w-xl text-sm text-[#475569]">
                 Montants encaissés via Stripe mais pas encore transférés sur votre compte bancaire.
               </p>
-              <label className="mt-3 block max-w-xs text-sm text-[#334155]">Solde d’ouverture
-                <input className={fieldClass} inputMode="decimal" placeholder="0" value={stripeAmount} onChange={(event) => setStripeAmount(event.target.value)} />
+              <label className="mt-3 block max-w-xs text-sm text-[#334155]">Solde
+                <input className={fieldClass} inputMode="decimal" placeholder="CHF" value={stripeAmount} onChange={(event) => setStripeAmount(event.target.value)} />
               </label>
             </section>
           ) : null}
 
           <section className="mt-8">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Autres éléments</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#64748B]">Autres éléments du patrimoine</h3>
             <p className="mt-2 max-w-xl text-sm text-[#475569]">
-              Ajoutez uniquement les éléments nécessaires pour représenter correctement la situation de votre club.
+              Ajoutez, si nécessaire, les créances, dettes, immobilisations, stocks ou autres éléments qui figurent dans la situation actuelle de votre club.
             </p>
-            {showOthers ? (
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {OTHER_OPENING_PRESETS.map((preset) => (
-                  <label key={preset.accountCode} className="text-sm text-[#334155]">{preset.label}
-                    <input
-                      className={fieldClass}
-                      inputMode="decimal"
-                      placeholder="CHF"
-                      value={others[preset.accountCode] || ""}
-                      onChange={(event) => setOthers({ ...others, [preset.accountCode]: event.target.value })}
-                    />
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <button type="button" className="mt-3 text-sm font-semibold text-[#1A23FF]" onClick={() => setShowOthers(true)}>
-                + Ajouter un élément
-              </button>
-            )}
+            <div className="mt-4 space-y-4">
+              {patrimony.map((row) => {
+                const item = PATRIMONY_ITEMS.find((preset) => preset.accountCode === row.accountCode) ?? PATRIMONY_ITEMS[0];
+                return (
+                  <div key={row.key} className="rounded-2xl bg-[#F8FAFC] p-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="text-sm text-[#334155]">Type
+                        <select
+                          className={fieldClass}
+                          value={row.accountCode}
+                          onChange={(event) => updatePatrimony(row.key, { accountCode: event.target.value })}
+                        >
+                          {PATRIMONY_ITEMS.map((preset) => (
+                            <option key={preset.accountCode} value={preset.accountCode}>{preset.label}</option>
+                          ))}
+                        </select>
+                        <span className="mt-1 block text-xs text-[#64748B]">{item.description}</span>
+                        <span className="mt-1 block text-xs text-[#64748B]">Compte comptable {item.number}</span>
+                      </label>
+                      <label className="text-sm text-[#334155]">Montant
+                        <input
+                          className={fieldClass}
+                          inputMode="decimal"
+                          placeholder="CHF"
+                          value={row.amount}
+                          onChange={(event) => updatePatrimony(row.key, { amount: event.target.value })}
+                        />
+                      </label>
+                      <label className="text-sm text-[#334155] sm:col-span-2">Description éventuelle
+                        <input
+                          className={fieldClass}
+                          value={row.note}
+                          onChange={(event) => updatePatrimony(row.key, { note: event.target.value })}
+                        />
+                      </label>
+                    </div>
+                    <button type="button" className="mt-3 text-sm text-[#64748B]" onClick={() => setPatrimony(patrimony.filter((itemRow) => itemRow.key !== row.key))}>
+                      Retirer
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="mt-3 text-sm font-semibold text-[#1A23FF]"
+              onClick={() => setPatrimony([...patrimony, { key: Date.now(), accountCode: "debtors", note: "", amount: "" }])}
+            >
+              + Ajouter un élément
+            </button>
           </section>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <ActionButton type="button" variant="ghost" onClick={() => go(2)}>Retour</ActionButton>
             <ActionButton type="button" variant="premiumInline" onClick={continueFromSituation}>Continuer</ActionButton>
-            <ActionButton
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                if (banks.some((bank) => !bank.name.trim())) {
-                  setError("Chaque compte bancaire a besoin d’un nom.");
-                  return;
-                }
-                setShowOthers(false);
-                setOthers({});
-                go(4);
-              }}
-            >
-              Passer cette étape
-            </ActionButton>
           </div>
         </GlassCard>
       ) : null}
@@ -478,11 +492,16 @@ export default function AccountingOnboarding({
             <div>
               <dt className="text-[#64748B]">Situation de départ</dt>
               <dd className="mt-2 space-y-1 text-[#0F172A]">
-                {banks.map((bank) => (
-                  <p key={bank.number}>{bank.name || "Compte bancaire"} : {formatChfAmount(parseChfInput(bank.amount) || 0)}</p>
+                {banks.map((bank, index) => (
+                  <p key={suggestBankNumber(index)}>
+                    {bank.name || "Compte bancaire"}
+                    <span className="text-[#64748B]"> · Compte comptable {suggestBankNumber(index)}</span>
+                    {" : "}
+                    {formatChfAmount(parseChfInput(bank.amount) || 0)}
+                  </p>
                 ))}
-                {useCash ? <p>{cashName || "Caisse"} : {formatChfAmount(parseChfInput(cashAmount) || 0)}</p> : null}
-                {usesStripe ? <p>Stripe : {formatChfAmount(parseChfInput(stripeAmount) || 0)}</p> : null}
+                {useCash ? <p>{cashName || "Caisse"} <span className="text-[#64748B]">· Compte comptable 1000</span> : {formatChfAmount(parseChfInput(cashAmount) || 0)}</p> : null}
+                {usesStripe ? <p>Stripe <span className="text-[#64748B]">· Compte comptable 1025</span> : {formatChfAmount(parseChfInput(stripeAmount) || 0)}</p> : null}
               </dd>
             </div>
             <div>
@@ -516,6 +535,10 @@ export default function AccountingOnboarding({
 
   function updateBank(index: number, patch: Partial<BankDraft>) {
     setBanks(banks.map((bank, item) => (item === index ? { ...bank, ...patch } : bank)));
+  }
+
+  function updatePatrimony(key: number, patch: Partial<PatrimonyDraft>) {
+    setPatrimony(patrimony.map((row) => (row.key === key ? { ...row, ...patch } : row)));
   }
 }
 

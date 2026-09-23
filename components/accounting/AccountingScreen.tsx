@@ -22,6 +22,7 @@ type Account = {
   accountClass: number;
   systemCode: string | null;
   isActive: boolean;
+  isSystem?: boolean;
 };
 
 type Entry = {
@@ -675,21 +676,69 @@ function Chart({
   const [number, setNumber] = useState("");
   const [name, setName] = useState("");
   const [accountType, setAccountType] = useState("expense");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftName, setDraftName] = useState("");
+  const [draftNumber, setDraftNumber] = useState("");
   const groups = [1, 2, 3, 4, 5, 6];
+
+  function saveAccount(account: Account) {
+    const nextNumber = draftNumber.trim();
+    if (!account.isSystem && nextNumber !== account.number) {
+      const confirmed = window.confirm(
+        `Le numéro comptable passera de ${account.number} à ${nextNumber}. Le compte reste le même en interne. Un numéro déjà utilisé par une écriture validée ne peut pas changer.`
+      );
+      if (!confirmed) return;
+    }
+    void onAct({
+      action: "update_account",
+      accountId: account.id,
+      name: draftName.trim(),
+      number: account.isSystem ? undefined : nextNumber,
+    });
+    setEditingId(null);
+  }
+
   return (
     <div className="space-y-4">
       {groups.map((accountClass) => (
         <GlassCard key={accountClass} padding="sm">
           <p className="font-semibold">{ACCOUNT_CLASS_LABELS[accountClass]}</p>
           <table className="mt-2 w-full text-sm">
-            <thead className="text-xs uppercase text-[#64748B]"><tr><th className="text-left">N°</th><th className="text-left">Compte</th><th className="text-left">Type</th><th>Statut</th></tr></thead>
+            <thead className="text-xs uppercase text-[#64748B]"><tr><th className="text-left">N°</th><th className="text-left">Compte</th><th className="text-left">Type</th><th></th></tr></thead>
             <tbody>
               {accounts.filter((account) => account.accountClass === accountClass).map((account) => (
-                <tr key={account.id} className="border-t">
+                <tr key={account.id} className="border-t align-top">
                   <td className="py-2">{account.number}</td>
-                  <td>{account.name}</td>
-                  <td>{account.accountType}</td>
-                  <td>{account.isActive ? "Actif" : "Inactif"}</td>
+                  <td className="py-2">
+                    {account.name}
+                    {account.isSystem ? <span className="mt-1 block text-xs text-[#64748B]">Compte système</span> : null}
+                  </td>
+                  <td className="py-2">{account.accountType}</td>
+                  <td className="py-2 text-right">
+                    {canWrite && editingId === account.id ? (
+                      <div className="flex flex-col items-end gap-2">
+                        <input className="w-40 rounded-xl border px-3 py-2 text-sm" value={draftName} onChange={(event) => setDraftName(event.target.value)} />
+                        {account.isSystem ? (
+                          <span className="text-xs text-[#64748B]">Numéro conservé</span>
+                        ) : (
+                          <input className="w-28 rounded-xl border px-3 py-2 text-sm" value={draftNumber} onChange={(event) => setDraftNumber(event.target.value)} />
+                        )}
+                        <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => saveAccount(account)}>Enregistrer</button>
+                      </div>
+                    ) : canWrite ? (
+                      <button
+                        type="button"
+                        className="text-sm text-[#1A23FF]"
+                        onClick={() => {
+                          setEditingId(account.id);
+                          setDraftName(account.name);
+                          setDraftNumber(account.number);
+                        }}
+                      >
+                        Modifier
+                      </button>
+                    ) : null}
+                  </td>
                 </tr>
               ))}
             </tbody>

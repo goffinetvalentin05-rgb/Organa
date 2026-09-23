@@ -88,6 +88,7 @@ export type OpeningOther = {
   accountCode: string;
   amount: number;
   side: "asset" | "liability";
+  note?: string;
 };
 
 export type OpeningInput = {

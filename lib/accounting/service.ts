@@ -11,11 +11,13 @@ import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
 import { extraBankSystemCode, isFinancialSystemCode } from "./financialAccounts";
 import {
+  allocateExtraBankNumbers,
   coverageSentence,
   normalizeOnboardingInput,
   periodLabel,
   resolveCoverageType,
   type NormalizedOnboarding,
+  type OpeningBank,
 } from "./onboarding";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
 
@@ -182,9 +184,9 @@ async function loadPeriods(admin: Admin, clubId: string): Promise<PeriodRecord[]
 
 function accountByCode(accounts: AccountRecord[], code: string | null): AccountRecord | undefined {
   if (!code) return undefined;
-  return accounts.find(
-    (account) => account.isActive && (account.systemCode === code || account.number === code)
-  );
+  const bySystem = accounts.find((account) => account.isActive && account.systemCode === code);
+  if (bySystem) return bySystem;
+  return accounts.find((account) => account.isActive && account.number === code);
 }
 
 function periodFor(periods: PeriodRecord[], date: string, openOnly: boolean): PeriodRecord | undefined {
@@ -838,7 +840,7 @@ export async function completeOnboarding(
     if (error) throw error;
   }
 
-  await applyFinancialAccounts(admin, clubId, params);
+  const allocatedBanks = await applyFinancialAccounts(admin, clubId, params);
   const accounts = await loadAccounts(admin, clubId);
   const byCode = new Map(accounts.map((account) => [account.systemCode, account]));
   const mappings = Object.entries(DEFAULT_MAPPINGS).flatMap(([kind, code]) => {
@@ -863,13 +865,13 @@ export async function completeOnboarding(
     .single();
   if (!period) throw new Error("Exercice introuvable");
 
-  const extraBanks = params.banks.slice(1).map((bank) => ({
-    accountCode: bank.number,
+  const extraBanks = allocatedBanks.slice(1).map((bank) => ({
+    accountCode: extraBankSystemCode(bank.number),
     amount: bank.amount,
     side: "asset" as const,
   }));
   const opening = buildOpeningLines({
-    bank: params.banks[0]?.amount ?? 0,
+    bank: allocatedBanks[0]?.amount ?? 0,
     cash: params.cashAmount,
     stripe: params.stripeAmount,
     others: [...extraBanks, ...params.others],
@@ -924,55 +926,68 @@ export async function completeOnboarding(
     periodStart: params.periodStart,
     coverage: covered,
     includeExisting: params.includeExisting,
+    patrimony: params.others,
   });
 }
 
-async function applyFinancialAccounts(admin: Admin, clubId: string, params: NormalizedOnboarding) {
+async function applyFinancialAccounts(
+  admin: Admin,
+  clubId: string,
+  params: NormalizedOnboarding
+): Promise<OpeningBank[]> {
   const accounts = await loadAccounts(admin, clubId);
   const bank = accounts.find((account) => account.systemCode === "bank");
   if (!bank) throw new Error("Compte banque introuvable");
   const primary = params.banks[0];
   if (!primary) throw new Error("Ajoutez un compte bancaire");
-  if (bank.number !== primary.number || bank.name !== primary.name) {
-    const clash = accounts.find((account) => account.id !== bank.id && account.number === primary.number);
-    if (clash) throw new Error(`Le numéro ${primary.number} est déjà utilisé`);
+  if (bank.name !== primary.name) {
     const { error } = await admin
       .from("accounting_accounts")
-      .update({ number: primary.number, name: primary.name, updated_at: new Date().toISOString() })
+      .update({ name: primary.name, updated_at: new Date().toISOString() })
       .eq("id", bank.id);
     if (error) throw error;
   }
 
-  for (const [index, extra] of params.banks.slice(1).entries()) {
-    const found = accounts.find((account) => account.number === extra.number);
+  const extras = params.banks.slice(1);
+  const existingExtras = accounts
+    .filter((account) => account.systemCode?.startsWith("bank_"))
+    .sort((left, right) => left.number.localeCompare(right.number));
+  const numbers = allocateExtraBankNumbers(
+    accounts.map((account) => account.number),
+    Math.max(0, extras.length - existingExtras.length)
+  );
+  const allocated: OpeningBank[] = [{ name: primary.name, number: bank.number, amount: primary.amount }];
+  let created = 0;
+
+  for (const [index, extra] of extras.entries()) {
+    const found = existingExtras[index];
     if (found) {
-      const code = extraBankSystemCode(extra.number);
-      if (found.systemCode && found.systemCode !== code) {
-        throw new Error(`Le numéro ${extra.number} est déjà réservé`);
+      if (found.name !== extra.name) {
+        const { error } = await admin
+          .from("accounting_accounts")
+          .update({ name: extra.name, updated_at: new Date().toISOString() })
+          .eq("id", found.id);
+        if (error) throw error;
       }
-      const { error } = await admin
-        .from("accounting_accounts")
-        .update({
-          name: extra.name,
-          system_code: code,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", found.id);
-      if (error) throw error;
+      allocated.push({ name: extra.name, number: found.number, amount: extra.amount });
       continue;
     }
+    const number = numbers[created];
+    created += 1;
+    if (!number) throw new Error("Plus de numéro bancaire disponible");
     const { error } = await admin.from("accounting_accounts").insert({
       club_id: clubId,
-      number: extra.number,
+      number,
       name: extra.name,
       account_type: "asset",
       account_class: 1,
-      system_code: extraBankSystemCode(extra.number),
+      system_code: extraBankSystemCode(number),
       is_system: false,
       is_active: true,
       sort_order: 30 + index,
     });
     if (error) throw error;
+    allocated.push({ name: extra.name, number, amount: extra.amount });
   }
 
   if (params.useCash) {
@@ -984,6 +999,8 @@ async function applyFinancialAccounts(admin: Admin, clubId: string, params: Norm
         .eq("id", cash.id);
     }
   }
+
+  return allocated;
 }
 
 async function backfillSince(admin: Admin, clubId: string, startDate: string) {
@@ -1239,11 +1256,22 @@ export async function createAccount(params: {
   accountType: AccountType;
 }) {
   const admin = createAdminClient();
-  const accountClass = Number(params.number.charAt(0)) || 1;
+  const number = params.number.trim();
+  const name = params.name.trim();
+  if (!/^\d{3,6}$/.test(number)) throw new Error("Numéro comptable invalide");
+  if (!name) throw new Error("Le compte a besoin d’un nom");
+  const { data: existing } = await admin
+    .from("accounting_accounts")
+    .select("id")
+    .eq("club_id", params.clubId)
+    .eq("number", number)
+    .maybeSingle();
+  if (existing) throw new Error("Ce numéro comptable est déjà utilisé");
+  const accountClass = Number(number.charAt(0)) || 1;
   const { error } = await admin.from("accounting_accounts").insert({
     club_id: params.clubId,
-    number: params.number.trim(),
-    name: params.name.trim(),
+    number,
+    name,
     account_type: params.accountType,
     account_class: accountClass,
     is_active: true,
@@ -1251,8 +1279,8 @@ export async function createAccount(params: {
   });
   if (error) throw error;
   await audit(admin, params.clubId, "create_account", params.userId, null, null, {
-    number: params.number,
-    name: params.name,
+    number,
+    name,
   });
 }
 
@@ -1282,12 +1310,33 @@ export async function updateAccount(params: {
     patch.is_active = params.isActive;
   }
   if (params.number && params.number !== account.number) {
-    const { count } = await admin
+    const nextNumber = params.number.trim();
+    if (!/^\d{3,6}$/.test(nextNumber)) throw new Error("Numéro comptable invalide");
+    if (account.is_system) {
+      throw new Error("Le numéro d’un compte système ne change pas. Le libellé reste modifiable.");
+    }
+    const { data: clash } = await admin
+      .from("accounting_accounts")
+      .select("id")
+      .eq("club_id", params.clubId)
+      .eq("number", nextNumber)
+      .neq("id", params.accountId)
+      .maybeSingle();
+    if (clash) throw new Error("Ce numéro comptable est déjà utilisé");
+    const { data: lines } = await admin
       .from("accounting_entry_lines")
-      .select("id", { count: "exact", head: true })
+      .select("entry_id")
       .eq("account_id", params.accountId);
-    if (count) throw new Error("Le numéro ne peut plus changer : des écritures existent");
-    patch.number = params.number.trim();
+    const entryIds = [...new Set((lines ?? []).map((line) => line.entry_id as string))];
+    if (entryIds.length > 0) {
+      const { count } = await admin
+        .from("accounting_entries")
+        .select("id", { count: "exact", head: true })
+        .in("id", entryIds)
+        .in("status", ["validated", "reversed"]);
+      if (count) throw new Error("Le numéro ne peut plus changer : des écritures validées utilisent ce compte");
+    }
+    patch.number = nextNumber;
   }
   const { error } = await admin.from("accounting_accounts").update(patch).eq("id", params.accountId);
   if (error) throw error;

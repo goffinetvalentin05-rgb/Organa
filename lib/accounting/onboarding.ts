@@ -1,4 +1,3 @@
-import { RECOMMENDED_CHART } from "./chart";
 import { formatSwissDate } from "./format";
 import { roundChf } from "./money";
 import type { OpeningOther } from "./types";
@@ -90,11 +89,32 @@ export function dateInPeriod(date: string, start: string, end: string): boolean 
   return date >= start && date <= end;
 }
 
-/** 1020, 1021… en sautant 1025, réservé à Stripe. */
+/** 1020, 1021… en sautant 1025, réservé à Stripe. Aperçu d’onboarding. */
 export function suggestBankNumber(index: number): string {
   let number = 1020 + index;
   if (number >= 1025) number += 1;
   return String(number);
+}
+
+/** Prochains numéros bancaires libres, à partir de 1021. 1025 reste Stripe. */
+export function allocateExtraBankNumbers(taken: Iterable<string>, count: number): string[] {
+  const used = new Set(taken);
+  const numbers: string[] = [];
+  let cursor = 1021;
+  while (numbers.length < count) {
+    if (cursor === 1025) {
+      cursor += 1;
+      continue;
+    }
+    const candidate = String(cursor);
+    if (!used.has(candidate)) {
+      numbers.push(candidate);
+      used.add(candidate);
+    }
+    cursor += 1;
+    if (cursor > 1099) throw new Error("Plus de numéro bancaire disponible");
+  }
+  return numbers;
 }
 
 export function parseChfInput(raw: unknown): number {
@@ -110,10 +130,6 @@ export function parseChfInput(raw: unknown): number {
   if (!Number.isFinite(value) || value < 0) return Number.NaN;
   return roundChf(value);
 }
-
-const RESERVED_NUMBERS = new Set(
-  RECOMMENDED_CHART.map((account) => account.number).filter((number) => number !== "1020")
-);
 
 function iso(value: unknown, label: string): string {
   const date = String(value || "").slice(0, 10);
@@ -150,12 +166,10 @@ export function normalizeOnboardingInput(body: Record<string, unknown>): Normali
   const banks: OpeningBank[] = rawBanks.map((row, index) => {
     const item = row as Record<string, unknown>;
     const name = String(item.name || "").trim();
-    const number = String(item.number || suggestBankNumber(index)).trim();
     const amount = parseChfInput(item.amount);
     if (!name) throw new Error("Chaque compte bancaire a besoin d’un nom");
-    if (!/^\d{3,6}$/.test(number)) throw new Error(`Numéro comptable invalide : ${number}`);
     if (Number.isNaN(amount)) throw new Error(`Solde invalide pour ${name}`);
-    return { name, number, amount };
+    return { name, number: suggestBankNumber(index), amount };
   });
 
   if (banks.length === 0) {
@@ -163,18 +177,6 @@ export function normalizeOnboardingInput(body: Record<string, unknown>): Normali
     if (Number.isNaN(amount)) throw new Error("Solde bancaire invalide");
     banks.push({ name: "Banque", number: "1020", amount });
   }
-
-  const numbers = new Set<string>();
-  banks.forEach((bank, index) => {
-    if (numbers.has(bank.number)) throw new Error(`Le numéro ${bank.number} est utilisé deux fois`);
-    numbers.add(bank.number);
-    if (index > 0 && RESERVED_NUMBERS.has(bank.number)) {
-      throw new Error(`Le numéro ${bank.number} est déjà réservé dans le plan comptable`);
-    }
-    if (index === 0 && bank.number !== "1020" && RESERVED_NUMBERS.has(bank.number)) {
-      throw new Error(`Le numéro ${bank.number} est déjà réservé dans le plan comptable`);
-    }
-  });
 
   const useCash = body.useCash === undefined ? true : Boolean(body.useCash);
   const cashAmount = useCash ? parseChfInput(body.cashAmount ?? body.cash ?? 0) : 0;
@@ -191,10 +193,12 @@ export function normalizeOnboardingInput(body: Record<string, unknown>): Normali
     .map((row) => {
       const item = row as Record<string, unknown>;
       const amount = parseChfInput(item.amount);
+      const note = String(item.note || "").trim();
       return {
         accountCode: String(item.accountCode || "").trim(),
         amount,
         side: item.side === "liability" ? "liability" as const : "asset" as const,
+        note: note || undefined,
       };
     })
     .filter((row) => row.accountCode && row.amount > 0);
@@ -216,12 +220,49 @@ export function normalizeOnboardingInput(body: Record<string, unknown>): Normali
   };
 }
 
-export const OTHER_OPENING_PRESETS = [
-  { accountCode: "prepaid", label: "Autres avoirs", side: "asset" as const },
-  { accountCode: "debtors", label: "Créances", side: "asset" as const },
-  { accountCode: "creditors", label: "Dettes", side: "liability" as const },
-  { accountCode: "fixed_assets", label: "Autres actifs", side: "asset" as const },
-  { accountCode: "accrued", label: "Autres passifs", side: "liability" as const },
+export const PATRIMONY_ITEMS = [
+  {
+    accountCode: "debtors",
+    number: "1100",
+    label: "Créance à recevoir",
+    description: "Montants que des membres, sponsors ou autres personnes doivent encore au club.",
+    side: "asset" as const,
+  },
+  {
+    accountCode: "creditors",
+    number: "2000",
+    label: "Dette à payer",
+    description: "Factures ou montants que le club doit encore payer.",
+    side: "liability" as const,
+  },
+  {
+    accountCode: "fixed_assets",
+    number: "1500",
+    label: "Matériel / immobilisations",
+    description: "Matériel ou biens importants figurant encore au patrimoine du club.",
+    side: "asset" as const,
+  },
+  {
+    accountCode: "inventory",
+    number: "1200",
+    label: "Stocks",
+    description: "Par exemple les articles encore disponibles dans la boutique du club.",
+    side: "asset" as const,
+  },
+  {
+    accountCode: "prepaid",
+    number: "1300",
+    label: "Autres actifs",
+    description: "Autre élément d’actif à reprendre dans la situation de départ.",
+    side: "asset" as const,
+  },
+  {
+    accountCode: "accrued",
+    number: "2300",
+    label: "Autres passifs",
+    description: "Autre élément de passif à reprendre dans la situation de départ.",
+    side: "liability" as const,
+  },
 ] as const;
 
 export const HISTORY_IMPORT_FORMATS = ["CSV", "Excel", "Balance comptable", "Journal comptable"] as const;

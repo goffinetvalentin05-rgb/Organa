@@ -7,6 +7,7 @@ import {
   nextAccountingPeriod,
   normalizeOnboardingInput,
   resolveCoverageType,
+  allocateExtraBankNumbers,
   suggestBankNumber,
 } from "@/lib/accounting/onboarding";
 
@@ -79,6 +80,8 @@ describe("exercice et date de départ", () => {
     expect(suggestBankNumber(0)).toBe("1020");
     expect(suggestBankNumber(1)).toBe("1021");
     expect(suggestBankNumber(5)).toBe("1026");
+    expect(allocateExtraBankNumbers(["1020", "1021", "1025"], 2)).toEqual(["1022", "1023"]);
+    expect(allocateExtraBankNumbers(["1020", "1021", "1022", "1023", "1024"], 1)).toEqual(["1026"]);
   });
 });
 
@@ -98,22 +101,22 @@ describe("situation de départ", () => {
     expect(coverageType(input.periodStart, input.accountingStartDate)).toBe("full_period");
   });
 
-  it("accepte plusieurs banques et refuse un numéro réservé", () => {
+  it("attribue les numéros bancaires sans tenir compte d’une saisie", () => {
     const input = normalizeOnboardingInput({
       periodStart: "2026-01-01",
       periodEnd: "2026-12-31",
       accountingStartDate: "2026-09-23",
       startMode: "from_today",
       banks: [
-        { name: "Compte courant Raiffeisen", number: "1020", amount: "18'420" },
-        { name: "Compte épargne", number: "1021", amount: "7500" },
+        { name: "Compte courant Raiffeisen", number: "9999", amount: "18'420" },
+        { name: "Compte épargne", number: "1000", amount: "7500" },
       ],
       useCash: true,
       cashAmount: "1'350",
       useStripe: true,
       stripeAmount: 430,
     });
-    expect(input.banks).toHaveLength(2);
+    expect(input.banks.map((bank) => bank.number)).toEqual(["1020", "1021"]);
     expect(input.cashAmount).toBe(1350);
 
     const opening = buildOpeningLines({
@@ -121,7 +124,7 @@ describe("situation de départ", () => {
       cash: input.cashAmount,
       stripe: input.stripeAmount,
       others: input.banks.slice(1).map((bank) => ({
-        accountCode: bank.number,
+        accountCode: `bank_${bank.number}`,
         amount: bank.amount,
         side: "asset" as const,
       })),
@@ -129,17 +132,5 @@ describe("situation de départ", () => {
     });
     expect(linesAreBalanced(opening.lines)).toBe(true);
     expect(opening.equityAmount).toBe(27700);
-
-    expect(() =>
-      normalizeOnboardingInput({
-        periodStart: "2026-01-01",
-        periodEnd: "2026-12-31",
-        accountingStartDate: "2026-09-23",
-        banks: [
-          { name: "Courant", number: "1020", amount: 1 },
-          { name: "Caisse détournée", number: "1000", amount: 1 },
-        ],
-      })
-    ).toThrow(/réservé/);
   });
 });
