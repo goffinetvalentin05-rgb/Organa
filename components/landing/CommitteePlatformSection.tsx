@@ -1,307 +1,302 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  CalendarDays,
+  CalendarRange,
+  CupSoda,
+  FileCheck,
+  FileText,
+  FolderOpen,
+  Globe,
+  Handshake,
+  LayoutDashboard,
+  LineChart,
+  ListChecks,
+  Megaphone,
+  MessageCircle,
+  QrCode,
+  Sheet,
+  StickyNote,
+  Users,
+  UsersRound,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import ScrollReveal from "@/components/landing/ScrollReveal";
 import { easePremium } from "@/components/landing/landing-motion";
 
-const CONVERGE = [
-  {
-    label: "Facture",
-    from: { left: "22%", top: "24%" },
-    mid: { left: "18%", top: "34%" },
-    to: { left: "30%", top: "40%" },
-    delay: 0,
-  },
-  {
-    label: "Cotisation",
-    from: { left: "74%", top: "22%" },
-    mid: { left: "78%", top: "32%" },
-    to: { left: "70%", top: "38%" },
-    delay: 0.12,
-  },
-  {
-    label: "Document",
-    from: { left: "22%", top: "76%" },
-    mid: { left: "18%", top: "66%" },
-    to: { left: "32%", top: "68%" },
-    delay: 0.22,
-  },
-  {
-    label: "Réunion",
-    from: { left: "74%", top: "74%" },
-    mid: { left: "78%", top: "64%" },
-    to: { left: "68%", top: "66%" },
-    delay: 0.3,
-  },
-  {
-    label: "Tâche",
-    from: { left: "70%", top: "18%" },
-    mid: { left: "76%", top: "28%" },
-    to: { left: "50%", top: "18%" },
-    delay: 0.08,
-  },
-] as const;
+const FEATURES: { label: string; icon: LucideIcon; tone: string }[] = [
+  { label: "Membres", icon: Users, tone: "blue" },
+  { label: "Cotisations", icon: Wallet, tone: "amber" },
+  { label: "Factures", icon: FileText, tone: "sand" },
+  { label: "Finances", icon: LineChart, tone: "mint" },
+  { label: "Plannings", icon: CalendarDays, tone: "teal" },
+  { label: "Événements", icon: CalendarRange, tone: "rose" },
+  { label: "Communication", icon: Megaphone, tone: "violet" },
+  { label: "Documents", icon: FolderOpen, tone: "sky" },
+  { label: "QR Codes", icon: QrCode, tone: "blue" },
+  { label: "Sponsoring", icon: Handshake, tone: "amber" },
+  { label: "Buvette", icon: CupSoda, tone: "rose" },
+  { label: "Tâches", icon: ListChecks, tone: "mint" },
+  { label: "Réunions", icon: UsersRound, tone: "violet" },
+  { label: "Page publique", icon: Globe, tone: "teal" },
+  { label: "Dashboard", icon: LayoutDashboard, tone: "sky" },
+];
 
-const BITS = [
-  { kind: "card", from: { left: "4%", top: "8%", rotate: -8 }, to: { left: "12%", top: "14%", rotate: 0 }, delay: 0 },
-  { kind: "line", from: { left: "62%", top: "4%", rotate: 7 }, to: { left: "12%", top: "36%", rotate: 0 }, delay: 0.08 },
-  { kind: "task", from: { left: "2%", top: "58%", rotate: 5 }, to: { left: "12%", top: "52%", rotate: 0 }, delay: 0.14 },
-  { kind: "ping", from: { left: "64%", top: "42%", rotate: -6 }, to: { left: "12%", top: "68%", rotate: 0 }, delay: 0.2 },
-  { kind: "doc", from: { left: "38%", top: "74%", rotate: 8 }, to: { left: "12%", top: "78%", rotate: 0 }, delay: 0.26 },
-] as const;
+const ORBIT = FEATURES.map((item, index) => {
+  const angle = -Math.PI / 2 + (index * 2 * Math.PI) / FEATURES.length;
+  const tilt = (index % 2 === 0 ? -1 : 1) * (1.5 + (index % 4));
+  const size = index % 5 === 0 ? "lg" : index % 3 === 1 ? "sm" : "md";
+  return {
+    ...item,
+    left: `${(50 + Math.cos(angle) * 40).toFixed(2)}%`,
+    top: `${(50 + Math.sin(angle) * 37).toFixed(2)}%`,
+    tilt,
+    size,
+    aim: `${((angle * 180) / Math.PI + 180).toFixed(1)}deg`,
+  };
+});
 
-function useGather(play: boolean, still: boolean, hold: number) {
-  const [run, setRun] = useState(0);
-  const [gather, setGather] = useState(still);
+const BEFORE: { label: string; detail: string; icon: LucideIcon; tone: string }[] = [
+  { label: "WhatsApp", detail: "Qui est dispo ?", icon: MessageCircle, tone: "mint" },
+  { label: "Excel", detail: "Onglet inscriptions", icon: Sheet, tone: "teal" },
+  { label: "Papier", detail: "Liste à la main", icon: StickyNote, tone: "sand" },
+];
 
-  useEffect(() => {
-    if (still) {
-      setGather(true);
-      return;
-    }
-    if (!play) return;
+const AFTER = ["14 inscrits", "Créneaux publiés", "Équipe prévenue"];
 
-    setGather(false);
-    const arm = window.setTimeout(() => setGather(true), 780);
-    const loop = window.setTimeout(() => setRun((value) => value + 1), hold);
-    return () => {
-      window.clearTimeout(arm);
-      window.clearTimeout(loop);
-    };
-  }, [play, still, run, hold]);
-
-  return { gather: still || gather, run };
+function useReveal(amount = 0.32) {
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const inView = useInView(ref, { once: true, amount });
+  return { ref, reduce: Boolean(reduce), active: Boolean(reduce) || inView };
 }
 
-function AutomateVisual({ play, still }: { play: boolean; still: boolean }) {
-  const [phase, setPhase] = useState(still ? 6 : 0);
+function CardHead({ index, title }: { index: string; title: string }) {
+  return (
+    <div className="lp-platform__card-head">
+      <span className="lp-platform__num" aria-hidden>
+        {index}
+      </span>
+      <h3>{title}</h3>
+    </div>
+  );
+}
+
+function ObillzSymbol({ tone = "blue" }: { tone?: "blue" | "light" }) {
+  return <span className={`lp-platform__symbol lp-platform__symbol--${tone}`} />;
+}
+
+function AutomateCard() {
+  const { ref, reduce, active } = useReveal(0.38);
+  const [phase, setPhase] = useState(reduce ? 5 : 0);
 
   useEffect(() => {
-    if (still) {
-      setPhase(6);
+    if (reduce) {
+      setPhase(5);
       return;
     }
-    if (!play) return;
-
-    let current = 0;
-    let timer = 0;
-    let cancelled = false;
-    setPhase(0);
-
-    const advance = () => {
-      if (cancelled) return;
-      current += 1;
-      if (current > 6) {
-        timer = window.setTimeout(() => {
-          if (cancelled) return;
-          current = 0;
-          setPhase(0);
-          timer = window.setTimeout(advance, 640);
-        }, 3200);
-        return;
-      }
-      setPhase(current);
-      timer = window.setTimeout(advance, current % 2 === 1 ? 720 : 620);
-    };
-
-    timer = window.setTimeout(advance, 360);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [play, still]);
-
-  const steps = [
-    { label: "PV validé", on: phase >= 1 },
-    { label: "Tâche créée", on: phase >= 3 },
-  ] as const;
+    if (!active) return;
+    const timers = [220, 720, 1240, 1760, 2280].map((delay, index) =>
+      window.setTimeout(() => setPhase(index + 1), delay),
+    );
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [active, reduce]);
 
   return (
-    <article className="lp-platform__piece lp-platform__piece--auto">
-      <h3 className="lp-platform__piece-title">Automatiser</h3>
-      <div className="lp-platform__flow">
-        {steps.map((step, index) => (
-          <div key={step.label} className="lp-platform__flow-step">
-            <span className={`lp-platform__node${step.on ? " is-on" : ""}`}>{step.label}</span>
-            <span className={`lp-platform__link${phase >= index * 2 + 2 ? " is-on" : ""}`} aria-hidden>
-              <svg viewBox="0 0 48 8" preserveAspectRatio="none">
-                <path d="M1 4 H47" />
-              </svg>
-            </span>
-          </div>
-        ))}
-        <div className={`lp-platform__node lp-platform__node--todo${phase >= 5 ? " is-on" : ""}`}>
-          <span>To Do List</span>
-          <span className={`lp-platform__todo${phase >= 6 ? " is-in" : ""}`}>
-            <span className="lp-platform__todo-inner">
+    <motion.article
+      ref={ref}
+      className="lp-platform__card lp-platform__card--auto"
+      initial={reduce ? false : { opacity: 0, x: 150, y: 28, scale: 0.96 }}
+      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.28 }}
+      transition={{ duration: 0.95, ease: easePremium }}
+    >
+      <CardHead index="1" title="Automatiser" />
+      <div className="lp-platform__flow" aria-hidden>
+        <span className={`lp-platform__step${phase >= 1 ? " is-on" : ""}`}>
+          <span className="lp-platform__step-icon">
+            <FileCheck strokeWidth={1.75} />
+          </span>
+          <span>PV validé</span>
+        </span>
+        <span className={`lp-platform__link${phase >= 2 ? " is-on" : ""}`} />
+        <span className={`lp-platform__step${phase >= 3 ? " is-on" : ""}`}>
+          <span className="lp-platform__step-icon">
+            <ListChecks strokeWidth={1.75} />
+          </span>
+          <span>Tâche créée</span>
+        </span>
+        <span className={`lp-platform__link${phase >= 4 ? " is-on" : ""}`} />
+        <span className={`lp-platform__step lp-platform__step--todo${phase >= 5 ? " is-on" : ""}`}>
+          <span className="lp-platform__step-icon">
+            <ListChecks strokeWidth={1.75} />
+          </span>
+          <span className="lp-platform__step-copy">
+            <span className="lp-platform__step-kicker">To Do List</span>
+            <span className={`lp-platform__task${phase >= 5 ? " is-in" : ""}`}>
               <span className="lp-platform__tick" />
-              <span className="lp-platform__todo-line" />
+              Tâche du PV
             </span>
           </span>
+        </span>
+      </div>
+    </motion.article>
+  );
+}
+
+function SimplifyCard() {
+  const { ref, reduce, active } = useReveal(0.34);
+  const [phase, setPhase] = useState(reduce ? 3 : 0);
+
+  useEffect(() => {
+    if (reduce) {
+      setPhase(3);
+      return;
+    }
+    if (!active) return;
+    const beats = [1300, 900, 700, 2800];
+    let step = 0;
+    let timer = 0;
+    const tick = () => {
+      setPhase(step);
+      timer = window.setTimeout(() => {
+        step = (step + 1) % beats.length;
+        tick();
+      }, beats[step]);
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, [active, reduce]);
+
+  const pulling = !reduce && (phase === 1 || phase === 2);
+  const lit = reduce || phase >= 3 ? AFTER.length : phase === 2 ? 1 : 0;
+
+  return (
+    <motion.article
+      ref={ref}
+      className="lp-platform__card lp-platform__card--simple"
+      initial={reduce ? false : { opacity: 0, x: -150, y: 28, scale: 0.96 }}
+      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.28 }}
+      transition={{ duration: 0.95, ease: easePremium }}
+    >
+      <CardHead index="2" title="Simplifier" />
+      <div className={`lp-platform__shift${pulling ? " is-pull" : ""}${phase >= 2 && !reduce ? " is-glow" : ""}`}>
+        <div className="lp-platform__before">
+          <p>Avant</p>
+          {BEFORE.map((item) => {
+            const Icon = item.icon;
+            return (
+              <span key={item.label} className={`lp-platform__scrap lp-platform__tone--${item.tone}`}>
+                <span>
+                  <Icon strokeWidth={1.75} />
+                </span>
+                <strong>{item.label}</strong>
+                <em>{item.detail}</em>
+              </span>
+            );
+          })}
+        </div>
+        <span className="lp-platform__pivot" aria-hidden>
+          <span className="lp-platform__hub">
+            <ObillzSymbol tone="light" />
+          </span>
+        </span>
+        <div className="lp-platform__after">
+          <p>Avec OBILLZ</p>
+          <div className="lp-platform__plan">
+            <span className="lp-platform__plan-kicker">Planning</span>
+            <strong>Tournoi samedi</strong>
+            {AFTER.map((label, index) => (
+              <span key={label} className={`lp-platform__plan-row${index < lit ? " is-on" : ""}`}>
+                <span className="lp-platform__tick" />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
-function CentralizeVisual({ play, still }: { play: boolean; still: boolean }) {
-  const { gather, run } = useGather(play, still, 5600);
+function CentralCard() {
+  const { ref, reduce, active } = useReveal(0.2);
+  const [live, setLive] = useState(0);
+
+  useEffect(() => {
+    if (!active || reduce) return;
+    const id = window.setInterval(() => setLive((current) => (current + 1) % FEATURES.length), 1700);
+    return () => window.clearInterval(id);
+  }, [active, reduce]);
 
   return (
-    <article className="lp-platform__piece lp-platform__piece--central">
-      <h3 className="lp-platform__piece-title">Centraliser</h3>
-      <div className="lp-platform__converge" aria-hidden>
-        <span className="lp-platform__hub">OBILLZ</span>
-        {CONVERGE.map((item) =>
-          still ? (
-            <span key={item.label} className="lp-platform__chip" style={item.to}>
-              {item.label}
-            </span>
-          ) : (
-            <motion.span
-              key={`${item.label}-${run}`}
-              className="lp-platform__chip"
-              initial={{ ...item.from, opacity: 0 }}
-              animate={
-                gather
-                  ? {
-                      left: [item.from.left, item.mid.left, item.to.left],
-                      top: [item.from.top, item.mid.top, item.to.top],
-                      opacity: 1,
-                    }
-                  : { ...item.from, opacity: 1 }
-              }
-              transition={
-                gather
-                  ? { duration: 1.7, delay: item.delay, ease: easePremium, times: [0, 0.46, 1] }
-                  : { duration: 0.45, ease: easePremium }
-              }
+    <motion.article
+      ref={ref}
+      className="lp-platform__card lp-platform__card--central"
+      initial={reduce ? false : { opacity: 0, y: 170, scale: 0.86 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.16 }}
+      transition={{ duration: 1.05, ease: easePremium }}
+    >
+      <CardHead index="3" title="Centraliser" />
+      <div className="lp-platform__orbit">
+        <span className="lp-platform__mark">
+          <ObillzSymbol />
+        </span>
+        {ORBIT.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <span
+              key={item.label}
+              className={`lp-platform__sat lp-platform__sat--${item.size}${!reduce && active && index === live ? " is-live" : ""}`}
+              style={{
+                ["--sat-x" as string]: item.left,
+                ["--sat-y" as string]: item.top,
+                ["--tilt" as string]: `${item.tilt}deg`,
+                ["--aim" as string]: item.aim,
+              }}
             >
-              {item.label}
-            </motion.span>
-          )
-        )}
-      </div>
-    </article>
-  );
-}
-
-function BitShape({ kind }: { kind: (typeof BITS)[number]["kind"] }) {
-  if (kind === "card") {
-    return (
-      <span className="lp-platform__bit lp-platform__bit--card">
-        <span />
-      </span>
-    );
-  }
-  if (kind === "line") {
-    return (
-      <span className="lp-platform__bit lp-platform__bit--line">
-        <span />
-        <span />
-      </span>
-    );
-  }
-  if (kind === "task") {
-    return (
-      <span className="lp-platform__bit lp-platform__bit--task">
-        <span />
-        <span />
-      </span>
-    );
-  }
-  if (kind === "ping") {
-    return (
-      <span className="lp-platform__bit lp-platform__bit--ping">
-        <span />
-        <span />
-      </span>
-    );
-  }
-  return (
-    <span className="lp-platform__bit lp-platform__bit--doc">
-      <span />
-    </span>
-  );
-}
-
-function SimplifyVisual({ play, still }: { play: boolean; still: boolean }) {
-  const { gather, run } = useGather(play, still, 5400);
-
-  return (
-    <article className="lp-platform__piece lp-platform__piece--simple">
-      <h3 className="lp-platform__piece-title">Simplifier</h3>
-      <div className="lp-platform__mess" aria-hidden>
-        {BITS.map((bit) =>
-          still ? (
-            <span key={bit.kind} className="lp-platform__float" style={{ left: bit.to.left, top: bit.to.top }}>
-              <BitShape kind={bit.kind} />
+              <span className="lp-platform__ray" />
+              <motion.span
+                className={`lp-platform__sat-icon lp-platform__tone--${item.tone}`}
+                initial={reduce ? false : { opacity: 0, y: 18, scale: 0.86 }}
+                animate={active ? { opacity: 1, y: 0, scale: 1 } : undefined}
+                transition={{ duration: 0.6, delay: reduce ? 0 : 0.12 + index * 0.04, ease: easePremium }}
+              >
+                <span>
+                  <Icon strokeWidth={1.8} />
+                </span>
+              </motion.span>
+              <span className="lp-platform__sat-label">{item.label}</span>
             </span>
-          ) : (
-            <motion.span
-              key={`${bit.kind}-${run}`}
-              className="lp-platform__float"
-              initial={{ ...bit.from, opacity: 0 }}
-              animate={
-                gather
-                  ? { left: bit.to.left, top: bit.to.top, rotate: 0, opacity: 1 }
-                  : { ...bit.from, opacity: 1 }
-              }
-              transition={
-                gather
-                  ? { duration: 1.45, delay: bit.delay, ease: easePremium }
-                  : { duration: 0.4, ease: easePremium }
-              }
-            >
-              <BitShape kind={bit.kind} />
-            </motion.span>
-          )
-        )}
+          );
+        })}
       </div>
-    </article>
+    </motion.article>
   );
 }
 
 export default function CommitteePlatformSection() {
-  const reduceMotion = useReducedMotion();
-  const [still, setStill] = useState(false);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(stageRef, { amount: 0.22, once: true });
-
-  useEffect(() => {
-    if (reduceMotion) setStill(true);
-  }, [reduceMotion]);
-
-  const play = inView && !still;
-
   return (
-    <section className="lp-platform" aria-labelledby="lp-platform-title">
+    <section id="modules" className="lp-platform scroll-mt-32 md:scroll-mt-36" aria-labelledby="lp-platform-title">
       <div className="lp-platform__wrap">
-        <ScrollReveal y={22}>
+        <header className="lp-platform__intro">
           <h2 id="lp-platform-title" className="lp-platform__title">
             <span>Pensé pour votre comité.</span>
             <span>Construit pour faire grandir votre club.</span>
           </h2>
-        </ScrollReveal>
-
-        <div className="lp-platform__split">
-          <ScrollReveal className="lp-platform__copy" y={16} delay={0.04}>
-            <p className="lp-platform__lead">
-              Les clubs reposent sur des personnes qui donnent déjà énormément de leur temps.
-              <span className="lp-platform__lead-strong">
-                OBILLZ a été pensé pour leur en faire récupérer.
-              </span>
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal className="lp-platform__visual" y={20} delay={0.06}>
-            <div ref={stageRef} className="lp-platform__stage">
-              <AutomateVisual play={play} still={still} />
-              <CentralizeVisual play={play} still={still} />
-              <SimplifyVisual play={play} still={still} />
-            </div>
-          </ScrollReveal>
+          <p className="lp-platform__lead">
+            Les clubs reposent sur des personnes qui donnent déjà énormément de leur temps.
+            <span className="lp-platform__lead-strong">OBILLZ a été pensé pour leur en faire récupérer.</span>
+          </p>
+        </header>
+        <div className="lp-platform__cards">
+          <AutomateCard />
+          <SimplifyCard />
+          <CentralCard />
         </div>
       </div>
     </section>

@@ -8,7 +8,6 @@ import LandingNav from "@/components/landing/LandingNav";
 import SimpleStartSection from "@/components/landing/SimpleStartSection";
 import CommitteePlatformSection from "@/components/landing/CommitteePlatformSection";
 import ClubGrowthSection from "@/components/landing/ClubGrowthSection";
-import ClubEcosystemSection from "@/components/landing/ClubEcosystemSection";
 import DemoInviteSection from "@/components/landing/DemoInviteSection";
 import FaqSection from "@/components/landing/FaqSection";
 import { obillzLandingHomeClass } from "@/components/ui/styles";
@@ -23,7 +22,6 @@ export default function LandingPage() {
         <HeroSection />
         <CommitteePlatformSection />
         <ClubGrowthSection />
-        <ClubEcosystemSection />
         <SimpleStartSection />
         <FaqSection />
         <DemoInviteSection />

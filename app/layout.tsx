@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./landing-committee.css";
 import type { Viewport } from "next";
 import { Inter } from "next/font/google";
 import { I18nProvider } from "@/components/I18nProvider";
