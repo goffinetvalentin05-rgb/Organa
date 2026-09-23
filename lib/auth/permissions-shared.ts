@@ -43,6 +43,9 @@ export const PERMISSIONS = {
   VIEW_MEETING_MINUTES: "view_meeting_minutes",
   MANAGE_MEETING_MINUTES: "manage_meeting_minutes",
 
+  VIEW_ACCOUNTING: "view_accounting",
+  MANAGE_ACCOUNTING: "manage_accounting",
+
   ACCESS_SETTINGS: "access_settings",
   MANAGE_USERS: "manage_users",
 } as const;
@@ -76,6 +79,8 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   manage_support_sales: "Gérer les ventes de soutien",
   view_visuals: "Voir les visuels",
   manage_visuals: "Gérer les visuels",
+  view_accounting: "Voir la comptabilité",
+  manage_accounting: "Gérer la comptabilité",
   access_settings: "Accéder aux paramètres",
   manage_users: "Gérer les utilisateurs / accès",
 };
@@ -142,6 +147,10 @@ export const PERMISSION_GROUPS: Array<{
   {
     title: "Visuels",
     permissions: [PERMISSIONS.VIEW_VISUALS, PERMISSIONS.MANAGE_VISUALS],
+  },
+  {
+    title: "Comptabilité",
+    permissions: [PERMISSIONS.VIEW_ACCOUNTING, PERMISSIONS.MANAGE_ACCOUNTING],
   },
   {
     title: "Paramètres",

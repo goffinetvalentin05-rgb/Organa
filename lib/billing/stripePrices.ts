@@ -130,6 +130,19 @@ export function tierFromStripeMetadata(
   return null;
 }
 
+const ACCOUNTING_PRICE_ENV = "STRIPE_PRICE_ACCOUNTING_YEARLY";
+
+/** Price ID de l'add-on Comptabilité, ou null s'il n'est pas configuré. */
+export function resolveAccountingPriceId(): string | null {
+  const fromEnv = process.env[ACCOUNTING_PRICE_ENV];
+  return isConfiguredPriceId(fromEnv) ? fromEnv : null;
+}
+
+export function isAccountingPriceId(priceId: string | null | undefined): boolean {
+  const configured = resolveAccountingPriceId();
+  return Boolean(priceId && configured && priceId === configured);
+}
+
 export function missingTeamPriceEnvKeys(): string[] {
   const missing: string[] = [];
   for (const key of Object.values(ENV_KEYS.team)) {

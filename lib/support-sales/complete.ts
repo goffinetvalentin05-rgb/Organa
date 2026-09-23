@@ -4,6 +4,7 @@ import { centsToChf } from "@/lib/shop/money";
 import { loadSaleRelations, mapSalesWithRelations } from "./service";
 import { todayZurichDate } from "./status";
 import { SUPPORT_SALE_SELECT, type SupportSale, type SupportSaleRow } from "./types";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 
 const SOURCE_TYPE = "support_sale";
 
@@ -117,6 +118,8 @@ export async function completeSupportSale(params: {
   revalidatePath("/tableau-de-bord/paiements");
   revalidatePath("/tableau-de-bord/ventes-soutien");
   revalidatePath(`/tableau-de-bord/ventes-soutien/${saleRow.id}`);
+
+  await safeProcessAccounting(params.clubId);
 
   const ended = mapSalesWithRelations([updated as SupportSaleRow], relations)[0];
   ended.status = "ended";

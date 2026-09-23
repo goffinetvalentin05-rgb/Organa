@@ -5,6 +5,7 @@ import {
   isMembershipPaidStatus,
   membershipPurposeFromMetadata,
 } from "./payment-method";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 
 const MEMBERSHIP_DOC_SELECT =
   "id, user_id, type, status, payment_method, total_ttc, stripe_payment_intent_id, stripe_checkout_session_id";
@@ -246,6 +247,8 @@ export async function markMembershipPaidFromStripe(params: {
     stripe_charge_id: updated?.stripe_charge_id ?? null,
     amount_cents: params.amountCents,
   });
+
+  await safeProcessAccounting(document.user_id);
 }
 
 export async function handleMembershipCheckoutSession(

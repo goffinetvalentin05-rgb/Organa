@@ -7,6 +7,7 @@ import {
   quotedLinesFromOrderItems,
 } from "./checkout";
 import { sendOrderPaidEmails } from "./email";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 import { syncStripeAccountRow } from "./stripe-connect";
 import {
   findMembershipDocument,
@@ -213,6 +214,7 @@ export async function markOrderPaid(params: {
 
   if (updError) throw updError;
 
+  await safeProcessAccounting(order.club_id);
   await sendOrderPaidEmails(order.id).catch((err) => {
     console.error("[SHOP][email] send after paid", err);
   });
@@ -247,6 +249,8 @@ async function markOrderTerminal(params: {
     })
     .eq("id", order.id)
     .eq("club_id", order.club_id);
+
+  await safeProcessAccounting(order.club_id);
 
   if (params.restoreStock && !alreadyRestored && order.payment_status === "pending") {
     await restoreOrderStock(order.id, order.club_id);

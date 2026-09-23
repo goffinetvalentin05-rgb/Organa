@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/components/ui/cn";
 import { useI18n } from "@/components/I18nProvider";
+import { usePermissions } from "@/lib/auth/permissions-client";
 
 export const FINANCE_DEFAULT_HREF = "/tableau-de-bord/devis";
 
@@ -13,6 +14,7 @@ export const FINANCE_NAV_ITEMS = [
   { href: "/tableau-de-bord/paiements", labelKey: "dashboard.nav.payments" },
   { href: "/tableau-de-bord/produits", labelKey: "dashboard.nav.productRevenues" },
   { href: "/tableau-de-bord/depenses", labelKey: "dashboard.nav.expenses" },
+  { href: "/tableau-de-bord/comptabilite", labelKey: "dashboard.nav.accounting" },
 ] as const;
 
 export function isFinancePath(pathname: string | null | undefined): boolean {
@@ -31,12 +33,18 @@ function isFinanceItemActive(pathname: string | null | undefined, href: string):
 export default function FinanceSectionNav() {
   const { t } = useI18n();
   const pathname = usePathname();
+  const permissions = usePermissions();
+  const items = FINANCE_NAV_ITEMS.filter((item) => {
+    if (item.href !== "/tableau-de-bord/comptabilite") return true;
+    if (permissions.loading) return false;
+    return permissions.has("view_accounting");
+  });
 
   return (
     <nav aria-label={t("dashboard.nav.finances")} className="w-full min-w-0">
       <div className="-mx-1 max-w-full overflow-x-auto overscroll-x-contain px-1 scrollbar-none">
         <div className="inline-flex min-w-min items-center rounded-full bg-[#F1F5F9] p-1 ring-1 ring-inset ring-[rgba(15,23,42,0.04)]">
-          {FINANCE_NAV_ITEMS.map((item) => {
+          {items.map((item) => {
             const active = isFinanceItemActive(pathname, item.href);
             return (
               <Link

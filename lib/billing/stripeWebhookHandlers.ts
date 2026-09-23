@@ -4,6 +4,7 @@
 
 import type Stripe from "stripe";
 import {
+  isAccountingPriceId,
   tierFromStripeMetadata,
   tierFromStripePriceId,
   type StripeBillingInterval,
@@ -16,6 +17,10 @@ import {
 } from "./stripeSync";
 import { mapStripeSubscriptionStatus } from "./stripeStatusMap";
 import type { SubscriptionTier } from "./teamPlan";
+import {
+  isAccountingAddonSubscription,
+  syncAccountingAddon,
+} from "./accountingAddon";
 
 export type StripeEventContext = {
   eventId: string;
@@ -30,13 +35,19 @@ function logHandler(
   console[level](`[WEBHOOK][stripe] ${message} ${JSON.stringify(ctx)}`);
 }
 
-function subscriptionPriceId(
-  subscription: Stripe.Subscription
-): string | null {
-  const item = subscription.items?.data?.[0];
-  if (!item) return null;
+function itemPriceId(item: Stripe.SubscriptionItem | undefined): string | null {
+  if (!item?.price) return null;
   if (typeof item.price === "string") return item.price;
-  return item.price?.id ?? null;
+  return item.price.id ?? null;
+}
+
+function subscriptionPriceId(subscription: Stripe.Subscription): string | null {
+  const items = subscription.items?.data ?? [];
+  for (const item of items) {
+    const id = itemPriceId(item);
+    if (id && !isAccountingPriceId(id)) return id;
+  }
+  return itemPriceId(items[0]);
 }
 
 function customerIdOf(
@@ -201,6 +212,20 @@ async function syncSubscriptionToProfile(params: {
     eventCtx,
   });
 
+  if (isAccountingAddonSubscription(subscription)) {
+    await syncAccountingAddon({
+      clubId: userId,
+      subscription,
+      stripeCustomerId: customerIdOf(subscription.customer),
+    });
+    logHandler("log", "add-on comptabilité synchronisé", {
+      event_id: eventCtx.eventId,
+      subscription_id: subscription.id,
+      user_id: userId,
+    });
+    return;
+  }
+
   const customerId = customerIdOf(subscription.customer);
   const priceId = subscriptionPriceId(subscription);
   const { tier, interval } = resolveTierAndInterval({
@@ -351,6 +376,15 @@ export async function handleCheckoutSessionCompleted(
 
   logHandler("log", "checkout.session.completed", logContext);
 
+  if (isAccountingAddonSubscription(subscription, session.metadata)) {
+    await syncAccountingAddon({
+      clubId: userId,
+      subscription,
+      stripeCustomerId: customerId,
+    });
+    return;
+  }
+
   await syncProfileFromStripe({
     userId,
     billingCycle: interval,
@@ -402,6 +436,20 @@ export async function handleSubscriptionDeleted(
     allowEmailFallback: false,
     eventCtx,
   });
+
+  if (isAccountingAddonSubscription(subscription)) {
+    await syncAccountingAddon({
+      clubId: userId,
+      subscription,
+      stripeCustomerId: customerIdOf(subscription.customer),
+    });
+    logHandler("log", "add-on comptabilité résilié", {
+      event_id: eventCtx.eventId,
+      subscription_id: subscription.id,
+      user_id: userId,
+    });
+    return;
+  }
 
   const customerId = customerIdOf(subscription.customer);
   const priceId = subscriptionPriceId(subscription);

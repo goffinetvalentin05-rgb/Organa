@@ -5,6 +5,7 @@ import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
 import { AuditAction, extractRequestMetadata, logAudit } from "@/lib/auth/audit";
 import { withIdempotency } from "@/lib/api/idempotency";
 import { removeStorageObjects } from "@/lib/storage/removeObjects";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 
 export const runtime = "nodejs";
 
@@ -189,6 +190,8 @@ export async function POST(request: NextRequest) {
         if (payload.event_id) {
           revalidatePath(`/tableau-de-bord/evenements/${payload.event_id}`);
         }
+
+        await safeProcessAccounting(guard.clubId);
 
         return {
           status: 201,

@@ -4,6 +4,7 @@ import { OFFER_SELECT, SUPPORTER_SELECT } from "./types";
 import { computeValidityPeriod } from "./status";
 import { createSupporterToken } from "./tokens";
 import { sendSupporterWelcomeEmail } from "./email";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 
 export async function activateSupporterFromPayment(params: {
   supporterId: string;
@@ -111,6 +112,7 @@ export async function activateSupporterFromPayment(params: {
 
   if (updError) throw updError;
 
+  await safeProcessAccounting(params.clubId);
   await sendSupporterWelcomeEmail(supporter.id).catch((err) => {
     console.error("[SUPPORTERS][email] send after paid", err);
   });

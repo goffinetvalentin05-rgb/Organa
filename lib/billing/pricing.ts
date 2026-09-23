@@ -37,6 +37,21 @@ export const TEAM_PRICING = {
 /** Tarif public actuel (nouveaux abonnements) */
 export const PRICING = TEAM_PRICING;
 
+/** Add-on Comptabilité — seule source du prix affiché. */
+export const ACCOUNTING_ADDON = {
+  yearly: {
+    amount: 100,
+    currency: "CHF",
+    label: "Comptabilité",
+    period: "an",
+  },
+} as const;
+
+export function accountingPriceLabel(): string {
+  const { currency, amount, period } = ACCOUNTING_ADDON.yearly;
+  return `${currency} ${amount}/${period}`;
+}
+
 export type PlanPricing = typeof STANDARD_PRICING | typeof TEAM_PRICING;
 
 export const STANDARD_PLAN_FEATURES = [

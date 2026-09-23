@@ -10,7 +10,7 @@ import { normalizeClientsDbRow } from "@/lib/clients/normalizeDbRow";
 import { CLIENTS_SAFE_COLUMNS } from "@/lib/clients/safeSelect";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
 import type { LigneDocument } from "@/lib/utils/calculations";
-import { getErrorMessage } from "@/lib/utils/error-message";
+import { safeProcessAccounting } from "@/lib/accounting/hooks";
 import {
   buildInvoiceRecipientDbFields,
   parseExternalRecipientData,
@@ -721,6 +721,8 @@ export async function POST(request: NextRequest) {
       ...meta,
     });
 
+    await safeProcessAccounting(guard.clubId);
+
     return {
       status: 201,
       body: {
@@ -1238,6 +1240,8 @@ export async function PATCH(request: NextRequest) {
       numero: updatedDoc.numero,
       type: updatedDoc.type,
     });
+
+    await safeProcessAccounting(guard.clubId);
 
     revalidatePath("/tableau-de-bord");
     revalidatePath("/tableau-de-bord/devis");
