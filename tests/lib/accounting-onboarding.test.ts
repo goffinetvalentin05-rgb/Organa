@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildOpeningLines, linesAreBalanced } from "@/lib/accounting/engine";
+import { isBankSystemCode, isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import {
   coverageSentence,
   coverageType,
   nextAccountingPeriod,
   normalizeOnboardingInput,
+  resolveCoverageType,
   suggestBankNumber,
 } from "@/lib/accounting/onboarding";
 
@@ -40,6 +42,37 @@ describe("exercice et date de départ", () => {
         periodEnd: "2027-12-31",
       })
     ).toBeNull();
+  });
+
+  it("laisse la reprise partielle tant que l’historique n’est pas importé", () => {
+    expect(resolveCoverageType({
+      periodStart: "2026-01-01",
+      accountingStartDate: "2026-01-01",
+      startMode: "resume_current",
+      historyImportStatus: "planned",
+    })).toBe("partial_period");
+    expect(resolveCoverageType({
+      periodStart: "2027-01-01",
+      accountingStartDate: "2027-01-01",
+      startMode: "next_period",
+      historyImportStatus: "not_requested",
+    })).toBe("full_period");
+    expect(
+      coverageSentence({
+        coverageType: "partial_period",
+        accountingStartDate: "2026-09-23",
+        periodEnd: "2026-12-31",
+        historyPending: true,
+      })
+    ).toContain("n’est pas encore repris");
+  });
+
+  it("reconnaît les banques ajoutées comme comptes financiers", () => {
+    expect(isFinancialSystemCode("bank")).toBe(true);
+    expect(isBankSystemCode("bank_1021")).toBe(true);
+    expect(isFinancialSystemCode("bank_1022")).toBe(true);
+    expect(isFinancialSystemCode("cash")).toBe(true);
+    expect(isFinancialSystemCode("debtors")).toBe(false);
   });
 
   it("propose des numéros bancaires en sautant Stripe", () => {

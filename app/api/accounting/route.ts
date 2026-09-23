@@ -7,6 +7,7 @@ import {
   clubUsesStripe,
   completeOnboarding,
   confirmInbox,
+  createTransfer,
   createAccount,
   createManualEntry,
   getAccountingAccess,
@@ -120,6 +121,17 @@ export async function POST(request: NextRequest) {
         break;
       case "void":
         await voidPendingEntry(guard.clubId, guard.userId, String(body.entryId));
+        break;
+      case "transfer":
+        await createTransfer({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          date: String(body.date),
+          amount: Number(body.amount),
+          description: String(body.description || ""),
+          fromAccountCode: String(body.fromAccountCode),
+          toAccountCode: String(body.toAccountCode),
+        });
         break;
       case "manual":
         await createManualEntry({

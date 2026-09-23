@@ -9,11 +9,12 @@ import {
 import { roundChf } from "./money";
 import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
+import { extraBankSystemCode, isFinancialSystemCode } from "./financialAccounts";
 import {
   coverageSentence,
-  coverageType,
   normalizeOnboardingInput,
   periodLabel,
+  resolveCoverageType,
   type NormalizedOnboarding,
 } from "./onboarding";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
@@ -114,7 +115,7 @@ export async function getAccountingAccess(clubId: string) {
       .maybeSingle(),
     admin
       .from("accounting_settings")
-      .select("onboarding_completed_at, start_date, auto_validate")
+      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status")
       .eq("club_id", clubId)
       .maybeSingle(),
   ]);
@@ -131,6 +132,8 @@ export async function getAccountingAccess(clubId: string) {
     canWrite: entitled && onboarded,
     autoValidate: Boolean(settings?.auto_validate),
     startDate: (settings?.start_date as string | undefined) ?? null,
+    startMode: (settings?.start_mode as string | undefined) ?? null,
+    historyImportStatus: (settings?.history_import_status as string | undefined) ?? null,
   };
 }
 
@@ -236,7 +239,16 @@ export async function processAccountingInbox(clubId: string, userId: string | nu
   for (const raw of rows ?? []) {
     const row = raw as InboxRow;
     try {
-      const did = await processInboxRow(admin, clubId, userId, row, accounts, periods, access.autoValidate);
+      const did = await processInboxRow(
+        admin,
+        clubId,
+        userId,
+        row,
+        accounts,
+        periods,
+        access.autoValidate,
+        access.startDate
+      );
       if (did) posted += 1;
     } catch (err) {
       console.error("[accounting] inbox", row.id, err);
@@ -252,7 +264,8 @@ async function processInboxRow(
   row: InboxRow,
   accounts: AccountRecord[],
   periods: PeriodRecord[],
-  autoValidate: boolean
+  autoValidate: boolean,
+  startDate: string | null
 ): Promise<boolean> {
   if (row.event_type === "payment_reversed") {
     return reverseFromInbox(admin, clubId, userId, row, periods);
@@ -273,7 +286,7 @@ async function processInboxRow(
     categoryCode: row.category_code,
     autoValidate,
     periodClosed: closed,
-    beforeStart: false,
+    beforeStart: Boolean(startDate && row.entry_date < startDate),
   });
 
   if (decision.kind === "ignore") {
@@ -495,12 +508,19 @@ export async function createManualEntry(params: {
   const admin = createAdminClient();
   const access = await getAccountingAccess(params.clubId);
   if (!access.canWrite) throw new Error("Comptabilité inactive");
+  if (access.startDate && params.date < access.startDate) {
+    throw new Error("Cette date est antérieure au démarrage de la comptabilité");
+  }
   const [accounts, periods] = await Promise.all([
     loadAccounts(admin, params.clubId),
     loadPeriods(admin, params.clubId),
   ]);
   const period = periodFor(periods, params.date, true);
   if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const financialAccount = accountByCode(accounts, params.financialAccountCode);
+  if (!financialAccount || !isFinancialSystemCode(financialAccount.systemCode)) {
+    throw new Error("Choisissez le compte qui a reçu ou payé ce montant");
+  }
   const decision = decidePosting({
     amount: params.amount,
     entryDate: params.date,
@@ -538,6 +558,61 @@ export async function createManualEntry(params: {
     created_by: params.userId,
     audit_action: "manual_create",
     lines: mapped,
+  });
+}
+
+export async function createTransfer(params: {
+  clubId: string;
+  userId: string;
+  date: string;
+  amount: number;
+  description: string;
+  fromAccountCode: string;
+  toAccountCode: string;
+}) {
+  if (params.fromAccountCode === params.toAccountCode) {
+    throw new Error("Choisissez deux comptes différents");
+  }
+  const amount = roundChf(params.amount);
+  if (amount <= 0) throw new Error("Montant invalide");
+  const admin = createAdminClient();
+  const access = await getAccountingAccess(params.clubId);
+  if (!access.canWrite) throw new Error("Comptabilité inactive");
+  if (access.startDate && params.date < access.startDate) {
+    throw new Error("Cette date est antérieure au démarrage de la comptabilité");
+  }
+  const [accounts, periods] = await Promise.all([
+    loadAccounts(admin, params.clubId),
+    loadPeriods(admin, params.clubId),
+  ]);
+  const period = periodFor(periods, params.date, true);
+  if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const from = accountByCode(accounts, params.fromAccountCode);
+  const to = accountByCode(accounts, params.toAccountCode);
+  if (!from || !to || !isFinancialSystemCode(from.systemCode) || !isFinancialSystemCode(to.systemCode)) {
+    throw new Error("Le transfert se fait entre deux comptes financiers");
+  }
+  const sourceId = crypto.randomUUID();
+  return postEntry(admin, {
+    club_id: params.clubId,
+    period_id: period.id,
+    entry_date: params.date,
+    description: params.description || `Transfert vers ${to.name}`,
+    amount,
+    direction: "transfer",
+    source_type: "manual",
+    source_id: sourceId,
+    event_type: "transfer",
+    idempotency_key: `transfer:${sourceId}`,
+    status: "pending",
+    counter_account_id: from.id,
+    category_account_id: to.id,
+    created_by: params.userId,
+    audit_action: "transfer",
+    lines: [
+      { account_id: to.id, debit: amount, credit: 0 },
+      { account_id: from.id, debit: 0, credit: amount },
+    ],
   });
 }
 
@@ -646,14 +721,21 @@ export async function loadWorkspace(clubId: string) {
     linesByEntry.set(line.entry_id as string, list);
   }
 
+  const historyPending = access.startMode === "resume_current" && access.historyImportStatus !== "applied";
   const type = access.startDate && current
-    ? coverageType(current.startsOn, access.startDate)
+    ? resolveCoverageType({
+        periodStart: current.startsOn,
+        accountingStartDate: access.startDate,
+        startMode: access.startMode,
+        historyImportStatus: access.historyImportStatus,
+      })
     : "full_period";
   const note = access.startDate && current
     ? coverageSentence({
         coverageType: type,
         accountingStartDate: access.startDate,
         periodEnd: current.endsOn,
+        historyPending,
       })
     : null;
 
@@ -719,7 +801,12 @@ export async function completeOnboarding(
     throw new Error("La comptabilité de ce club est déjà démarrée");
   }
 
-  const covered = coverageType(params.periodStart, params.accountingStartDate);
+  const covered = resolveCoverageType({
+    periodStart: params.periodStart,
+    accountingStartDate: params.accountingStartDate,
+    startMode: params.startMode,
+    historyImportStatus: params.historyImportStatus,
+  });
   await admin.from("accounting_settings").upsert({
     club_id: clubId,
     start_date: params.accountingStartDate,
@@ -859,10 +946,17 @@ async function applyFinancialAccounts(admin: Admin, clubId: string, params: Norm
   for (const [index, extra] of params.banks.slice(1).entries()) {
     const found = accounts.find((account) => account.number === extra.number);
     if (found) {
-      if (found.systemCode) throw new Error(`Le numéro ${extra.number} est déjà réservé`);
+      const code = extraBankSystemCode(extra.number);
+      if (found.systemCode && found.systemCode !== code) {
+        throw new Error(`Le numéro ${extra.number} est déjà réservé`);
+      }
       const { error } = await admin
         .from("accounting_accounts")
-        .update({ name: extra.name, updated_at: new Date().toISOString() })
+        .update({
+          name: extra.name,
+          system_code: code,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", found.id);
       if (error) throw error;
       continue;
@@ -873,7 +967,7 @@ async function applyFinancialAccounts(admin: Admin, clubId: string, params: Norm
       name: extra.name,
       account_type: "asset",
       account_class: 1,
-      system_code: null,
+      system_code: extraBankSystemCode(extra.number),
       is_system: false,
       is_active: true,
       sort_order: 30 + index,

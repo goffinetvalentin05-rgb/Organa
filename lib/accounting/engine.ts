@@ -1,3 +1,4 @@
+import { isBankSystemCode } from "./financialAccounts";
 import { roundChf } from "./money";
 import type {
   CashEvent,
@@ -210,7 +211,7 @@ export function officialTotals(lines: ReportLine[]): OfficialTotals {
     const balance = signedBalance(line.accountType, line.debit, line.credit);
     if (line.accountType === "revenue") revenue = roundChf(revenue + balance);
     if (line.accountType === "expense") expense = roundChf(expense + balance);
-    if (line.systemCode === "bank") bank = roundChf(bank + balance);
+    if (isBankSystemCode(line.systemCode)) bank = roundChf(bank + balance);
     if (line.systemCode === "cash") cash = roundChf(cash + balance);
     if (line.systemCode === "stripe") stripe = roundChf(stripe + balance);
   }

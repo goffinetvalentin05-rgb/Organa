@@ -466,8 +466,13 @@ export default function AccountingOnboarding({
             </div>
           </dl>
           {mode === "resume_current" ? (
-            <p className="mt-4 text-sm text-[#475569]">
-              L’import de l’historique reste à venir. Aucune opération passée n’est inventée.
+            <p className="mt-4 text-sm leading-relaxed text-[#475569]">
+              L’import de l’historique n’est pas encore disponible. Tant qu’il n’est pas effectué, les rapports ne couvrent pas tout l’exercice : seules les opérations enregistrées dans Obillz à partir du {formatSwissDate(window.accountingStartDate)} y figurent.
+            </p>
+          ) : null}
+          {mode === "next_period" ? (
+            <p className="mt-4 text-sm leading-relaxed text-[#475569]">
+              Votre comptabilité Obillz commencera le {formatSwissDate(window.accountingStartDate)}.
             </p>
           ) : null}
           <p className="mt-6 text-sm leading-relaxed text-[#334155]">

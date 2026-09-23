@@ -8,7 +8,8 @@ import AccountingOnboarding from "@/components/accounting/AccountingOnboarding";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import { ACCOUNTING_SCOPE_NOTE, ACCOUNTING_TAGLINE } from "@/lib/accounting/copy";
 import { ACCOUNT_CLASS_LABELS } from "@/lib/accounting/chart";
-import { formatChfAmount, formatSwissDate, formatSwissDateLong } from "@/lib/accounting/format";
+import { formatChfAmount, formatSwissDate, formatSwissDateLong, zurichToday } from "@/lib/accounting/format";
+import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { sourceHref, sourceLabel } from "@/lib/accounting/sources";
 
 type Section = "overview" | "journal" | "review" | "chart" | "reports" | "periods" | "settings";
@@ -180,6 +181,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
   const periods = (data?.periods || []) as Array<{ id: string; label: string; startsOn: string; endsOn: string; status: string }>;
   const linesByEntry = (data?.linesByEntry || {}) as Record<string, Array<{ accountId: string; debit: number; credit: number }>>;
   const coverageNote = (data?.coverage as { note?: string | null } | undefined)?.note || null;
+  const startsLater = Boolean(access.startDate && access.startDate > zurichToday());
   const openItems = data?.openItems as {
     receivableTotal: number;
     payableTotal: number;
@@ -209,7 +211,17 @@ export default function AccountingScreen({ section }: { section: Section }) {
         ))}
       </nav>
       {error ? <p className="text-sm text-rose-700">{error}</p> : null}
-      {section === "overview" ? (
+      {startsLater ? (
+        <GlassCard>
+          <h2 className="text-xl font-semibold text-[#0F172A]">
+            Votre comptabilité Obillz commencera le {formatSwissDate(access.startDate)}
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#475569]">
+            Les encaissements et les dépenses antérieurs à cette date ne sont pas comptabilisés. Le tableau de bord s’ouvrira lorsque la période aura commencé.
+          </p>
+        </GlassCard>
+      ) : null}
+      {section === "overview" && !startsLater ? (
         <Overview summary={summary} review={review} accounts={accounts} entries={entries} coverageNote={coverageNote} />
       ) : null}
       {section === "journal" ? (
@@ -441,7 +453,7 @@ function Review({
   canWrite: boolean;
   onAct: (payload: Record<string, unknown>) => Promise<void>;
 }) {
-  const financial = accounts.filter((account) => ["bank", "cash", "stripe"].includes(account.systemCode || "") || (account.accountType === "asset" && account.isActive));
+  const financial = accounts.filter((account) => account.isActive && isFinancialSystemCode(account.systemCode));
   const categories = accounts.filter((account) => account.accountType === "revenue" || account.accountType === "expense");
 
   return (
@@ -549,48 +561,80 @@ function ManualForm({
   accounts: Account[];
   onAct: (payload: Record<string, unknown>) => Promise<void>;
 }) {
-  const [direction, setDirection] = useState<"in" | "out">("in");
+  const [direction, setDirection] = useState<"in" | "out" | "transfer">("in");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [financialAccountCode, setFinancial] = useState("bank");
-  const [categoryCode, setCategory] = useState(direction === "in" ? "other_income" : "other_expense");
+  const [toAccountCode, setToAccount] = useState("");
+  const [categoryCode, setCategory] = useState("other_income");
+  const financials = accounts.filter((account) => account.isActive && isFinancialSystemCode(account.systemCode));
 
   return (
     <GlassCard padding="sm">
-      <p className="font-semibold">{direction === "in" ? "Ajouter un encaissement" : "Ajouter une dépense"}</p>
+      <p className="font-semibold">
+        {direction === "transfer" ? "Transfert entre comptes" : direction === "in" ? "Ajouter un encaissement" : "Ajouter une dépense"}
+      </p>
       <div className="mt-3 flex gap-2">
         <button type="button" className="text-sm underline" onClick={() => { setDirection("in"); setCategory("other_income"); }}>Encaissement</button>
         <button type="button" className="text-sm underline" onClick={() => { setDirection("out"); setCategory("other_expense"); }}>Dépense</button>
+        <button type="button" className="text-sm underline" onClick={() => setDirection("transfer")}>Transfert</button>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <input className="rounded-xl border px-3 py-2 text-sm" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         <input className="rounded-xl border px-3 py-2 text-sm" placeholder="Montant" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <input className="rounded-xl border px-3 py-2 text-sm sm:col-span-2" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <select className="rounded-xl border px-3 py-2 text-sm" value={financialAccountCode} onChange={(e) => setFinancial(e.target.value)}>
-          {accounts.filter((account) => account.systemCode === "bank" || account.systemCode === "cash" || account.systemCode === "stripe").map((account) => (
-            <option key={account.id} value={account.systemCode || ""}>{account.name}</option>
-          ))}
-        </select>
-        <select className="rounded-xl border px-3 py-2 text-sm" value={categoryCode} onChange={(e) => setCategory(e.target.value)}>
-          {accounts.filter((account) => account.accountType === (direction === "in" ? "revenue" : "expense")).map((account) => (
-            <option key={account.id} value={account.systemCode || ""}>{account.name}</option>
-          ))}
-        </select>
+        {direction === "transfer" ? (
+          <>
+            <select className="rounded-xl border px-3 py-2 text-sm" value={financialAccountCode} onChange={(e) => setFinancial(e.target.value)}>
+              {financials.map((account) => (
+                <option key={account.id} value={account.systemCode || account.number}>Depuis {account.number} {account.name}</option>
+              ))}
+            </select>
+            <select className="rounded-xl border px-3 py-2 text-sm" value={toAccountCode} onChange={(e) => setToAccount(e.target.value)}>
+              <option value="">Vers</option>
+              {financials.map((account) => (
+                <option key={account.id} value={account.systemCode || account.number}>Vers {account.number} {account.name}</option>
+              ))}
+            </select>
+          </>
+        ) : (
+          <>
+            <select className="rounded-xl border px-3 py-2 text-sm" value={financialAccountCode} onChange={(e) => setFinancial(e.target.value)}>
+              {financials.map((account) => (
+                <option key={account.id} value={account.systemCode || account.number}>{account.number} {account.name}</option>
+              ))}
+            </select>
+            <select className="rounded-xl border px-3 py-2 text-sm" value={categoryCode} onChange={(e) => setCategory(e.target.value)}>
+              {accounts.filter((account) => account.accountType === (direction === "in" ? "revenue" : "expense")).map((account) => (
+                <option key={account.id} value={account.systemCode || ""}>{account.name}</option>
+              ))}
+            </select>
+          </>
+        )}
       </div>
       <div className="mt-3">
         <ActionButton
           type="button"
           variant="premiumInline"
-          onClick={() => void onAct({
-            action: "manual",
-            direction,
-            date,
-            amount: Number(amount),
-            description,
-            financialAccountCode,
-            categoryCode,
-          })}
+          onClick={() => void onAct(direction === "transfer"
+            ? {
+                action: "transfer",
+                date,
+                amount: Number(amount),
+                description,
+                fromAccountCode: financialAccountCode,
+                toAccountCode,
+              }
+            : {
+                action: "manual",
+                direction,
+                date,
+                amount: Number(amount),
+                description,
+                financialAccountCode,
+                categoryCode,
+              })}
         >
           Enregistrer
         </ActionButton>

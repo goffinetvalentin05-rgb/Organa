@@ -5,7 +5,7 @@ import type { OpeningOther } from "./types";
 
 export type StartMode = "next_period" | "resume_current" | "from_today";
 export type CoverageType = "full_period" | "partial_period";
-export type HistoryImportStatus = "not_requested" | "planned" | "manual";
+export type HistoryImportStatus = "not_requested" | "planned" | "manual" | "applied";
 
 export type OpeningBank = {
   name: string;
@@ -57,11 +57,31 @@ export function coverageType(periodStart: string, accountingStartDate: string): 
   return accountingStartDate > periodStart ? "partial_period" : "full_period";
 }
 
+/**
+ * Un exercice repris sans import réel ne couvre pas toute la période,
+ * même si la date de départ tombe le premier jour.
+ */
+export function resolveCoverageType(input: {
+  periodStart: string;
+  accountingStartDate: string;
+  startMode?: string | null;
+  historyImportStatus?: string | null;
+}): CoverageType {
+  if (input.startMode === "resume_current" && input.historyImportStatus !== "applied") {
+    return "partial_period";
+  }
+  return coverageType(input.periodStart, input.accountingStartDate);
+}
+
 export function coverageSentence(input: {
   coverageType: CoverageType;
   accountingStartDate: string;
   periodEnd: string;
+  historyPending?: boolean;
 }): string | null {
+  if (input.historyPending) {
+    return `L’historique de l’exercice n’est pas encore repris. Les rapports n’incluent que les opérations enregistrées dans Obillz à partir du ${formatSwissDate(input.accountingStartDate)}.`;
+  }
   if (input.coverageType !== "partial_period") return null;
   return `Les données présentées couvrent la période du ${formatSwissDate(input.accountingStartDate)} au ${formatSwissDate(input.periodEnd)}.`;
 }
@@ -107,7 +127,7 @@ function startMode(value: unknown): StartMode {
 }
 
 function historyStatus(value: unknown, mode: StartMode): HistoryImportStatus {
-  if (value === "planned" || value === "manual" || value === "not_requested") return value;
+  if (value === "planned" || value === "manual" || value === "not_requested" || value === "applied") return value;
   return mode === "resume_current" ? "planned" : "not_requested";
 }
 

@@ -179,6 +179,15 @@ describe("rapports officiels", () => {
       stripe: 0,
       treasury: 250,
     });
+    expect(officialTotals([{
+      entryId: "bank-extra",
+      entryStatus: "validated",
+      accountType: "asset",
+      accountNumber: "1021",
+      systemCode: "bank_1021",
+      debit: 7500,
+      credit: 0,
+    }]).treasury).toBe(7500);
     expect(reviewAmount([
       { status: "pending", amount: 999 },
       { status: "validated", amount: 250 },

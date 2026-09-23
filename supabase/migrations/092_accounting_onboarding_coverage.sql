@@ -29,7 +29,7 @@ END $$;
 DO $$ BEGIN
   ALTER TABLE public.accounting_settings
     ADD CONSTRAINT accounting_settings_history_import
-    CHECK (history_import_status IN ('not_requested', 'planned', 'manual'));
+    CHECK (history_import_status IN ('not_requested', 'planned', 'manual', 'applied'));
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
