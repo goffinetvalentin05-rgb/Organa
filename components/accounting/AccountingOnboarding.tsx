@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { Check } from "lucide-react";
 import { ACCOUNT_CLASS_LABELS, DEFAULT_MAPPINGS, RECOMMENDED_CHART } from "@/lib/accounting/chart";
 import { formatChfAmount, formatSwissDate, zurichToday } from "@/lib/accounting/format";
 import {
@@ -76,6 +77,8 @@ export default function AccountingOnboarding({
   const [showOthers, setShowOthers] = useState(false);
   const [others, setOthers] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
+  const [modeMissing, setModeMissing] = useState(false);
+  const modeButtons = useRef<Array<HTMLButtonElement | null>>([]);
   const [busy, setBusy] = useState(false);
 
   const nextPeriod = useMemo(
@@ -96,6 +99,7 @@ export default function AccountingOnboarding({
 
   function go(next: number) {
     setError(null);
+    setModeMissing(false);
     setStep(next);
   }
 
@@ -107,16 +111,32 @@ export default function AccountingOnboarding({
     go(2);
   }
 
+  function selectMode(next: StartMode, focusIndex?: number) {
+    setMode(next);
+    setModeMissing(false);
+    if (focusIndex !== undefined) modeButtons.current[focusIndex]?.focus();
+  }
+
   function continueFromMode() {
     if (!mode) {
-      setError("Choisissez quand commencer avec Obillz.");
+      setModeMissing(true);
       return;
     }
+    setModeMissing(false);
     if (mode !== "next_period" && !dateInPeriod(today, periodStart, periodEnd)) {
       setError("Aujourd’hui est en dehors de l’exercice choisi. Ajustez les dates, ou démarrez au prochain exercice.");
       return;
     }
     go(3);
+  }
+
+  function onModeKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
+    const backward = event.key === "ArrowLeft" || event.key === "ArrowUp";
+    if (!forward && !backward) return;
+    event.preventDefault();
+    const nextIndex = (index + (forward ? 1 : -1) + START_MODES.length) % START_MODES.length;
+    selectMode(START_MODES[nextIndex].mode, nextIndex);
   }
 
   function continueFromSituation() {
@@ -210,33 +230,38 @@ export default function AccountingOnboarding({
 
       {step === 2 ? (
         <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold text-[#0F172A]">Quand souhaitez-vous commencer votre comptabilité Obillz ?</h2>
+          <h2 id="accounting-start-mode" className="text-xl font-semibold text-[#0F172A]">
+            Quand souhaitez-vous commencer votre comptabilité Obillz ?
+          </h2>
+          <div
+            role="radiogroup"
+            aria-labelledby="accounting-start-mode"
+            aria-describedby={modeMissing ? "accounting-start-mode-error" : undefined}
+            aria-invalid={modeMissing || undefined}
+            className="grid grid-cols-1 gap-4 lg:grid-cols-3"
+          >
+            {START_MODES.map((option, index) => (
+              <ChoiceCard
+                key={option.mode}
+                ref={(node) => {
+                  modeButtons.current[index] = node;
+                }}
+                selected={mode === option.mode}
+                tabIndex={mode === option.mode || (!mode && index === 0) ? 0 : -1}
+                title={option.title}
+                badge={option.badge}
+                text={option.text}
+                detail={option.detail(periodStart, periodEnd, today, nextPeriod.startsOn)}
+                onClick={() => selectMode(option.mode)}
+                onKeyDown={(event) => onModeKeyDown(event, index)}
+              />
+            ))}
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
-            <ChoiceCard
-              selected={mode === "next_period"}
-              title="Au début de mon prochain exercice"
-              badge="Recommandé si vous changez de logiciel en fin d’exercice"
-              text="Commencez avec Obillz lors de votre prochaine période comptable, sans reprendre l’historique de l’exercice actuel."
-              detail={`Prochain exercice : ${formatSwissDate(nextPeriod.startsOn)}`}
-              onClick={() => setMode("next_period")}
-            />
-            <ChoiceCard
-              selected={mode === "resume_current"}
-              title="Reprendre mon exercice actuel"
-              text="Reprenez votre comptabilité depuis le début de l’exercice afin de disposer de rapports complets."
-              detail={`Exercice : ${formatSwissDate(periodStart)} → ${formatSwissDate(periodEnd)}`}
-              onClick={() => setMode("resume_current")}
-            />
-            <ChoiceCard
-              selected={mode === "from_today"}
-              title="Commencer à partir d’aujourd’hui"
-              text="Indiquez simplement la situation actuelle du club. Obillz commencera à comptabiliser les nouvelles opérations à partir de cette date."
-              detail={formatSwissDate(today)}
-              onClick={() => setMode("from_today")}
-            />
-          </div>
+          {modeMissing ? (
+            <p id="accounting-start-mode-error" role="alert" className="text-sm text-rose-700">
+              Choisissez quand commencer avec Obillz.
+            </p>
+          ) : null}
 
           {mode === "resume_current" ? (
             <GlassCard padding="sm">
@@ -494,30 +519,77 @@ export default function AccountingOnboarding({
   }
 }
 
+const START_MODES: Array<{
+  mode: StartMode;
+  title: string;
+  badge?: string;
+  text: string;
+  detail: (periodStart: string, periodEnd: string, today: string, nextStart: string) => string;
+}> = [
+  {
+    mode: "next_period",
+    title: "Au début de mon prochain exercice",
+    badge: "Recommandé si vous changez de logiciel en fin d’exercice",
+    text: "Commencez avec Obillz lors de votre prochaine période comptable, sans reprendre l’historique de l’exercice actuel.",
+    detail: (_start, _end, _today, nextStart) => `Prochain exercice : ${formatSwissDate(nextStart)}`,
+  },
+  {
+    mode: "resume_current",
+    title: "Reprendre mon exercice actuel",
+    text: "Reprenez votre comptabilité depuis le début de l’exercice afin de disposer de rapports complets.",
+    detail: (periodStart, periodEnd) => `Exercice : ${formatSwissDate(periodStart)} → ${formatSwissDate(periodEnd)}`,
+  },
+  {
+    mode: "from_today",
+    title: "Commencer à partir d’aujourd’hui",
+    text: "Indiquez simplement la situation actuelle du club. Obillz commencera à comptabiliser les nouvelles opérations à partir de cette date.",
+    detail: (_start, _end, today) => formatSwissDate(today),
+  },
+];
+
 function ChoiceCard({
   selected,
   title,
   badge,
   text,
   detail,
+  tabIndex,
   onClick,
+  onKeyDown,
+  ref,
 }: {
   selected: boolean;
   title: string;
   badge?: string;
   text: string;
   detail: string;
+  tabIndex: number;
   onClick: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  ref: (node: HTMLButtonElement | null) => void;
 }) {
   return (
     <button
+      ref={ref}
       type="button"
+      role="radio"
+      aria-checked={selected}
+      tabIndex={tabIndex}
       onClick={onClick}
+      onKeyDown={onKeyDown}
       className={cn(
-        "flex h-full flex-col rounded-2xl border bg-white p-5 text-left shadow-sm transition",
-        selected ? "border-[#1A23FF] ring-2 ring-[#1A23FF]/20" : "border-[rgba(15,23,42,0.08)] hover:border-[rgba(26,35,255,0.35)]"
+        "relative flex h-full w-full cursor-pointer flex-col rounded-2xl border p-5 pr-12 text-left transition",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A23FF] focus-visible:ring-offset-2",
+        selected
+          ? "border-[#1A23FF] bg-[#F4F6FF] shadow-[0_8px_24px_rgba(26,35,255,0.12)]"
+          : "border-[rgba(15,23,42,0.08)] bg-white shadow-sm hover:border-[rgba(26,35,255,0.28)] hover:bg-[#FAFBFF] hover:shadow-md"
       )}
     >
+      {selected ? (
+        <span className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-[#1A23FF] text-white" aria-hidden>
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </span>
+      ) : null}
       <span className="text-base font-semibold text-[#0F172A]">{title}</span>
       {badge ? <span className="mt-2 text-xs font-medium text-[#1A23FF]">{badge}</span> : null}
       <span className="mt-3 flex-1 text-sm leading-relaxed text-[#475569]">{text}</span>
