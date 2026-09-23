@@ -8,6 +8,7 @@ import {
 } from "./engine";
 import { roundChf } from "./money";
 import { zurichToday } from "./format";
+import { isAccountingDevEmail } from "./devAccess";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -111,16 +112,36 @@ export async function getAccountingAccess(clubId: string) {
       .maybeSingle(),
   ]);
 
-  const entitled = addonIsEntitled(addon);
+  const paid = addonIsEntitled(addon);
+  const internal = paid ? null : await internalAccountingGrant(admin, clubId);
+  const entitled = paid || internal !== null;
   const onboarded = Boolean(settings?.onboarding_completed_at);
   return {
     entitled,
+    grant: paid ? "stripe" : internal,
     onboarded,
     canViewHistory: onboarded,
     canWrite: entitled && onboarded,
     autoValidate: Boolean(settings?.auto_validate),
     startDate: (settings?.start_date as string | undefined) ?? null,
   };
+}
+
+/** Fondateur ou e-mail développeur. N'écrit aucune ligne d'abonnement Stripe. */
+async function internalAccountingGrant(
+  admin: Admin,
+  clubId: string
+): Promise<"founder" | "developer" | null> {
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("is_founder")
+    .eq("user_id", clubId)
+    .maybeSingle();
+  if (profile?.is_founder === true) return "founder";
+
+  const { data, error } = await admin.auth.admin.getUserById(clubId);
+  if (error) return null;
+  return isAccountingDevEmail(data?.user?.email) ? "developer" : null;
 }
 
 async function loadAccounts(admin: Admin, clubId: string): Promise<AccountRecord[]> {

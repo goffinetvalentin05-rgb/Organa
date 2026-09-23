@@ -4,6 +4,7 @@ import { getAuthContext } from "@/lib/auth/rbac";
 import { getSubscriptionStatus } from "@/lib/billing/subscription";
 import { accountingPriceLabel } from "@/lib/billing/pricing";
 import { resolveAccountingPriceId } from "@/lib/billing/stripePrices";
+import { getAccountingAccess } from "@/lib/accounting/service";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -31,6 +32,11 @@ export async function POST() {
         { error: "Un abonnement Obillz actif est nécessaire avant cet add-on" },
         { status: 402 }
       );
+    }
+
+    const access = await getAccountingAccess(ctx.current.clubId);
+    if (access.entitled) {
+      return NextResponse.json({ alreadyEntitled: true });
     }
 
     const priceId = resolveAccountingPriceId();

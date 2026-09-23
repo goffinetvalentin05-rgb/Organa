@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   FINANCE_DEFAULT_HREF,
-  isFinancePath,
+  isFinanceSectionPath,
 } from "@/components/dashboard/FinanceSectionNav";
 import { cn } from "@/components/ui/cn";
 import { createClient } from "@/lib/supabase/client";
@@ -121,7 +121,7 @@ export default function DashboardShell({
     }
   };
 
-  const isFinanceRoute = isFinancePath(pathname);
+  const isFinanceRoute = isFinanceSectionPath(pathname);
 
   const navigationPrimary = [
     { name: t("dashboard.nav.dashboard"), href: "/tableau-de-bord", icon: LayoutDashboard },

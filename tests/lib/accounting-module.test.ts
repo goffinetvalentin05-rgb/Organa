@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { isAccountingAddonSubscription } from "@/lib/billing/accountingAddon";
+import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
+import { isAccountingDevEmail } from "@/lib/accounting/devAccess";
 
 const migration = readFileSync(
   path.resolve(__dirname, "../../supabase/migrations/091_accounting_module.sql"),
@@ -11,6 +13,22 @@ const purge = readFileSync(
   path.resolve(__dirname, "../../supabase/migrations/078_retention_purge_and_legal_acceptances.sql"),
   "utf8"
 );
+
+describe("accès et tarif comptabilité", () => {
+  it("affiche CHF 120/an depuis la source unique", () => {
+    expect(accountingPriceLabel()).toBe("CHF 120/an");
+    expect(accountingPriceDetail()).toBe("CHF 120 / an / club");
+  });
+
+  it("reconnaît uniquement les e-mails développeur listés", () => {
+    const list = "Dev@Obillz.ch, autre@example.com";
+    expect(isAccountingDevEmail("dev@obillz.ch", list)).toBe(true);
+    expect(isAccountingDevEmail("  AUTRE@example.com ", list)).toBe(true);
+    expect(isAccountingDevEmail("client@club.ch", list)).toBe(false);
+    expect(isAccountingDevEmail(null, list)).toBe(false);
+    expect(isAccountingDevEmail("dev@obillz.ch", "")).toBe(false);
+  });
+});
 
 describe("add-on comptabilité", () => {
   it("reconnaît un abonnement distinct et ne le confond pas avec la formule", () => {

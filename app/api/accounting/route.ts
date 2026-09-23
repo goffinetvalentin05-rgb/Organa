@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
-import { accountingPriceLabel } from "@/lib/billing/pricing";
+import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import {
   attachFile,
   closePeriod,
@@ -44,6 +44,7 @@ export async function GET() {
       return NextResponse.json({
         access,
         priceLabel: accountingPriceLabel(),
+        priceDetail: accountingPriceDetail(),
         accounts: [],
         periods: [],
         summary: null,
@@ -60,6 +61,7 @@ export async function GET() {
     return NextResponse.json({
       ...workspace,
       priceLabel: accountingPriceLabel(),
+      priceDetail: accountingPriceDetail(),
       openItems,
     });
   } catch (error) {

@@ -40,16 +40,23 @@ export const PRICING = TEAM_PRICING;
 /** Add-on Comptabilité — seule source du prix affiché. */
 export const ACCOUNTING_ADDON = {
   yearly: {
-    amount: 100,
+    amount: 120,
     currency: "CHF",
     label: "Comptabilité",
     period: "an",
   },
 } as const;
 
+/** Bouton : « CHF 120/an ». */
 export function accountingPriceLabel(): string {
   const { currency, amount, period } = ACCOUNTING_ADDON.yearly;
   return `${currency} ${amount}/${period}`;
+}
+
+/** Bloc tarif : « CHF 120 / an / club ». */
+export function accountingPriceDetail(): string {
+  const { currency, amount, period } = ACCOUNTING_ADDON.yearly;
+  return `${currency} ${amount} / ${period} / club`;
 }
 
 export type PlanPricing = typeof STANDARD_PRICING | typeof TEAM_PRICING;

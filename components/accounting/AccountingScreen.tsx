@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { PageHeader, PageLayout, GlassCard, ActionButton } from "@/components/ui";
-import { ACCOUNTING_BENEFITS, ACCOUNTING_PITCH, ACCOUNTING_SCOPE_NOTE, ACCOUNTING_TAGLINE, OPENING_HELP } from "@/lib/accounting/copy";
+import AccountingLanding from "@/components/accounting/AccountingLanding";
+import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
+import { ACCOUNTING_SCOPE_NOTE, ACCOUNTING_TAGLINE, OPENING_HELP } from "@/lib/accounting/copy";
 import { ACCOUNT_CLASS_LABELS } from "@/lib/accounting/chart";
 import { formatChfAmount, formatSwissDate, formatSwissDateLong } from "@/lib/accounting/format";
 import { sourceHref, sourceLabel } from "@/lib/accounting/sources";
@@ -138,23 +140,33 @@ export default function AccountingScreen({ section }: { section: Section }) {
 
   const access = (data?.access || {}) as {
     entitled?: boolean;
+    grant?: "stripe" | "founder" | "developer" | null;
     onboarded?: boolean;
     canWrite?: boolean;
     autoValidate?: boolean;
     startDate?: string | null;
   };
-  const priceLabel = String(data?.priceLabel || "CHF 100/an");
+  const priceLabel = String(data?.priceLabel || accountingPriceLabel());
+  const priceDetail = String(data?.priceDetail || accountingPriceDetail());
 
   if (!access.onboarded) {
+    if (!access.entitled) {
+      return (
+        <PageLayout>
+          {error ? <p className="text-sm text-rose-700">{error}</p> : null}
+          <AccountingLanding priceLabel={priceLabel} priceDetail={priceDetail} />
+        </PageLayout>
+      );
+    }
     return (
       <PageLayout>
         <PageHeader title="Comptabilité" subtitle={<p>{ACCOUNTING_TAGLINE}</p>} />
         {error ? <p className="text-sm text-rose-700">{error}</p> : null}
-        {access.entitled ? (
-          <Onboarding priceLabel={priceLabel} onDone={act} />
-        ) : (
-          <Landing priceLabel={priceLabel} />
-        )}
+        <Onboarding
+          priceLabel={priceLabel}
+          included={access.grant === "founder" || access.grant === "developer"}
+          onDone={act}
+        />
       </PageLayout>
     );
   }
@@ -231,41 +243,13 @@ export default function AccountingScreen({ section }: { section: Section }) {
   );
 }
 
-function Landing({ priceLabel }: { priceLabel: string }) {
-  async function activate() {
-    const response = await fetch("/api/stripe/accounting/checkout", { method: "POST" });
-    const body = await response.json();
-    if (body.url) {
-      window.location.href = body.url;
-      return;
-    }
-    window.alert(body.message || body.error || "Activation indisponible");
-  }
-
-  return (
-    <GlassCard>
-      <h2 className="text-2xl font-semibold text-[#0F172A]">Comptabilité</h2>
-      <p className="mt-3 max-w-2xl text-[#475569]">{ACCOUNTING_PITCH}</p>
-      <ul className="mt-6 grid gap-2 sm:grid-cols-2">
-        {ACCOUNTING_BENEFITS.map((item) => (
-          <li key={item} className="text-sm text-[#0F172A]">• {item}</li>
-        ))}
-      </ul>
-      <div className="mt-8">
-        <ActionButton type="button" variant="premiumInline" onClick={() => void activate()}>
-          Activer la comptabilité — {priceLabel}
-        </ActionButton>
-      </div>
-      <p className="mt-6 max-w-2xl text-xs leading-relaxed text-[#64748B]">{ACCOUNTING_SCOPE_NOTE}</p>
-    </GlassCard>
-  );
-}
-
 function Onboarding({
   priceLabel,
+  included,
   onDone,
 }: {
   priceLabel: string;
+  included: boolean;
   onDone: (payload: Record<string, unknown>) => Promise<void>;
 }) {
   const [startDate, setStartDate] = useState(`${new Date().getFullYear()}-01-01`);
@@ -280,7 +264,9 @@ function Onboarding({
   return (
     <GlassCard>
       <h2 className="text-xl font-semibold">Démarrer la comptabilité</h2>
-      <p className="mt-2 text-sm text-[#64748B]">{OPENING_HELP} Option {priceLabel}.</p>
+      <p className="mt-2 text-sm text-[#64748B]">
+        {OPENING_HELP} {included ? "Accès inclus pour ce club." : `Option ${priceLabel}.`}
+      </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <label className="text-sm">Date de début
           <input className="mt-1 w-full rounded-xl border px-3 py-2" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
