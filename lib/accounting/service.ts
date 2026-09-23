@@ -9,6 +9,13 @@ import {
 import { roundChf } from "./money";
 import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
+import {
+  coverageSentence,
+  coverageType,
+  normalizeOnboardingInput,
+  periodLabel,
+  type NormalizedOnboarding,
+} from "./onboarding";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -605,6 +612,7 @@ export async function loadWorkspace(clubId: string) {
     if (!current) return false;
     const date = entryDate.get(line.entryId);
     if (!date || date < current.startsOn || date > current.endsOn) return false;
+    if (access.startDate && date < access.startDate) return false;
     if (entrySource.get(line.entryId) === "period_close") return false;
     if (entryEvent.get(line.entryId) === "opening") return false;
     return line.accountType === "revenue" || line.accountType === "expense";
@@ -613,7 +621,9 @@ export async function loadWorkspace(clubId: string) {
   const balanceLines = reportLines.filter((line) => {
     if (!current) return false;
     const date = entryDate.get(line.entryId);
-    return Boolean(date && date <= current.endsOn);
+    if (!date || date > current.endsOn) return false;
+    if (access.startDate && date < access.startDate) return false;
+    return true;
   });
 
   const income = officialTotals(incomeLines);
@@ -636,11 +646,28 @@ export async function loadWorkspace(clubId: string) {
     linesByEntry.set(line.entry_id as string, list);
   }
 
+  const type = access.startDate && current
+    ? coverageType(current.startsOn, access.startDate)
+    : "full_period";
+  const note = access.startDate && current
+    ? coverageSentence({
+        coverageType: type,
+        accountingStartDate: access.startDate,
+        periodEnd: current.endsOn,
+      })
+    : null;
+
   return {
     access,
     accounts,
     periods,
     currentPeriod: current ?? null,
+    coverage: {
+      type,
+      accountingStartDate: access.startDate,
+      periodEnd: current?.endsOn ?? null,
+      note,
+    },
     summary: {
       revenue: income.revenue,
       expense: income.expense,
@@ -664,22 +691,41 @@ export async function loadWorkspace(clubId: string) {
   };
 }
 
-export async function completeOnboarding(params: {
-  clubId: string;
-  userId: string;
-  startDate: string;
-  endDate: string;
-  bank: number;
-  cash: number;
-  stripe: number;
-  others: Array<{ accountCode: string; amount: number; side: "asset" | "liability" }>;
-  includeExisting: boolean;
-}) {
+export async function clubUsesStripe(clubId: string): Promise<boolean> {
   const admin = createAdminClient();
-  const year = params.startDate.slice(0, 4);
+  const { data } = await admin
+    .from("club_payment_accounts")
+    .select("status, provider_account_id")
+    .eq("club_id", clubId)
+    .eq("provider", "stripe")
+    .maybeSingle();
+  if (!data?.provider_account_id) return false;
+  return data.status !== "not_connected" && data.status !== "disabled";
+}
+
+export async function completeOnboarding(
+  clubId: string,
+  userId: string,
+  raw: Record<string, unknown>
+) {
+  const params = normalizeOnboardingInput(raw);
+  const admin = createAdminClient();
+  const { data: existing } = await admin
+    .from("accounting_settings")
+    .select("onboarding_completed_at")
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (existing?.onboarding_completed_at) {
+    throw new Error("La comptabilité de ce club est déjà démarrée");
+  }
+
+  const covered = coverageType(params.periodStart, params.accountingStartDate);
   await admin.from("accounting_settings").upsert({
-    club_id: params.clubId,
-    start_date: params.startDate,
+    club_id: clubId,
+    start_date: params.accountingStartDate,
+    coverage_type: covered,
+    start_mode: params.startMode,
+    history_import_status: params.historyImportStatus,
     auto_validate: false,
     updated_at: new Date().toISOString(),
   });
@@ -687,11 +733,11 @@ export async function completeOnboarding(params: {
   const { count } = await admin
     .from("accounting_accounts")
     .select("id", { count: "exact", head: true })
-    .eq("club_id", params.clubId);
+    .eq("club_id", clubId);
 
   if (!count) {
     const rows = RECOMMENDED_CHART.map((account, index) => ({
-      club_id: params.clubId,
+      club_id: clubId,
       number: account.number,
       name: account.name,
       account_type: account.accountType,
@@ -705,12 +751,13 @@ export async function completeOnboarding(params: {
     if (error) throw error;
   }
 
-  const accounts = await loadAccounts(admin, params.clubId);
+  await applyFinancialAccounts(admin, clubId, params);
+  const accounts = await loadAccounts(admin, clubId);
   const byCode = new Map(accounts.map((account) => [account.systemCode, account]));
   const mappings = Object.entries(DEFAULT_MAPPINGS).flatMap(([kind, code]) => {
     const account = byCode.get(code);
     if (!account) return [];
-    return [{ club_id: params.clubId, source_kind: kind, account_id: account.id }];
+    return [{ club_id: clubId, source_kind: kind, account_id: account.id }];
   });
   if (mappings.length) {
     await admin.from("accounting_mappings").upsert(mappings, { onConflict: "club_id,source_kind" });
@@ -719,31 +766,36 @@ export async function completeOnboarding(params: {
   const { data: period } = await admin
     .from("accounting_periods")
     .upsert({
-      club_id: params.clubId,
-      label: year,
-      starts_on: params.startDate,
-      ends_on: params.endDate,
+      club_id: clubId,
+      label: periodLabel(params.periodStart, params.periodEnd),
+      starts_on: params.periodStart,
+      ends_on: params.periodEnd,
       status: "open",
     }, { onConflict: "club_id,starts_on" })
     .select("id")
     .single();
   if (!period) throw new Error("Exercice introuvable");
 
+  const extraBanks = params.banks.slice(1).map((bank) => ({
+    accountCode: bank.number,
+    amount: bank.amount,
+    side: "asset" as const,
+  }));
   const opening = buildOpeningLines({
-    bank: params.bank,
-    cash: params.cash,
-    stripe: params.stripe,
-    others: params.others,
+    bank: params.banks[0]?.amount ?? 0,
+    cash: params.cashAmount,
+    stripe: params.stripeAmount,
+    others: [...extraBanks, ...params.others],
     equityAccountCode: "equity",
   });
   if (opening.lines.length > 0) {
     const mapped = mapLines(opening.lines, accounts);
     if (!mapped) throw new Error("Plan comptable incomplet pour l’ouverture");
     await postEntry(admin, {
-      club_id: params.clubId,
+      club_id: clubId,
       period_id: period.id,
-      entry_date: params.startDate,
-      description: "Solde d’ouverture",
+      entry_date: params.accountingStartDate,
+      description: "Situation de départ",
       amount: roundChf(opening.lines.reduce((sum, line) => sum + line.debit, 0)),
       direction: "opening",
       source_type: "opening",
@@ -753,9 +805,18 @@ export async function completeOnboarding(params: {
       status: "validated",
       counter_account_id: accountByCode(accounts, "bank")?.id ?? null,
       category_account_id: accountByCode(accounts, "equity")?.id ?? null,
-      created_by: params.userId,
+      created_by: userId,
       audit_action: "opening",
       lines: mapped,
+    });
+  }
+
+  if (params.historyImportStatus === "planned") {
+    await admin.from("accounting_history_imports").insert({
+      club_id: clubId,
+      period_id: period.id,
+      format: "csv",
+      status: "planned",
     });
   }
 
@@ -765,16 +826,70 @@ export async function completeOnboarding(params: {
       onboarding_completed_at: new Date().toISOString(),
       opening_confirmed_at: new Date().toISOString(),
     })
-    .eq("club_id", params.clubId);
+    .eq("club_id", clubId);
 
   if (params.includeExisting) {
-    await backfillSince(admin, params.clubId, params.startDate);
+    await backfillSince(admin, clubId, params.accountingStartDate);
   }
-  await processAccountingInbox(params.clubId, params.userId);
-  await audit(admin, params.clubId, "onboarding", params.userId, null, null, {
-    startDate: params.startDate,
+  await processAccountingInbox(clubId, userId);
+  await audit(admin, clubId, "onboarding", userId, null, null, {
+    accountingStartDate: params.accountingStartDate,
+    periodStart: params.periodStart,
+    coverage: covered,
     includeExisting: params.includeExisting,
   });
+}
+
+async function applyFinancialAccounts(admin: Admin, clubId: string, params: NormalizedOnboarding) {
+  const accounts = await loadAccounts(admin, clubId);
+  const bank = accounts.find((account) => account.systemCode === "bank");
+  if (!bank) throw new Error("Compte banque introuvable");
+  const primary = params.banks[0];
+  if (!primary) throw new Error("Ajoutez un compte bancaire");
+  if (bank.number !== primary.number || bank.name !== primary.name) {
+    const clash = accounts.find((account) => account.id !== bank.id && account.number === primary.number);
+    if (clash) throw new Error(`Le numéro ${primary.number} est déjà utilisé`);
+    const { error } = await admin
+      .from("accounting_accounts")
+      .update({ number: primary.number, name: primary.name, updated_at: new Date().toISOString() })
+      .eq("id", bank.id);
+    if (error) throw error;
+  }
+
+  for (const [index, extra] of params.banks.slice(1).entries()) {
+    const found = accounts.find((account) => account.number === extra.number);
+    if (found) {
+      if (found.systemCode) throw new Error(`Le numéro ${extra.number} est déjà réservé`);
+      const { error } = await admin
+        .from("accounting_accounts")
+        .update({ name: extra.name, updated_at: new Date().toISOString() })
+        .eq("id", found.id);
+      if (error) throw error;
+      continue;
+    }
+    const { error } = await admin.from("accounting_accounts").insert({
+      club_id: clubId,
+      number: extra.number,
+      name: extra.name,
+      account_type: "asset",
+      account_class: 1,
+      system_code: null,
+      is_system: false,
+      is_active: true,
+      sort_order: 30 + index,
+    });
+    if (error) throw error;
+  }
+
+  if (params.useCash) {
+    const cash = accounts.find((account) => account.systemCode === "cash");
+    if (cash && cash.name !== params.cashName) {
+      await admin
+        .from("accounting_accounts")
+        .update({ name: params.cashName, updated_at: new Date().toISOString() })
+        .eq("id", cash.id);
+    }
+  }
 }
 
 async function backfillSince(admin: Admin, clubId: string, startDate: string) {

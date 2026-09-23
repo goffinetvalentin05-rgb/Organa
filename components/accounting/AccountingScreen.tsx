@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import Link from "next/link";
 import { PageHeader, PageLayout, GlassCard, ActionButton } from "@/components/ui";
 import AccountingLanding from "@/components/accounting/AccountingLanding";
+import AccountingOnboarding from "@/components/accounting/AccountingOnboarding";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
-import { ACCOUNTING_SCOPE_NOTE, ACCOUNTING_TAGLINE, OPENING_HELP } from "@/lib/accounting/copy";
+import { ACCOUNTING_SCOPE_NOTE, ACCOUNTING_TAGLINE } from "@/lib/accounting/copy";
 import { ACCOUNT_CLASS_LABELS } from "@/lib/accounting/chart";
 import { formatChfAmount, formatSwissDate, formatSwissDateLong } from "@/lib/accounting/format";
 import { sourceHref, sourceLabel } from "@/lib/accounting/sources";
@@ -162,11 +163,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
       <PageLayout>
         <PageHeader title="Comptabilité" subtitle={<p>{ACCOUNTING_TAGLINE}</p>} />
         {error ? <p className="text-sm text-rose-700">{error}</p> : null}
-        <Onboarding
-          priceLabel={priceLabel}
-          included={access.grant === "founder" || access.grant === "developer"}
-          onDone={act}
-        />
+        <AccountingOnboarding usesStripe={Boolean(data?.usesStripe)} onDone={act} />
       </PageLayout>
     );
   }
@@ -182,6 +179,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
   };
   const periods = (data?.periods || []) as Array<{ id: string; label: string; startsOn: string; endsOn: string; status: string }>;
   const linesByEntry = (data?.linesByEntry || {}) as Record<string, Array<{ accountId: string; debit: number; credit: number }>>;
+  const coverageNote = (data?.coverage as { note?: string | null } | undefined)?.note || null;
   const openItems = data?.openItems as {
     receivableTotal: number;
     payableTotal: number;
@@ -212,7 +210,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
       </nav>
       {error ? <p className="text-sm text-rose-700">{error}</p> : null}
       {section === "overview" ? (
-        <Overview summary={summary} review={review} accounts={accounts} entries={entries} />
+        <Overview summary={summary} review={review} accounts={accounts} entries={entries} coverageNote={coverageNote} />
       ) : null}
       {section === "journal" ? (
         <Journal entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} />
@@ -227,7 +225,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
         />
       ) : null}
       {section === "chart" ? <Chart accounts={accounts} canWrite={Boolean(access.canWrite)} onAct={act} /> : null}
-      {section === "reports" ? <Reports summary={summary} entries={entries} accounts={accounts} /> : null}
+      {section === "reports" ? <Reports summary={summary} entries={entries} accounts={accounts} coverageNote={coverageNote} /> : null}
       {section === "periods" ? (
         <Periods periods={periods} openItems={openItems} canWrite={Boolean(access.canWrite)} onAct={act} />
       ) : null}
@@ -235,6 +233,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
         <Settings
           autoValidate={Boolean(access.autoValidate)}
           startDate={access.startDate}
+          coverageNote={coverageNote}
           canWrite={Boolean(access.canWrite)}
           onAct={act}
         />
@@ -243,143 +242,18 @@ export default function AccountingScreen({ section }: { section: Section }) {
   );
 }
 
-function Onboarding({
-  priceLabel,
-  included,
-  onDone,
-}: {
-  priceLabel: string;
-  included: boolean;
-  onDone: (payload: Record<string, unknown>) => Promise<void>;
-}) {
-  const [startDate, setStartDate] = useState(`${new Date().getFullYear()}-01-01`);
-  const [endDate, setEndDate] = useState(`${new Date().getFullYear()}-12-31`);
-  const [bank, setBank] = useState("0");
-  const [cash, setCash] = useState("0");
-  const [stripe, setStripe] = useState("0");
-  const [includeExisting, setIncludeExisting] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [others, setOthers] = useState<Array<{ accountCode: string; amount: string; side: "asset" | "liability" }>>([]);
-
-  return (
-    <GlassCard>
-      <h2 className="text-xl font-semibold">Démarrer la comptabilité</h2>
-      <p className="mt-2 text-sm text-[#64748B]">
-        {OPENING_HELP} {included ? "Accès inclus pour ce club." : `Option ${priceLabel}.`}
-      </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <label className="text-sm">Date de début
-          <input className="mt-1 w-full rounded-xl border px-3 py-2" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-        </label>
-        <label className="text-sm">Date de fin
-          <input className="mt-1 w-full rounded-xl border px-3 py-2" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-        </label>
-        <label className="text-sm">Banque (CHF)
-          <input className="mt-1 w-full rounded-xl border px-3 py-2" inputMode="decimal" value={bank} onChange={(e) => setBank(e.target.value)} />
-        </label>
-        <label className="text-sm">Caisse (CHF)
-          <input className="mt-1 w-full rounded-xl border px-3 py-2" inputMode="decimal" value={cash} onChange={(e) => setCash(e.target.value)} />
-        </label>
-        <label className="text-sm">Stripe (CHF)
-          <input className="mt-1 w-full rounded-xl border px-3 py-2" inputMode="decimal" value={stripe} onChange={(e) => setStripe(e.target.value)} />
-        </label>
-      </div>
-      <p className="mt-4 text-sm text-[#475569]">
-        Exemple au {formatSwissDate(startDate)} : Banque {formatChfAmount(Number(bank) || 0)}, Caisse {formatChfAmount(Number(cash) || 0)}, Stripe {formatChfAmount(Number(stripe) || 0)}. Un montant à 0 est accepté.
-      </p>
-      <div className="mt-4">
-        <p className="text-sm font-medium">Autres éléments du patrimoine (optionnel)</p>
-        {others.map((row, index) => (
-          <div key={index} className="mt-2 grid gap-2 sm:grid-cols-3">
-            <input
-              className="rounded-xl border px-3 py-2 text-sm"
-              placeholder="N° de compte, ex. 1500"
-              value={row.accountCode}
-              onChange={(event) => {
-                const next = [...others];
-                next[index] = { ...row, accountCode: event.target.value };
-                setOthers(next);
-              }}
-            />
-            <input
-              className="rounded-xl border px-3 py-2 text-sm"
-              placeholder="Montant"
-              value={row.amount}
-              onChange={(event) => {
-                const next = [...others];
-                next[index] = { ...row, amount: event.target.value };
-                setOthers(next);
-              }}
-            />
-            <select
-              className="rounded-xl border px-3 py-2 text-sm"
-              value={row.side}
-              onChange={(event) => {
-                const next = [...others];
-                next[index] = { ...row, side: event.target.value === "liability" ? "liability" : "asset" };
-                setOthers(next);
-              }}
-            >
-              <option value="asset">Actif</option>
-              <option value="liability">Passif</option>
-            </select>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="mt-2 text-sm text-[#1A23FF]"
-          onClick={() => setOthers([...others, { accountCode: "", amount: "0", side: "asset" }])}
-        >
-          Ajouter un autre élément
-        </button>
-      </div>
-      <label className="mt-4 flex items-start gap-2 text-sm">
-        <input type="checkbox" checked={includeExisting} onChange={(e) => setIncludeExisting(e.target.checked)} />
-        Comptabiliser les paiements déjà enregistrés depuis cette date, après confirmation.
-      </label>
-      <p className="mt-4 text-xs text-[#64748B]">{ACCOUNTING_SCOPE_NOTE}</p>
-      <div className="mt-6">
-        <ActionButton
-          type="button"
-          variant="premiumInline"
-          disabled={busy}
-          onClick={() => {
-            setBusy(true);
-            void onDone({
-              action: "onboarding",
-              startDate,
-              endDate,
-              bank: Number(bank) || 0,
-              cash: Number(cash) || 0,
-              stripe: Number(stripe) || 0,
-              others: others
-                .filter((row) => row.accountCode.trim() && Number(row.amount) > 0)
-                .map((row) => ({
-                  accountCode: row.accountCode.trim(),
-                  amount: Number(row.amount) || 0,
-                  side: row.side,
-                })),
-              includeExisting,
-            }).finally(() => setBusy(false));
-          }}
-        >
-          Utiliser le plan recommandé
-        </ActionButton>
-      </div>
-    </GlassCard>
-  );
-}
-
 function Overview({
   summary,
   review,
   accounts,
   entries,
+  coverageNote,
 }: {
   summary: Record<string, number>;
   review: { count: number; amount: number };
   accounts: Account[];
   entries: Entry[];
+  coverageNote?: string | null;
 }) {
   const byCategory = useMemo(() => {
     const map = new Map<string, number>();
@@ -394,6 +268,7 @@ function Overview({
 
   return (
     <div className="space-y-6">
+      <CoverageNote note={coverageNote} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Revenus validés" value={formatChfAmount(summary.revenue || 0)} />
         <Stat label="Charges validées" value={formatChfAmount(summary.expense || 0)} />
@@ -424,6 +299,11 @@ function Overview({
       </GlassCard>
     </div>
   );
+}
+
+function CoverageNote({ note }: { note?: string | null }) {
+  if (!note) return null;
+  return <p className="text-xs leading-relaxed text-[#64748B]">{note}</p>;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -797,10 +677,12 @@ function Reports({
   summary,
   entries,
   accounts,
+  coverageNote,
 }: {
   summary: Record<string, number>;
   entries: Entry[];
   accounts: Account[];
+  coverageNote?: string | null;
 }) {
   function downloadCsv() {
     const header = ["Date", "N°", "Libellé", "Entrée", "Sortie", "Statut", "Source"];
@@ -835,6 +717,7 @@ function Reports({
     <div className="space-y-4">
       <GlassCard>
         <h2 className="text-lg font-semibold">Compte de résultat</h2>
+        <CoverageNote note={coverageNote} />
         <p className="mt-2 text-sm">Produits {formatChfAmount(summary.revenue || 0)}</p>
         <p className="text-sm">Charges {formatChfAmount(summary.expense || 0)}</p>
         <p className="mt-2 font-semibold">Résultat {formatChfAmount(summary.result || 0)}</p>
@@ -912,17 +795,20 @@ function Periods({
 function Settings({
   autoValidate,
   startDate,
+  coverageNote,
   canWrite,
   onAct,
 }: {
   autoValidate: boolean;
   startDate?: string | null;
+  coverageNote?: string | null;
   canWrite: boolean;
   onAct: (payload: Record<string, unknown>) => Promise<void>;
 }) {
   return (
     <GlassCard>
       <p className="text-sm">Date de départ : {startDate ? formatSwissDate(startDate) : "—"}</p>
+      <CoverageNote note={coverageNote} />
       <label className="mt-4 flex items-start gap-2 text-sm">
         <input
           type="checkbox"

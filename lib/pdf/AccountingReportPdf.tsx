@@ -19,6 +19,7 @@ export async function renderAccountingSummaryPdf(input: {
   bank: number;
   cash: number;
   stripe: number;
+  coverageNote?: string | null;
 }): Promise<Buffer> {
   const doc = (
     <Document>
@@ -27,6 +28,7 @@ export async function renderAccountingSummaryPdf(input: {
         <Text style={styles.meta}>
           {input.clubLabel} · Exercice {input.periodLabel} · {ACCOUNTING_TAGLINE}
         </Text>
+        {input.coverageNote ? <Text style={styles.meta}>{input.coverageNote}</Text> : null}
         <View style={styles.row}>
           <Text>Produits validés</Text>
           <Text>{formatChfAmount(input.revenue)}</Text>

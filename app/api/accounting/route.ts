@@ -4,6 +4,7 @@ import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/prici
 import {
   attachFile,
   closePeriod,
+  clubUsesStripe,
   completeOnboarding,
   confirmInbox,
   createAccount,
@@ -40,9 +41,11 @@ export async function GET() {
 
   try {
     const access = await getAccountingAccess(guard.clubId);
+    const usesStripe = await clubUsesStripe(guard.clubId);
     if (!access.onboarded) {
       return NextResponse.json({
         access,
+        usesStripe,
         priceLabel: accountingPriceLabel(),
         priceDetail: accountingPriceDetail(),
         accounts: [],
@@ -89,18 +92,20 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case "onboarding":
-        await completeOnboarding({
-          clubId: guard.clubId,
-          userId: guard.userId,
-          startDate: String(body.startDate),
-          endDate: String(body.endDate),
-          bank: Number(body.bank) || 0,
-          cash: Number(body.cash) || 0,
-          stripe: Number(body.stripe) || 0,
-          others: Array.isArray(body.others) ? body.others : [],
-          includeExisting: Boolean(body.includeExisting),
-        });
+        await completeOnboarding(guard.clubId, guard.userId, body);
         break;
+      case "history-import":
+        if (!access.onboarded) {
+          return NextResponse.json(
+            { error: "Démarrez d’abord la comptabilité" },
+            { status: 409 }
+          );
+        }
+        return NextResponse.json({
+          available: false,
+          message:
+            "L’import d’historique (CSV, Excel, balance ou journal) arrive. Aucune écriture n’a été créée.",
+        });
       case "confirm":
         await confirmInbox({
           clubId: guard.clubId,

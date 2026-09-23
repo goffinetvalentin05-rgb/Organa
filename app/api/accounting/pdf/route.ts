@@ -17,6 +17,7 @@ export async function GET() {
     const pdf = await renderAccountingSummaryPdf({
       clubLabel: "Club",
       periodLabel: workspace.currentPeriod.label,
+      coverageNote: workspace.coverage?.note ?? null,
       ...workspace.summary,
     });
     await recordExport(guard.clubId, guard.userId, "pdf");
