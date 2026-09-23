@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { useI18n } from "@/components/I18nProvider";
 import HeroDemoVideo from "@/components/landing/HeroDemoVideo";
+import HeroTrustRibbon from "@/components/landing/HeroTrustRibbon";
 import {
   easePremium,
   heroCtaEnter,
@@ -156,6 +157,7 @@ export default function HeroSection() {
                 {t("marketing.hero.ctaSecondary")}
               </button>
             </div>
+            <HeroTrustRibbon />
           </motion.div>
         </motion.div>
       </div>
