@@ -9,6 +9,10 @@ const migration = readFileSync(
   path.resolve(__dirname, "../../supabase/migrations/091_accounting_module.sql"),
   "utf8"
 );
+const finalize = readFileSync(
+  path.resolve(__dirname, "../../supabase/migrations/093_accounting_onboarding_finalize.sql"),
+  "utf8"
+);
 const purge = readFileSync(
   path.resolve(__dirname, "../../supabase/migrations/078_retention_purge_and_legal_acceptances.sql"),
   "utf8"
@@ -58,6 +62,17 @@ describe("migration comptabilité", () => {
     expect(migration).not.toContain("CREATE POLICY accounting_entries_insert");
     expect(purge).not.toContain("accounting_entries");
     expect(purge).not.toContain("accounting_audit_log");
+  });
+
+  it("finalise l’onboarding dans une transaction idempotente", () => {
+    expect(finalize).toContain("accounting_finalize_onboarding");
+    expect(finalize).toContain("FOR UPDATE");
+    expect(finalize).toContain("IF v_done IS NOT NULL THEN");
+    expect(finalize).toContain("onboarding_completed_at IS NULL");
+    expect(finalize).toContain("missing_account_codes=%");
+    expect(finalize).toContain("missing_account_ids=%");
+    expect(finalize).toContain("opening:' || v_period::TEXT");
+    expect(finalize).toContain("ON CONFLICT (club_id, source_kind)");
   });
 
   it("ne comptabilise pas une facture tant qu'elle n'est pas payée", () => {

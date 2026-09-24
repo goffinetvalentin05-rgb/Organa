@@ -1,7 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { DEFAULT_MAPPINGS, RECOMMENDED_CHART } from "./chart";
 import {
-  buildOpeningLines,
   decidePosting,
   linesAreBalanced,
   officialTotals,
@@ -9,16 +7,17 @@ import {
 import { roundChf } from "./money";
 import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
-import { extraBankSystemCode, isFinancialSystemCode } from "./financialAccounts";
+import { isFinancialSystemCode } from "./financialAccounts";
 import {
-  allocateExtraBankNumbers,
   coverageSentence,
   normalizeOnboardingInput,
-  periodLabel,
   resolveCoverageType,
-  type NormalizedOnboarding,
-  type OpeningBank,
 } from "./onboarding";
+import {
+  OPENING_PLAN_USER_MESSAGE,
+  buildFinalizePayload,
+  readOpeningDiagnostic,
+} from "./openingPlan";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -799,9 +798,7 @@ export async function completeOnboarding(
     .select("onboarding_completed_at")
     .eq("club_id", clubId)
     .maybeSingle();
-  if (existing?.onboarding_completed_at) {
-    throw new Error("La comptabilité de ce club est déjà démarrée");
-  }
+  if (existing?.onboarding_completed_at) return;
 
   const covered = resolveCoverageType({
     periodStart: params.periodStart,
@@ -809,113 +806,33 @@ export async function completeOnboarding(
     startMode: params.startMode,
     historyImportStatus: params.historyImportStatus,
   });
-  await admin.from("accounting_settings").upsert({
-    club_id: clubId,
-    start_date: params.accountingStartDate,
-    coverage_type: covered,
-    start_mode: params.startMode,
-    history_import_status: params.historyImportStatus,
-    auto_validate: false,
-    updated_at: new Date().toISOString(),
-  });
-
-  const { count } = await admin
-    .from("accounting_accounts")
-    .select("id", { count: "exact", head: true })
-    .eq("club_id", clubId);
-
-  if (!count) {
-    const rows = RECOMMENDED_CHART.map((account, index) => ({
-      club_id: clubId,
-      number: account.number,
-      name: account.name,
-      account_type: account.accountType,
-      account_class: account.accountClass,
-      system_code: account.systemCode,
-      is_system: account.isSystem,
-      is_active: true,
-      sort_order: index,
-    }));
-    const { error } = await admin.from("accounting_accounts").insert(rows);
-    if (error) throw error;
-  }
-
-  const allocatedBanks = await applyFinancialAccounts(admin, clubId, params);
-  const accounts = await loadAccounts(admin, clubId);
-  const byCode = new Map(accounts.map((account) => [account.systemCode, account]));
-  const mappings = Object.entries(DEFAULT_MAPPINGS).flatMap(([kind, code]) => {
-    const account = byCode.get(code);
-    if (!account) return [];
-    return [{ club_id: clubId, source_kind: kind, account_id: account.id }];
-  });
-  if (mappings.length) {
-    await admin.from("accounting_mappings").upsert(mappings, { onConflict: "club_id,source_kind" });
-  }
-
-  const { data: period } = await admin
-    .from("accounting_periods")
-    .upsert({
-      club_id: clubId,
-      label: periodLabel(params.periodStart, params.periodEnd),
-      starts_on: params.periodStart,
-      ends_on: params.periodEnd,
-      status: "open",
-    }, { onConflict: "club_id,starts_on" })
-    .select("id")
-    .single();
-  if (!period) throw new Error("Exercice introuvable");
-
-  const extraBanks = allocatedBanks.slice(1).map((bank) => ({
-    accountCode: extraBankSystemCode(bank.number),
-    amount: bank.amount,
-    side: "asset" as const,
-  }));
-  const opening = buildOpeningLines({
-    bank: allocatedBanks[0]?.amount ?? 0,
-    cash: params.cashAmount,
-    stripe: params.stripeAmount,
-    others: [...extraBanks, ...params.others],
-    equityAccountCode: "equity",
-  });
-  if (opening.lines.length > 0) {
-    const mapped = mapLines(opening.lines, accounts);
-    if (!mapped) throw new Error("Plan comptable incomplet pour l’ouverture");
-    await postEntry(admin, {
-      club_id: clubId,
-      period_id: period.id,
-      entry_date: params.accountingStartDate,
-      description: "Situation de départ",
-      amount: roundChf(opening.lines.reduce((sum, line) => sum + line.debit, 0)),
-      direction: "opening",
-      source_type: "opening",
-      source_id: period.id,
-      event_type: "opening",
-      idempotency_key: `opening:${period.id}`,
-      status: "validated",
-      counter_account_id: accountByCode(accounts, "bank")?.id ?? null,
-      category_account_id: accountByCode(accounts, "equity")?.id ?? null,
-      created_by: userId,
-      audit_action: "opening",
-      lines: mapped,
+  const plan = buildFinalizePayload(clubId, userId, params, covered);
+  if (!plan.resolved.ok) {
+    console.error("[accounting][onboarding]", {
+      missing_account_codes: plan.resolved.missing_account_codes,
+      missing_account_ids: plan.resolved.missing_account_ids,
+      cause: plan.resolved.missing_account_codes.length || plan.resolved.missing_account_ids.length
+        ? "missing_opening_account"
+        : "unbalanced_opening",
     });
+    throw new Error(OPENING_PLAN_USER_MESSAGE);
   }
 
-  if (params.historyImportStatus === "planned") {
-    await admin.from("accounting_history_imports").insert({
-      club_id: clubId,
-      period_id: period.id,
-      format: "csv",
-      status: "planned",
+  const { data, error } = await admin.rpc("accounting_finalize_onboarding", {
+    p_payload: plan.payload,
+  });
+  if (error) {
+    const diagnostic = readOpeningDiagnostic(error);
+    console.error("[accounting][onboarding]", {
+      missing_account_codes: diagnostic.missing_account_codes,
+      missing_account_ids: diagnostic.missing_account_ids,
+      cause: error.message,
     });
+    throw new Error(OPENING_PLAN_USER_MESSAGE);
   }
 
-  await admin
-    .from("accounting_settings")
-    .update({
-      onboarding_completed_at: new Date().toISOString(),
-      opening_confirmed_at: new Date().toISOString(),
-    })
-    .eq("club_id", clubId);
+  const finalized = (data ?? {}) as { already?: boolean };
+  if (finalized.already) return;
 
   if (params.includeExisting) {
     await backfillSince(admin, clubId, params.accountingStartDate);
@@ -928,79 +845,6 @@ export async function completeOnboarding(
     includeExisting: params.includeExisting,
     patrimony: params.others,
   });
-}
-
-async function applyFinancialAccounts(
-  admin: Admin,
-  clubId: string,
-  params: NormalizedOnboarding
-): Promise<OpeningBank[]> {
-  const accounts = await loadAccounts(admin, clubId);
-  const bank = accounts.find((account) => account.systemCode === "bank");
-  if (!bank) throw new Error("Compte banque introuvable");
-  const primary = params.banks[0];
-  if (!primary) throw new Error("Ajoutez un compte bancaire");
-  if (bank.name !== primary.name) {
-    const { error } = await admin
-      .from("accounting_accounts")
-      .update({ name: primary.name, updated_at: new Date().toISOString() })
-      .eq("id", bank.id);
-    if (error) throw error;
-  }
-
-  const extras = params.banks.slice(1);
-  const existingExtras = accounts
-    .filter((account) => account.systemCode?.startsWith("bank_"))
-    .sort((left, right) => left.number.localeCompare(right.number));
-  const numbers = allocateExtraBankNumbers(
-    accounts.map((account) => account.number),
-    Math.max(0, extras.length - existingExtras.length)
-  );
-  const allocated: OpeningBank[] = [{ name: primary.name, number: bank.number, amount: primary.amount }];
-  let created = 0;
-
-  for (const [index, extra] of extras.entries()) {
-    const found = existingExtras[index];
-    if (found) {
-      if (found.name !== extra.name) {
-        const { error } = await admin
-          .from("accounting_accounts")
-          .update({ name: extra.name, updated_at: new Date().toISOString() })
-          .eq("id", found.id);
-        if (error) throw error;
-      }
-      allocated.push({ name: extra.name, number: found.number, amount: extra.amount });
-      continue;
-    }
-    const number = numbers[created];
-    created += 1;
-    if (!number) throw new Error("Plus de numéro bancaire disponible");
-    const { error } = await admin.from("accounting_accounts").insert({
-      club_id: clubId,
-      number,
-      name: extra.name,
-      account_type: "asset",
-      account_class: 1,
-      system_code: extraBankSystemCode(number),
-      is_system: false,
-      is_active: true,
-      sort_order: 30 + index,
-    });
-    if (error) throw error;
-    allocated.push({ name: extra.name, number, amount: extra.amount });
-  }
-
-  if (params.useCash) {
-    const cash = accounts.find((account) => account.systemCode === "cash");
-    if (cash && cash.name !== params.cashName) {
-      await admin
-        .from("accounting_accounts")
-        .update({ name: params.cashName, updated_at: new Date().toISOString() })
-        .eq("id", cash.id);
-    }
-  }
-
-  return allocated;
 }
 
 async function backfillSince(admin: Admin, clubId: string, startDate: string) {

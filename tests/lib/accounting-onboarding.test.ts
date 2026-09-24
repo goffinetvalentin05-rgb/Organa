@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { RECOMMENDED_CHART } from "@/lib/accounting/chart";
 import { buildOpeningLines, linesAreBalanced } from "@/lib/accounting/engine";
-import { isBankSystemCode, isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
+import { isBankSystemCode, isExtraBankSystemCode, isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
+import { OPENING_PLAN_USER_MESSAGE, buildFinalizePayload, mapOpeningLines, planOnboardingAccounts, planOpening, readOpeningDiagnostic } from "@/lib/accounting/openingPlan";
 import {
   coverageSentence,
   coverageType,
@@ -76,6 +77,9 @@ describe("exercice et date de départ", () => {
     expect(isFinancialSystemCode("bank_1022")).toBe(true);
     expect(isFinancialSystemCode("cash")).toBe(true);
     expect(isFinancialSystemCode("debtors")).toBe(false);
+    expect(isExtraBankSystemCode("bank_fees")).toBe(false);
+    expect(isBankSystemCode("bank_fees")).toBe(false);
+    expect(isFinancialSystemCode("bank_fees")).toBe(false);
   });
 
   it("propose des numéros bancaires en sautant Stripe", () => {
@@ -156,5 +160,145 @@ describe("situation de départ", () => {
     expect(RECOMMENDED_CHART.find((account) => account.number === "2300")?.name).toBe(
       "Passifs de régularisation / passifs transitoires"
     );
+  });
+});
+
+function openingCase(body: Record<string, unknown>) {
+  const params = normalizeOnboardingInput({
+    periodStart: "2026-01-01",
+    periodEnd: "2026-12-31",
+    accountingStartDate: "2026-09-24",
+    startMode: "from_today",
+    useCash: false,
+    useStripe: true,
+    stripeAmount: 0,
+    ...body,
+  });
+  const accounts = planOnboardingAccounts(params);
+  const opening = planOpening(params, accounts);
+  const mapped = mapOpeningLines(
+    opening.lines,
+    accounts.map((account) => ({
+      id: `id-${account.systemCode}`,
+      systemCode: account.systemCode,
+      number: account.number,
+      isActive: true,
+    }))
+  );
+  const plan = buildFinalizePayload("club", "user", params, "partial_period");
+  return { params, accounts, opening, mapped, plan };
+}
+
+function debitOf(lines: Array<{ system_code: string | null; number: string; debit: number; credit: number }>, code: string) {
+  return lines.filter((line) => line.system_code === code).reduce((sum, line) => sum + line.debit, 0);
+}
+
+describe("finalisation de l’ouverture", () => {
+  it("ouvre deux banques, sans caisse, Stripe à zéro, contrepartie 2800", () => {
+    const { accounts, opening, mapped, plan } = openingCase({
+      banks: [
+        { name: "Compte courant", amount: 1000 },
+        { name: "Compte épargne", amount: 2000 },
+      ],
+    });
+
+    expect(mapped.ok).toBe(true);
+    expect(mapped.missing_account_codes).toEqual([]);
+    expect(mapped.missing_account_ids).toEqual([]);
+    expect(linesAreBalanced(opening.lines)).toBe(true);
+    expect(accounts.filter((account) => account.number === "1021")).toHaveLength(1);
+    expect(accounts.find((account) => account.systemCode === "bank_fees")?.number).toBe("6800");
+    expect(accounts.find((account) => account.number === "2800")?.systemCode).toBe("equity");
+    expect(opening.lines.map((line) => line.accountCode).sort()).toEqual(["bank", "bank_1021", "equity"]);
+    expect(debitOf(mapped.lines, "bank") + debitOf(mapped.lines, "bank_1021")).toBe(3000);
+    expect(mapped.lines.find((line) => line.number === "2800")).toMatchObject({
+      account_id: "id-equity",
+      credit: 3000,
+      debit: 0,
+    });
+    expect(plan.payload.opening).toMatchObject({ amount: 3000 });
+    expect(plan.payload.accounts.filter((account) => account.system_code === "bank_1021")).toHaveLength(1);
+
+    const again = openingCase({
+      banks: [
+        { name: "Compte courant", amount: 1000 },
+        { name: "Compte épargne", amount: 2000 },
+      ],
+    });
+    expect(again.accounts.filter((account) => account.systemCode === "bank_1021")).toHaveLength(1);
+    expect(again.plan.payload.opening?.lines).toHaveLength(3);
+  });
+
+  it("n’exige pas la caisse ni Stripe quand leur solde est nul", () => {
+    const { opening } = openingCase({
+      banks: [{ name: "Compte courant", amount: 1000 }],
+      useCash: false,
+      useStripe: true,
+      stripeAmount: 0,
+    });
+    expect(opening.lines.map((line) => line.accountCode).sort()).toEqual(["bank", "equity"]);
+    expect(opening.equityAmount).toBe(1000);
+  });
+
+  it("équilibre deux banques et une caisse", () => {
+    const { opening, mapped } = openingCase({
+      banks: [
+        { name: "Compte courant", amount: 1000 },
+        { name: "Compte épargne", amount: 2000 },
+      ],
+      useCash: true,
+      cashAmount: 100,
+    });
+    expect(mapped.ok).toBe(true);
+    expect(debitOf(mapped.lines, "bank") + debitOf(mapped.lines, "bank_1021") + debitOf(mapped.lines, "cash")).toBe(3100);
+    expect(mapped.lines.find((line) => line.number === "2800")?.credit).toBe(3100);
+    expect(opening.lines.some((line) => line.accountCode === "stripe")).toBe(false);
+  });
+
+  it("équilibre une banque et une dette", () => {
+    const { mapped } = openingCase({
+      banks: [{ name: "Compte courant", amount: 1000 }],
+      others: [{ accountCode: "creditors", amount: 400, side: "liability" }],
+    });
+    expect(mapped.ok).toBe(true);
+    expect(mapped.lines.find((line) => line.number === "2000")).toMatchObject({ credit: 400, account_id: "id-creditors" });
+    expect(mapped.lines.find((line) => line.number === "2800")?.credit).toBe(600);
+  });
+
+  it("équilibre une banque et une immobilisation", () => {
+    const { mapped } = openingCase({
+      banks: [{ name: "Compte courant", amount: 1000 }],
+      others: [{ accountCode: "fixed_assets", amount: 500, side: "asset" }],
+    });
+    expect(mapped.ok).toBe(true);
+    expect(debitOf(mapped.lines, "bank") + debitOf(mapped.lines, "fixed_assets")).toBe(1500);
+    expect(mapped.lines.find((line) => line.number === "1500")?.account_id).toBe("id-fixed_assets");
+    expect(mapped.lines.find((line) => line.number === "2800")?.credit).toBe(1500);
+  });
+
+  it("termine sans écriture quand tous les soldes sont à zéro", () => {
+    const { opening, plan, accounts } = openingCase({
+      banks: [{ name: "Compte courant", amount: 0 }],
+      useCash: false,
+      useStripe: true,
+      stripeAmount: 0,
+    });
+    expect(opening.lines).toEqual([]);
+    expect(plan.payload.opening).toBeNull();
+    expect(accounts.find((account) => account.number === "2800")?.systemCode).toBe("equity");
+    expect(accounts.some((account) => account.number === "1000")).toBe(true);
+    expect(accounts.some((account) => account.number === "1025")).toBe(true);
+  });
+
+  it("journalise les codes manquants sans les montrer au club", () => {
+    const diagnostic = readOpeningDiagnostic({
+      message: "missing_account_codes=bank_1021,equity missing_account_ids=",
+    });
+    expect(diagnostic).toEqual({
+      missing_account_codes: ["bank_1021", "equity"],
+      missing_account_ids: [],
+    });
+    expect(OPENING_PLAN_USER_MESSAGE).not.toContain("bank_");
+    expect(OPENING_PLAN_USER_MESSAGE).toContain("étape Plan");
   });
 });
