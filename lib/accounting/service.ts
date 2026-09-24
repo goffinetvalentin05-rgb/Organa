@@ -9,6 +9,10 @@ import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
 import { isFinancialSystemCode } from "./financialAccounts";
 import {
+  accountAllowed,
+  journalLinesBalanced,
+} from "./journalGrid";
+import {
   ADVANCED_EVENT,
   ADVANCED_SOURCE,
   assessAdvancedLines,
@@ -786,6 +790,162 @@ export async function reverseAdvancedEntry(clubId: string, userId: string, entry
     created_by: userId,
     audit_action: "advanced_reversal",
     lines: reversed.map((line) => ({
+      account_id: line.accountId,
+      debit: line.debit,
+      credit: line.credit,
+    })),
+  });
+}
+
+export async function saveJournalEntry(params: {
+  clubId: string;
+  userId: string;
+  entryId?: string;
+  date: string;
+  description: string;
+  reference?: string;
+  remark?: string;
+  idempotencyKey?: string;
+  lines: Array<{ accountId: string; debit: number; credit: number }>;
+}) {
+  const admin = createAdminClient();
+  const access = await getAccountingAccess(params.clubId);
+  if (!access.canWrite) throw new Error("Comptabilité inactive");
+  if (access.startDate && params.date < access.startDate) {
+    throw new Error("Cette date est antérieure au démarrage de la comptabilité");
+  }
+  const accounts = await loadAccounts(admin, params.clubId);
+  const known = accounts.map((account) => ({ id: account.id, clubId: params.clubId, isActive: account.isActive }));
+  for (const line of params.lines) {
+    if (!accountAllowed(known.find((account) => account.id === line.accountId), params.clubId)) {
+      throw new Error("Compte introuvable dans le plan de ce club.");
+    }
+  }
+  if (!journalLinesBalanced(params.lines)) {
+    throw new Error("L’écriture doit être équilibrée avant d’être enregistrée.");
+  }
+  const assessed = assessAdvancedLines({ clubId: params.clubId, lines: params.lines, accounts: known });
+  if (!assessed.ok) throw new Error(assessed.message);
+
+  if (params.entryId) {
+    const { error } = await admin.rpc("accounting_update_pending_entry", {
+      p_payload: {
+        club_id: params.clubId,
+        entry_id: params.entryId,
+        entry_date: params.date,
+        description: params.description.trim() || "Écriture",
+        reference: params.reference?.trim() || "",
+        remark: params.remark?.trim() || "",
+        lines: params.lines.map((line) => ({
+          account_id: line.accountId,
+          debit: roundChf(line.debit),
+          credit: roundChf(line.credit),
+        })),
+      },
+    });
+    if (error) throw new Error(error.message);
+    await audit(admin, params.clubId, "journal_update", params.userId, params.entryId, null, { lines: params.lines });
+    return { id: params.entryId };
+  }
+
+  const periods = await loadPeriods(admin, params.clubId);
+  const period = periodFor(periods, params.date, true);
+  if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const sourceId = crypto.randomUUID();
+  return postEntry(admin, {
+    club_id: params.clubId,
+    period_id: period.id,
+    entry_date: params.date,
+    description: params.description.trim() || "Écriture",
+    amount: assessed.debit,
+    direction: "adjustment",
+    source_type: "manual",
+    source_id: sourceId,
+    event_type: "manual_journal",
+    idempotency_key: params.idempotencyKey || `journal:${sourceId}`,
+    status: "pending",
+    party_name: params.remark?.trim() || null,
+    created_by: params.userId,
+    audit_action: "journal_create",
+    lines: params.lines.map((line) => ({
+      account_id: line.accountId,
+      debit: roundChf(line.debit),
+      credit: roundChf(line.credit),
+    })),
+  }).then(async (posted) => {
+    if (params.reference?.trim()) {
+      await admin.from("accounting_entries").update({ reference: params.reference.trim() }).eq("id", posted.id).eq("club_id", params.clubId);
+    }
+    return posted;
+  });
+}
+
+export async function correctJournalEntry(clubId: string, userId: string, entryId: string) {
+  const admin = createAdminClient();
+  const { data: entry } = await admin
+    .from("accounting_entries")
+    .select("id, status, description, amount, reference, party_name, entry_date, reversed_by_entry_id")
+    .eq("id", entryId)
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (!entry) throw new Error("Écriture introuvable");
+  if (entry.status !== "validated" || entry.reversed_by_entry_id) {
+    throw new Error("Seule une écriture validée non extournée peut être corrigée");
+  }
+  const periods = await loadPeriods(admin, clubId);
+  const today = zurichToday();
+  const period = periodFor(periods, today, true);
+  if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const { data: lines } = await admin
+    .from("accounting_entry_lines")
+    .select("account_id, debit, credit")
+    .eq("entry_id", entryId)
+    .eq("club_id", clubId)
+    .order("line_order");
+  const original = (lines ?? []).map((line) => ({
+    accountId: String(line.account_id),
+    debit: num(line.debit as number),
+    credit: num(line.credit as number),
+  }));
+  const reversed = buildReversalLines(original);
+  await postEntry(admin, {
+    club_id: clubId,
+    period_id: period.id,
+    entry_date: today,
+    description: `Extourne — ${entry.description}`,
+    amount: num(entry.amount as number),
+    direction: "reversal",
+    source_type: "manual",
+    source_id: entryId,
+    event_type: "reversal",
+    idempotency_key: `reversal:journal:${entryId}`,
+    status: "validated",
+    reversal_of_entry_id: entryId,
+    created_by: userId,
+    audit_action: "journal_reversal",
+    lines: reversed.map((line) => ({
+      account_id: line.accountId,
+      debit: line.debit,
+      credit: line.credit,
+    })),
+  });
+  const sourceId = crypto.randomUUID();
+  return postEntry(admin, {
+    club_id: clubId,
+    period_id: period.id,
+    entry_date: String(entry.entry_date),
+    description: String(entry.description || "Correction"),
+    amount: num(entry.amount as number),
+    direction: "adjustment",
+    source_type: "manual",
+    source_id: sourceId,
+    event_type: "manual_journal",
+    idempotency_key: `correction:${entryId}`,
+    status: "pending",
+    party_name: entry.party_name ? String(entry.party_name) : null,
+    created_by: userId,
+    audit_action: "journal_correction",
+    lines: original.map((line) => ({
       account_id: line.accountId,
       debit: line.debit,
       credit: line.credit,

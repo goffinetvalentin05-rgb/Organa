@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import { ActionButton } from "@/components/ui";
 import { ACCOUNT_CLASS_LABELS } from "@/lib/accounting/chart";
 import { formatChfAmount } from "@/lib/accounting/format";
-import type { Account } from "./model";
+import { isOfficialStatus, signedBalance, type Account, type Entry, type JournalLine } from "./model";
 
 const GROUPS: Array<{ title: string; types: string[] }> = [
   { title: "Actifs", types: ["asset"] },
@@ -14,24 +14,20 @@ const GROUPS: Array<{ title: string; types: string[] }> = [
   { title: "Charges", types: ["expense"] },
 ];
 
-const TYPE_LABEL: Record<string, string> = {
-  asset: "Actif",
-  liability: "Passif",
-  equity: "Capitaux propres",
-  revenue: "Produit",
-  expense: "Charge",
-};
-
 export default function ChartPanel({
   accounts,
   balances,
+  entries = [],
+  linesByEntry = {},
   canWrite,
   onAct,
 }: {
   accounts: Account[];
   balances: Map<string, number>;
+  entries?: Entry[];
+  linesByEntry?: Record<string, JournalLine[]>;
   canWrite: boolean;
-  onAct: (payload: Record<string, unknown>) => Promise<void>;
+  onAct: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const [editing, setEditing] = useState<Account | null>(null);
   const [creating, setCreating] = useState(false);
@@ -53,8 +49,10 @@ export default function ChartPanel({
                 <tr>
                   <th className="px-4 py-2 text-left">N°</th>
                   <th className="px-3 py-2 text-left">Compte</th>
-                  <th className="px-3 py-2 text-left">Type</th>
-                  <th className="px-3 py-2 text-right">Solde</th>
+                  <th className="px-3 py-2 text-right">Solde d’ouverture</th>
+                  <th className="px-3 py-2 text-right">Mouvements débit</th>
+                  <th className="px-3 py-2 text-right">Mouvements crédit</th>
+                  <th className="px-3 py-2 text-right">Solde actuel</th>
                   <th className="px-3 py-2 text-left">Statut</th>
                   <th className="px-3 py-2" />
                 </tr>
@@ -68,7 +66,9 @@ export default function ChartPanel({
                       {account.isSystem ? <span className="ml-2 rounded-full bg-[#EEF2FF] px-2 py-0.5 text-[11px] font-medium text-[#1A23FF]">Système</span> : null}
                       <span className="mt-0.5 block text-[11px] text-[#94A3B8]">{ACCOUNT_CLASS_LABELS[account.accountClass]}</span>
                     </td>
-                    <td className="px-3 py-2 text-[#475569]">{TYPE_LABEL[account.accountType] || account.accountType}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatChfAmount(movementOf(account, entries, linesByEntry).opening)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatChfAmount(movementOf(account, entries, linesByEntry).debit)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatChfAmount(movementOf(account, entries, linesByEntry).credit)}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{formatChfAmount(balances.get(account.id) || 0)}</td>
                     <td className="px-3 py-2">{account.isActive ? "Actif" : "Inactif"}</td>
                     <td className="px-3 py-2 text-right">
@@ -87,6 +87,24 @@ export default function ChartPanel({
   );
 }
 
+function movementOf(account: Account, entries: Entry[], linesByEntry: Record<string, JournalLine[]>) {
+  let opening = 0;
+  let debit = 0;
+  let credit = 0;
+  for (const entry of entries) {
+    if (!isOfficialStatus(entry.status)) continue;
+    for (const line of linesByEntry[entry.id] || []) {
+      if (line.accountId !== account.id) continue;
+      if (entry.source_type === "opening") opening += signedBalance(account.accountType, line.debit, line.credit);
+      else {
+        debit += line.debit;
+        credit += line.credit;
+      }
+    }
+  }
+  return { opening, debit, credit };
+}
+
 function EditAccount({
   account,
   onClose,
@@ -94,7 +112,7 @@ function EditAccount({
 }: {
   account: Account;
   onClose: () => void;
-  onAct: (payload: Record<string, unknown>) => Promise<void>;
+  onAct: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const [name, setName] = useState(account.name);
   const [number, setNumber] = useState(account.number);
@@ -129,7 +147,7 @@ function EditAccount({
   );
 }
 
-function CreateAccount({ onClose, onAct }: { onClose: () => void; onAct: (payload: Record<string, unknown>) => Promise<void> }) {
+function CreateAccount({ onClose, onAct }: { onClose: () => void; onAct: (payload: Record<string, unknown>) => Promise<unknown> }) {
   const [number, setNumber] = useState("");
   const [name, setName] = useState("");
   const [accountType, setAccountType] = useState("expense");

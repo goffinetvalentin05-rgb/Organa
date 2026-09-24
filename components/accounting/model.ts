@@ -104,6 +104,7 @@ export function accountLabel(account: Account | undefined): string {
 export function sideSummary(lines: JournalLine[], accounts: Account[], side: "debit" | "credit"): string {
   const picked = lines.filter((line) => (side === "debit" ? line.debit > 0 : line.credit > 0));
   if (picked.length === 0) return "—";
-  if (picked.length > 1) return `${picked.length} comptes`;
-  return accountLabel(accounts.find((account) => account.id === picked[0].accountId));
+  return picked
+    .map((line) => accountLabel(accounts.find((account) => account.id === line.accountId)))
+    .join(" · ");
 }

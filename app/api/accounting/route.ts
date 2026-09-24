@@ -12,7 +12,9 @@ import {
   createManualEntry,
   createAdvancedEntry,
   updateAdvancedEntry,
+  correctJournalEntry,
   reverseAdvancedEntry,
+  saveJournalEntry,
   getAccountingAccess,
   listOpenItems,
   loadWorkspace,
@@ -186,8 +188,29 @@ export async function POST(request: NextRequest) {
           })) : [],
         });
         break;
+      case "journal-save": {
+        const saved = await saveJournalEntry({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          entryId: body.entryId ? String(body.entryId) : undefined,
+          date: String(body.date),
+          description: String(body.description || ""),
+          reference: body.reference ? String(body.reference) : undefined,
+          remark: body.remark ? String(body.remark) : undefined,
+          idempotencyKey: body.idempotencyKey ? String(body.idempotencyKey) : undefined,
+          lines: Array.isArray(body.lines) ? body.lines.map((line: { accountId?: string; debit?: number; credit?: number }) => ({
+            accountId: String(line.accountId || ""),
+            debit: Number(line.debit || 0),
+            credit: Number(line.credit || 0),
+          })) : [],
+        });
+        return NextResponse.json({ ok: true, entryId: saved.id });
+      }
       case "reverse":
         await reverseAdvancedEntry(guard.clubId, guard.userId, String(body.entryId));
+        break;
+      case "correct":
+        await correctJournalEntry(guard.clubId, guard.userId, String(body.entryId));
         break;
       case "settings":
         await updateSettings(guard.clubId, guard.userId, Boolean(body.autoValidate));

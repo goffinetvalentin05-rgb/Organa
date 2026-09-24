@@ -6,8 +6,7 @@ import { PageHeader, PageLayout, GlassCard } from "@/components/ui";
 import AccountingLanding from "@/components/accounting/AccountingLanding";
 import AccountingOnboarding from "@/components/accounting/AccountingOnboarding";
 import ChartPanel from "@/components/accounting/ChartPanel";
-import JournalPanel from "@/components/accounting/JournalPanel";
-import OverviewPanel from "@/components/accounting/OverviewPanel";
+import JournalGrid from "@/components/accounting/JournalGrid";
 import PeriodsPanel from "@/components/accounting/PeriodsPanel";
 import ReportsPanel from "@/components/accounting/ReportsPanel";
 import SettingsPanel from "@/components/accounting/SettingsPanel";
@@ -19,7 +18,6 @@ import { formatSwissDate, zurichToday } from "@/lib/accounting/format";
 type Section = "overview" | "journal" | "review" | "chart" | "reports" | "periods" | "settings";
 
 const NAV = [
-  { href: "/tableau-de-bord/comptabilite", section: "overview" as const, label: "Vue d’ensemble" },
   { href: "/tableau-de-bord/comptabilite/journal", section: "journal" as const, label: "Journal" },
   { href: "/tableau-de-bord/comptabilite/plan", section: "chart" as const, label: "Plan comptable" },
   { href: "/tableau-de-bord/comptabilite/rapports", section: "reports" as const, label: "Rapports" },
@@ -163,11 +161,8 @@ export default function AccountingScreen({ section }: { section: Section }) {
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#475569]">Les encaissements et les dépenses antérieurs à cette date ne sont pas comptabilisés.</p>
         </GlassCard>
       ) : null}
-      {section === "overview" && !startsLater ? (
-        <OverviewPanel summary={summary} review={review} accounts={accounts} entries={entries} coverageNote={coverage.note} />
-      ) : null}
       {section === "journal" || section === "review" ? (
-        <JournalPanel
+        <JournalGrid
           entries={entries}
           accounts={accounts}
           linesByEntry={linesByEntry}
@@ -176,11 +171,20 @@ export default function AccountingScreen({ section }: { section: Section }) {
           inbox={review.inbox}
           reviewOnly={section === "review"}
           canWrite={Boolean(access.canWrite)}
-          canManage={Boolean(access.canManage)}
+          onAct={act}
+          onReload={reload}
+        />
+      ) : null}
+      {section === "chart" ? (
+        <ChartPanel
+          accounts={accounts}
+          balances={balances}
+          entries={entries}
+          linesByEntry={linesByEntry}
+          canWrite={Boolean(access.canWrite)}
           onAct={act}
         />
       ) : null}
-      {section === "chart" ? <ChartPanel accounts={accounts} balances={balances} canWrite={Boolean(access.canWrite)} onAct={act} /> : null}
       {section === "reports" ? (
         <ReportsPanel summary={summary} entries={entries} accounts={accounts} linesByEntry={linesByEntry} coverageNote={coverage.note} />
       ) : null}
