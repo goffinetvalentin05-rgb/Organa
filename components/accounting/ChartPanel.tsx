@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { ActionButton } from "@/components/ui";
+import AccountingModal from "./AccountingModal";
 import { ACCOUNT_CLASS_LABELS } from "@/lib/accounting/chart";
 import { formatChfAmount } from "@/lib/accounting/format";
 import { isOfficialStatus, signedBalance, type Account, type Entry, type JournalLine } from "./model";
@@ -133,7 +134,7 @@ function EditAccount({
   }
 
   return (
-    <Drawer title={`${account.number} ${account.name}`} onClose={onClose}>
+    <AccountingModal title="Modifier le compte" onClose={onClose}>
       <label className="block text-sm">Libellé
         <input className={field} value={name} onChange={(event) => setName(event.target.value)} />
       </label>
@@ -142,8 +143,11 @@ function EditAccount({
           <input className={field} value={number} onChange={(event) => setNumber(event.target.value)} />
         </label>
       )}
-      <ActionButton type="button" variant="premiumInline" onClick={save}>Enregistrer</ActionButton>
-    </Drawer>
+      <div className="flex justify-end gap-2 pt-2">
+        <button type="button" className="rounded-full px-3 py-1.5 text-sm text-[#475569]" onClick={onClose}>Annuler</button>
+        <ActionButton type="button" variant="premiumInline" onClick={save}>Enregistrer</ActionButton>
+      </div>
+    </AccountingModal>
   );
 }
 
@@ -152,7 +156,7 @@ function CreateAccount({ onClose, onAct }: { onClose: () => void; onAct: (payloa
   const [name, setName] = useState("");
   const [accountType, setAccountType] = useState("expense");
   return (
-    <Drawer title="Nouveau compte" onClose={onClose}>
+    <AccountingModal title="Créer un compte" onClose={onClose}>
       <label className="block text-sm">Numéro<input className={field} value={number} onChange={(event) => setNumber(event.target.value)} /></label>
       <label className="block text-sm">Nom<input className={field} value={name} onChange={(event) => setName(event.target.value)} /></label>
       <label className="block text-sm">Type
@@ -164,21 +168,11 @@ function CreateAccount({ onClose, onAct }: { onClose: () => void; onAct: (payloa
           <option value="expense">Charge</option>
         </select>
       </label>
-      <ActionButton type="button" variant="premiumInline" onClick={() => { void onAct({ action: "create_account", number, name, accountType }); onClose(); }}>Créer</ActionButton>
-    </Drawer>
-  );
-}
-
-function Drawer({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-[#0F172A]/30">
-      <button type="button" className="h-full flex-1" aria-label="Fermer" onClick={onClose} />
-      <aside className="flex h-full w-full max-w-md flex-col gap-4 bg-white p-5 shadow-2xl">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        {children}
-        <button type="button" className="text-sm text-[#64748B]" onClick={onClose}>Fermer</button>
-      </aside>
-    </div>
+      <div className="flex justify-end gap-2 pt-2">
+        <button type="button" className="rounded-full px-3 py-1.5 text-sm text-[#475569]" onClick={onClose}>Annuler</button>
+        <ActionButton type="button" variant="premiumInline" onClick={() => { void onAct({ action: "create_account", number, name, accountType }); onClose(); }}>Créer</ActionButton>
+      </div>
+    </AccountingModal>
   );
 }
 

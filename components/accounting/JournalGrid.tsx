@@ -13,6 +13,7 @@ import {
   type JournalVisualRow,
 } from "@/lib/accounting/journalGrid";
 import { sourceLabel } from "@/lib/accounting/sources";
+import AccountingModal from "./AccountingModal";
 import { STATUS_LABEL, type Account, type Attachment, type Entry, type InboxItem, type JournalLine, type Period } from "./model";
 
 type Draft = {
@@ -72,6 +73,7 @@ export default function JournalGrid({
   const [selected, setSelected] = useState<string[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const [correcting, setCorrecting] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const activeAccounts = accounts.filter((account) => account.isActive);
   const pendingCount = entries.filter((entry) => entry.status === "pending").length + inbox.length;
 
@@ -94,7 +96,7 @@ export default function JournalGrid({
   function seed(entry: Entry, rows: JournalVisualRow[]): EntryEdit {
     return {
       date: entry.entry_date,
-      piece: entry.reference || (entry.source_type === "opening" ? `OUV-${entry.entry_number}` : ""),
+      piece: entry.reference || "",
       label: entry.description,
       remark: entry.party_name || "",
       rows: rows.map((row) => ({
@@ -161,6 +163,7 @@ export default function JournalGrid({
         delete next[params.entry!.id];
         return next;
       });
+      setEditingId(null);
     }
   }
 
@@ -215,9 +218,8 @@ export default function JournalGrid({
   }
 
   function askCorrection(entry: Entry) {
-    if (canEditJournalEntry(entry.status)) return;
+    if (entry.status !== "validated" || entry.reversed_by_entry_id) return;
     setCorrecting(entry.id);
-    setNotice("Cette écriture est validée. Créer une correction ?");
   }
 
   async function upload(entryId: string, file: File) {
@@ -251,38 +253,68 @@ export default function JournalGrid({
         ) : null}
       </div>
       {notice ? <p className="text-sm text-[#334155]">{notice}</p> : null}
-      <div className="overflow-hidden rounded-xl border border-[rgba(15,23,42,0.08)] bg-white">
-        <div className="flex flex-wrap gap-1.5 border-b border-[#E2E8F0] bg-[#F8FAFC] p-2">
-          <input className={filter} placeholder="Recherche" value={query} onChange={(event) => setQuery(event.target.value)} />
-          <select className={filter} value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
-            <option value="all">Exercice</option>
-            {periods.map((period) => <option key={period.id} value={period.id}>{period.label}</option>)}
-          </select>
-          <input className={filter} type="date" value={from} onChange={(event) => setFrom(event.target.value)} aria-label="Du" />
-          <input className={filter} type="date" value={to} onChange={(event) => setTo(event.target.value)} aria-label="Au" />
-          <select className={filter} value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="all">Toutes</option>
-            <option value="pending">À vérifier</option>
-            <option value="validated">Validées</option>
-            <option value="reversed">Extournées</option>
-          </select>
-          <select className={filter} value={accountId} onChange={(event) => setAccountId(event.target.value)}>
-            <option value="">Compte</option>
-            {accounts.map((account) => <option key={account.id} value={account.id}>{account.number} {account.name}</option>)}
-          </select>
-          <select className={filter} value={source} onChange={(event) => setSource(event.target.value)}>
-            <option value="all">Source</option>
-            {[...new Set(entries.map((entry) => entry.source_type))].map((item) => <option key={item} value={item}>{sourceLabel(item)}</option>)}
-          </select>
+      <div className="overflow-hidden rounded-xl border border-[#D6DEE8] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+        <div className="grid grid-cols-2 gap-2 border-b border-[#E2E8F0] bg-[#F4F7FB] p-3 md:grid-cols-4 xl:grid-cols-7">
+          <Filter label="Recherche"><input className={filter} placeholder="Libellé, pièce, n°" value={query} onChange={(event) => setQuery(event.target.value)} /></Filter>
+          <Filter label="Exercice">
+            <select className={filter} value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+              <option value="all">Tous</option>
+              {periods.map((period) => <option key={period.id} value={period.id}>{period.label}</option>)}
+            </select>
+          </Filter>
+          <Filter label="Du"><input className={filter} type="date" value={from} onChange={(event) => setFrom(event.target.value)} /></Filter>
+          <Filter label="Au"><input className={filter} type="date" value={to} onChange={(event) => setTo(event.target.value)} /></Filter>
+          <Filter label="Statut">
+            <select className={filter} value={status} onChange={(event) => setStatus(event.target.value)}>
+              <option value="all">Toutes</option>
+              <option value="pending">À vérifier</option>
+              <option value="validated">Validées</option>
+              <option value="reversed">Extournées</option>
+            </select>
+          </Filter>
+          <Filter label="Compte">
+            <select className={filter} value={accountId} onChange={(event) => setAccountId(event.target.value)}>
+              <option value="">Tous</option>
+              {accounts.map((account) => <option key={account.id} value={account.id}>{account.number} {account.name}</option>)}
+            </select>
+          </Filter>
+          <Filter label="Source">
+            <select className={filter} value={source} onChange={(event) => setSource(event.target.value)}>
+              <option value="all">Toutes</option>
+              {[...new Set(entries.map((entry) => entry.source_type))].map((item) => <option key={item} value={item}>{sourceLabel(item)}</option>)}
+            </select>
+          </Filter>
         </div>
-        <div className="max-h-[calc(100vh-16rem)] overflow-auto">
-          <table className="min-w-[1180px] w-full border-collapse text-left text-[13px]">
-            <thead className="sticky top-0 z-10 bg-white text-[11px] uppercase tracking-wide text-[#64748B]">
-              <tr className="border-b border-[#E2E8F0]">
-                <th className="w-8 px-2 py-2" />
-                {["Date", "N°", "Pièce", "Libellé", "Débit", "Crédit", "Montant", "Statut", "Source", "Remarque", ""].map((label) => (
-                  <th key={label} className={`px-2 py-2 font-semibold ${label === "Montant" ? "text-right" : ""}`}>{label}</th>
-                ))}
+        <div className="max-h-[calc(100vh-13.5rem)] overflow-auto">
+          <table className="w-full min-w-[1280px] table-fixed border-collapse text-left text-[13px] text-[#0F172A]">
+            <colgroup>
+              <col className="w-9" />
+              <col className="w-[7.5rem]" />
+              <col className="w-16" />
+              <col className="w-28" />
+              <col />
+              <col className="w-[16rem]" />
+              <col className="w-[16rem]" />
+              <col className="w-32" />
+              <col className="w-24" />
+              <col className="w-28" />
+              <col className="w-36" />
+              <col className="w-14" />
+            </colgroup>
+            <thead className="sticky top-0 z-10 bg-[#F8FAFC] text-[11px] uppercase tracking-wide text-[#64748B]">
+              <tr className="border-b border-[#D6DEE8]">
+                <th className="px-2 py-2.5" />
+                <th className="px-3 py-2.5 font-semibold">Date</th>
+                <th className="px-2 py-2.5 font-semibold" title="Numéro interne de l’écriture">N° écr.</th>
+                <th className="px-2 py-2.5 font-semibold" title="Référence du document">Pièce</th>
+                <th className="px-3 py-2.5 font-semibold">Libellé</th>
+                <th className="px-3 py-2.5 font-semibold">Débit</th>
+                <th className="px-3 py-2.5 font-semibold">Crédit</th>
+                <th className="px-3 py-2.5 text-right font-semibold">Montant</th>
+                <th className="px-2 py-2.5 font-semibold">Statut</th>
+                <th className="px-2 py-2.5 font-semibold">Source</th>
+                <th className="px-2 py-2.5 font-semibold">Remarque</th>
+                <th className="px-2 py-2.5 font-semibold" title="Justificatif">Just.</th>
               </tr>
             </thead>
             <tbody>
@@ -302,6 +334,8 @@ export default function JournalGrid({
               {groups.map(({ entry, rows }) => {
                 const edit = editOf(entry, rows);
                 const editable = canWrite && canEditJournalEntry(entry.status);
+                const editing = editingId === entry.id;
+                const total = rows.reduce((sum, item) => sum + item.amount, 0);
                 return (
                   <GroupRows key={entry.id}>
                     {rows.map((row) => (
@@ -314,23 +348,34 @@ export default function JournalGrid({
                     files={attachments.filter((file) => file.entry_id === entry.id)}
                     selected={selected.includes(entry.id)}
                     showMeta={row.groupIndex === 0}
-                    editable={editable}
-                    correcting={correcting === entry.id}
+                    editable={editable && editing}
                     onToggle={() => setSelected(selected.includes(entry.id) ? selected.filter((id) => id !== entry.id) : [...selected, entry.id])}
                     onValidate={() => void onAct({ action: "validate", entryId: entry.id })}
-                    onLocked={() => askCorrection(entry)}
-                    onCorrect={() => void onAct({ action: "correct", entryId: entry.id })}
                     onChange={(next) => patchEdit(entry, rows, next)}
                     onSave={() => void saveEntry(entry, rows)}
-                    onCancel={() => setEdits((current) => {
-                      const next = { ...current };
-                      delete next[entry.id];
-                      return next;
-                    })}
-                    onAddLine={editable && row.groupIndex === rows.length - 1 ? () => addDraft(entry.id) : undefined}
+                    onCancel={() => {
+                      setEditingId(null);
+                      setEdits((current) => {
+                        const next = { ...current };
+                        delete next[entry.id];
+                        return next;
+                      });
+                    }}
+                    onAddLine={editable && editing && row.groupIndex === rows.length - 1 ? () => addDraft(entry.id) : undefined}
                     onUpload={(file) => void upload(entry.id, file)}
+                    onActivate={() => {
+                      if (editable) setEditingId(entry.id);
+                      else askCorrection(entry);
+                    }}
                   />
                     ))}
+                    {rows.length > 1 ? (
+                      <tr className="border-b-2 border-[#D6DEE8] bg-[#F4F7FB]">
+                        <td colSpan={7} className="px-3 py-1.5 text-right text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Total de l’écriture</td>
+                        <td className="px-3 py-1.5 text-right text-sm font-semibold tabular-nums">{formatChfAmount(total)}</td>
+                        <td colSpan={4} />
+                      </tr>
+                    ) : null}
                     {(extras[entry.id] || []).map((draft) => (
                       <DraftRow
                         key={draft.localId}
@@ -349,6 +394,15 @@ export default function JournalGrid({
           </table>
         </div>
       </div>
+      {correcting ? (
+        <AccountingModal title="Écriture validée" onClose={() => setCorrecting(null)}>
+          <p className="text-sm leading-relaxed text-[#334155]">Cette écriture est validée. Une correction extourne l’originale et ouvre une nouvelle écriture à vérifier.</p>
+          <div className="flex justify-end gap-2 pt-2">
+            <button type="button" className="rounded-full px-3 py-1.5 text-sm text-[#475569]" onClick={() => setCorrecting(null)}>Annuler</button>
+            <button type="button" className="rounded-full bg-[#1A23FF] px-3 py-1.5 text-sm font-semibold text-white" onClick={() => { const id = correcting; setCorrecting(null); void onAct({ action: "correct", entryId: id }); }}>Créer une correction</button>
+          </div>
+        </AccountingModal>
+      ) : null}
     </div>
   );
 }
@@ -415,16 +469,14 @@ function SavedRow({
   selected,
   showMeta,
   editable,
-  correcting,
   onToggle,
   onValidate,
-  onLocked,
-  onCorrect,
   onChange,
   onSave,
   onCancel,
   onAddLine,
   onUpload,
+  onActivate,
 }: {
   entry: Entry;
   row: JournalVisualRow;
@@ -434,18 +486,17 @@ function SavedRow({
   selected: boolean;
   showMeta: boolean;
   editable: boolean;
-  correcting: boolean;
   onToggle: () => void;
   onValidate: () => void;
-  onLocked: () => void;
-  onCorrect: () => void;
   onChange: (edit: EntryEdit) => void;
   onSave: () => void;
   onCancel: () => void;
   onAddLine?: () => void;
   onUpload: (file: File) => void;
+  onActivate: () => void;
 }) {
   const line = edit.rows[row.groupIndex] || { debitId: "", creditId: "", amount: "" };
+  const grouped = row.groupSize > 1;
   const debit = accounts.find((account) => account.id === (editable ? line.debitId : row.debitAccountId));
   const credit = accounts.find((account) => account.id === (editable ? line.creditId : row.creditAccountId));
   function keyDown(event: KeyboardEvent<HTMLInputElement>, field: JournalField) {
@@ -462,34 +513,36 @@ function SavedRow({
   }
   return (
     <>
-      <tr className={`border-b border-[#F1F5F9] hover:bg-[#F8FAFC] ${row.groupSize > 1 ? "shadow-[inset_3px_0_0_#E2E8F0]" : ""}`} onClick={editable ? undefined : onLocked}>
-        <td className="px-2">{showMeta && entry.status === "pending" ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label="Sélectionner" /> : null}</td>
-        <td className="whitespace-nowrap px-2 py-1 tabular-nums">
-          {showMeta && editable ? <input data-field="date" className={cell} type="date" value={edit.date} onChange={(event) => onChange({ ...edit, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} /> : showMeta ? formatSwissDate(entry.entry_date) : ""}
+      <tr
+        className={`border-b border-[#EEF2F6] ${grouped ? (row.groupIndex === 0 ? "border-t-2 border-t-[#CBD5E1] bg-white" : "bg-[#F7F9FC]") : "bg-white"} ${editable ? "cursor-text" : entry.status === "validated" ? "cursor-pointer" : ""} hover:bg-[#F3F6FB]`}
+        onClick={onActivate}
+      >
+        <td className="px-2" onClick={(event) => event.stopPropagation()}>{showMeta && entry.status === "pending" ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label="Sélectionner" /> : null}</td>
+        <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-[#334155]">
+          {showMeta && editable ? <input data-field="date" className={cell} type="date" value={edit.date} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} /> : showMeta ? formatSwissDate(entry.entry_date) : ""}
         </td>
-        <td className="px-2 py-1 tabular-nums text-[#64748B]">{showMeta ? entry.entry_number : ""}</td>
-        <td className="px-2 py-1">
-          {showMeta && editable ? <input data-field="piece" className={cell} value={edit.piece} onChange={(event) => onChange({ ...edit, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : showMeta ? (entry.reference || (entry.source_type === "opening" ? `OUV-${entry.entry_number}` : "")) : ""}
+        <td className="px-2 py-2.5 font-medium tabular-nums text-[#475569]">{showMeta ? entry.entry_number : ""}</td>
+        <td className="px-2 py-2.5 text-[#334155]">
+          {showMeta && editable ? <input data-field="piece" className={cell} value={edit.piece} placeholder="Réf." onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : showMeta ? (entry.reference || "—") : ""}
         </td>
-        <td className="px-2 py-1">
-          {showMeta && editable ? <input data-field="label" className={cell} value={edit.label} onChange={(event) => onChange({ ...edit, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : showMeta ? entry.description : ""}
-          {row.groupSize > 1 && row.groupIndex === 0 ? <span className="ml-2 text-[10px] uppercase tracking-wide text-[#94A3B8]">composée</span> : null}
+        <td className={`px-3 py-2.5 ${row.groupIndex > 0 ? "pl-6 text-[#475569]" : "font-medium"}`}>
+          {showMeta && editable ? <input data-field="label" className={cell} value={edit.label} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : showMeta ? entry.description : <span className="text-[#94A3B8]">↳</span>}
         </td>
-        <td className="px-2 py-1 font-mono text-[12px]">
-          {editable ? <AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => setRow({ debitId })} onSave={onSave} /> : debit ? `${debit.number} ${debit.name}` : ""}
+        <td className="px-3 py-2.5" onClick={(event) => editable && event.stopPropagation()}>
+          {editable ? <AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => setRow({ debitId })} onSave={onSave} /> : <AccountCell account={debit} />}
         </td>
-        <td className="px-2 py-1 font-mono text-[12px]">
-          {editable ? <AccountPicker field="credit" accounts={accounts} value={line.creditId} onChange={(creditId) => setRow({ creditId })} onSave={onSave} /> : credit ? `${credit.number} ${credit.name}` : ""}
+        <td className="px-3 py-2.5" onClick={(event) => editable && event.stopPropagation()}>
+          {editable ? <AccountPicker field="credit" accounts={accounts} value={line.creditId} onChange={(creditId) => setRow({ creditId })} onSave={onSave} /> : <AccountCell account={credit} />}
         </td>
-        <td className="px-2 py-1 text-right tabular-nums">
-          {editable ? <input data-field="amount" className={`${cell} text-right`} value={line.amount} onChange={(event) => setRow({ amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount")} /> : formatChfAmount(row.amount)}
+        <td className="px-3 py-2.5 text-right text-[13px] font-medium tabular-nums">
+          {editable ? <input data-field="amount" className={`${cell} text-right`} value={line.amount} onClick={(event) => event.stopPropagation()} onChange={(event) => setRow({ amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount")} /> : formatChfAmount(row.amount)}
         </td>
-        <td className="px-2 py-1 text-xs text-[#475569]">{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</td>
-        <td className="px-2 py-1 text-[11px] text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
-        <td className="px-2 py-1 text-xs">
-          {showMeta && editable ? <input data-field="remark" className={cell} value={edit.remark} onChange={(event) => onChange({ ...edit, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} /> : showMeta ? entry.party_name || "" : ""}
+        <td className="px-2 py-2.5 text-xs text-[#475569]">{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</td>
+        <td className="truncate px-2 py-2.5 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
+        <td className="truncate px-2 py-2.5 text-xs text-[#64748B]">
+          {showMeta && editable ? <input data-field="remark" className={cell} value={edit.remark} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} /> : showMeta ? entry.party_name || "" : ""}
         </td>
-        <td className="whitespace-nowrap px-2 py-1 text-xs">
+        <td className="whitespace-nowrap px-2 py-2.5 text-xs" onClick={(event) => event.stopPropagation()}>
           {showMeta ? (
             <label className="cursor-pointer" title={files.map((file) => file.file_name || "Pièce").join(", ") || "Ajouter un justificatif"}>
               <span className={files.length ? "text-[#0F172A]" : "text-[#CBD5E1]"}>📎</span>
@@ -500,10 +553,7 @@ function SavedRow({
         </td>
       </tr>
       {onAddLine ? (
-        <tr><td colSpan={12} className="px-8 py-1"><button type="button" className="text-xs text-[#1A23FF]" onClick={onAddLine}>+ Ajouter une ligne à cette écriture</button></td></tr>
-      ) : null}
-      {correcting && showMeta ? (
-        <tr><td colSpan={12} className="bg-[#F8FAFC] px-3 py-1.5 text-xs text-[#334155]">Cette écriture est validée. <button type="button" className="font-semibold text-[#1A23FF]" onClick={onCorrect}>Créer une correction</button></td></tr>
+        <tr><td colSpan={12} className="bg-[#F7F9FC] px-8 py-1.5"><button type="button" className="text-xs font-medium text-[#1A23FF]" onClick={onAddLine}>+ Ajouter une ligne à cette écriture</button></td></tr>
       ) : null}
     </>
   );
@@ -553,8 +603,27 @@ function AccountPicker({
   );
 }
 
-const filter = "rounded-md border border-[rgba(15,23,42,0.1)] bg-white px-2 py-1 text-xs";
-const cell = "w-full min-w-0 rounded border border-transparent bg-transparent px-1 py-0.5 outline-none focus:border-[#1A23FF] focus:bg-white";
+function AccountCell({ account }: { account?: Account }) {
+  if (!account) return <span className="text-[#CBD5E1]">—</span>;
+  return (
+    <span className="flex min-w-0 items-baseline gap-2" title={`${account.number} ${account.name}`}>
+      <span className="w-12 shrink-0 font-mono text-[13px] font-semibold tabular-nums text-[#0F172A]">{account.number}</span>
+      <span className="truncate text-[13px] text-[#334155]">{account.name}</span>
+    </span>
+  );
+}
+
+function Filter({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block min-w-0">
+      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-[#64748B]">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+const filter = "h-8 w-full rounded-md border border-[#D6DEE8] bg-white px-2 text-xs text-[#0F172A] outline-none focus:border-[#1A23FF]";
+const cell = "w-full min-w-0 rounded border border-[#D6DEE8] bg-white px-1.5 py-1 outline-none focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/20";
 
 function GroupRows({ children }: { children: ReactNode }) {
   return <>{children}</>;

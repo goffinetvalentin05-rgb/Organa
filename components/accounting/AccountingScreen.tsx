@@ -137,7 +137,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
   const reviewCount = review.count;
 
   return (
-    <PageLayout>
+    <PageLayout maxWidth="full" stack="compact">
       <PageHeader title="Comptabilité" subtitle={<p>{ACCOUNTING_TAGLINE}</p>} />
       <nav className="flex flex-wrap gap-2">
         {NAV.map((item) => {
