@@ -123,6 +123,37 @@ export function entryNumberAllowed(
   return !taken.some((row) => row.periodId === periodId && row.number === value && row.id !== selfId);
 }
 
+export type DraftCheck = {
+  date: string;
+  label: string;
+  lines: Array<{ debitAccountId: string; creditAccountId: string; amount: number }>;
+};
+
+/** Une nouvelle écriture reste un brouillon d’écran tant qu’elle n’est pas explicitement enregistrée. */
+export function nextDraftAction(alreadyOpen: boolean): "create" | "focus" {
+  return alreadyOpen ? "focus" : "create";
+}
+
+export function draftIssues(draft: DraftCheck): string[] {
+  const issues: string[] = [];
+  if (!draft.date) issues.push("Indiquez la date.");
+  if (!draft.label.trim()) issues.push("Indiquez le libellé.");
+  if (draft.lines.length === 0) issues.push("Ajoutez une ligne.");
+  const simple = draft.lines.length === 1 ? draft.lines[0] : null;
+  if (simple) {
+    if (!simple.debitAccountId) issues.push("Choisissez le compte au débit.");
+    if (!simple.creditAccountId) issues.push("Choisissez le compte au crédit.");
+    if (!(simple.amount > 0)) issues.push("Indiquez un montant supérieur à zéro.");
+    return issues;
+  }
+  const balanced = journalLinesBalanced(rowsToLines(draft.lines));
+  if (!balanced) issues.push("L’écriture composée doit être équilibrée.");
+  if (draft.lines.some((line) => line.amount <= 0 || (!line.debitAccountId && !line.creditAccountId))) {
+    issues.push("Chaque ligne doit avoir un compte et un montant.");
+  }
+  return issues;
+}
+
 export function journalImbalance(lines: GridLine[]): number {
   const debit = roundChf(lines.reduce((sum, line) => sum + line.debit, 0));
   const credit = roundChf(lines.reduce((sum, line) => sum + line.credit, 0));

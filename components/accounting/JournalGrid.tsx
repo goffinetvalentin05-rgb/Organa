@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import {
   canEditJournalEntry,
+  draftIssues,
   journalImbalance,
   journalLinesBalanced,
   nextJournalField,
@@ -17,6 +18,17 @@ import {
 import { sourceLabel } from "@/lib/accounting/sources";
 import AccountingModal from "./AccountingModal";
 import { STATUS_LABEL, type Account, type Attachment, type Entry, type InboxItem, type JournalLine, type Period } from "./model";
+
+type NewLine = { localId: string; debitId: string; creditId: string; amount: string };
+
+type NewEntry = {
+  date: string;
+  piece: string;
+  label: string;
+  remark: string;
+  idempotencyKey: string;
+  lines: NewLine[];
+};
 
 type Draft = {
   localId: string;
@@ -71,7 +83,9 @@ export default function JournalGrid({
   const [periodId, setPeriodId] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [draft, setDraft] = useState<NewEntry | null>(null);
+  const [draftPulse, setDraftPulse] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
   const [extras, setExtras] = useState<Record<string, Draft[]>>({});
   const [edits, setEdits] = useState<Record<string, EntryEdit>>({});
   const [selected, setSelected] = useState<string[]>([]);
@@ -127,7 +141,30 @@ export default function JournalGrid({
     setNotice(null);
   }
 
-  function addDraft(entryId?: string) {
+  function blankLine(): NewLine {
+    return { localId: crypto.randomUUID(), debitId: "", creditId: "", amount: "" };
+  }
+
+  function openNewEntry() {
+    if (draft) {
+      setDraftPulse(true);
+      window.setTimeout(() => setDraftPulse(false), 700);
+      document.getElementById("journal-draft")?.scrollIntoView({ block: "nearest" });
+      document.querySelector<HTMLElement>("#journal-draft [data-field='label']")?.focus();
+      return;
+    }
+    setDraftError(null);
+    setDraft({
+      date: new Date().toISOString().slice(0, 10),
+      piece: "",
+      label: "",
+      remark: "",
+      idempotencyKey: `journal:${crypto.randomUUID()}`,
+      lines: [blankLine()],
+    });
+  }
+
+  function addDraft(entryId: string) {
     const row: Draft = {
       localId: crypto.randomUUID(),
       entryId,
@@ -140,8 +177,7 @@ export default function JournalGrid({
       remark: "",
       idempotencyKey: `journal:${crypto.randomUUID()}`,
     };
-    if (entryId) setExtras((current) => ({ ...current, [entryId]: [...(current[entryId] || []), row] }));
-    else setDrafts((current) => [row, ...current]);
+    setExtras((current) => ({ ...current, [entryId]: [...(current[entryId] || []), row] }));
   }
 
   async function persistLines(params: {
@@ -175,9 +211,6 @@ export default function JournalGrid({
       return;
     }
     setSaveState("saved");
-    if (params.draft && !params.draft.entryId) {
-      setDrafts((current) => current.filter((item) => item.localId !== params.draft!.localId));
-    }
     if (params.entry) {
       setExtras((current) => ({ ...current, [params.entry!.id]: [] }));
       setEdits((current) => {
@@ -189,21 +222,49 @@ export default function JournalGrid({
     }
   }
 
-  async function saveDraft(draft: Draft) {
-    const amount = parseChfInput(draft.amount);
-    if (!draft.debitId || !draft.creditId || !amount) {
-      setNotice("Indiquez le débit, le crédit et le montant.");
+  async function saveNewEntry() {
+    if (!draft) return;
+    const issues = draftIssues({
+      date: draft.date,
+      label: draft.label,
+      lines: draft.lines.map((line) => ({
+        debitAccountId: line.debitId,
+        creditAccountId: line.creditId,
+        amount: parseChfInput(line.amount) || 0,
+      })),
+    });
+    if (issues.length) {
+      setDraftError(issues[0]);
+      setSaveState("idle");
       return;
     }
-    await persistLines({
-      draft,
+    const result = await onAct({
+      action: "journal-save",
       date: draft.date,
       description: draft.label,
       reference: draft.piece,
       remark: draft.remark,
-      lines: rowsToLines([{ debitAccountId: draft.debitId, creditAccountId: draft.creditId, amount }]),
+      idempotencyKey: draft.idempotencyKey,
+      status: "pending",
+      lines: rowsToLines(draft.lines.map((line) => ({
+        debitAccountId: line.debitId || null,
+        creditAccountId: line.creditId || null,
+        amount: parseChfInput(line.amount) || 0,
+      }))),
     });
+    if (!result) {
+      setSaveState("error");
+      return;
+    }
+    setSaveState("saved");
+    setDraft(null);
+    setDraftError(null);
   }
+
+  useEffect(() => {
+    if (!draft) return;
+    document.getElementById("journal-draft")?.querySelector<HTMLElement>("[data-field='label']")?.focus();
+  }, [draft?.idempotencyKey]);
 
   async function saveEntry(entry: Entry, rows: JournalVisualRow[], material = false, override?: EntryEdit) {
     const edit = override || editOf(entry, rows);
@@ -262,7 +323,7 @@ export default function JournalGrid({
   return (
     <div className={fullscreen ? "fixed inset-0 z-40 space-y-3 overflow-auto bg-[#F4F7FB] p-4" : "space-y-3"}>
       <div className="flex flex-wrap items-center gap-1">
-        {canWrite ? <ToolButton label="Ajouter une ligne vide dans le journal" onClick={() => addDraft()}>Nouvelle écriture</ToolButton> : null}
+        {canWrite ? <ToolButton label="Ouvrir une seule ligne de saisie" onClick={openNewEntry}>Nouvelle écriture</ToolButton> : null}
         {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Ajouter une ligne à l’écriture sélectionnée" onClick={() => addDraft(selectedEntry.id)}>Insérer une ligne</ToolButton> : null}
         {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Retirer l’écriture du journal en conservant l’historique" onClick={() => setVoiding(selectedEntry)}>Supprimer</ToolButton> : null}
         <ToolButton label={compact ? "Augmenter la hauteur des lignes" : "Afficher plus de lignes"} onClick={() => setCompact((value) => !value)}>{compact ? "Confortable" : "Compact"}</ToolButton>
@@ -333,16 +394,18 @@ export default function JournalGrid({
               </tr>
             </thead>
             <tbody>
-              {drafts.map((draft) => (
-                <DraftRow
-                  key={draft.localId}
-                  draft={draft}
+              {draft ? (
+                <NewEntryRows
+                  entry={draft}
                   accounts={activeAccounts}
-                  onChange={(next) => setDrafts(drafts.map((item) => item.localId === next.localId ? next : item))}
-                  onSave={() => void saveDraft(draft)}
-                  onCancel={() => setDrafts(drafts.filter((item) => item.localId !== draft.localId))}
+                  pulse={draftPulse}
+                  error={draftError}
+                  onChange={(next) => { setDraft(next); setDraftError(null); }}
+                  onSave={() => void saveNewEntry()}
+                  onCancel={() => { setDraft(null); setDraftError(null); }}
+                  onAddLine={() => setDraft({ ...draft, lines: [...draft.lines, blankLine()] })}
                 />
-              ))}
+              ) : null}
               {(status === "all" || status === "pending") ? inbox.map((item) => (
                 <InboxRow key={item.id} item={item} accounts={activeAccounts} canWrite={canWrite} onAct={onAct} />
               )) : null}
@@ -437,6 +500,78 @@ function moveField(event: KeyboardEvent<HTMLElement>, field: JournalField, onSav
   }
   const row = event.currentTarget.closest("tr");
   row?.querySelector<HTMLElement>(`[data-field="${next}"]`)?.focus();
+}
+
+function NewEntryRows({
+  entry,
+  accounts,
+  pulse,
+  error,
+  onChange,
+  onSave,
+  onCancel,
+  onAddLine,
+}: {
+  entry: NewEntry;
+  accounts: Account[];
+  pulse: boolean;
+  error: string | null;
+  onChange: (entry: NewEntry) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  onAddLine: () => void;
+}) {
+  function setLine(localId: string, patch: Partial<NewLine>) {
+    onChange({ ...entry, lines: entry.lines.map((line) => line.localId === localId ? { ...line, ...patch } : line) });
+  }
+  function keyDown(event: KeyboardEvent<HTMLInputElement>, field: JournalField) {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      onSave();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onCancel();
+      return;
+    }
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const next = nextJournalField(field);
+    if (next === "next-row") return;
+    document.querySelector<HTMLElement>(`#journal-draft [data-field="${next}"]`)?.focus();
+  }
+  const tone = `border-y-2 border-[#1A23FF] bg-[#F5F7FF] ${pulse ? "shadow-[inset_0_0_0_2px_#1A23FF]" : ""}`;
+  return (
+    <>
+      {entry.lines.map((line, index) => (
+        <tr key={line.localId} id={index === 0 ? "journal-draft" : undefined} className={tone}>
+          <td className="px-2 text-[10px] font-semibold uppercase tracking-wide text-[#1A23FF]">{index === 0 ? "Nouveau" : ""}</td>
+          <td className="px-2 py-2">{index === 0 ? <input data-field="date" className={cell} type="date" value={entry.date} onChange={(event) => onChange({ ...entry, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} /> : null}</td>
+          <td className="px-2 text-xs text-[#64748B]">{index === 0 ? "Auto" : ""}</td>
+          <td className="px-2 py-2">{index === 0 ? <input data-field="piece" className={cell} value={entry.piece} placeholder="Pièce" onChange={(event) => onChange({ ...entry, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : null}</td>
+          <td className="px-2 py-2">{index === 0 ? <input data-field="label" className={cell} value={entry.label} placeholder="Libellé" onChange={(event) => onChange({ ...entry, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : <span className="text-xs text-[#64748B]">même écriture</span>}</td>
+          <td className="px-2 py-2"><AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => setLine(line.localId, { debitId })} onSave={() => undefined} /></td>
+          <td className="px-2 py-2"><AccountPicker field="credit" accounts={accounts} value={line.creditId} onChange={(creditId) => setLine(line.localId, { creditId })} onSave={() => undefined} /></td>
+          <td className="px-2 py-2"><input data-field="amount" className={`${cell} text-right tabular-nums`} value={line.amount} placeholder="0.00" onChange={(event) => setLine(line.localId, { amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount")} /></td>
+          <td className="px-2 py-2">{index === 0 ? <input data-field="remark" className={cell} value={entry.remark} placeholder="Remarque" onChange={(event) => onChange({ ...entry, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} /> : null}</td>
+          <td className="px-2 text-xs text-[#94A3B8]">{index === 0 ? "Manuel" : ""}</td>
+          <td className="px-2 text-xs font-medium text-[#1A23FF]">{index === 0 ? "Brouillon" : ""}</td>
+        </tr>
+      ))}
+      <tr className={tone}>
+        <td colSpan={11} className="px-3 py-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-[#1A23FF]">Nouvelle écriture</span>
+            <button type="button" className="text-xs font-medium text-[#1A23FF]" onClick={onAddLine}>+ Ajouter une ligne</button>
+            <button type="button" className="rounded-md bg-[#1A23FF] px-2.5 py-1 text-xs font-semibold text-white" title="Enregistrer l’écriture" onClick={onSave}>Enregistrer</button>
+            <button type="button" className="rounded-md px-2.5 py-1 text-xs text-[#475569]" title="Annuler le brouillon" onClick={onCancel}>Annuler</button>
+            {error ? <span className="text-xs text-rose-700">{error}</span> : null}
+          </div>
+        </td>
+      </tr>
+    </>
+  );
 }
 
 function DraftRow({

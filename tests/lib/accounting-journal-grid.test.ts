@@ -4,7 +4,9 @@ import {
   canEditJournalEntry,
   editIsMaterial,
   entryNumberAllowed,
+  draftIssues,
   journalImbalance,
+  nextDraftAction,
   journalLinesBalanced,
   nextJournalField,
   resolveJournalStatus,
@@ -85,6 +87,29 @@ describe("grille du journal", () => {
     expect(resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
     const blocked = resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: false });
     expect("error" in blocked ? blocked.error : "").toMatch(/équilibrée/);
+  });
+
+  it("n’ouvre qu’un seul brouillon et refuse une saisie incomplète", () => {
+    expect(nextDraftAction(false)).toBe("create");
+    expect(nextDraftAction(true)).toBe("focus");
+    expect(nextDraftAction(true)).toBe("focus");
+    const missing = draftIssues({ date: "2026-09-24", label: "", lines: [{ debitAccountId: "", creditAccountId: "", amount: 0 }] });
+    expect(missing.length).toBeGreaterThan(0);
+    expect(draftIssues({
+      date: "2026-09-24",
+      label: "Cotisation",
+      lines: [{ debitAccountId: "1020", creditAccountId: "3000", amount: 250 }],
+    })).toEqual([]);
+    const compound = draftIssues({
+      date: "2026-09-24",
+      label: "Frais",
+      lines: [
+        { debitAccountId: "6500", creditAccountId: "", amount: 100 },
+        { debitAccountId: "6800", creditAccountId: "", amount: 10 },
+        { debitAccountId: "", creditAccountId: "1020", amount: 110 },
+      ],
+    });
+    expect(compound).toEqual([]);
   });
 
   it("calcule l’écart d’une écriture déséquilibrée", () => {
