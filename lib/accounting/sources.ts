@@ -38,6 +38,8 @@ export function sourceLabel(sourceType: string): string {
       return "Encaissement";
     case "manual":
       return "Saisie manuelle";
+    case "manual_accounting":
+      return "Écriture avancée";
     case "opening":
       return "Solde d’ouverture";
     case "period_close":

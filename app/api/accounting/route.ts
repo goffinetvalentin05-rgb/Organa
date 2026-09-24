@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
+import { PERMISSIONS, checkPermission, requirePermission } from "@/lib/auth/permissions";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import {
   attachFile,
@@ -10,6 +10,9 @@ import {
   createTransfer,
   createAccount,
   createManualEntry,
+  createAdvancedEntry,
+  updateAdvancedEntry,
+  reverseAdvancedEntry,
   getAccountingAccess,
   listOpenItems,
   loadWorkspace,
@@ -42,10 +45,12 @@ export async function GET() {
 
   try {
     const access = await getAccountingAccess(guard.clubId);
+    const manage = await checkPermission(PERMISSIONS.MANAGE_ACCOUNTING);
+    const visibleAccess = { ...access, canManage: manage.ok };
     const usesStripe = await clubUsesStripe(guard.clubId);
     if (!access.onboarded) {
       return NextResponse.json({
-        access,
+        access: visibleAccess,
         usesStripe,
         priceLabel: accountingPriceLabel(),
         priceDetail: accountingPriceDetail(),
@@ -64,6 +69,7 @@ export async function GET() {
       : null;
     return NextResponse.json({
       ...workspace,
+      access: visibleAccess,
       priceLabel: accountingPriceLabel(),
       priceDetail: accountingPriceDetail(),
       openItems,
@@ -145,6 +151,43 @@ export async function POST(request: NextRequest) {
           categoryCode: String(body.categoryCode),
           partyName: body.partyName ? String(body.partyName) : undefined,
         });
+        break;
+      case "advanced": {
+        const created = await createAdvancedEntry({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          date: String(body.date),
+          description: String(body.description || ""),
+          reference: body.reference ? String(body.reference) : undefined,
+          remark: body.remark ? String(body.remark) : undefined,
+          validateNow: Boolean(body.validateNow),
+          idempotencyKey: body.idempotencyKey ? String(body.idempotencyKey) : undefined,
+          lines: Array.isArray(body.lines) ? body.lines.map((line: { accountId?: string; debit?: number; credit?: number }) => ({
+            accountId: String(line.accountId || ""),
+            debit: Number(line.debit || 0),
+            credit: Number(line.credit || 0),
+          })) : [],
+        });
+        return NextResponse.json({ ok: true, entryId: created.id });
+      }
+      case "advanced-update":
+        await updateAdvancedEntry({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          entryId: String(body.entryId),
+          date: String(body.date),
+          description: String(body.description || ""),
+          reference: body.reference ? String(body.reference) : undefined,
+          remark: body.remark ? String(body.remark) : undefined,
+          lines: Array.isArray(body.lines) ? body.lines.map((line: { accountId?: string; debit?: number; credit?: number }) => ({
+            accountId: String(line.accountId || ""),
+            debit: Number(line.debit || 0),
+            credit: Number(line.credit || 0),
+          })) : [],
+        });
+        break;
+      case "reverse":
+        await reverseAdvancedEntry(guard.clubId, guard.userId, String(body.entryId));
         break;
       case "settings":
         await updateSettings(guard.clubId, guard.userId, Boolean(body.autoValidate));

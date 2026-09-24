@@ -6,11 +6,12 @@ import { ActionButton, GlassCard } from "@/components/ui";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { sourceHref, sourceLabel } from "@/lib/accounting/sources";
+import AdvancedEntryForm from "./AdvancedEntryForm";
 import EntryComposer from "./EntryComposer";
 import {
   STATUS_LABEL,
   accountLabel,
-  sideLabels,
+  sideSummary,
   type Account,
   type Attachment,
   type Entry,
@@ -30,6 +31,7 @@ export default function JournalPanel({
   inbox,
   reviewOnly,
   canWrite,
+  canManage,
   onAct,
 }: {
   entries: Entry[];
@@ -40,7 +42,8 @@ export default function JournalPanel({
   inbox: InboxItem[];
   reviewOnly: boolean;
   canWrite: boolean;
-  onAct: (payload: Record<string, unknown>) => Promise<void>;
+  canManage: boolean;
+  onAct: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(reviewOnly ? "pending" : "all");
@@ -50,7 +53,9 @@ export default function JournalPanel({
   const [source, setSource] = useState("all");
   const [periodId, setPeriodId] = useState("all");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [composer, setComposer] = useState<Kind | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [editingAdvanced, setEditingAdvanced] = useState<Entry | null>(null);
+  const [composer, setComposer] = useState<Kind | "advanced" | null>(null);
 
   const files = useMemo(() => {
     const map = new Map<string, Attachment[]>();
@@ -102,6 +107,9 @@ export default function JournalPanel({
           <ActionButton type="button" variant="surface" disabled={!canWrite} onClick={() => setComposer("in")}>Nouvel encaissement</ActionButton>
           <ActionButton type="button" variant="surface" disabled={!canWrite} onClick={() => setComposer("out")}>Nouvelle dépense</ActionButton>
           <ActionButton type="button" variant="surface" disabled={!canWrite} onClick={() => setComposer("transfer")}>Nouveau transfert</ActionButton>
+          {canManage ? (
+            <ActionButton type="button" variant="surface" onClick={() => setComposer("advanced")}>Écriture comptable avancée</ActionButton>
+          ) : null}
           {inbox.length + entries.filter((entry) => entry.status === "pending").length > 0 ? (
             <Link href="/tableau-de-bord/comptabilite/a-verifier" className="inline-flex items-center rounded-full bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
               À vérifier ({inbox.length + entries.filter((entry) => entry.status === "pending").length})
@@ -155,7 +163,8 @@ export default function JournalPanel({
               ) : null}
               {visible.map((entry) => {
                 const lines = linesByEntry[entry.id] || [];
-                const sides = sideLabels(lines, accounts);
+                const debitLabel = sideSummary(lines, accounts, "debit");
+                const creditLabel = sideSummary(lines, accounts, "credit");
                 const docs = files.get(entry.id) || [];
                 const href = sourceHref(entry.source_type, entry.source_id);
                 const open = openId === entry.id;
@@ -163,9 +172,9 @@ export default function JournalPanel({
                   <tr key={entry.id} className="border-b border-[#F1F5F9] align-top hover:bg-[#F8FAFC]">
                     <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-[#334155]">{formatSwissDate(entry.entry_date)}</td>
                     <td className="px-3 py-2.5 tabular-nums">{entry.entry_number}</td>
-                    <td className="px-3 py-2.5 text-[#475569]">{sourceLabel(entry.source_type)}</td>
+                    <td className="px-3 py-2.5 text-[#475569]">{entry.reference || sourceLabel(entry.source_type)}</td>
                     <td className="px-3 py-2.5">
-                      <p className="font-medium text-[#0F172A]">{entry.description}</p>
+                      <button type="button" className="text-left font-medium text-[#0F172A]" onClick={() => setDetailId(entry.id)}>{entry.description}</button>
                       {reviewOnly && entry.status === "pending" ? (
                         <div className="mt-2 flex flex-wrap gap-2">
                           {canWrite ? <button type="button" className="text-xs font-semibold text-[#1A23FF]" onClick={() => void onAct({ action: "validate", entryId: entry.id })}>Valider</button> : null}
@@ -190,8 +199,8 @@ export default function JournalPanel({
                         </div>
                       ) : null}
                     </td>
-                    <td className="max-w-[12rem] px-3 py-2.5 text-[#334155]">{sides.debit}</td>
-                    <td className="max-w-[12rem] px-3 py-2.5 text-[#334155]">{sides.credit}</td>
+                    <td className="max-w-[12rem] px-3 py-2.5 text-[#334155]">{debitLabel}</td>
+                    <td className="max-w-[12rem] px-3 py-2.5 text-[#334155]">{creditLabel}</td>
                     <td className="whitespace-nowrap px-3 py-2.5 text-right font-medium tabular-nums">{formatChfAmount(Number(entry.amount))}</td>
                     <td className="px-3 py-2.5"><StatusPill status={entry.status} /></td>
                     <td className="px-3 py-2.5">
@@ -208,9 +217,101 @@ export default function JournalPanel({
         <p className="border-t border-[#E2E8F0] px-3 py-2 text-xs text-[#64748B]">{visible.length} écriture{visible.length > 1 ? "s" : ""}</p>
       </div>
 
-      {composer ? (
-        <EntryComposer kind={composer} accounts={accounts} onClose={() => setComposer(null)} onAct={onAct} />
+      {composer && composer !== "advanced" ? (
+        <EntryComposer kind={composer} accounts={accounts} onClose={() => setComposer(null)} onAct={async (payload) => { await onAct(payload); }} />
       ) : null}
+      {composer === "advanced" ? (
+        <AdvancedEntryForm accounts={accounts} onClose={() => setComposer(null)} onAct={onAct} />
+      ) : null}
+      {detailId ? (
+        <EntryDetail
+          entry={entries.find((entry) => entry.id === detailId) || null}
+          lines={linesByEntry[detailId] || []}
+          accounts={accounts}
+          files={files.get(detailId) || []}
+          canManage={canManage}
+          onClose={() => setDetailId(null)}
+          onEdit={(entry) => { setDetailId(null); setEditingAdvanced(entry); }}
+          onAct={onAct}
+        />
+      ) : null}
+      {editingAdvanced ? (
+        <AdvancedEntryForm
+          accounts={accounts}
+          initial={{
+            entryId: editingAdvanced.id,
+            date: editingAdvanced.entry_date,
+            description: editingAdvanced.description,
+            reference: editingAdvanced.reference || "",
+            remark: editingAdvanced.party_name || "",
+            lines: linesByEntry[editingAdvanced.id] || [],
+          }}
+          onClose={() => setEditingAdvanced(null)}
+          onAct={onAct}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function EntryDetail({
+  entry,
+  lines,
+  accounts,
+  files,
+  canManage,
+  onClose,
+  onEdit,
+  onAct,
+}: {
+  entry: Entry | null;
+  lines: JournalLine[];
+  accounts: Account[];
+  files: Attachment[];
+  canManage: boolean;
+  onClose: () => void;
+  onEdit: (entry: Entry) => void;
+  onAct: (payload: Record<string, unknown>) => Promise<unknown>;
+}) {
+  if (!entry) return null;
+  const debit = lines.reduce((sum, line) => sum + line.debit, 0);
+  const credit = lines.reduce((sum, line) => sum + line.credit, 0);
+  const advanced = entry.source_type === "manual_accounting" && entry.event_type === "manual_advanced_entry";
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-[#0F172A]/30">
+      <button type="button" className="h-full flex-1" aria-label="Fermer" onClick={onClose} />
+      <aside className="flex h-full w-full max-w-xl flex-col overflow-y-auto bg-white p-5 shadow-2xl">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">Écriture {entry.entry_number}</p>
+        <h2 className="mt-1 text-lg font-semibold">{entry.description}</h2>
+        <p className="mt-1 text-sm text-[#64748B]">{formatSwissDate(entry.entry_date)} · {sourceLabel(entry.source_type)} · {STATUS_LABEL[entry.status] || entry.status}</p>
+        <table className="mt-4 w-full text-sm">
+          <thead className="text-[11px] uppercase text-[#64748B]"><tr><th className="py-1 text-left">Compte</th><th className="text-right">Débit</th><th className="text-right">Crédit</th></tr></thead>
+          <tbody>
+            {lines.map((line, index) => (
+              <tr key={index} className="border-t border-[#F1F5F9]">
+                <td className="py-1.5">{accountLabel(accounts.find((account) => account.id === line.accountId))}</td>
+                <td className="py-1.5 text-right tabular-nums">{line.debit ? formatChfAmount(line.debit) : ""}</td>
+                <td className="py-1.5 text-right tabular-nums">{line.credit ? formatChfAmount(line.credit) : ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-3 text-sm">Total débit {formatChfAmount(debit)} · Total crédit {formatChfAmount(credit)}</p>
+        <dl className="mt-4 space-y-2 text-sm">
+          <div><dt className="text-[#64748B]">Pièce</dt><dd>{entry.reference || "—"}</dd></div>
+          <div><dt className="text-[#64748B]">Remarque</dt><dd>{entry.party_name || "—"}</dd></div>
+          <div><dt className="text-[#64748B]">Création</dt><dd>{entry.created_at ? formatSwissDate(entry.created_at) : "—"}</dd></div>
+          <div><dt className="text-[#64748B]">Validation</dt><dd>{entry.validated_at ? formatSwissDate(entry.validated_at) : "Pas encore validée"}</dd></div>
+          <div><dt className="text-[#64748B]">Justificatifs</dt><dd>{files.length ? files.map((file) => file.file_name || "Pièce").join(", ") : "—"}</dd></div>
+          <div><dt className="text-[#64748B]">Audit</dt><dd>Création, modification, validation et extourne sont enregistrées dans le journal d’audit.</dd></div>
+        </dl>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {canManage && entry.status === "pending" ? <ActionButton type="button" variant="premiumInline" onClick={() => void onAct({ action: "validate", entryId: entry.id })}>Valider</ActionButton> : null}
+          {canManage && advanced && entry.status === "pending" ? <ActionButton type="button" variant="surface" onClick={() => onEdit(entry)}>Modifier</ActionButton> : null}
+          {canManage && advanced && entry.status === "validated" ? <ActionButton type="button" variant="ghost" onClick={() => void onAct({ action: "reverse", entryId: entry.id })}>Extourner</ActionButton> : null}
+          <ActionButton type="button" variant="ghost" onClick={onClose}>Fermer</ActionButton>
+        </div>
+      </aside>
     </div>
   );
 }
@@ -224,7 +325,7 @@ function InboxRow({
   item: InboxItem;
   accounts: Account[];
   canWrite: boolean;
-  onAct: (payload: Record<string, unknown>) => Promise<void>;
+  onAct: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const [financialCode, setFinancialCode] = useState(item.financial_account_code || "");
   const [categoryCode, setCategoryCode] = useState(item.category_code || "");

@@ -9,6 +9,13 @@ import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
 import { isFinancialSystemCode } from "./financialAccounts";
 import {
+  ADVANCED_EVENT,
+  ADVANCED_SOURCE,
+  assessAdvancedLines,
+  buildReversalLines,
+  canModifyAdvancedEntry,
+} from "./advancedEntry";
+import {
   coverageSentence,
   normalizeOnboardingInput,
   resolveCoverageType,
@@ -617,6 +624,175 @@ export async function createTransfer(params: {
   });
 }
 
+export async function createAdvancedEntry(params: {
+  clubId: string;
+  userId: string;
+  date: string;
+  description: string;
+  reference?: string;
+  remark?: string;
+  validateNow?: boolean;
+  idempotencyKey?: string;
+  lines: Array<{ accountId: string; debit: number; credit: number }>;
+}) {
+  const admin = createAdminClient();
+  const access = await getAccountingAccess(params.clubId);
+  if (!access.canWrite) throw new Error("Comptabilité inactive");
+  if (access.startDate && params.date < access.startDate) {
+    throw new Error("Cette date est antérieure au démarrage de la comptabilité");
+  }
+  const [accounts, periods] = await Promise.all([
+    loadAccounts(admin, params.clubId),
+    loadPeriods(admin, params.clubId),
+  ]);
+  const period = periodFor(periods, params.date, true);
+  if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const assessed = assessAdvancedLines({
+    clubId: params.clubId,
+    lines: params.lines,
+    accounts: accounts.map((account) => ({ id: account.id, clubId: params.clubId, isActive: account.isActive })),
+  });
+  if (!assessed.ok) throw new Error(assessed.message);
+  const sourceId = crypto.randomUUID();
+  const posted = await postEntry(admin, {
+    club_id: params.clubId,
+    period_id: period.id,
+    entry_date: params.date,
+    description: params.description.trim() || "Écriture comptable",
+    amount: assessed.debit,
+    direction: "adjustment",
+    source_type: ADVANCED_SOURCE,
+    source_id: sourceId,
+    event_type: ADVANCED_EVENT,
+    idempotency_key: params.idempotencyKey || `advanced:${sourceId}`,
+    status: "pending",
+    party_name: params.remark?.trim() || null,
+    created_by: params.userId,
+    audit_action: "advanced_create",
+    lines: params.lines.map((line) => ({
+      account_id: line.accountId,
+      debit: roundChf(line.debit),
+      credit: roundChf(line.credit),
+    })),
+  });
+  if (params.reference?.trim()) {
+    const { error } = await admin
+      .from("accounting_entries")
+      .update({ reference: params.reference.trim() })
+      .eq("id", posted.id)
+      .eq("club_id", params.clubId)
+      .eq("status", "pending");
+    if (error) throw error;
+  }
+  if (params.validateNow) await validateEntry(params.clubId, params.userId, posted.id);
+  return posted;
+}
+
+export async function updateAdvancedEntry(params: {
+  clubId: string;
+  userId: string;
+  entryId: string;
+  date: string;
+  description: string;
+  reference?: string;
+  remark?: string;
+  lines: Array<{ accountId: string; debit: number; credit: number }>;
+}) {
+  const admin = createAdminClient();
+  const { data: entry } = await admin
+    .from("accounting_entries")
+    .select("status, source_type, event_type")
+    .eq("id", params.entryId)
+    .eq("club_id", params.clubId)
+    .maybeSingle();
+  if (!entry || !canModifyAdvancedEntry({
+    status: String(entry.status),
+    sourceType: String(entry.source_type),
+    eventType: String(entry.event_type),
+  })) {
+    throw new Error("Seule une écriture avancée à vérifier peut être modifiée");
+  }
+  const accounts = await loadAccounts(admin, params.clubId);
+  const assessed = assessAdvancedLines({
+    clubId: params.clubId,
+    lines: params.lines,
+    accounts: accounts.map((account) => ({ id: account.id, clubId: params.clubId, isActive: account.isActive })),
+  });
+  if (!assessed.ok) throw new Error(assessed.message);
+  const { error } = await admin.rpc("accounting_update_advanced_entry", {
+    p_payload: {
+      club_id: params.clubId,
+      entry_id: params.entryId,
+      entry_date: params.date,
+      description: params.description.trim() || "Écriture comptable",
+      reference: params.reference?.trim() || "",
+      remark: params.remark?.trim() || "",
+      lines: params.lines.map((line) => ({
+        account_id: line.accountId,
+        debit: roundChf(line.debit),
+        credit: roundChf(line.credit),
+      })),
+    },
+  });
+  if (error) throw new Error(error.message);
+  await audit(admin, params.clubId, "advanced_update", params.userId, params.entryId, null, {
+    description: params.description,
+    lines: params.lines,
+  });
+}
+
+export async function reverseAdvancedEntry(clubId: string, userId: string, entryId: string) {
+  const admin = createAdminClient();
+  const { data: entry } = await admin
+    .from("accounting_entries")
+    .select("id, status, description, amount, source_type, event_type, reversed_by_entry_id")
+    .eq("id", entryId)
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (!entry || entry.source_type !== ADVANCED_SOURCE || entry.event_type !== ADVANCED_EVENT) {
+    throw new Error("Cette écriture ne s’extourne pas depuis le journal avancé");
+  }
+  if (entry.status !== "validated" || entry.reversed_by_entry_id) {
+    throw new Error("Seule une écriture validée non extournée peut être extournée");
+  }
+  const periods = await loadPeriods(admin, clubId);
+  const today = zurichToday();
+  const period = periodFor(periods, today, true);
+  if (!period) throw new Error("Aucun exercice ouvert pour cette date");
+  const { data: lines } = await admin
+    .from("accounting_entry_lines")
+    .select("account_id, debit, credit")
+    .eq("entry_id", entryId)
+    .eq("club_id", clubId)
+    .order("line_order");
+  const reversed = buildReversalLines((lines ?? []).map((line) => ({
+    accountId: String(line.account_id),
+    debit: num(line.debit as number),
+    credit: num(line.credit as number),
+  })));
+  return postEntry(admin, {
+    club_id: clubId,
+    period_id: period.id,
+    entry_date: today,
+    description: `Extourne — ${entry.description}`,
+    amount: num(entry.amount as number),
+    direction: "reversal",
+    source_type: ADVANCED_SOURCE,
+    source_id: entryId,
+    event_type: "reversal",
+    idempotency_key: `reversal:advanced:${entryId}`,
+    status: "validated",
+    reversal_of_entry_id: entryId,
+    created_by: userId,
+    audit_action: "advanced_reversal",
+    lines: reversed.map((line) => ({
+      account_id: line.accountId,
+      debit: line.debit,
+      credit: line.credit,
+    })),
+  });
+}
+
 export async function updateSettings(clubId: string, userId: string, autoValidate: boolean) {
   const admin = createAdminClient();
   const { error } = await admin
@@ -643,7 +819,7 @@ export async function loadWorkspace(clubId: string) {
   const [{ data: entries }, { data: lineRows }, { data: inbox }, { data: attachments }] = await Promise.all([
     admin
       .from("accounting_entries")
-      .select("id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id")
+      .select("id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, reference, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id, created_at, validated_at")
       .eq("club_id", clubId)
       .order("entry_date", { ascending: false })
       .limit(500),

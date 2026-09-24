@@ -76,9 +76,10 @@ export default function AccountingScreen({ section }: { section: Section }) {
     const body = await response.json();
     if (!response.ok) {
       setError(body.error || "Action impossible");
-      return;
+      return null;
     }
     await reload();
+    return body;
   }
 
   const accounts = (data?.accounts || []) as Account[];
@@ -98,6 +99,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
     entitled?: boolean;
     onboarded?: boolean;
     canWrite?: boolean;
+    canManage?: boolean;
     autoValidate?: boolean;
     startDate?: string | null;
   };
@@ -174,6 +176,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           inbox={review.inbox}
           reviewOnly={section === "review"}
           canWrite={Boolean(access.canWrite)}
+          canManage={Boolean(access.canManage)}
           onAct={act}
         />
       ) : null}

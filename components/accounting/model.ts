@@ -26,6 +26,10 @@ export type Entry = {
   category_account_id: string | null;
   reversed_by_entry_id: string | null;
   period_id?: string | null;
+  event_type?: string;
+  reference?: string | null;
+  created_at?: string | null;
+  validated_at?: string | null;
 };
 
 export type JournalLine = { accountId: string; debit: number; credit: number };
@@ -97,12 +101,9 @@ export function accountLabel(account: Account | undefined): string {
   return `${account.number} ${account.name}`;
 }
 
-export function sideLabels(lines: JournalLine[], accounts: Account[]): { debit: string; credit: string } {
-  const name = (accountId: string) => accountLabel(accounts.find((account) => account.id === accountId));
-  const debit = lines.filter((line) => line.debit > 0).map((line) => name(line.accountId));
-  const credit = lines.filter((line) => line.credit > 0).map((line) => name(line.accountId));
-  return {
-    debit: debit.length ? debit.join(" · ") : "—",
-    credit: credit.length ? credit.join(" · ") : "—",
-  };
+export function sideSummary(lines: JournalLine[], accounts: Account[], side: "debit" | "credit"): string {
+  const picked = lines.filter((line) => (side === "debit" ? line.debit > 0 : line.credit > 0));
+  if (picked.length === 0) return "—";
+  if (picked.length > 1) return `${picked.length} comptes`;
+  return accountLabel(accounts.find((account) => account.id === picked[0].accountId));
 }
