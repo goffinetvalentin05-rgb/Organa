@@ -82,8 +82,6 @@ export default function JournalGrid({
   const [voiding, setVoiding] = useState<Entry | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const activeAccounts = accounts.filter((account) => account.isActive);
-  const pendingCount = entries.filter((entry) => entry.status === "pending").length + inbox.length;
-
   const visibleEntries = entries.filter((entry) => {
     if (entry.status === "voided") return false;
     if (status !== "all" && entry.status !== status) return false;
@@ -94,6 +92,9 @@ export default function JournalGrid({
     if (accountId && !(linesByEntry[entry.id] || []).some((line) => line.accountId === accountId)) return false;
     const blob = `${entry.description} ${entry.party_name || ""} ${entry.reference || ""} ${entry.entry_number}`.toLowerCase();
     return blob.includes(query.trim().toLowerCase());
+  }).sort((a, b) => {
+    if (a.entry_date !== b.entry_date) return a.entry_date < b.entry_date ? 1 : -1;
+    return b.entry_number - a.entry_number;
   });
 
   const groups = useMemo(() => visibleEntries.map((entry) => ({
@@ -261,15 +262,11 @@ export default function JournalGrid({
   return (
     <div className={fullscreen ? "fixed inset-0 z-40 space-y-3 overflow-auto bg-[#F4F7FB] p-4" : "space-y-3"}>
       <div className="flex flex-wrap items-center gap-1">
-        {canWrite ? <ToolButton label="Nouvelle écriture" onClick={() => addDraft()}>+</ToolButton> : null}
-        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Ajouter une ligne" onClick={() => addDraft(selectedEntry.id)}>+</ToolButton> : null}
-        {canWrite && selectedEntry ? <ToolButton label="Dupliquer" onClick={() => addDraft()}>⧉</ToolButton> : null}
-        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Supprimer" onClick={() => setVoiding(selectedEntry)}>✕</ToolButton> : null}
-        <ToolButton label={compact ? "Affichage confortable" : "Affichage compact"} onClick={() => setCompact((value) => !value)}>≡</ToolButton>
-        <ToolButton label={fullscreen ? "Quitter le plein écran" : "Plein écran"} onClick={() => setFullscreen((value) => !value)}>{fullscreen ? "↙" : "⛶"}</ToolButton>
-        <button type="button" className={`ml-1 rounded-full px-3 py-1.5 text-sm ${status === "pending" ? "bg-amber-100 text-amber-900" : "bg-white text-[#334155] ring-1 ring-inset ring-[rgba(15,23,42,0.08)]"}`} onClick={() => setStatus(status === "pending" && !reviewOnly ? "all" : "pending")}>
-          À vérifier ({pendingCount})
-        </button>
+        {canWrite ? <ToolButton label="Ajouter une ligne vide dans le journal" onClick={() => addDraft()}>Nouvelle écriture</ToolButton> : null}
+        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Ajouter une ligne à l’écriture sélectionnée" onClick={() => addDraft(selectedEntry.id)}>Insérer une ligne</ToolButton> : null}
+        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Retirer l’écriture du journal en conservant l’historique" onClick={() => setVoiding(selectedEntry)}>Supprimer</ToolButton> : null}
+        <ToolButton label={compact ? "Augmenter la hauteur des lignes" : "Afficher plus de lignes"} onClick={() => setCompact((value) => !value)}>{compact ? "Confortable" : "Compact"}</ToolButton>
+        <ToolButton label={fullscreen ? "Revenir à l’écran du module" : "Afficher le journal sur tout l’écran"} onClick={() => setFullscreen((value) => !value)}>{fullscreen ? "Quitter le plein écran" : "Plein écran"}</ToolButton>
         {saveLabel ? <span className={`text-xs ${saveState === "error" ? "text-rose-700" : "text-[#64748B]"}`}>{saveLabel}</span> : null}
       </div>
       {notice ? <p className="text-sm text-[#334155]">{notice}</p> : null}
@@ -366,6 +363,7 @@ export default function JournalGrid({
                     files={attachments.filter((file) => file.entry_id === entry.id)}
                     selected={selected.includes(entry.id)}
                     showMeta={row.groupIndex === 0}
+                    selectable={canEditJournalEntry(entry.status)}
                     editable={editable && editing}
                     onToggle={() => setSelected(selected.includes(entry.id) ? selected.filter((id) => id !== entry.id) : [...selected, entry.id])}
                     onValidate={() => void onAct({ action: "validate", entryId: entry.id })}
@@ -383,6 +381,7 @@ export default function JournalGrid({
                     onUpload={(file) => void upload(entry.id, file)}
                     onActivate={() => {
                       if (editable) setEditingId(entry.id);
+                      else if (entry.status === "reversed") setNotice("Cette écriture est extournée. Elle reste dans le journal pour la trace et ne se modifie pas.");
                     }}
                   />
                     ))}
@@ -390,7 +389,7 @@ export default function JournalGrid({
                       <tr className="border-b-2 border-[#D6DEE8] bg-[#F4F7FB]">
                         <td colSpan={7} className="px-3 py-1.5 text-right text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Total de l’écriture</td>
                         <td className="px-3 py-1.5 text-right text-sm font-semibold tabular-nums">{formatChfAmount(total)}</td>
-                        <td colSpan={4} />
+                        <td colSpan={3} />
                       </tr>
                     ) : null}
                     {(extras[entry.id] || []).map((draft) => (
@@ -473,10 +472,9 @@ function DraftRow({
       <td className="px-2 py-1"><AccountPicker field="debit" accounts={accounts} value={draft.debitId} onChange={(debitId) => onChange({ ...draft, debitId })} onSave={onSave} /></td>
       <td className="px-2 py-1"><AccountPicker field="credit" accounts={accounts} value={draft.creditId} onChange={(creditId) => onChange({ ...draft, creditId })} onSave={onSave} /></td>
       <td className="px-2 py-1"><input data-field="amount" className={`${cell} text-right tabular-nums`} value={draft.amount} placeholder="0.00" onChange={(event) => onChange({ ...draft, amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount")} /></td>
-      <td className="px-2 py-1 text-xs text-[#64748B]">{compact ? "" : "Brouillon"}</td>
-      <td className="px-2 py-1 text-xs text-[#94A3B8]">{compact ? "" : "Manuel"}</td>
       <td className="px-2 py-1">{compact ? null : <input data-field="remark" className={cell} value={draft.remark} onChange={(event) => onChange({ ...draft, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} />}</td>
-      <td />
+      <td className="px-2 py-1 text-xs text-[#94A3B8]">{compact ? "" : "Manuel"}</td>
+      <td className="px-2 py-1 text-xs text-[#64748B]">{compact ? "" : "Brouillon"}</td>
     </tr>
   );
 }
@@ -489,6 +487,7 @@ function SavedRow({
   files,
   selected,
   showMeta,
+  selectable,
   editable,
   onToggle,
   onValidate,
@@ -506,6 +505,7 @@ function SavedRow({
   files: Attachment[];
   selected: boolean;
   showMeta: boolean;
+  selectable: boolean;
   editable: boolean;
   onToggle: () => void;
   onValidate: () => void;
@@ -536,10 +536,10 @@ function SavedRow({
   return (
     <>
       <tr
-        className={`border-b border-[#EEF2F6] ${grouped ? (row.groupIndex === 0 ? "border-t-2 border-t-[#CBD5E1] bg-white" : "bg-[#F7F9FC]") : "bg-white"} ${editable ? "cursor-text" : entry.status === "validated" ? "cursor-pointer" : ""} hover:bg-[#F3F6FB]`}
+        className={`border-b border-[#EEF2F6] ${grouped ? (row.groupIndex === 0 ? "border-t-2 border-t-[#94A3B8] bg-[#F8FAFC]" : "border-l-2 border-l-[#1A23FF] bg-[#F4F7FB]") : "bg-white"} ${canEditJournalEntry(entry.status) ? "cursor-text" : ""} hover:bg-[#EEF3FA]`}
         onClick={onActivate}
       >
-        <td className="px-2" onClick={(event) => event.stopPropagation()}>{showMeta && entry.status === "pending" ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label="Sélectionner" /> : null}</td>
+        <td className="px-2" onClick={(event) => event.stopPropagation()}>{showMeta && selectable ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label="Sélectionner l’écriture" /> : null}</td>
         <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-[#334155]">
           {showMeta && editable ? <input data-field="date" className={cell} type="date" value={edit.date} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} /> : showMeta ? formatSwissDate(entry.entry_date) : ""}
         </td>
@@ -550,7 +550,8 @@ function SavedRow({
           {showMeta && editable ? <input data-field="piece" className={cell} value={edit.piece} placeholder="Réf." onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : showMeta ? (entry.reference || "—") : ""}
         </td>
         <td className={`px-3 py-2.5 ${row.groupIndex > 0 ? "pl-6 text-[#475569]" : "font-medium"}`}>
-          {showMeta && editable ? <input data-field="label" className={cell} value={edit.label} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : showMeta ? entry.description : <span className="text-[#94A3B8]">↳</span>}
+          {showMeta && editable ? <input data-field="label" className={cell} value={edit.label} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : showMeta ? entry.description : <span className="text-[#94A3B8]">même écriture</span>}
+          {grouped && row.groupIndex === 0 ? <span className="ml-2 rounded bg-[#EEF2FF] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#1A23FF]">{row.groupSize} lignes</span> : null}
         </td>
         <td className="px-3 py-2.5" onClick={(event) => editable && event.stopPropagation()}>
           {editable ? <AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => { const next = { ...edit, rows: edit.rows.map((item, index) => index === row.groupIndex ? { ...item, debitId } : item) }; onChange(next); onSave(true, next); }} onSave={() => onSave(true)} /> : <AccountCell account={debit} />}
@@ -698,11 +699,11 @@ function InboxRow({
         ) : null}
       </td>
       <td className="px-2 py-1 text-right tabular-nums">{formatChfAmount(Number(item.amount))}</td>
-      <td className="px-2 py-1 text-xs">{STATUS_LABEL[item.status] || "À vérifier"}</td>
-      <td className="px-2 py-1 text-[11px] text-[#94A3B8]">{sourceLabel(item.source_type)}</td>
       <td />
-      <td className="px-2 py-1">
-        {canWrite ? <button type="button" className="text-xs font-semibold text-[#1A23FF]" onClick={() => void onAct({ action: "confirm", inboxId: item.id, financialAccountCode: financialCode, categoryCode })}>Proposer</button> : null}
+      <td className="px-2 py-1 text-[11px] text-[#94A3B8]">{sourceLabel(item.source_type)}</td>
+      <td className="px-2 py-1 text-xs">
+        {STATUS_LABEL[item.status] || "À vérifier"}
+        {canWrite ? <button type="button" className="ml-2 font-semibold text-[#1A23FF]" onClick={() => void onAct({ action: "confirm", inboxId: item.id, financialAccountCode: financialCode, categoryCode })}>Proposer</button> : null}
       </td>
     </tr>
   );

@@ -19,6 +19,7 @@ type Section = "overview" | "journal" | "review" | "chart" | "reports" | "period
 
 const NAV = [
   { href: "/tableau-de-bord/comptabilite/journal", section: "journal" as const, label: "Journal" },
+  { href: "/tableau-de-bord/comptabilite/a-verifier", section: "review" as const, label: "À vérifier" },
   { href: "/tableau-de-bord/comptabilite/plan", section: "chart" as const, label: "Plan comptable" },
   { href: "/tableau-de-bord/comptabilite/rapports", section: "reports" as const, label: "Rapports" },
   { href: "/tableau-de-bord/comptabilite/exercices", section: "periods" as const, label: "Exercices" },
@@ -139,17 +140,19 @@ export default function AccountingScreen({ section }: { section: Section }) {
   return (
     <PageLayout maxWidth="full" stack="compact">
       <PageHeader title="Comptabilité" subtitle={<p>{ACCOUNTING_TAGLINE}</p>} />
-      <nav className="flex flex-wrap gap-2">
+      <nav className="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-xl border border-[#D6DEE8] bg-white p-1">
         {NAV.map((item) => {
-          const active = item.section === section || (item.section === "journal" && section === "review");
+          const active = item.section === section;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-full px-4 py-2 text-sm ${active ? "bg-[#1A23FF] font-semibold text-white" : "bg-white text-[#475569] ring-1 ring-inset ring-[rgba(15,23,42,0.08)]"}`}
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm ${active ? "bg-[#0F172A] font-semibold text-white" : "text-[#475569] hover:bg-[#F4F7FB]"}`}
             >
               {item.label}
-              {item.section === "journal" && reviewCount > 0 ? ` · ${reviewCount}` : ""}
+              {item.section === "review" && reviewCount > 0 ? (
+                <span className={`rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${active ? "bg-white/15 text-white" : "bg-amber-100 text-amber-900"}`}>{reviewCount}</span>
+              ) : null}
             </Link>
           );
         })}
