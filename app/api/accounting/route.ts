@@ -15,6 +15,7 @@ import {
   correctJournalEntry,
   reverseAdvancedEntry,
   saveJournalEntry,
+  voidJournalEntry,
   getAccountingAccess,
   listOpenItems,
   loadWorkspace,
@@ -197,6 +198,9 @@ export async function POST(request: NextRequest) {
           description: String(body.description || ""),
           reference: body.reference ? String(body.reference) : undefined,
           remark: body.remark ? String(body.remark) : undefined,
+          entryNumber: body.entryNumber ? Number(body.entryNumber) : undefined,
+          status: body.status ? String(body.status) : undefined,
+          material: Boolean(body.material),
           idempotencyKey: body.idempotencyKey ? String(body.idempotencyKey) : undefined,
           lines: Array.isArray(body.lines) ? body.lines.map((line: { accountId?: string; debit?: number; credit?: number }) => ({
             accountId: String(line.accountId || ""),
@@ -208,6 +212,9 @@ export async function POST(request: NextRequest) {
       }
       case "reverse":
         await reverseAdvancedEntry(guard.clubId, guard.userId, String(body.entryId));
+        break;
+      case "journal-void":
+        await voidJournalEntry(guard.clubId, guard.userId, String(body.entryId));
         break;
       case "correct":
         await correctJournalEntry(guard.clubId, guard.userId, String(body.entryId));

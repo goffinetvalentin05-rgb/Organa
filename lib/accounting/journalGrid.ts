@@ -88,7 +88,45 @@ export function journalLinesBalanced(lines: GridLine[]): boolean {
 }
 
 export function canEditJournalEntry(status: string): boolean {
-  return status === "pending";
+  return status === "pending" || status === "validated";
+}
+
+const MATERIAL = new Set(["date", "piece", "debit", "credit", "amount", "lines"]);
+
+export function editIsMaterial(fields: string[]): boolean {
+  return fields.some((field) => MATERIAL.has(field));
+}
+
+export function resolveJournalStatus(input: {
+  previous: string;
+  requested: string;
+  material: boolean;
+  balanced: boolean;
+}): { status: "pending" | "validated" } | { error: string } {
+  if (input.previous === "validated" && input.material) {
+    return { status: "pending" };
+  }
+  if (input.requested === "validated" && !input.balanced) {
+    return { error: "L’écriture doit être équilibrée avant d’être vérifiée." };
+  }
+  if (input.requested === "validated") return { status: "validated" };
+  return { status: "pending" };
+}
+
+export function entryNumberAllowed(
+  value: number,
+  taken: Array<{ id: string; periodId: string | null; number: number }>,
+  periodId: string | null,
+  selfId: string
+): boolean {
+  if (!Number.isInteger(value) || value < 1) return false;
+  return !taken.some((row) => row.periodId === periodId && row.number === value && row.id !== selfId);
+}
+
+export function journalImbalance(lines: GridLine[]): number {
+  const debit = roundChf(lines.reduce((sum, line) => sum + line.debit, 0));
+  const credit = roundChf(lines.reduce((sum, line) => sum + line.credit, 0));
+  return roundChf(debit - credit);
 }
 
 export type JournalField = "date" | "piece" | "label" | "debit" | "credit" | "amount" | "remark";

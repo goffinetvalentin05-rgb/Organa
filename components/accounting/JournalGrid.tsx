@@ -6,6 +6,8 @@ import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import {
   canEditJournalEntry,
+  journalImbalance,
+  journalLinesBalanced,
   nextJournalField,
   rowsToLines,
   toJournalRows,
@@ -31,9 +33,11 @@ type Draft = {
 
 type EntryEdit = {
   date: string;
+  number: string;
   piece: string;
   label: string;
   remark: string;
+  status: string;
   rows: Array<{ debitId: string; creditId: string; amount: string }>;
 };
 
@@ -72,12 +76,16 @@ export default function JournalGrid({
   const [edits, setEdits] = useState<Record<string, EntryEdit>>({});
   const [selected, setSelected] = useState<string[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
-  const [correcting, setCorrecting] = useState<string | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [fullscreen, setFullscreen] = useState(false);
+  const [compact, setCompact] = useState(true);
+  const [voiding, setVoiding] = useState<Entry | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const activeAccounts = accounts.filter((account) => account.isActive);
   const pendingCount = entries.filter((entry) => entry.status === "pending").length + inbox.length;
 
   const visibleEntries = entries.filter((entry) => {
+    if (entry.status === "voided") return false;
     if (status !== "all" && entry.status !== status) return false;
     if (from && entry.entry_date < from) return false;
     if (to && entry.entry_date > to) return false;
@@ -96,9 +104,11 @@ export default function JournalGrid({
   function seed(entry: Entry, rows: JournalVisualRow[]): EntryEdit {
     return {
       date: entry.entry_date,
+      number: String(entry.entry_number),
       piece: entry.reference || "",
       label: entry.description,
       remark: entry.party_name || "",
+      status: entry.status,
       rows: rows.map((row) => ({
         debitId: row.debitAccountId || "",
         creditId: row.creditAccountId || "",
@@ -140,8 +150,12 @@ export default function JournalGrid({
     description: string;
     reference: string;
     remark: string;
+    entryNumber?: number;
+    status?: string;
+    material?: boolean;
     lines: ReturnType<typeof rowsToLines>;
   }) {
+    setSaveState("saving");
     const result = await onAct({
       action: "journal-save",
       entryId: params.entry?.id,
@@ -149,10 +163,17 @@ export default function JournalGrid({
       description: params.description,
       reference: params.reference,
       remark: params.remark,
+      entryNumber: params.entryNumber,
+      status: params.status,
+      material: params.material,
       idempotencyKey: params.draft?.idempotencyKey,
       lines: params.lines,
     });
-    if (!result) return;
+    if (!result) {
+      setSaveState("error");
+      return;
+    }
+    setSaveState("saved");
     if (params.draft && !params.draft.entryId) {
       setDrafts((current) => current.filter((item) => item.localId !== params.draft!.localId));
     }
@@ -183,8 +204,8 @@ export default function JournalGrid({
     });
   }
 
-  async function saveEntry(entry: Entry, rows: JournalVisualRow[]) {
-    const edit = editOf(entry, rows);
+  async function saveEntry(entry: Entry, rows: JournalVisualRow[], material = false, override?: EntryEdit) {
+    const edit = override || editOf(entry, rows);
     const added = extras[entry.id] || [];
     const visual = [
       ...edit.rows.map((row, index) => ({
@@ -201,25 +222,24 @@ export default function JournalGrid({
       })),
     ];
     const lines = rowsToLines(visual);
-    const debit = lines.reduce((sum, line) => sum + line.debit, 0);
-    const credit = lines.reduce((sum, line) => sum + line.credit, 0);
-    if (lines.length < 2 || debit !== credit || debit <= 0) {
-      setNotice("L’écriture doit être équilibrée avant d’être enregistrée.");
+    const gap = journalImbalance(lines);
+    if (!journalLinesBalanced(lines)) {
+      setNotice(gap === 0 ? "L’écriture doit être équilibrée avant d’être enregistrée." : `Écart : ${formatChfAmount(Math.abs(gap))}`);
+      setSaveState("error");
       return;
     }
+    const requested = edit.status === "validated" ? "validated" : "pending";
     await persistLines({
       entry,
       date: edit.date,
       description: edit.label,
       reference: edit.piece,
       remark: edit.remark,
+      entryNumber: Number(edit.number) || entry.entry_number,
+      status: requested,
+      material,
       lines,
     });
-  }
-
-  function askCorrection(entry: Entry) {
-    if (entry.status !== "validated" || entry.reversed_by_entry_id) return;
-    setCorrecting(entry.id);
   }
 
   async function upload(entryId: string, file: File) {
@@ -235,22 +255,22 @@ export default function JournalGrid({
     await onReload();
   }
 
+  const selectedEntry = entries.find((entry) => entry.id === selected[0]);
+  const saveLabel = saveState === "saving" ? "Enregistrement…" : saveState === "saved" ? "Enregistré" : saveState === "error" ? "Échec de l’enregistrement" : "";
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        {canWrite ? (
-          <button type="button" className="rounded-full bg-[#1A23FF] px-3 py-1.5 text-sm font-semibold text-white" onClick={() => addDraft()}>
-            Nouvelle écriture
-          </button>
-        ) : null}
-        <button type="button" className={`rounded-full px-3 py-1.5 text-sm ${status === "pending" ? "bg-amber-100 text-amber-900" : "bg-white text-[#334155] ring-1 ring-inset ring-[rgba(15,23,42,0.08)]"}`} onClick={() => setStatus(status === "pending" && !reviewOnly ? "all" : "pending")}>
+    <div className={fullscreen ? "fixed inset-0 z-40 space-y-3 overflow-auto bg-[#F4F7FB] p-4" : "space-y-3"}>
+      <div className="flex flex-wrap items-center gap-1">
+        {canWrite ? <ToolButton label="Nouvelle écriture" onClick={() => addDraft()}>+</ToolButton> : null}
+        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Ajouter une ligne" onClick={() => addDraft(selectedEntry.id)}>+</ToolButton> : null}
+        {canWrite && selectedEntry ? <ToolButton label="Dupliquer" onClick={() => addDraft()}>⧉</ToolButton> : null}
+        {canWrite && selectedEntry && canEditJournalEntry(selectedEntry.status) ? <ToolButton label="Supprimer" onClick={() => setVoiding(selectedEntry)}>✕</ToolButton> : null}
+        <ToolButton label={compact ? "Affichage confortable" : "Affichage compact"} onClick={() => setCompact((value) => !value)}>≡</ToolButton>
+        <ToolButton label={fullscreen ? "Quitter le plein écran" : "Plein écran"} onClick={() => setFullscreen((value) => !value)}>{fullscreen ? "↙" : "⛶"}</ToolButton>
+        <button type="button" className={`ml-1 rounded-full px-3 py-1.5 text-sm ${status === "pending" ? "bg-amber-100 text-amber-900" : "bg-white text-[#334155] ring-1 ring-inset ring-[rgba(15,23,42,0.08)]"}`} onClick={() => setStatus(status === "pending" && !reviewOnly ? "all" : "pending")}>
           À vérifier ({pendingCount})
         </button>
-        {selected.length > 0 && canWrite ? (
-          <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => void Promise.all(selected.map((id) => onAct({ action: "validate", entryId: id })))}>
-            Valider la sélection ({selected.length})
-          </button>
-        ) : null}
+        {saveLabel ? <span className={`text-xs ${saveState === "error" ? "text-rose-700" : "text-[#64748B]"}`}>{saveLabel}</span> : null}
       </div>
       {notice ? <p className="text-sm text-[#334155]">{notice}</p> : null}
       <div className="overflow-hidden rounded-xl border border-[#D6DEE8] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
@@ -268,7 +288,7 @@ export default function JournalGrid({
             <select className={filter} value={status} onChange={(event) => setStatus(event.target.value)}>
               <option value="all">Toutes</option>
               <option value="pending">À vérifier</option>
-              <option value="validated">Validées</option>
+              <option value="validated">Vérifiées</option>
               <option value="reversed">Extournées</option>
             </select>
           </Filter>
@@ -296,25 +316,23 @@ export default function JournalGrid({
               <col className="w-[16rem]" />
               <col className="w-[16rem]" />
               <col className="w-32" />
-              <col className="w-24" />
-              <col className="w-28" />
               <col className="w-36" />
-              <col className="w-14" />
+              <col className="w-28" />
+              <col className="w-28" />
             </colgroup>
             <thead className="sticky top-0 z-10 bg-[#F8FAFC] text-[11px] uppercase tracking-wide text-[#64748B]">
               <tr className="border-b border-[#D6DEE8]">
                 <th className="px-2 py-2.5" />
                 <th className="px-3 py-2.5 font-semibold">Date</th>
-                <th className="px-2 py-2.5 font-semibold" title="Numéro interne de l’écriture">N° écr.</th>
+                <th className="px-2 py-2.5 font-semibold" title="Numéro de l’écriture dans le journal">N° écr.</th>
                 <th className="px-2 py-2.5 font-semibold" title="Référence du document">Pièce</th>
                 <th className="px-3 py-2.5 font-semibold">Libellé</th>
                 <th className="px-3 py-2.5 font-semibold">Débit</th>
                 <th className="px-3 py-2.5 font-semibold">Crédit</th>
                 <th className="px-3 py-2.5 text-right font-semibold">Montant</th>
-                <th className="px-2 py-2.5 font-semibold">Statut</th>
-                <th className="px-2 py-2.5 font-semibold">Source</th>
                 <th className="px-2 py-2.5 font-semibold">Remarque</th>
-                <th className="px-2 py-2.5 font-semibold" title="Justificatif">Just.</th>
+                <th className="px-2 py-2.5 font-semibold">Source</th>
+                <th className="px-2 py-2.5 font-semibold">Statut</th>
               </tr>
             </thead>
             <tbody>
@@ -352,7 +370,7 @@ export default function JournalGrid({
                     onToggle={() => setSelected(selected.includes(entry.id) ? selected.filter((id) => id !== entry.id) : [...selected, entry.id])}
                     onValidate={() => void onAct({ action: "validate", entryId: entry.id })}
                     onChange={(next) => patchEdit(entry, rows, next)}
-                    onSave={() => void saveEntry(entry, rows)}
+                    onSave={(material, next) => void saveEntry(entry, rows, Boolean(material), next)}
                     onCancel={() => {
                       setEditingId(null);
                       setEdits((current) => {
@@ -365,7 +383,6 @@ export default function JournalGrid({
                     onUpload={(file) => void upload(entry.id, file)}
                     onActivate={() => {
                       if (editable) setEditingId(entry.id);
-                      else askCorrection(entry);
                     }}
                   />
                     ))}
@@ -394,12 +411,16 @@ export default function JournalGrid({
           </table>
         </div>
       </div>
-      {correcting ? (
-        <AccountingModal title="Écriture validée" onClose={() => setCorrecting(null)}>
-          <p className="text-sm leading-relaxed text-[#334155]">Cette écriture est validée. Une correction extourne l’originale et ouvre une nouvelle écriture à vérifier.</p>
+      {voiding ? (
+        <AccountingModal title="Supprimer cette écriture ?" onClose={() => setVoiding(null)}>
+          <p className="text-sm leading-relaxed text-[#334155]">
+            {voiding.source_type === "manual" || voiding.source_type === "manual_accounting"
+              ? "Elle disparaît du journal. L’historique reste conservé."
+              : "Cette écriture vient d’une source Obillz. La supprimer retire la ligne du journal sans annuler le document d’origine. L’historique reste conservé."}
+          </p>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="rounded-full px-3 py-1.5 text-sm text-[#475569]" onClick={() => setCorrecting(null)}>Annuler</button>
-            <button type="button" className="rounded-full bg-[#1A23FF] px-3 py-1.5 text-sm font-semibold text-white" onClick={() => { const id = correcting; setCorrecting(null); void onAct({ action: "correct", entryId: id }); }}>Créer une correction</button>
+            <button type="button" className="rounded-full px-3 py-1.5 text-sm text-[#475569]" onClick={() => setVoiding(null)}>Annuler</button>
+            <button type="button" className="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white" onClick={() => { const id = voiding.id; setVoiding(null); void onAct({ action: "journal-void", entryId: id }); }}>Supprimer</button>
           </div>
         </AccountingModal>
       ) : null}
@@ -489,8 +510,8 @@ function SavedRow({
   onToggle: () => void;
   onValidate: () => void;
   onChange: (edit: EntryEdit) => void;
-  onSave: () => void;
   onCancel: () => void;
+  onSave: (material?: boolean, next?: EntryEdit) => void;
   onAddLine?: () => void;
   onUpload: (file: File) => void;
   onActivate: () => void;
@@ -505,7 +526,8 @@ function SavedRow({
       onCancel();
       return;
     }
-    moveField(event, field, onSave);
+    const material = field === "date" || field === "piece" || field === "amount" || field === "debit" || field === "credit";
+    moveField(event, field, () => onSave(material));
   }
   function setRow(patch: Partial<typeof line>) {
     const rows = edit.rows.map((item, index) => index === row.groupIndex ? { ...item, ...patch } : item);
@@ -521,7 +543,9 @@ function SavedRow({
         <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-[#334155]">
           {showMeta && editable ? <input data-field="date" className={cell} type="date" value={edit.date} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} /> : showMeta ? formatSwissDate(entry.entry_date) : ""}
         </td>
-        <td className="px-2 py-2.5 font-medium tabular-nums text-[#475569]">{showMeta ? entry.entry_number : ""}</td>
+        <td className="px-2 py-2.5 font-medium tabular-nums text-[#475569]">
+          {showMeta && editable ? <input data-field="number" className={cell} value={edit.number} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, number: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : showMeta ? entry.entry_number : ""}
+        </td>
         <td className="px-2 py-2.5 text-[#334155]">
           {showMeta && editable ? <input data-field="piece" className={cell} value={edit.piece} placeholder="Réf." onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} /> : showMeta ? (entry.reference || "—") : ""}
         </td>
@@ -529,27 +553,25 @@ function SavedRow({
           {showMeta && editable ? <input data-field="label" className={cell} value={edit.label} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} /> : showMeta ? entry.description : <span className="text-[#94A3B8]">↳</span>}
         </td>
         <td className="px-3 py-2.5" onClick={(event) => editable && event.stopPropagation()}>
-          {editable ? <AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => setRow({ debitId })} onSave={onSave} /> : <AccountCell account={debit} />}
+          {editable ? <AccountPicker field="debit" accounts={accounts} value={line.debitId} onChange={(debitId) => { const next = { ...edit, rows: edit.rows.map((item, index) => index === row.groupIndex ? { ...item, debitId } : item) }; onChange(next); onSave(true, next); }} onSave={() => onSave(true)} /> : <AccountCell account={debit} />}
         </td>
         <td className="px-3 py-2.5" onClick={(event) => editable && event.stopPropagation()}>
-          {editable ? <AccountPicker field="credit" accounts={accounts} value={line.creditId} onChange={(creditId) => setRow({ creditId })} onSave={onSave} /> : <AccountCell account={credit} />}
+          {editable ? <AccountPicker field="credit" accounts={accounts} value={line.creditId} onChange={(creditId) => { const next = { ...edit, rows: edit.rows.map((item, index) => index === row.groupIndex ? { ...item, creditId } : item) }; onChange(next); onSave(true, next); }} onSave={() => onSave(true)} /> : <AccountCell account={credit} />}
         </td>
         <td className="px-3 py-2.5 text-right text-[13px] font-medium tabular-nums">
           {editable ? <input data-field="amount" className={`${cell} text-right`} value={line.amount} onClick={(event) => event.stopPropagation()} onChange={(event) => setRow({ amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount")} /> : formatChfAmount(row.amount)}
         </td>
-        <td className="px-2 py-2.5 text-xs text-[#475569]">{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</td>
-        <td className="truncate px-2 py-2.5 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
         <td className="truncate px-2 py-2.5 text-xs text-[#64748B]">
-          {showMeta && editable ? <input data-field="remark" className={cell} value={edit.remark} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} /> : showMeta ? entry.party_name || "" : ""}
+          {showMeta && editable ? <input data-field="remark" className={cell} value={edit.remark} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange({ ...edit, remark: event.target.value })} onBlur={() => onSave()} onKeyDown={(event) => keyDown(event, "remark")} /> : showMeta ? entry.party_name || "" : ""}
         </td>
-        <td className="whitespace-nowrap px-2 py-2.5 text-xs" onClick={(event) => event.stopPropagation()}>
-          {showMeta ? (
-            <label className="cursor-pointer" title={files.map((file) => file.file_name || "Pièce").join(", ") || "Ajouter un justificatif"}>
-              <span className={files.length ? "text-[#0F172A]" : "text-[#CBD5E1]"}>📎</span>
-              <input type="file" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) onUpload(file); }} />
-            </label>
-          ) : null}
-          {showMeta && entry.status === "pending" ? <button type="button" className="ml-2 font-semibold text-[#1A23FF]" aria-label="Valider" onClick={onValidate}>✓</button> : null}
+        <td className="truncate px-2 py-2.5 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
+        <td className="px-2 py-2.5 text-xs text-[#475569]" onClick={(event) => event.stopPropagation()}>
+          {showMeta && editable ? (
+            <select className={cell} value={edit.status === "validated" ? "validated" : "pending"} onChange={(event) => { const next = { ...edit, status: event.target.value }; onChange(next); onSave(false, next); }}>
+              <option value="pending">À vérifier</option>
+              <option value="validated">Vérifiée</option>
+            </select>
+          ) : showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}
         </td>
       </tr>
       {onAddLine ? (
@@ -624,6 +646,14 @@ function Filter({ label, children }: { label: string; children: ReactNode }) {
 
 const filter = "h-8 w-full rounded-md border border-[#D6DEE8] bg-white px-2 text-xs text-[#0F172A] outline-none focus:border-[#1A23FF]";
 const cell = "w-full min-w-0 rounded border border-[#D6DEE8] bg-white px-1.5 py-1 outline-none focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/20";
+
+function ToolButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" title={label} aria-label={label} className="rounded-md border border-[#D6DEE8] bg-white px-2.5 py-1 text-sm text-[#0F172A] hover:bg-[#F8FAFC]" onClick={onClick}>
+      {children}
+    </button>
+  );
+}
 
 function GroupRows({ children }: { children: ReactNode }) {
   return <>{children}</>;

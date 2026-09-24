@@ -60,7 +60,7 @@ export type Period = {
 
 export const STATUS_LABEL: Record<string, string> = {
   pending: "À vérifier",
-  validated: "Validée",
+  validated: "Vérifiée",
   reversed: "Extournée",
   voided: "Écartée",
   awaiting_account: "Compte à confirmer",

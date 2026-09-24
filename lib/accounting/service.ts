@@ -10,7 +10,9 @@ import { isAccountingDevEmail } from "./devAccess";
 import { isFinancialSystemCode } from "./financialAccounts";
 import {
   accountAllowed,
+  entryNumberAllowed,
   journalLinesBalanced,
+  resolveJournalStatus,
 } from "./journalGrid";
 import {
   ADVANCED_EVENT,
@@ -801,10 +803,13 @@ export async function saveJournalEntry(params: {
   clubId: string;
   userId: string;
   entryId?: string;
+  entryNumber?: number;
   date: string;
   description: string;
   reference?: string;
   remark?: string;
+  status?: string;
+  material?: boolean;
   idempotencyKey?: string;
   lines: Array<{ accountId: string; debit: number; credit: number }>;
 }) {
@@ -828,14 +833,57 @@ export async function saveJournalEntry(params: {
   if (!assessed.ok) throw new Error(assessed.message);
 
   if (params.entryId) {
+    const { data: current } = await admin
+      .from("accounting_entries")
+      .select("id, status, entry_number, entry_date, description, reference, party_name, amount, period_id")
+      .eq("id", params.entryId)
+      .eq("club_id", params.clubId)
+      .maybeSingle();
+    if (!current || !["pending", "validated"].includes(String(current.status))) {
+      throw new Error("Cette écriture ne peut plus être modifiée");
+    }
+    const nextNumber = params.entryNumber && params.entryNumber > 0 ? Math.trunc(params.entryNumber) : Number(current.entry_number);
+    const { data: siblings } = await admin
+      .from("accounting_entries")
+      .select("id, entry_number, period_id")
+      .eq("club_id", params.clubId)
+      .eq("period_id", current.period_id)
+      .neq("status", "voided");
+    const taken = (siblings || []).map((row) => ({
+      id: String(row.id),
+      periodId: row.period_id ? String(row.period_id) : null,
+      number: Number(row.entry_number),
+    }));
+    if (!entryNumberAllowed(nextNumber, taken, current.period_id ? String(current.period_id) : null, params.entryId)) {
+      throw new Error("Ce numéro d’écriture est déjà utilisé dans l’exercice.");
+    }
+    const resolved = resolveJournalStatus({
+      previous: String(current.status),
+      requested: params.status === "validated" ? "validated" : params.status === "pending" ? "pending" : String(current.status),
+      material: Boolean(params.material),
+      balanced: true,
+    });
+    if ("error" in resolved) throw new Error(resolved.error);
+    const { data: previousLineRows } = await admin
+      .from("accounting_entry_lines")
+      .select("account_id, debit, credit")
+      .eq("entry_id", params.entryId)
+      .eq("club_id", params.clubId);
+    const previousLines = (previousLineRows || []).map((line) => ({
+      accountId: String(line.account_id),
+      debit: num(line.debit as number),
+      credit: num(line.credit as number),
+    }));
     const { error } = await admin.rpc("accounting_update_pending_entry", {
       p_payload: {
         club_id: params.clubId,
         entry_id: params.entryId,
         entry_date: params.date,
+        entry_number: nextNumber,
         description: params.description.trim() || "Écriture",
         reference: params.reference?.trim() || "",
         remark: params.remark?.trim() || "",
+        status: resolved.status,
         lines: params.lines.map((line) => ({
           account_id: line.accountId,
           debit: roundChf(line.debit),
@@ -844,8 +892,25 @@ export async function saveJournalEntry(params: {
       },
     });
     if (error) throw new Error(error.message);
-    await audit(admin, params.clubId, "journal_update", params.userId, params.entryId, null, { lines: params.lines });
-    return { id: params.entryId };
+    await audit(admin, params.clubId, "journal_update", params.userId, params.entryId, {
+      entryNumber: current.entry_number,
+      date: current.entry_date,
+      description: current.description,
+      reference: current.reference,
+      remark: current.party_name,
+      amount: current.amount,
+      status: current.status,
+      lines: previousLines,
+    }, {
+      entryNumber: nextNumber,
+      date: params.date,
+      description: params.description,
+      reference: params.reference || "",
+      remark: params.remark || "",
+      status: resolved.status,
+      lines: params.lines,
+    });
+    return { id: params.entryId, status: resolved.status };
   }
 
   const periods = await loadPeriods(admin, params.clubId);
@@ -878,6 +943,32 @@ export async function saveJournalEntry(params: {
     }
     return posted;
   });
+}
+
+export async function voidJournalEntry(clubId: string, userId: string, entryId: string) {
+  const admin = createAdminClient();
+  const { data: entry } = await admin
+    .from("accounting_entries")
+    .select("id, status, entry_number, entry_date, description, amount, reference, party_name, source_type")
+    .eq("id", entryId)
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (!entry || !["pending", "validated"].includes(String(entry.status))) {
+    throw new Error("Cette écriture ne peut plus être supprimée");
+  }
+  const { data: lineRows } = await admin
+    .from("accounting_entry_lines")
+    .select("account_id, debit, credit")
+    .eq("entry_id", entryId)
+    .eq("club_id", clubId);
+  const { error } = await admin
+    .from("accounting_entries")
+    .update({ status: "voided" })
+    .eq("id", entryId)
+    .eq("club_id", clubId);
+  if (error) throw new Error(error.message);
+  await audit(admin, clubId, "journal_void", userId, entryId, { ...entry, lines: lineRows || [] }, { status: "voided" });
+  return { id: entryId, sourceType: String(entry.source_type) };
 }
 
 export async function correctJournalEntry(clubId: string, userId: string, entryId: string) {

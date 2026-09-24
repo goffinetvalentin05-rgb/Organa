@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   accountAllowed,
   canEditJournalEntry,
+  editIsMaterial,
+  entryNumberAllowed,
+  journalImbalance,
   journalLinesBalanced,
   nextJournalField,
+  resolveJournalStatus,
   rowsToLines,
   toJournalRows,
 } from "@/lib/accounting/journalGrid";
@@ -54,12 +58,39 @@ describe("grille du journal", () => {
     expect(accountAllowed({ id: "1", clubId: "a", isActive: false }, "a")).toBe(false);
     expect(accountAllowed(undefined, "a")).toBe(false);
     expect(canEditJournalEntry("pending")).toBe(true);
-    expect(canEditJournalEntry("validated")).toBe(false);
+    expect(canEditJournalEntry("validated")).toBe(true);
+    expect(canEditJournalEntry("reversed")).toBe(false);
+    expect(canEditJournalEntry("voided")).toBe(false);
   });
 
   it("avance le clavier de cellule en cellule", () => {
     expect(nextJournalField("date")).toBe("piece");
     expect(nextJournalField("debit")).toBe("credit");
     expect(nextJournalField("remark")).toBe("next-row");
+  });
+
+  it("numérote sans doublon dans l’exercice", () => {
+    const taken = [{ id: "a", periodId: "p", number: 1 }];
+    expect(entryNumberAllowed(2, taken, "p", "b")).toBe(true);
+    expect(entryNumberAllowed(1, taken, "p", "b")).toBe(false);
+    expect(entryNumberAllowed(1, taken, "p", "a")).toBe(true);
+    expect(entryNumberAllowed(0, taken, "p", "b")).toBe(false);
+  });
+
+  it("renvoie une écriture vérifiée à contrôler si le montant change", () => {
+    expect(editIsMaterial(["remark"])).toBe(false);
+    expect(editIsMaterial(["amount"])).toBe(true);
+    expect(resolveJournalStatus({ previous: "validated", requested: "validated", material: true, balanced: true })).toEqual({ status: "pending" });
+    expect(resolveJournalStatus({ previous: "validated", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
+    expect(resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
+    const blocked = resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: false });
+    expect("error" in blocked ? blocked.error : "").toMatch(/équilibrée/);
+  });
+
+  it("calcule l’écart d’une écriture déséquilibrée", () => {
+    expect(journalImbalance([
+      { accountId: "a", debit: 120, credit: 0 },
+      { accountId: "b", debit: 0, credit: 100 },
+    ])).toBe(20);
   });
 });
