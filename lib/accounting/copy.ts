@@ -63,7 +63,6 @@ export const ACCOUNTING_STEPS = [
 export const ACCOUNTING_MODULES = [
   "Vue d’ensemble",
   "Journal",
-  "À vérifier",
   "Plan comptable",
   "Rapports",
   "Exercices",
