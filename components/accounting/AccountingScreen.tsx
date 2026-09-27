@@ -124,7 +124,6 @@ export default function AccountingScreen({ section }: { section: Section }) {
     );
   }
 
-  const summary = (data?.summary || {}) as Record<string, number>;
   const review = (data?.review || { count: 0, amount: 0, inbox: [], entries: [] }) as {
     count: number;
     amount: number;
@@ -194,7 +193,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
         />
       ) : null}
       {section === "reports" ? (
-        <ReportsPanel summary={summary} entries={entries} accounts={accounts} linesByEntry={linesByEntry} coverageNote={coverage.note} />
+        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} coverageNote={coverage.note} />
       ) : null}
       {section === "periods" ? (
         <PeriodsPanel
