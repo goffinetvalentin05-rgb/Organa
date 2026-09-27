@@ -72,10 +72,11 @@ export default function AccountingScreen({ section }: { section: Section }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const body = await response.json();
+    const body = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setError(body.error || "Action impossible");
-      return null;
+      const message = body.error || "Action impossible";
+      setError(message);
+      return { error: message };
     }
     await reload();
     return body;

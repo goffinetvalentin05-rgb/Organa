@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { officialTotals } from "@/lib/accounting/engine";
 import {
   accountAllowed,
+  CLOSED_PERIOD_MESSAGE,
   canEditJournalEntry,
+  journalEditMaterial,
+  journalLockReason,
+  linkedJournalEntryId,
   editIsMaterial,
   entryNumberAllowed,
   draftIssues,
@@ -61,8 +66,36 @@ describe("grille du journal", () => {
     expect(accountAllowed(undefined, "a")).toBe(false);
     expect(canEditJournalEntry("pending")).toBe(true);
     expect(canEditJournalEntry("validated")).toBe(true);
-    expect(canEditJournalEntry("reversed")).toBe(false);
+    expect(canEditJournalEntry("reversed")).toBe(true);
+    expect(canEditJournalEntry("reversed", "closed")).toBe(false);
+    expect(canEditJournalEntry("validated", "closed")).toBe(false);
     expect(canEditJournalEntry("voided")).toBe(false);
+    expect(journalLockReason("reversed", "closed")).toBe(CLOSED_PERIOD_MESSAGE);
+    expect(journalLockReason("reversed", "open")).toBeNull();
+  });
+
+  it("modifie une ouverture extournée comme une seule écriture tant que l’exercice est ouvert", () => {
+    const rows = toJournalRows("open", opening);
+    expect(journalLockReason("reversed", "open")).toBeNull();
+    expect(linkedJournalEntryId({ reversed_by_entry_id: "ext", reversal_of_entry_id: null })).toBe("ext");
+    expect(journalEditMaterial(
+      { date: "2026-09-24", reference: "", rows: rows.map((row) => ({ debitAccountId: row.debitAccountId, creditAccountId: row.creditAccountId, amount: row.amount })) },
+      { date: "2026-09-24", reference: "", rows: rows.map((row) => ({ debitAccountId: row.debitAccountId, creditAccountId: row.creditAccountId, amount: row.amount })) }
+    )).toBe(false);
+    const changed = rows.map((row, index) => ({
+      debitAccountId: row.debitAccountId,
+      creditAccountId: row.creditAccountId,
+      amount: index === 0 ? row.amount + 50 : row.amount,
+    }));
+    expect(journalEditMaterial(
+      { date: "2026-09-24", reference: "", rows: rows.map((row) => ({ debitAccountId: row.debitAccountId, creditAccountId: row.creditAccountId, amount: row.amount })) },
+      { date: "2026-09-24", reference: "", rows: changed }
+    )).toBe(true);
+    expect(journalLinesBalanced(rowsToLines(rows.map((row) => ({
+      debitAccountId: row.debitAccountId,
+      creditAccountId: row.creditAccountId,
+      amount: row.amount,
+    }))))).toBe(true);
   });
 
   it("avance le clavier de cellule en cellule", () => {
@@ -85,6 +118,8 @@ describe("grille du journal", () => {
     expect(resolveJournalStatus({ previous: "validated", requested: "validated", material: true, balanced: true })).toEqual({ status: "pending" });
     expect(resolveJournalStatus({ previous: "validated", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
     expect(resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
+    expect(resolveJournalStatus({ previous: "reversed", requested: "validated", material: true, balanced: true })).toEqual({ status: "pending" });
+    expect(resolveJournalStatus({ previous: "reversed", requested: "validated", material: false, balanced: true })).toEqual({ status: "validated" });
     const blocked = resolveJournalStatus({ previous: "pending", requested: "validated", material: false, balanced: false });
     expect("error" in blocked ? blocked.error : "").toMatch(/équilibrée/);
   });
@@ -110,6 +145,25 @@ describe("grille du journal", () => {
       ],
     });
     expect(compound).toEqual([]);
+  });
+
+  it("sort une écriture supprimée ou à vérifier des soldes officiels", () => {
+    const bank = {
+      entryId: "e",
+      entryStatus: "validated" as const,
+      accountType: "asset" as const,
+      accountNumber: "1020",
+      systemCode: "bank",
+      debit: 1000,
+      credit: 0,
+    };
+    expect(officialTotals([bank]).bank).toBe(1000);
+    expect(officialTotals([{ ...bank, entryStatus: "voided" }]).bank).toBe(0);
+    expect(officialTotals([{ ...bank, entryStatus: "pending" }]).bank).toBe(0);
+    expect(officialTotals([
+      { ...bank, entryStatus: "reversed" },
+      { ...bank, entryId: "r", entryStatus: "validated", debit: 0, credit: 1000 },
+    ]).bank).toBe(0);
   });
 
   it("calcule l’écart d’une écriture déséquilibrée", () => {

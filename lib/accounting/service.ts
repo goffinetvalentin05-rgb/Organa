@@ -9,6 +9,7 @@ import { zurichToday } from "./format";
 import { isAccountingDevEmail } from "./devAccess";
 import { isFinancialSystemCode } from "./financialAccounts";
 import {
+  CLOSED_PERIOD_MESSAGE,
   accountAllowed,
   entryNumberAllowed,
   journalLinesBalanced,
@@ -835,40 +836,64 @@ export async function saveJournalEntry(params: {
   if (params.entryId) {
     const { data: current } = await admin
       .from("accounting_entries")
-      .select("id, status, entry_number, entry_date, description, reference, party_name, amount, period_id")
+      .select("id, status, entry_number, entry_date, description, reference, party_name, amount, period_id, reversed_by_entry_id, reversal_of_entry_id, source_type")
       .eq("id", params.entryId)
       .eq("club_id", params.clubId)
       .maybeSingle();
-    if (!current || !["pending", "validated"].includes(String(current.status))) {
+    if (!current) throw new Error("Écriture introuvable");
+    if (current.status === "voided") throw new Error("Cette écriture a déjà été retirée du journal.");
+    if (!["pending", "validated", "reversed"].includes(String(current.status))) {
       throw new Error("Cette écriture ne peut plus être modifiée");
+    }
+    const periods = await loadPeriods(admin, params.clubId);
+    const currentPeriod = periods.find((period) => period.id === current.period_id);
+    if (!currentPeriod || currentPeriod.status !== "open") throw new Error(CLOSED_PERIOD_MESSAGE);
+    const target = periodFor(periods, params.date, false);
+    if (target?.status === "closed") throw new Error(CLOSED_PERIOD_MESSAGE);
+    if (!target || target.status !== "open") throw new Error("Aucun exercice ouvert pour cette date");
+    const counterpartId = (current.reversed_by_entry_id || current.reversal_of_entry_id) as string | null;
+    let voidCounterpartId: string | null = null;
+    if (counterpartId) {
+      const { data: counterpart } = await admin
+        .from("accounting_entries")
+        .select("id, status, period_id")
+        .eq("id", counterpartId)
+        .eq("club_id", params.clubId)
+        .maybeSingle();
+      if (counterpart && counterpart.status !== "voided") {
+        const counterpartPeriod = periods.find((period) => period.id === counterpart.period_id);
+        if (!counterpartPeriod || counterpartPeriod.status !== "open") throw new Error(CLOSED_PERIOD_MESSAGE);
+        voidCounterpartId = String(counterpart.id);
+      }
     }
     const nextNumber = params.entryNumber && params.entryNumber > 0 ? Math.trunc(params.entryNumber) : Number(current.entry_number);
     const { data: siblings } = await admin
       .from("accounting_entries")
       .select("id, entry_number, period_id")
       .eq("club_id", params.clubId)
-      .eq("period_id", current.period_id)
+      .eq("period_id", target.id)
       .neq("status", "voided");
     const taken = (siblings || []).map((row) => ({
       id: String(row.id),
       periodId: row.period_id ? String(row.period_id) : null,
       number: Number(row.entry_number),
     }));
-    if (!entryNumberAllowed(nextNumber, taken, current.period_id ? String(current.period_id) : null, params.entryId)) {
+    if (!entryNumberAllowed(nextNumber, taken, target.id, params.entryId)) {
       throw new Error("Ce numéro d’écriture est déjà utilisé dans l’exercice.");
     }
     const resolved = resolveJournalStatus({
       previous: String(current.status),
-      requested: params.status === "validated" ? "validated" : params.status === "pending" ? "pending" : String(current.status),
+      requested: params.status === "validated" ? "validated" : "pending",
       material: Boolean(params.material),
       balanced: true,
     });
     if ("error" in resolved) throw new Error(resolved.error);
     const { data: previousLineRows } = await admin
       .from("accounting_entry_lines")
-      .select("account_id, debit, credit")
+      .select("account_id, debit, credit, line_order")
       .eq("entry_id", params.entryId)
-      .eq("club_id", params.clubId);
+      .eq("club_id", params.clubId)
+      .order("line_order");
     const previousLines = (previousLineRows || []).map((line) => ({
       accountId: String(line.account_id),
       debit: num(line.debit as number),
@@ -880,10 +905,12 @@ export async function saveJournalEntry(params: {
         entry_id: params.entryId,
         entry_date: params.date,
         entry_number: nextNumber,
+        period_id: target.id,
         description: params.description.trim() || "Écriture",
         reference: params.reference?.trim() || "",
         remark: params.remark?.trim() || "",
         status: resolved.status,
+        void_counterpart_id: voidCounterpartId,
         lines: params.lines.map((line) => ({
           account_id: line.accountId,
           debit: roundChf(line.debit),
@@ -914,7 +941,9 @@ export async function saveJournalEntry(params: {
   }
 
   const periods = await loadPeriods(admin, params.clubId);
-  const period = periodFor(periods, params.date, true);
+  const covering = periodFor(periods, params.date, false);
+  if (covering?.status === "closed") throw new Error(CLOSED_PERIOD_MESSAGE);
+  const period = covering?.status === "open" ? covering : undefined;
   if (!period) throw new Error("Aucun exercice ouvert pour cette date");
   const sourceId = crypto.randomUUID();
   return postEntry(admin, {
@@ -949,26 +978,61 @@ export async function voidJournalEntry(clubId: string, userId: string, entryId: 
   const admin = createAdminClient();
   const { data: entry } = await admin
     .from("accounting_entries")
-    .select("id, status, entry_number, entry_date, description, amount, reference, party_name, source_type")
+    .select("id, status, entry_number, entry_date, description, amount, reference, party_name, source_type, event_type, period_id, reversed_by_entry_id, reversal_of_entry_id")
     .eq("id", entryId)
     .eq("club_id", clubId)
     .maybeSingle();
-  if (!entry || !["pending", "validated"].includes(String(entry.status))) {
+  if (!entry) throw new Error("Écriture introuvable");
+  if (entry.status === "voided") throw new Error("Cette écriture a déjà été retirée du journal.");
+  if (!["pending", "validated", "reversed"].includes(String(entry.status))) {
     throw new Error("Cette écriture ne peut plus être supprimée");
+  }
+  const periods = await loadPeriods(admin, clubId);
+  const period = periods.find((item) => item.id === entry.period_id);
+  if (!period || period.status !== "open") throw new Error(CLOSED_PERIOD_MESSAGE);
+  const counterpartId = (entry.reversed_by_entry_id || entry.reversal_of_entry_id) as string | null;
+  if (counterpartId) {
+    const { data: counterpart } = await admin
+      .from("accounting_entries")
+      .select("id, status, period_id")
+      .eq("id", counterpartId)
+      .eq("club_id", clubId)
+      .maybeSingle();
+    if (counterpart && counterpart.status !== "voided") {
+      const counterpartPeriod = periods.find((item) => item.id === counterpart.period_id);
+      if (!counterpartPeriod || counterpartPeriod.status !== "open") throw new Error(CLOSED_PERIOD_MESSAGE);
+    }
   }
   const { data: lineRows } = await admin
     .from("accounting_entry_lines")
     .select("account_id, debit, credit")
     .eq("entry_id", entryId)
     .eq("club_id", clubId);
-  const { error } = await admin
-    .from("accounting_entries")
-    .update({ status: "voided" })
-    .eq("id", entryId)
-    .eq("club_id", clubId);
-  if (error) throw new Error(error.message);
-  await audit(admin, clubId, "journal_void", userId, entryId, { ...entry, lines: lineRows || [] }, { status: "voided" });
-  return { id: entryId, sourceType: String(entry.source_type) };
+  const { data: voided, error } = await admin.rpc("accounting_void_journal_entry", {
+    p_club: clubId,
+    p_entry: entryId,
+  });
+  let counterpart: string | null = null;
+  if (error && /accounting_void_journal_entry|schema cache|Could not find the function/i.test(error.message)) {
+    if (entry.status === "reversed" || counterpartId) {
+      throw new Error("La base doit d’abord recevoir la migration du journal pour retirer une écriture extournée ou liée.");
+    }
+    const { error: legacyError } = await admin
+      .from("accounting_entries")
+      .update({ status: "voided" })
+      .eq("id", entryId)
+      .eq("club_id", clubId);
+    if (legacyError) throw new Error(legacyError.message);
+  } else if (error) {
+    throw new Error(error.message);
+  } else {
+    counterpart = (voided as { voided_counterpart?: string | null } | null)?.voided_counterpart || null;
+  }
+  await audit(admin, clubId, "journal_void", userId, entryId, { ...entry, lines: lineRows || [] }, {
+    status: "voided",
+    voidedCounterpart: counterpart,
+  });
+  return { id: entryId, sourceType: String(entry.source_type), voidedCounterpart: counterpart };
 }
 
 export async function correctJournalEntry(clubId: string, userId: string, entryId: string) {
@@ -1139,7 +1203,12 @@ export async function loadWorkspace(clubId: string) {
   );
 
   const linesByEntry = new Map<string, Array<{ accountId: string; debit: number; credit: number }>>();
-  for (const line of lineRows ?? []) {
+  const orderedLineRows = [...(lineRows ?? [])].sort((a, b) => {
+    const byEntry = String(a.entry_id).localeCompare(String(b.entry_id));
+    if (byEntry !== 0) return byEntry;
+    return Number(a.line_order) - Number(b.line_order);
+  });
+  for (const line of orderedLineRows) {
     const list = linesByEntry.get(line.entry_id as string) ?? [];
     list.push({
       accountId: line.account_id as string,

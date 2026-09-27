@@ -25,6 +25,7 @@ export type Entry = {
   counter_account_id: string | null;
   category_account_id: string | null;
   reversed_by_entry_id: string | null;
+  reversal_of_entry_id?: string | null;
   period_id?: string | null;
   event_type?: string;
   reference?: string | null;

@@ -87,8 +87,48 @@ export function journalLinesBalanced(lines: GridLine[]): boolean {
   return lines.length >= 2 && debit > 0 && debit === credit;
 }
 
-export function canEditJournalEntry(status: string): boolean {
-  return status === "pending" || status === "validated";
+export const CLOSED_PERIOD_MESSAGE =
+  "Cet exercice est clôturé. Rouvrez-le dans Exercices pour modifier ou supprimer cette écriture.";
+
+/** Écriture visible du journal : modifiable tant que l’exercice est ouvert. L’extourne n’est pas un blocage. */
+export function journalLockReason(status: string, periodStatus: string | null | undefined): string | null {
+  if (status === "voided") return "Cette écriture a déjà été retirée du journal.";
+  if (periodStatus === "closed") return CLOSED_PERIOD_MESSAGE;
+  if (status === "pending" || status === "validated" || status === "reversed") return null;
+  return "Cette écriture ne peut pas être modifiée.";
+}
+
+export function canEditJournalEntry(status: string, periodStatus: string | null = "open"): boolean {
+  return journalLockReason(status, periodStatus) === null;
+}
+
+export function linkedJournalEntryId(entry: {
+  reversed_by_entry_id?: string | null;
+  reversal_of_entry_id?: string | null;
+}): string | null {
+  return entry.reversed_by_entry_id || entry.reversal_of_entry_id || null;
+}
+
+export function journalEditMaterial(
+  previous: {
+    date: string;
+    reference: string;
+    rows: Array<{ debitAccountId: string | null; creditAccountId: string | null; amount: number }>;
+  },
+  next: {
+    date: string;
+    reference: string;
+    rows: Array<{ debitAccountId: string | null; creditAccountId: string | null; amount: number }>;
+  }
+): boolean {
+  if (previous.date !== next.date || previous.reference !== next.reference) return true;
+  if (previous.rows.length !== next.rows.length) return true;
+  return next.rows.some((row, index) => {
+    const before = previous.rows[index];
+    return row.debitAccountId !== before.debitAccountId
+      || row.creditAccountId !== before.creditAccountId
+      || roundChf(row.amount) !== roundChf(before.amount);
+  });
 }
 
 const MATERIAL = new Set(["date", "piece", "debit", "credit", "amount", "lines"]);
@@ -103,12 +143,11 @@ export function resolveJournalStatus(input: {
   material: boolean;
   balanced: boolean;
 }): { status: "pending" | "validated" } | { error: string } {
-  if (input.previous === "validated" && input.material) {
-    return { status: "pending" };
-  }
   if (input.requested === "validated" && !input.balanced) {
     return { error: "L’écriture doit être équilibrée avant d’être vérifiée." };
   }
+  const official = input.previous === "validated" || input.previous === "reversed";
+  if (official && input.material) return { status: "pending" };
   if (input.requested === "validated") return { status: "validated" };
   return { status: "pending" };
 }
