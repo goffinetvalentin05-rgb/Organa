@@ -175,7 +175,11 @@ export default function AccountingScreen({ section }: { section: Section }) {
           inbox={review.inbox}
           reviewOnly={section === "review"}
           canWrite={Boolean(access.canWrite)}
-          onAct={act}
+          onAct={async (payload) => {
+            const result = await act(payload);
+            if (payload.action === "journal-save" && result && typeof result === "object" && "error" in result) setError(null);
+            return result;
+          }}
           onReload={reload}
         />
       ) : null}

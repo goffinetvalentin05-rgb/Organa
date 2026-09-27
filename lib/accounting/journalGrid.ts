@@ -152,6 +152,13 @@ export function resolveJournalStatus(input: {
   return { status: "pending" };
 }
 
+export const ENTRY_NUMBER_TAKEN = "Ce numéro d’écriture est déjà utilisé dans l’exercice.";
+
+export function explainJournalError(message: string): string {
+  if (/accounting_entries_number/i.test(message)) return ENTRY_NUMBER_TAKEN;
+  return message;
+}
+
 export function entryNumberAllowed(
   value: number,
   taken: Array<{ id: string; periodId: string | null; number: number }>,

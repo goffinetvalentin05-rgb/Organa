@@ -8,7 +8,9 @@ import {
   journalLockReason,
   linkedJournalEntryId,
   editIsMaterial,
+  ENTRY_NUMBER_TAKEN,
   entryNumberAllowed,
+  explainJournalError,
   draftIssues,
   journalImbalance,
   nextDraftAction,
@@ -110,6 +112,8 @@ describe("grille du journal", () => {
     expect(entryNumberAllowed(1, taken, "p", "b")).toBe(false);
     expect(entryNumberAllowed(1, taken, "p", "a")).toBe(true);
     expect(entryNumberAllowed(0, taken, "p", "b")).toBe(false);
+    expect(explainJournalError('duplicate key value violates unique constraint "accounting_entries_number"')).toBe(ENTRY_NUMBER_TAKEN);
+    expect(explainJournalError("Compte introuvable")).toBe("Compte introuvable");
   });
 
   it("renvoie une écriture vérifiée à contrôler si le montant change", () => {

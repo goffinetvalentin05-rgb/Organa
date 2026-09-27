@@ -12,6 +12,7 @@ import {
   CLOSED_PERIOD_MESSAGE,
   accountAllowed,
   entryNumberAllowed,
+  explainJournalError,
   journalLinesBalanced,
   resolveJournalStatus,
 } from "./journalGrid";
@@ -918,7 +919,7 @@ export async function saveJournalEntry(params: {
         })),
       },
     });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(explainJournalError(error.message));
     await audit(admin, params.clubId, "journal_update", params.userId, params.entryId, {
       entryNumber: current.entry_number,
       date: current.entry_date,

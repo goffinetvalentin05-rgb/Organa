@@ -7,6 +7,9 @@ import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import {
   draftIssues,
+  ENTRY_NUMBER_TAKEN,
+  entryNumberAllowed,
+  explainJournalError,
   journalEditMaterial,
   journalImbalance,
   journalLinesBalanced,
@@ -255,6 +258,19 @@ export default function JournalGrid({
           setComposerError("Indiquez le libellé.");
           return;
         }
+        const number = Number(composer.number);
+        if (!Number.isInteger(number) || number < 1) {
+          setComposerError("Le numéro d’écriture doit être un entier positif.");
+          return;
+        }
+        const period = periods.find((item) => composer.date >= item.startsOn && composer.date <= item.endsOn);
+        const taken = entries
+          .filter((item) => item.status !== "voided")
+          .map((item) => ({ id: item.id, periodId: item.period_id || null, number: item.entry_number }));
+        if (!entryNumberAllowed(number, taken, period?.id || null, composer.entryId || "")) {
+          setComposerError(ENTRY_NUMBER_TAKEN);
+          return;
+        }
       }
       const material = composer.mode === "edit" && origin
         ? journalEditMaterial(origin, { date: composer.date, reference: composer.piece, rows: visual })
@@ -274,7 +290,7 @@ export default function JournalGrid({
       });
       const message = readError(result);
       if (message) {
-        setComposerError(message);
+        setComposerError(explainJournalError(message));
         return;
       }
       setComposer(null);
@@ -593,7 +609,8 @@ function EditingRows({
   function setLine(localId: string, patch: Partial<EditorLine>) {
     replace({ ...composer, lines: composer.lines.map((line) => line.localId === localId ? { ...line, ...patch } : line) });
   }
-  function mark(changed: boolean) {
+  function mark(changed: boolean, invalid = false) {
+    if (invalid) return `${gridInput} bg-rose-50 ring-1 ring-inset ring-rose-400`;
     return changed ? `${gridInput} bg-[#FFF6D8]` : gridInput;
   }
   function arm(field: string, lineId: string, value: string) {
@@ -678,7 +695,7 @@ function EditingRows({
         return (
           <tr key={line.localId} id={first ? "journal-edit" : undefined} data-journal-edit="" className="border-b border-[#F4F7FB] bg-white">
             <td className="px-1 py-1">{first ? <input data-field="date" className={mark(origin !== null && composer.date !== origin.date)} type="date" value={composer.date} disabled={locked} onFocus={() => arm("date", line.localId, composer.date)} onChange={(event) => replace({ ...composer, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date", line.localId)} /> : null}</td>
-            <td className="px-1 py-1">{first && composer.mode === "edit" ? <input data-field="number" className={`${mark(origin !== null && composer.number !== origin.number)} text-center tabular-nums`} value={composer.number} disabled={locked} onFocus={() => arm("number", line.localId, composer.number)} onChange={(event) => replace({ ...composer, number: event.target.value })} onKeyDown={(event) => keyDown(event, "number", line.localId)} /> : first ? <span className="px-1 text-xs text-[#94A3B8]">Auto</span> : null}</td>
+            <td className="px-1 py-1">{first && composer.mode === "edit" ? <input data-field="number" className={`${mark(origin !== null && composer.number !== origin.number, error === ENTRY_NUMBER_TAKEN)} text-center tabular-nums`} value={composer.number} disabled={locked} onFocus={() => arm("number", line.localId, composer.number)} onChange={(event) => replace({ ...composer, number: event.target.value })} onKeyDown={(event) => keyDown(event, "number", line.localId)} /> : first ? <span className="px-1 text-xs text-[#94A3B8]">Auto</span> : null}</td>
             <td className="px-1 py-1">{first ? <input data-field="piece" className={mark(origin !== null && composer.piece !== origin.reference)} value={composer.piece} placeholder="Pièce" disabled={locked} onFocus={() => arm("piece", line.localId, composer.piece)} onChange={(event) => replace({ ...composer, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece", line.localId)} /> : null}</td>
             <td className="px-1 py-1">{first ? <input data-field="label" className={mark(origin !== null && composer.label !== origin.label)} value={composer.label} placeholder="Libellé" disabled={locked} onFocus={() => arm("label", line.localId, composer.label)} onChange={(event) => replace({ ...composer, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label", line.localId)} /> : <span className="px-2 text-xs text-[#94A3B8]">même écriture</span>}</td>
             <td className="px-1 py-1"><AccountPicker field="debit" dense dirty={origin !== null && (origin.rows[index]?.debitAccountId || "") !== line.debitId} accounts={accounts} value={line.debitId} disabled={locked} onArm={() => arm("debit", line.localId, line.debitId)} onChange={(debitId) => setLine(line.localId, { debitId })} onKeyDown={(event) => keyDown(event, "debit", line.localId)} /></td>
