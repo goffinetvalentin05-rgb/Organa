@@ -12,7 +12,6 @@ import {
   journalLinesBalanced,
   journalLockReason,
   linkedJournalEntryId,
-  nextJournalField,
   rowsToLines,
   toJournalRows,
   type JournalField,
@@ -39,7 +38,10 @@ type Composer = {
 
 type Origin = {
   date: string;
+  number: string;
   reference: string;
+  label: string;
+  remark: string;
   previousStatus: string;
   linked: boolean;
   rows: Array<{ debitAccountId: string | null; creditAccountId: string | null; amount: number }>;
@@ -132,12 +134,12 @@ export default function JournalGrid({
   function openNewEntry() {
     if (composer?.mode === "edit") {
       setNotice("Enregistrez ou annulez la modification en cours.");
-      document.getElementById("journal-composer")?.scrollIntoView({ block: "nearest" });
+      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
       return;
     }
     if (composer) {
-      document.getElementById("journal-composer")?.scrollIntoView({ block: "nearest" });
-      document.querySelector<HTMLElement>("#journal-composer [data-field='label']")?.focus();
+      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
+      document.querySelector<HTMLElement>("#journal-edit [data-field='label']")?.focus();
       return;
     }
     setComposerError(null);
@@ -156,7 +158,16 @@ export default function JournalGrid({
     });
   }
 
-  function openEdit(entry: Entry, rows: JournalVisualRow[]) {
+  function focusJournalCell(field: string, lineIndex = 0) {
+    window.setTimeout(() => {
+      const row = document.querySelectorAll<HTMLElement>("[data-journal-edit]")[lineIndex];
+      const target = row?.querySelector<HTMLElement>(`[data-field="${field}"]`)
+        || document.querySelector<HTMLElement>(`#journal-edit [data-field="${field}"]`);
+      target?.focus();
+    }, 0);
+  }
+
+  function openEdit(entry: Entry, rows: JournalVisualRow[], field = "label", lineIndex = 0) {
     const lock = journalLockReason(entry.status, periodStatus(entry));
     if (lock) {
       setNotice(lock);
@@ -164,14 +175,25 @@ export default function JournalGrid({
     }
     if (composer?.mode === "create") {
       setNotice("Enregistrez ou annulez la nouvelle écriture avant d’en modifier une autre.");
-      document.getElementById("journal-composer")?.scrollIntoView({ block: "nearest" });
+      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
+      return;
+    }
+    if (composer?.entryId === entry.id) {
+      focusJournalCell(field, lineIndex);
+      return;
+    }
+    if (composer?.mode === "edit") {
+      setNotice("Enregistrez ou annulez la modification en cours.");
       return;
     }
     setComposerError(null);
     setNotice(null);
     setOrigin({
       date: entry.entry_date,
+      number: String(entry.entry_number),
       reference: entry.reference || "",
+      label: entry.description,
+      remark: entry.party_name || "",
       previousStatus: entry.status,
       linked: Boolean(linkedJournalEntryId(entry)),
       rows: rows.map((row) => ({
@@ -197,7 +219,7 @@ export default function JournalGrid({
         amount: row.amount.toFixed(2),
       })),
     });
-    window.setTimeout(() => document.getElementById("journal-composer")?.scrollIntoView({ block: "nearest" }), 0);
+    focusJournalCell(field, lineIndex);
   }
 
   async function saveComposer() {
@@ -292,7 +314,7 @@ export default function JournalGrid({
   const createKey = composer?.mode === "create" ? composer.idempotencyKey : "";
   useEffect(() => {
     if (!createKey) return;
-    document.getElementById("journal-composer")?.querySelector<HTMLElement>("[data-field='label']")?.focus();
+    document.getElementById("journal-edit")?.querySelector<HTMLElement>("[data-field='label']")?.focus();
   }, [createKey]);
 
   const materialNow = composer?.mode === "edit" && origin
@@ -315,7 +337,7 @@ export default function JournalGrid({
       <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-2">
           {canWrite ? (
-            <ToolButton label="Ouvrir le formulaire d’écriture" onClick={openNewEntry} disabled={pending !== null}>
+            <ToolButton label="Ajouter une ligne de saisie dans le journal" onClick={openNewEntry} disabled={pending !== null}>
               Nouvelle écriture
             </ToolButton>
           ) : null}
@@ -357,26 +379,6 @@ export default function JournalGrid({
             </Filter>
           </div>
         </section>
-        {composer ? (
-          <EntryComposer
-            composer={composer}
-            accounts={activeAccounts}
-            error={composerError}
-            saving={saving}
-            locked={pending !== null}
-            materialNote={materialNow && origin && origin.previousStatus !== "pending"
-              ? "Un montant, un compte ou la date a changé. L’écriture repasse à vérifier et sort des rapports officiels jusqu’à une nouvelle vérification."
-              : null}
-            linkedNote={origin?.linked
-              ? "Cette écriture est liée à une extourne. À l’enregistrement, l’extourne est retirée du journal pour que les soldes suivent cette version."
-              : null}
-            onChange={(next) => { setComposer(next); setComposerError(null); }}
-            onAddLine={() => setComposer({ ...composer, lines: [...composer.lines, blankLine()] })}
-            onRemoveLine={(localId) => setComposer({ ...composer, lines: composer.lines.filter((line) => line.localId !== localId) })}
-            onSave={() => void saveComposer()}
-            onCancel={() => { if (pending) return; setComposer(null); setOrigin(null); setComposerError(null); }}
-          />
-        ) : null}
         <div className="overflow-hidden rounded-xl border border-[#D6DEE8] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <div className="max-h-[calc(100vh-16rem)] overflow-auto">
             <table className="w-full min-w-[1180px] table-fixed border-collapse text-left text-[13px] text-[#0F172A]">
@@ -391,7 +393,7 @@ export default function JournalGrid({
                 <col className="w-28" />
                 <col className="w-28" />
                 <col className="w-24" />
-                <col className="w-44" />
+                <col className="w-12" />
               </colgroup>
               <thead className="sticky top-0 z-10 bg-[#F8FAFC] text-[11px] uppercase tracking-wide text-[#64748B]">
                 <tr className="border-b border-[#E2E8F0]">
@@ -405,14 +407,54 @@ export default function JournalGrid({
                   <th className="px-2 py-3 font-semibold">Remarque</th>
                   <th className="px-2 py-3 font-semibold">Source</th>
                   <th className="px-2 py-3 font-semibold">Statut</th>
-                  <th className="px-2 py-3 font-semibold">Actions</th>
+                  <th className="px-2 py-3 font-semibold"><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
+                {composer?.mode === "create" ? (
+                  <EditingRows
+                    composer={composer}
+                    accounts={activeAccounts}
+                    error={composerError}
+                    saving={saving}
+                    locked={pending !== null}
+                    materialNote={null}
+                    linkedNote={null}
+                    origin={null}
+                    sourceText="Saisie manuelle"
+                    onChange={(next) => { setComposer(next); setComposerError(null); }}
+                    onAddLine={() => setComposer({ ...composer, lines: [...composer.lines, blankLine()] })}
+                    onSave={() => void saveComposer()}
+                    onCancel={() => { if (pending) return; setComposer(null); setOrigin(null); setComposerError(null); }}
+                  />
+                ) : null}
                 {showInbox ? inbox.map((item) => (
                   <InboxRow key={item.id} item={item} accounts={activeAccounts} canWrite={canWrite} pending={pending} onAct={onAct} startPending={startPending} stopPending={stopPending} />
                 )) : null}
                 {groups.map(({ entry, rows }) => {
+                  if (composer?.mode === "edit" && composer.entryId === entry.id) {
+                    return (
+                      <EditingRows
+                        key={entry.id}
+                        composer={composer}
+                        accounts={activeAccounts}
+                        error={composerError}
+                        saving={saving}
+                        locked={pending !== null}
+                        materialNote={materialNow && origin && origin.previousStatus !== "pending"
+                          ? "Cette modification repasse l’écriture à vérifier."
+                          : null}
+                        linkedNote={origin?.linked ? "L’extourne liée quittera le journal à l’enregistrement, pour que les soldes restent justes." : null}
+                        origin={origin}
+                        sourceText={sourceLabel(entry.source_type)}
+                        onChange={(next) => { setComposer(next); setComposerError(null); }}
+                        onAddLine={() => setComposer({ ...composer, lines: [...composer.lines, blankLine()] })}
+                        onSave={() => void saveComposer()}
+                        onCancel={() => { if (pending) return; setComposer(null); setOrigin(null); setComposerError(null); }}
+                        onDelete={() => { setNotice(null); setVoiding(entry); }}
+                      />
+                    );
+                  }
                   const lock = journalLockReason(entry.status, periodStatus(entry));
                   const total = rows.reduce((sum, item) => sum + item.amount, 0);
                   const linked = entries.find((item) => item.id === linkedJournalEntryId(entry));
@@ -425,51 +467,40 @@ export default function JournalGrid({
                       <tr
                         key={row.key}
                         data-entry-id={showMeta ? entry.id : undefined}
-                        className={`border-b ${last ? "border-[#E2E8F0]" : "border-[#F4F7FB]"} ${composer?.entryId === entry.id ? "bg-[#F8FAFC]" : "bg-white"} hover:bg-[#F8FAFC]`}
+                        className={`border-b ${last ? "border-[#E2E8F0]" : "border-[#F4F7FB]"} bg-white hover:bg-[#F8FAFC]`}
                       >
-                        <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-[#334155]">{showMeta ? formatSwissDate(entry.entry_date) : ""}</td>
-                        <td className="px-2 py-2.5 font-medium tabular-nums text-[#475569]">{showMeta ? entry.entry_number : ""}</td>
-                        <td className="px-2 py-2.5 text-[#334155]">{showMeta ? (entry.reference || "—") : ""}</td>
-                        <td className={`truncate px-3 py-2.5 ${showMeta ? "font-medium" : "text-[#64748B]"}`}>
-                          {showMeta ? entry.description : "même écriture"}
+                        <CellButton locked={Boolean(lock) || !canWrite} title={lock || "Modifier la date"} onClick={() => openEdit(entry, rows, "date", row.groupIndex)}>{showMeta ? formatSwissDate(entry.entry_date) : ""}</CellButton>
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le numéro d’écriture"} onClick={() => openEdit(entry, rows, "number", row.groupIndex)}>{showMeta ? entry.entry_number : ""}</CellButton>
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la pièce"} onClick={() => openEdit(entry, rows, "piece", row.groupIndex)}>{showMeta ? (entry.reference || "—") : ""}</CellButton>
+                        <td className={`truncate px-3 py-2 ${showMeta ? "font-medium" : "text-[#64748B]"}`}>
+                          {showMeta ? (
+                            <button type="button" className="max-w-full truncate text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le libellé"} onClick={() => openEdit(entry, rows, "label", row.groupIndex)}>{entry.description}</button>
+                          ) : "même écriture"}
                           {showMeta && rows.length > 1 ? <span className="ml-2 text-[11px] font-medium text-[#94A3B8]">{rows.length} lignes</span> : null}
                         </td>
-                        <td className="px-3 py-2.5"><AccountCell account={debit} /></td>
-                        <td className="px-3 py-2.5"><AccountCell account={credit} /></td>
-                        <td className="px-3 py-2.5 text-right font-medium tabular-nums">
-                          {formatChfAmount(row.amount)}
-                          {last && rows.length > 1 ? <span className="mt-1 block text-[11px] font-normal text-[#64748B]">Total {formatChfAmount(total)}</span> : null}
+                        <td className="px-3 py-2"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au débit"} onClick={() => openEdit(entry, rows, "debit", row.groupIndex)}><AccountCell account={debit} /></button></td>
+                        <td className="px-3 py-2"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au crédit"} onClick={() => openEdit(entry, rows, "credit", row.groupIndex)}><AccountCell account={credit} /></button></td>
+                        <td className="px-3 py-2 text-right font-medium tabular-nums">
+                          <button type="button" className="w-full text-right" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le montant"} onClick={() => openEdit(entry, rows, "amount", row.groupIndex)}>{formatChfAmount(row.amount)}</button>
+                          {last && rows.length > 1 ? <span className="mt-0.5 block text-[11px] font-normal text-[#64748B]">Total {formatChfAmount(total)}</span> : null}
                         </td>
-                        <td className="truncate px-2 py-2.5 text-xs text-[#64748B]">{showMeta ? entry.party_name || "" : ""}</td>
-                        <td className="truncate px-2 py-2.5 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
-                        <td className="px-2 py-2.5 text-xs text-[#475569]">{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</td>
-                        <td className="px-2 py-2 align-top">
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la remarque"} onClick={() => openEdit(entry, rows, "remark", row.groupIndex)}>{showMeta ? entry.party_name || "" : ""}</CellButton>
+                        <td className="truncate px-2 py-2 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le statut"} onClick={() => openEdit(entry, rows, "status", row.groupIndex)}>{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</CellButton>
+                        <td className="px-1 py-1 text-center">
                           {showMeta && canWrite ? (
-                            <div className="flex flex-col items-start gap-1">
-                              <div className="flex items-center gap-1">
-                                <button
-                                  type="button"
-                                  className={rowAction}
-                                  disabled={Boolean(lock) || pending !== null}
-                                  title={lock || "Modifier l’écriture entière"}
-                                  onClick={() => openEdit(entry, rows)}
-                                >
-                                  Modifier
-                                </button>
-                                <button
-                                  type="button"
-                                  className={rowDanger}
-                                  disabled={Boolean(lock) || pending !== null}
-                                  title={lock || "Supprimer l’écriture entière"}
-                                  onClick={() => { setNotice(null); setVoiding(entry); }}
-                                >
-                                  Supprimer
-                                </button>
-                              </div>
-                              {lock ? <p className="max-w-[14rem] text-[11px] leading-snug text-[#64748B]">{lock}</p> : null}
-                              {linked && !lock ? <p className="max-w-[14rem] text-[11px] leading-snug text-[#94A3B8]">Liée à l’écriture {linked.entry_number}</p> : null}
-                            </div>
+                            <button
+                              type="button"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded text-[#94A3B8] hover:bg-rose-50 hover:text-rose-700 disabled:opacity-40"
+                              disabled={Boolean(lock) || pending !== null}
+                              title={lock || "Supprimer l’écriture"}
+                              aria-label="Supprimer l’écriture"
+                              onClick={() => { setNotice(null); setVoiding(entry); }}
+                            >
+                              <TrashIcon />
+                            </button>
                           ) : null}
+                          {showMeta && linked && !lock ? <span className="sr-only">Liée à l’écriture {linked.entry_number}</span> : null}
                         </td>
                       </tr>
                     );
@@ -522,7 +553,9 @@ function deleteCopy(entry: Entry, linked: boolean): string {
   return parts.join(" ");
 }
 
-function EntryComposer({
+const EDIT_FIELDS = ["date", "number", "piece", "label", "debit", "credit", "amount", "remark", "status"] as const;
+
+function EditingRows({
   composer,
   accounts,
   error,
@@ -530,11 +563,13 @@ function EntryComposer({
   locked,
   materialNote,
   linkedNote,
+  origin,
+  sourceText,
   onChange,
   onAddLine,
-  onRemoveLine,
   onSave,
   onCancel,
+  onDelete,
 }: {
   composer: Composer;
   accounts: Account[];
@@ -543,16 +578,58 @@ function EntryComposer({
   locked: boolean;
   materialNote: string | null;
   linkedNote: string | null;
+  origin: Origin | null;
+  sourceText: string;
   onChange: (composer: Composer) => void;
   onAddLine: () => void;
-  onRemoveLine: (localId: string) => void;
   onSave: () => void;
   onCancel: () => void;
+  onDelete?: () => void;
 }) {
-  function setLine(localId: string, patch: Partial<EditorLine>) {
-    onChange({ ...composer, lines: composer.lines.map((line) => line.localId === localId ? { ...line, ...patch } : line) });
+  const baseline = useRef<{ field: string; lineId: string; value: string } | null>(null);
+  function replace(next: Composer) {
+    onChange(next);
   }
-  function keyDown(event: KeyboardEvent<HTMLElement>, field: JournalField) {
+  function setLine(localId: string, patch: Partial<EditorLine>) {
+    replace({ ...composer, lines: composer.lines.map((line) => line.localId === localId ? { ...line, ...patch } : line) });
+  }
+  function mark(changed: boolean) {
+    return changed ? `${gridInput} bg-[#FFF6D8]` : gridInput;
+  }
+  function arm(field: string, lineId: string, value: string) {
+    baseline.current = { field, lineId, value };
+  }
+  function fieldValue(field: string, line: EditorLine): string {
+    if (field === "date") return composer.date;
+    if (field === "number") return composer.number;
+    if (field === "piece") return composer.piece;
+    if (field === "label") return composer.label;
+    if (field === "remark") return composer.remark;
+    if (field === "status") return composer.status;
+    if (field === "amount") return line.amount;
+    if (field === "debit") return line.debitId;
+    if (field === "credit") return line.creditId;
+    return "";
+  }
+  function restore(field: string, lineId: string, value: string) {
+    if (field === "date") replace({ ...composer, date: value });
+    else if (field === "number") replace({ ...composer, number: value });
+    else if (field === "piece") replace({ ...composer, piece: value });
+    else if (field === "label") replace({ ...composer, label: value });
+    else if (field === "remark") replace({ ...composer, remark: value });
+    else if (field === "status") replace({ ...composer, status: value });
+    else if (field === "amount") setLine(lineId, { amount: value });
+    else if (field === "debit") setLine(lineId, { debitId: value });
+    else if (field === "credit") setLine(lineId, { creditId: value });
+  }
+  function draftUntouched() {
+    return composer.mode === "create"
+      && !composer.piece.trim()
+      && !composer.label.trim()
+      && !composer.remark.trim()
+      && composer.lines.every((line) => !line.debitId && !line.creditId && !line.amount.trim());
+  }
+  function keyDown(event: KeyboardEvent<HTMLElement>, field: string, lineId = "") {
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
       event.preventDefault();
       onSave();
@@ -560,102 +637,88 @@ function EntryComposer({
     }
     if (event.key === "Escape") {
       event.preventDefault();
-      onCancel();
+      const snap = baseline.current;
+      const line = composer.lines.find((item) => item.localId === (snap?.lineId || lineId));
+      const now = line ? fieldValue(field, line) : "";
+      if (snap && snap.field === field && snap.value !== now) {
+        restore(snap.field, snap.lineId, snap.value);
+        return;
+      }
+      if (draftUntouched()) {
+        onCancel();
+        return;
+      }
+      event.currentTarget.blur();
       return;
     }
-    if (event.key !== "Enter" || event.target instanceof HTMLTextAreaElement) return;
-    const next = nextJournalField(field);
-    if (next === "next-row") return;
+    if (event.key !== "Enter" || event.shiftKey) return;
+    const index = EDIT_FIELDS.indexOf(field as typeof EDIT_FIELDS[number]);
+    if (index < 0) return;
     event.preventDefault();
-    document.querySelector<HTMLElement>(`#journal-composer [data-field="${next}"]`)?.focus();
+    const row = event.currentTarget.closest("tr");
+    for (let cursor = index + 1; cursor < EDIT_FIELDS.length; cursor += 1) {
+      const target = row?.querySelector<HTMLElement>(`[data-field="${EDIT_FIELDS[cursor]}"]`);
+      if (target) {
+        target.focus();
+        return;
+      }
+    }
+    const nextRow = row?.nextElementSibling;
+    nextRow?.querySelector<HTMLElement>("[data-field]")?.focus();
   }
-  const title = composer.mode === "create" ? "Nouvelle écriture" : `Modifier l’écriture ${composer.number}`;
+  const gap = journalImbalance(rowsToLines(composer.lines.map((line) => ({
+    debitAccountId: line.debitId || null,
+    creditAccountId: line.creditId || null,
+    amount: parseChfInput(line.amount) || 0,
+  }))));
   return (
-    <section id="journal-composer" className="rounded-xl border border-[#D6DEE8] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold text-[#0F172A]">{title}</h3>
-        <p className="text-xs text-[#64748B]">{composer.mode === "create" ? "Brouillon, visible seulement ici tant qu’il n’est pas enregistré." : "Toutes les lignes de cette écriture sont modifiées ensemble."}</p>
-      </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Field label="Date">
-          <input data-field="date" className={editor} type="date" value={composer.date} disabled={locked} onChange={(event) => onChange({ ...composer, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date")} />
-        </Field>
-        <Field label="Pièce">
-          <input data-field="piece" className={editor} value={composer.piece} placeholder="Référence" disabled={locked} onChange={(event) => onChange({ ...composer, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece")} />
-        </Field>
-        <Field label="Libellé">
-          <input data-field="label" className={editor} value={composer.label} placeholder="Libellé de l’écriture" disabled={locked} onChange={(event) => onChange({ ...composer, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label")} />
-        </Field>
-        <Field label="Remarque">
-          <input data-field="remark" className={editor} value={composer.remark} placeholder="Remarque" disabled={locked} onChange={(event) => onChange({ ...composer, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark")} />
-        </Field>
-      </div>
-      {composer.mode === "edit" ? (
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:max-w-xl">
-          <Field label="N° d’écriture">
-            <input className={editor} value={composer.number} disabled={locked} onChange={(event) => onChange({ ...composer, number: event.target.value })} />
-          </Field>
-          <Field label="Statut">
-            <select className={editor} value={composer.status === "validated" ? "validated" : "pending"} disabled={locked} onChange={(event) => onChange({ ...composer, status: event.target.value })}>
-              <option value="pending">À vérifier</option>
-              <option value="validated">Vérifiée</option>
-            </select>
-          </Field>
-        </div>
-      ) : null}
-      <div className="mt-5 space-y-3">
-        <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9rem_2.5rem] gap-3 px-1 text-[11px] font-semibold uppercase tracking-wide text-[#64748B] sm:grid">
-          <span>Débit</span>
-          <span>Crédit</span>
-          <span className="text-right">Montant</span>
-          <span />
-        </div>
-        {composer.lines.map((line, index) => (
-          <div key={line.localId} className="grid gap-3 border-t border-[#F1F5F9] pt-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9rem_2.5rem] sm:border-0 sm:pt-0">
-            <AccountPicker field="debit" accounts={accounts} value={line.debitId} disabled={locked} onChange={(debitId) => setLine(line.localId, { debitId })} />
-            <AccountPicker field="credit" accounts={accounts} value={line.creditId} disabled={locked} onChange={(creditId) => setLine(line.localId, { creditId })} />
-            <input
-              data-field={index === 0 ? "amount" : undefined}
-              className={`${editor} text-right tabular-nums`}
-              value={line.amount}
-              placeholder="0.00"
-              inputMode="decimal"
-              disabled={locked}
-              aria-label={`Montant ligne ${index + 1}`}
-              onChange={(event) => setLine(line.localId, { amount: event.target.value })}
-              onKeyDown={(event) => keyDown(event, "amount")}
-            />
-            <button type="button" className="h-10 text-xs text-[#64748B] hover:text-[#0F172A] disabled:opacity-40" disabled={locked || composer.lines.length === 1} onClick={() => onRemoveLine(line.localId)} aria-label="Retirer la ligne">
-              {composer.lines.length > 1 ? "Retirer" : ""}
-            </button>
+    <>
+      {composer.lines.map((line, index) => {
+        const first = index === 0;
+        return (
+          <tr key={line.localId} id={first ? "journal-edit" : undefined} data-journal-edit="" className="border-b border-[#F4F7FB] bg-white">
+            <td className="px-1 py-1">{first ? <input data-field="date" className={mark(origin !== null && composer.date !== origin.date)} type="date" value={composer.date} disabled={locked} onFocus={() => arm("date", line.localId, composer.date)} onChange={(event) => replace({ ...composer, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date", line.localId)} /> : null}</td>
+            <td className="px-1 py-1">{first && composer.mode === "edit" ? <input data-field="number" className={`${mark(origin !== null && composer.number !== origin.number)} text-center tabular-nums`} value={composer.number} disabled={locked} onFocus={() => arm("number", line.localId, composer.number)} onChange={(event) => replace({ ...composer, number: event.target.value })} onKeyDown={(event) => keyDown(event, "number", line.localId)} /> : first ? <span className="px-1 text-xs text-[#94A3B8]">Auto</span> : null}</td>
+            <td className="px-1 py-1">{first ? <input data-field="piece" className={mark(origin !== null && composer.piece !== origin.reference)} value={composer.piece} placeholder="Pièce" disabled={locked} onFocus={() => arm("piece", line.localId, composer.piece)} onChange={(event) => replace({ ...composer, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece", line.localId)} /> : null}</td>
+            <td className="px-1 py-1">{first ? <input data-field="label" className={mark(origin !== null && composer.label !== origin.label)} value={composer.label} placeholder="Libellé" disabled={locked} onFocus={() => arm("label", line.localId, composer.label)} onChange={(event) => replace({ ...composer, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label", line.localId)} /> : <span className="px-2 text-xs text-[#94A3B8]">même écriture</span>}</td>
+            <td className="px-1 py-1"><AccountPicker field="debit" dense dirty={origin !== null && (origin.rows[index]?.debitAccountId || "") !== line.debitId} accounts={accounts} value={line.debitId} disabled={locked} onArm={() => arm("debit", line.localId, line.debitId)} onChange={(debitId) => setLine(line.localId, { debitId })} onKeyDown={(event) => keyDown(event, "debit", line.localId)} /></td>
+            <td className="px-1 py-1"><AccountPicker field="credit" dense dirty={origin !== null && (origin.rows[index]?.creditAccountId || "") !== line.creditId} accounts={accounts} value={line.creditId} disabled={locked} onArm={() => arm("credit", line.localId, line.creditId)} onChange={(creditId) => setLine(line.localId, { creditId })} onKeyDown={(event) => keyDown(event, "credit", line.localId)} /></td>
+            <td className="px-1 py-1"><input data-field="amount" className={`${mark(Boolean(origin?.rows[index] && (parseChfInput(line.amount) || 0) !== origin.rows[index].amount))} text-right tabular-nums`} value={line.amount} placeholder="0.00" inputMode="decimal" disabled={locked} aria-label={`Montant ligne ${index + 1}`} onFocus={() => arm("amount", line.localId, line.amount)} onChange={(event) => setLine(line.localId, { amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount", line.localId)} /></td>
+            <td className="px-1 py-1">{first ? <input data-field="remark" className={mark(origin !== null && composer.remark !== origin.remark)} value={composer.remark} placeholder="Remarque" disabled={locked} onFocus={() => arm("remark", line.localId, composer.remark)} onChange={(event) => replace({ ...composer, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark", line.localId)} /> : null}</td>
+            <td className="truncate px-2 text-xs text-[#94A3B8]" title={first ? sourceText : undefined}>{first ? sourceText : ""}</td>
+            <td className="px-1 py-1">{first && composer.mode === "edit" ? (
+              <select data-field="status" className={mark(origin !== null && (origin.previousStatus === "pending" ? "pending" : "validated") !== (composer.status === "validated" ? "validated" : "pending"))} value={composer.status === "validated" ? "validated" : "pending"} disabled={locked} onFocus={() => arm("status", line.localId, composer.status === "validated" ? "validated" : "pending")} onChange={(event) => replace({ ...composer, status: event.target.value })} onKeyDown={(event) => keyDown(event, "status", line.localId)}>
+                <option value="pending">À vérifier</option>
+                <option value="validated">Vérifiée</option>
+              </select>
+            ) : first ? <span className="px-1 text-xs text-[#64748B]">Brouillon</span> : null}</td>
+            <td className="px-1 text-center">
+              {first && onDelete ? (
+                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded text-[#94A3B8] hover:bg-rose-50 hover:text-rose-700" title="Supprimer l’écriture" aria-label="Supprimer l’écriture" onClick={onDelete}><TrashIcon /></button>
+              ) : null}
+            </td>
+          </tr>
+        );
+      })}
+      <tr className="border-b border-[#E2E8F0] bg-white">
+        <td colSpan={11} className="px-3 py-1.5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <button type="button" className="text-xs font-medium text-[#1A23FF] disabled:opacity-40" disabled={locked} onClick={onAddLine}>Ajouter une ligne</button>
+            {linkedNote ? <span className="text-xs text-[#64748B]">{linkedNote}</span> : null}
+            {materialNote ? <span className="text-xs text-[#64748B]">{materialNote}</span> : null}
+            {composer.lines.length > 1 && gap !== 0 ? <span className="text-xs text-rose-700">Écart : {formatChfAmount(Math.abs(gap))}</span> : null}
+            {error ? <span className="text-xs text-rose-700">{error}</span> : null}
+            <span className="ml-auto flex items-center gap-1">
+              <button type="button" className="h-7 rounded px-2 text-xs font-medium text-[#475569] hover:bg-[#F1F5F9]" disabled={locked} onClick={onCancel}>Annuler</button>
+              <button type="button" className="inline-flex h-7 items-center gap-1 rounded bg-[#1A23FF] px-2.5 text-xs font-semibold text-white disabled:opacity-60" disabled={locked} onClick={onSave}>
+                {saving ? <ButtonSpinner className="h-3 w-3" /> : null}
+                {saving ? "Enregistrement…" : "Enregistrer"}
+              </button>
+            </span>
           </div>
-        ))}
-      </div>
-      {linkedNote ? <p className="mt-4 text-sm leading-relaxed text-[#475569]">{linkedNote}</p> : null}
-      {materialNote ? <p className="mt-2 text-sm leading-relaxed text-[#475569]">{materialNote}</p> : null}
-      {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <button type="button" className="text-sm font-medium text-[#1A23FF] disabled:opacity-40" disabled={locked} onClick={onAddLine}>Ajouter une ligne</button>
-        <div className="ml-auto flex items-center gap-2">
-          <button type="button" className={quietBtn} disabled={locked} onClick={onCancel}>Annuler</button>
-          <button
-            type="button"
-            className={primaryBtn}
-            disabled={locked}
-            aria-busy={saving || undefined}
-            data-busy={saving ? "true" : undefined}
-            onPointerDown={(event) => {
-              if (locked) return;
-              event.currentTarget.dataset.busy = "true";
-            }}
-            onClick={onSave}
-          >
-            {saving ? <ButtonSpinner className="h-4 w-4" /> : null}
-            {saving ? "Enregistrement…" : "Enregistrer"}
-          </button>
-        </div>
-      </div>
-    </section>
+        </td>
+      </tr>
+    </>
   );
 }
 
@@ -664,13 +727,21 @@ function AccountPicker({
   value,
   field,
   disabled,
+  dense,
+  dirty,
+  onArm,
   onChange,
+  onKeyDown,
 }: {
   accounts: Account[];
   value: string;
   field: JournalField;
   disabled?: boolean;
+  dense?: boolean;
+  dirty?: boolean;
+  onArm?: () => void;
   onChange: (id: string) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -680,15 +751,23 @@ function AccountPicker({
     <div className="relative">
       <input
         data-field={field}
-        className={`${editor} font-mono`}
+        className={`${dense ? gridInput : editor} font-mono ${dirty ? "bg-[#FFF6D8]" : ""}`}
         value={open ? query : (selected ? `${selected.number} ${selected.name}` : "")}
-        placeholder="Compte"
+        placeholder="N° ou nom"
         disabled={disabled}
         autoComplete="off"
         aria-label={field === "debit" ? "Compte au débit" : "Compte au crédit"}
-        onFocus={() => { setOpen(true); setQuery(""); }}
+        onFocus={() => { onArm?.(); setOpen(true); setQuery(""); }}
         onChange={(event) => setQuery(event.target.value)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && open && matches[0] && query.trim()) {
+            event.preventDefault();
+            onChange(matches[0].id);
+            setOpen(false);
+          }
+          onKeyDown?.(event);
+        }}
       />
       {open ? (
         <ul className="absolute z-30 mt-1 max-h-56 w-full min-w-[16rem] overflow-auto rounded-lg border border-[#E2E8F0] bg-white py-1 shadow-lg">
@@ -717,19 +796,26 @@ function AccountCell({ account }: { account?: Account }) {
   );
 }
 
+function CellButton({ children, locked, title, onClick }: { children: ReactNode; locked?: boolean; title: string; onClick: () => void }) {
+  return (
+    <td className="px-2 py-2">
+      <button type="button" className="w-full truncate text-left disabled:cursor-default" disabled={locked} title={title} onClick={onClick}>{children}</button>
+    </td>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M4 7h16M9 7V5h6v2M8 7l1 13h6l1-13" />
+    </svg>
+  );
+}
+
 function Filter({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block min-w-0">
       <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide text-[#64748B]">{label}</span>
-      {children}
-    </label>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block min-w-0">
-      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">{label}</span>
       {children}
     </label>
   );
@@ -819,6 +905,7 @@ function InboxRow({
   );
 }
 
+const gridInput = "h-7 w-full min-w-0 rounded border border-transparent bg-white/80 px-1 text-[13px] text-[#0F172A] outline-none focus:border-[#94A3B8] focus:bg-white";
 const filter = "h-9 w-full rounded-md border border-[#D6DEE8] bg-white px-2.5 text-sm text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/15";
 const editor = "h-10 w-full rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/15 disabled:bg-[#F8FAFC]";
 const primaryBtn = "inline-flex h-10 min-w-[9.5rem] items-center justify-center gap-2 rounded-lg bg-[#1A23FF] px-4 text-sm font-semibold text-white transition active:scale-[0.98] active:bg-[#121AD6] disabled:cursor-wait disabled:opacity-70 data-[busy=true]:cursor-wait data-[busy=true]:opacity-70";
