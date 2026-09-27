@@ -7,6 +7,9 @@ export type ClubRevenueDbRow = {
   event_id: string | null;
   source_type?: string | null;
   source_id?: string | null;
+  status?: string | null;
+  received_on?: string | null;
+  category_account_id?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -24,6 +27,9 @@ export function mapClubRevenueToApi(
     event_id: row.event_id,
     source_type: row.source_type || null,
     source_id: row.source_id || null,
+    status: row.status === "prevu" ? "prevu" : "encaisse",
+    received_on: row.received_on || null,
+    category_account_id: row.category_account_id || null,
     event,
     created_at: row.created_at,
     updated_at: row.updated_at,

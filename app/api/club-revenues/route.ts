@@ -48,6 +48,9 @@ export async function GET() {
         event_id,
         source_type,
         source_id,
+        status,
+        received_on,
+        category_account_id,
         created_at,
         updated_at
       `;
@@ -70,7 +73,7 @@ export async function GET() {
       .order("revenue_date", { ascending: false });
     rows = (data || null) as ClubRevenueDbRow[] | null;
 
-    if (error && /source_type|source_id/.test(error.message || "")) {
+    if (error && /source_type|source_id|status|received_on|category_account_id/.test(error.message || "")) {
       const fallback = await supabase
         .from("club_revenues")
         .select(selectLegacy)

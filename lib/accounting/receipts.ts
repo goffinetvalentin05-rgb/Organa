@@ -80,3 +80,43 @@ export function receiptLines(amount: number): { debit: number; credit: number } 
   const value = roundChf(amount);
   return { debit: value, credit: value };
 }
+
+export type CashSide = "treasury" | "category";
+
+/**
+ * Charge : débit du compte de charge, crédit de la trésorerie.
+ * Revenu : débit de la trésorerie, crédit du compte de produit.
+ * Le montant confirmé est passé tel quel (TTC s'il l'est déjà). Pas de ligne de TVA ajoutée.
+ */
+export function paymentJournalLines(input: {
+  direction: "in" | "out";
+  amount: number;
+  treasuryAccountId: string;
+  categoryAccountId: string;
+}): Array<{ accountId: string; debit: number; credit: number }> {
+  const amount = roundChf(input.amount);
+  if (input.direction === "out") {
+    return [
+      { accountId: input.categoryAccountId, debit: amount, credit: 0 },
+      { accountId: input.treasuryAccountId, debit: 0, credit: amount },
+    ];
+  }
+  return [
+    { accountId: input.treasuryAccountId, debit: amount, credit: 0 },
+    { accountId: input.categoryAccountId, debit: 0, credit: amount },
+  ];
+}
+
+/**
+ * Une confirmation couvre le montant restant en une seule écriture.
+ * Un second appel, une fois le total couvert, ne crée plus rien.
+ */
+export function fullCashPayment(total: number, already: number, amount: number):
+  | { ok: true; amount: number }
+  | { ok: false; reason: "settled" | "amount" } {
+  const remaining = remainingDue(total, already);
+  if (remaining <= 0) return { ok: false, reason: "settled" };
+  const value = roundChf(amount);
+  if (value !== remaining || value <= 0) return { ok: false, reason: "amount" };
+  return { ok: true, amount: value };
+}

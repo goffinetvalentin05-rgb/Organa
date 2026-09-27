@@ -126,12 +126,19 @@ export async function POST(request: NextRequest) {
     );
     if (!eventCheck.ok) return eventCheck.response;
 
+    if (status === "paye") {
+      return NextResponse.json(
+        { error: "Une charge ne peut pas être créée déjà payée. Confirmez le paiement ensuite." },
+        { status: 400 }
+      );
+    }
+
     const payload = {
       user_id: guard.clubId,
       description: String(descriptionValue).trim(),
       amount,
       date,
-      status: status === "paye" ? "paye" : "a_payer",
+      status: "a_payer",
       notes: notes || null,
       attachment_url: attachment_url ?? attachmentUrl ?? null,
       event_id: resolvedEventId,

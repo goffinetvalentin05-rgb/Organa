@@ -11,6 +11,7 @@ import { localeToIntl } from "@/lib/i18n";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { idempotentFetch } from "@/lib/api/idempotentFetch";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import CashMovementDialog from "@/components/finances/CashMovementDialog";
 import {
   PageLayout,
   PageHeader,
@@ -34,6 +35,7 @@ interface ClubRevenue {
   revenue_date: string;
   description?: string | null;
   event_id?: string | null;
+  status?: string;
   event?: { id: string; name: string } | null;
 }
 
@@ -48,6 +50,7 @@ function ProduitsPageInner() {
   const [editing, setEditing] = useState<ClubRevenue | null>(null);
   const { isSubmitting, showOverlay, run } = useSafeSubmit({ overlayDelayMs: 280 });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [receiving, setReceiving] = useState<ClubRevenue | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -287,6 +290,16 @@ function ProduitsPageInner() {
               }
               actions={
                 <>
+                  {r.status === "prevu" ? (
+                    <ActionButton
+                      type="button"
+                      onClick={() => setReceiving(r)}
+                      title="Confirmer l'encaissement"
+                      className="inline-flex items-center gap-1.5"
+                    >
+                      Encaisser
+                    </ActionButton>
+                  ) : null}
                   <ActionButton
                     type="button"
                     onClick={() => openEdit(r)}
@@ -397,6 +410,21 @@ function ProduitsPageInner() {
           </GlassCard>
         </div>
       )}
+      {receiving ? (
+        <CashMovementDialog
+          endpoint={`/api/club-revenues/${receiving.id}/receipt`}
+          title="Encaissement du revenu"
+          dateLabel="Date réelle de l'encaissement"
+          accountLabel="Compte qui a reçu l'argent"
+          categoryLabel="Catégorie de produit"
+          confirmLabel="Confirmer l'encaissement"
+          onClose={() => setReceiving(null)}
+          onDone={() => {
+            setReceiving(null);
+            void loadRevenues();
+          }}
+        />
+      ) : null}
       </PageLayout>
     </>
   );

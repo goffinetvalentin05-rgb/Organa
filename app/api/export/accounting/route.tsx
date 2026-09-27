@@ -137,6 +137,7 @@ export async function GET(request: NextRequest) {
     const currency = profile?.currency || "CHF";
 
     if (resource === "expenses") {
+      // Archive CSV et pièces jointes. Ne crée aucune écriture comptable.
       const { data: expenses, error } = await supabase
         .from("expenses")
         .select("id, description, amount, date, status, notes, attachment_url")

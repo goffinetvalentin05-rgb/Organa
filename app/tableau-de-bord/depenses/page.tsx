@@ -31,6 +31,7 @@ import {
   expenseDraftStore,
   type ExpenseDraftData,
 } from "@/lib/drafts/expenseDraft";
+import CashMovementDialog from "@/components/finances/CashMovementDialog";
 
 type DepenseStatut = "a_payer" | "paye";
 
@@ -110,6 +111,7 @@ export default function DepensesPage() {
   const [showForm, setShowForm] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [paying, setPaying] = useState<Depense | null>(null);
   const [showJustificatifModal, setShowJustificatifModal] = useState(false);
   const [justificatifFile, setJustificatifFile] = useState<File | null>(null);
   const [justificatifLoading, setJustificatifLoading] = useState(false);
@@ -511,7 +513,7 @@ export default function DepensesPage() {
           label: formData.label.trim(),
           amount,
           date: formattedDate,
-          status: formData.status,
+          status: "a_payer",
           notes: formData.notes.trim() || null,
           attachmentUrl: attachmentUrl || null,
           eventId: formData.eventId || null,
@@ -589,13 +591,14 @@ export default function DepensesPage() {
       }
 
       const nextEventId = editFormData.eventId || null;
+      const becomingPaid = editFormData.status === "paye" && selectedDepense.status !== "paye";
       const { error } = await supabase
         .from("expenses")
         .update({
           description: editFormData.label.trim(),
           amount,
           date: editFormData.date,
-          status: editFormData.status,
+          status: becomingPaid ? "a_payer" : editFormData.status,
           notes: editFormData.notes.trim() || null,
           attachment_url: attachmentUrl,
           event_id: nextEventId,
@@ -611,6 +614,7 @@ export default function DepensesPage() {
       await loadDepenses();
       resetEditForm();
       setShowEditModal(false);
+      if (becomingPaid) setPaying(selectedDepense);
       setSelectedDepense(null);
       setUpdateLoading(false);
     } catch (error) {
@@ -863,7 +867,6 @@ export default function DepensesPage() {
                 className="w-full rounded-lg bg-surface border border-subtle-hover px-4 py-2 text-primary placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]"
               >
                 <option value="a_payer">{t("dashboard.expenses.status.toPay")}</option>
-                <option value="paye">{t("dashboard.expenses.status.paid")}</option>
               </select>
             </div>
           </div>
@@ -1040,6 +1043,16 @@ export default function DepensesPage() {
                       <Eye className="h-4 w-4" />
                       {t("dashboard.common.view")}
                     </ActionButton>
+                    {depense.status === "a_payer" ? (
+                      <ActionButton
+                        type="button"
+                        className="inline-flex items-center gap-1.5"
+                        title="Marquer comme payée"
+                        onClick={() => setPaying(depense)}
+                      >
+                        Marquer comme payée
+                      </ActionButton>
+                    ) : null}
                     <ActionButton
                       type="button"
                       className="inline-flex items-center gap-1.5"
@@ -1389,6 +1402,21 @@ export default function DepensesPage() {
             </div>
           </div>
         </div>
+      ) : null}
+      {paying ? (
+        <CashMovementDialog
+          endpoint={`/api/depenses/${paying.id}/payment`}
+          title="Paiement de la charge"
+          dateLabel="Date réelle du paiement"
+          accountLabel="Compte d'où l'argent est sorti"
+          categoryLabel="Catégorie de charge"
+          confirmLabel="Confirmer le paiement"
+          onClose={() => setPaying(null)}
+          onDone={() => {
+            setPaying(null);
+            void loadDepenses();
+          }}
+        />
       ) : null}
       </PageLayout>
     </>

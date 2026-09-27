@@ -1388,29 +1388,6 @@ async function backfillSince(admin: Admin, clubId: string, startDate: string) {
     });
   }
 
-  const { data: expenses } = await admin
-    .from("expenses")
-    .select("id, amount, description, status, date")
-    .eq("user_id", clubId)
-    .eq("status", "paye")
-    .is("deleted_at", null);
-  for (const expense of expenses ?? []) {
-    await enqueue({
-      p_club: clubId,
-      p_source_type: "expense",
-      p_source_id: expense.id,
-      p_event_type: "payment_sent",
-      p_direction: "out",
-      p_amount: expense.amount,
-      p_fee: 0,
-      p_entry_date: expense.date || startDate,
-      p_description: expense.description,
-      p_party: null,
-      p_financial: null,
-      p_category: null,
-    });
-  }
-
   const { data: orders } = await admin
     .from("shop_orders")
     .select("id, total_cents, paid_at, customer_first_name, customer_last_name")
@@ -1459,30 +1436,6 @@ async function backfillSince(admin: Admin, clubId: string, startDate: string) {
     });
   }
 
-  const { data: revenues } = await admin
-    .from("club_revenues")
-    .select("id, amount, revenue_date, name, source_type, source_id")
-    .eq("user_id", clubId)
-    .is("deleted_at", null);
-  for (const revenue of revenues ?? []) {
-    const date = (revenue.revenue_date as string) || startDate;
-    if (date < startDate) continue;
-    const sourceType = revenue.source_type || "club_revenue";
-    await enqueue({
-      p_club: clubId,
-      p_source_type: sourceType,
-      p_source_id: revenue.source_id || revenue.id,
-      p_event_type: "payment_received",
-      p_direction: "in",
-      p_amount: revenue.amount,
-      p_fee: 0,
-      p_entry_date: date,
-      p_description: revenue.name,
-      p_party: null,
-      p_financial: null,
-      p_category: sourceType === "support_sale" ? "support_sale" : null,
-    });
-  }
 }
 
 export async function closePeriod(params: {
