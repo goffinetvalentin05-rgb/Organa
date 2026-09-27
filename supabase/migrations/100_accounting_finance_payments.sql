@@ -225,7 +225,7 @@ BEGIN
     PERFORM set_config('obillz.cash_payment', 'on', true);
     IF p_source_type = 'expense' THEN
       UPDATE public.expenses
-      SET status = 'paye', paid_on = p_paid_on, updated_at = NOW()
+      SET status = 'paye', paid_on = p_paid_on
       WHERE id = p_source AND user_id = p_club;
     ELSE
       UPDATE public.club_revenues
@@ -286,8 +286,7 @@ BEGIN
     IF p_source_type = 'expense' THEN
       UPDATE public.expenses
       SET status = 'paye',
-          paid_on = COALESCE(paid_on, p_paid_on),
-          updated_at = NOW()
+          paid_on = COALESCE(paid_on, p_paid_on)
       WHERE id = p_source AND user_id = p_club;
     ELSE
       UPDATE public.club_revenues
@@ -391,8 +390,7 @@ BEGIN
     UPDATE public.expenses
     SET status = 'paye',
         paid_on = p_paid_on,
-        category_account_id = p_category,
-        updated_at = NOW()
+        category_account_id = p_category
     WHERE id = p_source AND user_id = p_club;
   ELSE
     UPDATE public.club_revenues

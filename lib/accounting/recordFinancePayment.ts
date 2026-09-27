@@ -186,7 +186,10 @@ export async function recordFinancePayment(input: {
     p_key: input.idempotencyKey.trim(),
     p_category: input.categoryAccountId || null,
   });
-  if (error) throw new Error(financeFailureMessage(error));
+  if (error) {
+    console.error("accounting_record_finance_payment", error.message, error.details, error.hint, error.code);
+    throw new Error(error.message || "Erreur comptable");
+  }
   const row = (data ?? {}) as Record<string, unknown>;
   return {
     created: Boolean(row.created),

@@ -129,6 +129,9 @@ describe("migration et export", () => {
     expect(migration).toContain("Choisissez une catégorie de charge");
     expect(migration).toContain("Choisissez une catégorie de produit");
     expect(migration).not.toContain("DELETE FROM public.accounting_entries");
+    const expenseUpdates = migration.match(/UPDATE public\.expenses[\s\S]*?WHERE id = p_source AND user_id = p_club;/g) ?? [];
+    expect(expenseUpdates.length).toBe(3);
+    expect(expenseUpdates.every((statement) => !statement.includes("updated_at"))).toBe(true);
     expect(exportRoute).toContain("Ne crée aucune écriture comptable");
     expect(exportRoute).not.toContain("accounting_enqueue");
   });
