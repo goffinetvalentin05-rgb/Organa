@@ -6,10 +6,14 @@ import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import {
+  createSaveQueue,
   draftIssues,
+  draftLeaveAction,
   ENTRY_NUMBER_TAKEN,
   entryNumberAllowed,
+  existingCellCommit,
   explainJournalError,
+  journalComposerChanged,
   journalEditMaterial,
   journalImbalance,
   journalLinesBalanced,
@@ -37,6 +41,13 @@ type Composer = {
   status: string;
   idempotencyKey: string;
   lines: EditorLine[];
+};
+
+type CellFeedback = {
+  key: string;
+  field: string;
+  lineId: string;
+  phase: "saving" | "saved" | "error";
 };
 
 type Origin = {
@@ -95,7 +106,19 @@ export default function JournalGrid({
   const [fullscreen, setFullscreen] = useState(false);
   const [voiding, setVoiding] = useState<Entry | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<CellFeedback | null>(null);
   const busyRef = useRef(false);
+  const composerRef = useRef<Composer | null>(null);
+  const originRef = useRef<Origin | null>(null);
+  const editGenRef = useRef(0);
+  const skipCommitRef = useRef(false);
+  const draftFlightRef = useRef<Promise<boolean> | null>(null);
+  const savedTimerRef = useRef<number | null>(null);
+  const enqueue = useRef(createSaveQueue()).current;
+  const entriesRef = useRef(entries);
+  const periodsRef = useRef(periods);
+  entriesRef.current = entries;
+  periodsRef.current = periods;
   const activeAccounts = accounts.filter((account) => account.isActive);
 
   const visibleEntries = entries.filter((entry) => {
@@ -122,6 +145,16 @@ export default function JournalGrid({
     return periods.find((period) => period.id === entry.period_id)?.status ?? null;
   }
 
+  function writeComposer(next: Composer | null) {
+    composerRef.current = next;
+    setComposer(next);
+  }
+
+  function writeOrigin(next: Origin | null) {
+    originRef.current = next;
+    setOrigin(next);
+  }
+
   function startPending(key: string): boolean {
     if (busyRef.current) return false;
     busyRef.current = true;
@@ -134,31 +167,287 @@ export default function JournalGrid({
     setPending(null);
   }
 
-  function openNewEntry() {
-    if (composer?.mode === "edit") {
-      setNotice("Enregistrez ou annulez la modification en cours.");
-      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
-      return;
-    }
-    if (composer) {
-      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
-      document.querySelector<HTMLElement>("#journal-edit [data-field='label']")?.focus();
-      return;
-    }
-    setComposerError(null);
-    setNotice(null);
-    setOrigin(null);
-    setComposer({
-      mode: "create",
-      date: new Date().toISOString().slice(0, 10),
-      number: "",
-      piece: "",
-      label: "",
-      remark: "",
-      status: "pending",
-      idempotencyKey: `journal:${crypto.randomUUID()}`,
-      lines: [blankLine()],
+  function showSaved(next: CellFeedback) {
+    setFeedback(next);
+    if (savedTimerRef.current) window.clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = window.setTimeout(() => {
+      setFeedback((current) => current?.phase === "saved" && current.key === next.key && current.field === next.field ? null : current);
+    }, 1200);
+  }
+
+  function visualOf(current: Composer) {
+    return current.lines.map((line) => ({
+      debitAccountId: line.debitId || null,
+      creditAccountId: line.creditId || null,
+      amount: parseChfInput(line.amount) || 0,
+    }));
+  }
+
+  function issuesOf(current: Composer): string[] {
+    return draftIssues({
+      date: current.date,
+      label: current.label,
+      lines: visualOf(current).map((line) => ({
+        debitAccountId: line.debitAccountId || "",
+        creditAccountId: line.creditAccountId || "",
+        amount: line.amount,
+      })),
     });
+  }
+
+  function editableStatus(status: string): string {
+    return status === "pending" ? "pending" : "validated";
+  }
+
+  function changedAgainst(originSnap: Origin, current: Composer): boolean {
+    return journalComposerChanged(
+      {
+        date: originSnap.date,
+        number: originSnap.number,
+        reference: originSnap.reference,
+        label: originSnap.label,
+        remark: originSnap.remark,
+        status: editableStatus(originSnap.previousStatus),
+        rows: originSnap.rows,
+      },
+      {
+        date: current.date,
+        number: current.number,
+        reference: current.piece,
+        label: current.label,
+        remark: current.remark,
+        status: editableStatus(current.status),
+        rows: visualOf(current),
+      }
+    );
+  }
+
+  function rejectCell(key: string, field: string, lineId: string, message: string) {
+    setComposerError(message);
+    setFeedback({ key, field, lineId, phase: "error" });
+  }
+
+  async function commitExisting(field = "label", lineId = ""): Promise<"clean" | "saved" | "invalid"> {
+    return enqueue(async () => {
+      const current = composerRef.current;
+      const originSnap = originRef.current;
+      if (!current || current.mode !== "edit" || !originSnap || !current.entryId) return "clean";
+      const visual = visualOf(current);
+      const lines = rowsToLines(visual);
+      const gap = journalImbalance(lines);
+      const number = Number(current.number);
+      const period = periodsRef.current.find((item) => current.date >= item.startsOn && current.date <= item.endsOn);
+      const taken = entriesRef.current
+        .filter((item) => item.status !== "voided")
+        .map((item) => ({ id: item.id, periodId: item.period_id || null, number: item.entry_number }));
+      const decision = existingCellCommit({
+        changed: changedAgainst(originSnap, current),
+        label: current.label,
+        number,
+        numberAllowed: entryNumberAllowed(number, taken, period?.id || null, current.entryId),
+        balanced: journalLinesBalanced(lines),
+        gapLabel: gap === 0 ? null : `Écart : ${formatChfAmount(Math.abs(gap))}`,
+      });
+      const cell = { key: current.entryId, field, lineId: lineId || current.lines[0]?.localId || "" };
+      if (decision.action === "ignore") {
+        setComposerError(null);
+        setFeedback((prev) => prev?.phase === "error" ? null : prev);
+        return "clean";
+      }
+      if (decision.action === "reject") {
+        rejectCell(cell.key, cell.field, cell.lineId, decision.error);
+        return "invalid";
+      }
+      const material = journalEditMaterial(originSnap, { date: current.date, reference: current.piece, rows: visual });
+      const sentStatus = material ? "pending" : editableStatus(current.status);
+      setFeedback({ ...cell, phase: "saving" });
+      try {
+        const result = await onAct({
+          action: "journal-save",
+          entryId: current.entryId,
+          date: current.date,
+          description: current.label,
+          reference: current.piece,
+          remark: current.remark,
+          entryNumber: number,
+          status: sentStatus,
+          material,
+          lines,
+        });
+        const message = readError(result);
+        if (message) {
+          rejectCell(cell.key, cell.field, cell.lineId, explainJournalError(message));
+          return "invalid";
+        }
+        if (composerRef.current?.entryId === current.entryId) {
+          const live = composerRef.current;
+          const patch: Partial<Composer> = {};
+          if (live.number === current.number) patch.number = String(number);
+          if (material && live.status === current.status) patch.status = "pending";
+          if (patch.number !== undefined || patch.status !== undefined) writeComposer({ ...live, ...patch });
+          writeOrigin({
+            date: current.date,
+            number: String(number),
+            reference: current.piece,
+            label: current.label,
+            remark: current.remark,
+            previousStatus: sentStatus,
+            linked: originSnap.linked,
+            rows: visual,
+          });
+          const liveNow = composerRef.current;
+          const originNow = originRef.current;
+          const stillDirty = Boolean(
+            liveNow && originNow && liveNow.entryId === current.entryId && changedAgainst(originNow, liveNow)
+          );
+          if (stillDirty) setFeedback(null);
+          else {
+            setComposerError(null);
+            showSaved({ ...cell, phase: "saved" });
+          }
+        }
+        return "saved";
+      } catch (error) {
+        rejectCell(cell.key, cell.field, cell.lineId, error instanceof Error ? error.message : "Action impossible");
+        return "invalid";
+      }
+    });
+  }
+
+  async function commitDraft(): Promise<boolean> {
+    const current = composerRef.current;
+    if (!current || current.mode !== "create") return true;
+    const issues = issuesOf(current);
+    if (issues.length > 0) {
+      rejectCell("draft", "label", current.lines[0]?.localId || "", issues[0]);
+      return false;
+    }
+    if (draftFlightRef.current) return draftFlightRef.current;
+    const snapshot = current;
+    const flight = enqueue(async () => {
+      if (composerRef.current?.idempotencyKey !== snapshot.idempotencyKey) return true;
+      const latest = composerRef.current?.idempotencyKey === snapshot.idempotencyKey ? composerRef.current : snapshot;
+      const latestIssues = issuesOf(latest);
+      if (latestIssues.length > 0) {
+        rejectCell("draft", "label", latest.lines[0]?.localId || "", latestIssues[0]);
+        return false;
+      }
+      setFeedback({ key: "draft", field: "label", lineId: latest.lines[0]?.localId || "", phase: "saving" });
+      try {
+        const result = await onAct({
+          action: "journal-save",
+          date: latest.date,
+          description: latest.label,
+          reference: latest.piece,
+          remark: latest.remark,
+          status: "pending",
+          material: false,
+          idempotencyKey: latest.idempotencyKey,
+          lines: rowsToLines(visualOf(latest)),
+        });
+        const message = readError(result);
+        if (message) {
+          rejectCell("draft", "label", latest.lines[0]?.localId || "", explainJournalError(message));
+          return false;
+        }
+        setComposerError(null);
+        showSaved({ key: "draft", field: "label", lineId: latest.lines[0]?.localId || "", phase: "saved" });
+        if (composerRef.current?.idempotencyKey === latest.idempotencyKey) {
+          writeComposer(null);
+          writeOrigin(null);
+        }
+        return true;
+      } catch (error) {
+        rejectCell("draft", "label", latest.lines[0]?.localId || "", error instanceof Error ? error.message : "Action impossible");
+        return false;
+      }
+    });
+    draftFlightRef.current = flight;
+    try {
+      return await flight;
+    } finally {
+      if (draftFlightRef.current === flight) draftFlightRef.current = null;
+    }
+  }
+
+  function focusInsideEditor(): boolean {
+    const active = document.activeElement;
+    return active instanceof HTMLElement && Boolean(active.closest("[data-journal-edit]"));
+  }
+
+  function scheduleCommit(field: string, lineId: string) {
+    if (skipCommitRef.current) {
+      skipCommitRef.current = false;
+      return;
+    }
+    window.setTimeout(() => {
+      const generation = editGenRef.current;
+      const mode = composerRef.current?.mode;
+      const entryId = composerRef.current?.entryId;
+      void (async () => {
+        if (mode === "create") {
+          const issues = composerRef.current ? issuesOf(composerRef.current) : [];
+          const action = draftLeaveAction(issues, !focusInsideEditor());
+          if (action === "keep") {
+            if (!focusInsideEditor() && issues[0]) setComposerError(issues[0]);
+            return;
+          }
+          await commitDraft();
+          return;
+        }
+        let result = await commitExisting(field, lineId);
+        for (let pass = 0; pass < 4 && result !== "invalid"; pass += 1) {
+          const live = composerRef.current;
+          const originSnap = originRef.current;
+          if (!live || live.mode !== "edit" || live.entryId !== entryId || !originSnap) break;
+          if (!changedAgainst(originSnap, live)) break;
+          result = await commitExisting(field, lineId);
+        }
+        if (editGenRef.current !== generation || composerRef.current?.entryId !== entryId) return;
+        if (result === "invalid" || focusInsideEditor()) return;
+        const delay = result === "saved" ? 700 : 0;
+        window.setTimeout(() => {
+          if (editGenRef.current !== generation || composerRef.current?.entryId !== entryId) return;
+          if (focusInsideEditor()) return;
+          writeComposer(null);
+          writeOrigin(null);
+        }, delay);
+      })();
+    }, 0);
+  }
+
+  function openNewEntry() {
+    const generation = ++editGenRef.current;
+    window.setTimeout(() => {
+      void (async () => {
+        if (editGenRef.current !== generation) return;
+        const current = composerRef.current;
+        if (current?.mode === "create") {
+          document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
+          document.querySelector<HTMLElement>("#journal-edit [data-field='label']")?.focus();
+          return;
+        }
+        if (current?.mode === "edit") {
+          const result = await commitExisting();
+          if (result === "invalid" || editGenRef.current !== generation) return;
+        }
+        setComposerError(null);
+        setNotice(null);
+        setFeedback(null);
+        writeOrigin(null);
+        writeComposer({
+          mode: "create",
+          date: new Date().toISOString().slice(0, 10),
+          number: "",
+          piece: "",
+          label: "",
+          remark: "",
+          status: "pending",
+          idempotencyKey: `journal:${crypto.randomUUID()}`,
+          lines: [blankLine()],
+        });
+      })();
+    }, 0);
   }
 
   function focusJournalCell(field: string, lineIndex = 0) {
@@ -176,132 +465,64 @@ export default function JournalGrid({
       setNotice(lock);
       return;
     }
-    if (composer?.mode === "create") {
-      setNotice("Enregistrez ou annulez la nouvelle écriture avant d’en modifier une autre.");
-      document.getElementById("journal-edit")?.scrollIntoView({ block: "nearest" });
-      return;
-    }
-    if (composer?.entryId === entry.id) {
-      focusJournalCell(field, lineIndex);
-      return;
-    }
-    if (composer?.mode === "edit") {
-      setNotice("Enregistrez ou annulez la modification en cours.");
-      return;
-    }
-    setComposerError(null);
-    setNotice(null);
-    setOrigin({
-      date: entry.entry_date,
-      number: String(entry.entry_number),
-      reference: entry.reference || "",
-      label: entry.description,
-      remark: entry.party_name || "",
-      previousStatus: entry.status,
-      linked: Boolean(linkedJournalEntryId(entry)),
-      rows: rows.map((row) => ({
-        debitAccountId: row.debitAccountId,
-        creditAccountId: row.creditAccountId,
-        amount: row.amount,
-      })),
-    });
-    setComposer({
-      mode: "edit",
-      entryId: entry.id,
-      date: entry.entry_date,
-      number: String(entry.entry_number),
-      piece: entry.reference || "",
-      label: entry.description,
-      remark: entry.party_name || "",
-      status: entry.status === "pending" ? "pending" : "validated",
-      idempotencyKey: "",
-      lines: rows.map((row) => ({
-        localId: row.key,
-        debitId: row.debitAccountId || "",
-        creditId: row.creditAccountId || "",
-        amount: row.amount.toFixed(2),
-      })),
-    });
-    focusJournalCell(field, lineIndex);
-  }
-
-  async function saveComposer() {
-    if (!composer || !startPending("save")) return;
-    try {
-      const visual = composer.lines.map((line) => ({
-        debitAccountId: line.debitId || null,
-        creditAccountId: line.creditId || null,
-        amount: parseChfInput(line.amount) || 0,
-      }));
-      if (composer.mode === "create") {
-        const issues = draftIssues({
-          date: composer.date,
-          label: composer.label,
-          lines: visual.map((line) => ({
-            debitAccountId: line.debitAccountId || "",
-            creditAccountId: line.creditAccountId || "",
-            amount: line.amount,
+    const generation = ++editGenRef.current;
+    window.setTimeout(() => {
+      void (async () => {
+        if (editGenRef.current !== generation) return;
+        const current = composerRef.current;
+        if (current?.mode === "edit" && current.entryId === entry.id) {
+          focusJournalCell(field, lineIndex);
+          return;
+        }
+        if (current?.mode === "create") {
+          const issues = issuesOf(current);
+          if (draftLeaveAction(issues, true) !== "create") {
+            setComposerError(issues[0] || "Complétez le brouillon ou retirez-le.");
+            return;
+          }
+          const created = await commitDraft();
+          if (!created || editGenRef.current !== generation) return;
+        } else if (current?.mode === "edit") {
+          const result = await commitExisting();
+          if (result === "invalid" || editGenRef.current !== generation) return;
+        }
+        setComposerError(null);
+        setNotice(null);
+        setFeedback(null);
+        writeOrigin({
+          date: entry.entry_date,
+          number: String(entry.entry_number),
+          reference: entry.reference || "",
+          label: entry.description,
+          remark: entry.party_name || "",
+          previousStatus: entry.status,
+          linked: Boolean(linkedJournalEntryId(entry)),
+          rows: rows.map((row) => ({
+            debitAccountId: row.debitAccountId,
+            creditAccountId: row.creditAccountId,
+            amount: row.amount,
           })),
         });
-        if (issues.length) {
-          setComposerError(issues[0]);
-          return;
-        }
-      } else {
-        const lines = rowsToLines(visual);
-        const gap = journalImbalance(lines);
-        if (!journalLinesBalanced(lines)) {
-          setComposerError(gap === 0 ? "L’écriture doit être équilibrée avant d’être enregistrée." : `Écart : ${formatChfAmount(Math.abs(gap))}`);
-          return;
-        }
-        if (!composer.label.trim()) {
-          setComposerError("Indiquez le libellé.");
-          return;
-        }
-        const number = Number(composer.number);
-        if (!Number.isInteger(number) || number < 1) {
-          setComposerError("Le numéro d’écriture doit être un entier positif.");
-          return;
-        }
-        const period = periods.find((item) => composer.date >= item.startsOn && composer.date <= item.endsOn);
-        const taken = entries
-          .filter((item) => item.status !== "voided")
-          .map((item) => ({ id: item.id, periodId: item.period_id || null, number: item.entry_number }));
-        if (!entryNumberAllowed(number, taken, period?.id || null, composer.entryId || "")) {
-          setComposerError(ENTRY_NUMBER_TAKEN);
-          return;
-        }
-      }
-      const material = composer.mode === "edit" && origin
-        ? journalEditMaterial(origin, { date: composer.date, reference: composer.piece, rows: visual })
-        : false;
-      const result = await onAct({
-        action: "journal-save",
-        entryId: composer.entryId,
-        date: composer.date,
-        description: composer.label,
-        reference: composer.piece,
-        remark: composer.remark,
-        entryNumber: composer.mode === "edit" ? Number(composer.number) || undefined : undefined,
-        status: composer.mode === "create" ? "pending" : composer.status,
-        material,
-        idempotencyKey: composer.mode === "create" ? composer.idempotencyKey : undefined,
-        lines: rowsToLines(visual),
-      });
-      const message = readError(result);
-      if (message) {
-        setComposerError(explainJournalError(message));
-        return;
-      }
-      setComposer(null);
-      setOrigin(null);
-      setComposerError(null);
-      setNotice(composer.mode === "create" ? "Écriture enregistrée." : "Écriture mise à jour. Les soldes et les rapports suivent les écritures vérifiées.");
-    } catch (error) {
-      setComposerError(error instanceof Error ? error.message : "Action impossible");
-    } finally {
-      stopPending();
-    }
+        writeComposer({
+          mode: "edit",
+          entryId: entry.id,
+          date: entry.entry_date,
+          number: String(entry.entry_number),
+          piece: entry.reference || "",
+          label: entry.description,
+          remark: entry.party_name || "",
+          status: entry.status === "pending" ? "pending" : "validated",
+          idempotencyKey: "",
+          lines: rows.map((row) => ({
+            localId: row.key,
+            debitId: row.debitAccountId || "",
+            creditId: row.creditAccountId || "",
+            amount: row.amount.toFixed(2),
+          })),
+        });
+        focusJournalCell(field, lineIndex);
+      })();
+    }, 0);
   }
 
   async function confirmVoid() {
@@ -314,9 +535,9 @@ export default function JournalGrid({
         setNotice(message);
         return;
       }
-      if (composer?.entryId === entry.id) {
-        setComposer(null);
-        setOrigin(null);
+      if (composerRef.current?.entryId === entry.id) {
+        writeComposer(null);
+        writeOrigin(null);
       }
       setVoiding(null);
       setNotice("Écriture retirée du journal. Les soldes et les rapports ont été recalculés.");
@@ -345,7 +566,6 @@ export default function JournalGrid({
     })
     : false;
   const showInbox = status === "all" || status === "pending";
-  const saving = pending === "save";
   const voidingBusy = pending === "void";
 
   return (
@@ -432,16 +652,31 @@ export default function JournalGrid({
                     composer={composer}
                     accounts={activeAccounts}
                     error={composerError}
-                    saving={saving}
-                    locked={pending !== null}
+                    feedback={feedback?.key === "draft" ? feedback : null}
+                    locked={pending === "void"}
                     materialNote={null}
                     linkedNote={null}
                     origin={null}
                     sourceText="Saisie manuelle"
-                    onChange={(next) => { setComposer(next); setComposerError(null); }}
-                    onAddLine={() => setComposer({ ...composer, lines: [...composer.lines, blankLine()] })}
-                    onSave={() => void saveComposer()}
-                    onCancel={() => { if (pending) return; setComposer(null); setOrigin(null); setComposerError(null); }}
+                    onChange={(next) => {
+                      writeComposer(next);
+                      setComposerError(null);
+                      setFeedback((prev) => prev?.phase === "error" ? null : prev);
+                    }}
+                    onAddLine={() => {
+                      const current = composerRef.current;
+                      if (!current) return;
+                      writeComposer({ ...current, lines: [...current.lines, blankLine()] });
+                    }}
+                    onCommit={scheduleCommit}
+                    onSkipNextCommit={() => { skipCommitRef.current = true; }}
+                    onRetry={() => void commitDraft()}
+                    onDiscard={() => {
+                      writeComposer(null);
+                      writeOrigin(null);
+                      setComposerError(null);
+                      setFeedback(null);
+                    }}
                   />
                 ) : null}
                 {showInbox ? inbox.map((item) => (
@@ -455,18 +690,27 @@ export default function JournalGrid({
                         composer={composer}
                         accounts={activeAccounts}
                         error={composerError}
-                        saving={saving}
-                        locked={pending !== null}
+                        feedback={feedback?.key === entry.id ? feedback : null}
+                        locked={pending === "void"}
                         materialNote={materialNow && origin && origin.previousStatus !== "pending"
                           ? "Cette modification repasse l’écriture à vérifier."
                           : null}
-                        linkedNote={origin?.linked ? "L’extourne liée quittera le journal à l’enregistrement, pour que les soldes restent justes." : null}
+                        linkedNote={origin?.linked ? "L’extourne liée quittera le journal avec cette modification, pour que les soldes restent justes." : null}
                         origin={origin}
                         sourceText={sourceLabel(entry.source_type)}
-                        onChange={(next) => { setComposer(next); setComposerError(null); }}
-                        onAddLine={() => setComposer({ ...composer, lines: [...composer.lines, blankLine()] })}
-                        onSave={() => void saveComposer()}
-                        onCancel={() => { if (pending) return; setComposer(null); setOrigin(null); setComposerError(null); }}
+                        onChange={(next) => {
+                          writeComposer(next);
+                          setComposerError(null);
+                          setFeedback((prev) => prev?.phase === "error" ? null : prev);
+                        }}
+                        onAddLine={() => {
+                          const current = composerRef.current;
+                          if (!current) return;
+                          writeComposer({ ...current, lines: [...current.lines, blankLine()] });
+                        }}
+                        onCommit={scheduleCommit}
+                        onSkipNextCommit={() => { skipCommitRef.current = true; }}
+                        onRetry={() => void commitExisting(feedback?.field || "label", feedback?.lineId || "")}
                         onDelete={() => { setNotice(null); setVoiding(entry); }}
                       />
                     );
@@ -488,20 +732,20 @@ export default function JournalGrid({
                         <CellButton locked={Boolean(lock) || !canWrite} title={lock || "Modifier la date"} onClick={() => openEdit(entry, rows, "date", row.groupIndex)}>{showMeta ? formatSwissDate(entry.entry_date) : ""}</CellButton>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le numéro d’écriture"} onClick={() => openEdit(entry, rows, "number", row.groupIndex)}>{showMeta ? entry.entry_number : ""}</CellButton>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la pièce"} onClick={() => openEdit(entry, rows, "piece", row.groupIndex)}>{showMeta ? (entry.reference || "—") : ""}</CellButton>
-                        <td className={`truncate px-3 py-2 ${showMeta ? "font-medium" : "text-[#64748B]"}`}>
+                        <td className={`truncate px-3 py-3 ${showMeta ? "font-medium" : "text-[#64748B]"}`}>
                           {showMeta ? (
                             <button type="button" className="max-w-full truncate text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le libellé"} onClick={() => openEdit(entry, rows, "label", row.groupIndex)}>{entry.description}</button>
                           ) : "même écriture"}
                           {showMeta && rows.length > 1 ? <span className="ml-2 text-[11px] font-medium text-[#94A3B8]">{rows.length} lignes</span> : null}
                         </td>
-                        <td className="px-3 py-2"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au débit"} onClick={() => openEdit(entry, rows, "debit", row.groupIndex)}><AccountCell account={debit} /></button></td>
-                        <td className="px-3 py-2"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au crédit"} onClick={() => openEdit(entry, rows, "credit", row.groupIndex)}><AccountCell account={credit} /></button></td>
-                        <td className="px-3 py-2 text-right font-medium tabular-nums">
+                        <td className="px-3 py-3"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au débit"} onClick={() => openEdit(entry, rows, "debit", row.groupIndex)}><AccountCell account={debit} /></button></td>
+                        <td className="px-3 py-3"><button type="button" className="w-full text-left" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le compte au crédit"} onClick={() => openEdit(entry, rows, "credit", row.groupIndex)}><AccountCell account={credit} /></button></td>
+                        <td className="px-3 py-3 text-right font-medium tabular-nums">
                           <button type="button" className="w-full text-right" disabled={Boolean(lock) || !canWrite} title={lock || "Modifier le montant"} onClick={() => openEdit(entry, rows, "amount", row.groupIndex)}>{formatChfAmount(row.amount)}</button>
                           {last && rows.length > 1 ? <span className="mt-0.5 block text-[11px] font-normal text-[#64748B]">Total {formatChfAmount(total)}</span> : null}
                         </td>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la remarque"} onClick={() => openEdit(entry, rows, "remark", row.groupIndex)}>{showMeta ? entry.party_name || "" : ""}</CellButton>
-                        <td className="truncate px-2 py-2 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
+                        <td className="truncate px-2 py-3 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le statut"} onClick={() => openEdit(entry, rows, "status", row.groupIndex)}>{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</CellButton>
                         <td className="px-1 py-1 text-center">
                           {showMeta && canWrite ? (
@@ -575,7 +819,7 @@ function EditingRows({
   composer,
   accounts,
   error,
-  saving,
+  feedback,
   locked,
   materialNote,
   linkedNote,
@@ -583,14 +827,16 @@ function EditingRows({
   sourceText,
   onChange,
   onAddLine,
-  onSave,
-  onCancel,
+  onCommit,
+  onSkipNextCommit,
+  onRetry,
+  onDiscard,
   onDelete,
 }: {
   composer: Composer;
   accounts: Account[];
   error: string | null;
-  saving: boolean;
+  feedback: CellFeedback | null;
   locked: boolean;
   materialNote: string | null;
   linkedNote: string | null;
@@ -598,8 +844,10 @@ function EditingRows({
   sourceText: string;
   onChange: (composer: Composer) => void;
   onAddLine: () => void;
-  onSave: () => void;
-  onCancel: () => void;
+  onCommit: (field: string, lineId: string) => void;
+  onSkipNextCommit: () => void;
+  onRetry: () => void;
+  onDiscard?: () => void;
   onDelete?: () => void;
 }) {
   const baseline = useRef<{ field: string; lineId: string; value: string } | null>(null);
@@ -639,32 +887,23 @@ function EditingRows({
     else if (field === "debit") setLine(lineId, { debitId: value });
     else if (field === "credit") setLine(lineId, { creditId: value });
   }
-  function draftUntouched() {
-    return composer.mode === "create"
-      && !composer.piece.trim()
-      && !composer.label.trim()
-      && !composer.remark.trim()
-      && composer.lines.every((line) => !line.debitId && !line.creditId && !line.amount.trim());
+  function cellPhase(field: string, lineId: string): CellFeedback["phase"] | null {
+    if (!feedback || feedback.field !== field || feedback.lineId !== lineId) return null;
+    return feedback.phase;
   }
   function keyDown(event: KeyboardEvent<HTMLElement>, field: string, lineId = "") {
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
       event.preventDefault();
-      onSave();
+      event.currentTarget.blur();
       return;
     }
     if (event.key === "Escape") {
       event.preventDefault();
+      onSkipNextCommit();
       const snap = baseline.current;
       const line = composer.lines.find((item) => item.localId === (snap?.lineId || lineId));
       const now = line ? fieldValue(field, line) : "";
-      if (snap && snap.field === field && snap.value !== now) {
-        restore(snap.field, snap.lineId, snap.value);
-        return;
-      }
-      if (draftUntouched()) {
-        onCancel();
-        return;
-      }
+      if (snap && snap.field === field && snap.value !== now) restore(snap.field, snap.lineId, snap.value);
       event.currentTarget.blur();
       return;
     }
@@ -680,8 +919,9 @@ function EditingRows({
         return;
       }
     }
-    const nextRow = row?.nextElementSibling;
-    nextRow?.querySelector<HTMLElement>("[data-field]")?.focus();
+    const nextField = row?.nextElementSibling?.querySelector<HTMLElement>("[data-field]");
+    if (nextField) nextField.focus();
+    else event.currentTarget.blur();
   }
   const gap = journalImbalance(rowsToLines(composer.lines.map((line) => ({
     debitAccountId: line.debitId || null,
@@ -694,49 +934,66 @@ function EditingRows({
         const first = index === 0;
         return (
           <tr key={line.localId} id={first ? "journal-edit" : undefined} data-journal-edit="" className="border-b border-[#F4F7FB] bg-white">
-            <td className="px-1 py-1">{first ? <input data-field="date" className={mark(origin !== null && composer.date !== origin.date)} type="date" value={composer.date} disabled={locked} onFocus={() => arm("date", line.localId, composer.date)} onChange={(event) => replace({ ...composer, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date", line.localId)} /> : null}</td>
-            <td className="px-1 py-1">{first && composer.mode === "edit" ? <input data-field="number" className={`${mark(origin !== null && composer.number !== origin.number, error === ENTRY_NUMBER_TAKEN)} text-center tabular-nums`} value={composer.number} disabled={locked} onFocus={() => arm("number", line.localId, composer.number)} onChange={(event) => replace({ ...composer, number: event.target.value })} onKeyDown={(event) => keyDown(event, "number", line.localId)} /> : first ? <span className="px-1 text-xs text-[#94A3B8]">Auto</span> : null}</td>
-            <td className="px-1 py-1">{first ? <input data-field="piece" className={mark(origin !== null && composer.piece !== origin.reference)} value={composer.piece} placeholder="Pièce" disabled={locked} onFocus={() => arm("piece", line.localId, composer.piece)} onChange={(event) => replace({ ...composer, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece", line.localId)} /> : null}</td>
-            <td className="px-1 py-1">{first ? <input data-field="label" className={mark(origin !== null && composer.label !== origin.label)} value={composer.label} placeholder="Libellé" disabled={locked} onFocus={() => arm("label", line.localId, composer.label)} onChange={(event) => replace({ ...composer, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label", line.localId)} /> : <span className="px-2 text-xs text-[#94A3B8]">même écriture</span>}</td>
-            <td className="px-1 py-1"><AccountPicker field="debit" dense dirty={origin !== null && (origin.rows[index]?.debitAccountId || "") !== line.debitId} accounts={accounts} value={line.debitId} disabled={locked} onArm={() => arm("debit", line.localId, line.debitId)} onChange={(debitId) => setLine(line.localId, { debitId })} onKeyDown={(event) => keyDown(event, "debit", line.localId)} /></td>
-            <td className="px-1 py-1"><AccountPicker field="credit" dense dirty={origin !== null && (origin.rows[index]?.creditAccountId || "") !== line.creditId} accounts={accounts} value={line.creditId} disabled={locked} onArm={() => arm("credit", line.localId, line.creditId)} onChange={(creditId) => setLine(line.localId, { creditId })} onKeyDown={(event) => keyDown(event, "credit", line.localId)} /></td>
-            <td className="px-1 py-1"><input data-field="amount" className={`${mark(Boolean(origin?.rows[index] && (parseChfInput(line.amount) || 0) !== origin.rows[index].amount))} text-right tabular-nums`} value={line.amount} placeholder="0.00" inputMode="decimal" disabled={locked} aria-label={`Montant ligne ${index + 1}`} onFocus={() => arm("amount", line.localId, line.amount)} onChange={(event) => setLine(line.localId, { amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount", line.localId)} /></td>
-            <td className="px-1 py-1">{first ? <input data-field="remark" className={mark(origin !== null && composer.remark !== origin.remark)} value={composer.remark} placeholder="Remarque" disabled={locked} onFocus={() => arm("remark", line.localId, composer.remark)} onChange={(event) => replace({ ...composer, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark", line.localId)} /> : null}</td>
-            <td className="truncate px-2 text-xs text-[#94A3B8]" title={first ? sourceText : undefined}>{first ? sourceText : ""}</td>
-            <td className="px-1 py-1">{first && composer.mode === "edit" ? (
-              <select data-field="status" className={mark(origin !== null && (origin.previousStatus === "pending" ? "pending" : "validated") !== (composer.status === "validated" ? "validated" : "pending"))} value={composer.status === "validated" ? "validated" : "pending"} disabled={locked} onFocus={() => arm("status", line.localId, composer.status === "validated" ? "validated" : "pending")} onChange={(event) => replace({ ...composer, status: event.target.value })} onKeyDown={(event) => keyDown(event, "status", line.localId)}>
+            <td className="relative px-1 py-1">{first ? <input data-field="date" className={mark(origin !== null && composer.date !== origin.date, cellPhase("date", line.localId) === "error")} type="date" value={composer.date} disabled={locked} onFocus={() => arm("date", line.localId, composer.date)} onBlur={() => onCommit("date", line.localId)} onChange={(event) => replace({ ...composer, date: event.target.value })} onKeyDown={(event) => keyDown(event, "date", line.localId)} /> : null}{first ? <CellMark phase={cellPhase("date", line.localId)} /> : null}</td>
+            <td className="relative px-1 py-1">{first && composer.mode === "edit" ? <input data-field="number" className={`${mark(origin !== null && composer.number !== origin.number, error === ENTRY_NUMBER_TAKEN || cellPhase("number", line.localId) === "error")} text-center tabular-nums`} value={composer.number} disabled={locked} onFocus={() => arm("number", line.localId, composer.number)} onBlur={() => onCommit("number", line.localId)} onChange={(event) => replace({ ...composer, number: event.target.value })} onKeyDown={(event) => keyDown(event, "number", line.localId)} /> : first ? <span className="px-1 text-xs text-[#94A3B8]">Auto</span> : null}{first && composer.mode === "edit" ? <CellMark phase={cellPhase("number", line.localId)} /> : null}</td>
+            <td className="relative px-1 py-1">{first ? <input data-field="piece" className={mark(origin !== null && composer.piece !== origin.reference, cellPhase("piece", line.localId) === "error")} value={composer.piece} placeholder="Pièce" disabled={locked} onFocus={() => arm("piece", line.localId, composer.piece)} onBlur={() => onCommit("piece", line.localId)} onChange={(event) => replace({ ...composer, piece: event.target.value })} onKeyDown={(event) => keyDown(event, "piece", line.localId)} /> : null}{first ? <CellMark phase={cellPhase("piece", line.localId)} /> : null}</td>
+            <td className="relative px-1 py-1">{first ? <input data-field="label" className={mark(origin !== null && composer.label !== origin.label, cellPhase("label", line.localId) === "error")} value={composer.label} placeholder="Libellé" disabled={locked} onFocus={() => arm("label", line.localId, composer.label)} onBlur={() => onCommit("label", line.localId)} onChange={(event) => replace({ ...composer, label: event.target.value })} onKeyDown={(event) => keyDown(event, "label", line.localId)} /> : <span className="px-2 text-xs text-[#94A3B8]">même écriture</span>}{first ? <CellMark phase={cellPhase("label", line.localId)} /> : null}</td>
+            <td className="relative px-1 py-1"><AccountPicker field="debit" dense dirty={origin !== null && (origin.rows[index]?.debitAccountId || "") !== line.debitId} invalid={cellPhase("debit", line.localId) === "error"} accounts={accounts} value={line.debitId} disabled={locked} onArm={() => arm("debit", line.localId, line.debitId)} onBlur={() => onCommit("debit", line.localId)} onChange={(debitId) => setLine(line.localId, { debitId })} onKeyDown={(event) => keyDown(event, "debit", line.localId)} /><CellMark phase={cellPhase("debit", line.localId)} /></td>
+            <td className="relative px-1 py-1"><AccountPicker field="credit" dense dirty={origin !== null && (origin.rows[index]?.creditAccountId || "") !== line.creditId} invalid={cellPhase("credit", line.localId) === "error"} accounts={accounts} value={line.creditId} disabled={locked} onArm={() => arm("credit", line.localId, line.creditId)} onBlur={() => onCommit("credit", line.localId)} onChange={(creditId) => setLine(line.localId, { creditId })} onKeyDown={(event) => keyDown(event, "credit", line.localId)} /><CellMark phase={cellPhase("credit", line.localId)} /></td>
+            <td className="relative px-1 py-1"><input data-field="amount" className={`${mark(Boolean(origin?.rows[index] && (parseChfInput(line.amount) || 0) !== origin.rows[index].amount), cellPhase("amount", line.localId) === "error")} text-right tabular-nums`} value={line.amount} placeholder="0.00" inputMode="decimal" disabled={locked} aria-label={`Montant ligne ${index + 1}`} onFocus={() => arm("amount", line.localId, line.amount)} onBlur={() => onCommit("amount", line.localId)} onChange={(event) => setLine(line.localId, { amount: event.target.value })} onKeyDown={(event) => keyDown(event, "amount", line.localId)} /><CellMark phase={cellPhase("amount", line.localId)} /></td>
+            <td className="relative px-1 py-1">{first ? <input data-field="remark" className={mark(origin !== null && composer.remark !== origin.remark, cellPhase("remark", line.localId) === "error")} value={composer.remark} placeholder="Remarque" disabled={locked} onFocus={() => arm("remark", line.localId, composer.remark)} onBlur={() => onCommit("remark", line.localId)} onChange={(event) => replace({ ...composer, remark: event.target.value })} onKeyDown={(event) => keyDown(event, "remark", line.localId)} /> : null}{first ? <CellMark phase={cellPhase("remark", line.localId)} /> : null}</td>
+            <td className="truncate px-2 py-1 text-xs text-[#94A3B8]" title={first ? sourceText : undefined}>{first ? sourceText : ""}</td>
+            <td className="relative px-1 py-1">{first && composer.mode === "edit" ? (
+              <select data-field="status" className={mark(origin !== null && (origin.previousStatus === "pending" ? "pending" : "validated") !== (composer.status === "validated" ? "validated" : "pending"), cellPhase("status", line.localId) === "error")} value={composer.status === "validated" ? "validated" : "pending"} disabled={locked} onFocus={() => arm("status", line.localId, composer.status === "validated" ? "validated" : "pending")} onBlur={() => onCommit("status", line.localId)} onChange={(event) => replace({ ...composer, status: event.target.value })} onKeyDown={(event) => keyDown(event, "status", line.localId)}>
                 <option value="pending">À vérifier</option>
                 <option value="validated">Vérifiée</option>
               </select>
-            ) : first ? <span className="px-1 text-xs text-[#64748B]">Brouillon</span> : null}</td>
-            <td className="px-1 text-center">
+            ) : first ? <span className="px-1 text-xs text-[#64748B]">Brouillon</span> : null}{first && composer.mode === "edit" ? <CellMark phase={cellPhase("status", line.localId)} /> : null}</td>
+            <td className="px-1 py-1 text-center">
               {first && onDelete ? (
-                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded text-[#94A3B8] hover:bg-rose-50 hover:text-rose-700" title="Supprimer l’écriture" aria-label="Supprimer l’écriture" onClick={onDelete}><TrashIcon /></button>
+                <button type="button" className="inline-flex h-8 w-8 items-center justify-center rounded text-[#94A3B8] hover:bg-rose-50 hover:text-rose-700" title="Supprimer l’écriture" aria-label="Supprimer l’écriture" onClick={onDelete}><TrashIcon /></button>
               ) : null}
             </td>
           </tr>
         );
       })}
-      <tr className="border-b border-[#E2E8F0] bg-white">
+      <tr
+        data-journal-edit=""
+        className="border-b border-[#E2E8F0] bg-white"
+        onBlur={(event) => {
+          const next = event.relatedTarget;
+          if (next instanceof Element && next.closest("[data-journal-edit]")) return;
+          const lineId = composer.lines[0]?.localId || "";
+          onCommit(composer.mode === "create" ? "remark" : "status", lineId);
+        }}
+      >
         <td colSpan={11} className="px-3 py-1.5">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <button type="button" className="text-xs font-medium text-[#1A23FF] disabled:opacity-40" disabled={locked} onClick={onAddLine}>Ajouter une ligne</button>
+            {composer.mode === "create" && onDiscard ? (
+              <button type="button" className="text-xs font-medium text-[#64748B] hover:text-[#0F172A]" onClick={onDiscard}>Retirer le brouillon</button>
+            ) : null}
             {linkedNote ? <span className="text-xs text-[#64748B]">{linkedNote}</span> : null}
             {materialNote ? <span className="text-xs text-[#64748B]">{materialNote}</span> : null}
             {composer.lines.length > 1 && gap !== 0 ? <span className="text-xs text-rose-700">Écart : {formatChfAmount(Math.abs(gap))}</span> : null}
+            {feedback?.phase === "saving" ? <span className="text-xs text-[#64748B]">Enregistrement…</span> : null}
+            {feedback?.phase === "saved" ? <span className="text-xs text-emerald-700">Enregistré</span> : null}
             {error ? <span className="text-xs text-rose-700">{error}</span> : null}
-            <span className="ml-auto flex items-center gap-1">
-              <button type="button" className="h-7 rounded px-2 text-xs font-medium text-[#475569] hover:bg-[#F1F5F9]" disabled={locked} onClick={onCancel}>Annuler</button>
-              <button type="button" className="inline-flex h-7 items-center gap-1 rounded bg-[#1A23FF] px-2.5 text-xs font-semibold text-white disabled:opacity-60" disabled={locked} onClick={onSave}>
-                {saving ? <ButtonSpinner className="h-3 w-3" /> : null}
-                {saving ? "Enregistrement…" : "Enregistrer"}
-              </button>
-            </span>
+            {feedback?.phase === "error" ? (
+              <button type="button" className="text-xs font-medium text-[#1A23FF]" onClick={onRetry}>Réessayer</button>
+            ) : null}
           </div>
         </td>
       </tr>
     </>
   );
+}
+
+function CellMark({ phase }: { phase: CellFeedback["phase"] | null }) {
+  if (!phase) return null;
+  const label = phase === "saving" ? "Enregistrement" : phase === "saved" ? "Enregistré" : "Erreur";
+  const color = phase === "saving" ? "animate-pulse bg-[#94A3B8]" : phase === "saved" ? "bg-emerald-500" : "bg-rose-500";
+  return <span className={`pointer-events-none absolute right-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full ${color}`} aria-label={label} />;
 }
 
 function AccountPicker({
@@ -746,7 +1003,9 @@ function AccountPicker({
   disabled,
   dense,
   dirty,
+  invalid,
   onArm,
+  onBlur,
   onChange,
   onKeyDown,
 }: {
@@ -756,7 +1015,9 @@ function AccountPicker({
   disabled?: boolean;
   dense?: boolean;
   dirty?: boolean;
+  invalid?: boolean;
   onArm?: () => void;
+  onBlur?: () => void;
   onChange: (id: string) => void;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 }) {
@@ -768,7 +1029,7 @@ function AccountPicker({
     <div className="relative">
       <input
         data-field={field}
-        className={`${dense ? gridInput : editor} font-mono ${dirty ? "bg-[#FFF6D8]" : ""}`}
+        className={`${dense ? gridInput : editor} font-mono ${invalid ? "bg-rose-50 ring-1 ring-inset ring-rose-400" : dirty ? "bg-[#FFF6D8]" : ""}`}
         value={open ? query : (selected ? `${selected.number} ${selected.name}` : "")}
         placeholder="N° ou nom"
         disabled={disabled}
@@ -776,7 +1037,10 @@ function AccountPicker({
         aria-label={field === "debit" ? "Compte au débit" : "Compte au crédit"}
         onFocus={() => { onArm?.(); setOpen(true); setQuery(""); }}
         onChange={(event) => setQuery(event.target.value)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={() => {
+          onBlur?.();
+          setTimeout(() => setOpen(false), 150);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter" && open && matches[0] && query.trim()) {
             event.preventDefault();
@@ -815,7 +1079,7 @@ function AccountCell({ account }: { account?: Account }) {
 
 function CellButton({ children, locked, title, onClick }: { children: ReactNode; locked?: boolean; title: string; onClick: () => void }) {
   return (
-    <td className="px-2 py-2">
+    <td className="px-2 py-3">
       <button type="button" className="w-full truncate text-left disabled:cursor-default" disabled={locked} title={title} onClick={onClick}>{children}</button>
     </td>
   );
@@ -922,7 +1186,7 @@ function InboxRow({
   );
 }
 
-const gridInput = "h-7 w-full min-w-0 rounded border border-transparent bg-white/80 px-1 text-[13px] text-[#0F172A] outline-none focus:border-[#94A3B8] focus:bg-white";
+const gridInput = "h-9 w-full min-w-0 rounded border border-transparent bg-white/80 px-1 text-[13px] text-[#0F172A] outline-none focus:border-[#94A3B8] focus:bg-white";
 const filter = "h-9 w-full rounded-md border border-[#D6DEE8] bg-white px-2.5 text-sm text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/15";
 const editor = "h-10 w-full rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm text-[#0F172A] outline-none transition focus:border-[#1A23FF] focus:ring-2 focus:ring-[#1A23FF]/15 disabled:bg-[#F8FAFC]";
 const primaryBtn = "inline-flex h-10 min-w-[9.5rem] items-center justify-center gap-2 rounded-lg bg-[#1A23FF] px-4 text-sm font-semibold text-white transition active:scale-[0.98] active:bg-[#121AD6] disabled:cursor-wait disabled:opacity-70 data-[busy=true]:cursor-wait data-[busy=true]:opacity-70";

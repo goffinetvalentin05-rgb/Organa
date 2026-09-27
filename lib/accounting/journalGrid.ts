@@ -131,6 +131,37 @@ export function journalEditMaterial(
   });
 }
 
+export function journalComposerChanged(
+  previous: {
+    date: string;
+    number: string;
+    reference: string;
+    label: string;
+    remark: string;
+    status: string;
+    rows: Array<{ debitAccountId: string | null; creditAccountId: string | null; amount: number }>;
+  },
+  next: {
+    date: string;
+    number: string;
+    reference: string;
+    label: string;
+    remark: string;
+    status: string;
+    rows: Array<{ debitAccountId: string | null; creditAccountId: string | null; amount: number }>;
+  }
+): boolean {
+  if (
+    previous.date !== next.date
+    || previous.number !== next.number
+    || previous.reference !== next.reference
+    || previous.label !== next.label
+    || previous.remark !== next.remark
+    || previous.status !== next.status
+  ) return true;
+  return journalEditMaterial(previous, next);
+}
+
 const MATERIAL = new Set(["date", "piece", "debit", "credit", "amount", "lines"]);
 
 export function editIsMaterial(fields: string[]): boolean {
@@ -175,9 +206,54 @@ export type DraftCheck = {
   lines: Array<{ debitAccountId: string; creditAccountId: string; amount: number }>;
 };
 
-/** Une nouvelle écriture reste un brouillon d’écran tant qu’elle n’est pas explicitement enregistrée. */
+/** Un seul brouillon à la fois. */
 export function nextDraftAction(alreadyOpen: boolean): "create" | "focus" {
   return alreadyOpen ? "focus" : "create";
+}
+
+export type CellCommit =
+  | { action: "ignore" }
+  | { action: "save" }
+  | { action: "reject"; error: string };
+
+/** Une cellule modifiée n’est envoyée que si toute l’écriture reste cohérente. */
+export function existingCellCommit(input: {
+  changed: boolean;
+  label: string;
+  number: number;
+  numberAllowed: boolean;
+  balanced: boolean;
+  gapLabel: string | null;
+}): CellCommit {
+  if (!input.changed) return { action: "ignore" };
+  if (!input.label.trim()) return { action: "reject", error: "Indiquez le libellé." };
+  if (!Number.isInteger(input.number) || input.number < 1) {
+    return { action: "reject", error: "Le numéro d’écriture doit être un entier positif." };
+  }
+  if (!input.numberAllowed) return { action: "reject", error: ENTRY_NUMBER_TAKEN };
+  if (!input.balanced) {
+    return {
+      action: "reject",
+      error: input.gapLabel || "L’écriture doit être équilibrée avant d’être enregistrée.",
+    };
+  }
+  return { action: "save" };
+}
+
+/** Le brouillon n’est créé qu’une fois complet, au moment où l’on quitte la ligne. */
+export function draftLeaveAction(issues: string[], focusLeftDraft: boolean): "create" | "keep" {
+  if (!focusLeftDraft || issues.length > 0) return "keep";
+  return "create";
+}
+
+/** Les enregistrements partent dans l’ordre des cellules, jamais en parallèle. */
+export function createSaveQueue() {
+  let chain: Promise<unknown> = Promise.resolve();
+  return function enqueue<T>(task: () => Promise<T>): Promise<T> {
+    const run = chain.then(task, task);
+    chain = run.then(() => undefined, () => undefined);
+    return run;
+  };
 }
 
 export function draftIssues(draft: DraftCheck): string[] {

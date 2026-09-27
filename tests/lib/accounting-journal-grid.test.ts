@@ -12,6 +12,10 @@ import {
   entryNumberAllowed,
   explainJournalError,
   draftIssues,
+  draftLeaveAction,
+  existingCellCommit,
+  createSaveQueue,
+  journalComposerChanged,
   journalImbalance,
   nextDraftAction,
   journalLinesBalanced,
@@ -168,6 +172,38 @@ describe("grille du journal", () => {
       { ...bank, entryStatus: "reversed" },
       { ...bank, entryId: "r", entryStatus: "validated", debit: 0, credit: 1000 },
     ]).bank).toBe(0);
+  });
+
+  it("enregistre une cellule seulement si l’écriture reste cohérente", () => {
+    const base = { changed: true, label: "Cotisation", number: 7, numberAllowed: true, balanced: true, gapLabel: null };
+    expect(existingCellCommit({ ...base, changed: false })).toEqual({ action: "ignore" });
+    expect(existingCellCommit(base)).toEqual({ action: "save" });
+    expect(existingCellCommit({ ...base, numberAllowed: false }).action).toBe("reject");
+    expect(existingCellCommit({ ...base, balanced: false, gapLabel: "Écart" })).toMatchObject({ action: "reject" });
+    const row = { debitAccountId: "1020", creditAccountId: "3000", amount: 10 };
+    const snap = { date: "2026-09-24", number: "7", reference: "", label: "Cotisation", remark: "", status: "validated", rows: [row] };
+    expect(journalComposerChanged(snap, { ...snap, label: "Cotisation 25/26" })).toBe(true);
+    expect(journalComposerChanged(snap, { ...snap, number: "8" })).toBe(true);
+    expect(journalComposerChanged(snap, snap)).toBe(false);
+    expect(draftLeaveAction(["Indiquez le libellé."], true)).toBe("keep");
+    expect(draftLeaveAction([], false)).toBe("keep");
+    expect(draftLeaveAction([], true)).toBe("create");
+  });
+
+  it("enchaîne les enregistrements de cellules sans les croiser", async () => {
+    const enqueue = createSaveQueue();
+    const order: string[] = [];
+    const first = enqueue(async () => {
+      order.push("start-1");
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      order.push("end-1");
+    });
+    const second = enqueue(async () => {
+      order.push("start-2");
+      order.push("end-2");
+    });
+    await Promise.all([first, second]);
+    expect(order).toEqual(["start-1", "end-1", "start-2", "end-2"]);
   });
 
   it("calcule l’écart d’une écriture déséquilibrée", () => {
