@@ -83,10 +83,10 @@ function Footer({ generatedOn }: { generatedOn: string }) {
   );
 }
 
-function AmountRows({ group }: { group: AmountGroup }) {
+function AmountRows({ group, showTitle = true, showSubtotal = true }: { group: AmountGroup; showTitle?: boolean; showSubtotal?: boolean }) {
   return (
     <View>
-      <Text style={styles.group}>{group.title}</Text>
+      {showTitle ? <Text style={styles.group}>{group.title}</Text> : null}
       {group.lines.length === 0 ? <Text style={styles.empty}>Aucun mouvement</Text> : null}
       {group.lines.map((item) => (
         <View key={`${group.title}-${item.number}`} style={styles.row} wrap={false}>
@@ -95,10 +95,12 @@ function AmountRows({ group }: { group: AmountGroup }) {
           <Text style={styles.amount}>{money(item.amount)}</Text>
         </View>
       ))}
-      <View style={styles.subtotal} wrap={false}>
-        <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total {group.title.toLowerCase()}</Text>
-        <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(group.total)}</Text>
-      </View>
+      {showSubtotal ? (
+        <View style={styles.subtotal} wrap={false}>
+          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total {group.title.toLowerCase()}</Text>
+          <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(group.total)}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -190,21 +192,25 @@ function IncomeDocument({ report, club, generatedOn }: Shared & { report: Income
             "Devise CHF",
           ]}
         />
-        <Text style={styles.section}>Charges</Text>
-        {report.charges.length === 0 ? <Text style={styles.empty}>Aucun mouvement</Text> : report.charges.map((group) => <AmountRows key={group.title} group={group} />)}
-        <View style={styles.subtotal}>
-          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total charges</Text>
-          <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(report.chargeTotal)}</Text>
-        </View>
         <Text style={styles.section}>Produits</Text>
-        {report.products.length === 0 ? <Text style={styles.empty}>Aucun mouvement</Text> : report.products.map((group) => <AmountRows key={group.title} group={group} />)}
+        {report.products.length === 0 ? <Text style={styles.empty}>Aucun produit sur cette période.</Text> : report.products.map((group) => (
+          <AmountRows key={group.title} group={group} showTitle={group.title !== "Produits"} showSubtotal={report.products.length > 1} />
+        ))}
         <View style={styles.subtotal}>
-          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total produits</Text>
+          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total des produits</Text>
           <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(report.productTotal)}</Text>
         </View>
+        <Text style={styles.section}>Charges</Text>
+        {report.charges.length === 0 ? <Text style={styles.empty}>Aucune charge sur cette période.</Text> : report.charges.map((group) => (
+          <AmountRows key={group.title} group={group} showTitle={group.title !== "Charges"} showSubtotal={report.charges.length > 1} />
+        ))}
+        <View style={styles.subtotal}>
+          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total des charges</Text>
+          <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(report.chargeTotal)}</Text>
+        </View>
         <View style={styles.totalBar}>
-          <Text style={styles.totalText}>Résultat de l'exercice</Text>
-          <Text style={styles.totalText}>{formatChfAmount(report.result)}</Text>
+          <Text style={styles.totalText}>{report.outcome.label}</Text>
+          <Text style={styles.totalText}>{formatChfAmount(report.outcome.amount)}</Text>
         </View>
         <Footer generatedOn={generatedOn} />
       </Page>
@@ -248,7 +254,7 @@ function JournalDocument({ report, club, generatedOn }: Shared & { report: Journ
             "Devise CHF",
           ]}
         />
-        <Text style={styles.scope}>{report.scope}</Text>
+        <Text style={styles.scope}>{report.scope} {report.lineCount} ligne{report.lineCount > 1 ? "s" : ""}.</Text>
         <View style={styles.tableHead} fixed>
           {heads.map(([key, label]) => <Text key={key} style={[styles.headCell, { width: journalWidths[key] }]}>{label}</Text>)}
         </View>

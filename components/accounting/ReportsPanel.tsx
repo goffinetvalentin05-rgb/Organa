@@ -51,44 +51,57 @@ export default function ReportsPanel({
   return (
     <div className="space-y-4">
       {coverageNote ? <p className="text-sm text-[#475569]">{coverageNote}</p> : null}
-      <div className="flex flex-wrap items-center gap-2">
+      <nav className="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-xl border border-[#D6DEE8] bg-white p-1" aria-label="Rapports">
         {(["result", "balance", "journal", "ledger"] as const).map((item) => (
-          <button key={item} type="button" className={tab === item ? active : quiet} onClick={() => setTab(item)}>
+          <button
+            key={item}
+            type="button"
+            className={`rounded-lg px-3 py-1.5 text-sm ${tab === item ? "bg-[#0F172A] font-semibold text-white" : "text-[#475569] hover:bg-[#F4F7FB]"}`}
+            onClick={() => setTab(item)}
+          >
             {TAB_LABEL[item]}
           </button>
         ))}
-        {periods.length > 0 ? (
-          <select className="rounded-full border border-[#E2E8F0] bg-white px-3 py-1.5 text-sm" value={periodId} onChange={(event) => setPeriodId(event.target.value)} aria-label="Exercice">
-            {periods.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
-        ) : null}
+      </nav>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-end gap-4">
+          {periods.length > 0 ? (
+            <label className="block text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+              Exercice
+              <select className="mt-1.5 block h-9 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+                {periods.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+              </select>
+            </label>
+          ) : null}
+          {tab === "ledger" ? (
+            <label className="block text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+              Compte
+              <select className="mt-1.5 block h-9 min-w-56 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={accountId} onChange={(event) => setAccountId(event.target.value)}>
+                {accounts.map((item) => <option key={item.id} value={item.id}>{item.number} {item.name}</option>)}
+              </select>
+            </label>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-2">
+          {pdfHref && (tab !== "ledger" || accountId) ? (
+            <a className="inline-flex h-9 items-center rounded-lg bg-[#1A23FF] px-3 text-sm font-semibold text-white" href={pdfHref}>PDF</a>
+          ) : (
+            <span className="inline-flex h-9 items-center rounded-lg bg-[#E2E8F0] px-3 text-sm text-[#64748B]">Choisissez un compte</span>
+          )}
+          {tab === "journal" && journal ? (
+            <button type="button" className="inline-flex h-9 items-center rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-medium text-[#0F172A]" onClick={() => downloadCsv(journal)}>CSV / Excel</button>
+          ) : null}
+        </div>
       </div>
       {tab === "result" && income ? <IncomeView report={income} /> : null}
       {tab === "balance" && balance ? <BalanceView report={balance} /> : null}
-      {tab === "journal" && journal ? (
-        <GlassCard padding="sm">
-          <h2 className="font-semibold">Journal</h2>
-          <p className="mt-1 text-sm text-[#64748B]">{journal.scope}</p>
-          <p className="mt-1 text-sm text-[#334155]">{journal.rows.length} ligne{journal.rows.length > 1 ? "s" : ""} sur la période.</p>
-        </GlassCard>
-      ) : null}
+      {tab === "journal" && journal ? <JournalView report={journal} /> : null}
       {tab === "ledger" ? (
         <LedgerView
-          accounts={accounts}
-          accountId={accountId}
-          setAccountId={setAccountId}
           ledger={ledger && "movements" in ledger ? ledger : null}
           error={ledger && "error" in ledger ? ledger.error : null}
         />
       ) : null}
-      <div className="flex gap-3">
-        {pdfHref && (tab !== "ledger" || accountId) ? (
-          <a className="rounded-full bg-[#1A23FF] px-4 py-2 text-sm font-semibold text-white" href={pdfHref}>PDF</a>
-        ) : (
-          <span className="rounded-full bg-[#E2E8F0] px-4 py-2 text-sm text-[#64748B]">Choisissez un compte</span>
-        )}
-        <button type="button" className="rounded-full bg-[#F1F5F9] px-4 py-2 text-sm" onClick={() => journal && downloadCsv(journal)}>CSV / Excel</button>
-      </div>
     </div>
   );
 }
@@ -105,9 +118,45 @@ function IncomeView({ report }: { report: ReturnType<typeof buildIncomeStatement
     <GlassCard padding="sm">
       <h2 className="text-lg font-semibold text-[#0F172A]">Compte de résultat</h2>
       <p className="mt-1 text-sm text-[#64748B]">Du {formatSwissDate(report.from)} au {formatSwissDate(report.to)}</p>
-      <GroupBlock title="Charges" groups={report.charges} totalLabel="Total charges" total={report.chargeTotal} />
-      <GroupBlock title="Produits" groups={report.products} totalLabel="Total produits" total={report.productTotal} />
-      <p className="mt-4 text-right text-base font-semibold">Résultat de l’exercice {formatChfAmount(report.result)}</p>
+      <GroupBlock title="Produits" groups={report.products} totalLabel="Total des produits" total={report.productTotal} empty="Aucun produit sur cette période." />
+      <GroupBlock title="Charges" groups={report.charges} totalLabel="Total des charges" total={report.chargeTotal} empty="Aucune charge sur cette période." />
+      <p className="mt-4 text-right text-base font-semibold">{report.outcome.label} {formatChfAmount(report.outcome.amount)}</p>
+    </GlassCard>
+  );
+}
+
+function JournalView({ report }: { report: ReturnType<typeof buildJournalReport> }) {
+  return (
+    <GlassCard padding="sm">
+      <h2 className="font-semibold">Journal</h2>
+      <p className="mt-1 text-sm text-[#64748B]">{report.scope}</p>
+      <p className="mt-1 text-sm text-[#334155]">{report.lineCount} ligne{report.lineCount > 1 ? "s" : ""}.</p>
+      <table className="mt-3 w-full text-sm">
+        <thead className="text-xs uppercase text-[#64748B]">
+          <tr>
+            <th className="py-1 text-left">Date</th>
+            <th className="text-left">N°</th>
+            <th className="text-left">Libellé</th>
+            <th className="text-left">Débit</th>
+            <th className="text-left">Crédit</th>
+            <th className="text-right">Montant</th>
+            <th className="text-left">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {report.rows.map((row) => (
+            <tr key={`${row.entryId}-${row.lineIndex}`} className="border-t border-[#F1F5F9]">
+              <td className="py-1.5">{formatSwissDate(row.date)}</td>
+              <td className="tabular-nums">{row.number}</td>
+              <td>{row.label}</td>
+              <td>{row.debit}</td>
+              <td>{row.credit}</td>
+              <td className="text-right tabular-nums">{formatChfAmount(row.amount)}</td>
+              <td>{row.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </GlassCard>
   );
 }
@@ -139,25 +188,29 @@ function GroupBlock({
   groups,
   totalLabel,
   total,
+  empty,
 }: {
   title: string;
   groups: ReturnType<typeof buildIncomeStatement>["charges"];
   totalLabel: string;
   total: number;
+  empty: string;
 }) {
   return (
     <div className="mt-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">{title}</p>
-      {groups.length === 0 ? <p className="py-1 text-sm text-[#94A3B8]">Aucun mouvement validé.</p> : groups.map((group) => <GroupTable key={group.title} group={group} />)}
+      {groups.length === 0 ? <p className="py-1 text-sm text-[#94A3B8]">{empty}</p> : groups.map((group) => (
+        <GroupTable key={group.title} group={group} hideTitle={group.title === title} hideSubtotal={groups.length === 1} />
+      ))}
       <p className="mt-2 text-right text-sm font-medium">{totalLabel} {formatChfAmount(total)}</p>
     </div>
   );
 }
 
-function GroupTable({ group }: { group: { title: string; lines: Array<{ number: string; name: string; amount: number }>; total: number } }) {
+function GroupTable({ group, hideTitle = false, hideSubtotal = false }: { group: { title: string; lines: Array<{ number: string; name: string; amount: number }>; total: number }; hideTitle?: boolean; hideSubtotal?: boolean }) {
   return (
     <div className="mt-3">
-      <p className="text-xs font-semibold text-[#334155]">{group.title}</p>
+      {hideTitle ? null : <p className="text-xs font-semibold text-[#334155]">{group.title}</p>}
       <table className="mt-1 w-full text-sm">
         <tbody>
           {group.lines.length === 0 ? <tr><td className="py-1 text-[#94A3B8]">Aucun mouvement validé.</td></tr> : null}
@@ -168,11 +221,13 @@ function GroupTable({ group }: { group: { title: string; lines: Array<{ number: 
               <td className="py-1.5 text-right tabular-nums">{formatChfAmount(row.amount)}</td>
             </tr>
           ))}
-          <tr className="border-t border-[#E2E8F0] font-medium">
-            <td />
-            <td className="py-1.5">Total {group.title.toLowerCase()}</td>
-            <td className="py-1.5 text-right tabular-nums">{formatChfAmount(group.total)}</td>
-          </tr>
+          {hideSubtotal ? null : (
+            <tr className="border-t border-[#E2E8F0] font-medium">
+              <td />
+              <td className="py-1.5">Total {group.title.toLowerCase()}</td>
+              <td className="py-1.5 text-right tabular-nums">{formatChfAmount(group.total)}</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
@@ -180,24 +235,15 @@ function GroupTable({ group }: { group: { title: string; lines: Array<{ number: 
 }
 
 function LedgerView({
-  accounts,
-  accountId,
-  setAccountId,
   ledger,
   error,
 }: {
-  accounts: Account[];
-  accountId: string;
-  setAccountId: (id: string) => void;
   ledger: LedgerReport | null;
   error: string | null;
 }) {
   return (
     <GlassCard padding="sm">
       <h2 className="font-semibold">Extrait de compte</h2>
-      <select className="mt-3 rounded-xl border px-3 py-2 text-sm" value={accountId} onChange={(event) => setAccountId(event.target.value)} aria-label="Compte">
-        {accounts.map((item) => <option key={item.id} value={item.id}>{item.number} {item.name}</option>)}
-      </select>
       {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
       {ledger && "movements" in ledger ? (
         <>
@@ -261,6 +307,3 @@ function downloadCsv(journal: ReturnType<typeof buildJournalReport>) {
     body: JSON.stringify({ action: "export", kind: "csv" }),
   });
 }
-
-const active = "rounded-full bg-[#1A23FF] px-3 py-1.5 text-sm font-semibold text-white";
-const quiet = "rounded-full bg-[#F1F5F9] px-3 py-1.5 text-sm text-[#334155]";

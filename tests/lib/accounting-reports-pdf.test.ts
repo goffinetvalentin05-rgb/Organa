@@ -191,8 +191,10 @@ describe("rapports comptables", () => {
     expect(report.chargeTotal).toBe(80);
     expect(report.productTotal).toBe(500);
     expect(report.result).toBe(420);
+    expect(report.outcome).toEqual({ label: "Bénéfice de l'exercice", amount: 420 });
     expect(numbers).not.toContain("1000");
     expect(numbers).not.toContain("2800");
+    expect(buildBalanceSheet(extendedBooks).gap).toBe(report.result);
   });
 
   it("détaille chaque ligne d’une écriture composée et annonce les statuts inclus", () => {
@@ -211,8 +213,40 @@ describe("rapports comptables", () => {
       "1000 Caisse",
     ]);
     expect(report.scope).toBe(JOURNAL_SCOPE);
-    expect(report.rows.some((row) => row.status === "Écartée")).toBe(true);
+    expect(report.rows.some((row) => row.status === "Écartée" || row.entryId === "retiree")).toBe(false);
     expect(report.rows.some((row) => row.status === "À vérifier" && row.entryId === "attente")).toBe(true);
+    expect(report.lineCount).toBe(report.rows.length);
+    const keys = report.rows.map((row) => `${row.entryId}:${row.lineIndex}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("ignore une écriture composée retirée, même si ses lignes existent encore", () => {
+    const report = buildJournalReport({
+      accounts,
+      entries: [
+        ...extendedEntries,
+        {
+          id: "composee-retiree",
+          entry_number: 9,
+          entry_date: "2026-10-05",
+          description: "Composée retirée",
+          status: "voided",
+          period_id: period.id,
+          source_type: "manual",
+        },
+      ],
+      linesByEntry: {
+        ...extendedLines,
+        "composee-retiree": [
+          { accountId: "caisse", debit: 10, credit: 0 },
+          { accountId: "courant", debit: 20, credit: 0 },
+          { accountId: "fortune", debit: 0, credit: 30 },
+        ],
+      },
+      period,
+    });
+    expect(report.rows.some((row) => row.entryId === "composee-retiree" || row.label === "Composée retirée")).toBe(false);
+    expect(report.lineCount).toBe(report.rows.length);
   });
 
   it("n’extrait que le compte choisi", () => {
@@ -269,6 +303,9 @@ describe("PDF des rapports", () => {
     expect(incomeText).toContain("Frais administratifs");
     expect(incomeText).not.toContain("Caisse");
     expect(incomeText).not.toContain("Fortune");
+    expect(incomeText).toContain("Total des produits");
+    expect(incomeText).toContain("Total des charges");
+    expect(incomeText).toContain("Bénéfice de l'exercice");
     expect(incomeText).toContain("420.00");
 
     expect(journalText).toContain("Journal");
@@ -281,7 +318,8 @@ describe("PDF des rapports", () => {
     expect(journalText).toContain("Compte épargne");
     expect(journalText).toContain("Fortune");
     expect(journalText.match(/même écriture/g)?.length).toBe(2);
-    expect(journalText).toContain("Écartée");
+    expect(journalText).not.toContain("Écriture retirée");
+    expect(journalText).not.toContain("Écartée");
     expect(journalText).toContain("À vérifier");
     expect(journalText).toContain("Écriture à contrôler");
 

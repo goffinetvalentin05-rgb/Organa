@@ -12,7 +12,7 @@ export const REPORT_KIND_TITLE: Record<ReportKind, string> = {
 };
 
 export const JOURNAL_SCOPE =
-  "Ce journal comprend toutes les écritures de la période : à vérifier, vérifiées, extournées et retirées.";
+  "Même ensemble que le journal de comptabilité pour cet exercice : écritures à vérifier, vérifiées et extournées. Les écritures retirées restent dans l'historique d'audit.";
 
 export const LEDGER_SCOPE =
   "Extrait limité au compte choisi. Écritures vérifiées et extournées. Les écritures à vérifier et retirées ne figurent pas.";
@@ -47,6 +47,7 @@ export type ReportEntry = {
   party_name?: string | null;
   source_type?: string | null;
   event_type?: string | null;
+  period_id?: string | null;
 };
 
 export type ReportMovement = { accountId: string; debit: number; credit: number };
@@ -74,6 +75,11 @@ export type BalanceSheetReport = {
   gap: number;
 };
 
+export type IncomeOutcome = {
+  label: "Bénéfice de l'exercice" | "Perte de l'exercice" | "Résultat nul";
+  amount: number;
+};
+
 export type IncomeReport = {
   kind: "result";
   title: "Compte de résultat";
@@ -85,6 +91,7 @@ export type IncomeReport = {
   products: AmountGroup[];
   productTotal: number;
   result: number;
+  outcome: IncomeOutcome;
 };
 
 export type JournalReportRow = {
@@ -109,6 +116,8 @@ export type JournalReport = {
   to: string;
   scope: string;
   rows: JournalReportRow[];
+  /** Nombre de lignes exportées, identique à l'aperçu, au PDF et au CSV. */
+  lineCount: number;
 };
 
 export type LedgerMovement = {
@@ -154,6 +163,19 @@ function official(status: string): boolean {
 
 function inPeriod(date: string, period: ReportPeriod): boolean {
   return date >= period.startsOn && date <= period.endsOn;
+}
+
+/** Même filtre que le journal affiché : l'exercice choisi, sans les écritures retirées. */
+export function shownInAccountingJournal(entry: ReportEntry, period: ReportPeriod): boolean {
+  if (entry.status === "voided") return false;
+  if (period.id && entry.period_id) return entry.period_id === period.id;
+  return inPeriod(entry.entry_date, period);
+}
+
+export function incomeOutcome(result: number): IncomeOutcome {
+  if (result > 0) return { label: "Bénéfice de l'exercice", amount: result };
+  if (result < 0) return { label: "Perte de l'exercice", amount: roundChf(Math.abs(result)) };
+  return { label: "Résultat nul", amount: 0 };
 }
 
 function printable(value: string): string {
@@ -249,6 +271,7 @@ export function buildIncomeStatement(input: Books): IncomeReport {
   const charges = classGroups(input.accounts, totals, "expense");
   const productTotal = roundChf(products.reduce((sum, group) => sum + group.total, 0));
   const chargeTotal = roundChf(charges.reduce((sum, group) => sum + group.total, 0));
+  const result = roundChf(productTotal - chargeTotal);
   return {
     kind: "result",
     title: "Compte de résultat",
@@ -259,13 +282,14 @@ export function buildIncomeStatement(input: Books): IncomeReport {
     chargeTotal,
     products,
     productTotal,
-    result: roundChf(productTotal - chargeTotal),
+    result,
+    outcome: incomeOutcome(result),
   };
 }
 
 export function buildJournalReport(input: Books): JournalReport {
   const included = input.entries
-    .filter((entry) => inPeriod(entry.entry_date, input.period))
+    .filter((entry) => shownInAccountingJournal(entry, input.period))
     .sort((a, b) => a.entry_date.localeCompare(b.entry_date) || a.entry_number - b.entry_number);
   const rows: JournalReportRow[] = [];
   for (const entry of included) {
@@ -294,6 +318,7 @@ export function buildJournalReport(input: Books): JournalReport {
     to: input.period.endsOn,
     scope: JOURNAL_SCOPE,
     rows,
+    lineCount: rows.length,
   };
 }
 
