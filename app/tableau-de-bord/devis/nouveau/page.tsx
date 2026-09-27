@@ -1176,7 +1176,6 @@ export default function NouveauDevisPage() {
             >
               <option value="brouillon">{t("dashboard.status.quote.draft")}</option>
               <option value="envoye">{t("dashboard.status.quote.sent")}</option>
-              <option value="accepte">{t("dashboard.status.quote.accepted")}</option>
               <option value="refuse">{t("dashboard.status.quote.refused")}</option>
             </select>
           </div>

@@ -29,6 +29,7 @@ import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
 
 interface Devis {
   id: string;
@@ -72,6 +73,7 @@ export default function DevisDetailPage() {
   const [currency, setCurrency] = useState<string>("CHF");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -136,6 +138,10 @@ export default function DevisDetailPage() {
 
   const handleChangerStatut = async (nouveauStatut: Devis["statut"]) => {
     if (!devis) return;
+    if (nouveauStatut === "accepte") {
+      setReceiptOpen(true);
+      return;
+    }
     try {
       const response = await fetch("/api/documents", {
         method: "PATCH",
@@ -538,6 +544,15 @@ export default function DevisDetailPage() {
             <option value="accepte">{t("dashboard.status.quote.accepted")}</option>
             <option value="refuse">{t("dashboard.status.quote.refused")}</option>
           </select>
+          {devis.statut !== "accepte" ? (
+            <button
+              type="button"
+              className="mt-3 rounded-lg bg-[#0F172A] px-3 py-1.5 text-sm font-semibold text-white"
+              onClick={() => setReceiptOpen(true)}
+            >
+              Marquer comme payée
+            </button>
+          ) : null}
         </div>
         {devis.notes && (
           <div>
@@ -546,6 +561,17 @@ export default function DevisDetailPage() {
           </div>
         )}
       </GlassCard>
+      {receiptOpen ? (
+        <MarkPaidDialog
+          documentId={id}
+          onClose={() => setReceiptOpen(false)}
+          onDone={(status) => {
+            setDevis((current) => (current ? { ...current, statut: status as Devis["statut"] } : current));
+            setReceiptOpen(false);
+            toast.success(status === "accepte" ? "Cotisation payée" : "Encaissement enregistré");
+          }}
+        />
+      ) : null}
       </PageLayout>
     </>
   );

@@ -830,7 +830,6 @@ function NouvelleFacturePageContent() {
             >
             <option value="brouillon">{t("dashboard.status.invoice.draft")}</option>
             <option value="envoye">{t("dashboard.status.invoice.sent")}</option>
-            <option value="paye">{t("dashboard.status.invoice.paid")}</option>
             <option value="en-retard">{t("dashboard.status.invoice.overdue")}</option>
             </select>
           </div>

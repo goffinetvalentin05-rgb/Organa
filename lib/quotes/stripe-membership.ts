@@ -5,7 +5,7 @@ import {
   isMembershipPaidStatus,
   membershipPurposeFromMetadata,
 } from "./payment-method";
-import { safeProcessAccounting } from "@/lib/accounting/hooks";
+import { recordDocumentReceipt } from "@/lib/accounting/recordReceipt";
 
 const MEMBERSHIP_DOC_SELECT =
   "id, user_id, type, status, payment_method, total_ttc, stripe_payment_intent_id, stripe_checkout_session_id";
@@ -209,12 +209,22 @@ export async function markMembershipPaidFromStripe(params: {
   }
 
   const paidAt = new Date().toISOString().slice(0, 10);
+  const amount = params.amountCents > 0 ? params.amountCents / 100 : Number(document.total_ttc) || 0;
+  await recordDocumentReceipt({
+    clubId: document.user_id,
+    userId: null,
+    documentId: document.id,
+    receivedOn: paidAt,
+    amount,
+    accountCode: "stripe",
+    idempotencyKey: `stripe:${params.paymentIntentId || params.sessionId || document.id}`,
+    allowStripe: true,
+  });
+
   const supabase = createAdminClient();
   const { data: updated, error: updateError } = await supabase
     .from("documents")
     .update({
-      status: "accepte",
-      date_paiement: paidAt,
       stripe_checkout_session_id:
         params.sessionId || document.stripe_checkout_session_id,
       stripe_payment_intent_id: params.paymentIntentId,
@@ -222,7 +232,6 @@ export async function markMembershipPaidFromStripe(params: {
     })
     .eq("id", document.id)
     .eq("user_id", document.user_id)
-    .neq("status", "accepte")
     .select(
       "id, status, date_paiement, stripe_checkout_session_id, stripe_payment_intent_id, stripe_charge_id"
     )
@@ -247,8 +256,6 @@ export async function markMembershipPaidFromStripe(params: {
     stripe_charge_id: updated?.stripe_charge_id ?? null,
     amount_cents: params.amountCents,
   });
-
-  await safeProcessAccounting(document.user_id);
 }
 
 export async function handleMembershipCheckoutSession(

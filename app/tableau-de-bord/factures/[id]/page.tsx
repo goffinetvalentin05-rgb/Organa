@@ -33,6 +33,7 @@ import SubmittingOverlay from "@/components/SubmittingOverlay";
 import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { sendInvoiceEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
 
 interface Facture {
   id: string;
@@ -97,6 +98,7 @@ export default function FactureDetailPage() {
   const [selectedEventId, setSelectedEventId] = useState("");
   const [linkSaving, setLinkSaving] = useState(false);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const loadFacture = useCallback(async () => {
     if (!id) return;
@@ -295,6 +297,10 @@ export default function FactureDetailPage() {
 
   const handleChangerStatut = async (nouveauStatut: Facture["statut"]) => {
     if (!facture) return;
+    if (nouveauStatut === "paye") {
+      setReceiptOpen(true);
+      return;
+    }
     try {
       const response = await fetch("/api/documents", {
         method: "PATCH",
@@ -740,6 +746,15 @@ export default function FactureDetailPage() {
             <option value="paye">{t("dashboard.status.invoice.paid")}</option>
             <option value="en-retard">{t("dashboard.status.invoice.overdue")}</option>
           </select>
+          {facture.statut !== "paye" ? (
+            <button
+              type="button"
+              className="mt-3 rounded-lg bg-[#0F172A] px-3 py-1.5 text-sm font-semibold text-white"
+              onClick={() => setReceiptOpen(true)}
+            >
+              Marquer comme payée
+            </button>
+          ) : null}
         </div>
         {facture.notes && (
           <div>
@@ -748,6 +763,17 @@ export default function FactureDetailPage() {
           </div>
         )}
       </GlassCard>
+      {receiptOpen ? (
+        <MarkPaidDialog
+          documentId={id}
+          onClose={() => setReceiptOpen(false)}
+          onDone={(status) => {
+            setFacture((current) => (current ? { ...current, statut: status as Facture["statut"] } : current));
+            setReceiptOpen(false);
+            toast.success(status === "paye" ? "Facture payée" : "Encaissement enregistré");
+          }}
+        />
+      ) : null}
       </PageLayout>
     </>
   );

@@ -14,6 +14,14 @@ import {
 import { isShopStripeEvent } from "@/lib/shop/stripe-webhook";
 import type Stripe from "stripe";
 
+const { recordDocumentReceiptMock } = vi.hoisted(() => ({
+  recordDocumentReceiptMock: vi.fn(),
+}));
+
+vi.mock("@/lib/accounting/recordReceipt", () => ({
+  recordDocumentReceipt: recordDocumentReceiptMock,
+}));
+
 describe("membership payment method", () => {
   it("parses known methods only", () => {
     expect(parseMembershipPaymentMethod("qr_invoice")).toBe("qr_invoice");
@@ -142,6 +150,18 @@ describe("markMembershipPaidFromStripe", () => {
     documents.clear();
     lastUpdate = null;
     updateFilters = {};
+    recordDocumentReceiptMock.mockReset();
+    recordDocumentReceiptMock.mockImplementation(async (params: { documentId: string; receivedOn: string }) => {
+      const row = documents.get(params.documentId);
+      if (row) {
+        documents.set(params.documentId, {
+          ...row,
+          status: "accepte",
+          date_paiement: params.receivedOn,
+        });
+      }
+      return { paid: true, status: "accepte", created: true, entryId: "entry-1" };
+    });
     documents.set("doc-1", {
       id: "doc-1",
       user_id: "club-a",
@@ -169,8 +189,35 @@ describe("markMembershipPaidFromStripe", () => {
     expect(row.status).toBe("accepte");
     expect(row.stripe_payment_intent_id).toBe("pi_1");
     expect(row.date_paiement).toBeTruthy();
-    expect(lastUpdate).toMatchObject({ status: "accepte" });
-    expect(updateFilters.statusNeq).toBe("accepte");
+    expect(recordDocumentReceiptMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        documentId: "doc-1",
+        accountCode: "stripe",
+        allowStripe: true,
+        amount: 150,
+        idempotencyKey: "stripe:pi_1",
+      })
+    );
+    expect(lastUpdate).toMatchObject({ stripe_payment_intent_id: "pi_1" });
+    expect(lastUpdate).not.toHaveProperty("status");
+  });
+
+  it("ne marque pas la cotisation payée si l'écriture échoue", async () => {
+    recordDocumentReceiptMock.mockRejectedValueOnce(new Error("Compte de produit introuvable"));
+    await expect(
+      markMembershipPaidFromStripe({
+        documentId: "doc-1",
+        clubId: "club-a",
+        expectedAccountId: "acct_club",
+        eventAccountId: "acct_club",
+        sessionId: "cs_1",
+        paymentIntentId: "pi_1",
+        chargeId: "ch_1",
+        amountCents: 15000,
+      })
+    ).rejects.toThrow(/produit/);
+    expect(documents.get("doc-1")!.status).toBe("envoye");
+    expect(lastUpdate).toBeNull();
   });
 
   it("is idempotent when already paid with the same intent", async () => {
@@ -195,6 +242,7 @@ describe("markMembershipPaidFromStripe", () => {
       amountCents: 15000,
     });
     expect(lastUpdate).toBeNull();
+    expect(recordDocumentReceiptMock).not.toHaveBeenCalled();
   });
 
   it("does not update when already paid even with another event", async () => {
@@ -234,7 +282,7 @@ describe("markMembershipPaidFromStripe", () => {
       amountCents: 15000,
     });
     expect(documents.get("doc-1")!.status).toBe("accepte");
-    expect(lastUpdate).toMatchObject({ status: "accepte" });
+    expect(recordDocumentReceiptMock).toHaveBeenCalled();
   });
 
   it("marks the cotisation paid from a Checkout session payload", async () => {

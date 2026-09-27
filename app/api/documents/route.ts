@@ -12,6 +12,7 @@ import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
 import type { LigneDocument } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { safeProcessAccounting } from "@/lib/accounting/hooks";
+import { isCashPaidStatus } from "@/lib/accounting/receipts";
 import {
   buildInvoiceRecipientDbFields,
   parseExternalRecipientData,
@@ -247,6 +248,13 @@ export async function POST(request: NextRequest) {
       eventId,
       paymentMethod,
     } = body;
+
+    if ((type === "invoice" || type === "quote") && isCashPaidStatus(type, statut)) {
+      return NextResponse.json(
+        { error: "Un document ne peut pas être créé déjà payé. Confirmez l'encaissement ensuite." },
+        { status: 400 }
+      );
+    }
 
     const idempotencyKey = request.headers.get("Idempotency-Key");
     const idempotencyResourceType = type === "invoice" ? "invoice" : "quote";
@@ -970,7 +978,7 @@ export async function PATCH(request: NextRequest) {
     // Vérifier que le document appartient au club
     const { data: existingDoc, error: fetchError } = await admin
       .from("documents")
-      .select("id, numero, title, event_id, type")
+      .select("id, numero, title, event_id, type, status")
       .eq("id", id)
       .eq("user_id", guard.clubId)
       .single();
@@ -1038,6 +1046,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (statut !== undefined) {
+      if (isCashPaidStatus(type, statut) && !isCashPaidStatus(type, existingDoc.status as string)) {
+        return NextResponse.json(
+          { error: "Confirmez l'encaissement pour marquer ce document comme payé." },
+          { status: 409 }
+        );
+      }
       updateData.status = statut;
     }
 
