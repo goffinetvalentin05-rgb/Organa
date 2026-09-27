@@ -102,6 +102,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
     canManage?: boolean;
     autoValidate?: boolean;
     startDate?: string | null;
+    numberingNotice?: string | null;
   };
   const priceLabel = String(data?.priceLabel || accountingPriceLabel());
   const priceDetail = String(data?.priceDetail || accountingPriceDetail());
@@ -174,6 +175,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           inbox={review.inbox}
           reviewOnly={section === "review"}
           canWrite={Boolean(access.canWrite)}
+          numberingNotice={access.numberingNotice}
           onAct={async (payload) => {
             const result = await act(payload);
             if (payload.action === "journal-save" && result && typeof result === "object" && "error" in result) setError(null);

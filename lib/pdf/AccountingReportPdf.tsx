@@ -279,10 +279,11 @@ function JournalDocument({ report, club, generatedOn }: Shared & { report: Journ
 }
 
 const ledgerWidths = {
-  date: "12%",
-  piece: "10%",
-  label: "22%",
-  counterpart: "24%",
+  date: "11%",
+  number: "6%",
+  piece: "9%",
+  label: "20%",
+  counterpart: "22%",
   debit: "10%",
   credit: "10%",
   balance: "12%",
@@ -291,6 +292,7 @@ const ledgerWidths = {
 function LedgerDocument({ report, club, generatedOn }: Shared & { report: LedgerReport }) {
   const heads: Array<[keyof typeof ledgerWidths, string]> = [
     ["date", "Date"],
+    ["number", "N°"],
     ["piece", "Pièce"],
     ["label", "Libellé"],
     ["counterpart", "Contrepartie"],
@@ -322,6 +324,7 @@ function LedgerDocument({ report, club, generatedOn }: Shared & { report: Ledger
         {report.movements.map((row, index) => (
           <View key={`${row.date}-${index}`} style={styles.row} wrap={false}>
             <Text style={[styles.cell, { width: ledgerWidths.date }]}>{formatSwissDate(row.date)}</Text>
+            <Text style={[styles.cell, { width: ledgerWidths.number }]}>{String(row.number)}</Text>
             <Text style={[styles.cell, { width: ledgerWidths.piece }]}>{row.piece}</Text>
             <Text style={[styles.cell, { width: ledgerWidths.label }]}>{row.label}</Text>
             <Text style={[styles.cell, { width: ledgerWidths.counterpart }]}>{row.counterpart}</Text>

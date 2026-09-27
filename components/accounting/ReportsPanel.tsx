@@ -253,6 +253,7 @@ function LedgerView({
             <thead className="text-xs uppercase text-[#64748B]">
               <tr>
                 <th className="py-1 text-left">Date</th>
+                <th className="text-left">N°</th>
                 <th className="text-left">Libellé</th>
                 <th className="text-left">Contrepartie</th>
                 <th className="text-right">Débit</th>
@@ -264,6 +265,7 @@ function LedgerView({
               {ledger.movements.map((row, index) => (
                 <tr key={`${row.date}-${index}`} className="border-t border-[#F1F5F9]">
                   <td className="py-1.5">{formatSwissDate(row.date)}</td>
+                  <td className="tabular-nums">{row.number}</td>
                   <td>{row.label}</td>
                   <td>{row.counterpart}</td>
                   <td className="text-right tabular-nums">{row.debit ? formatChfAmount(row.debit) : ""}</td>

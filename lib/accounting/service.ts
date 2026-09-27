@@ -11,7 +11,6 @@ import { isFinancialSystemCode } from "./financialAccounts";
 import {
   CLOSED_PERIOD_MESSAGE,
   accountAllowed,
-  entryNumberAllowed,
   explainJournalError,
   journalLinesBalanced,
   resolveJournalStatus,
@@ -122,7 +121,7 @@ async function audit(
 
 export async function getAccountingAccess(clubId: string) {
   const admin = createAdminClient();
-  const [{ data: addon }, { data: settings }] = await Promise.all([
+  const [{ data: addon }, settingsResult] = await Promise.all([
     admin
       .from("club_addons")
       .select("status, current_period_end")
@@ -131,10 +130,19 @@ export async function getAccountingAccess(clubId: string) {
       .maybeSingle(),
     admin
       .from("accounting_settings")
-      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status")
+      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status, numbering_notice")
       .eq("club_id", clubId)
       .maybeSingle(),
   ]);
+  let settings = settingsResult.data;
+  if (settingsResult.error && /numbering_notice/.test(settingsResult.error.message || "")) {
+    const legacy = await admin
+      .from("accounting_settings")
+      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status")
+      .eq("club_id", clubId)
+      .maybeSingle();
+    settings = legacy.data ? { ...legacy.data, numbering_notice: null } : null;
+  }
 
   const paid = addonIsEntitled(addon);
   const internal = paid ? null : await internalAccountingGrant(admin, clubId);
@@ -150,6 +158,7 @@ export async function getAccountingAccess(clubId: string) {
     startDate: (settings?.start_date as string | undefined) ?? null,
     startMode: (settings?.start_mode as string | undefined) ?? null,
     historyImportStatus: (settings?.history_import_status as string | undefined) ?? null,
+    numberingNotice: (settings?.numbering_notice as string | null) || null,
   };
 }
 
@@ -868,20 +877,7 @@ export async function saveJournalEntry(params: {
       }
     }
     const nextNumber = params.entryNumber && params.entryNumber > 0 ? Math.trunc(params.entryNumber) : Number(current.entry_number);
-    const { data: siblings } = await admin
-      .from("accounting_entries")
-      .select("id, entry_number, period_id")
-      .eq("club_id", params.clubId)
-      .eq("period_id", target.id)
-      .neq("status", "voided");
-    const taken = (siblings || []).map((row) => ({
-      id: String(row.id),
-      periodId: row.period_id ? String(row.period_id) : null,
-      number: Number(row.entry_number),
-    }));
-    if (!entryNumberAllowed(nextNumber, taken, target.id, params.entryId)) {
-      throw new Error("Ce numéro d’écriture est déjà utilisé dans l’exercice.");
-    }
+    const numberManual = nextNumber !== Number(current.entry_number);
     const resolved = resolveJournalStatus({
       previous: String(current.status),
       requested: params.status === "validated" ? "validated" : "pending",
@@ -900,12 +896,14 @@ export async function saveJournalEntry(params: {
       debit: num(line.debit as number),
       credit: num(line.credit as number),
     }));
-    const { error } = await admin.rpc("accounting_update_pending_entry", {
+    const { data: updated, error } = await admin.rpc("accounting_update_pending_entry", {
       p_payload: {
         club_id: params.clubId,
         entry_id: params.entryId,
         entry_date: params.date,
         entry_number: nextNumber,
+        number_manual: numberManual,
+        user_id: params.userId,
         period_id: target.id,
         description: params.description.trim() || "Écriture",
         reference: params.reference?.trim() || "",
@@ -920,6 +918,7 @@ export async function saveJournalEntry(params: {
       },
     });
     if (error) throw new Error(explainJournalError(error.message));
+    const savedRow = (updated ?? {}) as { entry_number?: number; notice?: string | null };
     await audit(admin, params.clubId, "journal_update", params.userId, params.entryId, {
       entryNumber: current.entry_number,
       date: current.entry_date,
@@ -930,7 +929,7 @@ export async function saveJournalEntry(params: {
       status: current.status,
       lines: previousLines,
     }, {
-      entryNumber: nextNumber,
+      entryNumber: Number(savedRow.entry_number || nextNumber),
       date: params.date,
       description: params.description,
       reference: params.reference || "",
@@ -938,7 +937,12 @@ export async function saveJournalEntry(params: {
       status: resolved.status,
       lines: params.lines,
     });
-    return { id: params.entryId, status: resolved.status };
+    return {
+      id: params.entryId,
+      status: resolved.status,
+      entryNumber: Number(savedRow.entry_number || nextNumber),
+      notice: savedRow.notice || null,
+    };
   }
 
   const periods = await loadPeriods(admin, params.clubId);
@@ -1109,6 +1113,15 @@ export async function correctJournalEntry(clubId: string, userId: string, entryI
   });
 }
 
+export async function clearNumberingNotice(clubId: string) {
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("accounting_settings")
+    .update({ numbering_notice: null })
+    .eq("club_id", clubId);
+  if (error && !/numbering_notice/.test(error.message || "")) throw error;
+}
+
 export async function updateSettings(clubId: string, userId: string, autoValidate: boolean) {
   const admin = createAdminClient();
   const { error } = await admin
@@ -1132,10 +1145,11 @@ export async function loadWorkspace(clubId: string) {
 
   const current = periods.find((period) => period.status === "open") ?? periods[periods.length - 1];
 
-  const [{ data: entries }, { data: lineRows }, { data: inbox }, { data: attachments }] = await Promise.all([
+  const entryColumns = "id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, reference, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id, created_at, validated_at";
+  const [entriesResult, { data: lineRows }, { data: inbox }, { data: attachments }] = await Promise.all([
     admin
       .from("accounting_entries")
-      .select("id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, reference, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id, created_at, validated_at")
+      .select(`${entryColumns}, entry_number_manual`)
       .eq("club_id", clubId)
       .order("entry_date", { ascending: false })
       .limit(500),
@@ -1154,6 +1168,18 @@ export async function loadWorkspace(clubId: string) {
       .select("id, entry_id, file_name, storage_path")
       .eq("club_id", clubId),
   ]);
+  let entries = entriesResult.data;
+  if (entriesResult.error && /entry_number_manual/.test(entriesResult.error.message || "")) {
+    const legacy = await admin
+      .from("accounting_entries")
+      .select(entryColumns)
+      .eq("club_id", clubId)
+      .order("entry_date", { ascending: false })
+      .limit(500);
+    entries = (legacy.data ?? []).map((row) => ({ ...row, entry_number_manual: false }));
+  } else if (entriesResult.error) {
+    throw entriesResult.error;
+  }
 
   const accountMap = new Map(accounts.map((account) => [account.id, account]));
   const entryStatus = new Map((entries ?? []).map((entry) => [entry.id as string, entry.status as EntryStatus]));

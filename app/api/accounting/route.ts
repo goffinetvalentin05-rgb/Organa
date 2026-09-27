@@ -3,6 +3,7 @@ import { PERMISSIONS, checkPermission, requirePermission } from "@/lib/auth/perm
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import {
   attachFile,
+  clearNumberingNotice,
   closePeriod,
   clubUsesStripe,
   completeOnboarding,
@@ -208,7 +209,12 @@ export async function POST(request: NextRequest) {
             credit: Number(line.credit || 0),
           })) : [],
         });
-        return NextResponse.json({ ok: true, entryId: saved.id });
+        return NextResponse.json({
+          ok: true,
+          entryId: saved.id,
+          entryNumber: "entryNumber" in saved ? saved.entryNumber : undefined,
+          notice: "notice" in saved ? saved.notice : null,
+        });
       }
       case "reverse":
         await reverseAdvancedEntry(guard.clubId, guard.userId, String(body.entryId));
@@ -218,6 +224,9 @@ export async function POST(request: NextRequest) {
         break;
       case "correct":
         await correctJournalEntry(guard.clubId, guard.userId, String(body.entryId));
+        break;
+      case "clear-numbering-notice":
+        await clearNumberingNotice(guard.clubId);
         break;
       case "settings":
         await updateSettings(guard.clubId, guard.userId, Boolean(body.autoValidate));

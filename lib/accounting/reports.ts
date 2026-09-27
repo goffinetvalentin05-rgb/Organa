@@ -122,6 +122,7 @@ export type JournalReport = {
 
 export type LedgerMovement = {
   date: string;
+  number: number;
   piece: string;
   label: string;
   counterpart: string;
@@ -356,6 +357,7 @@ export function buildAccountExtract(input: Books & { accountId: string }): Ledge
       .filter(Boolean);
     movements.push({
       date: entry.entry_date,
+      number: entry.entry_number,
       piece: printable(entry.reference?.trim() || "-"),
       label: printable(entry.description),
       counterpart: [...new Set(counterparts)].join(" · "),

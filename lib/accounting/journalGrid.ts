@@ -88,7 +88,7 @@ export function journalLinesBalanced(lines: GridLine[]): boolean {
 }
 
 export const CLOSED_PERIOD_MESSAGE =
-  "Cet exercice est clôturé. Rouvrez-le dans Exercices pour modifier ou supprimer cette écriture.";
+  "Cet exercice est clôturé. Les numéros d’écriture restent figés. Rouvrez-le dans Exercices pour modifier ou supprimer cette écriture.";
 
 /** Écriture visible du journal : modifiable tant que l’exercice est ouvert. L’extourne n’est pas un blocage. */
 export function journalLockReason(status: string, periodStatus: string | null | undefined): string | null {
@@ -222,6 +222,7 @@ export function existingCellCommit(input: {
   label: string;
   number: number;
   numberAllowed: boolean;
+  numberError?: string | null;
   balanced: boolean;
   gapLabel: string | null;
 }): CellCommit {
@@ -230,7 +231,7 @@ export function existingCellCommit(input: {
   if (!Number.isInteger(input.number) || input.number < 1) {
     return { action: "reject", error: "Le numéro d’écriture doit être un entier positif." };
   }
-  if (!input.numberAllowed) return { action: "reject", error: ENTRY_NUMBER_TAKEN };
+  if (!input.numberAllowed) return { action: "reject", error: input.numberError || ENTRY_NUMBER_TAKEN };
   if (!input.balanced) {
     return {
       action: "reject",

@@ -14,6 +14,7 @@ export type Account = {
 export type Entry = {
   id: string;
   entry_number: number;
+  entry_number_manual?: boolean;
   entry_date: string;
   description: string;
   amount: number;

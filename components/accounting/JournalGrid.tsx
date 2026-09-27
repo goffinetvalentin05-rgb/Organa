@@ -5,12 +5,13 @@ import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
+import { entryNumberRangeError } from "@/lib/accounting/entryNumbers";
 import {
+  CLOSED_PERIOD_MESSAGE,
   createSaveQueue,
   draftIssues,
   draftLeaveAction,
   ENTRY_NUMBER_TAKEN,
-  entryNumberAllowed,
   existingCellCommit,
   explainJournalError,
   journalComposerChanged,
@@ -79,6 +80,7 @@ export default function JournalGrid({
   inbox,
   reviewOnly,
   canWrite,
+  numberingNotice,
   onAct,
 }: {
   entries: Entry[];
@@ -89,6 +91,7 @@ export default function JournalGrid({
   inbox: InboxItem[];
   reviewOnly: boolean;
   canWrite: boolean;
+  numberingNotice?: string | null;
   onAct: (payload: Record<string, unknown>) => Promise<unknown>;
   onReload: () => Promise<void>;
 }) {
@@ -237,14 +240,15 @@ export default function JournalGrid({
       const gap = journalImbalance(lines);
       const number = Number(current.number);
       const period = periodsRef.current.find((item) => current.date >= item.startsOn && current.date <= item.endsOn);
-      const taken = entriesRef.current
-        .filter((item) => item.status !== "voided")
-        .map((item) => ({ id: item.id, periodId: item.period_id || null, number: item.entry_number }));
+      const inPeriod = entriesRef.current.filter((item) => item.status !== "voided" && item.period_id === period?.id);
+      const numberCount = inPeriod.some((item) => item.id === current.entryId) ? inPeriod.length : inPeriod.length + 1;
+      const numberError = period ? entryNumberRangeError(number, numberCount) : null;
       const decision = existingCellCommit({
         changed: changedAgainst(originSnap, current),
         label: current.label,
         number,
-        numberAllowed: entryNumberAllowed(number, taken, period?.id || null, current.entryId),
+        numberAllowed: !numberError,
+        numberError,
         balanced: journalLinesBalanced(lines),
         gapLabel: gap === 0 ? null : `Écart : ${formatChfAmount(Math.abs(gap))}`,
       });
@@ -279,15 +283,23 @@ export default function JournalGrid({
           rejectCell(cell.key, cell.field, cell.lineId, explainJournalError(message));
           return "invalid";
         }
+        const assigned = result && typeof result === "object" && "entryNumber" in result
+          ? Number((result as { entryNumber?: unknown }).entryNumber)
+          : number;
+        const shown = Number.isInteger(assigned) && assigned > 0 ? assigned : number;
+        const serverNotice = result && typeof result === "object" && "notice" in result
+          ? String((result as { notice?: unknown }).notice || "")
+          : "";
+        if (serverNotice) setNotice(serverNotice);
         if (composerRef.current?.entryId === current.entryId) {
           const live = composerRef.current;
           const patch: Partial<Composer> = {};
-          if (live.number === current.number) patch.number = String(number);
+          if (live.number === current.number) patch.number = String(shown);
           if (material && live.status === current.status) patch.status = "pending";
           if (patch.number !== undefined || patch.status !== undefined) writeComposer({ ...live, ...patch });
           writeOrigin({
             date: current.date,
-            number: String(number),
+            number: String(shown),
             reference: current.piece,
             label: current.label,
             remark: current.remark,
@@ -581,7 +593,17 @@ export default function JournalGrid({
             {fullscreen ? "Quitter le plein écran" : "Plein écran"}
           </ToolButton>
         </div>
-        {notice ? <p className="text-sm text-[#334155]">{notice}</p> : null}
+        {numberingNotice || notice ? (
+          <p className="text-sm text-[#334155]">
+            {numberingNotice || notice}
+            {numberingNotice ? (
+              <button type="button" className="ml-3 underline" onClick={() => void onAct({ action: "clear-numbering-notice" })}>Compris</button>
+            ) : null}
+          </p>
+        ) : null}
+        {periods.find((period) => period.id === periodId)?.status === "closed" ? (
+          <p className="text-sm text-[#475569]">{CLOSED_PERIOD_MESSAGE}</p>
+        ) : null}
         <section className="rounded-xl border border-[#D6DEE8] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <div className="grid grid-cols-2 gap-x-5 gap-y-4 md:grid-cols-4 xl:grid-cols-7">
             <Filter label="Recherche"><input className={filter} placeholder="Libellé, pièce, n°" value={query} onChange={(event) => setQuery(event.target.value)} /></Filter>
@@ -634,7 +656,7 @@ export default function JournalGrid({
               <thead className="sticky top-0 z-10 bg-[#F8FAFC] text-[11px] uppercase tracking-wide text-[#64748B]">
                 <tr className="border-b border-[#E2E8F0]">
                   <th className="px-3 py-3 font-semibold">Date</th>
-                  <th className="px-2 py-3 font-semibold" title="Numéro de l’écriture dans le journal">N° écr.</th>
+                  <th className="px-2 py-3 font-semibold" title="Numéro dans l’exercice, selon la date. Un numéro modifié à la main décale les autres.">N° écr.</th>
                   <th className="px-2 py-3 font-semibold" title="Référence du document">Pièce</th>
                   <th className="px-3 py-3 font-semibold">Libellé</th>
                   <th className="px-3 py-3 font-semibold">Débit</th>
@@ -730,7 +752,7 @@ export default function JournalGrid({
                         className={`border-b ${last ? "border-[#E2E8F0]" : "border-[#F4F7FB]"} bg-white hover:bg-[#F8FAFC]`}
                       >
                         <CellButton locked={Boolean(lock) || !canWrite} title={lock || "Modifier la date"} onClick={() => openEdit(entry, rows, "date", row.groupIndex)}>{showMeta ? formatSwissDate(entry.entry_date) : ""}</CellButton>
-                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le numéro d’écriture"} onClick={() => openEdit(entry, rows, "number", row.groupIndex)}>{showMeta ? entry.entry_number : ""}</CellButton>
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || (entry.entry_number_manual ? "Numéro corrigé manuellement. Un décalage ultérieur sera indiqué." : "Modifier le numéro d’écriture")} onClick={() => openEdit(entry, rows, "number", row.groupIndex)}>{showMeta ? entry.entry_number : ""}</CellButton>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la pièce"} onClick={() => openEdit(entry, rows, "piece", row.groupIndex)}>{showMeta ? (entry.reference || "—") : ""}</CellButton>
                         <td className={`truncate px-3 py-3 ${showMeta ? "font-medium" : "text-[#64748B]"}`}>
                           {showMeta ? (
