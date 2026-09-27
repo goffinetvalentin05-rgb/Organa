@@ -6,6 +6,7 @@ import {
   membershipPurposeFromMetadata,
 } from "./payment-method";
 import { recordDocumentReceipt } from "@/lib/accounting/recordReceipt";
+import { lookupStripeFeeCents } from "@/lib/accounting/stripeFeeLookup";
 
 const MEMBERSHIP_DOC_SELECT =
   "id, user_id, type, status, payment_method, total_ttc, stripe_payment_intent_id, stripe_checkout_session_id";
@@ -210,6 +211,12 @@ export async function markMembershipPaidFromStripe(params: {
 
   const paidAt = new Date().toISOString().slice(0, 10);
   const amount = params.amountCents > 0 ? params.amountCents / 100 : Number(document.total_ttc) || 0;
+  const feeCents = await lookupStripeFeeCents({
+    paymentIntentId: params.paymentIntentId,
+    chargeId: params.chargeId,
+    stripeAccount: params.eventAccountId,
+    amountCents: params.amountCents > 0 ? params.amountCents : Math.round(amount * 100),
+  });
   await recordDocumentReceipt({
     clubId: document.user_id,
     userId: null,
@@ -219,6 +226,7 @@ export async function markMembershipPaidFromStripe(params: {
     accountCode: "stripe",
     idempotencyKey: `stripe:${params.paymentIntentId || params.sessionId || document.id}`,
     allowStripe: true,
+    fee: feeCents / 100,
   });
 
   const supabase = createAdminClient();

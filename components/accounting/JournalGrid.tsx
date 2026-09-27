@@ -68,6 +68,8 @@ function readError(result: unknown): string | null {
   return null;
 }
 
+const JOURNAL_PAGE_SIZE = 100;
+
 function blankLine(): EditorLine {
   return { localId: crypto.randomUUID(), debitId: "", creditId: "", amount: "" };
 }
@@ -95,6 +97,7 @@ export default function JournalGrid({
   onAct: (payload: Record<string, unknown>) => Promise<unknown>;
   onReload: () => Promise<void>;
 }) {
+  const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(reviewOnly ? "pending" : "all");
   const [accountId, setAccountId] = useState("");
@@ -143,6 +146,13 @@ export default function JournalGrid({
     entry,
     rows: toJournalRows(entry.id, linesByEntry[entry.id] || []),
   })), [linesByEntry, visibleEntries]);
+  const pageCount = Math.max(1, Math.ceil(groups.length / JOURNAL_PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount - 1);
+  const displayedGroups = groups.slice(currentPage * JOURNAL_PAGE_SIZE, (currentPage + 1) * JOURNAL_PAGE_SIZE);
+
+  useEffect(() => {
+    setPage(0);
+  }, [query, status, accountId, source, periodId, from, to]);
 
   function periodStatus(entry: Entry): string | null {
     return periods.find((period) => period.id === entry.period_id)?.status ?? null;
@@ -589,6 +599,11 @@ export default function JournalGrid({
               Nouvelle écriture
             </ToolButton>
           ) : null}
+          {reviewOnly && canWrite ? (
+            <ToolButton label="Créer les écritures des opérations déjà complètes. Une consultation du journal ne le fait pas." onClick={() => void onAct({ action: "process-inbox" })} disabled={pending !== null}>
+              Comptabiliser les opérations prêtes
+            </ToolButton>
+          ) : null}
           <ToolButton label={fullscreen ? "Revenir à l’écran du module" : "Afficher le journal sur tout l’écran"} onClick={() => setFullscreen((value) => !value)}>
             {fullscreen ? "Quitter le plein écran" : "Plein écran"}
           </ToolButton>
@@ -704,7 +719,7 @@ export default function JournalGrid({
                 {showInbox ? inbox.map((item) => (
                   <InboxRow key={item.id} item={item} accounts={activeAccounts} canWrite={canWrite} pending={pending} onAct={onAct} startPending={startPending} stopPending={stopPending} />
                 )) : null}
-                {groups.map(({ entry, rows }) => {
+                {displayedGroups.map(({ entry, rows }) => {
                   if (composer?.mode === "edit" && composer.entryId === entry.id) {
                     return (
                       <EditingRows
@@ -790,6 +805,15 @@ export default function JournalGrid({
                 })}
                 {groups.length === 0 && (!showInbox || inbox.length === 0) ? (
                   <tr><td colSpan={11} className="px-3 py-8 text-sm text-[#64748B]">Aucune écriture pour ces filtres.</td></tr>
+                ) : null}
+                {groups.length > JOURNAL_PAGE_SIZE ? (
+                  <tr>
+                    <td colSpan={11} className="px-3 py-3 text-sm text-[#475569]">
+                      <span>{currentPage * JOURNAL_PAGE_SIZE + 1}–{Math.min(groups.length, (currentPage + 1) * JOURNAL_PAGE_SIZE)} sur {groups.length}</span>
+                      <button type="button" className="ml-4 underline disabled:opacity-40" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Page précédente</button>
+                      <button type="button" className="ml-3 underline disabled:opacity-40" disabled={currentPage >= pageCount - 1} onClick={() => setPage(currentPage + 1)}>Page suivante</button>
+                    </td>
+                  </tr>
                 ) : null}
               </tbody>
             </table>

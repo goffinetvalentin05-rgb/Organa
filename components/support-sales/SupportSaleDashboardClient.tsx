@@ -39,6 +39,17 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
   const [selected, setSelected] = useState<SupportSaleMemberRow | null>(null);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [settlement, setSettlement] = useState<{
+    accounting: boolean;
+    today: string;
+    categories: Array<{ id: string; number: string; name: string }>;
+    accounts: Array<{ id: string; number: string; name: string }>;
+  } | null>(null);
+  const [settlementError, setSettlementError] = useState("");
+  const [receivedOn, setReceivedOn] = useState("");
+  const [confirmedAmount, setConfirmedAmount] = useState("");
+  const [categoryAccountId, setCategoryAccountId] = useState("");
+  const [splits, setSplits] = useState<Array<{ accountId: string; amount: string }>>([{ accountId: "", amount: "" }]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,10 +94,50 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
     void load();
   };
 
+  useEffect(() => {
+    if (!confirmEnd || !data) return;
+    let cancelled = false;
+    const suggested = (data.sale.stats.revenueCents / 100).toFixed(2);
+    setSettlement(null);
+    setSettlementError("");
+    setReceivedOn("");
+    setConfirmedAmount(suggested);
+    setCategoryAccountId("");
+    setSplits([{ accountId: "", amount: suggested }]);
+    void fetch(`/api/support-sales/${saleId}/complete`, { cache: "no-store" })
+      .then(async (response) => {
+        const json = await response.json();
+        if (!response.ok) throw new Error(json.error || "Impossible de préparer la finalisation");
+        if (cancelled) return;
+        setSettlement(json);
+        setReceivedOn(json.today || "");
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setSettlementError(error instanceof Error ? error.message : "Impossible de préparer la finalisation");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [confirmEnd, saleId, data]);
+
   const completeSale = async () => {
     setCompleting(true);
     try {
-      const res = await fetch(`/api/support-sales/${saleId}/complete`, { method: "POST" });
+      const amount = Number(confirmedAmount);
+      const res = await fetch(`/api/support-sales/${saleId}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          receivedOn,
+          amount,
+          categoryAccountId: categoryAccountId || null,
+          splits: splits
+            .map((split) => ({ accountId: split.accountId, amount: Number(split.amount) }))
+            .filter((split) => split.accountId && split.amount > 0),
+        }),
+      });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Impossible de terminer la vente");
       setConfirmEnd(false);
@@ -145,6 +196,24 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
 
   const { sale, members } = data;
   const money = (cents: number) => formatChf(cents, intlLocale);
+  const confirmed = Number(confirmedAmount);
+  const splitTotal = splits.reduce((sum, split) => sum + (Number(split.amount) || 0), 0);
+  const canFinishSale = Boolean(
+    settlement
+    && receivedOn
+    && Number.isFinite(confirmed)
+    && confirmed >= 0
+    && (
+      !settlement.accounting
+      || confirmed === 0
+      || (
+        categoryAccountId
+        && splits.every((split) => !split.amount || (split.accountId && Number(split.amount) > 0))
+        && Math.abs(splitTotal - confirmed) < 0.001
+        && splitTotal > 0
+      )
+    )
+  );
 
   return (
     <PageLayout>
@@ -415,15 +484,98 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
             <h2 className="text-xl font-semibold text-[#0F172A]">Terminer cette vente ?</h2>
             <p className="mt-3 text-sm leading-relaxed text-[#475569]">
               {sale.stats.quantitySold} produits ont été vendus pour un total de{" "}
-              <strong>{money(sale.stats.revenueCents)}</strong>.
+              <strong>{money(sale.stats.revenueCents)}</strong>. Indiquez les sommes réellement encaissées.
+              Une seule écriture est passée, puis la vente est terminée.
             </p>
-            <ul className="mt-4 space-y-2 text-sm text-[#475569]">
-              <li>Les nouvelles réservations seront désactivées</li>
-              <li>Le récapitulatif PDF sera disponible</li>
-              <li>
-                <strong>{money(sale.stats.revenueCents)}</strong> seront ajoutés aux encaissements du club
-              </li>
-            </ul>
+            {settlementError ? <p className="mt-3 text-sm text-red-700">{settlementError}</p> : null}
+            {!settlement && !settlementError ? <p className="mt-3 text-sm text-[#64748B]">Chargement…</p> : null}
+            {settlement ? (
+              <div className="mt-4 space-y-3">
+                <label className="block text-sm text-[#334155]">
+                  Date d'encaissement
+                  <input
+                    type="date"
+                    value={receivedOn}
+                    onChange={(event) => setReceivedOn(event.target.value)}
+                    className="mt-1 w-full rounded-lg border border-[#D6DEE8] px-3 py-2 text-sm"
+                  />
+                </label>
+                <label className="block text-sm text-[#334155]">
+                  Somme réellement encaissée (CHF)
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.05"
+                    value={confirmedAmount}
+                    onChange={(event) => setConfirmedAmount(event.target.value)}
+                    className="mt-1 w-full rounded-lg border border-[#D6DEE8] px-3 py-2 text-sm"
+                  />
+                </label>
+                {settlement.accounting && Number(confirmedAmount) > 0 ? (
+                  <>
+                    <label className="block text-sm text-[#334155]">
+                      Compte de produit
+                      <select
+                        value={categoryAccountId}
+                        onChange={(event) => setCategoryAccountId(event.target.value)}
+                        className="mt-1 w-full rounded-lg border border-[#D6DEE8] px-3 py-2 text-sm"
+                      >
+                        <option value="">Choisir un compte</option>
+                        {settlement.categories.map((account) => (
+                          <option key={account.id} value={account.id}>
+                            {account.number} {account.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {splits.map((split, index) => (
+                      <div key={index} className="grid grid-cols-2 gap-2">
+                        <label className="block text-sm text-[#334155]">
+                          Compte qui a reçu l'argent
+                          <select
+                            value={split.accountId}
+                            onChange={(event) => {
+                              const next = [...splits];
+                              next[index] = { ...split, accountId: event.target.value };
+                              setSplits(next);
+                            }}
+                            className="mt-1 w-full rounded-lg border border-[#D6DEE8] px-3 py-2 text-sm"
+                          >
+                            <option value="">Choisir un compte</option>
+                            {settlement.accounts.map((account) => (
+                              <option key={account.id} value={account.id}>
+                                {account.number} {account.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="block text-sm text-[#334155]">
+                          Montant (CHF)
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.05"
+                            value={split.amount}
+                            onChange={(event) => {
+                              const next = [...splits];
+                              next[index] = { ...split, amount: event.target.value };
+                              setSplits(next);
+                            }}
+                            className="mt-1 w-full rounded-lg border border-[#D6DEE8] px-3 py-2 text-sm"
+                          />
+                        </label>
+                      </div>
+                    ))}
+                    <ActionButton
+                      variant="ghost"
+                      onClick={() => setSplits([...splits, { accountId: "", amount: "" }])}
+                    >
+                      Ajouter un compte
+                    </ActionButton>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
             <div className="mt-6 flex flex-wrap justify-end gap-2">
               <ActionButton variant="ghost" disabled={completing} onClick={() => setConfirmEnd(false)}>
                 Annuler
@@ -433,6 +585,7 @@ export default function SupportSaleDashboardClient({ saleId }: { saleId: string 
                 size="sm"
                 icon="none"
                 loading={completing}
+                disabled={!settlement || !receivedOn || !canFinishSale}
                 onClick={() => void completeSale()}
               >
                 Terminer la vente

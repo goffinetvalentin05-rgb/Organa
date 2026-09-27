@@ -27,6 +27,16 @@ import {
   normalizeOnboardingInput,
   resolveCoverageType,
 } from "./onboarding";
+import { fetchAllPages } from "./paging";
+import {
+  accumulatePnl,
+  closingTransferLines,
+  followingPeriod,
+  inboxProcessingDecision,
+  operationsBlockingClose,
+  type CloseEntry,
+  type InboxActor,
+} from "./closePeriod";
 import {
   OPENING_PLAN_USER_MESSAGE,
   buildFinalizePayload,
@@ -130,18 +140,20 @@ export async function getAccountingAccess(clubId: string) {
       .maybeSingle(),
     admin
       .from("accounting_settings")
-      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status, numbering_notice")
+      .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status, numbering_notice, stripe_payout_account_id")
       .eq("club_id", clubId)
       .maybeSingle(),
   ]);
   let settings = settingsResult.data;
-  if (settingsResult.error && /numbering_notice/.test(settingsResult.error.message || "")) {
+  if (settingsResult.error && /numbering_notice|stripe_payout_account_id/.test(settingsResult.error.message || "")) {
     const legacy = await admin
       .from("accounting_settings")
       .select("onboarding_completed_at, start_date, auto_validate, start_mode, history_import_status")
       .eq("club_id", clubId)
       .maybeSingle();
-    settings = legacy.data ? { ...legacy.data, numbering_notice: null } : null;
+    settings = legacy.data
+      ? { ...legacy.data, numbering_notice: null, stripe_payout_account_id: null }
+      : null;
   }
 
   const paid = addonIsEntitled(addon);
@@ -159,6 +171,7 @@ export async function getAccountingAccess(clubId: string) {
     startMode: (settings?.start_mode as string | undefined) ?? null,
     historyImportStatus: (settings?.history_import_status as string | undefined) ?? null,
     numberingNotice: (settings?.numbering_notice as string | null) || null,
+    stripePayoutAccountId: (settings?.stripe_payout_account_id as string | null) || null,
   };
 }
 
@@ -243,10 +256,23 @@ async function entryKey(admin: Admin, clubId: string, base: string): Promise<str
   return base;
 }
 
-export async function processAccountingInbox(clubId: string, userId: string | null = null) {
+export async function processAccountingInbox(
+  clubId: string,
+  userId: string | null = null,
+  actor: InboxActor = userId ? "user" : "system"
+) {
   const admin = createAdminClient();
   const access = await getAccountingAccess(clubId);
-  if (!access.onboarded) return { posted: 0 };
+  const decision = inboxProcessingDecision({
+    actor,
+    onboarded: access.onboarded,
+    canWrite: access.canWrite,
+    userId,
+  });
+  if (!decision.ok) {
+    if (decision.silent) return { posted: 0 };
+    throw new Error(decision.reason);
+  }
 
   const [accounts, periods] = await Promise.all([
     loadAccounts(admin, clubId),
@@ -267,12 +293,13 @@ export async function processAccountingInbox(clubId: string, userId: string | nu
       const did = await processInboxRow(
         admin,
         clubId,
-        userId,
+        actor === "user" ? userId : null,
         row,
         accounts,
         periods,
         access.autoValidate,
-        access.startDate
+        access.startDate,
+        actor
       );
       if (did) posted += 1;
     } catch (err) {
@@ -290,10 +317,11 @@ async function processInboxRow(
   accounts: AccountRecord[],
   periods: PeriodRecord[],
   autoValidate: boolean,
-  startDate: string | null
+  startDate: string | null,
+  actor: InboxActor
 ): Promise<boolean> {
   if (row.event_type === "payment_reversed") {
-    return reverseFromInbox(admin, clubId, userId, row, periods);
+    return reverseFromInbox(admin, clubId, userId, row, periods, actor);
   }
 
   const closed = periods.some(
@@ -362,7 +390,9 @@ async function processInboxRow(
     category_account_id: category?.id ?? null,
     party_name: row.party_name,
     created_by: userId,
-    audit_action: decision.autoValidated ? "auto_validate" : "create",
+    audit_action: actor === "system"
+      ? (decision.autoValidated ? "system_auto_validate" : "system_create")
+      : (decision.autoValidated ? "auto_validate" : "create"),
     lines: mapped,
   });
 
@@ -389,7 +419,8 @@ async function reverseFromInbox(
   clubId: string,
   userId: string | null,
   row: InboxRow,
-  periods: PeriodRecord[]
+  periods: PeriodRecord[],
+  actor: InboxActor
 ): Promise<boolean> {
   const today = zurichToday();
   const period = periodFor(periods, today, true);
@@ -449,7 +480,7 @@ async function reverseFromInbox(
     status: "validated",
     reversal_of_entry_id: entry.id,
     created_by: userId,
-    audit_action: "reversal",
+    audit_action: actor === "system" ? "system_reversal" : "reversal",
     lines: reversed,
   });
 
@@ -482,7 +513,7 @@ export async function confirmInbox(params: {
     financialAccountCode: params.financialAccountCode,
     categoryCode: params.categoryCode,
   });
-  return processAccountingInbox(params.clubId, params.userId);
+  return processAccountingInbox(params.clubId, params.userId, "user");
 }
 
 export async function validateEntry(clubId: string, userId: string, entryId: string) {
@@ -1122,72 +1153,97 @@ export async function clearNumberingNotice(clubId: string) {
   if (error && !/numbering_notice/.test(error.message || "")) throw error;
 }
 
-export async function updateSettings(clubId: string, userId: string, autoValidate: boolean) {
+export async function updateSettings(
+  clubId: string,
+  userId: string,
+  autoValidate: boolean,
+  payoutAccountId?: string | null,
+) {
   const admin = createAdminClient();
-  const { error } = await admin
-    .from("accounting_settings")
-    .update({ auto_validate: autoValidate, updated_at: new Date().toISOString() })
-    .eq("club_id", clubId);
-  if (error) throw error;
-  await audit(admin, clubId, "settings", userId, null, null, { autoValidate });
+  const patch: Record<string, unknown> = {
+    auto_validate: autoValidate,
+    updated_at: new Date().toISOString(),
+  };
+  if (payoutAccountId !== undefined) patch.stripe_payout_account_id = payoutAccountId || null;
+  const { error } = await admin.from("accounting_settings").update(patch).eq("club_id", clubId);
+  if (error) {
+    if (/stripe_payout_account_id/.test(error.message || "")) {
+      throw new Error("Le compte de versement Stripe n'est pas encore disponible. Appliquez la migration 102.");
+    }
+    throw error;
+  }
+  if (payoutAccountId) {
+    const pending = await admin.rpc("accounting_post_pending_payouts", {
+      p_club: clubId,
+      p_user: userId,
+    });
+    if (pending.error && !/accounting_post_pending_payouts|schema cache|Could not find the function/i.test(pending.error.message || "")) {
+      throw new Error(pending.error.message);
+    }
+  }
+  await audit(admin, clubId, "settings", userId, null, null, { autoValidate, payoutAccountId: payoutAccountId ?? null });
+}
+
+const ENTRY_COLUMNS = "id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, reference, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id, created_at, validated_at";
+
+async function loadAllEntries(admin: Admin, clubId: string) {
+  try {
+    return await fetchAllPages((from, to) => admin
+      .from("accounting_entries")
+      .select(`${ENTRY_COLUMNS}, entry_number_manual`)
+      .eq("club_id", clubId)
+      .order("id", { ascending: true })
+      .range(from, to));
+  } catch (error) {
+    if (!(error instanceof Error) || !/entry_number_manual/.test(error.message)) throw error;
+    const legacy = await fetchAllPages((from, to) => admin
+      .from("accounting_entries")
+      .select(ENTRY_COLUMNS)
+      .eq("club_id", clubId)
+      .order("id", { ascending: true })
+      .range(from, to));
+    return legacy.map((row) => ({ ...row, entry_number_manual: false }));
+  }
 }
 
 export async function loadWorkspace(clubId: string) {
-  await processAccountingInbox(clubId).catch((error) => {
-    console.error("[accounting] process", error);
-  });
   const admin = createAdminClient();
   const access = await getAccountingAccess(clubId);
-  const [accounts, periods] = await Promise.all([
+  const [accounts, periods, entries, lineRows, inbox, attachments] = await Promise.all([
     loadAccounts(admin, clubId),
     loadPeriods(admin, clubId),
-  ]);
-
-  const current = periods.find((period) => period.status === "open") ?? periods[periods.length - 1];
-
-  const entryColumns = "id, entry_number, entry_date, description, amount, direction, source_type, source_id, event_type, status, party_name, reference, counter_account_id, category_account_id, reversal_of_entry_id, reversed_by_entry_id, period_id, created_at, validated_at";
-  const [entriesResult, { data: lineRows }, { data: inbox }, { data: attachments }] = await Promise.all([
-    admin
-      .from("accounting_entries")
-      .select(`${entryColumns}, entry_number_manual`)
-      .eq("club_id", clubId)
-      .order("entry_date", { ascending: false })
-      .limit(500),
-    admin
+    loadAllEntries(admin, clubId),
+    fetchAllPages((from, to) => admin
       .from("accounting_entry_lines")
       .select("entry_id, account_id, debit, credit, line_order")
-      .eq("club_id", clubId),
-    admin
+      .eq("club_id", clubId)
+      .order("entry_id", { ascending: true })
+      .order("line_order", { ascending: true })
+      .range(from, to)),
+    fetchAllPages((from, to) => admin
       .from("accounting_inbox")
       .select("id, description, amount, entry_date, status, source_type, source_id, party_name, financial_account_code, category_code, direction")
       .eq("club_id", clubId)
       .in("status", ["awaiting_account", "awaiting_category", "awaiting_details", "blocked_closed_period", "pending"])
-      .order("entry_date", { ascending: false }),
-    admin
+      .order("id", { ascending: true })
+      .range(from, to)),
+    fetchAllPages((from, to) => admin
       .from("accounting_attachments")
       .select("id, entry_id, file_name, storage_path")
-      .eq("club_id", clubId),
-  ]);
-  let entries = entriesResult.data;
-  if (entriesResult.error && /entry_number_manual/.test(entriesResult.error.message || "")) {
-    const legacy = await admin
-      .from("accounting_entries")
-      .select(entryColumns)
       .eq("club_id", clubId)
-      .order("entry_date", { ascending: false })
-      .limit(500);
-    entries = (legacy.data ?? []).map((row) => ({ ...row, entry_number_manual: false }));
-  } else if (entriesResult.error) {
-    throw entriesResult.error;
-  }
+      .order("id", { ascending: true })
+      .range(from, to)),
+  ]);
+
+  const current = periods.find((period) => period.status === "open") ?? periods[periods.length - 1];
 
   const accountMap = new Map(accounts.map((account) => [account.id, account]));
-  const entryStatus = new Map((entries ?? []).map((entry) => [entry.id as string, entry.status as EntryStatus]));
-  const entryDate = new Map((entries ?? []).map((entry) => [entry.id as string, entry.entry_date as string]));
-  const entryEvent = new Map((entries ?? []).map((entry) => [entry.id as string, entry.event_type as string]));
-  const entrySource = new Map((entries ?? []).map((entry) => [entry.id as string, entry.source_type as string]));
+  const entryStatus = new Map(entries.map((entry) => [entry.id as string, entry.status as EntryStatus]));
+  const entryDate = new Map(entries.map((entry) => [entry.id as string, entry.entry_date as string]));
+  const entryEvent = new Map(entries.map((entry) => [entry.id as string, entry.event_type as string]));
+  const entrySource = new Map(entries.map((entry) => [entry.id as string, entry.source_type as string]));
 
-  const reportLines: ReportLine[] = (lineRows ?? []).map((line) => {
+  const reportLines: ReportLine[] = lineRows.map((line) => {
     const account = accountMap.get(line.account_id as string);
     return {
       entryId: line.entry_id as string,
@@ -1198,9 +1254,7 @@ export async function loadWorkspace(clubId: string) {
       debit: num(line.debit as number),
       credit: num(line.credit as number),
     };
-  }).filter((line) => entrySource.get(line.entryId) !== "period_close" || line.accountType === "asset" || line.accountType === "liability" || line.accountType === "equity"
-    ? true
-    : true);
+  });
 
   const incomeLines = reportLines.filter((line) => {
     if (!current) return false;
@@ -1474,80 +1528,55 @@ export async function closePeriod(params: {
   const workspace = await loadWorkspace(params.clubId);
   const period = workspace.periods.find((item) => item.id === params.periodId);
   if (!period || period.status !== "open") throw new Error("Exercice introuvable");
-  if (workspace.review.count > 0) {
-    throw new Error("Il reste des opérations à vérifier");
-  }
-
-  if (params.transferResult && workspace.summary.result !== 0) {
-    const accounts = workspace.accounts;
-    const lines: Array<{ account_id: string; debit: number; credit: number }> = [];
-    const balances = new Map<string, { type: AccountType; debit: number; credit: number }>();
-    for (const line of workspace.balanceLines) {
-      if (line.entryStatus !== "validated") continue;
-      if (line.accountType !== "revenue" && line.accountType !== "expense") continue;
-      const account = accounts.find((item) => item.number === line.accountNumber);
-      if (!account) continue;
-      const current = balances.get(account.id) ?? { type: line.accountType, debit: 0, credit: 0 };
-      current.debit = roundChf(current.debit + line.debit);
-      current.credit = roundChf(current.credit + line.credit);
-      balances.set(account.id, current);
-    }
-    for (const [accountId, balance] of balances) {
-      const net = balance.type === "revenue"
-        ? roundChf(balance.credit - balance.debit)
-        : roundChf(balance.debit - balance.credit);
-      if (net <= 0) continue;
-      if (balance.type === "revenue") lines.push({ account_id: accountId, debit: net, credit: 0 });
-      else lines.push({ account_id: accountId, debit: 0, credit: net });
-    }
-    const retained = accounts.find((account) => account.systemCode === "retained");
-    if (!retained) throw new Error("Compte 2900 introuvable");
-    const debit = roundChf(lines.reduce((sum, line) => sum + line.debit, 0));
-    const credit = roundChf(lines.reduce((sum, line) => sum + line.credit, 0));
-    const plug = roundChf(debit - credit);
-    if (plug > 0) lines.push({ account_id: retained.id, debit: 0, credit: plug });
-    else if (plug < 0) lines.push({ account_id: retained.id, debit: roundChf(Math.abs(plug)), credit: 0 });
-    if (lines.length >= 2) {
-      await postEntry(admin, {
-        club_id: params.clubId,
-        period_id: period.id,
-        entry_date: period.endsOn,
-        description: "Report du résultat",
-        amount: Math.abs(plug),
-        direction: "adjustment",
-        source_type: "period_close",
-        source_id: period.id,
-        event_type: "adjustment",
-        idempotency_key: `period_close:${period.id}`,
-        status: "validated",
-        category_account_id: retained.id,
-        created_by: params.userId,
-        audit_action: "period_close",
-        lines,
-      });
-    }
-  }
-
-  await admin
-    .from("accounting_periods")
-    .update({ status: "closed", closed_at: new Date().toISOString(), closed_by: params.userId })
-    .eq("id", period.id)
-    .eq("club_id", params.clubId);
-
-  const nextStart = addDays(period.endsOn, 1);
-  const nextEnd = `${Number(nextStart.slice(0, 4))}-12-31`;
-  await admin.from("accounting_periods").upsert({
-    club_id: params.clubId,
-    label: nextStart.slice(0, 4),
-    starts_on: nextStart,
-    ends_on: nextEnd,
-    status: "open",
-  }, { onConflict: "club_id,starts_on" });
-
-  await audit(admin, params.clubId, "close_period", params.userId, null, null, {
-    periodId: period.id,
-    transferResult: params.transferResult,
+  const closeEntries: CloseEntry[] = (workspace.entries as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id),
+    status: String(row.status),
+    entryDate: String(row.entry_date),
+    periodId: row.period_id ? String(row.period_id) : null,
+    sourceType: row.source_type ? String(row.source_type) : null,
+    eventType: row.event_type ? String(row.event_type) : null,
+    sourceId: row.source_id ? String(row.source_id) : null,
+  }));
+  const blocking = operationsBlockingClose({
+    entries: closeEntries,
+    inbox: (workspace.review.inbox as Array<{ status: string; entry_date: string }>).map((item) => ({
+      status: item.status,
+      entryDate: item.entry_date,
+    })),
+    period,
   });
+  if (blocking > 0) throw new Error("Il reste des opérations à vérifier");
+
+  let lines: Array<{ account_id: string; debit: number; credit: number }> = [];
+  if (params.transferResult) {
+    const retained = workspace.accounts.find((account) => account.systemCode === "retained");
+    if (!retained) throw new Error("Compte 2900 introuvable");
+    const accountTypes = new Map(workspace.accounts.map((account) => [account.id, account.accountType]));
+    lines = closingTransferLines(
+      accumulatePnl(closeEntries, workspace.linesByEntry, accountTypes, period),
+      retained.id
+    );
+  }
+
+  const next = followingPeriod(period);
+  const { error } = await admin.rpc("accounting_close_period", {
+    p_club: params.clubId,
+    p_period: period.id,
+    p_user: params.userId,
+    p_transfer: params.transferResult,
+    p_lines: lines,
+    p_next_start: next.startsOn,
+    p_next_end: next.endsOn,
+    p_next_label: next.label,
+  });
+  if (error) {
+    const message = error.message || "";
+    if (/accounting_close_period|schema cache|Could not find the function/i.test(message)) {
+      throw new Error("La clôture comptable n'est pas disponible. Appliquez la migration 102 dans Supabase, puis réessayez.");
+    }
+    const line = message.split("\n")[0] || "La clôture n'a pas abouti. L'exercice reste ouvert.";
+    throw new Error(line);
+  }
 }
 
 export async function reopenPeriod(clubId: string, userId: string, periodId: string, reason: string) {
@@ -1715,12 +1744,6 @@ export async function listOpenItems(clubId: string, endDate: string) {
     receivableTotal: roundChf(receivables.reduce((sum, doc) => sum + num(doc.total_ttc as number), 0)),
     payableTotal: roundChf(payables.reduce((sum, expense) => sum + num(expense.amount as number), 0)),
   };
-}
-
-function addDays(iso: string, days: number): string {
-  const date = new Date(`${iso}T12:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
 }
 
 export async function recordExport(clubId: string, userId: string, kind: string) {

@@ -19,6 +19,7 @@ export type RecordReceiptInput = {
   accountCode?: string | null;
   idempotencyKey: string;
   allowStripe?: boolean;
+  fee?: number;
 };
 
 export type RecordReceiptResult = {
@@ -42,6 +43,7 @@ const USER_ERRORS = [
   "Catégorie de produit manquante",
   "Encaissement incomplet",
   "Indiquez le montant total",
+  "Compte de frais bancaires introuvable",
 ];
 
 export function receiptFailureMessage(error: unknown): string {
@@ -100,7 +102,8 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
     eventId: doc.event_id as string | null,
   });
 
-  const { data, error } = await admin.rpc("accounting_record_document_receipt", {
+  const fee = roundChf(input.fee || 0);
+  const payload: Record<string, unknown> = {
     p_club: input.clubId,
     p_document: input.documentId,
     p_user: input.userId,
@@ -110,8 +113,15 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
     p_key: input.idempotencyKey.trim(),
     p_category: category,
     p_allow_stripe: Boolean(input.allowStripe),
-  });
-  if (error) throw new Error(receiptFailureMessage(error));
+  };
+  if (fee > 0) payload.p_fee = fee;
+  const { data, error } = await admin.rpc("accounting_record_document_receipt", payload);
+  if (error) {
+    if (fee > 0 && /schema cache|Could not find the function|p_fee/i.test(error.message || "")) {
+      throw new Error("Les frais Stripe ne peuvent pas encore être comptabilisés. Appliquez la migration 102, puis réessayez.");
+    }
+    throw new Error(receiptFailureMessage(error));
+  }
 
   const row = (data ?? {}) as Record<string, unknown>;
   return {

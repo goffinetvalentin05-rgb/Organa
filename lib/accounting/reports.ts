@@ -1,4 +1,4 @@
-import { ACCOUNT_CLASS_LABELS } from "./chart";
+import { ACCOUNT_CLASS_LABELS, RECOMMENDED_CHART } from "./chart";
 import { roundChf } from "./money";
 import { toJournalRows } from "./journalGrid";
 
@@ -223,6 +223,31 @@ function isFixedAsset(number: string): boolean {
   return Number.isFinite(value) && value >= 1500;
 }
 
+export const PRIOR_UNCLOSED_RESULT = "Résultats antérieurs non reportés";
+
+/**
+ * Résultat encore porté par les comptes de produits et de charges.
+ * Calculé sur les mouvements, pas sur l'écart du bilan.
+ * Un report déjà passé ramène ce montant à zéro et laisse le solde au 2900.
+ */
+export function unclosedResults(input: Books, entries: ReportEntry[]): { prior: number; current: number } {
+  const types = new Map(input.accounts.map((account) => [account.id, account.accountType]));
+  let prior = 0;
+  let current = 0;
+  for (const entry of entries) {
+    const bucket = entry.entry_date < input.period.startsOn ? "prior" : "current";
+    for (const line of input.linesByEntry[entry.id] || []) {
+      const type = types.get(line.accountId);
+      if (type !== "revenue" && type !== "expense") continue;
+      // Bénéfice = crédits − débits des produits et des charges. Une charge débitrice diminue le résultat.
+      const contribution = roundChf(line.credit - line.debit);
+      if (bucket === "prior") prior = roundChf(prior + contribution);
+      else current = roundChf(current + contribution);
+    }
+  }
+  return { prior, current };
+}
+
 export function buildBalanceSheet(input: Books): BalanceSheetReport {
   const included = input.entries.filter((entry) => official(entry.status) && entry.entry_date <= input.period.endsOn);
   const totals = balances(input, included);
@@ -230,9 +255,24 @@ export function buildBalanceSheet(input: Books): BalanceSheetReport {
     groupOf(input.accounts, BALANCE_ASSET_CURRENT, totals, (account) => account.accountType === "asset" && !isFixedAsset(account.number)),
     groupOf(input.accounts, BALANCE_ASSET_FIXED, totals, (account) => account.accountType === "asset" && isFixedAsset(account.number)),
   ];
+  const equity = groupOf(input.accounts, BALANCE_EQUITY, totals, (account) => account.accountType === "equity");
+  const unclosed = unclosedResults(input, included);
+  const chartResult = RECOMMENDED_CHART.find((account) => account.systemCode === "result");
+  const resultAccount = input.accounts.find((account) => account.number === chartResult?.number);
+  if (unclosed.prior !== 0) {
+    equity.lines.push({ number: "", name: printable(PRIOR_UNCLOSED_RESULT), amount: unclosed.prior });
+  }
+  if (unclosed.current !== 0) {
+    equity.lines.push({
+      number: resultAccount?.number || chartResult?.number || "",
+      name: printable(resultAccount?.name || chartResult?.name || "Résultat de l'exercice"),
+      amount: unclosed.current,
+    });
+  }
+  equity.total = roundChf(equity.lines.reduce((sum, line) => sum + line.amount, 0));
   const funding = [
     groupOf(input.accounts, BALANCE_LIABILITIES, totals, (account) => account.accountType === "liability"),
-    groupOf(input.accounts, BALANCE_EQUITY, totals, (account) => account.accountType === "equity"),
+    equity,
   ];
   const assetTotal = roundChf(assets.reduce((sum, group) => sum + group.total, 0));
   const fundingTotal = roundChf(funding.reduce((sum, group) => sum + group.total, 0));

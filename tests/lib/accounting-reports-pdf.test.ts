@@ -194,7 +194,12 @@ describe("rapports comptables", () => {
     expect(report.outcome).toEqual({ label: "Bénéfice de l'exercice", amount: 420 });
     expect(numbers).not.toContain("1000");
     expect(numbers).not.toContain("2800");
-    expect(buildBalanceSheet(extendedBooks).gap).toBe(report.result);
+    const balance = buildBalanceSheet(extendedBooks);
+    const equity = balance.funding.find((group) => group.title === "Fonds propres");
+    expect(equity?.lines.some((line) => line.number === "2979" && line.amount === report.result)).toBe(true);
+    expect(balance.assetTotal).toBe(3620);
+    expect(balance.fundingTotal).toBe(3620);
+    expect(balance.gap).toBe(0);
   });
 
   it("détaille chaque ligne d’une écriture composée et annonce les statuts inclus", () => {

@@ -114,7 +114,7 @@ function sideItems(groups: AmountGroup[]) {
     }
     for (const item of group.lines) {
       items.push({
-        key: `${group.title}-${item.number}`,
+        key: `${group.title}-${item.number}-${item.name}`,
         node: (
           <View style={styles.row} wrap={false}>
             <Text style={styles.num}>{item.number}</Text>

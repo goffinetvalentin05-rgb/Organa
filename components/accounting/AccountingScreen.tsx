@@ -10,6 +10,7 @@ import JournalGrid from "@/components/accounting/JournalGrid";
 import PeriodsPanel from "@/components/accounting/PeriodsPanel";
 import ReportsPanel from "@/components/accounting/ReportsPanel";
 import SettingsPanel from "@/components/accounting/SettingsPanel";
+import { isBankSystemCode } from "@/lib/accounting/financialAccounts";
 import { accountBalances, type Account, type Attachment, type Entry, type InboxItem, type JournalLine, type Period } from "@/components/accounting/model";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import { ACCOUNTING_TAGLINE } from "@/lib/accounting/copy";
@@ -103,6 +104,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
     autoValidate?: boolean;
     startDate?: string | null;
     numberingNotice?: string | null;
+    stripePayoutAccountId?: string | null;
   };
   const priceLabel = String(data?.priceLabel || accountingPriceLabel());
   const priceDetail = String(data?.priceDetail || accountingPriceDetail());
@@ -214,6 +216,10 @@ export default function AccountingScreen({ section }: { section: Section }) {
           startDate={access.startDate}
           coverageNote={coverage.note}
           canWrite={Boolean(access.canWrite)}
+          payoutAccountId={access.stripePayoutAccountId}
+          bankAccounts={accounts
+            .filter((account) => account.isActive && isBankSystemCode(account.systemCode))
+            .map((account) => ({ id: account.id, number: account.number, name: account.name }))}
           onAct={act}
         />
       ) : null}

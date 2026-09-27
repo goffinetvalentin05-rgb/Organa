@@ -10,8 +10,6 @@ import {
 } from "@/lib/club-revenues/types";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { withIdempotency } from "@/lib/api/idempotency";
-import { safeProcessAccounting } from "@/lib/accounting/hooks";
-
 export const runtime = "nodejs";
 
 async function assertEventOwnedByUser(
@@ -216,7 +214,6 @@ export async function POST(request: NextRequest) {
         }
 
         const event = await fetchEventLabelForRevenue(supabase, inserted.event_id);
-        await safeProcessAccounting(guard.clubId);
         return {
           status: 201,
           body: {

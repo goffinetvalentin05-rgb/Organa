@@ -1,7 +1,7 @@
 /**
  * Comptabilité de trésorerie Obillz.
  * Une opération métier = une accounting_entry.
- * Seules les écritures `validated` entrent dans les rapports officiels.
+ * Les écritures `validated` et `reversed` entrent dans les rapports officiels.
  */
 
 export type AccountType = "asset" | "liability" | "equity" | "revenue" | "expense";

@@ -5,6 +5,7 @@ import { computeValidityPeriod } from "./status";
 import { createSupporterToken } from "./tokens";
 import { sendSupporterWelcomeEmail } from "./email";
 import { safeProcessAccounting } from "@/lib/accounting/hooks";
+import { lookupStripeFeeCents } from "@/lib/accounting/stripeFeeLookup";
 
 export async function activateSupporterFromPayment(params: {
   supporterId: string;
@@ -91,24 +92,40 @@ export async function activateSupporterFromPayment(params: {
   const paidCents =
     params.amountCents > 0 ? params.amountCents : offer.price_cents;
 
-  const { error: updError } = await supabase
+  const feeCents = await lookupStripeFeeCents({
+    paymentIntentId: params.paymentIntentId,
+    chargeId: null,
+    stripeAccount: params.eventAccountId || supporter.stripe_connected_account_id,
+    amountCents: paidCents,
+  });
+  const patch: Record<string, unknown> = {
+    status: "active",
+    start_date: validity.startDate,
+    end_date: validity.endDate,
+    amount_paid_cents: paidCents,
+    supporter_number: supporterNumber,
+    card_token: cardToken,
+    qr_token: qrToken,
+    stripe_checkout_session_id:
+      params.sessionId || supporter.stripe_checkout_session_id,
+    stripe_payment_intent_id:
+      params.paymentIntentId || supporter.stripe_payment_intent_id,
+    activated_at: supporter.activated_at || new Date().toISOString(),
+    stripe_fee_cents: feeCents,
+  };
+  let { error: updError } = await supabase
     .from("supporters")
-    .update({
-      status: "active",
-      start_date: validity.startDate,
-      end_date: validity.endDate,
-      amount_paid_cents: paidCents,
-      supporter_number: supporterNumber,
-      card_token: cardToken,
-      qr_token: qrToken,
-      stripe_checkout_session_id:
-        params.sessionId || supporter.stripe_checkout_session_id,
-      stripe_payment_intent_id:
-        params.paymentIntentId || supporter.stripe_payment_intent_id,
-      activated_at: supporter.activated_at || new Date().toISOString(),
-    })
+    .update(patch)
     .eq("id", supporter.id)
     .eq("club_id", params.clubId);
+  if (updError && /stripe_fee_cents/.test(updError.message || "")) {
+    delete patch.stripe_fee_cents;
+    ({ error: updError } = await supabase
+      .from("supporters")
+      .update(patch)
+      .eq("id", supporter.id)
+      .eq("club_id", params.clubId));
+  }
 
   if (updError) throw updError;
 

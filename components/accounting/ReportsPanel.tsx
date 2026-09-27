@@ -215,7 +215,7 @@ function GroupTable({ group, hideTitle = false, hideSubtotal = false }: { group:
         <tbody>
           {group.lines.length === 0 ? <tr><td className="py-1 text-[#94A3B8]">Aucun mouvement validé.</td></tr> : null}
           {group.lines.map((row) => (
-            <tr key={row.number} className="border-t border-[#F1F5F9]">
+            <tr key={`${row.number}:${row.name}`} className="border-t border-[#F1F5F9]">
               <td className="py-1.5 tabular-nums text-[#64748B]">{row.number}</td>
               <td className="py-1.5">{row.name}</td>
               <td className="py-1.5 text-right tabular-nums">{formatChfAmount(row.amount)}</td>

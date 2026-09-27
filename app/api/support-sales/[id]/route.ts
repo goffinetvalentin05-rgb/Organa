@@ -169,10 +169,35 @@ export async function PATCH(
     }
 
     if (status === "ended") {
+      const payload = body as {
+        receivedOn?: unknown;
+        amount?: unknown;
+        categoryAccountId?: unknown;
+        splits?: unknown;
+      };
+      const receivedOn = typeof payload.receivedOn === "string" ? payload.receivedOn : "";
+      if (!receivedOn) {
+        return NextResponse.json(
+          { error: "Confirmez la date et les sommes encaissées pour terminer la vente." },
+          { status: 400 },
+        );
+      }
       const completed = await completeSupportSale({
         clubId: guard.clubId,
         userId: guard.userId,
         saleId: id,
+        receivedOn,
+        amount: Number(payload.amount),
+        categoryAccountId: payload.categoryAccountId ? String(payload.categoryAccountId) : null,
+        splits: Array.isArray(payload.splits)
+          ? payload.splits.flatMap((item) => {
+            if (!item || typeof item !== "object") return [];
+            const row = item as { accountId?: unknown; amount?: unknown };
+            return typeof row.accountId === "string"
+              ? [{ accountId: row.accountId, amount: Number(row.amount) }]
+              : [];
+          })
+          : [],
       });
       if (!completed.ok) {
         return NextResponse.json({ error: completed.error }, { status: completed.status });

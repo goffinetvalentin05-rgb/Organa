@@ -8,6 +8,8 @@ import {
 } from "./checkout";
 import { sendOrderPaidEmails } from "./email";
 import { safeProcessAccounting } from "@/lib/accounting/hooks";
+import { lookupStripeFeeCents } from "@/lib/accounting/stripeFeeLookup";
+import { recordClubStripePayout } from "@/lib/accounting/stripePayout";
 import { syncStripeAccountRow } from "./stripe-connect";
 import {
   findMembershipDocument,
@@ -37,7 +39,8 @@ function isConnectDirectChargeEvent(event: Stripe.Event): boolean {
     event.type === "checkout.session.expired" ||
     event.type === "payment_intent.succeeded" ||
     event.type === "payment_intent.payment_failed" ||
-    event.type === "charge.refunded"
+    event.type === "charge.refunded" ||
+    event.type === "payout.paid"
   );
 }
 
@@ -200,17 +203,35 @@ export async function markOrderPaid(params: {
     }
   }
 
-  const { error: updError } = await supabase
+  const amountCents = params.amountCents || order.total_cents;
+  const feeCents = await lookupStripeFeeCents({
+    paymentIntentId: params.paymentIntentId,
+    chargeId: params.chargeId,
+    stripeAccount: params.eventAccountId || order.stripe_connected_account_id,
+    amountCents,
+  });
+  const paidPatch: Record<string, unknown> = {
+    payment_status: "paid",
+    fulfillment_status: "to_prepare",
+    stripe_payment_intent_id: params.paymentIntentId,
+    paid_at: new Date().toISOString(),
+    stripe_fee_cents: feeCents,
+  };
+  let { error: updError } = await supabase
     .from("shop_orders")
-    .update({
-      payment_status: "paid",
-      fulfillment_status: "to_prepare",
-      stripe_payment_intent_id: params.paymentIntentId,
-      paid_at: new Date().toISOString(),
-    })
+    .update(paidPatch)
     .eq("id", order.id)
     .eq("club_id", order.club_id)
     .neq("payment_status", "paid");
+  if (updError && /stripe_fee_cents/.test(updError.message || "")) {
+    delete paidPatch.stripe_fee_cents;
+    ({ error: updError } = await supabase
+      .from("shop_orders")
+      .update(paidPatch)
+      .eq("id", order.id)
+      .eq("club_id", order.club_id)
+      .neq("payment_status", "paid"));
+  }
 
   if (updError) throw updError;
 
@@ -304,6 +325,18 @@ export async function handleShopStripeEvent(
       if (!clubId) return;
       const supabase = createAdminClient();
       await syncStripeAccountRow(supabase, clubId, account);
+      break;
+    }
+
+    case "payout.paid": {
+      const payout = event.data.object as Stripe.Payout;
+      await recordClubStripePayout({
+        connectedAccountId: connectedAccount,
+        payoutId: payout.id,
+        amountCents: payout.amount,
+        arrivalDate: payout.arrival_date,
+        currency: payout.currency,
+      });
       break;
     }
 

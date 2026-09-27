@@ -20,6 +20,7 @@ import {
   getAccountingAccess,
   listOpenItems,
   loadWorkspace,
+  processAccountingInbox,
   recordExport,
   reopenPeriod,
   updateAccount,
@@ -117,6 +118,9 @@ export async function POST(request: NextRequest) {
           message:
             "L’import d’historique (CSV, Excel, balance ou journal) arrive. Aucune écriture n’a été créée.",
         });
+      case "process-inbox":
+        await processAccountingInbox(guard.clubId, guard.userId, "user");
+        break;
       case "confirm":
         await confirmInbox({
           clubId: guard.clubId,
@@ -229,7 +233,14 @@ export async function POST(request: NextRequest) {
         await clearNumberingNotice(guard.clubId);
         break;
       case "settings":
-        await updateSettings(guard.clubId, guard.userId, Boolean(body.autoValidate));
+        await updateSettings(
+          guard.clubId,
+          guard.userId,
+          Boolean(body.autoValidate),
+          Object.prototype.hasOwnProperty.call(body, "payoutAccountId")
+            ? (body.payoutAccountId ? String(body.payoutAccountId) : null)
+            : undefined,
+        );
         break;
       case "close":
         await closePeriod({
