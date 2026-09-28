@@ -8639,67 +8639,88 @@ body.app-bg:has(.obillz-landing-home) {
 }
 
 .lp-hero-trust {
-  width: min(44rem, 100%);
-  margin-top: 0.35rem;
+  width: min(48rem, 100%);
+  margin-top: 0.85rem;
 }
 
 .lp-hero-trust__label {
-  margin: 0 0 0.7rem;
-  color: #3a4d6b;
-  font-size: 0.75rem;
-  font-weight: 550;
-  letter-spacing: 0.01em;
-  line-height: 1.45;
+  margin: 0 0 0.95rem;
+  color: rgba(16, 32, 79, 0.58);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.012em;
+  line-height: 1.55;
   text-wrap: balance;
 }
 
 .lp-hero-trust__marquee {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
 .lp-hero-trust__ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   width: max-content;
-  animation: lp-hero-trust 42s linear infinite;
+  animation: lp-hero-trust 40s linear infinite;
 }
 
 .lp-hero-trust__row {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 2.75rem;
+  gap: 5.5rem;
   margin: 0;
-  padding: 0 2.75rem 0 0;
+  padding: 0;
   list-style: none;
 }
 
+.lp-hero-trust__ribbon .lp-hero-trust__row {
+  padding-right: 5.5rem;
+}
+
+.lp-hero-trust__row--sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .lp-hero-trust__item {
-  color: #2a3b58;
-  white-space: nowrap;
-  transition: color 0.28s ease;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
 }
 
-.lp-hero-trust__item--tool {
-  font-size: 0.98rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+.lp-hero-trust__logo {
+  display: block;
+  width: auto;
+  height: 2.35rem;
+  object-fit: contain;
+  opacity: 0.9;
+  user-select: none;
+  pointer-events: none;
 }
 
-.lp-hero-trust__item--club {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.lp-hero-trust__logo--stripe {
+  height: 1.28rem;
+  opacity: 0.86;
+}
+
+.lp-hero-trust__logo--resend {
+  height: 1.05rem;
+  opacity: 0.82;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .lp-hero-trust__marquee:hover .lp-hero-trust__ribbon {
     animation-play-state: paused;
-  }
-
-  .lp-hero-trust__item:hover {
-    color: #10204f;
   }
 }
 
@@ -8709,34 +8730,52 @@ body.app-bg:has(.obillz-landing-home) {
 }
 
 @media (max-width: 768px) {
+  .lp-hero-trust {
+    margin-top: 0.7rem;
+  }
+
   .lp-hero-trust__label {
-    font-size: 0.72rem;
-    padding-inline: 0.25rem;
+    font-size: 0.75rem;
+    padding-inline: 0.35rem;
   }
 
   .lp-hero-trust__row {
-    gap: 2.15rem;
-    padding-right: 2.15rem;
+    gap: 2.25rem;
+  }
+
+  .lp-hero-trust__ribbon .lp-hero-trust__row {
+    padding-right: 5.25rem;
+  }
+
+  .lp-hero-trust__logo {
+    height: 2rem;
+  }
+
+  .lp-hero-trust__logo--stripe {
+    height: 1.1rem;
+  }
+
+  .lp-hero-trust__logo--resend {
+    height: 0.92rem;
   }
 
   .lp-hero-trust__ribbon {
-    animation-duration: 32s;
+    animation-duration: 34s;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .lp-hero-trust__ribbon {
-    animation: none;
+    display: none;
+  }
+
+  .lp-hero-trust__row--sizer {
+    visibility: visible;
   }
 
   .lp-hero-trust__marquee {
-    overflow-x: auto;
     mask-image: none;
     -webkit-mask-image: none;
-  }
-
-  .lp-hero-trust__row[aria-hidden="true"] {
-    display: none;
   }
 }
 
