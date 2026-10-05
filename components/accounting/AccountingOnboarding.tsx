@@ -90,7 +90,7 @@ export default function AccountingOnboarding({
   onDone,
 }: {
   usesStripe: boolean;
-  onDone: (payload: Record<string, unknown>) => Promise<void>;
+  onDone: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
   const year = new Date().getFullYear();
   const accounts = useMemo(() => chartTakeoverAccounts().filter((account) => usesStripe || account.code !== "stripe"), [usesStripe]);
@@ -226,7 +226,12 @@ export default function AccountingOnboarding({
     }
     setBusy(true);
     try {
-      await onDone(payload());
+      const result = await onDone(payload());
+      if (result && typeof result === "object" && "error" in result && result.error) {
+        setNotice(null);
+        setError(`${String(result.error)} La reprise n'a pas été enregistrée.`);
+        return;
+      }
       setNotice("La reprise est enregistrée.");
     } catch (cause) {
       setNotice(null);

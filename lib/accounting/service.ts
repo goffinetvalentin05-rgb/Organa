@@ -1562,6 +1562,9 @@ async function completeTakeover(clubId: string, userId: string, raw: Record<stri
     if (input.mode === "fresh" && /start_mode|accounting_settings_start_mode/i.test(error.message)) {
       throw new Error("Le démarrage sans historique demande la migration 106. Aucune écriture n'a été créée.");
     }
+    if (/accounting_settings_history_import/i.test(error.message)) {
+      throw new Error("L'import des écritures demande la migration 107. Aucune écriture n'a été créée.");
+    }
     throw new Error(error.message);
   }
   void data;
