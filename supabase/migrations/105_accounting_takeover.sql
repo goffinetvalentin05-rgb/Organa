@@ -12,7 +12,7 @@ ALTER TABLE public.accounting_settings
 ALTER TABLE public.accounting_settings
   ADD CONSTRAINT accounting_settings_start_mode
   CHECK (start_mode IS NULL OR start_mode IN (
-    'next_period', 'resume_current', 'from_today', 'full_period', 'from_date'
+    'next_period', 'resume_current', 'from_today', 'full_period', 'from_date', 'fresh'
   ));
 
 ALTER TABLE public.accounting_history_imports

@@ -6,7 +6,7 @@ import { roundChf } from "./money";
 import { parseChfInput, periodLabel } from "./onboarding";
 import type { DraftLine } from "./types";
 
-export type TakeoverMode = "full_period" | "from_date";
+export type TakeoverMode = "fresh" | "full_period" | "from_date";
 
 export type TakeoverAccount = {
   code: string;
@@ -35,6 +35,8 @@ export type TakeoverJournalEntry = {
   piece: string;
   label: string;
   origin: string;
+  remark?: string;
+  reference?: string;
   sourceType?: string;
   sourceId?: string;
   lines: TakeoverJournalLine[];
@@ -48,6 +50,7 @@ export type TakeoverInput = {
   balances: TakeoverBalance[];
   accounts: TakeoverAccount[];
   confirmEquityProposal?: boolean;
+  confirmZeroOpening?: boolean;
   journal?: TakeoverJournalEntry[];
   cumulatives?: TakeoverBalance[];
   openItems?: TakeoverOpenItem[];
@@ -91,18 +94,20 @@ export type TakeoverFailure = {
 const ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const TAKEOVER_CSV_HEADERS = ["date", "piece", "libelle", "compte", "debit", "credit", "origine"] as const;
+export const TAKEOVER_CSV_HEADERS = ["date", "piece", "libelle", "compte", "debit", "credit", "origine", "remarque", "reference"] as const;
+
+export const TAKEOVER_CSV_REQUIRED = ["date", "compte", "origine"] as const;
 
 export const TAKEOVER_CSV_TEMPLATE = [
   TAKEOVER_CSV_HEADERS.join(";"),
-  "2027-01-15;FAC-12;Cotisation janvier;1020;120.00;0;EXT-12",
-  "2027-01-15;FAC-12;Cotisation janvier;3000;0;120.00;EXT-12",
-  "2027-02-02;FAC-18;Facture matériel;4000;80.00;0;EXT-18",
-  "2027-02-02;FAC-18;Facture matériel;2000;0;80.00;EXT-18",
+  "2027-01-15;FAC-12;Cotisation janvier;1020;120.00;0;EXT-12;;",
+  "2027-01-15;FAC-12;Cotisation janvier;3000;0;120.00;EXT-12;;",
+  "2027-02-02;FAC-18;Facture matériel;4000;80.00;0;EXT-18;;",
+  "2027-02-02;FAC-18;Facture matériel;2000;0;80.00;EXT-18;;",
 ].join("\n");
 
 export const TAKEOVER_CSV_HELP =
-  "Une ligne par compte. Les lignes qui partagent la même origine forment une seule écriture, même composée. Le compte est le numéro Obillz. L'origine est la référence de l'ancien logiciel : elle empêche de reprendre deux fois le même lot.";
+  "Une ligne par compte. Les lignes qui partagent la même origine forment une seule écriture, même composée. Obligatoires : date, compte, origine, et un montant au débit ou au crédit. Facultatifs : pièce, libellé, remarque, référence. Le compte est un numéro Obillz, ou un ancien numéro que vous avez associé. Rien n'est placé sur un compte inconnu.";
 
 export function dayBefore(iso: string): string {
   const match = ISO.exec(iso);
@@ -196,64 +201,121 @@ export function annualContinuity(priorStatus: "open" | "closed" | null): {
   return { copyOpening: false, provisional: false, note: null };
 }
 
+export type ImportCellError = {
+  sheet: string;
+  row: number;
+  column: string;
+  message: string;
+};
+
 export function parseTakeoverCsv(
   text: string,
   columnOf: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>> = {},
-): { ok: true; entries: TakeoverJournalEntry[] } | { ok: false; message: string } {
-  const rows = splitCsv(text);
-  if (rows.length < 2) return { ok: false, message: "Le fichier ne contient aucune écriture." };
-  const headers = rows[0].map((cell) => cell.trim().toLowerCase());
-  const index = (field: (typeof TAKEOVER_CSV_HEADERS)[number]) => {
-    const wanted = (columnOf[field] || field).trim().toLowerCase();
-    const found = headers.indexOf(wanted);
-    return found;
-  };
-  const missing = TAKEOVER_CSV_HEADERS.filter((field) => index(field) < 0);
+  options: { delimiter?: ";" | ","; sheet?: string; accounts?: TakeoverAccount[]; accountMap?: Record<string, string> } = {},
+): { ok: true; entries: TakeoverJournalEntry[] } | { ok: false; message: string; errors: ImportCellError[]; needsDelimiter?: boolean; headers?: string[]; unknownAccounts?: string[] } {
+  const sheet = options.sheet || "Ecritures";
+  const detected = detectCsvDelimiter(text);
+  if (!options.delimiter && detected === "ambiguous") {
+    return {
+      ok: false,
+      needsDelimiter: true,
+      message: "Le séparateur du CSV est ambigu. Choisissez le point-virgule ou la virgule.",
+      errors: [{ sheet, row: 1, column: "fichier", message: "Choisissez le point-virgule ou la virgule comme séparateur." }],
+    };
+  }
+  const rows = splitCsv(text, options.delimiter || (detected === "ambiguous" ? ";" : detected));
+  if (rows.length < 2) {
+    return failImport(sheet, 1, "fichier", "Le fichier ne contient aucune écriture.");
+  }
+  const headers = rows[0].map((cell) => cell.trim());
+  const index = (field: (typeof TAKEOVER_CSV_HEADERS)[number]) => headerIndex(headers, columnOf[field] || field);
+  const missing: string[] = TAKEOVER_CSV_REQUIRED.filter((field) => index(field) < 0);
+  if (index("debit") < 0 && index("credit") < 0) missing.push("debit");
   if (missing.length) {
-    return { ok: false, message: `Colonne manquante : ${missing.join(", ")}.` };
+    return {
+      ok: false,
+      headers,
+      message: `Colonne manquante : ${missing.join(", ")}. Associez les colonnes du fichier.`,
+      errors: missing.map((field) => ({ sheet, row: 1, column: field, message: `Associez la colonne « ${field} ».` })),
+    };
   }
   const groups = new Map<string, TakeoverJournalEntry>();
+  const unknown = new Set<string>();
+  let skippedExample = false;
   for (let rowIndex = 1; rowIndex < rows.length; rowIndex += 1) {
     const row = rows[rowIndex];
     if (row.every((cell) => !cell.trim())) continue;
-    const cell = (field: (typeof TAKEOVER_CSV_HEADERS)[number]) => row[index(field)]?.trim() || "";
-    const date = cell("date").slice(0, 10);
+    const cell = (field: (typeof TAKEOVER_CSV_HEADERS)[number]) => {
+      const at = index(field);
+      return at < 0 ? "" : String(row[at] ?? "").trim();
+    };
     const origin = cell("origine");
+    if (origin.toUpperCase().startsWith("EXEMPLE")) {
+      skippedExample = true;
+      continue;
+    }
+    const lineNo = rowIndex + 1;
+    const date = toIsoDate(cell("date"));
     const piece = cell("piece");
     const label = cell("libelle");
-    const account = cell("compte");
+    const accountRaw = cell("compte");
     const debit = parseAmount(cell("debit"));
     const credit = parseAmount(cell("credit"));
-    const where = `Ligne ${rowIndex + 1}`;
-    if (!ISO.test(date)) return { ok: false, message: `${where} : date invalide.` };
-    if (!origin) return { ok: false, message: `${where} : l'origine est obligatoire.` };
-    if (!account) return { ok: false, message: `${where} : le compte est obligatoire.` };
-    if (debit === null || credit === null) return { ok: false, message: `${where} : montant invalide.` };
-    if (debit > 0 && credit > 0) return { ok: false, message: `${where} : un montant est soit au débit, soit au crédit.` };
-    if (debit === 0 && credit === 0) return { ok: false, message: `${where} : le montant est vide.` };
+    if (!date) return failImport(sheet, lineNo, "date", "Date invalide. Utilisez une date Excel, aaaa-mm-jj ou jj.mm.aaaa.");
+    if (!origin) return failImport(sheet, lineNo, "origine", "L'origine, qui regroupe les lignes d'une même écriture, est obligatoire.");
+    if (!accountRaw) return failImport(sheet, lineNo, "compte", "Le compte est obligatoire.");
+    const account = resolveImportAccount(accountRaw, options.accounts, options.accountMap);
+    if (options.accounts && !account) {
+      unknown.add(accountRaw);
+      continue;
+    }
+    if (debit === null || credit === null) return failImport(sheet, lineNo, "debit", "Montant invalide. Utilisez un montant suisse, par exemple 1'250.50 ou 1250,50.");
+    if (debit > 0 && credit > 0) return failImport(sheet, lineNo, "debit", "Un montant est soit au débit, soit au crédit.");
+    if (debit === 0 && credit === 0) return failImport(sheet, lineNo, "debit", "Le montant est vide.");
     const current = groups.get(origin) ?? {
       date,
       piece,
       label,
       origin,
+      remark: cell("remarque") || undefined,
+      reference: cell("reference") || undefined,
       lines: [],
     };
-    if (current.date !== date || current.piece !== piece) {
-      return { ok: false, message: `${where} : l'origine ${origin} mélange deux pièces ou deux dates.` };
+    if (current.date !== date || (piece && current.piece && current.piece !== piece)) {
+      return failImport(sheet, lineNo, "origine", `L'origine ${origin} mélange deux pièces ou deux dates. Une écriture à plusieurs lignes reste une seule écriture.`);
     }
-    current.lines.push({ code: account, debit, credit });
+    if (!current.remark && cell("remarque")) current.remark = cell("remarque");
+    if (!current.reference && cell("reference")) current.reference = cell("reference");
+    current.lines.push({ code: account || accountRaw, debit, credit });
     groups.set(origin, current);
   }
+  if (unknown.size) {
+    const list = [...unknown];
+    return {
+      ok: false,
+      unknownAccounts: list,
+      message: `Comptes inconnus : ${list.join(", ")}. Associez-les au plan Obillz. Aucun n'est affecté automatiquement.`,
+      errors: list.map((number) => ({ sheet, row: 0, column: "compte", message: `Associez le compte ${number}.` })),
+    };
+  }
   const entries = [...groups.values()];
-  if (!entries.length) return { ok: false, message: "Le fichier ne contient aucune écriture." };
+  if (!entries.length) {
+    if (skippedExample) return { ok: true, entries: [] };
+    return failImport(sheet, 1, "fichier", "Le fichier ne contient aucune écriture.");
+  }
   for (const entry of entries) {
     const debit = roundChf(entry.lines.reduce((sum, line) => sum + line.debit, 0));
     const credit = roundChf(entry.lines.reduce((sum, line) => sum + line.credit, 0));
     if (debit !== credit || debit <= 0) {
-      return { ok: false, message: `L'écriture ${entry.origin} n'est pas équilibrée.` };
+      return failImport(sheet, 0, "origine", `L'écriture ${entry.origin} n'est pas équilibrée. Le total débit doit égaler le total crédit.`);
     }
   }
   return { ok: true, entries };
+}
+
+function failImport(sheet: string, row: number, column: string, message: string) {
+  const where = row > 0 ? `Feuille ${sheet}, ligne ${row}, colonne ${column} : ${message}` : message;
+  return { ok: false as const, message: where, errors: [{ sheet, row, column, message }] };
 }
 
 export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFailure {
@@ -269,6 +331,9 @@ export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFa
 
   const journal = input.journal ?? [];
   const cumulatives = (input.cumulatives ?? []).filter((row) => roundChf(row.amount) > 0);
+  if (input.mode === "fresh" && (journal.length || cumulatives.length)) {
+    return { ok: false, message: "Une nouvelle comptabilité sans historique ne reprend ni les anciennes écritures ni leurs cumuls." };
+  }
   if (input.mode === "full_period" && cumulatives.length) {
     return { ok: false, message: "La reprise de tout l'exercice utilise les écritures détaillées. Les cumuls compteraient une deuxième fois les produits et les charges." };
   }
@@ -307,6 +372,15 @@ export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFa
     rollupLines.push(account.accountType === "revenue"
       ? { accountCode: account.code, debit: 0, credit: amount }
       : { accountCode: account.code, debit: amount, credit: 0 });
+  }
+
+  if (input.mode === "fresh" && balanceLines.length === 0) {
+    if (!input.confirmZeroOpening) {
+      return {
+        ok: false,
+        message: "Tous les soldes sont nuls. Confirmez que le club n'a ni argent, ni bien, ni dette, ni fonds propres. Aucun fonds propre n'est ajouté pour combler un écart.",
+      };
+    }
   }
 
   const gap = trialGap(balanceLines);
@@ -407,10 +481,14 @@ export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFa
     }
   }
 
-  const openingDate = input.mode === "full_period" || input.takeoverDate === input.periodStart
-    ? input.periodStart
-    : dayBefore(input.takeoverDate);
-  const incomeAnnual = input.mode === "full_period" || rollupLines.length > 0;
+  const openingDate = input.mode === "fresh"
+    ? input.takeoverDate
+    : input.mode === "full_period" || input.takeoverDate === input.periodStart
+      ? input.periodStart
+      : dayBefore(input.takeoverDate);
+  const incomeAnnual = input.mode === "full_period"
+    || (input.mode === "fresh" && input.takeoverDate === input.periodStart)
+    || rollupLines.length > 0;
   const coverageNote = coverageText({
     mode: input.mode,
     periodEnd: input.periodEnd,
@@ -422,9 +500,11 @@ export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFa
   return {
     ok: true,
     openingDate,
-    openingDescription: input.mode === "full_period"
-      ? "Soldes au début de l'exercice"
-      : "Situation juste avant le passage",
+    openingDescription: input.mode === "fresh"
+      ? "Situation de départ"
+      : input.mode === "full_period"
+        ? "Soldes au début de l'exercice"
+        : "Situation juste avant le passage",
     openingLines,
     equityProposalApplied,
     journal: postedJournal,
@@ -437,11 +517,13 @@ export function planTakeover(input: TakeoverInput): TakeoverSuccess | TakeoverFa
         }
       : null,
     coverageNote,
-    journalScope: input.mode === "full_period"
-      ? (postedJournal.length
-        ? `Le journal détaille les opérations du ${formatSwissDate(input.periodStart)} au ${formatSwissDate(dayBefore(input.takeoverDate))}, puis les nouvelles opérations dès le ${formatSwissDate(input.takeoverDate)}.`
-        : `Le journal commence au ${formatSwissDate(input.takeoverDate)}. Les opérations de l'exercice précédent ne sont pas importées.`)
-      : `Le journal détaille les opérations à partir du ${formatSwissDate(input.takeoverDate)}. ${rollupLines.length ? "Les produits et les charges antérieurs figurent en un seul cumul, sans le détail des anciennes opérations." : "Les produits et les charges antérieurs ne sont pas repris."}`,
+    journalScope: input.mode === "fresh"
+      ? `Les nouvelles opérations commencent le ${formatSwissDate(input.takeoverDate)}. Aucune écriture antérieure n'est importée.`
+      : input.mode === "full_period"
+        ? (postedJournal.length
+          ? `Le journal détaille les opérations du ${formatSwissDate(input.periodStart)} au ${formatSwissDate(dayBefore(input.takeoverDate))}, puis les nouvelles opérations dès le ${formatSwissDate(input.takeoverDate)}.`
+          : `Le journal commence au ${formatSwissDate(input.takeoverDate)}. Les opérations de l'exercice précédent ne sont pas importées.`)
+        : `Le journal détaille les opérations à partir du ${formatSwissDate(input.takeoverDate)}. ${rollupLines.length ? "Les produits et les charges antérieurs figurent en un seul cumul, sans le détail des anciennes opérations." : "Les produits et les charges antérieurs ne sont pas repris."}`,
     incomeAnnual,
     openItems,
     fingerprint: importFingerprint({
@@ -462,6 +544,12 @@ function coverageText(input: {
   incomeAnnual: boolean;
   journalCount: number;
 }): string {
+  if (input.mode === "fresh" && input.incomeAnnual) {
+    return `Nouvelle comptabilité sans historique. Le résultat couvre l'exercice depuis le ${formatSwissDate(input.takeoverDate)}.`;
+  }
+  if (input.mode === "fresh") {
+    return `Le compte de résultat couvre seulement du ${formatSwissDate(input.takeoverDate)} au ${formatSwissDate(input.periodEnd)}. Il n'y a pas d'historique antérieur, donc ce total n'est pas celui d'une année déjà commencée ailleurs.`;
+  }
   if (input.mode === "from_date" && !input.incomeAnnual) {
     return `Le compte de résultat couvre seulement du ${formatSwissDate(input.takeoverDate)} au ${formatSwissDate(input.periodEnd)}. Les cumuls antérieurs n'ont pas été repris, donc ce total n'est pas celui de l'année entière.`;
   }
@@ -494,27 +582,114 @@ function formatChf(amount: number): string {
   return `${amount.toFixed(2)} CHF`;
 }
 
-function parseAmount(raw: string): number | null {
-  if (!raw) return 0;
-  const value = Number(raw.replace(/['\s]/g, "").replace(",", "."));
+export function parseAmount(raw: unknown): number | null {
+  if (typeof raw === "number") {
+    if (!Number.isFinite(raw) || raw < 0) return null;
+    return roundChf(raw);
+  }
+  const text = String(raw ?? "").trim();
+  if (!text) return 0;
+  const value = Number(text.replace(/[’'\u00A0\s]/g, "").replace(",", "."));
   if (!Number.isFinite(value) || value < 0) return null;
   return roundChf(value);
 }
 
-function splitCsv(text: string): string[][] {
+export function toIsoDate(raw: unknown): string | null {
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    const year = raw.getFullYear();
+    const month = String(raw.getMonth() + 1).padStart(2, "0");
+    const day = String(raw.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  if (typeof raw === "number" && raw > 20000 && raw < 80000) {
+    const utc = new Date(Date.UTC(1899, 11, 30) + Math.round(raw) * 86400000);
+    return utc.toISOString().slice(0, 10);
+  }
+  const text = String(raw ?? "").trim();
+  const iso = text.slice(0, 10);
+  if (ISO.test(iso)) {
+    const year = Number(iso.slice(0, 4));
+    const month = Number(iso.slice(5, 7));
+    const day = Number(iso.slice(8, 10));
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+    if (parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day) return iso;
+    return null;
+  }
+  const swiss = /^(\d{1,2})[./](\d{1,2})[./](\d{4})$/.exec(text);
+  if (!swiss) return null;
+  const day = Number(swiss[1]);
+  const month = Number(swiss[2]);
+  const year = Number(swiss[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+export function normalizeHeader(value: string): string {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+const HEADER_ALIASES: Record<string, string[]> = {
+  date: ["date"],
+  piece: ["piece"],
+  libelle: ["libelle", "label"],
+  compte: ["compte", "account"],
+  debit: ["debit"],
+  credit: ["credit"],
+  origine: ["origine", "origin", "regroupement", "referencederegroupement"],
+  remarque: ["remarque", "note"],
+  reference: ["reference", "ref"],
+  numero: ["numero"],
+  nom: ["nom"],
+  solde: ["solde", "montant"],
+  cumul: ["cumul"],
+  ancien: ["anciennumero", "ancienn"],
+};
+
+export function headerIndex(headers: string[], field: string): number {
+  const wanted = normalizeHeader(field);
+  const aliases = HEADER_ALIASES[wanted] || [wanted];
+  return headers.findIndex((header) => aliases.includes(normalizeHeader(header)) || normalizeHeader(header) === wanted);
+}
+
+export function detectCsvDelimiter(text: string): ";" | "," | "ambiguous" {
+  const header = text.replace(/^\uFEFF/, "").split(/\r?\n/, 1)[0] || "";
+  let semi = 0;
+  let comma = 0;
+  let quoted = false;
+  for (const char of header) {
+    if (char === '"') quoted = !quoted;
+    else if (!quoted && char === ";") semi += 1;
+    else if (!quoted && char === ",") comma += 1;
+  }
+  if (semi > 0 && comma > 0) return "ambiguous";
+  return semi > 0 ? ";" : ",";
+}
+
+export function resolveImportAccount(
+  raw: string,
+  accounts?: TakeoverAccount[],
+  accountMap?: Record<string, string>,
+): string | null {
+  const trimmed = raw.trim();
+  const mapped = accountMap?.[trimmed] || trimmed;
+  if (!accounts) return mapped;
+  const found = accounts.find((account) => account.number === mapped || account.code === mapped || account.number === trimmed || account.code === trimmed);
+  return found ? found.code : null;
+}
+
+function splitCsv(text: string, delimiter: ";" | ","): string[][] {
   const normalized = text.replace(/^\uFEFF/, "").trim();
   if (!normalized) return [];
-  const header = normalized.split(/\r?\n/, 1)[0] || "";
-  const delimiter = header.includes(";") ? ";" : ",";
   return normalized.split(/\r?\n/).map((line) => splitCsvLine(line, delimiter));
 }
 
 export function takeoverInputFromBody(body: Record<string, unknown>): TakeoverInput | { error: string } {
-  const mode = body.takeoverMode === "full_period" || body.mode === "full_period"
-    ? "full_period"
-    : body.takeoverMode === "from_date" || body.mode === "from_date"
-      ? "from_date"
-      : null;
+  const requested = body.takeoverMode || body.mode;
+  const mode = requested === "fresh" || requested === "full_period" || requested === "from_date"
+    ? requested
+    : null;
   if (!mode) return { error: "Choisissez comment reprendre la comptabilité." };
   const accounts = chartTakeoverAccounts();
   const custom = Array.isArray(body.customAccounts) ? body.customAccounts : [];
@@ -556,6 +731,7 @@ export function takeoverInputFromBody(body: Record<string, unknown>): TakeoverIn
     balances,
     accounts,
     confirmEquityProposal: body.confirmEquityProposal === true,
+    confirmZeroOpening: body.confirmZeroOpening === true,
     journal,
     cumulatives,
     openItems,
@@ -603,8 +779,8 @@ export function takeoverRpcPayload(
       : null,
     journal: plan.journal.map((entry) => ({
       entry_date: entry.date,
-      description: entry.label,
-      reference: entry.piece,
+      description: [entry.label, entry.remark].filter(Boolean).join(" — ") || entry.origin,
+      reference: entry.reference || entry.piece,
       amount: roundChf(entry.lines.reduce((sum, line) => sum + line.debit, 0)),
       source_type: entry.sourceType || "import",
       source_id: entry.sourceId || null,

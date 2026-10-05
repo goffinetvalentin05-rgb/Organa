@@ -247,7 +247,7 @@ describe("import", () => {
   });
 
   it("signale une date, un compte ou un écart", () => {
-    expect(parseTakeoverCsv("date;piece;libelle;compte;debit;credit;origine\n31.01.2027;A;x;1020;10;0;O1").ok).toBe(false);
+    expect(parseTakeoverCsv("date;piece;libelle;compte;debit;credit;origine\nhier;A;x;1020;10;0;O1").ok).toBe(false);
     expect(parseTakeoverCsv("date;piece;libelle;compte;debit;credit;origine\n2027-01-31;A;x;1020;10;0;O1\n2027-01-31;A;x;1020;0;9;O1").ok).toBe(false);
     const unknown = planTakeover({
       accounts,

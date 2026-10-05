@@ -1559,6 +1559,9 @@ async function completeTakeover(clubId: string, userId: string, raw: Record<stri
     if (/finalize_takeover|does not exist|n'existe pas/i.test(error.message)) {
       throw new Error("La reprise demande la migration 105. Aucune écriture n'a été créée.");
     }
+    if (input.mode === "fresh" && /start_mode|accounting_settings_start_mode/i.test(error.message)) {
+      throw new Error("Le démarrage sans historique demande la migration 106. Aucune écriture n'a été créée.");
+    }
     throw new Error(error.message);
   }
   void data;
@@ -1574,6 +1577,9 @@ export async function applyHistoryImport(clubId: string, userId: string, raw: Re
   const periods = await loadPeriods(admin, clubId);
   const period = periods.find((item) => item.id === String(raw.periodId || "")) || periods.find((item) => item.status === "open");
   if (!period) throw new Error("Aucun exercice ouvert pour cette reprise.");
+  if (settings?.start_mode === "fresh") {
+    throw new Error("Une comptabilité sans historique n'importe pas d'anciennes opérations.");
+  }
   const input = takeoverInputFromBody({
     ...raw,
     takeoverMode: raw.takeoverMode || settings?.start_mode,
