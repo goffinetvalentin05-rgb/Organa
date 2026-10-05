@@ -50,24 +50,25 @@ const HELP: Record<string, string> = {
   retained: "Résultat des exercices précédents déjà affecté.",
 };
 
-const MODES: Array<{ id: TakeoverMode; title: string; text: string; help: string }> = [
+const MODES: Array<{ id: TakeoverMode; title: string; text: string; example: string; note?: string }> = [
   {
     id: "fresh",
-    title: "Sans historique",
-    text: "Saisissez votre situation de départ, puis commencez vos nouvelles opérations.",
-    help: "Sans historique ne veut pas dire sans argent : indiquez les biens, les disponibilités, les dettes et les fonds propres déjà là. Si tout est vraiment à zéro, une confirmation est demandée. Obillz n'ajoute pas de fonds propres pour masquer un écart. Les anciennes opérations et leurs cumuls ne sont pas importés.",
+    title: "Commencer sans anciennes écritures",
+    text: "Vous commencez votre comptabilité dans Obillz. Si le club possède déjà de l'argent, des biens ou des dettes, vous renseignerez cette situation de départ.",
+    example: "Votre club commence le 1er janvier avec 2 000 CHF en banque. Vous indiquez ce montant, puis vous enregistrez vos nouvelles opérations.",
   },
   {
     id: "full_period",
-    title: "Reprendre tout l'exercice",
-    text: "Reprenez les soldes au début de l'exercice et importez les opérations déjà enregistrées depuis cette date.",
-    help: "Les soldes sont ceux du premier jour, pas ceux d'aujourd'hui. Les opérations déjà enregistrées vont jusqu'au dernier jour avant le début dans Obillz, ce jour compris. N'ajoutez pas les soldes actuels ni les cumuls de ces mêmes opérations : ils seraient comptés une seconde fois.",
+    title: "Importer mes anciennes écritures de l'exercice",
+    text: "Vous voulez retrouver dans Obillz toutes les opérations de l'exercice en cours.",
+    example: "Vous passez sur Obillz le 1er juillet. Vous renseignez les soldes du 1er janvier, puis vous importez les écritures de janvier à juin. Ensuite, vous continuez en juillet. Toute l'année est dans Obillz.",
   },
   {
     id: "from_date",
-    title: "Continuer à partir d'une date",
-    text: "Reprenez les soldes juste avant votre passage à Obillz. Vous pourrez aussi ajouter les cumuls de charges et de produits.",
-    help: "Les soldes sont ceux juste avant le passage. Les nouvelles opérations commencent à la date choisie. Les cumuls sont facultatifs et séparés. Sans eux, le résultat ne couvre que la période depuis cette date. N'importez pas les anciennes opérations en plus des soldes : elles y sont déjà comprises.",
+    title: "Commencer avec mes soldes à la date du passage",
+    text: "Vous gardez les anciennes écritures dans votre ancien logiciel et continuez dans Obillz.",
+    example: "Vous passez sur Obillz le 1er juillet. Vous renseignez les soldes au 30 juin, puis vous enregistrez les nouvelles opérations dès juillet. Les écritures de janvier à juin restent dans votre ancien logiciel.",
+    note: "À l'étape suivante, vous pourrez aussi reprendre les totaux de charges et de produits déjà enregistrés pour obtenir un résultat annuel complet.",
   },
 ];
 
@@ -329,20 +330,20 @@ export default function AccountingOnboarding({
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#475569]">
             La date d'inscription du club sur Obillz ne fixe ni l'exercice ni le jour où les écritures commencent. Choisissez l'exercice, puis la façon de démarrer.
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <label className="text-sm text-[#334155]">Début d'exercice
               <input className={fieldClass} type="date" value={periodStart} onChange={(event) => setPeriodStart(event.target.value)} />
             </label>
             <label className="text-sm text-[#334155]">Fin d'exercice
               <input className={fieldClass} type="date" value={periodEnd} onChange={(event) => setPeriodEnd(event.target.value)} />
             </label>
-            <label className="text-sm text-[#334155]">Début des nouvelles opérations dans Obillz
-              <input className={fieldClass} type="date" value={takeoverDate} onChange={(event) => setTakeoverDate(event.target.value)} />
+            <label className="text-sm text-[#334155] sm:col-span-2">À partir de quel jour enregistrerez-vous les nouvelles opérations dans Obillz ?
+              <input className={`${fieldClass} sm:max-w-xs`} type="date" value={takeoverDate} onChange={(event) => setTakeoverDate(event.target.value)} />
             </label>
           </div>
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
             {MODES.map((item) => (
-              <ModeCard key={item.id} selected={mode === item.id} title={item.title} text={item.text} help={item.help} onClick={() => setMode(item.id)} />
+              <ModeCard key={item.id} selected={mode === item.id} title={item.title} text={item.text} example={item.example} note={item.note} onClick={() => setMode(item.id)} />
             ))}
           </div>
           <div className="mt-6">
@@ -722,18 +723,17 @@ function FileDrop({ onFile }: { onFile: (file: File) => void }) {
   );
 }
 
-function ModeCard({ selected, title, text, help, onClick }: { selected: boolean; title: string; text: string; help: string; onClick: () => void }) {
+function ModeCard({ selected, title, text, example, note, onClick }: { selected: boolean; title: string; text: string; example: string; note?: string; onClick: () => void }) {
   return (
-    <div className={`rounded-2xl border p-5 ${selected ? "border-[#1A23FF] bg-[#F4F6FF]" : "border-[rgba(15,23,42,0.08)] bg-white"}`}>
-      <button type="button" onClick={onClick} className="text-left">
-        <span className="text-base font-semibold text-[#0F172A]">{title}</span>
-        <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{text}</span>
-      </button>
-      <details className="mt-3">
-        <summary className="cursor-pointer text-sm font-medium text-[#1A23FF]">Précisions</summary>
-        <p className="mt-2 text-sm leading-relaxed text-[#475569]">{help}</p>
-      </details>
-    </div>
+    <button type="button" onClick={onClick} className={`flex h-full min-w-0 flex-col rounded-2xl border p-5 text-left ${selected ? "border-[#1A23FF] bg-[#F4F6FF]" : "border-[rgba(15,23,42,0.08)] bg-white"}`}>
+      <span className="text-base font-semibold leading-snug text-[#0F172A]">{title}</span>
+      <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{text}</span>
+      <span className={`mt-4 block rounded-xl px-3 py-3 ${selected ? "bg-white" : "bg-[#F8FAFC]"}`}>
+        <span className="block text-xs font-semibold text-[#1A23FF]">Exemple</span>
+        <span className="mt-1 block text-sm leading-relaxed text-[#334155]">{example}</span>
+      </span>
+      {note ? <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{note}</span> : null}
+    </button>
   );
 }
 
