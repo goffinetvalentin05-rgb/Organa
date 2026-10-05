@@ -5,24 +5,26 @@ import Link from "next/link";
 import { PageHeader, PageLayout, GlassCard } from "@/components/ui";
 import AccountingLanding from "@/components/accounting/AccountingLanding";
 import AccountingOnboarding from "@/components/accounting/AccountingOnboarding";
+import BudgetPanel from "@/components/accounting/BudgetPanel";
 import ChartPanel from "@/components/accounting/ChartPanel";
 import JournalGrid from "@/components/accounting/JournalGrid";
 import PeriodsPanel from "@/components/accounting/PeriodsPanel";
 import ReportsPanel from "@/components/accounting/ReportsPanel";
 import SettingsPanel from "@/components/accounting/SettingsPanel";
 import { isBankSystemCode } from "@/lib/accounting/financialAccounts";
-import { accountBalances, type Account, type Attachment, type Entry, type InboxItem, type JournalLine, type Period } from "@/components/accounting/model";
+import { accountBalances, type Account, type AccountGroup, type Attachment, type BudgetRecord, type Entry, type InboxItem, type JournalLine, type Period } from "@/components/accounting/model";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import { ACCOUNTING_TAGLINE } from "@/lib/accounting/copy";
 import { formatSwissDate, zurichToday } from "@/lib/accounting/format";
 
-type Section = "overview" | "journal" | "review" | "chart" | "reports" | "periods" | "settings";
+type Section = "overview" | "journal" | "review" | "chart" | "reports" | "budget" | "periods" | "settings";
 
 const NAV = [
   { href: "/tableau-de-bord/comptabilite/journal", section: "journal" as const, label: "Journal" },
   { href: "/tableau-de-bord/comptabilite/a-verifier", section: "review" as const, label: "À vérifier" },
   { href: "/tableau-de-bord/comptabilite/plan", section: "chart" as const, label: "Plan comptable" },
   { href: "/tableau-de-bord/comptabilite/rapports", section: "reports" as const, label: "Rapports" },
+  { href: "/tableau-de-bord/comptabilite/budget", section: "budget" as const, label: "Budget" },
   { href: "/tableau-de-bord/comptabilite/exercices", section: "periods" as const, label: "Exercices" },
   { href: "/tableau-de-bord/comptabilite/parametres", section: "settings" as const, label: "Paramètres" },
 ];
@@ -193,11 +195,26 @@ export default function AccountingScreen({ section }: { section: Section }) {
           entries={entries}
           linesByEntry={linesByEntry}
           canWrite={Boolean(access.canWrite)}
+          groups={(data?.groups || []) as AccountGroup[]}
+          extensionsReady={data?.extensionsReady !== false}
           onAct={act}
         />
       ) : null}
       {section === "reports" ? (
-        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} coverageNote={coverage.note} />
+        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} groups={(data?.groups || []) as AccountGroup[]} coverageNote={coverage.note} />
+      ) : null}
+      {section === "budget" ? (
+        <BudgetPanel
+          accounts={accounts}
+          groups={(data?.groups || []) as AccountGroup[]}
+          budgets={(data?.budgets || []) as BudgetRecord[]}
+          entries={entries}
+          linesByEntry={linesByEntry}
+          periods={periods}
+          canWrite={Boolean(access.canManage)}
+          extensionsReady={data?.extensionsReady !== false}
+          onAct={act}
+        />
       ) : null}
       {section === "periods" ? (
         <PeriodsPanel

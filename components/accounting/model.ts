@@ -60,6 +60,32 @@ export type Period = {
   status: string;
 };
 
+export type AccountGroup = {
+  id: string;
+  number: string;
+  name: string;
+  accountIds: string[];
+};
+
+export type BudgetLineRecord = {
+  accountId: string | null;
+  groupId: string | null;
+  groupNumber: string | null;
+  groupName: string | null;
+  amount: number;
+};
+
+export type BudgetRecord = {
+  id: string;
+  periodId: string;
+  status: "draft" | "validated" | "superseded";
+  version: number;
+  supersedesId: string | null;
+  note: string | null;
+  validatedAt: string | null;
+  lines: BudgetLineRecord[];
+};
+
 export const STATUS_LABEL: Record<string, string> = {
   pending: "À vérifier",
   validated: "Vérifiée",

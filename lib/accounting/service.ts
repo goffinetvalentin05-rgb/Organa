@@ -30,13 +30,16 @@ import {
 import { fetchAllPages } from "./paging";
 import {
   accumulatePnl,
+  assertExplicitClose,
   closingTransferLines,
   followingPeriod,
   inboxProcessingDecision,
   operationsBlockingClose,
+  periodCoveringDate,
   type CloseEntry,
   type InboxActor,
 } from "./closePeriod";
+import { groupUsesNumber, loadAccountingExtras } from "./extras";
 import {
   OPENING_PLAN_USER_MESSAGE,
   buildFinalizePayload,
@@ -226,10 +229,7 @@ function accountByCode(accounts: AccountRecord[], code: string | null): AccountR
 }
 
 function periodFor(periods: PeriodRecord[], date: string, openOnly: boolean): PeriodRecord | undefined {
-  return periods.find((period) => {
-    if (openOnly && period.status !== "open") return false;
-    return date >= period.startsOn && date <= period.endsOn;
-  });
+  return periodCoveringDate(periods, date, openOnly);
 }
 
 async function postEntry(
@@ -1209,7 +1209,7 @@ async function loadAllEntries(admin: Admin, clubId: string) {
 export async function loadWorkspace(clubId: string) {
   const admin = createAdminClient();
   const access = await getAccountingAccess(clubId);
-  const [accounts, periods, entries, lineRows, inbox, attachments] = await Promise.all([
+  const [accounts, periods, entries, lineRows, inbox, attachments, extras] = await Promise.all([
     loadAccounts(admin, clubId),
     loadPeriods(admin, clubId),
     loadAllEntries(admin, clubId),
@@ -1233,6 +1233,7 @@ export async function loadWorkspace(clubId: string) {
       .eq("club_id", clubId)
       .order("id", { ascending: true })
       .range(from, to)),
+    loadAccountingExtras(admin, clubId),
   ]);
 
   const current = periods.find((period) => period.status === "open") ?? periods[periods.length - 1];
@@ -1346,6 +1347,9 @@ export async function loadWorkspace(clubId: string) {
     entries: entries ?? [],
     linesByEntry: Object.fromEntries(linesByEntry),
     attachments: attachments ?? [],
+    groups: extras.groups,
+    budgets: extras.budgets,
+    extensionsReady: extras.ready,
     incomeLines,
     balanceLines,
   };
@@ -1523,7 +1527,9 @@ export async function closePeriod(params: {
   userId: string;
   periodId: string;
   transferResult: boolean;
+  confirmed: boolean;
 }) {
+  assertExplicitClose(params.confirmed);
   const admin = createAdminClient();
   const workspace = await loadWorkspace(params.clubId);
   const period = workspace.periods.find((item) => item.id === params.periodId);
@@ -1616,6 +1622,9 @@ export async function createAccount(params: {
     .eq("number", number)
     .maybeSingle();
   if (existing) throw new Error("Ce numéro comptable est déjà utilisé");
+  if (await groupUsesNumber(admin, params.clubId, number)) {
+    throw new Error("Ce numéro est une rubrique de regroupement. Une rubrique ne reçoit pas d’écritures.");
+  }
   const accountClass = Number(number.charAt(0)) || 1;
   const { error } = await admin.from("accounting_accounts").insert({
     club_id: params.clubId,
@@ -1672,6 +1681,9 @@ export async function updateAccount(params: {
       .neq("id", params.accountId)
       .maybeSingle();
     if (clash) throw new Error("Ce numéro comptable est déjà utilisé");
+    if (await groupUsesNumber(admin, params.clubId, nextNumber)) {
+      throw new Error("Ce numéro est une rubrique de regroupement. Une rubrique ne reçoit pas d’écritures.");
+    }
     const { data: lines } = await admin
       .from("accounting_entry_lines")
       .select("entry_id")

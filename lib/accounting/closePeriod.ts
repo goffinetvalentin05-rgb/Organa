@@ -145,6 +145,28 @@ export function followingPeriod(period: { startsOn: string; endsOn: string }): {
   return { ...next, label: periodLabel(next.startsOn, next.endsOn) };
 }
 
+/**
+ * Exercice dont la période contient la date.
+ * Un exercice encore ouvert reste recevable pour ses propres dates,
+ * même si un exercice suivant existe déjà. Cette fonction ne clôture rien.
+ */
+export function periodCoveringDate<T extends { startsOn: string; endsOn: string; status: string }>(
+  periods: T[],
+  date: string,
+  openOnly = false,
+): T | undefined {
+  return periods.find((period) => {
+    if (openOnly && period.status !== "open") return false;
+    return date >= period.startsOn && date <= period.endsOn;
+  });
+}
+
+export function assertExplicitClose(confirmed: boolean): void {
+  if (confirmed !== true) {
+    throw new Error("La clôture demande une confirmation explicite.");
+  }
+}
+
 /** Un exercice qui commence déjà à la date suivante est laissé tel quel, même clôturé. */
 export function planFollowingPeriod(
   period: { startsOn: string; endsOn: string },

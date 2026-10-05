@@ -181,7 +181,8 @@ describe("rapports comptables", () => {
     expect(report.gap).toBe(0);
     expect(report.assets.flatMap((group) => group.lines).map((line) => line.number)).toEqual(["1000", "1020", "1021"]);
     expect(report.funding.find((group) => group.title === "Fonds propres")?.total).toBe(3200);
-    expect(report.funding.find((group) => group.title === "Fonds étrangers (dettes)")?.total).toBe(0);
+    expect(report.funding.find((group) => group.title === "Dettes à court terme")?.total).toBe(0);
+    expect(report.funding.find((group) => group.title === "Dettes à long terme")?.total).toBe(0);
   });
 
   it("limite le compte de résultat aux charges et aux produits", () => {
@@ -293,8 +294,15 @@ describe("PDF des rapports", () => {
     const ledgerText = extractPdfText(ledgerPdf);
 
     expect(balanceText).toContain("Bilan");
-    expect(balanceText).toContain("Actifs");
+    expect(balanceText).toContain("Actif circulant");
+    expect(balanceText).toContain("Actif immobilisé");
+    expect(balanceText).toContain("Total de l'actif");
+    expect(balanceText).toContain("Dettes à court terme");
+    expect(balanceText).toContain("Dettes à long terme");
     expect(balanceText).toContain("Fonds propres");
+    expect(balanceText).toContain("Total du passif");
+    expect(balanceText).toContain("Sous-total actif circulant");
+    expect(balanceText).toContain("Sous-total fonds propres");
     expect(balanceText).toContain("3'200.00");
     expect(balanceText).not.toContain("Compte de résultat");
     expect(balanceText).not.toContain("Produits validés");

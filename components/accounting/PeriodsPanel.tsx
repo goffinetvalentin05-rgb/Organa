@@ -27,6 +27,7 @@ export default function PeriodsPanel({
 }) {
   const [reason, setReason] = useState("");
   const [transfer, setTransfer] = useState(false);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   return (
     <div className="space-y-4">
@@ -47,13 +48,26 @@ export default function PeriodsPanel({
             <div><dt className="text-[#64748B]">Clôture</dt><dd className="font-medium">{period.status === "closed" ? "Exercice clôturé" : "Encore ouvert"}</dd></div>
           </dl>
           {coverageNote ? <p className="mt-3 text-sm text-[#475569]">{coverageNote}</p> : null}
+          {period.status === "open" ? (
+            <p className="mt-3 text-sm text-[#475569]">Cet exercice ouvert accepte les écritures datées du {formatSwissDate(period.startsOn)} au {formatSwissDate(period.endsOn)}, même si l’exercice suivant a commencé. Aucune date ni consultation ne le clôture.</p>
+          ) : null}
           {canWrite && period.status === "open" ? (
             <div className="mt-4 space-y-2">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={transfer} onChange={(event) => setTransfer(event.target.checked)} />
                 Reporter le résultat sur le compte 2900 après confirmation
               </label>
-              <ActionButton type="button" variant="premiumInline" onClick={() => void onAct({ action: "close", periodId: period.id, transferResult: transfer })}>Clôturer l’exercice</ActionButton>
+              {confirmingId === period.id ? (
+                <div className="space-y-2 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+                  <p className="text-sm text-[#334155]">Confirmez la clôture de l’exercice {period.label}. Cette action est manuelle et définitive jusqu’à une réouverture motivée.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <ActionButton type="button" variant="premiumInline" onClick={() => void onAct({ action: "close", periodId: period.id, transferResult: transfer, confirm: true })}>Confirmer la clôture</ActionButton>
+                    <ActionButton type="button" variant="ghost" onClick={() => setConfirmingId(null)}>Annuler</ActionButton>
+                  </div>
+                </div>
+              ) : (
+                <ActionButton type="button" variant="premiumInline" onClick={() => setConfirmingId(period.id)}>Clôturer l’exercice</ActionButton>
+              )}
             </div>
           ) : null}
           {canWrite && period.status === "closed" ? (

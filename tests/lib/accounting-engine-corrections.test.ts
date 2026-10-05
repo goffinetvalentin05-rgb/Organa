@@ -597,6 +597,19 @@ describe("clôture atomique", () => {
     closeRpcFails = false;
   });
 
+  it("refuse une clôture sans confirmation et n'appelle pas la base", async () => {
+    const { closePeriod } = await import("@/lib/accounting/service");
+    await expect(closePeriod({
+      clubId: "club-lecture",
+      userId: "gestionnaire",
+      periodId: "season",
+      transferResult: false,
+      confirmed: false,
+    })).rejects.toThrow(/confirmation/);
+    expect(rpcCalls).toEqual([]);
+    expect(inboxWrites).toEqual([]);
+  });
+
   it("passe le report et l'exercice suivant dans un seul appel, sans écriture séparée", async () => {
     const { closePeriod } = await import("@/lib/accounting/service");
     await closePeriod({
@@ -604,6 +617,7 @@ describe("clôture atomique", () => {
       userId: "gestionnaire",
       periodId: "season",
       transferResult: true,
+      confirmed: true,
     });
     expect(rpcCalls.filter((name) => name === "accounting_close_period")).toEqual(["accounting_close_period"]);
     expect(rpcCalls).not.toContain("accounting_void_journal_entry");
@@ -632,6 +646,7 @@ describe("clôture atomique", () => {
       userId: "gestionnaire",
       periodId: "season",
       transferResult: true,
+      confirmed: true,
     })).rejects.toThrow(/déséquilibrée/);
     expect(inboxWrites).not.toContain("accounting_periods");
     expect(inboxWrites).not.toContain("accounting_entries");

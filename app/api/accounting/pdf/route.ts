@@ -46,6 +46,7 @@ export async function GET(request: Request) {
       entries: workspace.entries,
       linesByEntry: workspace.linesByEntry,
       period,
+      groups: workspace.groups,
     };
     const clubPdf = await getClubCompanyPdfData(createAdminClient(), guard.clubId);
     const club = { name: clubPdf.company.name, logoUrl: clubPdf.company.logoUrl || null };

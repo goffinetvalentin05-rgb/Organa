@@ -28,6 +28,13 @@ import {
   validateEntry,
   voidPendingEntry,
 } from "@/lib/accounting/service";
+import {
+  removeAccountGroup,
+  reviseBudget,
+  saveAccountGroup,
+  saveBudgetDraft,
+  validateBudget,
+} from "@/lib/accounting/extras";
 import type { AccountType } from "@/lib/accounting/types";
 
 export const runtime = "nodejs";
@@ -243,12 +250,47 @@ export async function POST(request: NextRequest) {
         );
         break;
       case "close":
+        if (body.confirm !== true) {
+          return NextResponse.json({ error: "La clôture demande une confirmation explicite." }, { status: 400 });
+        }
         await closePeriod({
           clubId: guard.clubId,
           userId: guard.userId,
           periodId: String(body.periodId),
           transferResult: Boolean(body.transferResult),
+          confirmed: true,
         });
+        break;
+      case "group-save":
+        await saveAccountGroup({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          groupId: body.groupId ? String(body.groupId) : undefined,
+          number: String(body.number || ""),
+          name: String(body.name || ""),
+          accountIds: Array.isArray(body.accountIds) ? body.accountIds.map((id: unknown) => String(id)) : [],
+        });
+        break;
+      case "group-remove":
+        await removeAccountGroup(guard.clubId, guard.userId, String(body.groupId || ""));
+        break;
+      case "budget-save":
+        await saveBudgetDraft({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          periodId: String(body.periodId || ""),
+          lines: Array.isArray(body.lines) ? body.lines.map((line: { accountId?: string; groupId?: string; amount?: number }) => ({
+            accountId: line.accountId ? String(line.accountId) : null,
+            groupId: line.groupId ? String(line.groupId) : null,
+            amount: Number(line.amount || 0),
+          })) : [],
+        });
+        break;
+      case "budget-validate":
+        await validateBudget(guard.clubId, guard.userId, String(body.budgetId || ""));
+        break;
+      case "budget-revise":
+        await reviseBudget(guard.clubId, guard.userId, String(body.budgetId || ""), String(body.note || ""));
         break;
       case "reopen":
         await reopenPeriod(guard.clubId, guard.userId, String(body.periodId), String(body.reason || ""));

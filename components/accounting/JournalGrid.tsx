@@ -608,6 +608,9 @@ export default function JournalGrid({
             {fullscreen ? "Quitter le plein écran" : "Plein écran"}
           </ToolButton>
         </div>
+        {canWrite ? (
+          <p className="text-sm text-[#475569]">Les écritures de régularisation et transitoires se saisissent ici, dans l’exercice encore ouvert. Les comptes 1300 et 2300 servent aux actifs et passifs transitoires.</p>
+        ) : null}
         {numberingNotice || notice ? (
           <p className="text-sm text-[#334155]">
             {numberingNotice || notice}

@@ -1,12 +1,16 @@
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { ReactNode } from "react";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
-import type {
-  AmountGroup,
-  BalanceSheetReport,
-  IncomeReport,
-  JournalReport,
-  LedgerReport,
+import {
+  BALANCE_ASSET_TOTAL_LABEL,
+  BALANCE_FUNDING_TOTAL_LABEL,
+  balanceSubtotalLabel,
+  reportLineLabel,
+  type AmountGroup,
+  type BalanceSheetReport,
+  type IncomeReport,
+  type JournalReport,
+  type LedgerReport,
 } from "@/lib/accounting/reports";
 
 const ink = "#0F172A";
@@ -89,10 +93,10 @@ function AmountRows({ group, showTitle = true, showSubtotal = true }: { group: A
       {showTitle ? <Text style={styles.group}>{group.title}</Text> : null}
       {group.lines.length === 0 ? <Text style={styles.empty}>Aucun mouvement</Text> : null}
       {group.lines.map((item) => (
-        <View key={`${group.title}-${item.number}`} style={styles.row} wrap={false}>
+        <View key={`${group.title}-${item.kind || "account"}-${item.number}-${item.name}`} style={item.kind === "group" ? styles.subtotal : styles.row} wrap={false}>
           <Text style={styles.num}>{item.number}</Text>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.amount}>{money(item.amount)}</Text>
+          <Text style={[styles.name, item.kind === "group" ? { fontFamily: "Helvetica-Bold" } : {}]}>{reportLineLabel(item)}</Text>
+          <Text style={[styles.amount, item.kind === "group" ? { fontFamily: "Helvetica-Bold" } : {}]}>{money(item.amount)}</Text>
         </View>
       ))}
       {showSubtotal ? (
@@ -114,12 +118,12 @@ function sideItems(groups: AmountGroup[]) {
     }
     for (const item of group.lines) {
       items.push({
-        key: `${group.title}-${item.number}-${item.name}`,
+        key: `${group.title}-${item.kind || "account"}-${item.number}-${item.name}`,
         node: (
-          <View style={styles.row} wrap={false}>
+          <View style={item.kind === "group" ? styles.subtotal : styles.row} wrap={false}>
             <Text style={styles.num}>{item.number}</Text>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.amount}>{money(item.amount)}</Text>
+            <Text style={[styles.name, item.kind === "group" ? { fontFamily: "Helvetica-Bold" } : {}]}>{reportLineLabel(item)}</Text>
+            <Text style={[styles.amount, item.kind === "group" ? { fontFamily: "Helvetica-Bold" } : {}]}>{money(item.amount)}</Text>
           </View>
         ),
       });
@@ -128,7 +132,7 @@ function sideItems(groups: AmountGroup[]) {
       key: `${group.title}-total`,
       node: (
         <View style={styles.subtotal} wrap={false}>
-          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>Total {group.title.toLowerCase()}</Text>
+          <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>{balanceSubtotalLabel(group.title)}</Text>
           <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(group.total)}</Text>
         </View>
       ),
@@ -165,8 +169,8 @@ function BalanceDocument({ report, club, generatedOn }: Shared & { report: Balan
           </View>
         ))}
         <View style={styles.totalBar} wrap={false}>
-          <Text style={styles.totalText}>Total actifs {formatChfAmount(report.assetTotal)}</Text>
-          <Text style={styles.totalText}>Total passifs et fonds propres {formatChfAmount(report.fundingTotal)}</Text>
+          <Text style={styles.totalText}>{BALANCE_ASSET_TOTAL_LABEL} {formatChfAmount(report.assetTotal)}</Text>
+          <Text style={styles.totalText}>{BALANCE_FUNDING_TOTAL_LABEL} {formatChfAmount(report.fundingTotal)}</Text>
         </View>
         {report.gap !== 0 ? (
           <Text style={styles.gap}>

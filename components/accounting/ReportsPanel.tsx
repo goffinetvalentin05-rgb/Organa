@@ -4,14 +4,18 @@ import { useMemo, useState } from "react";
 import { GlassCard } from "@/components/ui";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import {
+  BALANCE_ASSET_TOTAL_LABEL,
+  BALANCE_FUNDING_TOTAL_LABEL,
+  balanceSubtotalLabel,
   buildAccountExtract,
   buildBalanceSheet,
   buildIncomeStatement,
   buildJournalReport,
+  reportLineLabel,
   type LedgerReport,
   type ReportKind,
 } from "@/lib/accounting/reports";
-import type { Account, Entry, JournalLine, Period } from "./model";
+import type { Account, AccountGroup, Entry, JournalLine, Period } from "./model";
 
 type Tab = ReportKind;
 
@@ -20,12 +24,14 @@ export default function ReportsPanel({
   accounts,
   linesByEntry,
   periods,
+  groups = [],
   coverageNote,
 }: {
   entries: Entry[];
   accounts: Account[];
   linesByEntry: Record<string, JournalLine[]>;
   periods: Period[];
+  groups?: AccountGroup[];
   coverageNote?: string | null;
 }) {
   const [tab, setTab] = useState<Tab>("result");
@@ -34,8 +40,8 @@ export default function ReportsPanel({
   const period = periods.find((item) => item.id === periodId) || periods[periods.length - 1];
   const books = useMemo(() => {
     if (!period) return null;
-    return { accounts, entries, linesByEntry, period };
-  }, [accounts, entries, linesByEntry, period]);
+    return { accounts, entries, linesByEntry, period, groups };
+  }, [accounts, entries, linesByEntry, period, groups]);
   const balance = books ? buildBalanceSheet(books) : null;
   const income = books ? buildIncomeStatement(books) : null;
   const journal = books ? buildJournalReport(books) : null;
@@ -168,12 +174,12 @@ function BalanceView({ report }: { report: ReturnType<typeof buildBalanceSheet> 
       <p className="mt-1 text-sm text-[#64748B]">Situation au {formatSwissDate(report.asOf)}</p>
       <div className="mt-4 grid gap-6 lg:grid-cols-2">
         <div>
-          {report.assets.map((group) => <GroupTable key={group.title} group={group} />)}
-          <p className="mt-3 text-right font-semibold">Total actifs {formatChfAmount(report.assetTotal)}</p>
+          {report.assets.map((group) => <GroupTable key={group.title} group={group} subtotalLabel={balanceSubtotalLabel(group.title)} />)}
+          <p className="mt-3 text-right font-semibold">{BALANCE_ASSET_TOTAL_LABEL} {formatChfAmount(report.assetTotal)}</p>
         </div>
         <div>
-          {report.funding.map((group) => <GroupTable key={group.title} group={group} />)}
-          <p className="mt-3 text-right font-semibold">Total passifs et fonds propres {formatChfAmount(report.fundingTotal)}</p>
+          {report.funding.map((group) => <GroupTable key={group.title} group={group} subtotalLabel={balanceSubtotalLabel(group.title)} />)}
+          <p className="mt-3 text-right font-semibold">{BALANCE_FUNDING_TOTAL_LABEL} {formatChfAmount(report.fundingTotal)}</p>
         </div>
       </div>
       {report.gap !== 0 ? (
@@ -207,7 +213,17 @@ function GroupBlock({
   );
 }
 
-function GroupTable({ group, hideTitle = false, hideSubtotal = false }: { group: { title: string; lines: Array<{ number: string; name: string; amount: number }>; total: number }; hideTitle?: boolean; hideSubtotal?: boolean }) {
+function GroupTable({
+  group,
+  hideTitle = false,
+  hideSubtotal = false,
+  subtotalLabel,
+}: {
+  group: { title: string; lines: Array<{ number: string; name: string; amount: number; kind?: "account" | "group" }>; total: number };
+  hideTitle?: boolean;
+  hideSubtotal?: boolean;
+  subtotalLabel?: string;
+}) {
   return (
     <div className="mt-3">
       {hideTitle ? null : <p className="text-xs font-semibold text-[#334155]">{group.title}</p>}
@@ -215,16 +231,16 @@ function GroupTable({ group, hideTitle = false, hideSubtotal = false }: { group:
         <tbody>
           {group.lines.length === 0 ? <tr><td className="py-1 text-[#94A3B8]">Aucun mouvement validé.</td></tr> : null}
           {group.lines.map((row) => (
-            <tr key={`${row.number}:${row.name}`} className="border-t border-[#F1F5F9]">
+            <tr key={`${row.kind || "account"}:${row.number}:${row.name}`} className={`border-t border-[#F1F5F9] ${row.kind === "group" ? "font-semibold" : ""}`}>
               <td className="py-1.5 tabular-nums text-[#64748B]">{row.number}</td>
-              <td className="py-1.5">{row.name}</td>
+              <td className="py-1.5">{reportLineLabel(row)}{row.kind === "group" ? <span className="ml-2 text-[11px] font-medium text-[#64748B]">Sous-total, sans écriture</span> : null}</td>
               <td className="py-1.5 text-right tabular-nums">{formatChfAmount(row.amount)}</td>
             </tr>
           ))}
           {hideSubtotal ? null : (
             <tr className="border-t border-[#E2E8F0] font-medium">
               <td />
-              <td className="py-1.5">Total {group.title.toLowerCase()}</td>
+              <td className="py-1.5">{subtotalLabel || `Total ${group.title.toLowerCase()}`}</td>
               <td className="py-1.5 text-right tabular-nums">{formatChfAmount(group.total)}</td>
             </tr>
           )}

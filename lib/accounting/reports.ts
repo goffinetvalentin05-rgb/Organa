@@ -1,4 +1,5 @@
 import { ACCOUNT_CLASS_LABELS, RECOMMENDED_CHART } from "./chart";
+import type { AccountGroup } from "./groups";
 import { roundChf } from "./money";
 import { toJournalRows } from "./journalGrid";
 
@@ -17,10 +18,25 @@ export const JOURNAL_SCOPE =
 export const LEDGER_SCOPE =
   "Extrait limité au compte choisi. Écritures vérifiées et extournées. Les écritures à vérifier et retirées ne figurent pas.";
 
-export const BALANCE_ASSET_CURRENT = "Actifs circulants";
-export const BALANCE_ASSET_FIXED = "Actifs immobilisés";
-export const BALANCE_LIABILITIES = "Fonds étrangers (dettes)";
+export const BALANCE_ASSET_CURRENT = "Actif circulant";
+export const BALANCE_ASSET_FIXED = "Actif immobilisé";
+export const BALANCE_LIABILITY_SHORT = "Dettes à court terme";
+export const BALANCE_LIABILITY_LONG = "Dettes à long terme";
 export const BALANCE_EQUITY = "Fonds propres";
+export const BALANCE_ASSET_TOTAL_LABEL = "Total de l'actif";
+export const BALANCE_FUNDING_TOTAL_LABEL = "Total du passif";
+
+/** Plan suisse PME : immobilisé à partir de 1500, dettes à long terme à partir de 2400. */
+export const FIXED_ASSET_FROM = 1500;
+export const LONG_TERM_LIABILITY_FROM = 2400;
+
+export function balanceSubtotalLabel(title: string): string {
+  return `Sous-total ${title.toLowerCase()}`;
+}
+
+export function reportLineLabel(line: { name: string; kind?: "account" | "group" }): string {
+  return line.kind === "group" ? `Rubrique ${line.name}` : line.name;
+}
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "À vérifier",
@@ -59,7 +75,7 @@ export type ReportPeriod = {
   endsOn: string;
 };
 
-export type AmountLine = { number: string; name: string; amount: number };
+export type AmountLine = { number: string; name: string; amount: number; kind?: "account" | "group" };
 
 export type AmountGroup = { title: string; lines: AmountLine[]; total: number };
 
@@ -151,6 +167,7 @@ type Books = {
   entries: ReportEntry[];
   linesByEntry: Record<string, ReportMovement[]>;
   period: ReportPeriod;
+  groups?: AccountGroup[];
 };
 
 function signed(type: string, debit: number, credit: number): number {
@@ -204,23 +221,79 @@ function balances(input: Books, entries: ReportEntry[]): Map<string, number> {
   return totals;
 }
 
-function groupOf(accounts: ReportAccount[], title: string, totals: Map<string, number>, accept: (account: ReportAccount) => boolean): AmountGroup {
-  const lines = accounts
+function accountLines(accounts: ReportAccount[], totals: Map<string, number>, accept: (account: ReportAccount) => boolean): AmountLine[] {
+  return accounts
     .filter(accept)
     .map((account) => ({ number: account.number, name: printable(account.name), amount: totals.get(account.id) || 0 }))
     .filter((line) => line.amount !== 0)
     .sort((a, b) => a.number.localeCompare(b.number, "fr"));
+}
+
+function insertGroupSubtotals(
+  baseLines: AmountLine[],
+  lines: AmountLine[],
+  groups: AccountGroup[] | undefined,
+  accounts: ReportAccount[],
+  totals: Map<string, number>,
+  accept: (account: ReportAccount) => boolean,
+): AmountLine[] {
+  if (!groups?.length) return lines;
+  const base = new Set(baseLines);
+  const result = [...lines];
+  const ordered = [...groups].sort((a, b) => a.number.localeCompare(b.number, "fr"));
+  for (const group of ordered) {
+    const members = accounts.filter((account) => group.accountIds.includes(account.id) && accept(account) && baseLines.some((line) => line.number === account.number));
+    if (!members.length) continue;
+    const amount = roundChf(members.reduce((sum, account) => sum + (totals.get(account.id) || 0), 0));
+    let insertAt = -1;
+    for (let index = 0; index < result.length; index += 1) {
+      if (!base.has(result[index])) continue;
+      if (members.some((account) => account.number === result[index].number)) insertAt = index;
+    }
+    if (insertAt < 0) continue;
+    result.splice(insertAt + 1, 0, {
+      number: group.number,
+      name: printable(group.name),
+      amount,
+      kind: "group",
+    });
+  }
+  return result;
+}
+
+function finishGroup(
+  input: Books,
+  title: string,
+  baseLines: AmountLine[],
+  extraLines: AmountLine[],
+  totals: Map<string, number>,
+  accept: (account: ReportAccount) => boolean,
+): AmountGroup {
+  const lines = insertGroupSubtotals(baseLines, [...baseLines, ...extraLines], input.groups, input.accounts, totals, accept);
   return {
     title,
     lines,
-    total: roundChf(lines.reduce((sum, line) => sum + line.amount, 0)),
+    total: roundChf(lines.filter((line) => line.kind !== "group").reduce((sum, line) => sum + line.amount, 0)),
   };
 }
 
-/** Actifs circulants : numéros du plan avant 1500. Immobilisés : à partir de 1500, comme le plan du club. */
-function isFixedAsset(number: string): boolean {
+function groupOf(input: Books, title: string, totals: Map<string, number>, accept: (account: ReportAccount) => boolean): AmountGroup {
+  return finishGroup(input, title, accountLines(input.accounts, totals, accept), [], totals, accept);
+}
+
+/** Actif circulant avant 1500. Actif immobilisé à partir de 1500, comme le plan du club. */
+export function isFixedAsset(number: string): boolean {
   const value = Number(number);
-  return Number.isFinite(value) && value >= 1500;
+  return Number.isFinite(value) && value >= FIXED_ASSET_FROM;
+}
+
+/**
+ * Dettes à long terme : comptes de passif à partir de 2400.
+ * Les comptes du plan recommandé 2000, 2200 et 2300 restent à court terme.
+ */
+export function isLongTermLiability(number: string): boolean {
+  const value = Number(number);
+  return Number.isFinite(value) && value >= LONG_TERM_LIABILITY_FROM;
 }
 
 export const PRIOR_UNCLOSED_RESULT = "Résultats antérieurs non reportés";
@@ -252,26 +325,35 @@ export function buildBalanceSheet(input: Books): BalanceSheetReport {
   const included = input.entries.filter((entry) => official(entry.status) && entry.entry_date <= input.period.endsOn);
   const totals = balances(input, included);
   const assets = [
-    groupOf(input.accounts, BALANCE_ASSET_CURRENT, totals, (account) => account.accountType === "asset" && !isFixedAsset(account.number)),
-    groupOf(input.accounts, BALANCE_ASSET_FIXED, totals, (account) => account.accountType === "asset" && isFixedAsset(account.number)),
+    groupOf(input, BALANCE_ASSET_CURRENT, totals, (account) => account.accountType === "asset" && !isFixedAsset(account.number)),
+    groupOf(input, BALANCE_ASSET_FIXED, totals, (account) => account.accountType === "asset" && isFixedAsset(account.number)),
   ];
-  const equity = groupOf(input.accounts, BALANCE_EQUITY, totals, (account) => account.accountType === "equity");
+  const equityBase = accountLines(input.accounts, totals, (account) => account.accountType === "equity");
   const unclosed = unclosedResults(input, included);
   const chartResult = RECOMMENDED_CHART.find((account) => account.systemCode === "result");
   const resultAccount = input.accounts.find((account) => account.number === chartResult?.number);
+  const equityExtra: AmountLine[] = [];
   if (unclosed.prior !== 0) {
-    equity.lines.push({ number: "", name: printable(PRIOR_UNCLOSED_RESULT), amount: unclosed.prior });
+    equityExtra.push({ number: "", name: printable(PRIOR_UNCLOSED_RESULT), amount: unclosed.prior });
   }
   if (unclosed.current !== 0) {
-    equity.lines.push({
+    equityExtra.push({
       number: resultAccount?.number || chartResult?.number || "",
       name: printable(resultAccount?.name || chartResult?.name || "Résultat de l'exercice"),
       amount: unclosed.current,
     });
   }
-  equity.total = roundChf(equity.lines.reduce((sum, line) => sum + line.amount, 0));
+  const equity = finishGroup(
+    input,
+    BALANCE_EQUITY,
+    equityBase,
+    equityExtra,
+    totals,
+    (account) => account.accountType === "equity",
+  );
   const funding = [
-    groupOf(input.accounts, BALANCE_LIABILITIES, totals, (account) => account.accountType === "liability"),
+    groupOf(input, BALANCE_LIABILITY_SHORT, totals, (account) => account.accountType === "liability" && !isLongTermLiability(account.number)),
+    groupOf(input, BALANCE_LIABILITY_LONG, totals, (account) => account.accountType === "liability" && isLongTermLiability(account.number)),
     equity,
   ];
   const assetTotal = roundChf(assets.reduce((sum, group) => sum + group.total, 0));
@@ -289,27 +371,35 @@ export function buildBalanceSheet(input: Books): BalanceSheetReport {
   };
 }
 
-function classGroups(accounts: ReportAccount[], totals: Map<string, number>, type: "revenue" | "expense"): AmountGroup[] {
-  const classes = [...new Set(accounts.filter((account) => account.accountType === type).map((account) => account.accountClass))].sort((a, b) => a - b);
+function classGroups(input: Books, totals: Map<string, number>, type: "revenue" | "expense"): AmountGroup[] {
+  const classes = [...new Set(input.accounts.filter((account) => account.accountType === type).map((account) => account.accountClass))].sort((a, b) => a - b);
   return classes
     .map((accountClass) => groupOf(
-      accounts,
+      input,
       ACCOUNT_CLASS_LABELS[accountClass] || (type === "revenue" ? "Produits" : "Charges"),
       totals,
       (account) => account.accountType === type && account.accountClass === accountClass,
     ))
-    .filter((group) => group.lines.length > 0);
+    .filter((group) => group.lines.some((line) => line.kind !== "group"));
 }
 
-export function buildIncomeStatement(input: Books): IncomeReport {
-  const included = input.entries.filter((entry) => {
+function incomeEntries(input: Books): ReportEntry[] {
+  return input.entries.filter((entry) => {
     if (!official(entry.status) || !inPeriod(entry.entry_date, input.period)) return false;
     if (entry.source_type === "opening" || entry.event_type === "opening" || entry.source_type === "period_close") return false;
     return true;
   });
-  const totals = balances(input, included);
-  const products = classGroups(input.accounts, totals, "revenue");
-  const charges = classGroups(input.accounts, totals, "expense");
+}
+
+/** Soldes des produits et des charges sur le même périmètre que le compte de résultat. */
+export function officialIncomeBalances(input: Books): Map<string, number> {
+  return balances(input, incomeEntries(input));
+}
+
+export function buildIncomeStatement(input: Books): IncomeReport {
+  const totals = officialIncomeBalances(input);
+  const products = classGroups(input, totals, "revenue");
+  const charges = classGroups(input, totals, "expense");
   const productTotal = roundChf(products.reduce((sum, group) => sum + group.total, 0));
   const chargeTotal = roundChf(charges.reduce((sum, group) => sum + group.total, 0));
   const result = roundChf(productTotal - chargeTotal);
