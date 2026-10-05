@@ -28,6 +28,7 @@ import {
   resolveCoverageType,
 } from "./onboarding";
 import { fetchAllPages } from "./paging";
+import { BRIDGE_EDIT_MESSAGE, planBridgeCorrection } from "./transitory";
 import {
   accumulatePnl,
   assertExplicitClose,
@@ -36,6 +37,7 @@ import {
   inboxProcessingDecision,
   operationsBlockingClose,
   periodCoveringDate,
+  planOpenFollowingPeriod,
   type CloseEntry,
   type InboxActor,
 } from "./closePeriod";
@@ -230,6 +232,57 @@ function accountByCode(accounts: AccountRecord[], code: string | null): AccountR
 
 function periodFor(periods: PeriodRecord[], date: string, openOnly: boolean): PeriodRecord | undefined {
   return periodCoveringDate(periods, date, openOnly);
+}
+
+async function bridgeHalves(admin: Admin, clubId: string, entryId: string) {
+  const { data, error } = await admin
+    .from("document_receipts")
+    .select("id, entry_id, release_entry_id, accrual_entry_id")
+    .eq("club_id", clubId)
+    .or(`entry_id.eq.${entryId},accrual_entry_id.eq.${entryId},release_entry_id.eq.${entryId}`)
+    .limit(1);
+  if (error) {
+    if (/column|schema cache|accrual_entry_id/i.test(error.message)) return null;
+    throw new Error(error.message);
+  }
+  const receipt = data?.[0];
+  if (!receipt) return null;
+  const ids = [receipt.entry_id, receipt.release_entry_id].filter((id): id is string => Boolean(id));
+  const { data: direct, error: directError } = ids.length
+    ? await admin.from("accounting_entries").select("id, status, period_id, bridge_receipt_id").eq("club_id", clubId).in("id", ids)
+    : { data: [], error: null };
+  if (directError) {
+    if (/bridge_receipt_id|column|schema cache/i.test(directError.message)) return null;
+    throw new Error(directError.message);
+  }
+  const { data: bridged, error: bridgedError } = await admin
+    .from("accounting_entries")
+    .select("id, status, period_id, bridge_receipt_id")
+    .eq("club_id", clubId)
+    .eq("bridge_receipt_id", receipt.id);
+  if (bridgedError) {
+    if (/bridge_receipt_id|column|schema cache/i.test(bridgedError.message)) return null;
+    throw new Error(bridgedError.message);
+  }
+  const rows = new Map<string, { id: string; status: string; period_id: string | null }>();
+  for (const row of [...(direct ?? []), ...(bridged ?? [])]) {
+    if (row.bridge_receipt_id && row.bridge_receipt_id !== receipt.id) continue;
+    rows.set(String(row.id), { id: String(row.id), status: String(row.status), period_id: row.period_id ? String(row.period_id) : null });
+  }
+  return [...rows.values()];
+}
+
+async function refuseBridgeEdit(admin: Admin, clubId: string, entryId: string) {
+  const halves = await bridgeHalves(admin, clubId, entryId);
+  if (!halves || halves.length === 0) return;
+  const periods = await loadPeriods(admin, clubId);
+  const decision = planBridgeCorrection(halves.map((half) => ({
+    id: half.id,
+    status: half.status,
+    periodStatus: periods.find((period) => period.id === half.period_id)?.status || "closed",
+  })));
+  if (!decision.ok) throw new Error(decision.message);
+  throw new Error(BRIDGE_EDIT_MESSAGE);
 }
 
 async function postEntry(
@@ -882,6 +935,7 @@ export async function saveJournalEntry(params: {
       .eq("club_id", params.clubId)
       .maybeSingle();
     if (!current) throw new Error("Écriture introuvable");
+    await refuseBridgeEdit(admin, params.clubId, params.entryId);
     if (current.status === "voided") throw new Error("Cette écriture a déjà été retirée du journal.");
     if (!["pending", "validated", "reversed"].includes(String(current.status))) {
       throw new Error("Cette écriture ne peut plus être modifiée");
@@ -1019,6 +1073,35 @@ export async function voidJournalEntry(clubId: string, userId: string, entryId: 
     .eq("club_id", clubId)
     .maybeSingle();
   if (!entry) throw new Error("Écriture introuvable");
+  const halves = await bridgeHalves(admin, clubId, entryId);
+  if (halves && halves.length > 0) {
+    const bridgePeriods = await loadPeriods(admin, clubId);
+    const decision = planBridgeCorrection(halves.map((half) => ({
+      id: half.id,
+      status: half.status,
+      periodStatus: bridgePeriods.find((item) => item.id === half.period_id)?.status || "closed",
+    })));
+    if (!decision.ok) throw new Error(decision.message);
+    const { error: bridgeError } = await admin.rpc("accounting_void_receipt_bridge", {
+      p_club: clubId,
+      p_entry: entryId,
+    });
+    if (bridgeError) {
+      if (/schema cache|Could not find the function/i.test(bridgeError.message)) {
+        throw new Error("Le retrait d'un encaissement transitoire demande la migration 104. Aucune écriture n'a été retirée.");
+      }
+      throw new Error(bridgeError.message.split("\n")[0] || bridgeError.message);
+    }
+    await audit(admin, clubId, "journal_void", userId, entryId, entry, {
+      status: "voided",
+      voidedCounterpart: decision.voidIds.filter((id) => id !== entryId).join(","),
+    });
+    return {
+      id: entryId,
+      sourceType: String(entry.source_type),
+      voidedCounterpart: decision.voidIds.find((id) => id !== entryId) || null,
+    };
+  }
   if (entry.status === "voided") throw new Error("Cette écriture a déjà été retirée du journal.");
   if (!["pending", "validated", "reversed"].includes(String(entry.status))) {
     throw new Error("Cette écriture ne peut plus être supprimée");
@@ -1080,6 +1163,7 @@ export async function correctJournalEntry(clubId: string, userId: string, entryI
     .eq("club_id", clubId)
     .maybeSingle();
   if (!entry) throw new Error("Écriture introuvable");
+  await refuseBridgeEdit(admin, clubId, entryId);
   if (entry.status !== "validated" || entry.reversed_by_entry_id) {
     throw new Error("Seule une écriture validée non extournée peut être corrigée");
   }
@@ -1582,6 +1666,31 @@ export async function closePeriod(params: {
     }
     const line = message.split("\n")[0] || "La clôture n'a pas abouti. L'exercice reste ouvert.";
     throw new Error(line);
+  }
+}
+
+export async function openFollowingPeriod(params: { clubId: string; userId: string; periodId: string }) {
+  const admin = createAdminClient();
+  const periods = await loadPeriods(admin, params.clubId);
+  const anchor = periods.find((period) => period.id === params.periodId);
+  if (!anchor) throw new Error("Exercice introuvable");
+  const plan = planOpenFollowingPeriod(anchor, periods);
+  if (plan.action === "overlap") throw new Error("Cette période chevauche un exercice existant.");
+  if (plan.action === "exists") throw new Error("L'exercice suivant existe déjà. Il n'a pas été recréé.");
+  const { error } = await admin.rpc("accounting_open_following_period", {
+    p_club: params.clubId,
+    p_anchor: anchor.id,
+    p_user: params.userId,
+    p_start: plan.startsOn,
+    p_end: plan.endsOn,
+    p_label: plan.label,
+  });
+  if (error) {
+    const message = error.message || "";
+    if (/schema cache|Could not find the function/i.test(message)) {
+      throw new Error("L'ouverture de l'exercice suivant n'est pas disponible. Appliquez la migration 104.");
+    }
+    throw new Error(message.split("\n")[0] || "L'exercice suivant n'a pas été ouvert.");
   }
 }
 

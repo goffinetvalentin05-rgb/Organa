@@ -19,6 +19,15 @@ import { formatSwissDate, zurichToday } from "@/lib/accounting/format";
 
 type Section = "overview" | "journal" | "review" | "chart" | "reports" | "budget" | "periods" | "settings";
 
+const PERIOD_STORAGE = "organa.accounting.period";
+
+function preferredPeriod(periods: Period[], current: string): string {
+  if (current && periods.some((period) => period.id === current)) return current;
+  const today = zurichToday();
+  const covering = periods.find((period) => today >= period.startsOn && today <= period.endsOn);
+  return covering?.id || periods[periods.length - 1]?.id || "";
+}
+
 const NAV = [
   { href: "/tableau-de-bord/comptabilite/journal", section: "journal" as const, label: "Journal" },
   { href: "/tableau-de-bord/comptabilite/a-verifier", section: "review" as const, label: "À vérifier" },
@@ -33,6 +42,12 @@ export default function AccountingScreen({ section }: { section: Section }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [periodId, setPeriodId] = useState("");
+
+  useEffect(() => {
+    const stored = window.sessionStorage.getItem(PERIOD_STORAGE) || "";
+    if (stored) setPeriodId(stored);
+  }, []);
 
   const reload = useCallback(async () => {
     const response = await fetch("/api/accounting", { cache: "no-store" });
@@ -141,10 +156,12 @@ export default function AccountingScreen({ section }: { section: Section }) {
   const startsLater = Boolean(access.startDate && access.startDate > zurichToday());
   const openItems = data?.openItems as { receivableTotal: number; payableTotal: number } | null;
   const reviewCount = review.count;
+  const activePeriodId = preferredPeriod(periods, periodId);
 
   return (
     <PageLayout maxWidth="full" stack="compact">
       <PageHeader title="Comptabilité" subtitle={<p>{ACCOUNTING_TAGLINE}</p>} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
       <nav className="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-xl border border-[#D6DEE8] bg-white p-1">
         {NAV.map((item) => {
           const active = item.section === section;
@@ -162,6 +179,27 @@ export default function AccountingScreen({ section }: { section: Section }) {
           );
         })}
       </nav>
+      {periods.length > 0 ? (
+        <label className="ml-auto text-sm text-[#64748B]">
+          <span className="sr-only">Exercice affiché</span>
+          <select
+            aria-label="Exercice affiché"
+            className="h-9 rounded-lg border border-[#D6DEE8] bg-white px-2 text-sm text-[#0F172A]"
+            value={activePeriodId}
+            onChange={(event) => {
+              setPeriodId(event.target.value);
+              window.sessionStorage.setItem(PERIOD_STORAGE, event.target.value);
+            }}
+          >
+            {periods.map((period) => (
+              <option key={period.id} value={period.id}>
+                Exercice {period.label}{period.status === "closed" ? " · clôturé" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      </div>
       {error ? <p className="text-sm text-rose-700">{error}</p> : null}
       {startsLater ? (
         <GlassCard>
@@ -175,6 +213,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           accounts={accounts}
           linesByEntry={linesByEntry}
           periods={periods}
+          selectedPeriodId={activePeriodId}
           attachments={attachments}
           inbox={review.inbox}
           reviewOnly={section === "review"}
@@ -201,7 +240,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
         />
       ) : null}
       {section === "reports" ? (
-        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} groups={(data?.groups || []) as AccountGroup[]} coverageNote={coverage.note} />
+        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} periodId={activePeriodId} groups={(data?.groups || []) as AccountGroup[]} coverageNote={coverage.note} />
       ) : null}
       {section === "budget" ? (
         <BudgetPanel
@@ -211,6 +250,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           entries={entries}
           linesByEntry={linesByEntry}
           periods={periods}
+          periodId={activePeriodId}
           canWrite={Boolean(access.canManage)}
           extensionsReady={data?.extensionsReady !== false}
           onAct={act}

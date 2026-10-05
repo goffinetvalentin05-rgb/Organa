@@ -79,6 +79,7 @@ export default function JournalGrid({
   accounts,
   linesByEntry,
   periods,
+  selectedPeriodId,
   inbox,
   reviewOnly,
   canWrite,
@@ -89,6 +90,7 @@ export default function JournalGrid({
   accounts: Account[];
   linesByEntry: Record<string, JournalLine[]>;
   periods: Period[];
+  selectedPeriodId?: string;
   attachments: unknown;
   inbox: InboxItem[];
   reviewOnly: boolean;
@@ -102,7 +104,8 @@ export default function JournalGrid({
   const [status, setStatus] = useState(reviewOnly ? "pending" : "all");
   const [accountId, setAccountId] = useState("");
   const [source, setSource] = useState("all");
-  const [periodId, setPeriodId] = useState("all");
+  const [manualPeriodId, setManualPeriodId] = useState("all");
+  const periodId = selectedPeriodId || manualPeriodId;
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [composer, setComposer] = useState<Composer | null>(null);
@@ -625,12 +628,14 @@ export default function JournalGrid({
         <section className="rounded-xl border border-[#D6DEE8] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <div className="grid grid-cols-2 gap-x-5 gap-y-4 md:grid-cols-4 xl:grid-cols-7">
             <Filter label="Recherche"><input className={filter} placeholder="Libellé, pièce, n°" value={query} onChange={(event) => setQuery(event.target.value)} /></Filter>
+            {selectedPeriodId ? null : (
             <Filter label="Exercice">
-              <select className={filter} value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+              <select className={filter} value={periodId} onChange={(event) => setManualPeriodId(event.target.value)}>
                 <option value="all">Tous</option>
                 {periods.map((period) => <option key={period.id} value={period.id}>{period.label}</option>)}
               </select>
             </Filter>
+            )}
             <Filter label="Du"><input className={filter} type="date" value={from} onChange={(event) => setFrom(event.target.value)} /></Filter>
             <Filter label="Au"><input className={filter} type="date" value={to} onChange={(event) => setTo(event.target.value)} /></Filter>
             <Filter label="Statut">

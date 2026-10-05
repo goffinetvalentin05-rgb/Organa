@@ -13,6 +13,7 @@ export default function BudgetPanel({
   entries,
   linesByEntry,
   periods,
+  periodId: controlledPeriodId,
   canWrite,
   extensionsReady,
   onAct,
@@ -23,11 +24,13 @@ export default function BudgetPanel({
   entries: Entry[];
   linesByEntry: Record<string, JournalLine[]>;
   periods: Period[];
+  periodId?: string;
   canWrite: boolean;
   extensionsReady: boolean;
   onAct: (payload: Record<string, unknown>) => Promise<unknown>;
 }) {
-  const [periodId, setPeriodId] = useState(periods.find((period) => period.status === "open")?.id || periods[periods.length - 1]?.id || "");
+  const [manualPeriodId, setManualPeriodId] = useState(periods.find((period) => period.status === "open")?.id || periods[periods.length - 1]?.id || "");
+  const periodId = controlledPeriodId || manualPeriodId;
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [note, setNote] = useState("");
   const [confirmValidate, setConfirmValidate] = useState(false);
@@ -104,14 +107,15 @@ export default function BudgetPanel({
       ) : (
         <p className="text-sm text-[#475569]">Le budget compare les charges et les produits prévus au réalisé des rapports officiels. Il ne crée aucune écriture.</p>
       )}
-      {periods.length > 0 ? (
+      {periods.length > 0 && !controlledPeriodId ? (
         <label className="block text-xs font-semibold uppercase tracking-wide text-[#64748B]">
           Exercice
-          <select className="mt-1.5 block h-9 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+          <select className="mt-1.5 block h-9 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={periodId} onChange={(event) => setManualPeriodId(event.target.value)}>
             {periods.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
         </label>
       ) : null}
+      {period?.status === "closed" ? <p className="text-sm text-[#475569]">Cet exercice est clôturé. Le budget se consulte, il ne se modifie pas.</p> : null}
       {comparison ? (
         <GlassCard padding="sm">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -153,7 +157,7 @@ export default function BudgetPanel({
           <Totals label="Résultat" figures={comparison.result} strong />
         </GlassCard>
       ) : null}
-      {canWrite && extensionsReady && editing ? (
+      {canWrite && extensionsReady && editing && period?.status !== "closed" ? (
         <GlassCard padding="sm">
           <h2 className="font-semibold">Saisie du brouillon</h2>
           <div className="mt-3 space-y-2">
@@ -192,7 +196,7 @@ export default function BudgetPanel({
           {confirmValidate ? <p className="mt-2 text-sm text-[#475569]">La validation est explicite. Elle n’écrit rien au journal.</p> : null}
         </GlassCard>
       ) : null}
-      {canWrite && extensionsReady && validated && !draft ? (
+      {canWrite && extensionsReady && validated && !draft && period?.status !== "closed" ? (
         <GlassCard padding="sm">
           <h2 className="font-semibold">Réviser le budget validé</h2>
           <p className="mt-1 text-sm text-[#64748B]">La version validée est conservée. La révision ouvre un brouillon traçable.</p>

@@ -53,6 +53,8 @@ export default function PeriodsPanel({
           ) : null}
           {canWrite && period.status === "open" ? (
             <div className="mt-4 space-y-2">
+              <p className="text-sm text-[#475569]">Ouvrir l’exercice suivant laisse celui-ci ouvert. Aucun solde d’ouverture n’est recopié.</p>
+              <ActionButton type="button" variant="ghost" onClick={() => void onAct({ action: "open-next", periodId: period.id })}>Ouvrir l’exercice suivant</ActionButton>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={transfer} onChange={(event) => setTransfer(event.target.checked)} />
                 Reporter le résultat sur le compte 2900 après confirmation

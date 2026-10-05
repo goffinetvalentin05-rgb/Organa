@@ -12,6 +12,7 @@ import {
   revenueCategoryForDocument,
 } from "@/lib/accounting/receipts";
 import { recordDocumentReceipt, receiptFailureMessage } from "@/lib/accounting/recordReceipt";
+import { loadTransitoryFacts } from "@/lib/accounting/transitoryLoad";
 import { zurichToday } from "@/lib/accounting/format";
 import { roundChf } from "@/lib/accounting/money";
 
@@ -33,7 +34,7 @@ export async function GET(
   const admin = createAdminClient();
   const { data: doc } = await admin
     .from("documents")
-    .select("id, type, status, total_ttc, title, numero, notes, sponsor_contract_id, event_id")
+    .select("id, type, status, total_ht, total_tva, total_ttc, date_creation, title, numero, notes, sponsor_contract_id, event_id")
     .eq("id", id)
     .eq("user_id", guard.clubId)
     .maybeSingle();
@@ -101,6 +102,14 @@ export async function GET(
   }
 
   const total = roundChf(Number(doc.total_ttc) || 0);
+  let transitory = null;
+  if (access.onboarded && doc.type === "invoice") {
+    try {
+      transitory = await loadTransitoryFacts(admin, { clubId: guard.clubId, documentId: id, categoryCode });
+    } catch {
+      transitory = null;
+    }
+  }
   return NextResponse.json({
     accounting: access.onboarded,
     today: zurichToday(),
@@ -112,6 +121,12 @@ export async function GET(
     categoryLabel: REVENUE_CATEGORY_LABELS[categoryCode] ?? categoryCode,
     categoryAccount,
     accounts,
+    documentType: doc.type,
+    documentStatus: doc.status,
+    invoiceDate: doc.date_creation || null,
+    totalHt: roundChf(Number(doc.total_ht) || 0),
+    totalTva: roundChf(Number(doc.total_tva) || 0),
+    transitory,
   });
 }
 
@@ -130,6 +145,12 @@ export async function POST(
   const amount = Number(body?.amount);
   const accountId = typeof body?.accountId === "string" ? body.accountId : null;
   const idempotencyKey = String(body?.idempotencyKey ?? "");
+  const transitory = body?.transitory && typeof body.transitory === "object"
+    ? {
+        productPeriodId: body.transitory.productPeriodId ? String(body.transitory.productPeriodId) : null,
+        recognitionDate: body.transitory.recognitionDate ? String(body.transitory.recognitionDate) : null,
+      }
+    : null;
 
   try {
     const result = await recordDocumentReceipt({
@@ -140,6 +161,7 @@ export async function POST(
       amount,
       accountId,
       idempotencyKey,
+      transitory,
     });
     revalidatePath("/tableau-de-bord/factures");
     revalidatePath(`/tableau-de-bord/factures/${id}`);

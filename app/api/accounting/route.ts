@@ -22,6 +22,7 @@ import {
   loadWorkspace,
   processAccountingInbox,
   recordExport,
+  openFollowingPeriod,
   reopenPeriod,
   updateAccount,
   updateSettings,
@@ -291,6 +292,13 @@ export async function POST(request: NextRequest) {
         break;
       case "budget-revise":
         await reviseBudget(guard.clubId, guard.userId, String(body.budgetId || ""), String(body.note || ""));
+        break;
+      case "open-next":
+        await openFollowingPeriod({
+          clubId: guard.clubId,
+          userId: guard.userId,
+          periodId: String(body.periodId || ""),
+        });
         break;
       case "reopen":
         await reopenPeriod(guard.clubId, guard.userId, String(body.periodId), String(body.reason || ""));

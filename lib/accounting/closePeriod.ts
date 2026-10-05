@@ -177,6 +177,34 @@ export function planFollowingPeriod(
   return { action: "insert", ...next };
 }
 
+export function rangesOverlap(
+  left: { startsOn: string; endsOn: string },
+  right: { startsOn: string; endsOn: string },
+): boolean {
+  return left.startsOn <= right.endsOn && right.startsOn <= left.endsOn;
+}
+
+/**
+ * Ouvre l'exercice suivant sans clôturer le précédent et sans recopier de solde.
+ * Une période déjà présente au même départ est conservée. Un chevauchement est refusé.
+ */
+export function planOpenFollowingPeriod(
+  anchor: { startsOn: string; endsOn: string },
+  existing: Array<{ startsOn: string; endsOn: string }>,
+):
+  | { action: "insert"; startsOn: string; endsOn: string; label: string }
+  | { action: "exists"; startsOn: string }
+  | { action: "overlap" } {
+  const next = followingPeriod(anchor);
+  if (existing.some((period) => period.startsOn === next.startsOn)) {
+    return { action: "exists", startsOn: next.startsOn };
+  }
+  if (rangesOverlap(anchor, next) || existing.some((period) => rangesOverlap(period, next))) {
+    return { action: "overlap" };
+  }
+  return { action: "insert", ...next };
+}
+
 export function inboxProcessingDecision(input: {
   actor: InboxActor;
   onboarded: boolean;

@@ -24,6 +24,7 @@ export default function ReportsPanel({
   accounts,
   linesByEntry,
   periods,
+  periodId: controlledPeriodId,
   groups = [],
   coverageNote,
 }: {
@@ -31,12 +32,14 @@ export default function ReportsPanel({
   accounts: Account[];
   linesByEntry: Record<string, JournalLine[]>;
   periods: Period[];
+  periodId?: string;
   groups?: AccountGroup[];
   coverageNote?: string | null;
 }) {
   const [tab, setTab] = useState<Tab>("result");
   const [accountId, setAccountId] = useState(accounts[0]?.id || "");
-  const [periodId, setPeriodId] = useState(periods.find((period) => period.status === "open")?.id || periods[periods.length - 1]?.id || "");
+  const [manualPeriodId, setManualPeriodId] = useState(periods.find((period) => period.status === "open")?.id || periods[periods.length - 1]?.id || "");
+  const periodId = controlledPeriodId || manualPeriodId;
   const period = periods.find((item) => item.id === periodId) || periods[periods.length - 1];
   const books = useMemo(() => {
     if (!period) return null;
@@ -71,10 +74,10 @@ export default function ReportsPanel({
       </nav>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-wrap items-end gap-4">
-          {periods.length > 0 ? (
+          {periods.length > 0 && !controlledPeriodId ? (
             <label className="block text-xs font-semibold uppercase tracking-wide text-[#64748B]">
               Exercice
-              <select className="mt-1.5 block h-9 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+              <select className="mt-1.5 block h-9 rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#0F172A]" value={periodId} onChange={(event) => setManualPeriodId(event.target.value)}>
                 {periods.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
