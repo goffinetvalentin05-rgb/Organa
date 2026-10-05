@@ -5,7 +5,7 @@ import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { roundChf } from "@/lib/accounting/money";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
-import { buildTakeoverCsv, buildTakeoverWorkbook, readTakeoverFile } from "@/lib/accounting/takeoverImport";
+import { buildTakeoverCsv, buildTakeoverWorkbook, readTakeoverFile, type WorkbookSheet } from "@/lib/accounting/takeoverImport";
 import {
   TAKEOVER_CSV_HEADERS,
   TAKEOVER_CSV_HELP,
@@ -21,7 +21,20 @@ import {
 } from "@/lib/accounting/takeover";
 import { ActionButton, GlassCard } from "@/components/ui";
 
-const fieldClass = "mt-1 w-full rounded-xl border border-[rgba(15,23,42,0.1)] px-3 py-2 text-sm";
+const fieldClass = "mt-1 w-full rounded-xl border border-[rgba(15,23,42,0.1)] bg-white px-3 py-2 text-sm text-[#0F172A]";
+const choiceClass = `${fieldClass} [color-scheme:light]`;
+const optionStyle = { color: "#0F172A", backgroundColor: "#ffffff" };
+const COLUMN_LABELS: Record<(typeof TAKEOVER_CSV_HEADERS)[number], string> = {
+  date: "Date",
+  piece: "Pièce",
+  libelle: "Libellé",
+  compte: "Compte",
+  debit: "Débit",
+  credit: "Crédit",
+  origine: "Référence de regroupement",
+  remarque: "Remarque",
+  reference: "Référence",
+};
 
 const HELP: Record<string, string> = {
   cash: "Argent liquide du club.",
@@ -37,21 +50,24 @@ const HELP: Record<string, string> = {
   retained: "Résultat des exercices précédents déjà affecté.",
 };
 
-const MODES: Array<{ id: TakeoverMode; title: string; text: string }> = [
+const MODES: Array<{ id: TakeoverMode; title: string; text: string; help: string }> = [
   {
     id: "fresh",
-    title: "Commencer sans historique",
-    text: "Le club démarre sa comptabilité dans Obillz, sans reprendre le détail des anciennes opérations. Vous pouvez tout de même indiquer l'argent, les biens, les dettes et les fonds propres déjà là. Si tout est vraiment à zéro, vous le confirmerez. Obillz n'invente pas de fonds propres.",
+    title: "Sans historique",
+    text: "Saisissez votre situation de départ, puis commencez vos nouvelles opérations.",
+    help: "Sans historique ne veut pas dire sans argent : indiquez les biens, les disponibilités, les dettes et les fonds propres déjà là. Si tout est vraiment à zéro, une confirmation est demandée. Obillz n'ajoute pas de fonds propres pour masquer un écart. Les anciennes opérations et leurs cumuls ne sont pas importés.",
   },
   {
     id: "full_period",
     title: "Reprendre tout l'exercice",
-    text: "Indiquez les soldes de bilan au premier jour de l'exercice, puis les opérations déjà passées jusqu'à la veille de la reprise. N'ajoutez pas les soldes d'aujourd'hui ni les cumuls de ces mêmes opérations : ils compteraient une seconde fois.",
+    text: "Reprenez les soldes au début de l'exercice et importez les opérations déjà enregistrées depuis cette date.",
+    help: "Les soldes sont ceux du premier jour, pas ceux d'aujourd'hui. Les opérations déjà enregistrées vont jusqu'au dernier jour avant le début dans Obillz, ce jour compris. N'ajoutez pas les soldes actuels ni les cumuls de ces mêmes opérations : ils seraient comptés une seconde fois.",
   },
   {
     id: "from_date",
     title: "Continuer à partir d'une date",
-    text: "Indiquez les soldes de bilan juste avant le passage. Les nouvelles opérations commencent à la date choisie. Les cumuls de charges et de produits déjà réalisés sont facultatifs, dans une section à part. Sans ces cumuls, le résultat ne couvre que la période depuis la reprise.",
+    text: "Reprenez les soldes juste avant votre passage à Obillz. Vous pourrez aussi ajouter les cumuls de charges et de produits.",
+    help: "Les soldes sont ceux juste avant le passage. Les nouvelles opérations commencent à la date choisie. Les cumuls sont facultatifs et séparés. Sans eux, le résultat ne couvre que la période depuis cette date. N'importez pas les anciennes opérations en plus des soldes : elles y sont déjà comprises.",
   },
 ];
 
@@ -86,6 +102,12 @@ export default function AccountingOnboarding({
   const [needsDelimiter, setNeedsDelimiter] = useState(false);
   const [delimiter, setDelimiter] = useState<";" | "," | null>(null);
   const [columnHeaders, setColumnHeaders] = useState<string[] | null>(null);
+  const [workbookSheets, setWorkbookSheets] = useState<WorkbookSheet[]>([]);
+  const [ignoredSheets, setIgnoredSheets] = useState<string[]>([]);
+  const [ambiguousSheets, setAmbiguousSheets] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState("");
+  const [headerRow, setHeaderRow] = useState(1);
+  const [previewRows, setPreviewRows] = useState<string[][]>([]);
   const [columnMap, setColumnMap] = useState<Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>>({});
   const [unknownAccounts, setUnknownAccounts] = useState<string[]>([]);
   const [accountMap, setAccountMap] = useState<Record<string, string>>({});
@@ -150,14 +172,14 @@ export default function AccountingOnboarding({
   function nextFromChoice() {
     setError(null);
     if (periodEnd < periodStart) return setError("La fin d'exercice précède le début.");
-    if (takeoverDate < periodStart || takeoverDate > periodEnd) return setError("La date de reprise doit être comprise dans l'exercice.");
+    if (takeoverDate < periodStart || takeoverDate > periodEnd) return setError("Le début des nouvelles opérations doit être compris dans l'exercice.");
     if (!mode) return setError("Choisissez comment commencer la comptabilité.");
     setStep(2);
   }
 
   function nextFromBalances() {
     setError(null);
-    if (importErrors.length || needsDelimiter || columnHeaders || unknownAccounts.length) {
+    if (importErrors.length || needsDelimiter || unknownAccounts.length) {
       return setError(importMessage || "Corrigez le fichier avant de continuer.");
     }
     if (!draft) return setError("Choisissez comment commencer la comptabilité.");
@@ -199,13 +221,12 @@ export default function AccountingOnboarding({
     setCustomName("");
   }
 
-  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string> } = {}) {
+  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string>; sheet?: string; headerRow?: number; asRole?: "journal" | "balances" | "cumulatives" } = {}) {
     if (!mode) return;
     setError(null);
     setImportMessage(null);
     setImportErrors([]);
     setNeedsDelimiter(false);
-    setColumnHeaders(null);
     setUnknownAccounts([]);
     const result = readTakeoverFile({
       filename: nextFile.name,
@@ -215,14 +236,26 @@ export default function AccountingOnboarding({
       delimiter: options.delimiter || delimiter || undefined,
       columns: options.columns || columnMap,
       accountMap: options.accountMap || accountMap,
+      sheet: options.sheet,
+      headerRow: options.headerRow,
+      asRole: options.asRole,
     });
+    const headers = (result.headers || []).map((header) => header.trim()).filter(Boolean);
+    setWorkbookSheets(result.sheets || []);
+    setIgnoredSheets(result.ignoredSheets || []);
+    setAmbiguousSheets(result.ambiguousSheets || []);
+    setPreviewRows(result.preview || []);
+    setHeaderRow(result.headerRow || options.headerRow || 1);
+    if (result.previewSheet) setSelectedSheet(result.previewSheet);
+    const manual = options.columns && Object.values(options.columns).some(Boolean);
+    if (!manual && result.suggestedColumns) setColumnMap(result.suggestedColumns);
+    setColumnHeaders(headers.length ? headers : null);
     if (!result.ok) {
       setImportMessage(result.message);
       setImportErrors(result.errors);
       setNeedsDelimiter(Boolean(result.needsDelimiter));
-      setColumnHeaders(result.headers && !result.unknownAccounts ? result.headers : null);
       setUnknownAccounts(result.unknownAccounts || []);
-      setJournal([]);
+      if (!options.sheet) setJournal([]);
       return;
     }
     if (result.balances.length) {
@@ -241,7 +274,10 @@ export default function AccountingOnboarding({
       setCumulatives(next);
       setWithCumulatives(true);
     }
-    setJournal(result.journal);
+    const selectedRole = (result.sheets || []).find((item) => item.name === options.sheet)?.role;
+    if (!options.sheet || result.journal.length || options.asRole === "journal" || selectedRole === "journal") {
+      setJournal(result.journal);
+    }
   }
 
   async function onFile(selected: File) {
@@ -300,13 +336,13 @@ export default function AccountingOnboarding({
             <label className="text-sm text-[#334155]">Fin d'exercice
               <input className={fieldClass} type="date" value={periodEnd} onChange={(event) => setPeriodEnd(event.target.value)} />
             </label>
-            <label className="text-sm text-[#334155]">Date de reprise
+            <label className="text-sm text-[#334155]">Début des nouvelles opérations dans Obillz
               <input className={fieldClass} type="date" value={takeoverDate} onChange={(event) => setTakeoverDate(event.target.value)} />
             </label>
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
             {MODES.map((item) => (
-              <ModeCard key={item.id} selected={mode === item.id} title={item.title} text={item.text} onClick={() => setMode(item.id)} />
+              <ModeCard key={item.id} selected={mode === item.id} title={item.title} text={item.text} help={item.help} onClick={() => setMode(item.id)} />
             ))}
           </div>
           <div className="mt-6">
@@ -432,53 +468,54 @@ export default function AccountingOnboarding({
 
           {mode === "full_period" && takeoverDate > periodStart ? (
             <section className="mt-8">
-              <h3 className="text-sm font-semibold text-[#0F172A]">Écritures du {formatSwissDate(periodStart)} au {formatSwissDate(dayBefore(takeoverDate))}</h3>
-              <p className="mt-1 text-sm text-[#475569]">{TAKEOVER_CSV_HELP} Les dates attendues vont du {formatSwissDate(periodStart)} au {formatSwissDate(takeoverDate)}, veille de reprise non comprise.</p>
+              <h3 className="text-sm font-semibold text-[#0F172A]">Écritures du {formatSwissDate(periodStart)} au {formatSwissDate(dayBefore(takeoverDate))} inclus</h3>
+              <p className="mt-1 text-sm text-[#475569]">Les écritures historiques vont du {formatSwissDate(periodStart)} au {formatSwissDate(dayBefore(takeoverDate))} inclus. Les nouvelles opérations commencent le {formatSwissDate(takeoverDate)}.</p>
+              <details className="mt-2 text-sm text-[#475569]">
+                <summary className="cursor-pointer font-medium text-[#1A23FF]">Comment remplir le fichier</summary>
+                <p className="mt-2 leading-relaxed">{TAKEOVER_CSV_HELP}</p>
+              </details>
               <div className="mt-3 flex flex-wrap gap-4">
                 <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadExcel}>Télécharger le modèle Excel</button>
                 <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadCsv}>Télécharger le modèle CSV</button>
               </div>
               <FileDrop onFile={(selected) => void onFile(selected)} />
-              <ImportIssues message={importMessage} errors={importErrors} />
-              {needsDelimiter ? (
-                <div className="mt-3 flex gap-3">
-                  <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => { setDelimiter(";"); if (file) void ingest(file, { delimiter: ";" }); }}>Point-virgule</button>
-                  <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => { setDelimiter(","); if (file) void ingest(file, { delimiter: "," }); }}>Virgule</button>
-                </div>
-              ) : null}
-              {columnHeaders ? (
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {TAKEOVER_CSV_HEADERS.map((field) => (
-                    <label key={field} className="text-xs text-[#64748B]">{field}
-                      <select className={fieldClass} value={columnMap[field] || ""} onChange={(event) => {
-                        const next = { ...columnMap, [field]: event.target.value };
-                        setColumnMap(next);
-                        if (file) void ingest(file, { columns: next });
-                      }}>
-                        <option value="">Choisir une colonne</option>
-                        {columnHeaders.map((header) => <option key={header} value={header}>{header}</option>)}
-                      </select>
-                    </label>
-                  ))}
-                </div>
-              ) : null}
-              {unknownAccounts.length ? (
-                <div className="mt-4 space-y-2">
-                  {unknownAccounts.map((number) => (
-                    <label key={number} className="block text-sm text-[#334155]">Ancien compte {number}
-                      <select className={fieldClass} value={accountMap[number] || ""} onChange={(event) => {
-                        const next = { ...accountMap, [number]: event.target.value };
-                        setAccountMap(next);
-                        if (file && event.target.value) void ingest(file, { accountMap: next });
-                      }}>
-                        <option value="">Associer à un compte Obillz</option>
-                        {catalog.map((account) => <option key={account.code} value={account.number}>{account.number} {account.name}</option>)}
-                      </select>
-                    </label>
-                  ))}
-                </div>
-              ) : null}
-              {journal.length ? <JournalPreview entries={journal} /> : null}
+              <ImportWorkspace
+                file={file}
+                sheets={workbookSheets}
+                ignoredSheets={ignoredSheets}
+                ambiguousSheets={ambiguousSheets}
+                selectedSheet={selectedSheet}
+                headerRow={headerRow}
+                columnHeaders={columnHeaders}
+                columnMap={columnMap}
+                previewRows={previewRows}
+                needsDelimiter={needsDelimiter}
+                unknownAccounts={unknownAccounts}
+                accountMap={accountMap}
+                catalog={catalog}
+                message={importMessage}
+                errors={importErrors}
+                journal={journal}
+                onDelimiter={(value) => { setDelimiter(value); if (file) void ingest(file, { delimiter: value, sheet: selectedSheet || undefined, headerRow }); }}
+                onSheet={(name) => {
+                  setSelectedSheet(name);
+                  const role = workbookSheets.find((item) => item.name === name)?.role;
+                  if (!file || role === "ambiguous") return;
+                  void ingest(file, { sheet: name, headerRow, asRole: role === "journal" || role === "balances" || role === "cumulatives" ? role : undefined });
+                }}
+                onConfirmAmbiguous={(name) => { setSelectedSheet(name); if (file) void ingest(file, { sheet: name, headerRow, asRole: "journal" }); }}
+                onHeaderRow={(row) => { setHeaderRow(row); if (file) void ingest(file, { sheet: selectedSheet || undefined, headerRow: row, asRole: workbookSheets.find((item) => item.name === selectedSheet)?.role === "journal" ? "journal" : undefined }); }}
+                onColumn={(field, value) => {
+                  const next = { ...columnMap, [field]: value };
+                  setColumnMap(next);
+                  if (file) void ingest(file, { columns: next, sheet: selectedSheet || undefined, headerRow });
+                }}
+                onAccount={(number, value) => {
+                  const next = { ...accountMap, [number]: value };
+                  setAccountMap(next);
+                  if (file && value) void ingest(file, { accountMap: next, columns: columnMap, sheet: selectedSheet || undefined, headerRow });
+                }}
+              />
             </section>
           ) : null}
           {mode === "full_period" && takeoverDate === periodStart ? (
@@ -608,7 +645,7 @@ function PreviewSummary(props: {
   return (
     <div className="mt-4 space-y-2 text-sm text-[#334155]">
       <p>Méthode : {MODES.find((item) => item.id === props.mode)?.title}. Exercice du {formatSwissDate(props.periodStart)} au {formatSwissDate(props.periodEnd)}.</p>
-      <p>Date de reprise : {formatSwissDate(props.takeoverDate)}. Date des soldes : {formatSwissDate(props.openingDate)}.</p>
+      <p>Début des nouvelles opérations dans Obillz : {formatSwissDate(props.takeoverDate)}. Date des soldes : {formatSwissDate(props.openingDate)}.</p>
       {props.balances.length ? props.balances.map((row) => (
         <p key={row.code}>{names.get(row.code) || row.code} : {formatChfAmount(row.amount)}</p>
       )) : <p>Aucun solde de bilan saisi.</p>}
@@ -685,12 +722,120 @@ function FileDrop({ onFile }: { onFile: (file: File) => void }) {
   );
 }
 
-function ModeCard({ selected, title, text, onClick }: { selected: boolean; title: string; text: string; onClick: () => void }) {
+function ModeCard({ selected, title, text, help, onClick }: { selected: boolean; title: string; text: string; help: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`rounded-2xl border p-5 text-left ${selected ? "border-[#1A23FF] bg-[#F4F6FF]" : "border-[rgba(15,23,42,0.08)] bg-white"}`}>
-      <span className="text-base font-semibold text-[#0F172A]">{title}</span>
-      <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{text}</span>
-    </button>
+    <div className={`rounded-2xl border p-5 ${selected ? "border-[#1A23FF] bg-[#F4F6FF]" : "border-[rgba(15,23,42,0.08)] bg-white"}`}>
+      <button type="button" onClick={onClick} className="text-left">
+        <span className="text-base font-semibold text-[#0F172A]">{title}</span>
+        <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{text}</span>
+      </button>
+      <details className="mt-3">
+        <summary className="cursor-pointer text-sm font-medium text-[#1A23FF]">Précisions</summary>
+        <p className="mt-2 text-sm leading-relaxed text-[#475569]">{help}</p>
+      </details>
+    </div>
+  );
+}
+
+function ImportWorkspace(props: {
+  file: { name: string; data: ArrayBuffer | string } | null;
+  sheets: WorkbookSheet[];
+  ignoredSheets: string[];
+  ambiguousSheets: string[];
+  selectedSheet: string;
+  headerRow: number;
+  columnHeaders: string[] | null;
+  columnMap: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>;
+  previewRows: string[][];
+  needsDelimiter: boolean;
+  unknownAccounts: string[];
+  accountMap: Record<string, string>;
+  catalog: TakeoverAccount[];
+  message: string | null;
+  errors: ImportCellError[];
+  journal: TakeoverJournalEntry[];
+  onDelimiter: (value: ";" | ",") => void;
+  onSheet: (name: string) => void;
+  onConfirmAmbiguous: (name: string) => void;
+  onHeaderRow: (row: number) => void;
+  onColumn: (field: (typeof TAKEOVER_CSV_HEADERS)[number], value: string) => void;
+  onAccount: (number: string, value: string) => void;
+}) {
+  if (!props.file) return null;
+  const importable = props.sheets.filter((item) => item.role !== "ignored");
+  return (
+    <div>
+      <ImportIssues message={props.message} errors={props.errors} />
+      {props.ignoredSheets.length ? <p className="mt-3 text-sm text-[#475569]">Feuille ignorée : {props.ignoredSheets.join(", ")}. Ce texte explicatif n'est pas importé.</p> : null}
+      {importable.length ? (
+        <label className="mt-4 block text-xs text-[#64748B]">Feuille
+          <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.selectedSheet} onChange={(event) => props.onSheet(event.target.value)}>
+            {importable.map((item) => (
+              <option key={item.name} value={item.name} style={optionStyle}>{item.name}{item.role === "ambiguous" ? " — à confirmer" : ""}</option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      {props.ambiguousSheets.includes(props.selectedSheet) ? (
+        <button type="button" className="mt-3 text-sm font-semibold text-[#1A23FF]" onClick={() => props.onConfirmAmbiguous(props.selectedSheet)}>Importer cette feuille comme écritures</button>
+      ) : null}
+      {props.file.name.toLowerCase().endsWith(".csv") || importable.length ? (
+        <label className="mt-4 block text-xs text-[#64748B]">Ligne des en-têtes
+          <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={String(props.headerRow)} onChange={(event) => props.onHeaderRow(Number(event.target.value))}>
+            {Array.from({ length: 15 }, (_, index) => (
+              <option key={index + 1} value={String(index + 1)} style={optionStyle}>Ligne {index + 1}</option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      {props.needsDelimiter ? (
+        <div className="mt-3 flex gap-3">
+          <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => props.onDelimiter(";")}>Point-virgule</button>
+          <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => props.onDelimiter(",")}>Virgule</button>
+        </div>
+      ) : null}
+      {props.columnHeaders?.length ? (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {TAKEOVER_CSV_HEADERS.map((field) => (
+            <label key={field} className="text-xs text-[#334155]">{COLUMN_LABELS[field]}
+              <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.columnMap[field] || ""} onChange={(event) => props.onColumn(field, event.target.value)}>
+                <option value="" style={optionStyle}>Choisir une colonne</option>
+                {props.columnHeaders?.filter((header) => header.trim()).map((header) => (
+                  <option key={header} value={header} style={optionStyle}>{header}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      ) : null}
+      {props.unknownAccounts.length ? (
+        <div className="mt-4 space-y-2">
+          {props.unknownAccounts.map((number) => (
+            <label key={number} className="block text-sm text-[#334155]">Ancien compte {number}
+              <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.accountMap[number] || ""} onChange={(event) => props.onAccount(number, event.target.value)}>
+                <option value="" style={optionStyle}>Associer à un compte Obillz</option>
+                {props.catalog.map((account) => <option key={account.code} value={account.number} style={optionStyle}>{account.number} {account.name}</option>)}
+              </select>
+            </label>
+          ))}
+        </div>
+      ) : null}
+      {props.previewRows.length ? (
+        <div className="mt-4 overflow-x-auto">
+          <p className="text-xs font-medium text-[#64748B]">Aperçu des premières lignes</p>
+          <table className="mt-2 w-full text-sm text-[#0F172A]">
+            <tbody>
+              {props.previewRows.map((row, index) => (
+                <tr key={index} className="border-b border-[rgba(15,23,42,0.05)]">
+                  {row.map((cell, cellIndex) => <td key={cellIndex} className="py-1 pr-3">{cell}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+      {props.journal.length ? <JournalPreview entries={props.journal} /> : null}
+    </div>
   );
 }
 

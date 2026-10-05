@@ -1,11 +1,11 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
 import { chartTakeoverAccounts, importReplay, planTakeover, toIsoDate } from "@/lib/accounting/takeover";
-import { buildTakeoverCsv, buildTakeoverWorkbook, readTakeoverFile } from "@/lib/accounting/takeoverImport";
+import { buildTakeoverCsv, buildTakeoverWorkbook, classifySheet, readTakeoverFile, suggestColumnMap } from "@/lib/accounting/takeoverImport";
 
 const accounts = chartTakeoverAccounts();
 const year = { periodStart: "2027-01-01", periodEnd: "2027-12-31", takeoverDate: "2027-07-01" };
@@ -256,5 +256,74 @@ describe("fichiers xlsx et csv", () => {
     if (!first.ok) return;
     expect(importReplay({ fingerprint: first.fingerprint, appliedFingerprints: [first.fingerprint] })).toBe("already");
     expect(toIsoDate(44927)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("ignore la feuille Guide et soldes et lit Ecritures, y compris les fichiers fournis", () => {
+    expect(classifySheet("Guide et soldes")).toBe("ignored");
+    expect(classifySheet("Ecritures")).toBe("journal");
+    const book = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet([
+      ["", "", ""],
+      ["Obillz — exemple fictif de reprise 2026"],
+      ["Date de reprise", "06.10.2026"],
+    ]), "Guide et soldes");
+    XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet([
+      ["date", "piece", "libelle", "compte", "debit", "credit", "origine"],
+      ["15.01.2026", "COT-001", "Cotisations encaissées en banque", "1020", 1200, 0, "TEST-1"],
+      ["15.01.2026", "COT-001", "Cotisations encaissées en banque", "3000", 0, 1200, "TEST-1"],
+    ]), "Ecritures");
+    XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet([["Export libre"], ["pas un journal"]]), "Annexe");
+    const path = join(dir, "guide-et-ecritures.xlsx");
+    XLSX.writeFile(book, path);
+    const read = readTakeoverFile({ filename: "reprise.xlsx", data: readFileSync(path), mode: "full_period", accounts });
+    expect(read.ok).toBe(true);
+    if (!read.ok) return;
+    expect(read.ignoredSheets).toContain("Guide et soldes");
+    expect(read.ambiguousSheets).toContain("Annexe");
+    expect(read.previewSheet).toBe("Ecritures");
+    expect(read.journal).toHaveLength(1);
+    expect(read.journal[0].date).toBe("2026-01-15");
+    expect(read.journal[0].lines).toHaveLength(2);
+    expect(suggestColumnMap(read.headers).date).toBe("date");
+    expect(suggestColumnMap(read.headers).origine).toBe("origine");
+    expect(read.headers.every((header) => header.trim())).toBe(true);
+
+    const forced = readTakeoverFile({ filename: "reprise.xlsx", data: readFileSync(path), mode: "full_period", accounts, sheet: "Annexe" });
+    expect(forced.ok).toBe(false);
+    if (!forced.ok) expect(forced.message).toContain("pas reconnue");
+
+    const blank = readTakeoverFile({ filename: "vide.csv", data: "\n\n", mode: "full_period", accounts, headerRow: 1 });
+    expect(blank.ok).toBe(false);
+    if (!blank.ok) {
+      expect(blank.message).toContain("aucun en-tête");
+      expect(blank.headers || []).toEqual([]);
+    }
+
+    const providedBook = "C:/Users/Goffi/Downloads/obillz-test-reprise-2026.xlsx";
+    if (existsSync(providedBook)) {
+      const provided = readTakeoverFile({ filename: "obillz-test-reprise-2026.xlsx", data: readFileSync(providedBook), mode: "full_period", accounts });
+      expect(provided.ok).toBe(true);
+      if (provided.ok) {
+        expect(provided.ignoredSheets).toContain("Guide et soldes");
+        expect(provided.previewSheet).toBe("Ecritures");
+        expect(provided.journal.length).toBeGreaterThan(0);
+        expect(provided.journal[0].date).toBe("2026-01-15");
+        expect(provided.journal.every((entry) => entry.date <= "2026-10-05")).toBe(true);
+        expect(provided.suggestedColumns.origine).toBe("origine");
+        expect(provided.headers.filter((header) => !header.trim())).toEqual([]);
+      }
+    }
+
+    const providedCsv = "C:/Users/Goffi/Downloads/modele-reprise-comptable.csv";
+    if (existsSync(providedCsv)) {
+      const csv = readTakeoverFile({ filename: "modele-reprise-comptable.csv", data: readFileSync(providedCsv, "utf8"), mode: "full_period", accounts });
+      expect(csv.ok).toBe(true);
+      if (csv.ok) {
+        expect(csv.suggestedColumns.date).toBe("date");
+        expect(csv.suggestedColumns.compte).toBe("compte");
+        expect(csv.suggestedColumns.origine).toBe("origine");
+        expect(csv.journal.length).toBeGreaterThan(0);
+      }
+    }
   });
 });
