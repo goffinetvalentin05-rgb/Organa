@@ -1,7 +1,5 @@
-"use client";
-
-import AccountingScreen from "@/components/accounting/AccountingScreen";
+import { redirect } from "next/navigation";
 
 export default function ReviewPage() {
-  return <AccountingScreen section="review" />;
+  redirect("/tableau-de-bord/comptabilite/journal");
 }

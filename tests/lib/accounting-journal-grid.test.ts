@@ -18,7 +18,9 @@ import {
   journalComposerChanged,
   journalImbalance,
   nextDraftAction,
+  journalEntryListed,
   journalLinesBalanced,
+  listedJournalEntries,
   nextJournalField,
   resolveJournalStatus,
   rowsToLines,
@@ -204,6 +206,41 @@ describe("grille du journal", () => {
     });
     await Promise.all([first, second]);
     expect(order).toEqual(["start-1", "end-1", "start-2", "end-2"]);
+  });
+
+  it("liste chaque écriture active une fois, sans filtre À vérifier par défaut", () => {
+    const entries = [
+      { id: "a", status: "pending" },
+      { id: "b", status: "validated" },
+      { id: "c", status: "reversed" },
+      { id: "d", status: "voided" },
+      { id: "a", status: "pending" },
+    ];
+    expect(listedJournalEntries(entries, "all").map((entry) => entry.id)).toEqual(["a", "b", "c"]);
+    expect(journalEntryListed("voided", "all")).toBe(false);
+    expect(journalEntryListed("pending", "all")).toBe(true);
+  });
+
+  it("filtre le journal par statut sans retirer les écritures écartées du cas Toutes", () => {
+    const entries = [
+      { id: "a", status: "pending" },
+      { id: "b", status: "validated" },
+      { id: "c", status: "reversed" },
+      { id: "d", status: "voided" },
+    ];
+    expect(listedJournalEntries(entries, "pending").map((entry) => entry.id)).toEqual(["a"]);
+    expect(listedJournalEntries(entries, "validated").map((entry) => entry.id)).toEqual(["b"]);
+    expect(listedJournalEntries(entries, "voided")).toEqual([]);
+  });
+
+  it("laisse vérifier une écriture à vérifier depuis le journal", () => {
+    expect(canEditJournalEntry("pending", "open")).toBe(true);
+    expect(resolveJournalStatus({
+      previous: "pending",
+      requested: "validated",
+      material: false,
+      balanced: true,
+    })).toEqual({ status: "validated" });
   });
 
   it("calcule l’écart d’une écriture déséquilibrée", () => {

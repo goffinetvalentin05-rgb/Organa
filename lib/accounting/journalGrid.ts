@@ -90,6 +90,25 @@ export function journalLinesBalanced(lines: GridLine[]): boolean {
 export const CLOSED_PERIOD_MESSAGE =
   "Cet exercice est clôturé. Les numéros d’écriture restent figés. Rouvrez-le dans Exercices pour modifier ou supprimer cette écriture.";
 
+/** Le journal liste les écritures actives. « all » n’applique aucun filtre de statut. Les écritures retirées restent exclues. */
+export function journalEntryListed(status: string, filter: string): boolean {
+  if (status === "voided") return false;
+  if (filter === "all") return true;
+  return status === filter;
+}
+
+/** Chaque écriture active n’apparaît qu’une fois, même si la source la répète. */
+export function listedJournalEntries<T extends { id: string; status: string }>(entries: T[], filter: string): T[] {
+  const seen = new Set<string>();
+  const listed: T[] = [];
+  for (const entry of entries) {
+    if (!journalEntryListed(entry.status, filter) || seen.has(entry.id)) continue;
+    seen.add(entry.id);
+    listed.push(entry);
+  }
+  return listed;
+}
+
 /** Écriture visible du journal : modifiable tant que l’exercice est ouvert. L’extourne n’est pas un blocage. */
 export function journalLockReason(status: string, periodStatus: string | null | undefined): string | null {
   if (status === "voided") return "Cette écriture a déjà été retirée du journal.";

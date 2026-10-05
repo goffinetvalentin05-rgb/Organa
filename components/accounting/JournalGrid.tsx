@@ -19,6 +19,7 @@ import {
   journalImbalance,
   journalLinesBalanced,
   journalLockReason,
+  listedJournalEntries,
   linkedJournalEntryId,
   rowsToLines,
   toJournalRows,
@@ -81,7 +82,6 @@ export default function JournalGrid({
   periods,
   selectedPeriodId,
   inbox,
-  reviewOnly,
   canWrite,
   numberingNotice,
   onAct,
@@ -93,7 +93,6 @@ export default function JournalGrid({
   selectedPeriodId?: string;
   attachments: unknown;
   inbox: InboxItem[];
-  reviewOnly: boolean;
   canWrite: boolean;
   numberingNotice?: string | null;
   onAct: (payload: Record<string, unknown>) => Promise<unknown>;
@@ -101,7 +100,7 @@ export default function JournalGrid({
 }) {
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState(reviewOnly ? "pending" : "all");
+  const [status, setStatus] = useState("all");
   const [accountId, setAccountId] = useState("");
   const [source, setSource] = useState("all");
   const [manualPeriodId, setManualPeriodId] = useState("all");
@@ -130,9 +129,7 @@ export default function JournalGrid({
   periodsRef.current = periods;
   const activeAccounts = accounts.filter((account) => account.isActive);
 
-  const visibleEntries = entries.filter((entry) => {
-    if (entry.status === "voided") return false;
-    if (status !== "all" && entry.status !== status) return false;
+  const visibleEntries = listedJournalEntries(entries, status).filter((entry) => {
     if (from && entry.entry_date < from) return false;
     if (to && entry.entry_date > to) return false;
     if (periodId !== "all" && entry.period_id !== periodId) return false;
@@ -602,7 +599,7 @@ export default function JournalGrid({
               Nouvelle écriture
             </ToolButton>
           ) : null}
-          {reviewOnly && canWrite ? (
+          {canWrite ? (
             <ToolButton label="Créer les écritures des opérations déjà complètes. Une consultation du journal ne le fait pas." onClick={() => void onAct({ action: "process-inbox" })} disabled={pending !== null}>
               Comptabiliser les opérations prêtes
             </ToolButton>
@@ -763,6 +760,7 @@ export default function JournalGrid({
                   const lock = journalLockReason(entry.status, periodStatus(entry));
                   const total = rows.reduce((sum, item) => sum + item.amount, 0);
                   const linked = entries.find((item) => item.id === linkedJournalEntryId(entry));
+                  const toReview = entry.status === "pending";
                   return rows.map((row) => {
                     const showMeta = row.groupIndex === 0;
                     const debit = accounts.find((account) => account.id === row.debitAccountId);
@@ -772,7 +770,7 @@ export default function JournalGrid({
                       <tr
                         key={row.key}
                         data-entry-id={showMeta ? entry.id : undefined}
-                        className={`border-b ${last ? "border-[#E2E8F0]" : "border-[#F4F7FB]"} bg-white hover:bg-[#F8FAFC]`}
+                        className={`border-b ${last ? "border-[#E2E8F0]" : "border-[#F4F7FB]"} ${toReview ? "bg-[#FFFBEB] hover:bg-[#FFF6D8]" : "bg-white hover:bg-[#F8FAFC]"}`}
                       >
                         <CellButton locked={Boolean(lock) || !canWrite} title={lock || "Modifier la date"} onClick={() => openEdit(entry, rows, "date", row.groupIndex)}>{showMeta ? formatSwissDate(entry.entry_date) : ""}</CellButton>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || (entry.entry_number_manual ? "Numéro corrigé manuellement. Un décalage ultérieur sera indiqué." : "Modifier le numéro d’écriture")} onClick={() => openEdit(entry, rows, "number", row.groupIndex)}>{showMeta ? entry.entry_number : ""}</CellButton>
@@ -791,7 +789,7 @@ export default function JournalGrid({
                         </td>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la remarque"} onClick={() => openEdit(entry, rows, "remark", row.groupIndex)}>{showMeta ? entry.party_name || "" : ""}</CellButton>
                         <td className="truncate px-2 py-3 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
-                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le statut"} onClick={() => openEdit(entry, rows, "status", row.groupIndex)}>{showMeta ? STATUS_LABEL[entry.status] || entry.status : ""}</CellButton>
+                        <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le statut"} onClick={() => openEdit(entry, rows, "status", row.groupIndex)}>{showMeta ? (toReview ? <span className="inline-flex max-w-full truncate rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-950">{STATUS_LABEL.pending}</span> : (STATUS_LABEL[entry.status] || entry.status)) : ""}</CellButton>
                         <td className="px-1 py-1 text-center">
                           {showMeta && canWrite ? (
                             <button

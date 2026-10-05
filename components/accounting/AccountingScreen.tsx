@@ -17,7 +17,7 @@ import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/prici
 import { ACCOUNTING_TAGLINE } from "@/lib/accounting/copy";
 import { formatSwissDate, zurichToday } from "@/lib/accounting/format";
 
-type Section = "overview" | "journal" | "review" | "chart" | "reports" | "budget" | "periods" | "settings";
+type Section = "overview" | "journal" | "chart" | "reports" | "budget" | "periods" | "settings";
 
 const PERIOD_STORAGE = "organa.accounting.period";
 
@@ -30,7 +30,6 @@ function preferredPeriod(periods: Period[], current: string): string {
 
 const NAV = [
   { href: "/tableau-de-bord/comptabilite/journal", section: "journal" as const, label: "Journal" },
-  { href: "/tableau-de-bord/comptabilite/a-verifier", section: "review" as const, label: "À vérifier" },
   { href: "/tableau-de-bord/comptabilite/plan", section: "chart" as const, label: "Plan comptable" },
   { href: "/tableau-de-bord/comptabilite/rapports", section: "reports" as const, label: "Rapports" },
   { href: "/tableau-de-bord/comptabilite/budget", section: "budget" as const, label: "Budget" },
@@ -157,7 +156,6 @@ export default function AccountingScreen({ section }: { section: Section }) {
   const coverage = (data?.coverage || {}) as { note?: string | null; type?: string | null };
   const startsLater = Boolean(access.startDate && access.startDate > zurichToday());
   const openItems = data?.openItems as { receivableTotal: number; payableTotal: number } | null;
-  const reviewCount = review.count;
   const activePeriodId = preferredPeriod(periods, periodId);
 
   return (
@@ -174,9 +172,6 @@ export default function AccountingScreen({ section }: { section: Section }) {
               className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm ${active ? "bg-[#0F172A] font-semibold text-white" : "text-[#475569] hover:bg-[#F4F7FB]"}`}
             >
               {item.label}
-              {item.section === "review" && reviewCount > 0 ? (
-                <span className={`rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${active ? "bg-white/15 text-white" : "bg-amber-100 text-amber-900"}`}>{reviewCount}</span>
-              ) : null}
             </Link>
           );
         })}
@@ -209,7 +204,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#475569]">Les encaissements et les dépenses antérieurs à cette date ne sont pas comptabilisés.</p>
         </GlassCard>
       ) : null}
-      {section === "journal" || section === "review" ? (
+      {section === "journal" ? (
         <JournalGrid
           entries={entries}
           accounts={accounts}
@@ -218,7 +213,6 @@ export default function AccountingScreen({ section }: { section: Section }) {
           selectedPeriodId={activePeriodId}
           attachments={attachments}
           inbox={review.inbox}
-          reviewOnly={section === "review"}
           canWrite={Boolean(access.canWrite)}
           numberingNotice={access.numberingNotice}
           onAct={async (payload) => {
