@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { buildBudgetComparison, buildBudgetDocument } from "@/lib/accounting/budget";
 import {
   buildAccountExtract,
   buildBalanceSheet,
@@ -352,5 +353,65 @@ describe("PDF des rapports", () => {
     writeFileSync(path.join(directory, "compte-de-resultat.pdf"), incomePdf);
     writeFileSync(path.join(directory, "journal.pdf"), journalPdf);
     writeFileSync(path.join(directory, "extrait-1020.pdf"), ledgerPdf);
+  });
+
+  it("sépare le budget prévu du comparatif réalisé", async () => {
+    const comparison = buildBudgetComparison({
+      accounts,
+      groups: [],
+      entries: extendedBooks.entries,
+      linesByEntry: extendedLines,
+      period,
+      lines: [
+        { accountId: "cotisations", groupId: null, amount: 800 },
+        { accountId: "admin", groupId: null, amount: 200 },
+      ],
+    });
+    const forecast = buildBudgetDocument({
+      view: "forecast",
+      comparison,
+      periodLabel: period.label,
+      from: period.startsOn,
+      to: period.endsOn,
+      status: "validated",
+      version: 1,
+    });
+    const compared = buildBudgetDocument({
+      view: "comparison",
+      comparison,
+      periodLabel: period.label,
+      from: period.startsOn,
+      to: period.endsOn,
+      status: "validated",
+      version: 1,
+    });
+    const [forecastPdf, comparedPdf] = await Promise.all([
+      renderAccountingReportPdf({ kind: "budget", report: forecast, club, generatedOn }),
+      renderAccountingReportPdf({ kind: "budget", report: compared, club, generatedOn }),
+    ]);
+    const forecastText = extractPdfText(forecastPdf);
+    const comparedText = extractPdfText(comparedPdf);
+
+    expect(forecast.products.map((row) => row.number)).toEqual(["3000"]);
+    expect(forecast.charges.map((row) => row.number)).toEqual(["6500"]);
+    expect(forecastText).toContain("Budget");
+    expect(forecastText).toContain("Club de démonstration");
+    expect(forecastText).toContain("Cotisations membres");
+    expect(forecastText).toContain("Frais administratifs");
+    expect(forecastText).toContain("800.00");
+    expect(forecastText).toContain("Résultat prévu");
+    expect(forecastText).toContain("600.00");
+    expect(forecastText).not.toContain("Réalisé");
+    expect(forecastText).not.toContain("Écart");
+    expect(forecastText).not.toContain("500.00");
+
+    expect(comparedText).toContain("Budget et réalisé");
+    expect(comparedText).toContain("Réalisé");
+    expect(comparedText).toContain("Écart");
+    expect(comparedText).toContain("800.00");
+    expect(comparedText).toContain("500.00");
+    expect(comparedText).toContain("80.00");
+    expect(comparedText).toContain("420.00");
+    expect(compared.pendingLabel).toContain("à vérifier");
   });
 });

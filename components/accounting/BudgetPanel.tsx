@@ -126,7 +126,17 @@ export default function BudgetPanel({
                 {draft?.note ? ` · ${draft.note}` : ""}
               </p>
             </div>
-            {validated && draft ? <p className="text-sm text-[#475569]">La version validée reste la référence tant que cette révision n’est pas validée.</p> : null}
+            <div className="flex flex-col items-end gap-2">
+              {validated && draft ? <p className="text-sm text-[#475569]">La version validée reste la référence tant que cette révision n’est pas validée.</p> : null}
+              {period && (validated || draft) ? (
+                <div className="flex flex-wrap justify-end gap-2">
+                  <a className="inline-flex h-9 items-center rounded-lg bg-[#1A23FF] px-3 text-sm font-semibold text-white" href={`/api/accounting/pdf?kind=budget&view=forecast&periodId=${period.id}`}>PDF du budget</a>
+                  <a className="inline-flex h-9 items-center rounded-lg border border-[#D6DEE8] bg-white px-3 text-sm font-semibold text-[#0F172A]" href={`/api/accounting/pdf?kind=budget&view=comparison&periodId=${period.id}`}>PDF budget et réalisé</a>
+                </div>
+              ) : (
+                <p className="text-sm text-[#64748B]">Enregistrez le budget pour le tirer en PDF.</p>
+              )}
+            </div>
           </div>
           <p className={`mt-3 text-sm ${comparison.pendingCount > 0 ? "font-medium text-amber-800" : "text-[#475569]"}`}>{comparison.pendingLabel}</p>
           <table className="mt-4 w-full text-sm">

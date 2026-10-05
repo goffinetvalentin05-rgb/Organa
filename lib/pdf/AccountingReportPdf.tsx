@@ -1,6 +1,7 @@
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { ReactNode } from "react";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
+import type { BudgetDocument, BudgetPdfView, BudgetRow } from "@/lib/accounting/budget";
 import {
   BALANCE_ASSET_TOTAL_LABEL,
   BALANCE_FUNDING_TOTAL_LABEL,
@@ -350,11 +351,85 @@ function LedgerDocument({ report, club, generatedOn }: Shared & { report: Ledger
   );
 }
 
+function BudgetDocumentView({ report, club, generatedOn }: Shared & { report: BudgetDocument }) {
+  return (
+    <Document title={report.title}>
+      <Page size="A4" style={styles.page}>
+        <Header
+          club={club}
+          title={report.title}
+          lines={[
+            `Exercice ${report.periodLabel}`,
+            `Du ${formatSwissDate(report.from)} au ${formatSwissDate(report.to)}`,
+            "Devise CHF",
+          ]}
+        />
+        <Text style={styles.scope}>{report.statusLine}</Text>
+        {report.pendingLabel ? <Text style={styles.scope}>{report.pendingLabel}</Text> : null}
+        <BudgetTable view={report.view} title="Produits" rows={report.products} totalLabel="Total des produits" total={report.revenue} empty="Aucun produit prévu." />
+        <BudgetTable view={report.view} title="Charges" rows={report.charges} totalLabel="Total des charges" total={report.expense} empty="Aucune charge prévue." />
+        <View style={styles.totalBar} wrap={false}>
+          <Text style={[styles.totalText, { flexGrow: 1 }]}>{report.view === "forecast" ? "Résultat prévu" : "Résultat"}</Text>
+          <Text style={[styles.totalText, styles.amount]}>{money(report.result.budget)}</Text>
+          {report.view === "comparison" ? <Text style={[styles.totalText, styles.amount]}>{money(report.result.actual)}</Text> : null}
+          {report.view === "comparison" ? <Text style={[styles.totalText, styles.amount]}>{money(report.result.variance)}</Text> : null}
+        </View>
+        <Footer generatedOn={generatedOn} />
+      </Page>
+    </Document>
+  );
+}
+
+function BudgetTable({
+  view,
+  title,
+  rows,
+  totalLabel,
+  total,
+  empty,
+}: {
+  view: BudgetPdfView;
+  title: string;
+  rows: BudgetRow[];
+  totalLabel: string;
+  total: { budget: number; actual: number; variance: number };
+  empty: string;
+}) {
+  return (
+    <View>
+      <Text style={styles.section}>{title}</Text>
+      <View style={styles.tableHead}>
+        <Text style={[styles.headCell, { flexGrow: 1 }]}>Poste</Text>
+        <Text style={[styles.headCell, styles.amount]}>Budget</Text>
+        {view === "comparison" ? <Text style={[styles.headCell, styles.amount]}>Réalisé</Text> : null}
+        {view === "comparison" ? <Text style={[styles.headCell, styles.amount]}>Écart</Text> : null}
+      </View>
+      {rows.length === 0 ? <Text style={styles.empty}>{empty}</Text> : null}
+      {rows.map((row) => (
+        <View key={row.key} style={styles.row} wrap={false}>
+          <Text style={styles.num}>{row.number}</Text>
+          <Text style={styles.name}>{row.kind === "group" ? `Rubrique ${row.name}` : row.name}</Text>
+          <Text style={styles.amount}>{money(row.budget)}</Text>
+          {view === "comparison" ? <Text style={styles.amount}>{money(row.actual)}</Text> : null}
+          {view === "comparison" ? <Text style={styles.amount}>{money(row.variance)}</Text> : null}
+        </View>
+      ))}
+      <View style={styles.subtotal} wrap={false}>
+        <Text style={[styles.name, { fontFamily: "Helvetica-Bold" }]}>{totalLabel}</Text>
+        <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(total.budget)}</Text>
+        {view === "comparison" ? <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(total.actual)}</Text> : null}
+        {view === "comparison" ? <Text style={[styles.amount, { fontFamily: "Helvetica-Bold" }]}>{money(total.variance)}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
 export type AccountingReportPdfInput = Shared & (
   | { kind: "balance"; report: BalanceSheetReport }
   | { kind: "result"; report: IncomeReport }
   | { kind: "journal"; report: JournalReport }
   | { kind: "ledger"; report: LedgerReport }
+  | { kind: "budget"; report: BudgetDocument }
 );
 
 export async function renderAccountingReportPdf(input: AccountingReportPdfInput): Promise<Buffer> {
@@ -368,5 +443,7 @@ export async function renderAccountingReportPdf(input: AccountingReportPdfInput)
       return renderToBuffer(<JournalDocument {...shared} report={input.report} />);
     case "ledger":
       return renderToBuffer(<LedgerDocument {...shared} report={input.report} />);
+    case "budget":
+      return renderToBuffer(<BudgetDocumentView {...shared} report={input.report} />);
   }
 }

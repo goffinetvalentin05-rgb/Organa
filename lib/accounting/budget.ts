@@ -284,3 +284,51 @@ export function buildBudgetComparison(input: {
     pendingLabel: pendingLabel(pendingCount),
   };
 }
+
+export type BudgetPdfView = "forecast" | "comparison";
+
+export type BudgetDocument = {
+  view: BudgetPdfView;
+  title: string;
+  periodLabel: string;
+  from: string;
+  to: string;
+  statusLine: string;
+  products: BudgetRow[];
+  charges: BudgetRow[];
+  revenue: BudgetFigures;
+  expense: BudgetFigures;
+  result: BudgetFigures;
+  pendingLabel: string | null;
+};
+
+/** Le PDF de début d'année ne garde que les postes budgétés. Le comparatif reprend aussi le réalisé. */
+export function buildBudgetDocument(input: {
+  view: BudgetPdfView;
+  comparison: BudgetComparison;
+  periodLabel: string;
+  from: string;
+  to: string;
+  status: "draft" | "validated";
+  version: number;
+}): BudgetDocument {
+  const rows = input.view === "forecast"
+    ? input.comparison.rows.filter((row) => row.budget > 0)
+    : input.comparison.rows;
+  return {
+    view: input.view,
+    title: input.view === "forecast" ? "Budget" : "Budget et réalisé",
+    periodLabel: input.periodLabel,
+    from: input.from,
+    to: input.to,
+    statusLine: input.status === "validated"
+      ? `Budget validé, version ${input.version}`
+      : `Brouillon enregistré, version ${input.version}`,
+    products: rows.filter((row) => row.nature === "revenue"),
+    charges: rows.filter((row) => row.nature === "expense"),
+    revenue: input.comparison.revenue,
+    expense: input.comparison.expense,
+    result: input.comparison.result,
+    pendingLabel: input.view === "comparison" ? input.comparison.pendingLabel : null,
+  };
+}
