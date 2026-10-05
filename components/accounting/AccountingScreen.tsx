@@ -236,7 +236,18 @@ export default function AccountingScreen({ section }: { section: Section }) {
         />
       ) : null}
       {section === "reports" ? (
-        <ReportsPanel entries={entries} accounts={accounts} linesByEntry={linesByEntry} periods={periods} periodId={activePeriodId} groups={(data?.groups || []) as AccountGroup[]} coverageNote={coverage.note} />
+        <ReportsPanel
+          entries={entries}
+          accounts={accounts}
+          linesByEntry={linesByEntry}
+          periods={periods}
+          periodId={activePeriodId}
+          groups={(data?.groups || []) as AccountGroup[]}
+          coverageNote={coverage.note}
+          startDate={access.startDate}
+          historyPending={access.startMode === "resume_current" && access.historyImportStatus !== "applied"}
+          rollupPeriodIds={entries.flatMap((entry) => entry.event_type === "history_rollup" && entry.period_id && entry.status !== "voided" ? [entry.period_id] : [])}
+        />
       ) : null}
       {section === "budget" ? (
         <BudgetPanel
@@ -260,6 +271,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           canWrite={Boolean(access.canWrite)}
           startDate={access.startDate}
           historyPending={access.startMode === "resume_current" && access.historyImportStatus !== "applied"}
+          rollupPeriodIds={entries.flatMap((entry) => entry.event_type === "history_rollup" && entry.period_id && entry.status !== "voided" ? [entry.period_id] : [])}
           onSelect={(id) => {
             setPeriodId(id);
             window.sessionStorage.setItem(PERIOD_STORAGE, id);

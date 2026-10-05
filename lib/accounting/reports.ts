@@ -89,6 +89,7 @@ export type BalanceSheetReport = {
   funding: AmountGroup[];
   fundingTotal: number;
   gap: number;
+  coverageNote?: string | null;
 };
 
 export type IncomeOutcome = {
@@ -108,6 +109,7 @@ export type IncomeReport = {
   productTotal: number;
   result: number;
   outcome: IncomeOutcome;
+  coverageNote?: string | null;
 };
 
 export type JournalReportRow = {
@@ -134,6 +136,7 @@ export type JournalReport = {
   rows: JournalReportRow[];
   /** Nombre de lignes exportées, identique à l'aperçu, au PDF et au CSV. */
   lineCount: number;
+  coverageNote?: string | null;
 };
 
 export type LedgerMovement = {
@@ -168,6 +171,8 @@ type Books = {
   linesByEntry: Record<string, ReportMovement[]>;
   period: ReportPeriod;
   groups?: AccountGroup[];
+  coverageNote?: string | null;
+  detailFrom?: string | null;
 };
 
 function signed(type: string, debit: number, credit: number): number {
@@ -181,6 +186,12 @@ function official(status: string): boolean {
 
 function inPeriod(date: string, period: ReportPeriod): boolean {
   return date >= period.startsOn && date <= period.endsOn;
+}
+
+function reportedFrom(input: Books): string {
+  const from = input.detailFrom;
+  if (from && from > input.period.startsOn && from <= input.period.endsOn) return from;
+  return input.period.startsOn;
 }
 
 /** Même filtre que le journal affiché : l'exercice choisi, sans les écritures retirées. */
@@ -368,6 +379,7 @@ export function buildBalanceSheet(input: Books): BalanceSheetReport {
     funding,
     fundingTotal,
     gap: roundChf(assetTotal - fundingTotal),
+    coverageNote: input.coverageNote ?? null,
   };
 }
 
@@ -407,7 +419,7 @@ export function buildIncomeStatement(input: Books): IncomeReport {
     kind: "result",
     title: "Compte de résultat",
     periodLabel: input.period.label,
-    from: input.period.startsOn,
+    from: reportedFrom(input),
     to: input.period.endsOn,
     charges,
     chargeTotal,
@@ -415,6 +427,7 @@ export function buildIncomeStatement(input: Books): IncomeReport {
     productTotal,
     result,
     outcome: incomeOutcome(result),
+    coverageNote: input.coverageNote ?? null,
   };
 }
 
@@ -448,6 +461,7 @@ export function buildJournalReport(input: Books): JournalReport {
     from: input.period.startsOn,
     to: input.period.endsOn,
     scope: JOURNAL_SCOPE,
+    coverageNote: input.coverageNote ?? null,
     rows,
     lineCount: rows.length,
   };

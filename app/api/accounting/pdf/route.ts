@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
+import { coverageForPeriod } from "@/lib/accounting/onboarding";
 import { loadWorkspace, recordExport } from "@/lib/accounting/service";
 import {
   buildAccountExtract,
@@ -41,12 +42,24 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Comptabilité non initialisée" }, { status: 404 });
     }
     const period = workspace.periods.find((item) => item.id === url.searchParams.get("periodId")) || workspace.currentPeriod;
+    const startDate = workspace.access.startDate;
+    const coverage = coverageForPeriod({
+      period,
+      accountingStartDate: startDate,
+      historyPending: workspace.access.startMode === "resume_current"
+        && workspace.access.historyImportStatus !== "applied"
+        && Boolean(startDate && period.startsOn <= startDate && startDate <= period.endsOn),
+      hasRollup: workspace.entries.some((entry) => entry.event_type === "history_rollup" && entry.period_id === period.id && entry.status !== "voided"),
+      priorOpen: workspace.periods.some((item) => item.endsOn < period.startsOn && item.status === "open"),
+    });
     const books = {
       accounts: workspace.accounts,
       entries: workspace.entries,
       linesByEntry: workspace.linesByEntry,
       period,
       groups: workspace.groups,
+      coverageNote: coverage.note,
+      detailFrom: coverage.label === "Partielle" ? startDate : null,
     };
     const clubPdf = await getClubCompanyPdfData(createAdminClient(), guard.clubId);
     const club = { name: clubPdf.company.name, logoUrl: clubPdf.company.logoUrl || null };

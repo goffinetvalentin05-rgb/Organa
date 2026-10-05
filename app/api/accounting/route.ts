@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS, checkPermission, requirePermission } from "@/lib/auth/permissions";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import {
+  applyHistoryImport,
   attachFile,
   clearNumberingNotice,
   closePeriod,
   clubUsesStripe,
   completeOnboarding,
   confirmInbox,
+  correctOpening,
   createTransfer,
   createAccount,
   createManualEntry,
@@ -16,6 +18,7 @@ import {
   correctJournalEntry,
   reverseAdvancedEntry,
   saveJournalEntry,
+  settleTakeoverItem,
   voidJournalEntry,
   getAccountingAccess,
   listOpenItems,
@@ -121,11 +124,20 @@ export async function POST(request: NextRequest) {
             { status: 409 }
           );
         }
-        return NextResponse.json({
-          available: false,
-          message:
-            "L’import d’historique (CSV, Excel, balance ou journal) arrive. Aucune écriture n’a été créée.",
-        });
+        if (!Array.isArray(body.journal) && !Array.isArray(body.cumulatives)) {
+          return NextResponse.json({
+            available: true,
+            message: "Choisissez un fichier CSV. Aucune écriture n’a été créée.",
+          });
+        }
+        await applyHistoryImport(guard.clubId, guard.userId, body);
+        break;
+      case "correct-opening":
+        await correctOpening(guard.clubId, guard.userId, body);
+        break;
+      case "settle-open-item":
+        await settleTakeoverItem(guard.clubId, guard.userId, body);
+        break;
       case "process-inbox":
         await processAccountingInbox(guard.clubId, guard.userId, "user");
         break;

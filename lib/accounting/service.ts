@@ -47,6 +47,12 @@ import {
   buildFinalizePayload,
   readOpeningDiagnostic,
 } from "./openingPlan";
+import {
+  planOpeningCorrection,
+  planTakeover,
+  takeoverInputFromBody,
+  takeoverRpcPayload,
+} from "./takeover";
 import type { AccountType, DraftLine, EntryStatus, ReportLine } from "./types";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -1436,7 +1442,25 @@ export async function loadWorkspace(clubId: string) {
     extensionsReady: extras.ready,
     incomeLines,
     balanceLines,
+    takeoverItems: await loadTakeoverItems(admin, clubId),
   };
+}
+
+async function loadTakeoverItems(admin: Admin, clubId: string) {
+  const { data, error } = await admin
+    .from("accounting_open_items")
+    .select("id, period_id, account_id, label, side, amount, settled_amount")
+    .eq("club_id", clubId);
+  if (error) return [];
+  return (data ?? []).map((item) => ({
+    id: String(item.id),
+    periodId: item.period_id ? String(item.period_id) : null,
+    accountId: item.account_id ? String(item.account_id) : null,
+    label: String(item.label),
+    side: item.side === "payable" ? "payable" as const : "receivable" as const,
+    amount: num(item.amount),
+    settledAmount: num(item.settled_amount),
+  }));
 }
 
 export async function clubUsesStripe(clubId: string): Promise<boolean> {
@@ -1456,6 +1480,10 @@ export async function completeOnboarding(
   userId: string,
   raw: Record<string, unknown>
 ) {
+  if (raw.takeoverMode === "full_period" || raw.takeoverMode === "from_date") {
+    await completeTakeover(clubId, userId, raw);
+    return;
+  }
   const params = normalizeOnboardingInput(raw);
   const admin = createAdminClient();
   const { data: existing } = await admin
@@ -1510,6 +1538,197 @@ export async function completeOnboarding(
     includeExisting: params.includeExisting,
     patrimony: params.others,
   });
+}
+
+async function completeTakeover(clubId: string, userId: string, raw: Record<string, unknown>) {
+  const input = takeoverInputFromBody(raw);
+  if ("error" in input) throw new Error(input.error);
+  const plan = planTakeover(input);
+  if (!plan.ok) throw new Error(plan.message);
+  const admin = createAdminClient();
+  const { data: existing } = await admin
+    .from("accounting_settings")
+    .select("onboarding_completed_at")
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (existing?.onboarding_completed_at) return;
+  const { data, error } = await admin.rpc("accounting_finalize_takeover", {
+    p_payload: takeoverRpcPayload(clubId, userId, input, plan),
+  });
+  if (error) {
+    if (/finalize_takeover|does not exist|n'existe pas/i.test(error.message)) {
+      throw new Error("La reprise demande la migration 105. Aucune écriture n'a été créée.");
+    }
+    throw new Error(error.message);
+  }
+  void data;
+}
+
+export async function applyHistoryImport(clubId: string, userId: string, raw: Record<string, unknown>) {
+  const admin = createAdminClient();
+  const { data: settings } = await admin
+    .from("accounting_settings")
+    .select("start_mode, start_date, history_import_status")
+    .eq("club_id", clubId)
+    .maybeSingle();
+  const periods = await loadPeriods(admin, clubId);
+  const period = periods.find((item) => item.id === String(raw.periodId || "")) || periods.find((item) => item.status === "open");
+  if (!period) throw new Error("Aucun exercice ouvert pour cette reprise.");
+  const input = takeoverInputFromBody({
+    ...raw,
+    takeoverMode: raw.takeoverMode || settings?.start_mode,
+    periodStart: period.startsOn,
+    periodEnd: period.endsOn,
+    takeoverDate: settings?.start_mode === "from_date"
+      ? String(raw.takeoverDate || settings?.start_date || period.startsOn)
+      : period.endsOn,
+  });
+  if ("error" in input) throw new Error(input.error);
+  const plan = planTakeover({ ...input, balances: [] });
+  if (!plan.ok) throw new Error(plan.message);
+  if (!plan.journal.length && !plan.rollup) throw new Error("Le fichier ne contient aucune écriture à reprendre.");
+  const { data: applied, error: appliedError } = await admin
+    .from("accounting_history_imports")
+    .select("fingerprint")
+    .eq("club_id", clubId)
+    .eq("period_id", period.id)
+    .eq("status", "applied");
+  if (appliedError) {
+    if (/fingerprint|history_imports|does not exist|n'existe pas/i.test(appliedError.message)) {
+      throw new Error("L'import demande la migration 105. Aucune écriture n'a été créée.");
+    }
+    throw new Error(appliedError.message);
+  }
+  const fingerprints = (applied ?? []).map((row) => String(row.fingerprint || "")).filter(Boolean);
+  if (fingerprints.includes(plan.fingerprint)) return { already: true };
+  if (fingerprints.length) {
+    throw new Error("Un import a déjà repris cet exercice. Un second lot compterait les mêmes opérations deux fois.");
+  }
+  const { error } = await admin.rpc("accounting_apply_history_import", {
+    p_payload: {
+      ...takeoverRpcPayload(clubId, userId, input, plan),
+      period_id: period.id,
+      opening: null,
+      open_items: [],
+    },
+  });
+  if (error) {
+    if (/apply_history_import|does not exist|n'existe pas/i.test(error.message)) {
+      throw new Error("L'import demande la migration 105. Aucune écriture n'a été créée.");
+    }
+    throw new Error(error.message);
+  }
+  return { already: false };
+}
+
+export async function correctOpening(clubId: string, userId: string, raw: Record<string, unknown>) {
+  const admin = createAdminClient();
+  const periods = await loadPeriods(admin, clubId);
+  const period = periods.find((item) => item.id === String(raw.periodId || ""));
+  if (!period) throw new Error("Exercice introuvable.");
+  const { data: opening } = await admin
+    .from("accounting_entries")
+    .select("id, entry_number, entry_date, description, status, source_type")
+    .eq("club_id", clubId)
+    .eq("period_id", period.id)
+    .eq("source_type", "opening")
+    .neq("status", "voided")
+    .maybeSingle();
+  const decision = planOpeningCorrection({
+    openingEntryId: opening?.id ? String(opening.id) : null,
+    periodStatus: period.status,
+  });
+  if (!decision.ok) throw new Error(decision.message);
+  const { data: settings } = await admin
+    .from("accounting_settings")
+    .select("start_mode, start_date")
+    .eq("club_id", clubId)
+    .maybeSingle();
+  const accounts = await loadAccounts(admin, clubId);
+  const rollup = await admin
+    .from("accounting_entries")
+    .select("id")
+    .eq("club_id", clubId)
+    .eq("period_id", period.id)
+    .eq("event_type", "history_rollup")
+    .neq("status", "voided")
+    .maybeSingle();
+  let cumulatives: Array<{ code: string; amount: number }> = [];
+  if (rollup.data?.id) {
+    const { data: lines } = await admin
+      .from("accounting_entry_lines")
+      .select("account_id, debit, credit")
+      .eq("entry_id", rollup.data.id);
+    cumulatives = (lines ?? []).flatMap((line) => {
+      const account = accounts.find((item) => item.id === line.account_id);
+      if (!account || (account.accountType !== "revenue" && account.accountType !== "expense")) return [];
+      const amount = account.accountType === "revenue" ? num(line.credit) : num(line.debit);
+      if (!(amount > 0)) return [];
+      return [{ code: account.systemCode || account.number, amount }];
+    });
+  }
+  const input = takeoverInputFromBody({
+    ...raw,
+    takeoverMode: settings?.start_mode === "from_date" ? "from_date" : "full_period",
+    periodStart: period.startsOn,
+    periodEnd: period.endsOn,
+    takeoverDate: settings?.start_mode === "from_date" ? settings.start_date : period.endsOn,
+    journal: [],
+    cumulatives,
+  });
+  if ("error" in input) throw new Error(input.error);
+  const plan = planTakeover(input);
+  if (!plan.ok) throw new Error(plan.message);
+  const lines = plan.openingLines.map((line) => {
+    const account = accounts.find((item) => item.systemCode === line.accountCode || item.number === line.accountCode);
+    if (!account) throw new Error(`Compte de reprise introuvable : ${line.accountCode}.`);
+    return { account_id: account.id, debit: line.debit, credit: line.credit };
+  });
+  const { error } = await admin.rpc("accounting_update_pending_entry", {
+    p_payload: {
+      club_id: clubId,
+      entry_id: decision.entryId,
+      entry_date: plan.openingDate,
+      entry_number: opening?.entry_number,
+      number_manual: false,
+      user_id: userId,
+      period_id: period.id,
+      description: plan.openingDescription,
+      reference: "",
+      remark: "",
+      status: "validated",
+      lines,
+    },
+  });
+  if (error) throw new Error(explainJournalError(error.message));
+  await audit(admin, clubId, "opening_correction", userId, decision.entryId, {
+    description: opening?.description,
+  }, { lines, description: plan.openingDescription });
+}
+
+export async function settleTakeoverItem(clubId: string, userId: string, raw: Record<string, unknown>) {
+  const admin = createAdminClient();
+  const accounts = await loadAccounts(admin, clubId);
+  const financial = accounts.find((account) => account.systemCode === String(raw.financialAccountCode || "") || account.id === String(raw.financialAccountId || ""));
+  if (!financial) throw new Error("Choisissez le compte de trésorerie du règlement.");
+  const { data, error } = await admin.rpc("accounting_settle_open_item", {
+    p_payload: {
+      club_id: clubId,
+      user_id: userId,
+      item_id: String(raw.itemId || ""),
+      financial_account_id: financial.id,
+      amount: Number(raw.amount),
+      entry_date: String(raw.date || zurichToday()),
+      description: String(raw.description || "Règlement d'une somme reprise"),
+    },
+  });
+  if (error) {
+    if (/settle_open_item|does not exist|n'existe pas|accounting_open_items/i.test(error.message)) {
+      throw new Error("Le suivi des sommes reprises demande la migration 105.");
+    }
+    throw new Error(error.message);
+  }
+  return data;
 }
 
 async function backfillSince(admin: Admin, clubId: string, startDate: string) {

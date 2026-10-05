@@ -80,22 +80,44 @@ export function coverageForPeriod(input: {
   period: { startsOn: string; endsOn: string };
   accountingStartDate: string | null;
   historyPending?: boolean;
+  hasRollup?: boolean;
+  priorOpen?: boolean;
 }): { label: "Complète" | "Partielle" | "Avant le démarrage"; note: string | null } {
   const start = input.accountingStartDate;
+  const base = coverageBase(input.period, start, input.historyPending);
+  const notes = [base.note];
+  let label = base.label;
+  const containsStart = Boolean(start && input.period.startsOn <= start && start <= input.period.endsOn);
+  if (containsStart && input.hasRollup && start) {
+    label = "Complète";
+    notes[0] = `Les totaux de cet exercice incluent une reprise agrégée des produits et des charges. Le journal détaille les opérations à partir du ${formatSwissDate(start)}. Le détail des anciennes opérations n'y figure pas.`;
+  }
+  if (input.priorOpen) {
+    notes.push("Les soldes issus de l'exercice précédent encore ouvert sont provisoires.");
+  }
+  const note = notes.filter(Boolean).join(" ");
+  return { label, note: note || null };
+}
+
+function coverageBase(
+  period: { startsOn: string; endsOn: string },
+  start: string | null,
+  historyPending?: boolean,
+): { label: "Complète" | "Partielle" | "Avant le démarrage"; note: string | null } {
   if (!start) return { label: "Complète", note: null };
-  if (input.period.endsOn < start) return { label: "Avant le démarrage", note: null };
-  const containsStart = input.period.startsOn <= start && start <= input.period.endsOn;
+  if (period.endsOn < start) return { label: "Avant le démarrage", note: null };
+  const containsStart = period.startsOn <= start && start <= period.endsOn;
   if (!containsStart) return { label: "Complète", note: null };
-  if (input.historyPending) {
+  if (historyPending) {
     return {
       label: "Partielle",
       note: `L'historique de cet exercice n'est pas encore repris. Les rapports n'incluent que les opérations enregistrées dans Obillz à partir du ${formatSwissDate(start)}.`,
     };
   }
-  if (start > input.period.startsOn) {
+  if (start > period.startsOn) {
     return {
       label: "Partielle",
-      note: `Les données de cet exercice couvrent du ${formatSwissDate(start)} au ${formatSwissDate(input.period.endsOn)}.`,
+      note: `Les données de cet exercice couvrent du ${formatSwissDate(start)} au ${formatSwissDate(period.endsOn)}.`,
     };
   }
   return { label: "Complète", note: null };

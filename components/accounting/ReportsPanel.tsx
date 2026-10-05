@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GlassCard } from "@/components/ui";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
+import { coverageForPeriod } from "@/lib/accounting/onboarding";
 import {
   BALANCE_ASSET_TOTAL_LABEL,
   BALANCE_FUNDING_TOTAL_LABEL,
@@ -27,6 +28,9 @@ export default function ReportsPanel({
   periodId: controlledPeriodId,
   groups = [],
   coverageNote,
+  startDate = null,
+  historyPending = false,
+  rollupPeriodIds = [],
 }: {
   entries: Entry[];
   accounts: Account[];
@@ -35,16 +39,36 @@ export default function ReportsPanel({
   periodId?: string;
   groups?: AccountGroup[];
   coverageNote?: string | null;
+  startDate?: string | null;
+  historyPending?: boolean;
+  rollupPeriodIds?: string[];
 }) {
   const [tab, setTab] = useState<Tab>("result");
   const [accountId, setAccountId] = useState(accounts[0]?.id || "");
   const [manualPeriodId, setManualPeriodId] = useState(periods.find((period) => period.status === "open")?.id || periods[periods.length - 1]?.id || "");
   const periodId = controlledPeriodId || manualPeriodId;
   const period = periods.find((item) => item.id === periodId) || periods[periods.length - 1];
+  const coverage = period
+    ? coverageForPeriod({
+        period,
+        accountingStartDate: startDate,
+        historyPending: historyPending && Boolean(startDate && period.startsOn <= startDate && startDate <= period.endsOn),
+        hasRollup: rollupPeriodIds.includes(period.id),
+        priorOpen: periods.some((item) => item.endsOn < period.startsOn && item.status === "open"),
+      })
+    : null;
   const books = useMemo(() => {
     if (!period) return null;
-    return { accounts, entries, linesByEntry, period, groups };
-  }, [accounts, entries, linesByEntry, period, groups]);
+    return {
+      accounts,
+      entries,
+      linesByEntry,
+      period,
+      groups,
+      coverageNote: coverage?.note || coverageNote || null,
+      detailFrom: coverage?.label === "Partielle" ? startDate : null,
+    };
+  }, [accounts, coverage?.label, coverage?.note, coverageNote, entries, groups, linesByEntry, period, startDate]);
   const balance = books ? buildBalanceSheet(books) : null;
   const income = books ? buildIncomeStatement(books) : null;
   const journal = books ? buildJournalReport(books) : null;
@@ -59,7 +83,7 @@ export default function ReportsPanel({
 
   return (
     <div className="space-y-4">
-      {coverageNote ? <p className="text-sm text-[#475569]">{coverageNote}</p> : null}
+      {books?.coverageNote ? <p className="text-sm text-[#475569]">{books.coverageNote}</p> : null}
       <nav className="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-xl border border-[#D6DEE8] bg-white p-1" aria-label="Rapports">
         {(["result", "balance", "journal", "ledger"] as const).map((item) => (
           <button

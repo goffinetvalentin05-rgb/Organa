@@ -14,6 +14,7 @@ export default function PeriodsPanel({
   canWrite,
   startDate,
   historyPending,
+  rollupPeriodIds = [],
   onSelect,
   onAct,
 }: {
@@ -26,6 +27,7 @@ export default function PeriodsPanel({
   canWrite: boolean;
   startDate?: string | null;
   historyPending?: boolean;
+  rollupPeriodIds?: string[];
   onSelect: (periodId: string) => void;
   onAct: (payload: Record<string, unknown>) => Promise<void>;
 }) {
@@ -45,7 +47,9 @@ export default function PeriodsPanel({
           const coverage = coverageForPeriod({
             period,
             accountingStartDate: startDate || null,
-            historyPending,
+            historyPending: historyPending && period.startsOn <= (startDate || "") && (startDate || "") <= period.endsOn,
+            hasRollup: rollupPeriodIds.includes(period.id),
+            priorOpen: periods.some((item) => item.endsOn < period.startsOn && item.status === "open"),
           });
           const following = planOpenFollowingPeriod(period, periods);
           const next = following.action === "exists"

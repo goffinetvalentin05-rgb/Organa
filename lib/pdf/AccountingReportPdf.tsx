@@ -162,6 +162,7 @@ function BalanceDocument({ report, club, generatedOn }: Shared & { report: Balan
             "Devise CHF",
           ]}
         />
+        {report.coverageNote ? <Text style={styles.scope}>{report.coverageNote}</Text> : null}
         {pairs.map((pair) => (
           <View key={pair.key} style={styles.pair} wrap={false}>
             <View style={styles.col}>{pair.left}</View>
@@ -196,6 +197,7 @@ function IncomeDocument({ report, club, generatedOn }: Shared & { report: Income
             "Devise CHF",
           ]}
         />
+        {report.coverageNote ? <Text style={styles.scope}>{report.coverageNote}</Text> : null}
         <Text style={styles.section}>Produits</Text>
         {report.products.length === 0 ? <Text style={styles.empty}>Aucun produit sur cette période.</Text> : report.products.map((group) => (
           <AmountRows key={group.title} group={group} showTitle={group.title !== "Produits"} showSubtotal={report.products.length > 1} />
@@ -259,6 +261,7 @@ function JournalDocument({ report, club, generatedOn }: Shared & { report: Journ
           ]}
         />
         <Text style={styles.scope}>{report.scope} {report.lineCount} ligne{report.lineCount > 1 ? "s" : ""}.</Text>
+        {report.coverageNote ? <Text style={styles.scope}>{report.coverageNote}</Text> : null}
         <View style={styles.tableHead} fixed>
           {heads.map(([key, label]) => <Text key={key} style={[styles.headCell, { width: journalWidths[key] }]}>{label}</Text>)}
         </View>
