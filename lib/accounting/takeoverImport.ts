@@ -2,6 +2,7 @@ import * as XLSX from "xlsx";
 import {
   detectCsvDelimiter,
   headerIndex,
+  normalizeHeader,
   parseAmount,
   parseTakeoverCsv,
   resolveImportAccount,
@@ -104,6 +105,148 @@ export function visibleHeaders(headers: string[]): string[] {
   return visible;
 }
 
+export const SIMPLE_JOURNAL_HEADERS = ["Date", "N° écr.", "Pièce", "Libellé", "Débit", "Crédit", "Montant", "Remarque"] as const;
+
+const SIMPLE_FIELDS = ["date", "number", "piece", "label", "debit", "credit", "amount", "remark"] as const;
+type SimpleField = (typeof SIMPLE_FIELDS)[number];
+
+const SIMPLE_ALIASES: Record<SimpleField, string[]> = {
+  date: ["date"],
+  number: ["necr", "n", "numero", "numeroecriture"],
+  piece: ["piece"],
+  label: ["libelle"],
+  debit: ["debit", "comptedebit"],
+  credit: ["credit", "comptecredit"],
+  amount: ["montant"],
+  remark: ["remarque"],
+};
+
+export function buildSimpleJournalWorkbook(): Uint8Array {
+  const book = XLSX.utils.book_new();
+  const sheet = XLSX.utils.aoa_to_sheet([[...SIMPLE_JOURNAL_HEADERS]]);
+  sheet["!cols"] = [16, 12, 16, 36, 16, 16, 14, 28].map((wch) => ({ wch }));
+  XLSX.utils.book_append_sheet(book, sheet, "Ecritures");
+  const bytes = XLSX.write(book, { type: "array", bookType: "xlsx" }) as ArrayBuffer;
+  return new Uint8Array(bytes);
+}
+
+export function buildSimpleJournalCsv(): { name: string; text: string } {
+  return { name: "modele-ecritures.csv", text: toCsv([[...SIMPLE_JOURNAL_HEADERS]]) };
+}
+
+export function detectJournalLayout(headers: string[]): "simple" | "lines" | "unknown" {
+  const normalized = headers.map((header) => normalizeHeader(header));
+  const has = (name: string) => normalized.includes(name);
+  if (has("origine") || (has("compte") && has("debit") && !has("montant"))) return "lines";
+  if (has("montant") && has("date") && (has("debit") || has("comptedebit")) && (has("credit") || has("comptecredit"))) return "simple";
+  return "unknown";
+}
+
+export function suggestSimpleColumns(headers: string[]): Partial<Record<SimpleField, string>> {
+  const map: Partial<Record<SimpleField, string>> = {};
+  for (const field of SIMPLE_FIELDS) {
+    const at = simpleColumnAt(headers, field);
+    if (at >= 0) map[field] = headers[at].trim();
+  }
+  return map;
+}
+
+function simpleColumnAt(headers: string[], field: SimpleField, chosen?: string): number {
+  if (chosen) {
+    const exact = headers.findIndex((header) => header.trim() === chosen);
+    if (exact >= 0) return exact;
+  }
+  const aliases = SIMPLE_ALIASES[field];
+  return headers.findIndex((header) => aliases.includes(normalizeHeader(header)));
+}
+
+function accountToken(raw: string): string {
+  const text = raw.trim();
+  const leading = /^(\d{3,6})\b/.exec(text);
+  return leading ? leading[1] : text;
+}
+
+export function parseSimpleJournal(
+  rows: unknown[][],
+  options: {
+    sheet?: string;
+    headerRow?: number;
+    accounts?: TakeoverAccount[];
+    accountMap?: Record<string, string>;
+    columns?: Partial<Record<SimpleField, string>>;
+  } = {},
+): { ok: true; entries: TakeoverJournalEntry[] } | Extract<TakeoverFileResult, { ok: false }> {
+  const sheet = options.sheet || "Ecritures";
+  const headerRow = options.headerRow && options.headerRow > 0 ? options.headerRow : 1;
+  const headers = ((rows[0] || []) as unknown[]).map((cell) => String(cell ?? ""));
+  const at = (field: SimpleField) => simpleColumnAt(headers, field, options.columns?.[field]);
+  const missing = (["date", "debit", "credit", "amount"] as const).filter((field) => at(field) < 0);
+  if (missing.length) {
+    const labels: Record<SimpleField, string> = { date: "Date", number: "N° écr.", piece: "Pièce", label: "Libellé", debit: "Débit", credit: "Crédit", amount: "Montant", remark: "Remarque" };
+    return {
+      ok: false,
+      headers: visibleHeaders(headers),
+      message: "Ce fichier ne correspond pas au modèle Obillz. Ouvrez « Mon fichier vient directement d'un autre logiciel » pour indiquer ses colonnes.",
+      errors: missing.map((field) => ({ sheet, row: headerRow, column: labels[field], message: `La colonne ${labels[field]} est introuvable.` })),
+    };
+  }
+  const entries: TakeoverJournalEntry[] = [];
+  const errors: ImportCellError[] = [];
+  const unknown: string[] = [];
+  const seen = new Map<string, number>();
+  const cell = (row: unknown[], field: SimpleField) => String(row[at(field)] ?? "").trim();
+  for (let index = 1; index < rows.length; index += 1) {
+    const row = (rows[index] || []) as unknown[];
+    if (row.every((value) => String(value ?? "").trim() === "")) continue;
+    const lineNo = headerRow + index;
+    const date = toIsoDate(row[at("date")]);
+    if (!date) errors.push({ sheet, row: lineNo, column: "Date", message: "Cette date n'est pas valable. Écrivez 15.01.2026 ou utilisez une date Excel." });
+    const amount = parseAmount(row[at("amount")]);
+    if (amount === null || !(amount > 0)) errors.push({ sheet, row: lineNo, column: "Montant", message: "Indiquez le montant de l'écriture, par exemple 1 200.00." });
+    const debitToken = accountToken(cell(row, "debit"));
+    const creditToken = accountToken(cell(row, "credit"));
+    if (!debitToken) errors.push({ sheet, row: lineNo, column: "Débit", message: "Indiquez le numéro du compte au débit, par exemple 1020." });
+    if (!creditToken) errors.push({ sheet, row: lineNo, column: "Crédit", message: "Indiquez le numéro du compte au crédit, par exemple 3000." });
+    if (debitToken && debitToken === creditToken) errors.push({ sheet, row: lineNo, column: "Crédit", message: "Le compte au débit et le compte au crédit doivent être différents." });
+    const number = cell(row, "number");
+    const origin = number || `ligne ${lineNo}`;
+    if (seen.has(origin)) errors.push({ sheet, row: lineNo, column: "N° écr.", message: `Le numéro ${number} est déjà utilisé à la ligne ${seen.get(origin)}.` });
+    else seen.set(origin, lineNo);
+    const debitCode = debitToken ? resolveImportAccount(debitToken, options.accounts, options.accountMap) : null;
+    const creditCode = creditToken ? resolveImportAccount(creditToken, options.accounts, options.accountMap) : null;
+    if (options.accounts && debitToken && !debitCode) unknown.push(debitToken);
+    if (options.accounts && creditToken && !creditCode) unknown.push(creditToken);
+    if (!date || amount === null || !(amount > 0) || !debitCode || !creditCode || debitToken === creditToken) continue;
+    entries.push({
+      date,
+      piece: cell(row, "piece"),
+      label: cell(row, "label"),
+      origin,
+      entryNumber: number || undefined,
+      remark: cell(row, "remark") || undefined,
+      lines: [
+        { code: debitCode, debit: amount, credit: 0 },
+        { code: creditCode, debit: 0, credit: amount },
+      ],
+    });
+  }
+  const distinctUnknown = [...new Set(unknown)];
+  if (distinctUnknown.length) {
+    return {
+      ok: false,
+      unknownAccounts: distinctUnknown,
+      headers: visibleHeaders(headers),
+      message: `Comptes inconnus : ${distinctUnknown.join(", ")}. Indiquez le compte Obillz correspondant. Aucun n'est choisi automatiquement.`,
+      errors: distinctUnknown.map((number) => ({ sheet, row: 0, column: "Compte", message: `Le compte ${number} n'est pas dans le plan Obillz.` })),
+    };
+  }
+  if (errors.length) {
+    const first = errors[0];
+    return { ok: false, headers: visibleHeaders(headers), message: `Ligne ${first.row}, colonne ${first.column} : ${first.message}`, errors };
+  }
+  return { ok: true, entries };
+}
+
 export function suggestColumnMap(headers: string[]): Partial<Record<(typeof ENTRY_HEADERS)[number], string>> {
   const map: Partial<Record<(typeof ENTRY_HEADERS)[number], string>> = {};
   for (const field of ENTRY_HEADERS) {
@@ -124,6 +267,8 @@ export function readTakeoverFile(input: {
   sheet?: string;
   headerRow?: number;
   asRole?: "journal" | "balances" | "cumulatives";
+  layout?: "auto" | "simple" | "lines";
+  simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>;
 }): TakeoverFileResult {
   const lower = input.filename.toLowerCase();
   if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) {
@@ -141,6 +286,8 @@ function readWorkbook(input: {
   sheet?: string;
   headerRow?: number;
   asRole?: "journal" | "balances" | "cumulatives";
+  layout?: "auto" | "simple" | "lines";
+  simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>;
 }): TakeoverFileResult {
   const bytes = typeof input.data === "string" ? new TextEncoder().encode(input.data) : new Uint8Array(input.data);
   const book = XLSX.read(bytes, { type: "array", cellDates: true });
@@ -187,8 +334,7 @@ function readWorkbook(input: {
       if (role === "balances") balances.push(...parsed.rows);
       else cumulatives.push(...parsed.rows);
     } else {
-      const csv = toCsv(sliced.map((row, rowIndex) => row.map((cell, index) => rowIndex === 0 ? cell : formatCell(cell, String(sliced[0]?.[index] ?? "")))));
-      const parsed = parseTakeoverCsv(csv, input.columns, { delimiter: ";", sheet: item.name, accounts: input.accounts, accountMap: input.accountMap });
+      const parsed = readJournalMatrix(sliced, { ...input, sheetName: item.name, headerRow: located.headerRow });
       if (!parsed.ok) return { ...parsed, headers: located.headers, ...context, preview: previewOf(sliced), headerRow: located.headerRow, previewSheet: item.name, suggestedColumns: suggestColumnMap(located.headers) };
       journal = parsed.entries;
     }
@@ -212,6 +358,8 @@ function readCsvFile(input: {
   columns?: Partial<Record<(typeof ENTRY_HEADERS)[number], string>>;
   accountMap?: Record<string, string>;
   headerRow?: number;
+  layout?: "auto" | "simple" | "lines";
+  simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>;
 }): TakeoverFileResult {
   const text = typeof input.data === "string" ? input.data : new TextDecoder("utf-8").decode(input.data);
   if (!input.delimiter && detectCsvDelimiter(text) === "ambiguous") {
@@ -243,8 +391,8 @@ function readCsvFile(input: {
   }
   const journalish = headerIndex(headers, input.columns?.date || "date") >= 0 || headerIndex(headers, input.columns?.origine || "origine") >= 0;
   const cumulative = headerIndex(headers, "cumul") >= 0;
-  if (journalish && !cumulative) {
-    const parsed = parseTakeoverCsv(toCsv(sliced), input.columns, { delimiter, sheet: "CSV", accounts: input.accounts, accountMap: input.accountMap });
+  if ((journalish && !cumulative) || detectJournalLayout(headers) === "simple" || input.layout === "simple") {
+    const parsed = readJournalMatrix(sliced, { ...input, sheetName: "CSV", headerRow });
     if (!parsed.ok) return { ...parsed, ...blank, headers };
     const guarded = guardMode({ ok: true, balances: [], journal: parsed.entries, cumulatives: [] }, input.mode);
     if (!guarded.ok) return { ...guarded, ...blank };
@@ -260,6 +408,36 @@ function readCsvFile(input: {
   }, input.mode);
   if (!guarded.ok) return { ...guarded, ...blank };
   return { ...guarded, ...blank };
+}
+
+function readJournalMatrix(
+  rows: unknown[][],
+  input: {
+    columns?: Partial<Record<(typeof ENTRY_HEADERS)[number], string>>;
+    simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>;
+    accounts?: TakeoverAccount[];
+    accountMap?: Record<string, string>;
+    layout?: "auto" | "simple" | "lines";
+    sheetName: string;
+    headerRow: number;
+  },
+): { ok: true; entries: TakeoverJournalEntry[] } | Extract<TakeoverFileResult, { ok: false }> {
+  const headers = ((rows[0] || []) as unknown[]).map((cell) => String(cell ?? ""));
+  const layout = input.layout && input.layout !== "auto" ? input.layout : detectJournalLayout(headers);
+  if (layout === "unknown") {
+    return {
+      ok: false,
+      headers: visibleHeaders(headers),
+      message: "Ce fichier ne correspond pas au modèle Obillz. Ouvrez « Mon fichier vient directement d'un autre logiciel » pour indiquer ses colonnes.",
+      errors: [{ sheet: input.sheetName, row: input.headerRow, column: "en-têtes", message: "Les colonnes Date, Débit, Crédit et Montant sont introuvables." }],
+    };
+  }
+  if (layout === "simple") {
+    if (rows.length < 2) return { ok: true, entries: [] };
+    return parseSimpleJournal(rows, { sheet: input.sheetName, headerRow: input.headerRow, accounts: input.accounts, accountMap: input.accountMap, columns: input.simpleColumns });
+  }
+  const csv = toCsv(rows.map((row, rowIndex) => row.map((cell, index) => rowIndex === 0 ? cell : formatCell(cell, String(rows[0]?.[index] ?? "")))));
+  return parseTakeoverCsv(csv, input.columns, { delimiter: ";", sheet: input.sheetName, accounts: input.accounts, accountMap: input.accountMap });
 }
 
 function guardMode(

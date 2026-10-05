@@ -1,0 +1,11 @@
+﻿Date;N° écr.;Pièce;Libellé;Débit;Crédit;Montant;Remarque
+15.01.2026;1;COT-1;Cotisations encaissées;1020;3000;1200.00;
+20.01.2026;2;COT-2;Cotisations en espèces;1000;3000;200.00;
+02.02.2026;3;FAC-1;Matériel;4000;1020;350.00;
+10.02.2026;4;FAC-2;Fournitures;4000;1000;80.00;
+01.03.2026;5;COT-3;Cotisation;1020;3000;500.00;
+15.03.2026;6;FAC-3;Location;4000;1020;200.00;
+01.04.2026;7;COT-4;Don;1020;3000;150.00;
+10.04.2026;8;FAC-4;Assurance;4000;1020;90.00;
+02.05.2026;9;COT-5;Cotisation;1000;3000;75.00;
+20.05.2026;10;FAC-5;Repas;4000;1000;40.00;accueil

@@ -5,10 +5,9 @@ import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import { roundChf } from "@/lib/accounting/money";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
-import { buildTakeoverCsv, buildTakeoverWorkbook, readTakeoverFile, type WorkbookSheet } from "@/lib/accounting/takeoverImport";
+import { buildSimpleJournalCsv, buildSimpleJournalWorkbook, buildTakeoverCsv, buildTakeoverWorkbook, readTakeoverFile, suggestSimpleColumns, type WorkbookSheet } from "@/lib/accounting/takeoverImport";
 import {
   TAKEOVER_CSV_HEADERS,
-  TAKEOVER_CSV_HELP,
   chartTakeoverAccounts,
   dayBefore,
   planTakeover,
@@ -24,6 +23,18 @@ import { ActionButton, GlassCard } from "@/components/ui";
 const fieldClass = "mt-1 w-full rounded-xl border border-[rgba(15,23,42,0.1)] bg-white px-3 py-2 text-sm text-[#0F172A]";
 const choiceClass = `${fieldClass} [color-scheme:light]`;
 const optionStyle = { color: "#0F172A", backgroundColor: "#ffffff" };
+const SIMPLE_MAP_FIELDS = [
+  ["date", "Date"],
+  ["number", "N° écr."],
+  ["piece", "Pièce"],
+  ["label", "Libellé"],
+  ["debit", "Débit"],
+  ["credit", "Crédit"],
+  ["amount", "Montant"],
+  ["remark", "Remarque"],
+] as const;
+type SimpleMapField = (typeof SIMPLE_MAP_FIELDS)[number][0];
+
 const COLUMN_LABELS: Record<(typeof TAKEOVER_CSV_HEADERS)[number], string> = {
   date: "Date",
   piece: "Pièce",
@@ -110,6 +121,8 @@ export default function AccountingOnboarding({
   const [headerRow, setHeaderRow] = useState(1);
   const [previewRows, setPreviewRows] = useState<string[][]>([]);
   const [columnMap, setColumnMap] = useState<Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>>({});
+  const [simpleMap, setSimpleMap] = useState<Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>>({});
+  const [lineLayout, setLineLayout] = useState(false);
   const [unknownAccounts, setUnknownAccounts] = useState<string[]>([]);
   const [accountMap, setAccountMap] = useState<Record<string, string>>({});
   const [file, setFile] = useState<{ name: string; data: ArrayBuffer | string } | null>(null);
@@ -222,7 +235,7 @@ export default function AccountingOnboarding({
     setCustomName("");
   }
 
-  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string>; sheet?: string; headerRow?: number; asRole?: "journal" | "balances" | "cumulatives" } = {}) {
+  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string>; sheet?: string; headerRow?: number; asRole?: "journal" | "balances" | "cumulatives"; layout?: "auto" | "simple" | "lines"; simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>> } = {}) {
     if (!mode) return;
     setError(null);
     setImportMessage(null);
@@ -240,6 +253,8 @@ export default function AccountingOnboarding({
       sheet: options.sheet,
       headerRow: options.headerRow,
       asRole: options.asRole,
+      layout: options.layout || (lineLayout ? "lines" : "auto"),
+      simpleColumns: options.simpleColumns,
     });
     const headers = (result.headers || []).map((header) => header.trim()).filter(Boolean);
     setWorkbookSheets(result.sheets || []);
@@ -250,6 +265,7 @@ export default function AccountingOnboarding({
     if (result.previewSheet) setSelectedSheet(result.previewSheet);
     const manual = options.columns && Object.values(options.columns).some(Boolean);
     if (!manual && result.suggestedColumns) setColumnMap(result.suggestedColumns);
+    if (!options.simpleColumns) setSimpleMap(suggestSimpleColumns(result.headers || []));
     setColumnHeaders(headers.length ? headers : null);
     if (!result.ok) {
       setImportMessage(result.message);
@@ -293,18 +309,25 @@ export default function AccountingOnboarding({
 
   function downloadExcel() {
     if (!mode) return;
-    const bytes = buildTakeoverWorkbook({ mode, periodStart, periodEnd, takeoverDate });
+    const journalModel = mode === "full_period" && takeoverDate > periodStart;
+    const bytes = journalModel ? buildSimpleJournalWorkbook() : buildTakeoverWorkbook({ mode, periodStart, periodEnd, takeoverDate });
     const copy = new ArrayBuffer(bytes.byteLength);
     new Uint8Array(copy).set(bytes);
-    downloadBlob(new Blob([copy]), "modele-reprise-comptable.xlsx");
+    downloadBlob(new Blob([copy]), journalModel ? "modele-ecritures.xlsx" : "modele-reprise-comptable.xlsx");
   }
 
   function downloadCsv() {
     if (!mode) return;
+    if (mode === "full_period" && takeoverDate > periodStart) {
+      const csv = buildSimpleJournalCsv();
+      downloadBlob(new Blob([csv.text], { type: "text/csv;charset=utf-8" }), csv.name);
+      return;
+    }
     const csv = buildTakeoverCsv({ mode, periodStart, periodEnd, takeoverDate });
     downloadBlob(new Blob([csv.text], { type: "text/csv;charset=utf-8" }), csv.name);
   }
 
+  const importableSheets = workbookSheets.filter((item) => item.role !== "ignored");
   const balanceTitle = mode === "full_period" ? "Soldes au premier jour de l'exercice" : mode === "from_date" ? "Soldes juste avant la reprise" : "Biens, disponibilités, dettes et fonds propres de départ";
   const balanceDate = !mode || mode === "full_period" || (mode === "from_date" && takeoverDate <= periodStart)
     ? periodStart
@@ -471,52 +494,88 @@ export default function AccountingOnboarding({
             <section className="mt-8">
               <h3 className="text-sm font-semibold text-[#0F172A]">Écritures du {formatSwissDate(periodStart)} au {formatSwissDate(dayBefore(takeoverDate))} inclus</h3>
               <p className="mt-1 text-sm text-[#475569]">Les écritures historiques vont du {formatSwissDate(periodStart)} au {formatSwissDate(dayBefore(takeoverDate))} inclus. Les nouvelles opérations commencent le {formatSwissDate(takeoverDate)}.</p>
-              <details className="mt-2 text-sm text-[#475569]">
-                <summary className="cursor-pointer font-medium text-[#1A23FF]">Comment remplir le fichier</summary>
-                <p className="mt-2 leading-relaxed">{TAKEOVER_CSV_HELP}</p>
-              </details>
+              <p className="mt-3 text-sm text-[#0F172A]">Téléchargez le modèle, copiez vos écritures dans les colonnes, puis importez le fichier rempli.</p>
+              <ExampleJournal />
               <div className="mt-3 flex flex-wrap gap-4">
                 <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadExcel}>Télécharger le modèle Excel</button>
                 <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadCsv}>Télécharger le modèle CSV</button>
               </div>
               <FileDrop onFile={(selected) => void onFile(selected)} />
-              <ImportWorkspace
-                file={file}
-                sheets={workbookSheets}
-                ignoredSheets={ignoredSheets}
-                ambiguousSheets={ambiguousSheets}
-                selectedSheet={selectedSheet}
-                headerRow={headerRow}
-                columnHeaders={columnHeaders}
-                columnMap={columnMap}
-                previewRows={previewRows}
-                needsDelimiter={needsDelimiter}
-                unknownAccounts={unknownAccounts}
-                accountMap={accountMap}
-                catalog={catalog}
-                message={importMessage}
-                errors={importErrors}
-                journal={journal}
-                onDelimiter={(value) => { setDelimiter(value); if (file) void ingest(file, { delimiter: value, sheet: selectedSheet || undefined, headerRow }); }}
-                onSheet={(name) => {
-                  setSelectedSheet(name);
-                  const role = workbookSheets.find((item) => item.name === name)?.role;
-                  if (!file || role === "ambiguous") return;
-                  void ingest(file, { sheet: name, headerRow, asRole: role === "journal" || role === "balances" || role === "cumulatives" ? role : undefined });
-                }}
-                onConfirmAmbiguous={(name) => { setSelectedSheet(name); if (file) void ingest(file, { sheet: name, headerRow, asRole: "journal" }); }}
-                onHeaderRow={(row) => { setHeaderRow(row); if (file) void ingest(file, { sheet: selectedSheet || undefined, headerRow: row, asRole: workbookSheets.find((item) => item.name === selectedSheet)?.role === "journal" ? "journal" : undefined }); }}
-                onColumn={(field, value) => {
-                  const next = { ...columnMap, [field]: value };
-                  setColumnMap(next);
-                  if (file) void ingest(file, { columns: next, sheet: selectedSheet || undefined, headerRow });
-                }}
-                onAccount={(number, value) => {
-                  const next = { ...accountMap, [number]: value };
-                  setAccountMap(next);
-                  if (file && value) void ingest(file, { accountMap: next, columns: columnMap, sheet: selectedSheet || undefined, headerRow });
-                }}
-              />
+              <ImportIssues message={importMessage} errors={importErrors} />
+              {needsDelimiter ? (
+                <div className="mt-3 flex gap-3">
+                  <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => { setDelimiter(";"); if (file) void ingest(file, { delimiter: ";", sheet: selectedSheet || undefined, headerRow }); }}>Point-virgule</button>
+                  <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => { setDelimiter(","); if (file) void ingest(file, { delimiter: ",", sheet: selectedSheet || undefined, headerRow }); }}>Virgule</button>
+                </div>
+              ) : null}
+              {unknownAccounts.length ? (
+                <div className="mt-4 space-y-2">
+                  {unknownAccounts.map((number) => (
+                    <label key={number} className="block text-sm text-[#334155]">Compte {number}
+                      <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={accountMap[number] || ""} onChange={(event) => {
+                        const next = { ...accountMap, [number]: event.target.value };
+                        setAccountMap(next);
+                        if (file && event.target.value) void ingest(file, { accountMap: next, sheet: selectedSheet || undefined, headerRow, layout: lineLayout ? "lines" : "auto" });
+                      }}>
+                        <option value="" style={optionStyle}>Choisir le compte Obillz</option>
+                        {catalog.map((account) => <option key={account.code} value={account.number} style={optionStyle}>{account.number} {account.name}</option>)}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+              {journal.length ? <JournalPreview entries={journal} accounts={catalog} /> : null}
+              <details className="mt-4 text-sm text-[#475569]">
+                <summary className="cursor-pointer font-medium text-[#1A23FF]">Mon fichier vient directement d'un autre logiciel</summary>
+                <p className="mt-2 leading-relaxed">Indiquez à quoi correspond chaque colonne. Une écriture simple tient sur une seule ligne : un compte au débit, un compte au crédit, un montant.</p>
+                <label className="mt-3 flex items-start gap-2 text-[#0F172A]">
+                  <input type="checkbox" className="mt-1" checked={lineLayout} onChange={(event) => {
+                    const next = event.target.checked;
+                    setLineLayout(next);
+                    if (file) void ingest(file, { layout: next ? "lines" : "auto", sheet: selectedSheet || undefined, headerRow });
+                  }} />
+                  Mon fichier met chaque compte sur sa propre ligne. Les lignes d'une même écriture partagent le même regroupement, et le débit doit égaler le crédit.
+                </label>
+                {importableSheets.length ? (
+                  <label className="mt-3 block text-xs text-[#64748B]">Feuille
+                    <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={selectedSheet} onChange={(event) => {
+                      const name = event.target.value;
+                      setSelectedSheet(name);
+                      const role = workbookSheets.find((item) => item.name === name)?.role;
+                      if (!file || role === "ambiguous") return;
+                      void ingest(file, { sheet: name, headerRow, layout: lineLayout ? "lines" : "auto", asRole: role === "journal" || role === "balances" || role === "cumulatives" ? role : undefined });
+                    }}>
+                      {importableSheets.map((item) => <option key={item.name} value={item.name} style={optionStyle}>{item.name}{item.role === "ambiguous" ? " — à confirmer" : ""}</option>)}
+                    </select>
+                  </label>
+                ) : null}
+                {ambiguousSheets.includes(selectedSheet) ? (
+                  <button type="button" className="mt-3 text-sm font-semibold text-[#1A23FF]" onClick={() => { if (file) void ingest(file, { sheet: selectedSheet, headerRow, asRole: "journal", layout: lineLayout ? "lines" : "auto" }); }}>Importer cette feuille</button>
+                ) : null}
+                {columnHeaders?.length ? (
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {(lineLayout ? TAKEOVER_CSV_HEADERS.map((field) => [field, COLUMN_LABELS[field]] as const) : SIMPLE_MAP_FIELDS).map(([field, label]) => (
+                      <label key={field} className="text-xs text-[#334155]">{label}
+                        <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={(lineLayout ? columnMap[field as (typeof TAKEOVER_CSV_HEADERS)[number]] : simpleMap[field as SimpleMapField]) || ""} onChange={(event) => {
+                          if (!file) return;
+                          if (lineLayout) {
+                            const next = { ...columnMap, [field]: event.target.value };
+                            setColumnMap(next);
+                            void ingest(file, { columns: next, layout: "lines", sheet: selectedSheet || undefined, headerRow });
+                          } else {
+                            const next = { ...simpleMap, [field]: event.target.value };
+                            setSimpleMap(next);
+                            void ingest(file, { simpleColumns: next, layout: "simple", sheet: selectedSheet || undefined, headerRow });
+                          }
+                        }}>
+                          <option value="" style={optionStyle}>Choisir une colonne</option>
+                          {columnHeaders.filter((header) => header.trim()).map((header) => <option key={header} value={header} style={optionStyle}>{header}</option>)}
+                        </select>
+                      </label>
+                    ))}
+                  </div>
+                ) : null}
+              </details>
             </section>
           ) : null}
           {mode === "full_period" && takeoverDate === periodStart ? (
@@ -650,7 +709,7 @@ function PreviewSummary(props: {
       {props.balances.length ? props.balances.map((row) => (
         <p key={row.code}>{names.get(row.code) || row.code} : {formatChfAmount(row.amount)}</p>
       )) : <p>Aucun solde de bilan saisi.</p>}
-      <p>{props.journalCount} écriture{props.journalCount > 1 ? "s" : ""} importée{props.journalCount > 1 ? "s" : ""}, {props.lineCount} ligne{props.lineCount > 1 ? "s" : ""}.</p>
+      <p>{props.journalCount} écriture{props.journalCount > 1 ? "s" : ""} reconnue{props.journalCount > 1 ? "s" : ""}.</p>
       {props.cumulatives.length ? props.cumulatives.map((row) => (
         <p key={row.code}>Cumul {names.get(row.code) || row.code} : {formatChfAmount(row.amount)}</p>
       )) : <p>Aucun cumul antérieur.</p>}
@@ -661,28 +720,79 @@ function PreviewSummary(props: {
   );
 }
 
-function JournalPreview({ entries }: { entries: TakeoverJournalEntry[] }) {
+function ExampleJournal() {
+  const row = ["15.01.2026", "1", "COT-1", "Cotisations encaissées", "1020", "3000", "1 200.00", ""];
   return (
-    <table className="mt-4 w-full text-sm">
-      <thead className="sticky top-0 bg-white">
-        <tr className="border-b text-left text-xs text-[#64748B]">
-          <th className="py-2 pr-3">Origine</th>
-          <th className="py-2 pr-3">Date</th>
-          <th className="py-2 pr-3">Libellé</th>
-          <th className="py-2 pr-3">Lignes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry) => (
-          <tr key={entry.origin} className="border-b border-[rgba(15,23,42,0.05)]">
-            <td className="py-2 pr-3">{entry.origin}</td>
-            <td className="py-2 pr-3">{formatSwissDate(entry.date)}</td>
-            <td className="py-2 pr-3">{entry.label || entry.piece}</td>
-            <td className="py-2 pr-3">{entry.lines.length}</td>
+    <div className="mt-4 overflow-x-auto rounded-xl bg-[#F8FAFC] px-3 py-3">
+      <p className="text-xs font-semibold text-[#1A23FF]">Exemple</p>
+      <table className="mt-2 w-full min-w-[720px] text-left text-sm text-[#0F172A]">
+        <thead>
+          <tr className="border-b border-[#E2E8F0] text-xs text-[#64748B]">
+            {["Date", "N° écr.", "Pièce", "Libellé", "Débit", "Crédit", "Montant", "Remarque"].map((title) => <th key={title} className="py-2 pr-3 font-semibold">{title}</th>)}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <tr>{row.map((cell, index) => <td key={index} className="py-2 pr-3">{cell}</td>)}</tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function isSimpleEntry(entry: TakeoverJournalEntry): boolean {
+  const debits = entry.lines.filter((line) => line.debit > 0);
+  const credits = entry.lines.filter((line) => line.credit > 0);
+  return entry.lines.length === 2 && debits.length === 1 && credits.length === 1;
+}
+
+function JournalPreview({ entries, accounts }: { entries: TakeoverJournalEntry[]; accounts: TakeoverAccount[] }) {
+  const names = new Map(accounts.map((account) => [account.code, `${account.number} ${account.name}`]));
+  const simple = entries.filter(isSimpleEntry);
+  const total = roundChf(simple.reduce((sum, entry) => sum + entry.lines.reduce((lineSum, line) => lineSum + line.debit, 0), 0));
+  const composed = entries.length - simple.length;
+  const rows = entries.flatMap((entry) => {
+    if (isSimpleEntry(entry)) {
+      const debit = entry.lines.find((line) => line.debit > 0);
+      const credit = entry.lines.find((line) => line.credit > 0);
+      return [{ key: entry.origin, meta: true, entry, debit: debit?.code, credit: credit?.code, amount: debit?.debit || 0 }];
+    }
+    return entry.lines.map((line, index) => ({
+      key: `${entry.origin}-${index}`,
+      meta: index === 0,
+      entry,
+      debit: line.debit > 0 ? line.code : undefined,
+      credit: line.credit > 0 ? line.code : undefined,
+      amount: line.debit || line.credit,
+    }));
+  });
+  return (
+    <div className="mt-4">
+      <p className="text-sm text-[#0F172A]">{entries.length} écriture{entries.length > 1 ? "s" : ""} reconnue{entries.length > 1 ? "s" : ""}. Total des montants : {formatChfAmount(total)}.</p>
+      {composed ? <p className="mt-1 text-sm text-[#475569]">{composed} écriture{composed > 1 ? "s" : ""} composée{composed > 1 ? "s" : ""}, contrôlée{composed > 1 ? "s" : ""} à part.</p> : null}
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[720px] text-left text-sm text-[#0F172A]">
+          <thead className="sticky top-0 bg-white">
+            <tr className="border-b border-[#E2E8F0] text-xs text-[#64748B]">
+              {["Date", "N° écr.", "Pièce", "Libellé", "Débit", "Crédit", "Montant", "Remarque"].map((title) => <th key={title} className="py-2 pr-3 font-semibold">{title}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.key} className="border-b border-[rgba(15,23,42,0.05)]">
+                <td className="py-2 pr-3">{row.meta ? formatSwissDate(row.entry.date) : ""}</td>
+                <td className="py-2 pr-3">{row.meta ? (row.entry.entryNumber || "") : ""}</td>
+                <td className="py-2 pr-3">{row.meta ? row.entry.piece : ""}</td>
+                <td className="py-2 pr-3">{row.meta ? row.entry.label : "même écriture"}</td>
+                <td className="py-2 pr-3">{row.debit ? names.get(row.debit) || row.debit : ""}</td>
+                <td className="py-2 pr-3">{row.credit ? names.get(row.credit) || row.credit : ""}</td>
+                <td className="py-2 pr-3 text-right tabular-nums">{formatChfAmount(row.amount)}</td>
+                <td className="py-2 pr-3">{row.meta ? row.entry.remark || "" : ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -734,108 +844,6 @@ function ModeCard({ selected, title, text, example, note, onClick }: { selected:
       </span>
       {note ? <span className="mt-3 block text-sm leading-relaxed text-[#475569]">{note}</span> : null}
     </button>
-  );
-}
-
-function ImportWorkspace(props: {
-  file: { name: string; data: ArrayBuffer | string } | null;
-  sheets: WorkbookSheet[];
-  ignoredSheets: string[];
-  ambiguousSheets: string[];
-  selectedSheet: string;
-  headerRow: number;
-  columnHeaders: string[] | null;
-  columnMap: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>;
-  previewRows: string[][];
-  needsDelimiter: boolean;
-  unknownAccounts: string[];
-  accountMap: Record<string, string>;
-  catalog: TakeoverAccount[];
-  message: string | null;
-  errors: ImportCellError[];
-  journal: TakeoverJournalEntry[];
-  onDelimiter: (value: ";" | ",") => void;
-  onSheet: (name: string) => void;
-  onConfirmAmbiguous: (name: string) => void;
-  onHeaderRow: (row: number) => void;
-  onColumn: (field: (typeof TAKEOVER_CSV_HEADERS)[number], value: string) => void;
-  onAccount: (number: string, value: string) => void;
-}) {
-  if (!props.file) return null;
-  const importable = props.sheets.filter((item) => item.role !== "ignored");
-  return (
-    <div>
-      <ImportIssues message={props.message} errors={props.errors} />
-      {props.ignoredSheets.length ? <p className="mt-3 text-sm text-[#475569]">Feuille ignorée : {props.ignoredSheets.join(", ")}. Ce texte explicatif n'est pas importé.</p> : null}
-      {importable.length ? (
-        <label className="mt-4 block text-xs text-[#64748B]">Feuille
-          <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.selectedSheet} onChange={(event) => props.onSheet(event.target.value)}>
-            {importable.map((item) => (
-              <option key={item.name} value={item.name} style={optionStyle}>{item.name}{item.role === "ambiguous" ? " — à confirmer" : ""}</option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      {props.ambiguousSheets.includes(props.selectedSheet) ? (
-        <button type="button" className="mt-3 text-sm font-semibold text-[#1A23FF]" onClick={() => props.onConfirmAmbiguous(props.selectedSheet)}>Importer cette feuille comme écritures</button>
-      ) : null}
-      {props.file.name.toLowerCase().endsWith(".csv") || importable.length ? (
-        <label className="mt-4 block text-xs text-[#64748B]">Ligne des en-têtes
-          <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={String(props.headerRow)} onChange={(event) => props.onHeaderRow(Number(event.target.value))}>
-            {Array.from({ length: 15 }, (_, index) => (
-              <option key={index + 1} value={String(index + 1)} style={optionStyle}>Ligne {index + 1}</option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      {props.needsDelimiter ? (
-        <div className="mt-3 flex gap-3">
-          <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => props.onDelimiter(";")}>Point-virgule</button>
-          <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={() => props.onDelimiter(",")}>Virgule</button>
-        </div>
-      ) : null}
-      {props.columnHeaders?.length ? (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {TAKEOVER_CSV_HEADERS.map((field) => (
-            <label key={field} className="text-xs text-[#334155]">{COLUMN_LABELS[field]}
-              <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.columnMap[field] || ""} onChange={(event) => props.onColumn(field, event.target.value)}>
-                <option value="" style={optionStyle}>Choisir une colonne</option>
-                {props.columnHeaders?.filter((header) => header.trim()).map((header) => (
-                  <option key={header} value={header} style={optionStyle}>{header}</option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
-      ) : null}
-      {props.unknownAccounts.length ? (
-        <div className="mt-4 space-y-2">
-          {props.unknownAccounts.map((number) => (
-            <label key={number} className="block text-sm text-[#334155]">Ancien compte {number}
-              <select className={choiceClass} style={{ colorScheme: "light", color: "#0F172A", backgroundColor: "#ffffff" }} value={props.accountMap[number] || ""} onChange={(event) => props.onAccount(number, event.target.value)}>
-                <option value="" style={optionStyle}>Associer à un compte Obillz</option>
-                {props.catalog.map((account) => <option key={account.code} value={account.number} style={optionStyle}>{account.number} {account.name}</option>)}
-              </select>
-            </label>
-          ))}
-        </div>
-      ) : null}
-      {props.previewRows.length ? (
-        <div className="mt-4 overflow-x-auto">
-          <p className="text-xs font-medium text-[#64748B]">Aperçu des premières lignes</p>
-          <table className="mt-2 w-full text-sm text-[#0F172A]">
-            <tbody>
-              {props.previewRows.map((row, index) => (
-                <tr key={index} className="border-b border-[rgba(15,23,42,0.05)]">
-                  {row.map((cell, cellIndex) => <td key={cellIndex} className="py-1 pr-3">{cell}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : null}
-      {props.journal.length ? <JournalPreview entries={props.journal} /> : null}
-    </div>
   );
 }
 

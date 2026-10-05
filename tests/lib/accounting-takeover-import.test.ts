@@ -1,11 +1,11 @@
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
 import { chartTakeoverAccounts, importReplay, planTakeover, toIsoDate } from "@/lib/accounting/takeover";
-import { buildTakeoverCsv, buildTakeoverWorkbook, classifySheet, readTakeoverFile, suggestColumnMap } from "@/lib/accounting/takeoverImport";
+import { buildSimpleJournalWorkbook, buildTakeoverCsv, buildTakeoverWorkbook, classifySheet, readTakeoverFile, suggestColumnMap, SIMPLE_JOURNAL_HEADERS } from "@/lib/accounting/takeoverImport";
 
 const accounts = chartTakeoverAccounts();
 const year = { periodStart: "2027-01-01", periodEnd: "2027-12-31", takeoverDate: "2027-07-01" };
@@ -325,5 +325,101 @@ describe("fichiers xlsx et csv", () => {
         expect(csv.journal.length).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe("modèle simple, une ligne par écriture", () => {
+  const rows = [
+    ["15.01.2026", "1", "COT-1", "Cotisations encaissées", "1020", "3000", "1200.00", ""],
+    ["20.01.2026", "2", "COT-2", "Cotisations en espèces", "1000", "3000", "200.00", ""],
+    ["02.02.2026", "3", "FAC-1", "Matériel", "4000", "1020", "350.00", ""],
+    ["10.02.2026", "4", "FAC-2", "Fournitures", "4000", "1000", "80.00", ""],
+    ["01.03.2026", "5", "COT-3", "Cotisation", "1020", "3000", "500.00", ""],
+    ["15.03.2026", "6", "FAC-3", "Location", "4000", "1020", "200.00", ""],
+    ["01.04.2026", "7", "COT-4", "Don", "1020", "3000", "150.00", ""],
+    ["10.04.2026", "8", "FAC-4", "Assurance", "4000", "1020", "90.00", ""],
+    ["02.05.2026", "9", "COT-5", "Cotisation", "1000", "3000", "75.00", ""],
+    ["20.05.2026", "10", "FAC-5", "Repas", "4000", "1000", "40.00", "accueil"],
+  ];
+
+  it("relit dix écritures simples depuis Excel et CSV, et bloque une date invalide", () => {
+    const fixtureDir = join(process.cwd(), "tests/fixtures/accounting-import");
+    mkdirSync(fixtureDir, { recursive: true });
+    const blank = XLSX.read(buildSimpleJournalWorkbook(), { type: "array" });
+    expect(blank.SheetNames).toEqual(["Ecritures"]);
+    const blankRows = XLSX.utils.sheet_to_json<string[]>(blank.Sheets.Ecritures, { header: 1, defval: "" });
+    expect(blankRows).toEqual([[...SIMPLE_JOURNAL_HEADERS]]);
+
+    const book = XLSX.utils.book_new();
+    const grid = XLSX.utils.aoa_to_sheet([[...SIMPLE_JOURNAL_HEADERS], ...rows]);
+    rows.forEach((_, index) => {
+      const dateCell = grid[XLSX.utils.encode_cell({ r: index + 1, c: 0 })];
+      const amountCell = grid[XLSX.utils.encode_cell({ r: index + 1, c: 6 })];
+      if (dateCell) dateCell.z = "dd.mm.yyyy";
+      if (amountCell) amountCell.z = "#,##0.00";
+    });
+    grid["!cols"] = [16, 12, 16, 36, 16, 16, 14, 28].map((wch) => ({ wch }));
+    XLSX.utils.book_append_sheet(book, grid, "Ecritures");
+    const xlsxPath = join(fixtureDir, "ecritures-simples.xlsx");
+    XLSX.writeFile(book, xlsxPath);
+    const csvPath = join(fixtureDir, "ecritures-simples.csv");
+    const csv = `\uFEFF${[SIMPLE_JOURNAL_HEADERS.join(";"), ...rows.map((row) => row.join(";"))].join("\n")}`;
+    writeFileSync(csvPath, csv, "utf8");
+    writeFileSync(join(fixtureDir, "resultats-attendus.json"), JSON.stringify({
+      ecritures: 10,
+      totalMontants: 2885,
+      produits: 2125,
+      charges: 760,
+      resultat: 1365,
+    }, null, 2));
+
+    const fromXlsx = readTakeoverFile({ filename: "ecritures-simples.xlsx", data: readFileSync(xlsxPath), mode: "full_period", accounts });
+    const fromCsv = readTakeoverFile({ filename: "ecritures-simples.csv", data: readFileSync(csvPath, "utf8"), mode: "full_period", accounts });
+    for (const read of [fromXlsx, fromCsv]) {
+      expect(read.ok).toBe(true);
+      if (!read.ok) return;
+      expect(read.journal).toHaveLength(10);
+      expect(read.journal[0].date).toBe("2026-01-15");
+      expect(read.journal[0].label).toBe("Cotisations encaissées");
+      expect(read.journal[0].entryNumber).toBe("1");
+      expect(read.journal[0].lines).toEqual([
+        { code: "bank", debit: 1200, credit: 0 },
+        { code: "membership", debit: 0, credit: 1200 },
+      ]);
+      expect(read.journal[9].remark).toBe("accueil");
+      const planned = plan({
+        mode: "full_period",
+        periodStart: "2026-01-01",
+        periodEnd: "2026-12-31",
+        takeoverDate: "2026-07-01",
+        balances: [],
+        journal: read.journal,
+      });
+      expect(planned.ok).toBe(true);
+      if (!planned.ok) return;
+      const income = buildIncomeStatement({
+        ...sheet(planned),
+        period: { label: "2026", startsOn: "2026-01-01", endsOn: "2026-12-31" },
+      });
+      expect(income.productTotal).toBe(2125);
+      expect(income.chargeTotal).toBe(760);
+      expect(income.result).toBe(1365);
+      const balance = buildBalanceSheet({
+        ...sheet(planned),
+        period: { label: "2026", startsOn: "2026-01-01", endsOn: "2026-12-31" },
+      });
+      expect(balance.gap).toBe(0);
+      expect(balance.assetTotal).toBe(1365);
+      expect(importReplay({ fingerprint: planned.fingerprint, appliedFingerprints: [planned.fingerprint] })).toBe("already");
+    }
+
+    const invalid = readTakeoverFile({
+      filename: "ecritures-simples.csv",
+      data: `${SIMPLE_JOURNAL_HEADERS.join(";")}\nhier;1;COT-1;Test;1020;3000;10;`,
+      mode: "full_period",
+      accounts,
+    });
+    expect(invalid.ok).toBe(false);
+    if (!invalid.ok) expect(invalid.message).toContain("Ligne 2");
   });
 });

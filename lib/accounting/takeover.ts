@@ -35,6 +35,7 @@ export type TakeoverJournalEntry = {
   piece: string;
   label: string;
   origin: string;
+  entryNumber?: string;
   remark?: string;
   reference?: string;
   sourceType?: string;
