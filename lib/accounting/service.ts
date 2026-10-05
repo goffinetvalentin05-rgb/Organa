@@ -1480,7 +1480,7 @@ export async function completeOnboarding(
   userId: string,
   raw: Record<string, unknown>
 ) {
-  if (raw.takeoverMode === "full_period" || raw.takeoverMode === "from_date") {
+  if (raw.takeoverMode === "fresh" || raw.takeoverMode === "full_period" || raw.takeoverMode === "from_date") {
     await completeTakeover(clubId, userId, raw);
     return;
   }

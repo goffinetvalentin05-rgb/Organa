@@ -129,6 +129,34 @@ export function chartTakeoverAccounts(): TakeoverAccount[] {
     }));
 }
 
+/** Seul l'import de l'exercice envoie des écritures. Les autres parcours n'en conservent aucune. */
+export function journalForSubmission(mode: TakeoverMode, journal: TakeoverJournalEntry[] | undefined): TakeoverJournalEntry[] {
+  return mode === "full_period" ? (journal ?? []) : [];
+}
+
+/** Ancien numéro → numéro Obillz. Un même ancien numéro ne peut viser qu'un seul compte. */
+export function legacyNumberMap(
+  accounts: TakeoverAccount[],
+  legacyByCode: Record<string, string | undefined>,
+): { ok: true; map: Record<string, string> } | { ok: false; message: string } {
+  const map: Record<string, string> = {};
+  const owner = new Map<string, string>();
+  for (const account of accounts) {
+    const legacy = String(legacyByCode[account.code] ?? "").trim();
+    if (!legacy) continue;
+    const previous = owner.get(legacy);
+    if (previous) {
+      return {
+        ok: false,
+        message: `Le numéro ${legacy} est déjà indiqué pour ${previous}. Un ancien numéro ne correspond qu'à un seul compte Obillz.`,
+      };
+    }
+    owner.set(legacy, `${account.number} ${account.name}`);
+    map[legacy] = account.number;
+  }
+  return { ok: true, map };
+}
+
 export function importFingerprint(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
@@ -724,19 +752,58 @@ export function takeoverInputFromBody(body: Record<string, unknown>): TakeoverIn
         side: item.side === "payable" ? "payable" as const : "receivable" as const,
       }))
     : [];
-  return {
-    mode,
+  const dates = {
     periodStart: String(body.periodStart || "").slice(0, 10),
     periodEnd: String(body.periodEnd || "").slice(0, 10),
     takeoverDate: String(body.takeoverDate || body.accountingStartDate || "").slice(0, 10),
+  };
+  if (mode === "fresh") {
+    return {
+      mode,
+      ...dates,
+      balances: balances.map(({ code, amount }) => ({ code, amount })),
+      accounts,
+      confirmEquityProposal: body.confirmEquityProposal === true,
+      confirmZeroOpening: body.confirmZeroOpening === true,
+      journal: [],
+      cumulatives: [],
+      openItems,
+    };
+  }
+  const legacyByCode: Record<string, string> = {};
+  if (body.legacyNumbers && typeof body.legacyNumbers === "object" && !Array.isArray(body.legacyNumbers)) {
+    for (const [code, value] of Object.entries(body.legacyNumbers as Record<string, unknown>)) {
+      const text = String(value ?? "").trim();
+      if (text) legacyByCode[code] = text;
+    }
+  }
+  for (const row of balances) {
+    if (row.legacyNumber) legacyByCode[row.code] = row.legacyNumber;
+  }
+  const aliases = legacyNumberMap(accounts, legacyByCode);
+  if (!aliases.ok) return { error: aliases.message };
+  return {
+    mode,
+    ...dates,
     balances,
     accounts,
     confirmEquityProposal: body.confirmEquityProposal === true,
     confirmZeroOpening: body.confirmZeroOpening === true,
-    journal,
+    journal: journal.map((entry) => ({
+      ...entry,
+      lines: entry.lines.map((line) => ({ ...line, code: remapAccountCode(line.code, accounts, aliases.map) })),
+    })),
     cumulatives,
     openItems,
   };
+}
+
+function remapAccountCode(raw: string, accounts: TakeoverAccount[], map: Record<string, string>): string {
+  const trimmed = raw.trim();
+  const target = map[trimmed];
+  if (!target) return trimmed;
+  const account = accounts.find((item) => item.number === target || item.code === target);
+  return account ? account.code : trimmed;
 }
 
 export function takeoverRpcPayload(

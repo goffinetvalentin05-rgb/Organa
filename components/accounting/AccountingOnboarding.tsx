@@ -10,6 +10,8 @@ import {
   TAKEOVER_CSV_HEADERS,
   chartTakeoverAccounts,
   dayBefore,
+  journalForSubmission,
+  legacyNumberMap,
   planTakeover,
   type ImportCellError,
   type TakeoverAccount,
@@ -148,15 +150,17 @@ export default function AccountingOnboarding({
       balances: balanceAccounts.flatMap((account) => {
         const amount = parseChfInput(amounts[account.code] || "");
         if (!amount) return [];
-        return [{ code: account.code, amount, legacyNumber: legacyNumbers[account.code] || undefined }];
+        const legacyNumber = mode === "fresh" ? "" : (legacyNumbers[account.code] || "").trim();
+        return [{ code: account.code, amount, legacyNumber: legacyNumber || undefined }];
       }),
+      legacyNumbers: mode === "fresh" ? {} : legacyNumbers,
       cumulatives: mode === "from_date" && withCumulatives
         ? resultAccounts.flatMap((account) => {
             const amount = parseChfInput(cumulatives[account.code] || "");
             return amount ? [{ code: account.code, amount }] : [];
           })
         : [],
-      journal: mode === "full_period" ? journal : [],
+      journal: journalForSubmission(mode, journal),
       openItems: items,
     };
   }, [amounts, balanceAccounts, catalog, confirmEquity, confirmZero, cumulatives, items, journal, legacyNumbers, mode, periodEnd, periodStart, resultAccounts, takeoverDate, withCumulatives]);
@@ -176,6 +180,7 @@ export default function AccountingOnboarding({
       confirmEquityProposal: form.confirmEquityProposal,
       confirmZeroOpening: form.confirmZeroOpening,
       balances: form.balances,
+      legacyNumbers: form.legacyNumbers,
       customAccounts: customs.map((account) => ({ number: account.number, name: account.name, accountType: account.accountType })),
       cumulatives: form.cumulatives,
       journal: form.journal,
@@ -193,7 +198,11 @@ export default function AccountingOnboarding({
 
   function nextFromBalances() {
     setError(null);
-    if (importErrors.length || needsDelimiter || unknownAccounts.length) {
+    if (mode !== "fresh") {
+      const aliases = legacyNumberMap(catalog, legacyNumbers);
+      if (!aliases.ok) return setError(aliases.message);
+    }
+    if (mode !== "fresh" && (importErrors.length || needsDelimiter || unknownAccounts.length)) {
       return setError(importMessage || "Corrigez le fichier avant de continuer.");
     }
     if (!draft) return setError("Choisissez comment commencer la comptabilité.");
@@ -204,7 +213,14 @@ export default function AccountingOnboarding({
   async function confirm() {
     setError(null);
     setNotice(null);
-    if (importErrors.length || !draft?.ok) {
+    if (mode !== "fresh") {
+      const aliases = legacyNumberMap(catalog, legacyNumbers);
+      if (!aliases.ok) {
+        setError(aliases.message);
+        return;
+      }
+    }
+    if ((mode !== "fresh" && importErrors.length) || !draft?.ok) {
       setError(draft && !draft.ok ? draft.message : importMessage || "La reprise n'est pas prête. Rien n'a été enregistré.");
       return;
     }
@@ -235,13 +251,38 @@ export default function AccountingOnboarding({
     setCustomName("");
   }
 
-  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string>; sheet?: string; headerRow?: number; asRole?: "journal" | "balances" | "cumulatives"; layout?: "auto" | "simple" | "lines"; simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>> } = {}) {
-    if (!mode) return;
+  function accountMapFor(legacyByCode: Record<string, string>, chosen?: Record<string, string>): { map: Record<string, string> } | { message: string } {
+    if (mode === "fresh") return { map: chosen || accountMap };
+    const declared = legacyNumberMap(catalog, legacyByCode);
+    if (!declared.ok) return { message: declared.message };
+    return { map: { ...declared.map, ...(chosen || accountMap) } };
+  }
+
+  function changeLegacy(code: string, value: string) {
+    const next = { ...legacyNumbers, [code]: value };
+    setLegacyNumbers(next);
+    const declared = legacyNumberMap(catalog, next);
+    if (!declared.ok) {
+      setError(declared.message);
+      return;
+    }
+    setError(null);
+    if (file && mode && mode !== "fresh") void ingest(file, { legacyByCode: next, accountMap });
+  }
+
+  async function ingest(nextFile: { name: string; data: ArrayBuffer | string }, options: { delimiter?: ";" | ","; columns?: Partial<Record<(typeof TAKEOVER_CSV_HEADERS)[number], string>>; accountMap?: Record<string, string>; legacyByCode?: Record<string, string>; sheet?: string; headerRow?: number; asRole?: "journal" | "balances" | "cumulatives"; layout?: "auto" | "simple" | "lines"; simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>> } = {}) {
+    if (!mode || mode === "fresh") return;
     setError(null);
     setImportMessage(null);
     setImportErrors([]);
     setNeedsDelimiter(false);
     setUnknownAccounts([]);
+    const resolvedMap = accountMapFor(options.legacyByCode || legacyNumbers, options.accountMap);
+    if ("message" in resolvedMap) {
+      setError(resolvedMap.message);
+      setImportMessage(resolvedMap.message);
+      return;
+    }
     const result = readTakeoverFile({
       filename: nextFile.name,
       data: nextFile.data,
@@ -249,7 +290,7 @@ export default function AccountingOnboarding({
       accounts: catalog,
       delimiter: options.delimiter || delimiter || undefined,
       columns: options.columns || columnMap,
-      accountMap: options.accountMap || accountMap,
+      accountMap: resolvedMap.map,
       sheet: options.sheet,
       headerRow: options.headerRow,
       asRole: options.asRole,
@@ -394,7 +435,6 @@ export default function AccountingOnboarding({
                     <tr className="border-b border-[rgba(15,23,42,0.08)] text-left text-xs text-[#64748B]">
                       <th className="py-2 pr-3 font-medium">Compte</th>
                       <th className="py-2 pr-3 font-medium">Nom</th>
-                      <th className="py-2 pr-3 font-medium">Ancien n°</th>
                       <th className="py-2 font-medium">Solde CHF</th>
                     </tr>
                   </thead>
@@ -404,9 +444,6 @@ export default function AccountingOnboarding({
                         <td className="py-3 pr-3 font-medium text-[#0F172A]">{account.number}</td>
                         <td className="py-3 pr-3 text-[#334155]">{account.name}
                           <span className="mt-1 block text-xs text-[#64748B]">{HELP[account.code] || "Compte de bilan à reprendre s'il a un solde."}</span>
-                        </td>
-                        <td className="py-3 pr-3">
-                          <input className={fieldClass} value={legacyNumbers[account.code] || ""} onChange={(event) => setLegacyNumbers({ ...legacyNumbers, [account.code]: event.target.value })} />
                         </td>
                         <td className="py-3">
                           <input className={fieldClass} inputMode="decimal" value={amounts[account.code] || ""} onChange={(event) => setAmounts({ ...amounts, [account.code]: event.target.value })} />
@@ -455,6 +492,31 @@ export default function AccountingOnboarding({
               <input type="checkbox" className="mt-1" checked={confirmZero} onChange={(event) => setConfirmZero(event.target.checked)} />
               Le club n'a ni argent, ni bien, ni dette, ni fonds propres. Je confirme un départ à zéro.
             </label>
+          ) : null}
+
+          {mode !== "fresh" ? (
+            <details className="mt-8 rounded-2xl border border-[rgba(15,23,42,0.08)] p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0F172A]">Mes anciens numéros de comptes sont différents</summary>
+              <p className="mt-3 text-sm text-[#475569]">Votre ancien compte 2850 correspond au compte 2800 dans Obillz. Les opérations importées sur 2850 seront affectées à 2800.</p>
+              <div className="mt-4 space-y-6">
+                {[...groups, { title: "Charges et produits", rows: resultAccounts }].map((group) => (
+                  <section key={group.title}>
+                    <h3 className="text-sm font-semibold text-[#0F172A]">{group.title}</h3>
+                    <div className="mt-3 space-y-3">
+                      {group.rows.map((account) => (
+                        <label key={account.code} className="grid gap-2 text-sm text-[#334155] sm:grid-cols-[8rem_1fr_12rem] sm:items-center">
+                          <span className="font-medium text-[#0F172A]">{account.number}</span>
+                          <span>{account.name}</span>
+                          <span>N° de compte dans l'ancien logiciel
+                            <input className={fieldClass} value={legacyNumbers[account.code] || ""} onChange={(event) => changeLegacy(account.code, event.target.value)} />
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </details>
           ) : null}
 
           {mode === "from_date" ? (
@@ -524,7 +586,7 @@ export default function AccountingOnboarding({
                   ))}
                 </div>
               ) : null}
-              {journal.length ? <JournalPreview entries={journal} accounts={catalog} /> : null}
+              {journal.length ? <JournalPreview entries={journal} accounts={catalog} legacyNumbers={legacyNumbers} /> : null}
               <details className="mt-4 text-sm text-[#475569]">
                 <summary className="cursor-pointer font-medium text-[#1A23FF]">Mon fichier vient directement d'un autre logiciel</summary>
                 <p className="mt-2 leading-relaxed">Indiquez à quoi correspond chaque colonne. Une écriture simple tient sur une seule ligne : un compte au débit, un compte au crédit, un montant.</p>
@@ -581,13 +643,13 @@ export default function AccountingOnboarding({
           {mode === "full_period" && takeoverDate === periodStart ? (
             <p className="mt-6 text-sm text-[#475569]">La reprise tombe le premier jour. Le bilan de départ suffit. Les opérations de l'année précédente ne s'importent pas.</p>
           ) : null}
-          {mode !== "full_period" ? (
+          {mode === "from_date" ? (
             <div className="mt-6 flex flex-wrap gap-4">
               <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadExcel}>Télécharger le modèle Excel</button>
               <button type="button" className="text-sm font-semibold text-[#1A23FF]" onClick={downloadCsv}>Télécharger le modèle CSV</button>
             </div>
           ) : null}
-          {mode !== "full_period" || takeoverDate === periodStart ? (
+          {mode === "from_date" || (mode === "full_period" && takeoverDate === periodStart) ? (
             <div className="mt-4">
               <FileDrop onFile={(selected) => void onFile(selected)} />
               <ImportIssues message={importMessage} errors={importErrors} />
@@ -745,8 +807,17 @@ function isSimpleEntry(entry: TakeoverJournalEntry): boolean {
   return entry.lines.length === 2 && debits.length === 1 && credits.length === 1;
 }
 
-function JournalPreview({ entries, accounts }: { entries: TakeoverJournalEntry[]; accounts: TakeoverAccount[] }) {
+function JournalPreview({ entries, accounts, legacyNumbers }: { entries: TakeoverJournalEntry[]; accounts: TakeoverAccount[]; legacyNumbers: Record<string, string> }) {
   const names = new Map(accounts.map((account) => [account.code, `${account.number} ${account.name}`]));
+  const aliases = legacyNumberMap(accounts, legacyNumbers);
+  const mappings = aliases.ok
+    ? Object.entries(aliases.map).flatMap(([legacy, number]) => {
+        const account = accounts.find((item) => item.number === number);
+        if (!account) return [];
+        const used = entries.some((entry) => entry.lines.some((line) => line.code === account.code));
+        return used ? [{ legacy, number, name: account.name }] : [];
+      })
+    : [];
   const simple = entries.filter(isSimpleEntry);
   const total = roundChf(simple.reduce((sum, entry) => sum + entry.lines.reduce((lineSum, line) => lineSum + line.debit, 0), 0));
   const composed = entries.length - simple.length;
@@ -769,6 +840,9 @@ function JournalPreview({ entries, accounts }: { entries: TakeoverJournalEntry[]
     <div className="mt-4">
       <p className="text-sm text-[#0F172A]">{entries.length} écriture{entries.length > 1 ? "s" : ""} reconnue{entries.length > 1 ? "s" : ""}. Total des montants : {formatChfAmount(total)}.</p>
       {composed ? <p className="mt-1 text-sm text-[#475569]">{composed} écriture{composed > 1 ? "s" : ""} composée{composed > 1 ? "s" : ""}, contrôlée{composed > 1 ? "s" : ""} à part.</p> : null}
+      {mappings.map((item) => (
+        <p key={item.legacy} className="mt-1 text-sm text-[#334155]">Compte {item.legacy} de l'ancien logiciel → {item.number} {item.name}. Les opérations importées sur {item.legacy} sont affectées à {item.number}.</p>
+      ))}
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[720px] text-left text-sm text-[#0F172A]">
           <thead className="sticky top-0 bg-white">

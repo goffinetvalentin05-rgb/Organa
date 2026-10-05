@@ -8,10 +8,14 @@ import {
   annualContinuity,
   chartTakeoverAccounts,
   importReplay,
+  journalForSubmission,
+  legacyNumberMap,
   parseTakeoverCsv,
   planOpenItemSettlement,
   planOpeningCorrection,
   planTakeover,
+  takeoverInputFromBody,
+  takeoverRpcPayload,
   type TakeoverJournalEntry,
 } from "@/lib/accounting/takeover";
 
@@ -376,5 +380,81 @@ describe("sommes reprises et continuité", () => {
     expect(buildIncomeStatement(view).productTotal).toBe(250);
     expect(buildBalanceSheet(view).gap).toBe(0);
     expect(planOpenFollowingPeriod(season, []).action).toBe("insert");
+  });
+});
+
+describe("parcours sans anciennes écritures et anciens numéros", () => {
+  const loaded: TakeoverJournalEntry[] = [{
+    date: "2026-02-01",
+    piece: "A",
+    label: "Apport",
+    origin: "1",
+    lines: [
+      { code: "1020", debit: 500, credit: 0 },
+      { code: "2850", debit: 0, credit: 500 },
+    ],
+  }];
+
+  it("n'envoie plus les écritures chargées après le passage au parcours sans historique", () => {
+    expect(journalForSubmission("full_period", loaded)).toHaveLength(1);
+    expect(journalForSubmission("fresh", loaded)).toEqual([]);
+    const input = takeoverInputFromBody({
+      takeoverMode: "fresh",
+      periodStart: "2026-01-01",
+      periodEnd: "2026-12-31",
+      takeoverDate: "2026-01-01",
+      confirmZeroOpening: true,
+      journal: loaded,
+      cumulatives: [{ code: "membership", amount: 40 }],
+      legacyNumbers: { equity: "2850" },
+      balances: [
+        { code: "bank", amount: 200, legacyNumber: "1999" },
+        { code: "equity", amount: 200 },
+      ],
+    });
+    if ("error" in input) throw new Error(input.error);
+    expect(input.journal).toEqual([]);
+    expect(input.cumulatives).toEqual([]);
+    expect(input.balances.every((row) => row.legacyNumber === undefined)).toBe(true);
+    const planned = planTakeover(input);
+    expect(planned.ok).toBe(true);
+    if (!planned.ok) return;
+    expect(planned.journal).toEqual([]);
+    expect(takeoverRpcPayload("club", "user", input, planned).journal).toEqual([]);
+  });
+
+  it("affecte l'ancien numéro au compte Obillz et refuse un doublon", () => {
+    const duplicate = legacyNumberMap(accounts, { equity: "2850", retained: "2850" });
+    expect(duplicate.ok).toBe(false);
+    if (!duplicate.ok) expect(duplicate.message).toContain("2850");
+
+    const input = takeoverInputFromBody({
+      takeoverMode: "full_period",
+      periodStart: "2026-01-01",
+      periodEnd: "2026-12-31",
+      takeoverDate: "2026-07-01",
+      balances: [
+        { code: "bank", amount: 500 },
+        { code: "equity", amount: 500 },
+      ],
+      legacyNumbers: { equity: "2850" },
+      journal: loaded,
+    });
+    if ("error" in input) throw new Error(input.error);
+    expect(input.journal?.[0].lines[1].code).toBe("equity");
+    const planned = planTakeover(input);
+    expect(planned.ok).toBe(true);
+    if (!planned.ok) return;
+    expect(planned.journal[0].lines[1].code).toBe("equity");
+
+    const refused = takeoverInputFromBody({
+      takeoverMode: "full_period",
+      periodStart: "2026-01-01",
+      periodEnd: "2026-12-31",
+      takeoverDate: "2026-07-01",
+      legacyNumbers: { equity: "2850", retained: "2850" },
+      journal: [],
+    });
+    expect("error" in refused && refused.error).toContain("2850");
   });
 });

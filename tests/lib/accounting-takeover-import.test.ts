@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
-import { chartTakeoverAccounts, importReplay, planTakeover, toIsoDate } from "@/lib/accounting/takeover";
+import { chartTakeoverAccounts, importReplay, journalForSubmission, planTakeover, takeoverInputFromBody, toIsoDate } from "@/lib/accounting/takeover";
 import { buildSimpleJournalWorkbook, buildTakeoverCsv, buildTakeoverWorkbook, classifySheet, readTakeoverFile, suggestColumnMap, SIMPLE_JOURNAL_HEADERS } from "@/lib/accounting/takeoverImport";
 
 const accounts = chartTakeoverAccounts();
@@ -421,5 +421,40 @@ describe("modèle simple, une ligne par écriture", () => {
     });
     expect(invalid.ok).toBe(false);
     if (!invalid.ok) expect(invalid.message).toContain("Ligne 2");
+  });
+
+  it("applique l'ancien numéro dans le fichier, puis l'oublie si le parcours change", () => {
+    const csv = "Date;N° écr.;Pièce;Libellé;Débit;Crédit;Montant;Remarque\n15.02.2026;1;A;Apport;1020;2850;500.00;\n";
+    const unknown = readTakeoverFile({ filename: "ancien.csv", data: csv, mode: "full_period", accounts });
+    expect(unknown.ok).toBe(false);
+    if (!unknown.ok) expect(unknown.unknownAccounts).toContain("2850");
+
+    const read = readTakeoverFile({
+      filename: "ancien.csv",
+      data: csv,
+      mode: "full_period",
+      accounts,
+      accountMap: { "2850": "2800" },
+    });
+    expect(read.ok).toBe(true);
+    if (!read.ok) return;
+    expect(read.journal).toHaveLength(1);
+    expect(read.journal[0].lines.map((line) => line.code)).toEqual(["bank", "equity"]);
+    expect(journalForSubmission("full_period", read.journal)).toHaveLength(1);
+    const switched = takeoverInputFromBody({
+      takeoverMode: "fresh",
+      periodStart: "2026-01-01",
+      periodEnd: "2026-12-31",
+      takeoverDate: "2026-01-01",
+      confirmZeroOpening: true,
+      journal: read.journal,
+      cumulatives: [{ code: "membership", amount: 10 }],
+    });
+    if ("error" in switched) throw new Error(switched.error);
+    expect(switched.journal).toEqual([]);
+    expect(journalForSubmission("fresh", read.journal)).toEqual([]);
+    const planned = planTakeover(switched);
+    expect(planned.ok).toBe(true);
+    if (planned.ok) expect(planned.journal).toEqual([]);
   });
 });
