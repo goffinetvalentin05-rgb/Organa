@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   decidePosting,
+  inboxHoldMessage,
   linesAreBalanced,
   officialTotals,
 } from "./engine";
@@ -329,7 +330,7 @@ export async function processAccountingInbox(
     userId,
   });
   if (!decision.ok) {
-    if (decision.silent) return { posted: 0 };
+    if (decision.silent) return { posted: 0, created: 0, already: 0, voided: 0, held: [] };
     throw new Error(decision.reason);
   }
 
@@ -346,10 +347,15 @@ export async function processAccountingInbox(
   if (error) throw error;
 
   let posted = 0;
+  let created = 0;
+  let already = 0;
+  let voided = 0;
+  const held: Array<{ label: string; reason: string }> = [];
   for (const raw of rows ?? []) {
     const row = raw as InboxRow;
+    const label = (row.party_name || row.description || "Opération").trim() || "Opération";
     try {
-      const did = await processInboxRow(
+      const outcome = await processInboxRow(
         admin,
         clubId,
         actor === "user" ? userId : null,
@@ -360,12 +366,17 @@ export async function processAccountingInbox(
         access.startDate,
         actor
       );
-      if (did) posted += 1;
+      if (outcome.kind === "created" || outcome.kind === "already" || outcome.kind === "voided") posted += 1;
+      if (outcome.kind === "created") created += 1;
+      if (outcome.kind === "already") already += 1;
+      if (outcome.kind === "voided") voided += 1;
+      if (outcome.kind === "held") held.push({ label, reason: outcome.reason });
     } catch (err) {
       console.error("[accounting] inbox", row.id, err);
+      held.push({ label, reason: err instanceof Error ? err.message : "Écriture impossible." });
     }
   }
-  return { posted };
+  return { posted, created, already, voided, held };
 }
 
 async function processInboxRow(
@@ -378,7 +389,7 @@ async function processInboxRow(
   autoValidate: boolean,
   startDate: string | null,
   actor: InboxActor
-): Promise<boolean> {
+): Promise<{ kind: "created" | "already" | "voided" | "skipped" } | { kind: "held"; reason: string }> {
   if (row.event_type === "payment_reversed") {
     return reverseFromInbox(admin, clubId, userId, row, periods, actor);
   }
@@ -403,7 +414,7 @@ async function processInboxRow(
 
   if (decision.kind === "ignore") {
     await admin.from("accounting_inbox").update({ status: "ignored_before_start" }).eq("id", row.id);
-    return false;
+    return { kind: "held", reason: inboxHoldMessage("before_start") };
   }
   if (decision.kind === "blocked" || decision.kind === "awaiting") {
     const status = decision.kind === "blocked"
@@ -414,26 +425,29 @@ async function processInboxRow(
           ? "awaiting_account"
           : "awaiting_category";
     await admin.from("accounting_inbox").update({ status }).eq("id", row.id);
-    return false;
+    const reason = decision.kind === "blocked"
+      ? inboxHoldMessage("closed_period")
+      : inboxHoldMessage(status === "awaiting_account" ? "awaiting_account" : status === "awaiting_details" ? "awaiting_details" : "awaiting_category");
+    return { kind: "held", reason };
   }
 
   const period = periodFor(periods, row.entry_date, true);
   if (!period) {
     await admin.from("accounting_inbox").update({ status: "blocked_closed_period" }).eq("id", row.id);
-    return false;
+    return { kind: "held", reason: inboxHoldMessage("closed_period") };
   }
 
   const mapped = mapLines(decision.lines, accounts);
   if (!mapped) {
     await admin.from("accounting_inbox").update({ status: "awaiting_category" }).eq("id", row.id);
-    return false;
+    return { kind: "held", reason: inboxHoldMessage("unknown_account") };
   }
 
   const financial = accountByCode(accounts, row.financial_account_code);
   const category = accountByCode(accounts, row.category_code);
   const key = await entryKey(admin, clubId, row.idempotency_key);
 
-  await postEntry(admin, {
+  const posted = await postEntry(admin, {
     club_id: clubId,
     period_id: period.id,
     entry_date: row.entry_date,
@@ -456,7 +470,7 @@ async function processInboxRow(
   });
 
   await admin.from("accounting_inbox").update({ status: "posted", updated_at: new Date().toISOString() }).eq("id", row.id);
-  return true;
+  return posted.created ? { kind: "created" } : { kind: "already" };
 }
 
 function mapLines(lines: DraftLine[], accounts: AccountRecord[]) {
@@ -480,12 +494,12 @@ async function reverseFromInbox(
   row: InboxRow,
   periods: PeriodRecord[],
   actor: InboxActor
-): Promise<boolean> {
+): Promise<{ kind: "created" | "already" | "voided" | "skipped" } | { kind: "held"; reason: string }> {
   const today = zurichToday();
   const period = periodFor(periods, today, true);
   if (!period) {
     await admin.from("accounting_inbox").update({ status: "blocked_closed_period" }).eq("id", row.id);
-    return false;
+    return { kind: "held", reason: inboxHoldMessage("closed_period") };
   }
 
   const eventType = row.source_type === "expense" ? "payment_sent" : "payment_received";
@@ -503,14 +517,14 @@ async function reverseFromInbox(
 
   if (!entry) {
     await admin.from("accounting_inbox").update({ status: "posted" }).eq("id", row.id);
-    return false;
+    return { kind: "skipped" };
   }
 
   if (entry.status === "pending") {
     await admin.from("accounting_entries").update({ status: "voided" }).eq("id", entry.id).eq("club_id", clubId);
     await audit(admin, clubId, "void", userId, entry.id as string, { status: "pending" }, { status: "voided" });
     await admin.from("accounting_inbox").update({ status: "reversed" }).eq("id", row.id);
-    return true;
+    return { kind: "voided" };
   }
 
   const { data: lines } = await admin
@@ -525,7 +539,7 @@ async function reverseFromInbox(
     credit: num(line.debit as number),
   }));
 
-  await postEntry(admin, {
+  const reversal = await postEntry(admin, {
     club_id: clubId,
     period_id: period.id,
     entry_date: today,
@@ -544,7 +558,7 @@ async function reverseFromInbox(
   });
 
   await admin.from("accounting_inbox").update({ status: "reversed" }).eq("id", row.id);
-  return true;
+  return reversal.created ? { kind: "created" } : { kind: "already" };
 }
 
 export async function confirmInbox(params: {
@@ -1312,7 +1326,7 @@ export async function loadWorkspace(clubId: string) {
       .range(from, to)),
     fetchAllPages((from, to) => admin
       .from("accounting_inbox")
-      .select("id, description, amount, entry_date, status, source_type, source_id, party_name, financial_account_code, category_code, direction")
+      .select("id, description, amount, fee_amount, entry_date, status, source_type, source_id, party_name, financial_account_code, category_code, direction, event_type")
       .eq("club_id", clubId)
       .in("status", ["awaiting_account", "awaiting_category", "awaiting_details", "blocked_closed_period", "pending"])
       .order("id", { ascending: true })

@@ -138,9 +138,10 @@ export async function POST(request: NextRequest) {
       case "settle-open-item":
         await settleTakeoverItem(guard.clubId, guard.userId, body);
         break;
-      case "process-inbox":
-        await processAccountingInbox(guard.clubId, guard.userId, "user");
-        break;
+      case "process-inbox": {
+        const processed = await processAccountingInbox(guard.clubId, guard.userId, "user");
+        return NextResponse.json(processed);
+      }
       case "confirm":
         await confirmInbox({
           clubId: guard.clubId,

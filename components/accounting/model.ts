@@ -48,6 +48,8 @@ export type InboxItem = {
   direction: string;
   financial_account_code: string | null;
   category_code: string | null;
+  event_type?: string | null;
+  fee_amount?: number | null;
 };
 
 export type Attachment = { id: string; entry_id: string; file_name: string | null };

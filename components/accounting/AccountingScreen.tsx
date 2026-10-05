@@ -215,6 +215,7 @@ export default function AccountingScreen({ section }: { section: Section }) {
           inbox={review.inbox}
           canWrite={Boolean(access.canWrite)}
           numberingNotice={access.numberingNotice}
+          startDate={access.startDate}
           onAct={async (payload) => {
             const result = await act(payload);
             if (payload.action === "journal-save" && result && typeof result === "object" && "error" in result) setError(null);

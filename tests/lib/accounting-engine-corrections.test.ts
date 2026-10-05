@@ -582,7 +582,7 @@ describe("lecture du journal", () => {
     addonActive = false;
     const { processAccountingInbox } = await import("@/lib/accounting/service");
     const result = await processAccountingInbox("club-lecture", null, "system");
-    expect(result).toEqual({ posted: 0 });
+    expect(result).toEqual({ posted: 0, created: 0, already: 0, voided: 0, held: [] });
     expect(rpcCalls).toEqual([]);
     expect(inboxWrites).toEqual([]);
   });

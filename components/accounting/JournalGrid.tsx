@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import ButtonSpinner from "@/components/ui/ButtonSpinner";
-import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
+import { countReadyInbox, inboxProcessNoticeFromResult } from "@/lib/accounting/engine";
+import { formatChfAmount, formatSwissDate, zurichToday } from "@/lib/accounting/format";
 import { isFinancialSystemCode } from "@/lib/accounting/financialAccounts";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import { entryNumberRangeError } from "@/lib/accounting/entryNumbers";
@@ -84,6 +85,7 @@ export default function JournalGrid({
   inbox,
   canWrite,
   numberingNotice,
+  startDate = null,
   onAct,
 }: {
   entries: Entry[];
@@ -95,6 +97,7 @@ export default function JournalGrid({
   inbox: InboxItem[];
   canWrite: boolean;
   numberingNotice?: string | null;
+  startDate?: string | null;
   onAct: (payload: Record<string, unknown>) => Promise<unknown>;
   onReload: () => Promise<void>;
 }) {
@@ -111,7 +114,6 @@ export default function JournalGrid({
   const [origin, setOrigin] = useState<Origin | null>(null);
   const [composerError, setComposerError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [fullscreen, setFullscreen] = useState(false);
   const [voiding, setVoiding] = useState<Entry | null>(null);
   const [pending, setPending] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<CellFeedback | null>(null);
@@ -589,9 +591,38 @@ export default function JournalGrid({
     : false;
   const showInbox = status === "all" || status === "pending";
   const voidingBusy = pending === "void";
+  const readyInbox = countReadyInbox(inbox.map((item) => ({
+    status: item.status,
+    eventType: item.event_type || null,
+    amount: Number(item.amount) || 0,
+    feeAmount: Number(item.fee_amount) || 0,
+    entryDate: item.entry_date,
+    sourceType: item.source_type,
+    sourceId: item.source_id,
+    direction: item.direction,
+    financialAccountCode: item.financial_account_code,
+    categoryCode: item.category_code,
+  })), {
+    periods,
+    startDate,
+    today: zurichToday(),
+    knownCodes: new Set(accounts.filter((account) => account.isActive).flatMap((account) => [account.systemCode, account.number].filter((code): code is string => Boolean(code)))),
+  });
+
+  async function addReadyOperations() {
+    if (!startPending("inbox-ready")) return;
+    try {
+      const result = await onAct({ action: "process-inbox" });
+      setNotice(inboxProcessNoticeFromResult(result));
+    } catch (error) {
+      setNotice(error instanceof Error ? `${error.message} Le traitement n'a pas abouti.` : "Le traitement n'a pas abouti.");
+    } finally {
+      stopPending();
+    }
+  }
 
   return (
-    <div className={fullscreen ? "fixed inset-0 z-40 overflow-auto bg-[#F4F7FB] p-4" : ""}>
+    <>
       <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-2">
           {canWrite ? (
@@ -599,15 +630,18 @@ export default function JournalGrid({
               Nouvelle écriture
             </ToolButton>
           ) : null}
-          {canWrite ? (
-            <ToolButton label="Créer les écritures des opérations déjà complètes. Une consultation du journal ne le fait pas." onClick={() => void onAct({ action: "process-inbox" })} disabled={pending !== null}>
-              Comptabiliser les opérations prêtes
+          {canWrite && readyInbox.total > 0 ? (
+            <ToolButton label="Créer les écritures des paiements déjà complets. Une consultation du journal ne le fait pas." onClick={() => void addReadyOperations()} disabled={pending !== null}>
+              {pending === "inbox-ready" ? "Ajout…" : `Ajouter les opérations complètes au journal (${readyInbox.total})`}
             </ToolButton>
           ) : null}
-          <ToolButton label={fullscreen ? "Revenir à l’écran du module" : "Afficher le journal sur tout l’écran"} onClick={() => setFullscreen((value) => !value)}>
-            {fullscreen ? "Quitter le plein écran" : "Plein écran"}
-          </ToolButton>
         </div>
+        {canWrite && readyInbox.total > 0 ? (
+          <p className="text-sm text-[#475569]">
+            Ces encaissements et décaissements ont déjà un compte et une catégorie. Cette action crée les écritures correspondantes dans le journal.
+            {readyInbox.reversals > 0 ? " Les annulations prêtes sont traitées en même temps." : ""}
+          </p>
+        ) : null}
         {canWrite ? (
           <p className="text-sm text-[#475569]">Les écritures de régularisation et transitoires se saisissent ici, dans l’exercice encore ouvert. Les comptes 1300 et 2300 servent aux actifs et passifs transitoires.</p>
         ) : null}
@@ -845,7 +879,7 @@ export default function JournalGrid({
           </div>
         </AccountingModal>
       ) : null}
-    </div>
+    </>
   );
 }
 

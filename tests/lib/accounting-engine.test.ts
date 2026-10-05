@@ -4,13 +4,17 @@ import {
   buildCashLines,
   buildOpeningLines,
   canAutoValidate,
+  countReadyInbox,
   decidePosting,
+  formatInboxProcessNotice,
+  inboxProcessNoticeFromResult,
   linesAreBalanced,
   nextPaymentGeneration,
   officialTotals,
   paymentIdempotencyKey,
   reverseLines,
   reviewAmount,
+  type InboxReadyItem,
 } from "@/lib/accounting/engine";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
 import type { CashEvent, ReportLine } from "@/lib/accounting/types";
@@ -239,5 +243,71 @@ describe("ouverture et extourne", () => {
       { accountCode: "bank", debit: 0, credit: 250 },
       { accountCode: "membership", debit: 250, credit: 0 },
     ]);
+  });
+});
+
+describe("opérations prêtes du journal", () => {
+  const periods = [{ status: "open", startsOn: "2026-01-01", endsOn: "2026-12-31" }];
+  const knownCodes = new Set(["bank", "membership", "sports_equipment"]);
+  const context = { periods, startDate: "2026-01-01", knownCodes, today: "2026-10-05" };
+
+  function item(overrides: Partial<InboxReadyItem> = {}): InboxReadyItem {
+    return {
+      status: "pending",
+      eventType: "payment_received",
+      amount: 120,
+      feeAmount: 0,
+      entryDate: "2026-03-01",
+      sourceType: "membership",
+      sourceId: "doc-1",
+      direction: "in",
+      financialAccountCode: "bank",
+      categoryCode: "membership",
+      ...overrides,
+    };
+  }
+
+  it("ne compte aucune opération quand rien n'est traitable", () => {
+    expect(countReadyInbox([], context)).toEqual({ payments: 0, reversals: 0, total: 0 });
+    expect(countReadyInbox([
+      item({ categoryCode: null }),
+      item({ status: "awaiting_account" }),
+      item({ entryDate: "2025-12-01" }),
+      item({ financialAccountCode: "9999", categoryCode: "membership" }),
+    ], context).total).toBe(0);
+  });
+
+  it("compte les encaissements et les décaissements complets, pas une catégorie manquante", () => {
+    const ready = countReadyInbox([
+      item(),
+      item({ direction: "out", eventType: "payment_sent", categoryCode: "sports_equipment", sourceType: "expense" }),
+      item({ categoryCode: null }),
+    ], context);
+    expect(ready).toEqual({ payments: 2, reversals: 0, total: 2 });
+  });
+
+  it("décrit les écritures créées et celles restées en attente", () => {
+    expect(formatInboxProcessNotice({
+      created: 2,
+      already: 0,
+      voided: 0,
+      held: [{ label: "Cotisation", reason: "La catégorie n'est pas indiquée." }],
+    })).toBe("2 écritures créées. Restées en attente : Cotisation — La catégorie n'est pas indiquée.");
+    expect(formatInboxProcessNotice({ created: 0, already: 1, voided: 0, held: [] })).toContain("Aucune écriture créée.");
+    expect(formatInboxProcessNotice({ created: 0, already: 1, voided: 0, held: [] })).toContain("déjà au journal");
+  });
+
+  it("compte une annulation seulement si un exercice ouvert couvre aujourd'hui", () => {
+    expect(countReadyInbox([item({ eventType: "payment_reversed" })], context).reversals).toBe(1);
+    expect(countReadyInbox([item({ eventType: "payment_reversed" })], {
+      ...context,
+      periods: [{ status: "closed", startsOn: "2026-01-01", endsOn: "2026-12-31" }],
+    }).total).toBe(0);
+  });
+
+  it("signale l'échec sans annoncer d'écriture créée", () => {
+    expect(inboxProcessNoticeFromResult({ error: "Session expirée" })).toBe("Session expirée Le traitement n'a pas abouti.");
+    expect(inboxProcessNoticeFromResult(null)).toBe("Le traitement n'a pas abouti.");
+    expect(inboxProcessNoticeFromResult({ created: 0, already: 0, voided: 0, held: [] })).toBe("Aucune écriture créée.");
   });
 });

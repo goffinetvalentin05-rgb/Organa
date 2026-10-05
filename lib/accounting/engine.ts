@@ -237,6 +237,126 @@ export function reviewAmount(
   };
 }
 
+export type InboxReadyItem = {
+  status: string;
+  eventType: string | null;
+  amount: number;
+  feeAmount: number;
+  entryDate: string;
+  sourceType: string;
+  sourceId: string;
+  direction: string;
+  financialAccountCode: string | null;
+  categoryCode: string | null;
+};
+
+export type InboxReadyContext = {
+  periods: Array<{ status: string; startsOn: string; endsOn: string }>;
+  startDate: string | null;
+  knownCodes: ReadonlySet<string>;
+  today: string;
+};
+
+/** Une opération est prête seulement si cette action peut en créer l'écriture, ou traiter une annulation. */
+export function inboxReadyKind(item: InboxReadyItem, context: InboxReadyContext): "payment" | "reversal" | null {
+  if (item.status !== "pending") return null;
+  if (item.eventType === "payment_reversed") {
+    const openToday = context.periods.some((period) => period.status === "open" && context.today >= period.startsOn && context.today <= period.endsOn);
+    return openToday ? "reversal" : null;
+  }
+  const periodClosed = context.periods.some((period) => period.status === "closed" && item.entryDate >= period.startsOn && item.entryDate <= period.endsOn);
+  const open = context.periods.some((period) => period.status === "open" && item.entryDate >= period.startsOn && item.entryDate <= period.endsOn);
+  const decision = decidePosting({
+    amount: item.amount,
+    feeAmount: item.feeAmount,
+    entryDate: item.entryDate,
+    sourceType: item.sourceType,
+    sourceId: item.sourceId || "inbox",
+    eventType: item.eventType === "payment_sent" ? "payment_sent" : "payment_received",
+    direction: item.direction === "out" ? "out" : "in",
+    financialAccountCode: item.financialAccountCode,
+    categoryCode: item.categoryCode,
+    autoValidate: false,
+    periodClosed,
+    beforeStart: Boolean(context.startDate && item.entryDate < context.startDate),
+  });
+  if (decision.kind !== "post" || !open) return null;
+  if (decision.lines.some((line) => !context.knownCodes.has(line.accountCode))) return null;
+  return "payment";
+}
+
+export function countReadyInbox(items: InboxReadyItem[], context: InboxReadyContext): { payments: number; reversals: number; total: number } {
+  let payments = 0;
+  let reversals = 0;
+  for (const item of items) {
+    const kind = inboxReadyKind(item, context);
+    if (kind === "payment") payments += 1;
+    if (kind === "reversal") reversals += 1;
+  }
+  return { payments, reversals, total: payments + reversals };
+}
+
+export function inboxHoldMessage(reason: "before_start" | "closed_period" | "awaiting_account" | "awaiting_category" | "awaiting_details" | "unknown_account"): string {
+  switch (reason) {
+    case "before_start":
+      return "La date est antérieure au début de la comptabilité dans Obillz.";
+    case "closed_period":
+      return "L'exercice de cette date est clôturé.";
+    case "awaiting_account":
+      return "Le compte financier n'est pas indiqué.";
+    case "awaiting_category":
+      return "La catégorie n'est pas indiquée.";
+    case "awaiting_details":
+      return "Le compte financier et la catégorie ne sont pas indiqués.";
+    case "unknown_account":
+      return "Un compte indiqué n'existe pas dans le plan.";
+  }
+}
+
+export function inboxProcessNoticeFromResult(result: unknown): string {
+  if (result && typeof result === "object" && "error" in result && (result as { error?: unknown }).error) {
+    return `${String((result as { error: unknown }).error)} Le traitement n'a pas abouti.`;
+  }
+  if (!result || typeof result !== "object" || !("created" in result)) return "Le traitement n'a pas abouti.";
+  const row = result as { created?: unknown; already?: unknown; voided?: unknown; held?: unknown };
+  const held = Array.isArray(row.held)
+    ? row.held.flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const entry = item as { label?: unknown; reason?: unknown };
+        return [{ label: String(entry.label || "Opération"), reason: String(entry.reason || "Écriture impossible.") }];
+      })
+    : [];
+  return formatInboxProcessNotice({
+    created: Number(row.created) || 0,
+    already: Number(row.already) || 0,
+    voided: Number(row.voided) || 0,
+    held,
+  });
+}
+
+export function formatInboxProcessNotice(result: {
+  created: number;
+  already: number;
+  voided: number;
+  held: Array<{ label: string; reason: string }>;
+}): string {
+  const created = result.created === 0
+    ? "Aucune écriture créée."
+    : result.created === 1
+      ? "1 écriture créée."
+      : `${result.created} écritures créées.`;
+  const already = result.already > 0
+    ? ` ${result.already} opération${result.already > 1 ? "s étaient" : " était"} déjà au journal.`
+    : "";
+  const voided = result.voided > 0
+    ? ` ${result.voided} écriture${result.voided > 1 ? "s en attente ont été retirées" : " en attente a été retirée"} après annulation.`
+    : "";
+  const held = result.held.length
+    ? ` Restées en attente : ${result.held.map((item) => `${item.label} — ${item.reason}`).join(" ")}`
+    : "";
+  return `${created}${already}${voided}${held}`;
+}
+
 export function isOfficialStatus(status: EntryStatus): boolean {
   return status === "validated" || status === "reversed";
 }
