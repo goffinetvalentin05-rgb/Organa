@@ -120,6 +120,8 @@ export default function AccountingScreen({ section }: { section: Section }) {
     canManage?: boolean;
     autoValidate?: boolean;
     startDate?: string | null;
+    startMode?: string | null;
+    historyImportStatus?: string | null;
     numberingNotice?: string | null;
     stripePayoutAccountId?: string | null;
   };
@@ -259,11 +261,15 @@ export default function AccountingScreen({ section }: { section: Section }) {
       {section === "periods" ? (
         <PeriodsPanel
           periods={periods}
+          selectedPeriodId={activePeriodId}
           openItems={openItems}
           canWrite={Boolean(access.canWrite)}
           startDate={access.startDate}
-          coverageNote={coverage.note}
-          coverageType={coverage.type}
+          historyPending={access.startMode === "resume_current" && access.historyImportStatus !== "applied"}
+          onSelect={(id) => {
+            setPeriodId(id);
+            window.sessionStorage.setItem(PERIOD_STORAGE, id);
+          }}
           onAct={act}
         />
       ) : null}
@@ -271,7 +277,6 @@ export default function AccountingScreen({ section }: { section: Section }) {
         <SettingsPanel
           autoValidate={Boolean(access.autoValidate)}
           startDate={access.startDate}
-          coverageNote={coverage.note}
           canWrite={Boolean(access.canWrite)}
           payoutAccountId={access.stripePayoutAccountId}
           bankAccounts={accounts

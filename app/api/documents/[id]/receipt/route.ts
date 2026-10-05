@@ -103,9 +103,14 @@ export async function GET(
 
   const total = roundChf(Number(doc.total_ttc) || 0);
   let transitory = null;
-  if (access.onboarded && doc.type === "invoice") {
+  if (access.onboarded && (doc.type === "invoice" || doc.type === "quote")) {
     try {
-      transitory = await loadTransitoryFacts(admin, { clubId: guard.clubId, documentId: id, categoryCode });
+      transitory = await loadTransitoryFacts(admin, {
+        clubId: guard.clubId,
+        documentId: id,
+        categoryCode,
+        sourceType,
+      });
     } catch {
       transitory = null;
     }

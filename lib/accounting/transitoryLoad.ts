@@ -45,7 +45,7 @@ function missingBridge(error: { message?: string } | null): boolean {
 
 export async function loadTransitoryFacts(
   admin: Admin,
-  input: { clubId: string; documentId: string; categoryCode: string },
+  input: { clubId: string; documentId: string; categoryCode: string; sourceType?: "invoice" | "membership" },
 ): Promise<TransitoryFacts> {
   const [{ data: periodRows, error: periodError }, { data: accountRows, error: accountError }, { data: mapping }] = await Promise.all([
     admin.from("accounting_periods").select("id, label, starts_on, ends_on, status").eq("club_id", input.clubId).order("starts_on"),
@@ -158,7 +158,7 @@ export async function loadTransitoryFacts(
     .from("accounting_entries")
     .select("id, amount")
     .eq("club_id", input.clubId)
-    .eq("source_type", "invoice")
+    .eq("source_type", input.sourceType || "invoice")
     .eq("source_id", input.documentId)
     .eq("event_type", "payment_received")
     .in("status", ["pending", "validated"]);

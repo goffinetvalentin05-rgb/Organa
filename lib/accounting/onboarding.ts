@@ -72,6 +72,35 @@ export function resolveCoverageType(input: {
   return coverageType(input.periodStart, input.accountingStartDate);
 }
 
+/**
+ * La date de démarrage ne concerne que l'exercice qui la contient.
+ * Les exercices suivants restent en couverture complète.
+ */
+export function coverageForPeriod(input: {
+  period: { startsOn: string; endsOn: string };
+  accountingStartDate: string | null;
+  historyPending?: boolean;
+}): { label: "Complète" | "Partielle" | "Avant le démarrage"; note: string | null } {
+  const start = input.accountingStartDate;
+  if (!start) return { label: "Complète", note: null };
+  if (input.period.endsOn < start) return { label: "Avant le démarrage", note: null };
+  const containsStart = input.period.startsOn <= start && start <= input.period.endsOn;
+  if (!containsStart) return { label: "Complète", note: null };
+  if (input.historyPending) {
+    return {
+      label: "Partielle",
+      note: `L'historique de cet exercice n'est pas encore repris. Les rapports n'incluent que les opérations enregistrées dans Obillz à partir du ${formatSwissDate(start)}.`,
+    };
+  }
+  if (start > input.period.startsOn) {
+    return {
+      label: "Partielle",
+      note: `Les données de cet exercice couvrent du ${formatSwissDate(start)} au ${formatSwissDate(input.period.endsOn)}.`,
+    };
+  }
+  return { label: "Complète", note: null };
+}
+
 export function coverageSentence(input: {
   coverageType: CoverageType;
   accountingStartDate: string;

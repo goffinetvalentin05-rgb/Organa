@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { planOpenFollowingPeriod } from "@/lib/accounting/closePeriod";
+import { coverageForPeriod } from "@/lib/accounting/onboarding";
 import { paymentJournalLines } from "@/lib/accounting/receipts";
 import { buildBalanceSheet, buildIncomeStatement, type ReportAccount, type ReportEntry } from "@/lib/accounting/reports";
 import {
@@ -87,6 +88,24 @@ describe("exercices ouverts", () => {
   it("ne recrée pas un exercice déjà ouvert", () => {
     const plan = planOpenFollowingPeriod(y2026, [y2026, y2027]);
     expect(plan).toEqual({ action: "exists", startsOn: "2027-01-01" });
+  });
+});
+
+describe("couverture de chaque exercice", () => {
+  it("limite la couverture partielle à l'exercice qui contient le démarrage", () => {
+    const first = coverageForPeriod({
+      period: y2026,
+      accountingStartDate: "2026-03-01",
+    });
+    const next = coverageForPeriod({
+      period: y2027,
+      accountingStartDate: "2026-03-01",
+    });
+    expect(first.label).toBe("Partielle");
+    expect(first.note).toContain("01.03.2026");
+    expect(first.note).toContain("31.12.2026");
+    expect(next.label).toBe("Complète");
+    expect(next.note).toBeNull();
   });
 });
 
@@ -194,6 +213,24 @@ describe("encaissement transitoire", () => {
     expect(revenueEffects(plan.effects)).toHaveLength(0);
     expect(plan.effects.some((effect) => effect.periodId === "y2026")).toBe(false);
     expect(plan.info).toContain("accrual-2026");
+  });
+
+  it("encaisse en 2026 une cotisation rattachée à 2027, une seule fois", () => {
+    const plan = base({
+      documentType: "quote",
+      documentStatus: "envoye",
+      paymentDate: "2026-11-15",
+      productPeriodId: "y2027",
+      recognitionDate: "2027-01-01",
+    });
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) return;
+    expect(plan.kind).toBe("future");
+    expect(plan.clearingCode).toBe("accrued");
+    expect(treasuryEffects(plan.effects).map((effect) => effect.periodId)).toEqual(["y2026"]);
+    expect(revenueEffects(plan.effects)).toHaveLength(1);
+    expect(revenueEffects(plan.effects)[0].periodId).toBe("y2027");
+    expect(plan.effects[0].date).toBe("2026-11-15");
   });
 
   it("encaisse en 2027 un produit de 2028", () => {

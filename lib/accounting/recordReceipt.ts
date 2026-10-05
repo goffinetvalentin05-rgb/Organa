@@ -126,7 +126,9 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
 
   const fee = roundChf(input.fee || 0);
   if (input.transitory) {
-    if (String(doc.type) !== "invoice") throw new Error("L'option Transitoire concerne une facture");
+    if (String(doc.type) !== "invoice" && String(doc.type) !== "quote") {
+      throw new Error("L'option Transitoire concerne une facture ou une cotisation");
+    }
     if (fee > 0) throw new Error("L'option Transitoire ne répartit pas les frais. Enregistrez un encaissement normal.");
     const { data: replay } = await admin
       .from("document_receipts")
@@ -141,6 +143,7 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
         clubId: input.clubId,
         documentId: input.documentId,
         categoryCode: category,
+        sourceType: String(doc.type) === "quote" ? "membership" : "invoice",
       });
       if (!facts.ready || !facts.revenueAccountId) {
         throw new Error(facts.notice || "L'option Transitoire demande la migration 104. L'encaissement normal reste disponible.");
@@ -201,11 +204,12 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
     };
   }
 
-  if (String(doc.type) === "invoice") {
+  if (String(doc.type) === "invoice" || String(doc.type) === "quote") {
     const facts = await loadTransitoryFacts(admin, {
       clubId: input.clubId,
       documentId: input.documentId,
       categoryCode: category,
+      sourceType: String(doc.type) === "quote" ? "membership" : "invoice",
     });
     if (facts.ready && facts.openReceivable > 0) throw new Error(EXISTING_ACCRUAL_MESSAGE);
   }

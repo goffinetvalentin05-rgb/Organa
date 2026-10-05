@@ -157,6 +157,28 @@ export default function MarkPaidDialog({
       <p className="text-sm text-[#475569]">
         L'écriture est passée à la date où le club a reçu l'argent. Le document passe à Payée quand le total est encaissé.
       </p>
+      {preview && (preview.documentType === "invoice" || preview.documentType === "quote") && preview.accounting ? (
+        <TransitoryLink
+          panelOpen={panelOpen}
+          onToggle={() => setPanelOpen((open) => !open)}
+          facts={facts}
+          otherPeriod={otherPeriod}
+          onOtherPeriod={setOtherPeriod}
+          openPeriods={openPeriods}
+          productPeriodId={productPeriodId}
+          recognitionDate={recognitionDate}
+          coversExisting={coversExisting}
+          plan={plan}
+          onPeriod={(value) => {
+            setProductPeriodId(value);
+            setRecognitionTouched(false);
+          }}
+          onDate={(value) => {
+            setRecognitionTouched(true);
+            setRecognitionDate(value);
+          }}
+        />
+      ) : null}
       {!preview && !error ? <p className="text-sm text-[#64748B]">Chargement…</p> : null}
       {preview ? (
         <>
@@ -203,54 +225,6 @@ export default function MarkPaidDialog({
             . Reste à encaisser : CHF {preview.remaining.toFixed(2)}.
           </p>
           {suggestion && !otherPeriod ? <p className="text-xs text-[#64748B]">{suggestion}</p> : null}
-          {preview.documentType === "invoice" && preview.accounting ? (
-            <div className="space-y-2">
-              <button
-                type="button"
-                className="text-xs text-[#64748B] underline"
-                onClick={() => setPanelOpen((open) => !open)}
-              >
-                Transitoire
-              </button>
-              {panelOpen ? (
-                <div className="max-h-64 space-y-2 overflow-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
-                  {!facts ? <p className="text-xs text-[#475569]">L'option Transitoire n'a pas pu être préparée. L'encaissement normal reste disponible.</p> : null}
-                  {facts && !facts.ready ? <p className="text-xs text-[#475569]">{facts.notice}</p> : null}
-                  {facts?.ready ? (
-                    <>
-                      <label className="flex items-start gap-2 text-sm text-[#334155]">
-                        <input
-                          type="checkbox"
-                          className="mt-1"
-                          checked={otherPeriod}
-                          onChange={(event) => setOtherPeriod(event.target.checked)}
-                        />
-                        Ce paiement concerne un autre exercice
-                      </label>
-                      {otherPeriod ? (
-                        <TransitoryFields
-                          openPeriods={openPeriods}
-                          productPeriodId={productPeriodId}
-                          recognitionDate={recognitionDate}
-                          coversExisting={coversExisting}
-                          existing={facts.existingAccrual}
-                          plan={plan}
-                          onPeriod={(value) => {
-                            setProductPeriodId(value);
-                            setRecognitionTouched(false);
-                          }}
-                          onDate={(value) => {
-                            setRecognitionTouched(true);
-                            setRecognitionDate(value);
-                          }}
-                        />
-                      ) : null}
-                    </>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
         </>
       ) : null}
       {error ? <p className="text-sm text-rose-700">{error}</p> : null}
@@ -268,6 +242,73 @@ export default function MarkPaidDialog({
         </button>
       </div>
     </AccountingModal>
+  );
+}
+
+function TransitoryLink({
+  panelOpen,
+  onToggle,
+  facts,
+  otherPeriod,
+  onOtherPeriod,
+  openPeriods,
+  productPeriodId,
+  recognitionDate,
+  coversExisting,
+  plan,
+  onPeriod,
+  onDate,
+}: {
+  panelOpen: boolean;
+  onToggle: () => void;
+  facts: TransitoryFacts | null | undefined;
+  otherPeriod: boolean;
+  onOtherPeriod: (value: boolean) => void;
+  openPeriods: BridgePeriod[];
+  productPeriodId: string;
+  recognitionDate: string;
+  coversExisting: boolean;
+  plan: TransitoryPlan | null;
+  onPeriod: (value: string) => void;
+  onDate: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <button type="button" className="text-xs text-[#64748B] underline" onClick={onToggle}>
+        Transitoire
+      </button>
+      {panelOpen ? (
+        <div className="max-h-64 space-y-2 overflow-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+          {!facts ? <p className="text-xs text-[#475569]">L'option Transitoire n'a pas pu être préparée. L'encaissement normal reste disponible.</p> : null}
+          {facts && !facts.ready ? <p className="text-xs text-[#475569]">{facts.notice}</p> : null}
+          {facts?.ready ? (
+            <>
+              <label className="flex items-start gap-2 text-sm text-[#334155]">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={otherPeriod}
+                  onChange={(event) => onOtherPeriod(event.target.checked)}
+                />
+                Ce paiement concerne un autre exercice
+              </label>
+              {otherPeriod ? (
+                <TransitoryFields
+                  openPeriods={openPeriods}
+                  productPeriodId={productPeriodId}
+                  recognitionDate={recognitionDate}
+                  coversExisting={coversExisting}
+                  existing={facts.existingAccrual}
+                  plan={plan}
+                  onPeriod={onPeriod}
+                  onDate={onDate}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 

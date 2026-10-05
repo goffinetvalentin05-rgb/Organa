@@ -192,8 +192,8 @@ BEGIN
   FROM public.document_receipts r
   WHERE r.club_id = p_club AND r.idempotency_key = btrim(p_key);
 
-  v_source := 'invoice';
-  v_paid_status := 'paye';
+  v_source := CASE WHEN v_doc.type = 'quote' THEN 'membership' ELSE 'invoice' END;
+  v_paid_status := CASE WHEN v_doc.type = 'quote' THEN 'accepte' ELSE 'paye' END;
   v_total := ROUND(COALESCE(v_doc.total_ttc, 0), 2);
 
   SELECT COALESCE(SUM(e.amount), 0) INTO v_historical
@@ -230,8 +230,8 @@ BEGIN
     );
   END IF;
 
-  IF v_doc.type IS DISTINCT FROM 'invoice' THEN
-    RAISE EXCEPTION 'L''option Transitoire concerne une facture';
+  IF v_doc.type NOT IN ('invoice', 'quote') THEN
+    RAISE EXCEPTION 'L''option Transitoire concerne une facture ou une cotisation';
   END IF;
   IF v_doc.status IN ('refuse', 'annule') THEN
     RAISE EXCEPTION 'Ce document est annulé';
