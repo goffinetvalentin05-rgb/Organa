@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 import { ToolError } from "@/lib/obillz-tools/core/errors";
 
 const UNPAID_EXCLUDED = new Set([
@@ -53,7 +54,17 @@ export async function listDocumentsForClub(params: {
     .is("deleted_at", null);
 
   if (params.type) query = query.eq("type", params.type);
-  if (params.id) query = query.eq("id", params.id);
+  if (params.id) {
+    const resolved = await resolveClubDocumentId(admin(), params.clubId, params.id);
+    if (!resolved.ok) {
+      throw new ToolError(
+        resolved.error,
+        resolved.status === 409 ? "DOCUMENT_AMBIGUOUS" : "DOCUMENT_NOT_FOUND",
+        resolved.status,
+      );
+    }
+    query = query.eq("id", resolved.id);
+  }
 
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) {
@@ -91,10 +102,15 @@ export async function cancelDocumentForClub(params: {
   type: "invoice" | "quote";
 }): Promise<{ id: string; status: string }> {
   const db = admin();
+  const resolved = await resolveClubDocumentId(db, params.clubId, params.documentId);
+  if (!resolved.ok) {
+    throw new ToolError(resolved.error, resolved.status === 409 ? "DOCUMENT_AMBIGUOUS" : "DOCUMENT_NOT_FOUND", resolved.status);
+  }
+  const documentId = resolved.id;
   const { data: existing, error: fetchError } = await db
     .from("documents")
     .select("id, type, status")
-    .eq("id", params.documentId)
+    .eq("id", documentId)
     .eq("user_id", params.clubId)
     .maybeSingle();
 
@@ -115,7 +131,7 @@ export async function cancelDocumentForClub(params: {
   const { data: updated, error } = await db
     .from("documents")
     .update({ status: "annule", updated_by: params.actorUserId })
-    .eq("id", params.documentId)
+    .eq("id", documentId)
     .eq("user_id", params.clubId)
     .select("id, status")
     .single();

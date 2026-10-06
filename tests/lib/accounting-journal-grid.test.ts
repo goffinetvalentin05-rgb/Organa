@@ -120,6 +120,8 @@ describe("grille du journal", () => {
     expect(entryNumberAllowed(0, taken, "p", "b")).toBe(false);
     expect(explainJournalError('duplicate key value violates unique constraint "accounting_entries_number"')).toBe(ENTRY_NUMBER_TAKEN);
     expect(explainJournalError("Compte introuvable")).toBe("Compte introuvable");
+    expect(explainJournalError("Lignes d'une écriture supprimée immuables")).toMatch(/retirée du journal/);
+    expect(explainJournalError("Ecriture supprimée immuable")).toMatch(/retirée du journal/);
   });
 
   it("renvoie une écriture vérifiée à contrôler si le montant change", () => {

@@ -23,6 +23,8 @@ import {
   type RecipientType,
 } from "@/lib/documents/recipient";
 import { withIdempotency } from "@/lib/api/idempotency";
+import { allocateDocumentNumero } from "@/lib/documents/allocateNumero";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
 import {
   createMembershipPaymentToken,
@@ -160,7 +162,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (id) {
-      const { data, error } = await query.eq("id", id).single();
+      const resolved = await resolveClubDocumentId(admin, guard.clubId, id);
+      if (!resolved.ok) {
+        return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+      }
+      const { data, error } = await query.eq("id", resolved.id).single();
       if (error || !data) {
         console.error("[API][documents][GET] Document introuvable:", error);
         return NextResponse.json(
@@ -440,6 +446,7 @@ export async function POST(request: NextRequest) {
     const baseSeq = (docCount ?? 0) + 1;
     const buildNumero = (seq: number) =>
       `${prefix}-${year}-${String(seq).padStart(3, "0")}`;
+    let reservedNumero = await allocateDocumentNumero(admin, guard.clubId, type, year);
 
     const firstDesignation = lignes
       .map((l: { designation?: string }) => String(l?.designation || "").trim())
@@ -616,8 +623,7 @@ export async function POST(request: NextRequest) {
     let insertError: InsertError | null = null;
 
     for (let retry = 0; retry < 3; retry += 1) {
-      // Recalculer un numéro différent à chaque retry pour éviter duplicate key.
-      documentData.numero = buildNumero(baseSeq + retry);
+      documentData.numero = reservedNumero ?? buildNumero(baseSeq + retry);
 
       const result = await tryInsertWithFallback(documentData);
       newDocument = result.data;
@@ -648,7 +654,10 @@ export async function POST(request: NextRequest) {
           pdfPayload: null,
           storagePath: null,
         });
-        // Réessayer avec le prochain numéro
+        if (reservedNumero) {
+          reservedNumero = await allocateDocumentNumero(admin, guard.clubId, type, year);
+          if (!reservedNumero) break;
+        }
         continue;
       }
 
@@ -804,18 +813,24 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const resolvedDelete = await resolveClubDocumentId(admin, guard.clubId, id);
+    if (!resolvedDelete.ok) {
+      return NextResponse.json({ error: resolvedDelete.error }, { status: resolvedDelete.status });
+    }
+    const documentId = resolvedDelete.id;
+
     // Récupérer le doc avant delete pour audit
     const { data: docInfo } = await admin
       .from("documents")
       .select("numero, type, total_ttc")
-      .eq("id", id)
+      .eq("id", documentId)
       .eq("user_id", guard.clubId)
       .maybeSingle();
 
     const { error } = await admin
       .from("documents")
       .delete()
-      .eq("id", id)
+      .eq("id", documentId)
       .eq("user_id", guard.clubId);
 
     if (error) {
@@ -965,6 +980,12 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    const resolvedPatch = await resolveClubDocumentId(admin, guard.clubId, id);
+    if (!resolvedPatch.ok) {
+      return NextResponse.json({ error: resolvedPatch.error }, { status: resolvedPatch.status });
+    }
+    const documentId = resolvedPatch.id;
+
     if (!type || (type !== "invoice" && type !== "quote")) {
       return NextResponse.json(
         { error: "Paramètre 'type' requis et doit être 'invoice' ou 'quote'" },
@@ -976,7 +997,7 @@ export async function PATCH(request: NextRequest) {
     const { data: existingDoc, error: fetchError } = await admin
       .from("documents")
       .select("id, numero, title, event_id, type, status")
-      .eq("id", id)
+      .eq("id", documentId)
       .eq("user_id", guard.clubId)
       .single();
 
@@ -1217,7 +1238,7 @@ export async function PATCH(request: NextRequest) {
     const { data: updatedDoc, error: updateError } = await admin
       .from("documents")
       .update(updateData)
-      .eq("id", id)
+      .eq("id", documentId)
       .eq("user_id", guard.clubId)
       .select("id, numero, title, type, event_id")
       .single();

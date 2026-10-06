@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isUuid } from "@/lib/documents/documentRef";
 import { roundChf } from "./money";
 import type { BridgeAccount, BridgePeriod, ExistingAccrual } from "./transitory";
 
@@ -47,6 +48,9 @@ export async function loadTransitoryFacts(
   admin: Admin,
   input: { clubId: string; documentId: string; categoryCode: string; sourceType?: "invoice" | "membership" },
 ): Promise<TransitoryFacts> {
+  if (!isUuid(input.documentId)) {
+    throw new Error("Le document doit être ouvert par son identifiant technique, pas par son numéro visible.");
+  }
   const [{ data: periodRows, error: periodError }, { data: accountRows, error: accountError }, { data: mapping }] = await Promise.all([
     admin.from("accounting_periods").select("id, label, starts_on, ends_on, status").eq("club_id", input.clubId).order("starts_on"),
     admin.from("accounting_accounts").select("id, number, name, system_code, is_active").eq("club_id", input.clubId).eq("is_active", true),
@@ -94,16 +98,13 @@ export async function loadTransitoryFacts(
     .in("event_type", ["accrual_income", "deferred_release"])
     .eq("status", "validated");
 
-  let sourceRows = sourceQuery.data ?? [];
   if (sourceQuery.error) {
     if (missingBridge(sourceQuery.error)) {
       return { ...emptyFacts(MIGRATION_NOTICE), periods, accounts, revenueAccountId: revenue?.id ?? null };
     }
-    if (!/invalid input syntax for type uuid/i.test(sourceQuery.error.message)) {
-      throw new Error(sourceQuery.error.message);
-    }
-    sourceRows = [];
+    throw new Error(sourceQuery.error.message);
   }
+  const sourceRows = sourceQuery.data ?? [];
 
   let bridgeRows: typeof sourceRows = [];
   if (receiptIds.length > 0) {
@@ -163,9 +164,7 @@ export async function loadTransitoryFacts(
     .eq("event_type", "payment_received")
     .in("status", ["pending", "validated"]);
   if (historicalQuery.error) {
-    if (!/invalid input syntax for type uuid/i.test(historicalQuery.error.message)) {
-      throw new Error(historicalQuery.error.message);
-    }
+    throw new Error(historicalQuery.error.message);
   } else {
     historical = (historicalQuery.data ?? [])
       .filter((row) => !linkedCash.has(String(row.id)))

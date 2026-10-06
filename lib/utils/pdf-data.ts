@@ -18,6 +18,7 @@ import {
   resolveDocumentRecipient,
 } from "@/lib/documents/recipient";
 import { getClubLogoDataUrlForPdf } from "@/lib/club/resolveClubLogoUrl";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 import {
   validateQRBillData,
   formatValidationErrors,
@@ -132,6 +133,9 @@ export async function getDocumentPdfData(
 
   const scopeUserId = options?.dataUserId ?? user.id;
   const admin = createAdminClient();
+  const resolved = await resolveClubDocumentId(admin, scopeUserId, id);
+  if (!resolved.ok) throw new Error(resolved.error);
+  const documentId = resolved.id;
 
   const { company, primaryColor, currency, currencySymbol } = await getClubCompanyPdfData(
     admin,
@@ -143,7 +147,7 @@ export async function getDocumentPdfData(
     .select(
       "id, numero, title, type, date_creation, date_echeance, items, notes, total_ht, total_tva, total_ttc, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, qr_reference, payment_method, payment_token, client:clients(id, nom, email, telephone, adresse, postal_code, city), sponsor:sponsor_contracts(id, sponsor_name, title)"
     )
-    .eq("id", id)
+    .eq("id", documentId)
     .eq("user_id", scopeUserId)
     .single();
 

@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 import { roundChf } from "./money";
 import {
   isCashPaidStatus,
@@ -88,6 +89,9 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
   }
 
   const admin = createAdminClient();
+  const resolvedDocument = await resolveClubDocumentId(admin, input.clubId, input.documentId);
+  if (!resolvedDocument.ok) throw new Error(resolvedDocument.error);
+  input.documentId = resolvedDocument.id;
   const access = await getAccountingAccess(input.clubId);
   const { data: doc, error: docError } = await admin
     .from("documents")

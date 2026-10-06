@@ -28,6 +28,7 @@ import {
   normalizeOnboardingInput,
   resolveCoverageType,
 } from "./onboarding";
+import { accountIdFromRef, assertTechnicalUuid, resolveAccountingEntryId } from "./technicalId";
 import { fetchAllPages } from "./paging";
 import { BRIDGE_EDIT_MESSAGE, planBridgeCorrection } from "./transitory";
 import {
@@ -296,6 +297,15 @@ async function postEntry(
   admin: Admin,
   payload: Record<string, unknown>
 ): Promise<{ id: string; created: boolean }> {
+  assertTechnicalUuid(payload.source_id, "L'origine de l'écriture");
+  assertTechnicalUuid(payload.counter_account_id, "Le compte");
+  assertTechnicalUuid(payload.category_account_id, "Le compte");
+  const lines = Array.isArray(payload.lines) ? payload.lines : [];
+  for (const line of lines) {
+    if (line && typeof line === "object" && "account_id" in line) {
+      assertTechnicalUuid((line as { account_id?: unknown }).account_id, "Le compte");
+    }
+  }
   const { data, error } = await admin.rpc("accounting_post_entry", { p_payload: payload });
   if (error) throw error;
   const result = data as { id: string; created: boolean };
@@ -591,6 +601,7 @@ export async function confirmInbox(params: {
 
 export async function validateEntry(clubId: string, userId: string, entryId: string) {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data, error } = await admin
     .from("accounting_entries")
     .update({
@@ -610,6 +621,7 @@ export async function validateEntry(clubId: string, userId: string, entryId: str
 
 export async function voidPendingEntry(clubId: string, userId: string, entryId: string) {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data, error } = await admin
     .from("accounting_entries")
     .update({ status: "voided" })
@@ -820,6 +832,11 @@ export async function updateAdvancedEntry(params: {
   lines: Array<{ accountId: string; debit: number; credit: number }>;
 }) {
   const admin = createAdminClient();
+  params.entryId = await resolveAccountingEntryId(admin, params.clubId, params.entryId);
+  const accountsForIds = await loadAccounts(admin, params.clubId);
+  for (const line of params.lines) {
+    line.accountId = accountIdFromRef(accountsForIds, line.accountId);
+  }
   const { data: entry } = await admin
     .from("accounting_entries")
     .select("status, source_type, event_type")
@@ -833,7 +850,7 @@ export async function updateAdvancedEntry(params: {
   })) {
     throw new Error("Seule une écriture avancée à vérifier peut être modifiée");
   }
-  const accounts = await loadAccounts(admin, params.clubId);
+  const accounts = accountsForIds;
   const assessed = assessAdvancedLines({
     clubId: params.clubId,
     lines: params.lines,
@@ -855,7 +872,7 @@ export async function updateAdvancedEntry(params: {
       })),
     },
   });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(explainJournalError(error.message));
   await audit(admin, params.clubId, "advanced_update", params.userId, params.entryId, null, {
     description: params.description,
     lines: params.lines,
@@ -864,6 +881,7 @@ export async function updateAdvancedEntry(params: {
 
 export async function reverseAdvancedEntry(clubId: string, userId: string, entryId: string) {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data: entry } = await admin
     .from("accounting_entries")
     .select("id, status, description, amount, source_type, event_type, reversed_by_entry_id")
@@ -935,6 +953,12 @@ export async function saveJournalEntry(params: {
     throw new Error("Cette date est antérieure au démarrage de la comptabilité");
   }
   const accounts = await loadAccounts(admin, params.clubId);
+  if (params.entryId) {
+    params.entryId = await resolveAccountingEntryId(admin, params.clubId, params.entryId);
+  }
+  for (const line of params.lines) {
+    line.accountId = accountIdFromRef(accounts, line.accountId);
+  }
   const known = accounts.map((account) => ({ id: account.id, clubId: params.clubId, isActive: account.isActive }));
   for (const line of params.lines) {
     if (!accountAllowed(known.find((account) => account.id === line.accountId), params.clubId)) {
@@ -1086,6 +1110,7 @@ export async function saveJournalEntry(params: {
 
 export async function voidJournalEntry(clubId: string, userId: string, entryId: string) {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data: entry } = await admin
     .from("accounting_entries")
     .select("id, status, entry_number, entry_date, description, amount, reference, party_name, source_type, event_type, period_id, reversed_by_entry_id, reversal_of_entry_id")
@@ -1161,9 +1186,9 @@ export async function voidJournalEntry(clubId: string, userId: string, entryId: 
       .update({ status: "voided" })
       .eq("id", entryId)
       .eq("club_id", clubId);
-    if (legacyError) throw new Error(legacyError.message);
+    if (legacyError) throw new Error(explainJournalError(legacyError.message));
   } else if (error) {
-    throw new Error(error.message);
+    throw new Error(explainJournalError(error.message));
   } else {
     counterpart = (voided as { voided_counterpart?: string | null } | null)?.voided_counterpart || null;
   }
@@ -1176,6 +1201,7 @@ export async function voidJournalEntry(clubId: string, userId: string, entryId: 
 
 export async function correctJournalEntry(clubId: string, userId: string, entryId: string) {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data: entry } = await admin
     .from("accounting_entries")
     .select("id, status, description, amount, reference, party_name, entry_date, reversed_by_entry_id")
@@ -1576,8 +1602,14 @@ async function completeTakeover(clubId: string, userId: string, raw: Record<stri
     if (input.mode === "fresh" && /start_mode|accounting_settings_start_mode/i.test(error.message)) {
       throw new Error("Le démarrage sans historique demande la migration 106. Aucune écriture n'a été créée.");
     }
-    if (/accounting_settings_history_import/i.test(error.message)) {
-      throw new Error("L'import des écritures demande la migration 107. Aucune écriture n'a été créée.");
+    if (/accounting_settings_history_import|Statut d'import inconnu/i.test(error.message)) {
+      const status = String(
+        (takeoverRpcPayload(clubId, userId, input, plan) as { history_import_status?: string }).history_import_status || ""
+      );
+      if (status === "not_requested" || status === "planned" || status === "manual" || status === "applied") {
+        throw new Error("L'import des écritures demande la migration 107. Aucune écriture n'a été créée.");
+      }
+      throw new Error("Le statut d'import n'est pas reconnu. Aucune écriture n'a été créée.");
     }
     throw new Error(error.message);
   }
@@ -2002,6 +2034,8 @@ export async function updateAccount(params: {
   isActive?: boolean;
 }) {
   const admin = createAdminClient();
+  const chart = await loadAccounts(admin, params.clubId);
+  params.accountId = accountIdFromRef(chart, params.accountId);
   const { data: account } = await admin
     .from("accounting_accounts")
     .select("id, number, name, is_system, is_active")
@@ -2057,6 +2091,7 @@ export async function updateAccount(params: {
 
 export async function assertEntryInClub(clubId: string, entryId: string): Promise<void> {
   const admin = createAdminClient();
+  entryId = await resolveAccountingEntryId(admin, clubId, entryId);
   const { data, error } = await admin
     .from("accounting_entries")
     .select("id")

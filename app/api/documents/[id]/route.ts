@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 
 export const runtime = "nodejs";
 
@@ -42,6 +43,10 @@ export async function GET(
     if ("error" in guard) return guard.error;
 
     const admin = createAdminClient();
+    const resolved = await resolveClubDocumentId(admin, guard.clubId, id);
+    if (!resolved.ok) {
+      return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+    }
 
     const { data: document, error: docError } = await admin
       .from("documents")
@@ -63,7 +68,7 @@ export async function GET(
         created_at,
         updated_at
       `)
-      .eq("id", id)
+      .eq("id", resolved.id)
       .eq("user_id", guard.clubId)
       .single();
 

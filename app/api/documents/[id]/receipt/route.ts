@@ -15,6 +15,7 @@ import { recordDocumentReceipt, receiptFailureMessage } from "@/lib/accounting/r
 import { loadTransitoryFacts } from "@/lib/accounting/transitoryLoad";
 import { zurichToday } from "@/lib/accounting/format";
 import { roundChf } from "@/lib/accounting/money";
+import { resolveClubDocumentId } from "@/lib/documents/documentRef";
 
 export const runtime = "nodejs";
 
@@ -30,8 +31,13 @@ export async function GET(
 ) {
   const guard = await guardReceipt();
   if ("error" in guard) return guard.error;
-  const { id } = await Promise.resolve(params);
+  const { id: rawId } = await Promise.resolve(params);
   const admin = createAdminClient();
+  const resolved = await resolveClubDocumentId(admin, guard.clubId, rawId);
+  if (!resolved.ok) {
+    return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+  }
+  const id = resolved.id;
   const { data: doc } = await admin
     .from("documents")
     .select("id, type, status, total_ht, total_tva, total_ttc, date_creation, title, numero, notes, sponsor_contract_id, event_id")

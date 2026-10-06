@@ -6,6 +6,7 @@ import {
   type LigneDocument,
 } from "@/lib/utils/calculations";
 import { DOCUMENT_TITLE_MAX_LENGTH } from "@/lib/documents/identityLimits";
+import { allocateDocumentNumero } from "@/lib/documents/allocateNumero";
 import {
   buildInvoiceRecipientDbFields,
   parseExternalRecipientData,
@@ -285,6 +286,7 @@ export async function createDocumentRecord(params: {
   const baseSeq = (docCount ?? 0) + 1;
   const buildNumero = (seq: number) =>
     `${prefix}-${year}-${String(seq).padStart(3, "0")}`;
+  let reservedNumero = await allocateDocumentNumero(admin, clubId, type, year);
 
   const firstDesignation = lignes
     .map((l) => String(l?.designation || "").trim())
@@ -315,7 +317,7 @@ export async function createDocumentRecord(params: {
     total_ht: totalHT,
     total_tva: totalTVA,
     total_ttc: totalTTC,
-    numero: buildNumero(baseSeq),
+    numero: reservedNumero ?? buildNumero(baseSeq),
     ...recipientDbFields,
     client_id: (recipientDbFields.client_id as string | null) ?? null,
   };
@@ -360,12 +362,18 @@ export async function createDocumentRecord(params: {
   let insertError: InsertError | null = null;
 
   for (let retry = 0; retry < 3; retry += 1) {
-    documentData.numero = buildNumero(baseSeq + retry);
+    documentData.numero = reservedNumero ?? buildNumero(baseSeq + retry);
     const result = await tryInsertWithFallback(admin, documentData);
     newDocument = result.data;
     insertError = result.error;
     if (!insertError) break;
-    if (String(insertError?.code || "") === "23505") continue;
+    if (String(insertError?.code || "") === "23505") {
+      if (reservedNumero) {
+        reservedNumero = await allocateDocumentNumero(admin, clubId, type, year);
+        if (!reservedNumero) break;
+      }
+      continue;
+    }
     break;
   }
 

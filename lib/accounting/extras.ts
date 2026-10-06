@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isUuid } from "@/lib/documents/documentRef";
 import { assessBudgetLines, planBudgetRevision, planBudgetValidation, type BudgetTarget } from "./budget";
 import { assessAccountGroup, type AccountGroup } from "./groups";
 import { roundChf } from "./money";
@@ -56,6 +57,12 @@ async function audit(
 function throwIfMissing(error: { message?: string; code?: string } | null, table: string): void {
   if (!error) return;
   if (isMissingTable(error, table)) throw new Error(MIGRATION_HINT);
+  if (error.code === "23505" && table === "accounting_budget_lines") {
+    throw new Error("Ce compte est déjà dans le budget. Enregistrez une seule fois.");
+  }
+  if (error.code === "23505" && table === "accounting_budgets") {
+    throw new Error("Un brouillon existe déjà pour cet exercice. Rechargez le budget.");
+  }
   throw new Error(error.message || "Erreur comptable");
 }
 
@@ -326,8 +333,42 @@ export async function saveBudgetDraft(params: {
   const extras = await loadAccountingExtras(admin, params.clubId);
   if (!extras.ready) throw new Error(MIGRATION_HINT);
   const accounts = await clubAccounts(admin, params.clubId);
-  const assessed = assessBudgetLines({ lines: params.lines, accounts, groups: extras.groups });
+  const lines = params.lines.map((line) => {
+    if (!line.accountId || isUuid(line.accountId)) return line;
+    const matches = accounts.filter((account) => account.number === line.accountId);
+    if (matches.length !== 1) {
+      throw new Error(`Le numéro ${line.accountId} ne désigne pas un seul compte de ce club.`);
+    }
+    return { ...line, accountId: matches[0].id };
+  });
+  const assessed = assessBudgetLines({ lines, accounts, groups: extras.groups });
   if (!assessed.ok) throw new Error(assessed.message);
+
+  if (typeof admin.rpc === "function") {
+    const { data: savedId, error: saveError } = await admin.rpc("accounting_save_budget_draft", {
+      p_club: params.clubId,
+      p_user: params.userId,
+      p_period: params.periodId,
+      p_lines: assessed.lines.map((line) => ({
+        account_id: line.accountId,
+        group_id: line.groupId,
+        group_number: line.number ?? null,
+        group_name: line.name ?? null,
+        amount: line.amount,
+      })),
+    });
+    if (!saveError && savedId) {
+      await audit(admin, params.clubId, "budget_save", params.userId, null, {
+        budgetId: String(savedId),
+        periodId: params.periodId,
+        lines: assessed.lines,
+      });
+      return;
+    }
+    if (saveError && !/accounting_save_budget_draft|does not exist|n'existe pas|schema cache|Could not find the function/i.test(saveError.message || "")) {
+      throw new Error(saveError.message);
+    }
+  }
 
   const current = extras.budgets.filter((budget) => budget.periodId === params.periodId && budget.status !== "superseded");
   const draft = current.find((budget) => budget.status === "draft");

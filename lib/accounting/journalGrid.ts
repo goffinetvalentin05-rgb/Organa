@@ -204,8 +204,17 @@ export function resolveJournalStatus(input: {
 
 export const ENTRY_NUMBER_TAKEN = "Ce numéro d’écriture est déjà utilisé dans l’exercice.";
 
+export const VOIDED_ENTRY_MESSAGE =
+  "Cette écriture a été retirée du journal. Ses lignes ne peuvent plus être modifiées.";
+
 export function explainJournalError(message: string): string {
   if (/accounting_entries_number/i.test(message)) return ENTRY_NUMBER_TAKEN;
+  if (/Lignes d['’]une écriture supprimée immuables|Ecriture supprimée immuable|écriture supprimée immuable/i.test(message)) {
+    return VOIDED_ENTRY_MESSAGE;
+  }
+  if (/invalid input syntax for type uuid/i.test(message)) {
+    return "Un numéro visible a été envoyé à la place de l'identifiant technique.";
+  }
   return message;
 }
 
