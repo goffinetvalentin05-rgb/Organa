@@ -1097,6 +1097,15 @@
       "Documents centralisés",
       "Support inclus"
     ],
+    "includedHeading": "Inclus dans la Formule Club",
+    "accountingOption": {
+      "title": "Comptabilité semi-automatique",
+      "badge": "En option",
+      "price": "+120 CHF/an",
+      "description": "Les paiements confirmés alimentent votre comptabilité. Retrouvez votre journal, votre bilan et votre compte de résultat au même endroit.",
+      "note": "Option à activer depuis votre espace club, après souscription à la Formule Club.",
+      "total": "Formule Club + Comptabilité : 610 CHF/an"
+    },
     "everythingIncluded": {
       "title": "Tout ce dont votre club a besoin, dans une seule formule.",
       "subtitle": "Obillz regroupe les fonctionnalités essentielles pour simplifier la gestion de votre club, sans complexité inutile."

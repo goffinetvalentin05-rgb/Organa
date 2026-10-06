@@ -61,7 +61,7 @@ export default function TarifsPage() {
 
             <div className="mt-8 border-t border-slate-100 pt-7">
               <h3 className="text-base font-bold text-slate-900">
-                {t("marketing.pricing.includedLabel")}
+                {t("marketing.pricingPage.includedHeading")}
               </h3>
               <ul className="mt-4 grid gap-2.5">
                 {planFeatures.map((feature) => (
@@ -73,6 +73,29 @@ export default function TarifsPage() {
                   </li>
                 ))}
               </ul>
+
+              <div className="mt-6 rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-4 sm:mt-7 sm:px-5 sm:py-5">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <h4 className="min-w-0 text-[0.95rem] font-bold tracking-tight text-slate-900 sm:text-base">
+                    {t("marketing.pricingPage.accountingOption.title")}
+                  </h4>
+                  <span className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                    {t("marketing.pricingPage.accountingOption.badge")}
+                  </span>
+                </div>
+                <p className="mt-2.5 text-base font-semibold tracking-tight text-slate-800">
+                  {t("marketing.pricingPage.accountingOption.price")}
+                </p>
+                <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">
+                  {t("marketing.pricingPage.accountingOption.description")}
+                </p>
+                <p className="mt-2.5 text-[13px] leading-relaxed text-slate-500">
+                  {t("marketing.pricingPage.accountingOption.note")}
+                </p>
+                <p className="mt-4 border-t border-slate-200 pt-3.5 text-[13px] leading-relaxed text-slate-500 sm:text-sm">
+                  {t("marketing.pricingPage.accountingOption.total")}
+                </p>
+              </div>
             </div>
           </article>
         </div>

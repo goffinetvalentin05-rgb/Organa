@@ -1097,6 +1097,15 @@
       "Centralized documents",
       "Support included"
     ],
+    "includedHeading": "Included in the Club Plan",
+    "accountingOption": {
+      "title": "Semi-automatic accounting",
+      "badge": "Optional",
+      "price": "+120 CHF/year",
+      "description": "Confirmed payments feed your accounts. Find your journal, balance sheet and income statement in one place.",
+      "note": "Activate this option from your club space, after subscribing to the Club Plan.",
+      "total": "Club Plan + Accounting: 610 CHF/year"
+    },
     "everythingIncluded": {
       "title": "Everything your club needs, in one plan.",
       "subtitle": "Obillz brings together the essential features to simplify your club management — without unnecessary complexity."
