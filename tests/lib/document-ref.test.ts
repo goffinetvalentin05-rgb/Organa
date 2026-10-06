@@ -21,26 +21,74 @@ describe("référence de document", () => {
     expect(numeroMatchesVisible("COT-2026-143", "FAC-2026-143")).toBe(false);
   });
 
-  it("résout le numéro avant toute lecture de la colonne id", async () => {
-    const filters: Array<[string, string]> = [];
-    const query = {
-      select: () => query,
-      eq: (column: string, value: string) => {
-        filters.push([column, value]);
+  it("ouvre l'identifiant technique 126 même si le numéro commercial est COT-2026-007", async () => {
+    const otherClub = "11111111-1111-4111-8111-111111111111";
+    const uuidId = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+    const rows = [
+      { id: "126", numero: "COT-2026-007", user_id: CLUB },
+      { id: "50", numero: "FAC-2026-126", user_id: CLUB },
+      { id: "88", numero: "COT-2026-007", user_id: otherClub },
+      { id: "77", numero: "COT-2026-099", user_id: otherClub },
+      { id: uuidId, numero: "FAC-2026-001", user_id: CLUB },
+    ];
+    const seen: string[] = [];
+
+    const admin = {
+      from: () => {
+        const filters: Array<[string, string]> = [];
+        const query = {
+          select: () => query,
+          eq: (column: string, value: string) => {
+            filters.push([column, value]);
+            return query;
+          },
+          is: () => query,
+          ilike: () => {
+            throw new Error("recherche de numéro non demandée");
+          },
+          maybeSingle: async () => {
+            const club = filters.find(([column]) => column === "user_id")?.[1];
+            const id = filters.find(([column]) => column === "id")?.[1];
+            seen.push(`id:${id}@${club}`);
+            const row = rows.find((item) => item.id === id && (club ? item.user_id === club : true));
+            return { data: row ? { id: row.id } : null, error: null };
+          },
+          then: (resolve: (value: unknown) => unknown) => {
+            const club = filters.find(([column]) => column === "user_id")?.[1];
+            const numero = filters.find(([column]) => column === "numero")?.[1];
+            seen.push(`numero:${numero}@${club}`);
+            const data = rows.filter((item) => item.numero === numero && (club ? item.user_id === club : true));
+            return resolve({ data, error: null });
+          },
+        };
         return query;
       },
-      is: () => query,
-      ilike: () => query,
-      then: (resolve: (value: unknown) => unknown) =>
-        resolve({
-          data: [{ id: "00000000-0000-4000-8000-000000000143", numero: "FAC-2026-143" }],
-          error: null,
-        }),
     };
-    const admin = { from: () => query };
-    const resolved = await resolveClubDocumentId(admin as never, CLUB, "143");
-    expect(resolved).toEqual({ ok: true, id: "00000000-0000-4000-8000-000000000143" });
-    expect(filters.some(([column]) => column === "id")).toBe(false);
+
+    await expect(resolveClubDocumentId(admin as never, CLUB, "126")).resolves.toEqual({
+      ok: true,
+      id: "126",
+    });
+    const callsBeforeUuid = seen.length;
+    await expect(resolveClubDocumentId(admin as never, CLUB, uuidId)).resolves.toEqual({
+      ok: true,
+      id: uuidId,
+    });
+    expect(seen.length).toBe(callsBeforeUuid);
+    await expect(resolveClubDocumentId(admin as never, CLUB, "COT-2026-007")).resolves.toEqual({
+      ok: true,
+      id: "126",
+    });
+    await expect(resolveClubDocumentId(admin as never, CLUB, "77")).resolves.toEqual({
+      ok: false,
+      status: 404,
+      error: "Document introuvable",
+    });
+    expect(seen).toEqual([
+      `id:126@${CLUB}`,
+      `numero:COT-2026-007@${CLUB}`,
+      `id:77@${CLUB}`,
+    ]);
   });
 });
 

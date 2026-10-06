@@ -28,6 +28,17 @@ export type ResolvedDocument =
   | { ok: true; id: string }
   | { ok: false; status: 400 | 404 | 409; error: string };
 
+const COMMERCIAL_NUMERO_RE = /^(?:COT|FAC)-\d{4}-\d+$/i;
+
+/** UUID du script d'origine, ou entier : documents.id est un bigint en production. */
+export function isTechnicalDocumentId(value: string): boolean {
+  return isUuid(value) || /^\d+$/.test(value);
+}
+
+function isIdTypeMismatch(error: { code?: string; message?: string }): boolean {
+  return error.code === "22P02" || /invalid input syntax for type/i.test(error.message ?? "");
+}
+
 export async function resolveClubDocumentId(
   admin: SupabaseClient,
   clubId: string,
@@ -35,8 +46,25 @@ export async function resolveClubDocumentId(
 ): Promise<ResolvedDocument> {
   const trimmed = ref.trim();
   if (!trimmed) return { ok: false, status: 400, error: "Document introuvable" };
-  if (isUuid(trimmed)) return { ok: true, id: trimmed };
-  if (!/^[\p{L}\p{N} ./_-]{1,40}$/u.test(trimmed)) {
+
+  if (isTechnicalDocumentId(trimmed)) {
+    if (isUuid(trimmed)) return { ok: true, id: trimmed };
+
+    const { data, error } = await admin
+      .from("documents")
+      .select("id")
+      .eq("user_id", clubId)
+      .eq("id", trimmed)
+      .maybeSingle();
+    if (error) {
+      if (isIdTypeMismatch(error)) return { ok: false, status: 404, error: "Document introuvable" };
+      throw new Error(error.message);
+    }
+    if (data?.id == null || data.id === "") return { ok: false, status: 404, error: "Document introuvable" };
+    return { ok: true, id: String(data.id) };
+  }
+
+  if (!COMMERCIAL_NUMERO_RE.test(trimmed)) {
     return { ok: false, status: 400, error: "Référence de document invalide" };
   }
 
@@ -48,19 +76,7 @@ export async function resolveClubDocumentId(
     .eq("numero", trimmed);
   if (exactError) throw new Error(exactError.message);
 
-  let rows = exact ?? [];
-  if (rows.length === 0 && /^\d+$/.test(trimmed)) {
-    const { data: suffixed, error: suffixError } = await admin
-      .from("documents")
-      .select("id, numero")
-      .eq("user_id", clubId)
-      .is("deleted_at", null)
-      .ilike("numero", `%${trimmed}`);
-    if (suffixError) throw new Error(suffixError.message);
-    rows = (suffixed ?? []).filter((row) => numeroMatchesVisible(String(row.numero ?? ""), trimmed));
-  }
-
-  const matches = rows.filter((row) => numeroMatchesVisible(String(row.numero ?? ""), trimmed));
+  const matches = exact ?? [];
   if (matches.length === 0) {
     return { ok: false, status: 404, error: `Aucun document ne porte le numéro ${trimmed}.` };
   }
