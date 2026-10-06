@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
@@ -34,6 +34,7 @@ import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { sendInvoiceEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
+import { documentDetailFailure, documentIdFromRoute } from "@/lib/documents/detailNavigation";
 
 interface Facture {
   id: string;
@@ -81,9 +82,11 @@ interface CompanySettings {
 export default function FactureDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const id = (params?.id as string) || "";
+  const pathname = usePathname();
+  const id = documentIdFromRoute(params?.id, pathname, "factures");
   const { t, locale } = useI18n();
   const [facture, setFacture] = useState<Facture | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const {
     isSubmitting: envoiEmail,
     showOverlay: showEmailOverlay,
@@ -103,30 +106,33 @@ export default function FactureDetailPage() {
   const loadFacture = useCallback(async () => {
     if (!id) return;
     try {
-      const response = await fetch(`/api/documents?id=${id}`, {
+      const response = await fetch(`/api/documents?id=${encodeURIComponent(id)}`, {
         cache: "no-store",
       });
-      if (!response.ok) {
-        router.push("/tableau-de-bord/factures");
+      const data = await response.json().catch(() => ({}));
+      const failure = documentDetailFailure({
+        ok: response.ok,
+        document: data.document ?? null,
+        expectedType: "invoice",
+        error: typeof data.error === "string" ? data.error : null,
+        fallback: t("dashboard.invoices.loadError"),
+      });
+      if (failure) {
+        setFacture(null);
+        setLoadError(failure);
         return;
       }
-      const data = await response.json();
-      if (!data.document || data.document.type !== "invoice") {
-        router.push("/tableau-de-bord/factures");
-        return;
-      }
+      setLoadError(null);
       setFacture(data.document);
     } catch (error) {
       console.error("[Facture] Erreur chargement:", error);
-      router.push("/tableau-de-bord/factures");
+      setFacture(null);
+      setLoadError(t("dashboard.invoices.loadError"));
     }
-  }, [id, router]);
+  }, [id, t]);
 
   useEffect(() => {
-    if (!id) {
-      router.push("/tableau-de-bord/factures");
-      return;
-    }
+    if (!id) return;
 
     const loadCurrency = async () => {
       try {
@@ -145,7 +151,7 @@ export default function FactureDetailPage() {
 
     void loadFacture();
     void loadCurrency();
-  }, [id, router, loadFacture]);
+  }, [id, loadFacture]);
 
   const loadEventsForModal = useCallback(async () => {
     setEventsLoading(true);
@@ -326,8 +332,18 @@ export default function FactureDetailPage() {
   if (!facture) {
     return (
       <PageLayout maxWidth="7xl">
-        <GlassCard padding="lg" className="text-center">
-          <p className="text-slate-600">{t("dashboard.common.loading")}</p>
+        <GlassCard padding="lg" className={loadError ? "text-center border-red-200/80 bg-red-50/70" : "text-center"}>
+          <p className={loadError ? "font-medium text-red-700" : "text-slate-600"}>
+            {loadError || t("dashboard.common.loading")}
+          </p>
+          {loadError ? (
+            <Link
+              href="/tableau-de-bord/factures"
+              className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+            >
+              ← {t("dashboard.invoices.detail.backToList")}
+            </Link>
+          ) : null}
         </GlassCard>
       </PageLayout>
     );

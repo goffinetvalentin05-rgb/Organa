@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
@@ -30,6 +30,7 @@ import { useSafeSubmit } from "@/hooks/useSafeSubmit";
 import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
+import { documentDetailFailure, documentIdFromRoute } from "@/lib/documents/detailNavigation";
 
 interface Devis {
   id: string;
@@ -62,9 +63,11 @@ interface CompanySettings {
 export default function DevisDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const id = (params?.id as string) || "";
+  const pathname = usePathname();
+  const id = documentIdFromRoute(params?.id, pathname, "devis");
   const { t, locale } = useI18n();
   const [devis, setDevis] = useState<Devis | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const {
     isSubmitting: envoiEmail,
     showOverlay: showEmailOverlay,
@@ -76,29 +79,36 @@ export default function DevisDetailPage() {
   const [receiptOpen, setReceiptOpen] = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      router.push("/tableau-de-bord/devis");
-      return;
-    }
+    if (!id) return;
+    let cancelled = false;
 
     const loadDevis = async () => {
       try {
-        const response = await fetch(`/api/documents?id=${id}`, {
+        const response = await fetch(`/api/documents?id=${encodeURIComponent(id)}`, {
           cache: "no-store",
         });
-        if (!response.ok) {
-          router.push("/tableau-de-bord/devis");
+        const data = await response.json().catch(() => ({}));
+        if (cancelled) return;
+        const failure = documentDetailFailure({
+          ok: response.ok,
+          document: data.document ?? null,
+          expectedType: "quote",
+          error: typeof data.error === "string" ? data.error : null,
+          fallback: t("dashboard.quotes.loadError"),
+        });
+        if (failure) {
+          setDevis(null);
+          setLoadError(failure);
           return;
         }
-        const data = await response.json();
-        if (!data.document || data.document.type !== "quote") {
-          router.push("/tableau-de-bord/devis");
-          return;
-        }
+        setLoadError(null);
         setDevis(data.document);
       } catch (error) {
         console.error("[Devis] Erreur chargement:", error);
-        router.push("/tableau-de-bord/devis");
+        if (!cancelled) {
+          setDevis(null);
+          setLoadError(t("dashboard.quotes.loadError"));
+        }
       }
     };
 
@@ -119,7 +129,10 @@ export default function DevisDetailPage() {
 
     void loadDevis();
     void loadCurrency();
-  }, [id, router]);
+    return () => {
+      cancelled = true;
+    };
+  }, [id, t]);
 
   const handleDelete = async () => {
     if (!confirm(t("dashboard.quotes.detail.deleteConfirm"))) return;
@@ -197,8 +210,18 @@ export default function DevisDetailPage() {
   if (!devis) {
     return (
       <PageLayout maxWidth="7xl">
-        <GlassCard padding="lg" className="text-center">
-          <p className="text-slate-600">{t("dashboard.common.loading")}</p>
+        <GlassCard padding="lg" className={loadError ? "text-center border-red-200/80 bg-red-50/70" : "text-center"}>
+          <p className={loadError ? "font-medium text-red-700" : "text-slate-600"}>
+            {loadError || t("dashboard.common.loading")}
+          </p>
+          {loadError ? (
+            <Link
+              href="/tableau-de-bord/devis"
+              className="mt-3 inline-block text-sm font-semibold text-[var(--obillz-hero-blue)] hover:underline"
+            >
+              ← {t("dashboard.quotes.detail.backToList")}
+            </Link>
+          ) : null}
         </GlassCard>
       </PageLayout>
     );

@@ -158,7 +158,8 @@ export default function DevisPage() {
                 <EntityCard
                   key={devisItem.id}
                   layout="row"
-                  href={`/tableau-de-bord/devis/${devisItem.id}`}
+                  prefetch={false}
+                  href={`/tableau-de-bord/devis/${encodeURIComponent(devisItem.id)}`}
                   title={devisItem.title || devisItem.numero}
                   subtitle={devisItem.numero}
                   badges={
@@ -196,7 +197,8 @@ export default function DevisPage() {
                   actions={
                     <>
                       <ActionButton
-                        href={`/tableau-de-bord/devis/${devisItem.id}`}
+                        href={`/tableau-de-bord/devis/${encodeURIComponent(devisItem.id)}`}
+                        prefetch={false}
                         className="inline-flex items-center gap-1.5"
                         title={t("dashboard.common.view")}
                       >

@@ -9,6 +9,8 @@ import { isInteractiveTarget } from "@/lib/ui/optimistic";
 export type EntityCardProps = {
   /** Lien principal de la carte (titre / zone contenu). */
   href?: string;
+  /** false : le clic charge la fiche, sans réutiliser une redirection mise en cache. */
+  prefetch?: boolean;
   title: ReactNode;
   subtitle?: ReactNode;
   /** Avatar ou icône en tête de carte. */
@@ -36,6 +38,7 @@ export type EntityCardProps = {
  */
 export default function EntityCard({
   href,
+  prefetch,
   title,
   subtitle,
   leading,
@@ -68,6 +71,7 @@ export default function EntityCard({
       {href ? (
         <Link
           href={href}
+          prefetch={prefetch}
           className="block min-w-0 rounded-lg outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1A23FF]"
         >
           {titleNode}

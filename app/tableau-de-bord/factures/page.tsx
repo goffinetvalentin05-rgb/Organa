@@ -219,7 +219,8 @@ export default function FacturesPage() {
                 <EntityCard
                   key={facture.id}
                   layout="row"
-                  href={`/tableau-de-bord/factures/${facture.id}`}
+                  prefetch={false}
+                  href={`/tableau-de-bord/factures/${encodeURIComponent(facture.id)}`}
                   title={facture.title || facture.numero}
                   subtitle={facture.numero}
                   amount={
@@ -254,7 +255,8 @@ export default function FacturesPage() {
                   actions={
                     <>
                       <ActionButton
-                        href={`/tableau-de-bord/factures/${facture.id}`}
+                        href={`/tableau-de-bord/factures/${encodeURIComponent(facture.id)}`}
+                        prefetch={false}
                         className="inline-flex items-center gap-1.5"
                         title={t("dashboard.common.view")}
                       >

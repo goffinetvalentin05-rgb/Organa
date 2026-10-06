@@ -177,7 +177,12 @@ export default function PaiementsPage() {
             <EntityCard
               key={payment.id}
               layout="row"
-              href={`/tableau-de-bord/${payment.documentType}/${payment.documentId}`}
+              prefetch={false}
+              href={
+                payment.documentType === "produits"
+                  ? "/tableau-de-bord/produits"
+                  : `/tableau-de-bord/${payment.documentType}/${encodeURIComponent(payment.documentId)}`
+              }
               leading={
                 <div
                   className={`flex h-11 w-11 items-center justify-center rounded-xl ${

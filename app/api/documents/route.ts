@@ -166,9 +166,15 @@ export async function GET(request: NextRequest) {
       if (!resolved.ok) {
         return NextResponse.json({ error: resolved.error }, { status: resolved.status });
       }
-      const { data, error } = await query.eq("id", resolved.id).single();
-      if (error || !data) {
+      const { data, error } = await query.eq("id", resolved.id).maybeSingle();
+      if (error) {
         console.error("[API][documents][GET] Document introuvable:", error);
+        return NextResponse.json(
+          { error: error.message || "Document introuvable" },
+          { status: 500 }
+        );
+      }
+      if (!data) {
         return NextResponse.json(
           { error: "Document introuvable" },
           { status: 404 }
