@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GlassCard } from "@/components/ui";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
+import { buildJournalCsv } from "@/lib/accounting/spreadsheet";
 import { coverageForPeriod } from "@/lib/accounting/onboarding";
 import {
   BALANCE_ASSET_TOTAL_LABEL,
@@ -326,19 +327,7 @@ function LedgerView({
 }
 
 function downloadCsv(journal: ReturnType<typeof buildJournalReport>) {
-  const header = ["Date", "N°", "Pièce", "Libellé", "Débit", "Crédit", "Montant", "Remarque", "Statut"];
-  const rows = journal.rows.map((row) => [
-    formatSwissDate(row.date),
-    row.number,
-    row.piece,
-    row.label,
-    row.debit,
-    row.credit,
-    row.amount,
-    row.remark,
-    row.status,
-  ]);
-  const csv = [header, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const csv = buildJournalCsv(journal.rows);
   const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");

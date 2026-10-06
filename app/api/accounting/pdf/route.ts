@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PERMISSIONS, requirePermission } from "@/lib/auth/permissions";
+import { accountingClientMessage, logAccountingFailure } from "@/lib/accounting/clientError";
 import { buildBudgetComparison, buildBudgetDocument, type BudgetPdfView } from "@/lib/accounting/budget";
 import { coverageForPeriod } from "@/lib/accounting/onboarding";
 import { loadWorkspace, recordExport } from "@/lib/accounting/service";
@@ -95,8 +96,11 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur PDF";
-    return NextResponse.json({ error: message }, { status: 500 });
+    logAccountingFailure("PDF", error);
+    return NextResponse.json(
+      { error: accountingClientMessage(error, "Le PDF n'a pas pu être créé.") },
+      { status: 500 },
+    );
   }
 }
 

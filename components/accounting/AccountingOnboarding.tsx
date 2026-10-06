@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatChfAmount, formatSwissDate } from "@/lib/accounting/format";
+import { ACCOUNTING_IMPORT_MAX_BYTES, importFileTooLargeMessage, isImportVolumeMessage } from "@/lib/accounting/importLimits";
 import { roundChf } from "@/lib/accounting/money";
 import { parseChfInput } from "@/lib/accounting/onboarding";
 import { buildBalanceSheet, buildIncomeStatement } from "@/lib/accounting/reports";
@@ -318,7 +319,7 @@ export default function AccountingOnboarding({
       setImportErrors(result.errors);
       setNeedsDelimiter(Boolean(result.needsDelimiter));
       setUnknownAccounts(result.unknownAccounts || []);
-      if (!options.sheet) setJournal([]);
+      if (!options.sheet || isImportVolumeMessage(result.message)) setJournal([]);
       return;
     }
     if (result.balances.length) {
@@ -344,6 +345,15 @@ export default function AccountingOnboarding({
   }
 
   async function onFile(selected: File) {
+    if (selected.size > ACCOUNTING_IMPORT_MAX_BYTES) {
+      const message = importFileTooLargeMessage();
+      setError(message);
+      setImportMessage(message);
+      setImportErrors([]);
+      setJournal([]);
+      setFile(null);
+      return;
+    }
     const data = selected.name.toLowerCase().endsWith(".csv") ? await selected.text() : await selected.arrayBuffer();
     const next = { name: selected.name, data };
     setFile(next);
@@ -903,7 +913,7 @@ function FileDrop({ onFile }: { onFile: (file: File) => void }) {
       }}
     >
       <span className="text-sm font-medium text-[#0F172A]">Déposez un fichier Excel ou CSV</span>
-      <span className="mt-1 text-xs text-[#64748B]">.xlsx ou .csv. L'aperçu n'enregistre rien.</span>
+      <span className="mt-1 text-xs text-[#64748B]">.xlsx ou .csv, 10 Mo, 5 000 écritures ou 20 000 lignes au maximum. Au-delà, rien n'est importé. L'aperçu n'enregistre rien.</span>
       <input className="sr-only" type="file" accept=".xlsx,.xlsm,.csv,text/csv" onChange={(event) => {
         const selected = event.target.files?.[0];
         if (selected) onFile(selected);

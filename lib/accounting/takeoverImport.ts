@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { ACCOUNTING_IMPORT_MAX_BYTES, byteLengthOf, importFileTooLargeMessage, submittedImportIssue } from "./importLimits";
 import {
   detectCsvDelimiter,
   headerIndex,
@@ -270,11 +271,18 @@ export function readTakeoverFile(input: {
   layout?: "auto" | "simple" | "lines";
   simpleColumns?: Partial<Record<"date" | "number" | "piece" | "label" | "debit" | "credit" | "amount" | "remark", string>>;
 }): TakeoverFileResult {
-  const lower = input.filename.toLowerCase();
-  if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) {
-    return readWorkbook(input);
+  if (byteLengthOf(input.data) > ACCOUNTING_IMPORT_MAX_BYTES) {
+    const message = importFileTooLargeMessage();
+    return { ok: false, message, errors: [{ sheet: input.filename, row: 0, column: "fichier", message }] };
   }
-  return readCsvFile(input);
+  const lower = input.filename.toLowerCase();
+  const result = lower.endsWith(".xlsx") || lower.endsWith(".xlsm")
+    ? readWorkbook(input)
+    : readCsvFile(input);
+  if (!result.ok) return result;
+  const volume = submittedImportIssue(result);
+  if (!volume) return result;
+  return { ok: false, message: volume, errors: [{ sheet: input.filename, row: 0, column: "fichier", message: volume }] };
 }
 
 function readWorkbook(input: {

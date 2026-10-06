@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { DEFAULT_MAPPINGS, RECOMMENDED_CHART } from "./chart";
 import { paymentIdempotencyKey } from "./engine";
 import { formatSwissDate } from "./format";
+import { submittedImportIssue } from "./importLimits";
 import { roundChf } from "./money";
 import { parseChfInput, periodLabel } from "./onboarding";
 import type { DraftLine } from "./types";
@@ -715,6 +716,8 @@ function splitCsv(text: string, delimiter: ";" | ","): string[][] {
 }
 
 export function takeoverInputFromBody(body: Record<string, unknown>): TakeoverInput | { error: string } {
+  const volume = submittedImportIssue(body);
+  if (volume) return { error: volume };
   const requested = body.takeoverMode || body.mode;
   const mode = requested === "fresh" || requested === "full_period" || requested === "from_date"
     ? requested

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS, checkPermission, requirePermission } from "@/lib/auth/permissions";
+import { accountingClientMessage, logAccountingFailure } from "@/lib/accounting/clientError";
+import { ACCOUNTING_ATTACHMENT_MAX_BYTES, ACCOUNTING_IMPORT_MAX_BYTES, importFileTooLargeMessage } from "@/lib/accounting/importLimits";
 import { accountingPriceDetail, accountingPriceLabel } from "@/lib/billing/pricing";
 import {
   applyHistoryImport,
+  assertEntryInClub,
   attachFile,
   clearNumberingNotice,
   closePeriod,
@@ -91,15 +94,22 @@ export async function GET() {
       openItems,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur comptable";
-    console.error("[API][accounting][GET]", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    logAccountingFailure("GET", error);
+    return NextResponse.json(
+      { error: accountingClientMessage(error, "La comptabilité n'a pas pu être chargée.") },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   const guard = await guardManage();
   if ("error" in guard) return guard.error;
+
+  const declared = Number(request.headers.get("content-length") || "0");
+  if (Number.isFinite(declared) && declared > ACCOUNTING_IMPORT_MAX_BYTES) {
+    return NextResponse.json({ error: importFileTooLargeMessage() }, { status: 413 });
+  }
 
   try {
     const body = await request.json();
@@ -344,9 +354,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur comptable";
-    console.error("[API][accounting][POST]", error);
-    return NextResponse.json({ error: message }, { status: 400 });
+    logAccountingFailure("POST", error);
+    return NextResponse.json(
+      { error: accountingClientMessage(error, "L'opération n'a pas été enregistrée.") },
+      { status: 400 },
+    );
   }
 }
 
@@ -360,9 +372,10 @@ export async function PUT(request: NextRequest) {
     if (!entryId || !(file instanceof File)) {
       return NextResponse.json({ error: "Écriture et fichier requis" }, { status: 400 });
     }
-    if (file.size <= 0 || file.size > 10 * 1024 * 1024) {
+    if (file.size <= 0 || file.size > ACCOUNTING_ATTACHMENT_MAX_BYTES) {
       return NextResponse.json({ error: "Fichier trop volumineux (max 10 Mo)" }, { status: 400 });
     }
+    await assertEntryInClub(guard.clubId, entryId);
     const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
     const safeName = (file.name || "piece").replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 120);
@@ -373,7 +386,8 @@ export async function PUT(request: NextRequest) {
       upsert: false,
     });
     if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      logAccountingFailure("PUT", uploadError);
+      return NextResponse.json({ error: "La pièce n'a pas pu être enregistrée." }, { status: 500 });
     }
     await attachFile({
       clubId: guard.clubId,
@@ -385,7 +399,10 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json({ ok: true, path });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur";
-    return NextResponse.json({ error: message }, { status: 400 });
+    logAccountingFailure("PUT", error);
+    return NextResponse.json(
+      { error: accountingClientMessage(error, "La pièce n'a pas pu être enregistrée.") },
+      { status: 400 },
+    );
   }
 }

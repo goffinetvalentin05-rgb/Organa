@@ -2055,6 +2055,18 @@ export async function updateAccount(params: {
   await audit(admin, params.clubId, "update_account", params.userId, null, account, patch);
 }
 
+export async function assertEntryInClub(clubId: string, entryId: string): Promise<void> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("accounting_entries")
+    .select("id")
+    .eq("id", entryId)
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Écriture introuvable");
+}
+
 export async function attachFile(params: {
   clubId: string;
   userId: string;
@@ -2063,6 +2075,7 @@ export async function attachFile(params: {
   fileName: string;
   mimeType: string;
 }) {
+  await assertEntryInClub(params.clubId, params.entryId);
   const admin = createAdminClient();
   const { error } = await admin.from("accounting_attachments").insert({
     club_id: params.clubId,

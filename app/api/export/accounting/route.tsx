@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { FacturePdf } from "@/lib/pdf/FacturePdf";
 import { getDocumentPdfData } from "@/lib/utils/pdf-data";
 import { requirePermission, PERMISSIONS } from "@/lib/auth/permissions";
+import { quoteCsvField } from "@/lib/accounting/spreadsheet";
 
 export const runtime = "nodejs";
 
@@ -44,11 +45,7 @@ const formatExpenseStatus = (status: string | null | undefined) => {
   return labels[status ?? ""] || status || "";
 };
 
-const csvEscape = (value: string | number | null | undefined) => {
-  if (value === null || value === undefined) return "\"\"";
-  const str = String(value);
-  return `"${str.replace(/"/g, "\"\"")}"`;
-};
+const csvEscape = (value: string | number | null | undefined) => quoteCsvField(value);
 
 const buildCsv = (
   headers: string[],
