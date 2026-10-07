@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isUuid } from "@/lib/documents/documentRef";
+import { isTechnicalDocumentId, isUuid } from "@/lib/documents/documentRef";
 import { roundChf } from "./money";
 import type { BridgeAccount, BridgePeriod, ExistingAccrual } from "./transitory";
 
@@ -21,6 +21,16 @@ export type TransitoryFacts = {
 };
 
 const MIGRATION_NOTICE = "L'option Transitoire demande la migration 104. L'encaissement normal reste disponible.";
+
+type LinkedEntry = {
+  id: string;
+  amount: number | null;
+  status: string;
+  event_type: string;
+  period_id: string | null;
+  entry_date: string | null;
+  bridge_receipt_id: string | null;
+};
 
 function emptyFacts(notice: string | null): TransitoryFacts {
   return {
@@ -48,9 +58,12 @@ export async function loadTransitoryFacts(
   admin: Admin,
   input: { clubId: string; documentId: string; categoryCode: string; sourceType?: "invoice" | "membership" },
 ): Promise<TransitoryFacts> {
-  if (!isUuid(input.documentId)) {
+  const documentId = input.documentId.trim();
+  if (!isTechnicalDocumentId(documentId)) {
     throw new Error("Le document doit être ouvert par son identifiant technique, pas par son numéro visible.");
   }
+  // accounting_entries.source_id est un UUID. Un documents.id bigint ne s'y compare pas.
+  const sourceDocumentId = isUuid(documentId) ? documentId : null;
   const [{ data: periodRows, error: periodError }, { data: accountRows, error: accountError }, { data: mapping }] = await Promise.all([
     admin.from("accounting_periods").select("id, label, starts_on, ends_on, status").eq("club_id", input.clubId).order("starts_on"),
     admin.from("accounting_accounts").select("id, number, name, system_code, is_active").eq("club_id", input.clubId).eq("is_active", true),
@@ -80,7 +93,7 @@ export async function loadTransitoryFacts(
     .from("document_receipts")
     .select("id, amount, entry_id, bridge_mode, accrual_entry_id, product_period_id")
     .eq("club_id", input.clubId)
-    .eq("document_id", input.documentId);
+    .eq("document_id", documentId);
   if (receiptError) {
     if (missingBridge(receiptError)) {
       return { ...emptyFacts(MIGRATION_NOTICE), periods, accounts, revenueAccountId: revenue?.id ?? null };
@@ -90,23 +103,26 @@ export async function loadTransitoryFacts(
 
   const receipts = receiptRows ?? [];
   const receiptIds = receipts.map((row) => String(row.id));
-  const sourceQuery = await admin
-    .from("accounting_entries")
-    .select("id, amount, status, event_type, period_id, entry_date, bridge_receipt_id")
-    .eq("club_id", input.clubId)
-    .eq("source_id", input.documentId)
-    .in("event_type", ["accrual_income", "deferred_release"])
-    .eq("status", "validated");
+  let sourceRows: LinkedEntry[] = [];
+  if (sourceDocumentId) {
+    const sourceQuery = await admin
+      .from("accounting_entries")
+      .select("id, amount, status, event_type, period_id, entry_date, bridge_receipt_id")
+      .eq("club_id", input.clubId)
+      .eq("source_id", sourceDocumentId)
+      .in("event_type", ["accrual_income", "deferred_release"])
+      .eq("status", "validated");
 
-  if (sourceQuery.error) {
-    if (missingBridge(sourceQuery.error)) {
-      return { ...emptyFacts(MIGRATION_NOTICE), periods, accounts, revenueAccountId: revenue?.id ?? null };
+    if (sourceQuery.error) {
+      if (missingBridge(sourceQuery.error)) {
+        return { ...emptyFacts(MIGRATION_NOTICE), periods, accounts, revenueAccountId: revenue?.id ?? null };
+      }
+      throw new Error(sourceQuery.error.message);
     }
-    throw new Error(sourceQuery.error.message);
+    sourceRows = (sourceQuery.data ?? []) as LinkedEntry[];
   }
-  const sourceRows = sourceQuery.data ?? [];
 
-  let bridgeRows: typeof sourceRows = [];
+  let bridgeRows: LinkedEntry[] = [];
   if (receiptIds.length > 0) {
     const bridgeQuery = await admin
       .from("accounting_entries")
@@ -121,7 +137,7 @@ export async function loadTransitoryFacts(
       }
       throw new Error(bridgeQuery.error.message);
     }
-    bridgeRows = bridgeQuery.data ?? [];
+    bridgeRows = (bridgeQuery.data ?? []) as LinkedEntry[];
   }
 
   const linked = new Map<string, (typeof sourceRows)[number]>();
@@ -155,17 +171,18 @@ export async function loadTransitoryFacts(
   const openReceivable = roundChf(regularized - settled);
   const linkedCash = new Set(receipts.map((row) => row.entry_id).filter(Boolean).map(String));
   let historical = 0;
-  const historicalQuery = await admin
-    .from("accounting_entries")
-    .select("id, amount")
-    .eq("club_id", input.clubId)
-    .eq("source_type", input.sourceType || "invoice")
-    .eq("source_id", input.documentId)
-    .eq("event_type", "payment_received")
-    .in("status", ["pending", "validated"]);
-  if (historicalQuery.error) {
-    throw new Error(historicalQuery.error.message);
-  } else {
+  if (sourceDocumentId) {
+    const historicalQuery = await admin
+      .from("accounting_entries")
+      .select("id, amount")
+      .eq("club_id", input.clubId)
+      .eq("source_type", input.sourceType || "invoice")
+      .eq("source_id", sourceDocumentId)
+      .eq("event_type", "payment_received")
+      .in("status", ["pending", "validated"]);
+    if (historicalQuery.error) {
+      throw new Error(historicalQuery.error.message);
+    }
     historical = (historicalQuery.data ?? [])
       .filter((row) => !linkedCash.has(String(row.id)))
       .reduce((sum, row) => sum + Number(row.amount || 0), 0);

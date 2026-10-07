@@ -133,13 +133,44 @@ describe("identifiants comptables", () => {
 });
 
 describe("écritures transitoires", () => {
-  it("rejette le numéro visible avant de filtrer source_id", async () => {
+  it("rejette le numéro commercial avant de filtrer source_id", async () => {
     const admin = { from: vi.fn() };
     await expect(loadTransitoryFacts(admin as never, {
       clubId: CLUB,
-      documentId: "143",
-      categoryCode: "memberships",
+      documentId: "COT-2026-007",
+      categoryCode: "membership",
     })).rejects.toThrow(/numéro visible/);
     expect(admin.from).not.toHaveBeenCalled();
+  });
+
+  it("accepte l'identifiant technique 184 sans l'envoyer dans source_id", async () => {
+    const filters: string[] = [];
+    const admin = {
+      from: (table: string) => {
+        const query = {
+          select: () => query,
+          eq: (column: string, value: string) => {
+            filters.push(`${table}.${column}=${value}`);
+            return query;
+          },
+          order: () => query,
+          in: () => query,
+          maybeSingle: async () => ({ data: null, error: null }),
+          then: (resolve: (value: unknown) => unknown) => resolve({ data: [], error: null }),
+        };
+        return query;
+      },
+    };
+
+    const facts = await loadTransitoryFacts(admin as never, {
+      clubId: CLUB,
+      documentId: "184",
+      categoryCode: "membership",
+      sourceType: "membership",
+    });
+
+    expect(facts.ready).toBe(true);
+    expect(filters).toContain("document_receipts.document_id=184");
+    expect(filters.some((filter) => filter.startsWith("accounting_entries.source_id="))).toBe(false);
   });
 });
