@@ -35,6 +35,7 @@ import { sendInvoiceEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
 import { documentDetailFailure, documentIdFromRoute } from "@/lib/documents/detailNavigation";
+import DeleteDocumentDialog from "@/components/documents/DeleteDocumentDialog";
 
 interface Facture {
   id: string;
@@ -64,6 +65,7 @@ interface Facture {
   type?: string;
   eventId?: string | null;
   linkedEvent?: { id: string; name: string } | null;
+  archived?: boolean;
 }
 
 interface CompanySettings {
@@ -102,6 +104,7 @@ export default function FactureDetailPage() {
   const [linkSaving, setLinkSaving] = useState(false);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const loadFacture = useCallback(async () => {
     if (!id) return;
@@ -245,19 +248,8 @@ export default function FactureDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm(t("dashboard.invoices.detail.deleteConfirm"))) return;
-    try {
-      const response = await fetch(`/api/documents?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(t("dashboard.invoices.detail.deleteError"));
-      }
-      router.push("/tableau-de-bord/factures");
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error) || t("dashboard.invoices.detail.deleteErrorFallback"));
-    }
+  const handleDelete = () => {
+    setDeleteOpen(true);
   };
 
   const recipientName =
@@ -424,6 +416,8 @@ export default function FactureDetailPage() {
         }
         actions={
           <>
+            {facture.archived ? null : (
+            <>
             <ActionButton
               type="button"
               onClick={() => setIdentityModalOpen(true)}
@@ -442,6 +436,8 @@ export default function FactureDetailPage() {
               <Mail className="h-4 w-4" />
               {envoiEmail ? t("dashboard.invoices.detail.sending") : t("dashboard.invoices.detail.sendEmail")}
             </ActionButton>
+            </>
+            )}
             <ActionButton
               type="button"
               onClick={() => {
@@ -477,6 +473,7 @@ export default function FactureDetailPage() {
               <Download className="h-4 w-4" />
               {t("dashboard.invoices.detail.downloadPdf")}
             </ActionButton>
+            {facture.archived ? null : (
             <ActionButton
               type="button"
               variant="dangerSoft"
@@ -486,9 +483,16 @@ export default function FactureDetailPage() {
               <Trash className="h-4 w-4" />
               {t("dashboard.common.delete")}
             </ActionButton>
+            )}
           </>
         }
       />
+
+      {facture.archived ? (
+        <GlassCard padding="md" className="border-amber-200/80 bg-amber-50/80 text-sm text-amber-950">
+          Cette facture est archivée. Elle n’est plus modifiable. L’écriture, les paiements et le justificatif restent consultables.
+        </GlassCard>
+      ) : null}
  
       {/* Aperçu */}
       <div className={documentPreviewSurfaceClass}>
@@ -687,6 +691,7 @@ export default function FactureDetailPage() {
                     {facture.linkedEvent.name}
                   </Link>
                 </div>
+                {facture.archived ? null : (
                 <div className="flex flex-wrap gap-2">
                   <ActionButton type="button" onClick={openEventModal} disabled={linkSaving} className="disabled:opacity-50">
                     {t("dashboard.invoices.detail.changeEvent")}
@@ -695,24 +700,29 @@ export default function FactureDetailPage() {
                     {t("dashboard.invoices.detail.unlinkEvent")}
                   </ActionButton>
                 </div>
+                )}
               </div>
             ) : facture.eventId ? (
               <div className="mt-3 space-y-3">
                 <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
                   {t("dashboard.invoices.detail.eventOrphan")}
                 </p>
+                {facture.archived ? null : (
                 <DashboardPrimaryButton type="button" onClick={openEventModal} disabled={linkSaving} icon="none" className="rounded-xl">
                   {t("dashboard.invoices.detail.linkToEvent")}
                 </DashboardPrimaryButton>
+                )}
               </div>
             ) : (
               <div className="mt-3">
                 <p className="mb-3 text-sm text-slate-600">
                   {t("dashboard.invoices.detail.eventNone")}
                 </p>
+                {facture.archived ? null : (
                 <DashboardPrimaryButton type="button" onClick={openEventModal} disabled={linkSaving} icon="none" className="rounded-xl">
                   {t("dashboard.invoices.detail.linkToEvent")}
                 </DashboardPrimaryButton>
+                )}
               </div>
             )}
           </div>
@@ -750,6 +760,7 @@ export default function FactureDetailPage() {
           <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.status")}</label>
           <select
             value={facture.statut}
+            disabled={Boolean(facture.archived)}
             onChange={(e) =>
               handleChangerStatut(
                 e.target.value as "brouillon" | "envoye" | "paye" | "en-retard"
@@ -762,7 +773,7 @@ export default function FactureDetailPage() {
             <option value="paye">{t("dashboard.status.invoice.paid")}</option>
             <option value="en-retard">{t("dashboard.status.invoice.overdue")}</option>
           </select>
-          {facture.statut !== "paye" ? (
+          {!facture.archived && facture.statut !== "paye" ? (
             <button
               type="button"
               className="mt-3 rounded-lg bg-[#0F172A] px-3 py-1.5 text-sm font-semibold text-white"
@@ -779,7 +790,12 @@ export default function FactureDetailPage() {
           </div>
         )}
       </GlassCard>
-      {receiptOpen ? (
+      <DeleteDocumentDialog
+        target={deleteOpen ? { id, numero: facture.numero, kind: "invoice" } : null}
+        onClose={() => setDeleteOpen(false)}
+        onDeleted={() => router.push("/tableau-de-bord/factures")}
+      />
+      {receiptOpen && !facture.archived ? (
         <MarkPaidDialog
           documentId={id}
           onClose={() => setReceiptOpen(false)}

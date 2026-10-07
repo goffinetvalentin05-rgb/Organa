@@ -43,7 +43,7 @@ export default function PaiementsPage() {
   useEffect(() => {
     const loadPayments = async () => {
       try {
-        const res = await fetch("/api/documents", { cache: "no-store" });
+        const res = await fetch("/api/documents?includeArchived=1", { cache: "no-store" });
         if (!res.ok) {
           console.error("[Paiements] Erreur chargement documents:", res.status);
           toast.error(t("dashboard.payments.loadError"));

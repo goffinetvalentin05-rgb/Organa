@@ -31,6 +31,7 @@ import { sendCotisationEmail } from "@/lib/documents/sendDocumentEmail";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import MarkPaidDialog from "@/components/documents/MarkPaidDialog";
 import { documentDetailFailure, documentIdFromRoute } from "@/lib/documents/detailNavigation";
+import DeleteDocumentDialog from "@/components/documents/DeleteDocumentDialog";
 
 interface Devis {
   id: string;
@@ -45,6 +46,7 @@ interface Devis {
   notes?: string | null;
   type?: string;
   paymentMethod?: "qr_invoice" | "stripe" | null;
+  archived?: boolean;
 }
 
 interface CompanySettings {
@@ -77,6 +79,7 @@ export default function DevisDetailPage() {
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [identityModalOpen, setIdentityModalOpen] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -134,19 +137,8 @@ export default function DevisDetailPage() {
     };
   }, [id, t]);
 
-  const handleDelete = async () => {
-    if (!confirm(t("dashboard.quotes.detail.deleteConfirm"))) return;
-    try {
-      const response = await fetch(`/api/documents?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(t("dashboard.quotes.detail.deleteError"));
-      }
-      router.push("/tableau-de-bord/devis");
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error) || t("dashboard.quotes.detail.deleteErrorFallback"));
-    }
+  const handleDelete = () => {
+    setDeleteOpen(true);
   };
 
   const handleChangerStatut = async (nouveauStatut: Devis["statut"]) => {
@@ -301,6 +293,8 @@ export default function DevisDetailPage() {
         }
         actions={
           <>
+            {devis.archived ? null : (
+            <>
             <ActionButton
               type="button"
               onClick={() => setIdentityModalOpen(true)}
@@ -319,6 +313,8 @@ export default function DevisDetailPage() {
               <Mail className="h-4 w-4" />
               {envoiEmail ? t("dashboard.quotes.detail.sending") : t("dashboard.quotes.detail.sendEmail")}
             </ActionButton>
+            </>
+            )}
             <ActionButton
               type="button"
               onClick={() => {
@@ -354,6 +350,7 @@ export default function DevisDetailPage() {
               <Download className="h-4 w-4" />
               {t("dashboard.quotes.detail.downloadPdf")}
             </ActionButton>
+            {devis.archived ? null : (
             <ActionButton
               type="button"
               variant="dangerSoft"
@@ -363,9 +360,16 @@ export default function DevisDetailPage() {
               <Trash className="h-4 w-4" />
               {t("dashboard.common.delete")}
             </ActionButton>
+            )}
           </>
         }
       />
+
+      {devis.archived ? (
+        <GlassCard padding="md" className="border-amber-200/80 bg-amber-50/80 text-sm text-amber-950">
+          Cette cotisation est archivée. Elle n’est plus modifiable. L’écriture, les paiements et le justificatif restent consultables.
+        </GlassCard>
+      ) : null}
 
       <div className={documentPreviewSurfaceClass}>
         <div className="flex items-start justify-between gap-6">
@@ -555,6 +559,7 @@ export default function DevisDetailPage() {
           <label className="mb-2 block text-sm font-medium text-[#E2E8F0]">{t("dashboard.common.status")}</label>
           <select
             value={devis.statut}
+            disabled={Boolean(devis.archived)}
             onChange={(e) =>
               handleChangerStatut(
                 e.target.value as "brouillon" | "envoye" | "accepte" | "refuse"
@@ -567,7 +572,7 @@ export default function DevisDetailPage() {
             <option value="accepte">{t("dashboard.status.quote.accepted")}</option>
             <option value="refuse">{t("dashboard.status.quote.refused")}</option>
           </select>
-          {devis.statut !== "accepte" ? (
+          {!devis.archived && devis.statut !== "accepte" ? (
             <button
               type="button"
               className="mt-3 rounded-lg bg-[#0F172A] px-3 py-1.5 text-sm font-semibold text-white"
@@ -584,7 +589,12 @@ export default function DevisDetailPage() {
           </div>
         )}
       </GlassCard>
-      {receiptOpen ? (
+      <DeleteDocumentDialog
+        target={deleteOpen ? { id, numero: devis.numero, kind: "quote" } : null}
+        onClose={() => setDeleteOpen(false)}
+        onDeleted={() => router.push("/tableau-de-bord/devis")}
+      />
+      {receiptOpen && !devis.archived ? (
         <MarkPaidDialog
           documentId={id}
           onClose={() => setReceiptOpen(false)}

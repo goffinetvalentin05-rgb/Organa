@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import Link from "next/link";
 import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { countReadyInbox, inboxProcessNoticeFromResult } from "@/lib/accounting/engine";
 import { formatChfAmount, formatSwissDate, zurichToday } from "@/lib/accounting/format";
@@ -27,7 +28,7 @@ import {
   type JournalField,
   type JournalVisualRow,
 } from "@/lib/accounting/journalGrid";
-import { sourceLabel } from "@/lib/accounting/sources";
+import { sourceHref, sourceLabel } from "@/lib/accounting/sources";
 import AccountingModal from "./AccountingModal";
 import { STATUS_LABEL, type Account, type Entry, type InboxItem, type JournalLine, type Period } from "./model";
 
@@ -822,7 +823,7 @@ export default function JournalGrid({
                           {last && rows.length > 1 ? <span className="mt-0.5 block text-[11px] font-normal text-[#64748B]">Total {formatChfAmount(total)}</span> : null}
                         </td>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier la remarque"} onClick={() => openEdit(entry, rows, "remark", row.groupIndex)}>{showMeta ? entry.party_name || "" : ""}</CellButton>
-                        <td className="truncate px-2 py-3 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? sourceLabel(entry.source_type) : ""}</td>
+                        <td className="truncate px-2 py-3 text-xs text-[#94A3B8]" title={sourceLabel(entry.source_type)}>{showMeta ? <SourceLink sourceType={entry.source_type} sourceId={entry.source_id} /> : ""}</td>
                         <CellButton locked={Boolean(lock) || !canWrite || !showMeta} title={lock || "Modifier le statut"} onClick={() => openEdit(entry, rows, "status", row.groupIndex)}>{showMeta ? (toReview ? <span className="inline-flex max-w-full truncate rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-950">{STATUS_LABEL.pending}</span> : (STATUS_LABEL[entry.status] || entry.status)) : ""}</CellButton>
                         <td className="px-1 py-1 text-center">
                           {showMeta && canWrite ? (
@@ -1279,3 +1280,14 @@ const primaryBtn = "inline-flex h-10 min-w-[9.5rem] items-center justify-center 
 const quietBtn = "inline-flex h-10 items-center justify-center rounded-lg px-3 text-sm font-medium text-[#475569] transition hover:bg-[#F1F5F9] active:scale-[0.98] disabled:opacity-60";
 const rowAction = "inline-flex h-8 items-center rounded-md px-2 text-xs font-semibold text-[#334155] transition hover:bg-[#F1F5F9] active:scale-[0.97] active:bg-[#E8EEF5] disabled:cursor-not-allowed disabled:opacity-40 data-[busy=true]:opacity-70";
 const rowDanger = "inline-flex h-8 items-center rounded-md px-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50 active:scale-[0.97] active:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40";
+
+function SourceLink({ sourceType, sourceId }: { sourceType: string; sourceId: string | null }) {
+  const label = sourceLabel(sourceType);
+  const href = sourceHref(sourceType, sourceId);
+  if (!href) return <>{label}</>;
+  return (
+    <Link href={href} className="underline decoration-[#CBD5E1] underline-offset-2 hover:text-[#1A23FF]">
+      {label}
+    </Link>
+  );
+}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { calculerTotalTTC, type LigneDocument } from "@/lib/utils/calculations";
 import { getErrorMessage } from "@/lib/utils/error-message";
 import { Eye, Trash, Download, Receipt } from "@/lib/icons";
+import DeleteDocumentDialog from "@/components/documents/DeleteDocumentDialog";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import { localeToIntl } from "@/lib/i18n";
@@ -37,6 +38,7 @@ export default function FacturesPage() {
   const [factures, setFactures] = useState<Facture[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; numero: string } | null>(null);
   const currentYear = new Date().getFullYear();
   const [showAccountingExport, setShowAccountingExport] = useState(false);
   const [accountingYear, setAccountingYear] = useState<string>(String(currentYear));
@@ -68,19 +70,8 @@ export default function FacturesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t("dashboard.invoices.deleteConfirm"))) return;
-    try {
-      const response = await fetch(`/api/documents?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(t("dashboard.invoices.deleteError"));
-      }
-      await loadFactures();
-    } catch (error) {
-      console.error(error);
-    }
+  const handleDelete = (id: string, numero: string) => {
+    setPendingDelete({ id, numero });
   };
 
   const formatMontant = (montant: number) => {
@@ -266,7 +257,7 @@ export default function FacturesPage() {
                       <ActionButton
                         type="button"
                         variant="dangerSoft"
-                        onClick={() => handleDelete(facture.id)}
+                        onClick={() => handleDelete(facture.id, facture.numero)}
                         title={t("dashboard.common.delete")}
                         className="inline-flex p-2"
                       >
@@ -283,6 +274,14 @@ export default function FacturesPage() {
           </p>
         </>
       )}
+      <DeleteDocumentDialog
+        target={pendingDelete ? { ...pendingDelete, kind: "invoice" } : null}
+        onClose={() => setPendingDelete(null)}
+        onDeleted={() => {
+          setPendingDelete(null);
+          void loadFactures();
+        }}
+      />
     </PageLayout>
   );
 }

@@ -40,11 +40,17 @@ export async function GET(
   const id = resolved.id;
   const { data: doc } = await admin
     .from("documents")
-    .select("id, type, status, total_ht, total_tva, total_ttc, date_creation, title, numero, notes, sponsor_contract_id, event_id")
+    .select("id, type, status, total_ht, total_tva, total_ttc, date_creation, title, numero, notes, sponsor_contract_id, event_id, deleted_at")
     .eq("id", id)
     .eq("user_id", guard.clubId)
     .maybeSingle();
   if (!doc) return NextResponse.json({ error: "Document introuvable" }, { status: 404 });
+  if (doc.deleted_at) {
+    return NextResponse.json(
+      { error: "Ce document est archivé. Aucun nouveau paiement ne peut être enregistré." },
+      { status: 409 }
+    );
+  }
 
   const access = await getAccountingAccess(guard.clubId);
   const categoryCode = revenueCategoryForDocument({

@@ -50,6 +50,7 @@ const USER_ERRORS = [
   "Date de réception invalide",
   "Ce document est annulé",
   "Document introuvable",
+  "Ce document est archivé",
   "Catégorie de produit manquante",
   "Encaissement incomplet",
   "Indiquez le montant total",
@@ -99,7 +100,10 @@ export async function recordDocumentReceipt(input: RecordReceiptInput): Promise<
     .eq("id", input.documentId)
     .eq("user_id", input.clubId)
     .maybeSingle();
-  if (docError || !doc || doc.deleted_at) throw new Error("Document introuvable");
+  if (docError || !doc) throw new Error("Document introuvable");
+  if (doc.deleted_at) {
+    throw new Error("Ce document est archivé. Aucun nouveau paiement ne peut être enregistré.");
+  }
   if (doc.status === "refuse" || doc.status === "annule") throw new Error("Ce document est annulé");
 
   const total = roundChf(Number(doc.total_ttc) || 0);

@@ -7,6 +7,7 @@ import { Eye, Trash, FileText } from "@/lib/icons";
 import { useI18n } from "@/components/I18nProvider";
 import DashboardPrimaryButton from "@/components/DashboardPrimaryButton";
 import MembershipPaymentMethodControl from "@/components/quotes/MembershipPaymentMethodControl";
+import DeleteDocumentDialog from "@/components/documents/DeleteDocumentDialog";
 import { localeToIntl } from "@/lib/i18n";
 import {
   PageLayout,
@@ -35,6 +36,7 @@ export default function DevisPage() {
   const [devis, setDevis] = useState<Devis[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; numero: string } | null>(null);
 
   useEffect(() => {
     void loadDevis();
@@ -60,19 +62,8 @@ export default function DevisPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t("dashboard.quotes.deleteConfirm"))) return;
-    try {
-      const response = await fetch(`/api/documents?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(t("dashboard.quotes.deleteError"));
-      }
-      await loadDevis();
-    } catch (error) {
-      console.error(error);
-    }
+  const handleDelete = (id: string, numero: string) => {
+    setPendingDelete({ id, numero });
   };
 
   const formatMontant = (montant: number) => {
@@ -208,7 +199,7 @@ export default function DevisPage() {
                       <ActionButton
                         type="button"
                         variant="dangerSoft"
-                        onClick={() => handleDelete(devisItem.id)}
+                        onClick={() => handleDelete(devisItem.id, devisItem.numero)}
                         title={t("dashboard.common.delete")}
                         className="inline-flex p-2"
                       >
@@ -225,6 +216,14 @@ export default function DevisPage() {
           </p>
         </>
       )}
+      <DeleteDocumentDialog
+        target={pendingDelete ? { ...pendingDelete, kind: "quote" } : null}
+        onClose={() => setPendingDelete(null)}
+        onDeleted={() => {
+          setPendingDelete(null);
+          void loadDevis();
+        }}
+      />
     </PageLayout>
   );
 }

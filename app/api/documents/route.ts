@@ -25,6 +25,7 @@ import {
 import { withIdempotency } from "@/lib/api/idempotency";
 import { allocateDocumentNumero } from "@/lib/documents/allocateNumero";
 import { resolveClubDocumentId } from "@/lib/documents/documentRef";
+import { classifyDocumentRemoval, type DocumentRemoval } from "@/lib/documents/documentDeletion";
 import { resolveMembershipPaymentMethod } from "@/lib/quotes/payment-method";
 import {
   createMembershipPaymentToken,
@@ -103,12 +104,13 @@ type DocumentDbRow = {
   created_at?: string | null;
   updated_at?: string | null;
   payment_method?: string | null;
+  deleted_at?: string | null;
   client?: unknown;
   sponsor?: unknown;
 };
 
 const DOCUMENT_SELECT =
-  `id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, payment_method, client:clients(${CLIENTS_SAFE_COLUMNS}), sponsor:sponsor_contracts(id, sponsor_name, title)`;
+  `id, numero, title, type, status, date_creation, date_echeance, date_paiement, items, total_ht, total_tva, total_ttc, notes, client_id, recipient_type, sponsor_contract_id, recipient_data, external_recipient_name, external_recipient_contact_name, external_recipient_address, external_recipient_zip, external_recipient_city, external_recipient_country, external_recipient_email, external_recipient_phone, event_id, created_by, updated_by, created_at, updated_at, payment_method, deleted_at, client:clients(${CLIENTS_SAFE_COLUMNS}), sponsor:sponsor_contracts(id, sponsor_name, title)`;
 
 type DocumentInsertPayload = Record<string, unknown> & {
   user_id: string;
@@ -194,10 +196,16 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      return NextResponse.json(
-        { document: formatDocument(data, linkedEvent) },
-        { status: 200 }
-      );
+      const document = formatDocument(data, linkedEvent);
+      if (searchParams.get("retention") === "1") {
+        const removal = await inspectDocumentRemoval(admin, guard.clubId, data);
+        return NextResponse.json({ document, removal }, { status: 200 });
+      }
+      return NextResponse.json({ document }, { status: 200 });
+    }
+
+    if (searchParams.get("includeArchived") !== "1") {
+      query = query.is("deleted_at", null);
     }
 
     const { data, error } = await query.order("created_at", {
@@ -786,6 +794,43 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE /api/documents - Supprimer un document
+function isTypeMismatch(error: { code?: string; message?: string } | null): boolean {
+  return error?.code === "22P02" || /invalid input syntax for type/i.test(error?.message ?? "");
+}
+
+async function inspectDocumentRemoval(
+  admin: ReturnType<typeof createAdminClient>,
+  clubId: string,
+  doc: { id: string | number; type?: string | null; status?: string | null; date_paiement?: string | null },
+): Promise<DocumentRemoval> {
+  const documentId = String(doc.id);
+  const source = doc.type === "quote" ? "membership" : "invoice";
+  const receipts = await admin
+    .from("document_receipts")
+    .select("id")
+    .eq("club_id", clubId)
+    .eq("document_id", documentId);
+  if (receipts.error && !isTypeMismatch(receipts.error)) {
+    throw new Error(receipts.error.message);
+  }
+  const entries = await admin
+    .from("accounting_entries")
+    .select("id")
+    .eq("club_id", clubId)
+    .eq("source_type", source)
+    .eq("source_id", documentId);
+  if (entries.error && !isTypeMismatch(entries.error)) {
+    throw new Error(entries.error.message);
+  }
+  return classifyDocumentRemoval({
+    type: doc.type || "invoice",
+    status: doc.status,
+    datePaiement: doc.date_paiement,
+    receiptCount: isTypeMismatch(receipts.error) ? 0 : (receipts.data?.length ?? 0),
+    entryCount: isTypeMismatch(entries.error) ? 0 : (entries.data?.length ?? 0),
+  });
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     // Supprimer un document est plus sensible: exiger delete_documents OU delete_invoices.
@@ -825,13 +870,75 @@ export async function DELETE(request: NextRequest) {
     }
     const documentId = resolvedDelete.id;
 
-    // Récupérer le doc avant delete pour audit
-    const { data: docInfo } = await admin
+    const { data: docInfo, error: docError } = await admin
       .from("documents")
-      .select("numero, type, total_ttc")
+      .select("id, numero, type, status, total_ttc, date_paiement, deleted_at")
       .eq("id", documentId)
       .eq("user_id", guard.clubId)
       .maybeSingle();
+
+    if (docError) {
+      console.error("[API][documents][DELETE] Lecture:", docError);
+      return NextResponse.json(
+        { error: "La suppression n'a pas abouti. Le document est inchangé." },
+        { status: 500 }
+      );
+    }
+    if (!docInfo) {
+      return NextResponse.json({ error: "Document introuvable" }, { status: 404 });
+    }
+
+    if (docInfo.deleted_at) {
+      return NextResponse.json({ success: true, archived: true }, { status: 200 });
+    }
+
+    let removal: DocumentRemoval;
+    try {
+      removal = await inspectDocumentRemoval(admin, guard.clubId, docInfo);
+    } catch (inspectionError: unknown) {
+      console.error("[API][documents][DELETE] Liens:", inspectionError);
+      return NextResponse.json(
+        { error: "La suppression n'a pas abouti. Le document est inchangé." },
+        { status: 500 }
+      );
+    }
+
+    const meta = extractRequestMetadata(request);
+    const resourceType = docInfo.type === "invoice" ? "invoice" : "quote";
+
+    if (removal.action === "archive") {
+      const { error: archiveError } = await admin
+        .from("documents")
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: guard.userId,
+        })
+        .eq("id", documentId)
+        .eq("user_id", guard.clubId);
+      if (archiveError) {
+        console.error("[API][documents][DELETE] Archivage:", archiveError);
+        return NextResponse.json(
+          { error: "La suppression n'a pas abouti. Le document est inchangé." },
+          { status: 500 }
+        );
+      }
+      await logAudit({
+        clubId: guard.clubId,
+        action: AuditAction.SOFT_DELETE,
+        resourceType,
+        resourceId: String(docInfo.id),
+        metadata: {
+          numero: docInfo.numero,
+          total_ttc: docInfo.total_ttc,
+          retention: removal.retention,
+        },
+        ...meta,
+      });
+      revalidatePath("/tableau-de-bord");
+      revalidatePath("/tableau-de-bord/devis");
+      revalidatePath("/tableau-de-bord/factures");
+      return NextResponse.json({ success: true, archived: true }, { status: 200 });
+    }
 
     const { error } = await admin
       .from("documents")
@@ -841,19 +948,46 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       console.error("[API][documents][DELETE] Erreur Supabase:", error);
+      if ((error as { code?: string }).code === "23503") {
+        const { error: archiveError } = await admin
+          .from("documents")
+          .update({
+            deleted_at: new Date().toISOString(),
+            deleted_by: guard.userId,
+          })
+          .eq("id", documentId)
+          .eq("user_id", guard.clubId);
+        if (archiveError) {
+          return NextResponse.json(
+            { error: "La suppression n'a pas abouti. Le document est inchangé." },
+            { status: 500 }
+          );
+        }
+        await logAudit({
+          clubId: guard.clubId,
+          action: AuditAction.SOFT_DELETE,
+          resourceType,
+          resourceId: String(docInfo.id),
+          metadata: { numero: docInfo.numero, total_ttc: docInfo.total_ttc, retention: "payment" },
+          ...meta,
+        });
+        revalidatePath("/tableau-de-bord");
+        revalidatePath("/tableau-de-bord/devis");
+        revalidatePath("/tableau-de-bord/factures");
+        return NextResponse.json({ success: true, archived: true }, { status: 200 });
+      }
       return NextResponse.json(
-        { error: "Erreur lors de la suppression du document" },
+        { error: "La suppression n'a pas abouti. Le document est inchangé." },
         { status: 500 }
       );
     }
 
-    const meta = extractRequestMetadata(request);
     await logAudit({
       clubId: guard.clubId,
       action: AuditAction.HARD_DELETE,
-      resourceType: docInfo?.type === "invoice" ? "invoice" : "quote",
-      resourceId: id,
-      metadata: { numero: docInfo?.numero, total_ttc: docInfo?.total_ttc },
+      resourceType,
+      resourceId: String(docInfo.id),
+      metadata: { numero: docInfo.numero, total_ttc: docInfo.total_ttc },
       ...meta,
     });
 
@@ -929,6 +1063,7 @@ function formatDocument(
       doc.type === "quote"
         ? resolveMembershipPaymentMethod(doc.payment_method)
         : null,
+    archived: Boolean(doc.deleted_at),
     client: (() => {
       if (!client) return null;
       const n = normalizeClientsDbRow(client as Record<string, unknown>);
@@ -1002,7 +1137,7 @@ export async function PATCH(request: NextRequest) {
     // Vérifier que le document appartient au club
     const { data: existingDoc, error: fetchError } = await admin
       .from("documents")
-      .select("id, numero, title, event_id, type, status")
+      .select("id, numero, title, event_id, type, status, deleted_at")
       .eq("id", documentId)
       .eq("user_id", guard.clubId)
       .single();
@@ -1012,6 +1147,13 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(
         { error: "Document introuvable ou non autorisé" },
         { status: 404 }
+      );
+    }
+
+    if (existingDoc.deleted_at) {
+      return NextResponse.json(
+        { error: "Ce document est archivé et ne peut plus être modifié." },
+        { status: 409 }
       );
     }
 
